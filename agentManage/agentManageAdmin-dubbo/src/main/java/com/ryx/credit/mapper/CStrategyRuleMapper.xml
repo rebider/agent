@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.CStrategyRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.CStrategyRule" >
+    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <result column="RULE_ID" property="ruleId" jdbcType="DECIMAL" />
+    <result column="STRATEGY_ID" property="strategyId" jdbcType="DECIMAL" />
+    <result column="UPDATE_TIME" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, RULE_ID, STRATEGY_ID, UPDATE_TIME
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.CStrategyRuleExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from C_STRATEGY_RULE
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.math.BigDecimal" >
+    select 
+    <include refid="Base_Column_List" />
+    from C_STRATEGY_RULE
+    where ID = #{id,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.CStrategyRuleExample" >
+    delete from C_STRATEGY_RULE
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.CStrategyRule" >
+    <selectKey keyProperty="id" resultType="DECIMAL" order="BEFORE">
+      select C_STRATEGY_RULE_SEQUENCE.nextval from dual
+    </selectKey>
+    insert into C_STRATEGY_RULE (ID, RULE_ID, STRATEGY_ID,
+      UPDATE_TIME)
+    values (#{id,jdbcType=DECIMAL}, #{ruleId,jdbcType=DECIMAL}, #{strategyId,jdbcType=DECIMAL}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.CStrategyRule" >
+    insert into C_STRATEGY_RULE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="ruleId != null" >
+        RULE_ID,
+      </if>
+      <if test="strategyId != null" >
+        STRATEGY_ID,
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=DECIMAL},
+      </if>
+      <if test="ruleId != null" >
+        #{ruleId,jdbcType=DECIMAL},
+      </if>
+      <if test="strategyId != null" >
+        #{strategyId,jdbcType=DECIMAL},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.CStrategyRuleExample" resultType="java.lang.Integer" >
+    select count(*) from C_STRATEGY_RULE
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.CStrategyRule" >
+    update C_STRATEGY_RULE
+    <set >
+      <if test="ruleId != null" >
+        RULE_ID = #{ruleId,jdbcType=DECIMAL},
+      </if>
+      <if test="strategyId != null" >
+        STRATEGY_ID = #{strategyId,jdbcType=DECIMAL},
+      </if>
+      <if test="updateTime != null" >
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.CStrategyRule" >
+    update C_STRATEGY_RULE
+    set RULE_ID = #{ruleId,jdbcType=DECIMAL},
+      STRATEGY_ID = #{strategyId,jdbcType=DECIMAL},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=DECIMAL}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

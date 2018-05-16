@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+        ">
+
+
+
+    <bean id="processEngineConfiguration"
+          class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+        <property name="jdbcDriver" value="oracle.jdbc.driver.OracleDriver" />
+        <property name="jdbcUrl" value="jdbc:oracle:thin:@127.0.0.1:1521:wq" />
+        <property name="jdbcUsername" value="bcms" />
+        <property name="jdbcPassword" value="bcms" />
+        <property name="databaseSchemaUpdate" value="true"/>
+    </bean>
+    <!--<bean id="processEngineConfiguration"-->
+          <!--class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">-->
+        <!--<property name="jdbcDriver" value="com.mysql.jdbc.Driver" />-->
+        <!--<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/wq?useUnicode=true&amp;characterEncoding=utf8" />-->
+        <!--<property name="jdbcUsername" value="root" />-->
+        <!--<property name="jdbcPassword" value="111111wq" />-->
+        <!--<property name="databaseSchemaUpdate" value="true"/>-->
+    <!--</bean>-->
+
+</beans>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.CProductTreeMapper">
+
+    <!-- 通用查询结果列-->
+   <sql id="Base_Column_List">
+    PRODUCT_ID, PRODUCT_NAME, PRODUCT_TYPE as productType, PRODUCT_SHORTDESC, PRODUCT_DESC, PARENT_PRODUCT_ID, 
+    PRODUCT_LEVEL as productLevel, REPAY_TYPE as repayType, PAY_TYPE as payType, PERIOD_TYPE as periodType, MIN_PERIOD, MAX_PERIOD, 
+    TERMINATION_AGING, CREDATE_DATE, STATUS as statusType, AGREEMENT_ID, LOAN_TYPE as loanType, PERIOD_LIST, 
+    PERIOD_UNIT, PLAN_TYPE as planType, REPAY_DAY_DIFF, BILL_RULES
+  </sql>
+
+</mapper> 
