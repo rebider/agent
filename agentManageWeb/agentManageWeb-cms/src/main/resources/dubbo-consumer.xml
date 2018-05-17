@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="wap-dubbo-client"/>
+   <!-- 使用zookeeper注册中心暴露服务地址 uat-->
+   <!-- <dubbo:registry protocol="zookeeper" address="172.30.16.56:2181" /> -->
+   <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
+
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
+   <!--  <dubbo:protocol name="dubbo" port="20881"/>
+    <dubbo:protocol name="dubbo" port="20880"/> -->
+    
+    <dubbo:consumer check="false" timeout="1200000" />
+    
+    <dubbo:annotation package="com.ryx.credit.service.*" />
+    <dubbo:reference interface="com.ryx.credit.service.IOrganizationService" id="organizationService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.IResourceService" id="resourceService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.IRoleResourceService" id="roleResourceService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.IRoleService" id="roleService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ISysLogService" id="sysLogService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.IUserRoleService" id="userRoleService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.IUserService" id="userService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICConditionService" id="cConditionService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICConditionValueService" id="cConditionValueService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICRuleConditionService" id="cRuleConditionService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICRulePlatformService" id="cRulePlatformService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICRuleService" id="cRuleService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICStrategyRuleService" id="cStrategyRuleService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ICStrategyService" id="cStrategyService"  timeout="1200000" registry="${zk.group}"/>
+
+
+</beans>
