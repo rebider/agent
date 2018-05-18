@@ -72,6 +72,7 @@
                 /static/** = anon
                 /webhooks = anon
                 /login = anon
+                /activity/** = anon
                 /** = user
             </value>
         </property>

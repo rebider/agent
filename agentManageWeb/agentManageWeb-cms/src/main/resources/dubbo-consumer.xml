@@ -35,6 +35,6 @@
     <dubbo:reference interface="com.ryx.credit.service.ICRuleService" id="cRuleService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:reference interface="com.ryx.credit.service.ICStrategyRuleService" id="cStrategyRuleService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:reference interface="com.ryx.credit.service.ICStrategyService" id="cStrategyService"  timeout="1200000" registry="${zk.group}"/>
-
+    <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}"/>
 
 </beans>
