@@ -1,6 +1,7 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.service.ActivityService;
+import net.sf.json.JSONObject;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
@@ -79,7 +80,7 @@ public class ActivityServiceImpl implements ActivityService {
     public List<Task> findMyPersonTask(String assignee) {
         ProcessEngine processEngine = processEngineConfiguration
                 .buildProcessEngine();
-        List<Task> taskList = processEngine.getTaskService().createTaskQuery().taskAssignee(assignee).list();
+        List<Task> taskList = processEngine.getTaskService().createTaskQuery().taskCandidateOrAssigned(assignee).list();
         for (Task task : taskList) {
             logger.info("待办" + task.getId());
             logger.info("任务名" + task.getName());
@@ -99,15 +100,17 @@ public class ActivityServiceImpl implements ActivityService {
         try {
             ProcessEngine processEngine = processEngineConfiguration
                     .buildProcessEngine();
-            processEngine.getTaskService().complete(taskId, map);
+            TaskService taskService = processEngine.getTaskService();
+            taskService.setVariable(taskId,taskId, JSONObject.fromMap(map).toString());
+            taskService.complete(taskId, map);
             logger.info("完成任务" + taskId);
+            rs.put("rs",true);
+            rs.put("msg","success");
         } catch (Exception e) {
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());
         }
-        rs.put("rs",true);
-        rs.put("msg","success");
         return rs;
     }
 
