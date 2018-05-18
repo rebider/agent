@@ -1,6 +1,7 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.service.ActivityService;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.*;
 import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricProcessInstance;
@@ -12,11 +13,14 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.image.ProcessDiagramGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -201,10 +205,20 @@ public class ActivityServiceImpl implements ActivityService {
                 String activityId = tempActivity.getActivityId();
                 highLightedActivitis.add(activityId);
             }
+            //获取流程图
+            BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstance.getProcessDefinitionId());
+            ProcessDiagramGenerator diagramGenerator = processEngineConfiguration.getProcessDiagramGenerator();
+
+            //中文显示的是口口口，设置字体就好了
+            InputStream imageStream = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivitis,highLightedFlows,"宋体","宋体","宋体",processEngineConfiguration.getClassLoader(),1.0);
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] b = new byte[1024];
+            int len;
+            while ((len = imageStream.read(b, 0, 1024)) != -1) {
+                byteArrayOutputStream.write(b, 0, len);
+            }
             map = new HashMap<>(3);
-            map.put("processInstanceId",processInstanceId);
-            map.put("highLightedActivitis",highLightedActivitis);
-            map.put("highLightedFlows",highLightedFlows);
+            map.put("b",byteArrayOutputStream.toByteArray());
         } catch (Exception e) {
             logger.error("getImage error",e);
         }
