@@ -4,7 +4,6 @@ package com.ryx.credit.dao.agent;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface AgentMapper {
@@ -18,7 +17,7 @@ public interface AgentMapper {
 
     List<Agent> selectByExample(AgentExample example);
 
-    Agent selectByPrimaryKey(BigDecimal id);
+    Agent selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(Agent record);
 

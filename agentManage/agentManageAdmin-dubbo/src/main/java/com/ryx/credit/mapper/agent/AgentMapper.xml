@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ryx.credit.dao.agent.AgentMapper" >
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.Agent" >
-    <id column="ID" property="id" jdbcType="DECIMAL" />
+    <id column="ID" property="id" jdbcType="VARCHAR" />
     <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR" />
     <result column="AG_NAME" property="agName" jdbcType="VARCHAR" />
     <result column="AG_NATURE" property="agNature" jdbcType="DECIMAL" />
@@ -84,11 +84,11 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.math.BigDecimal" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from A_AGENT
-    where ID = #{id,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample" >
     delete from A_AGENT
@@ -107,7 +107,7 @@
       C_INCOM_TIME, C_TIME, C_UTIME, 
       C_INCOM_STATUS, C_USER, AG_ZBH, 
       STATUS, VERSION)
-    values (#{id,jdbcType=DECIMAL}, #{agUniqNum,jdbcType=VARCHAR}, #{agName,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{agUniqNum,jdbcType=VARCHAR}, #{agName,jdbcType=VARCHAR}, 
       #{agNature,jdbcType=DECIMAL}, #{agCapital,jdbcType=DECIMAL}, #{agBusLic,jdbcType=VARCHAR}, 
       #{agBusLicb,jdbcType=TIMESTAMP}, #{agBusLice,jdbcType=TIMESTAMP}, #{agLegal,jdbcType=VARCHAR}, 
       #{agLegalCertype,jdbcType=DECIMAL}, #{agLegalCernum,jdbcType=VARCHAR}, #{agLegalMobile,jdbcType=VARCHAR}, 
@@ -211,7 +211,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
-        #{id,jdbcType=DECIMAL},
+        #{id,jdbcType=VARCHAR},
       </if>
       <if test="agUniqNum != null" >
         #{agUniqNum,jdbcType=VARCHAR},
@@ -393,7 +393,7 @@
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
     </set>
-    where ID = #{id,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
     update A_AGENT
@@ -425,7 +425,7 @@
       AG_ZBH = #{agZbh,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >

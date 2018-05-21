@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Agent {
-    private BigDecimal id;
+    private String id;
 
     private String agUniqNum;
 
@@ -62,12 +62,12 @@ public class Agent {
 
     private BigDecimal version;
 
-    public BigDecimal getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
-        this.id = id;
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
     }
 
     public String getAgUniqNum() {
