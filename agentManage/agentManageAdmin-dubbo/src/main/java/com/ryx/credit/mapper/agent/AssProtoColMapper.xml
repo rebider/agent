@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.agent.AssProtoColMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="PLATFORM" property="platform" jdbcType="VARCHAR" />
+    <result column="PROTOCOL_DES" property="protocolDes" jdbcType="VARCHAR" />
+    <result column="PROTOCOL_RULE" property="protocolRule" jdbcType="VARCHAR" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="C_START" property="cStart" jdbcType="TIMESTAMP" />
+    <result column="C_END" property="cEnd" jdbcType="TIMESTAMP" />
+    <result column="C_SORT" property="cSort" jdbcType="DECIMAL" />
+    <result column="PROTOCOL_STATUS" property="protocolStatus" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, PLATFORM, PROTOCOL_DES, PROTOCOL_RULE, C_TIME, C_START, C_END, C_SORT, PROTOCOL_STATUS
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_ASS_PROTOCOL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from A_ASS_PROTOCOL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColExample" >
+    delete from A_ASS_PROTOCOL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
+    insert into A_ASS_PROTOCOL (ID, PLATFORM, PROTOCOL_DES, 
+      PROTOCOL_RULE, C_TIME, C_START, 
+      C_END, C_SORT, PROTOCOL_STATUS
+      )
+    values (#{id,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{protocolDes,jdbcType=VARCHAR}, 
+      #{protocolRule,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cStart,jdbcType=TIMESTAMP}, 
+      #{cEnd,jdbcType=TIMESTAMP}, #{cSort,jdbcType=DECIMAL}, #{protocolStatus,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
+    insert into A_ASS_PROTOCOL
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="platform != null" >
+        PLATFORM,
+      </if>
+      <if test="protocolDes != null" >
+        PROTOCOL_DES,
+      </if>
+      <if test="protocolRule != null" >
+        PROTOCOL_RULE,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="cStart != null" >
+        C_START,
+      </if>
+      <if test="cEnd != null" >
+        C_END,
+      </if>
+      <if test="cSort != null" >
+        C_SORT,
+      </if>
+      <if test="protocolStatus != null" >
+        PROTOCOL_STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null" >
+        #{platform,jdbcType=VARCHAR},
+      </if>
+      <if test="protocolDes != null" >
+        #{protocolDes,jdbcType=VARCHAR},
+      </if>
+      <if test="protocolRule != null" >
+        #{protocolRule,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cStart != null" >
+        #{cStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cEnd != null" >
+        #{cEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cSort != null" >
+        #{cSort,jdbcType=DECIMAL},
+      </if>
+      <if test="protocolStatus != null" >
+        #{protocolStatus,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColExample" resultType="java.lang.Integer" >
+    select count(*) from A_ASS_PROTOCOL
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
+    update A_ASS_PROTOCOL
+    <set >
+      <if test="platform != null" >
+        PLATFORM = #{platform,jdbcType=VARCHAR},
+      </if>
+      <if test="protocolDes != null" >
+        PROTOCOL_DES = #{protocolDes,jdbcType=VARCHAR},
+      </if>
+      <if test="protocolRule != null" >
+        PROTOCOL_RULE = #{protocolRule,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cStart != null" >
+        C_START = #{cStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cEnd != null" >
+        C_END = #{cEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cSort != null" >
+        C_SORT = #{cSort,jdbcType=DECIMAL},
+      </if>
+      <if test="protocolStatus != null" >
+        PROTOCOL_STATUS = #{protocolStatus,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
+    update A_ASS_PROTOCOL
+    set PLATFORM = #{platform,jdbcType=VARCHAR},
+      PROTOCOL_DES = #{protocolDes,jdbcType=VARCHAR},
+      PROTOCOL_RULE = #{protocolRule,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      C_START = #{cStart,jdbcType=TIMESTAMP},
+      C_END = #{cEnd,jdbcType=TIMESTAMP},
+      C_SORT = #{cSort,jdbcType=DECIMAL},
+      PROTOCOL_STATUS = #{protocolStatus,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

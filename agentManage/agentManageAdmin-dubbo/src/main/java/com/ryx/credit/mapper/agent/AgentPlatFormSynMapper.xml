@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.agent.AgentPlatFormSynMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
+    <result column="BUS_ID" property="busId" jdbcType="VARCHAR" />
+    <result column="PLATFORM_CODE" property="platformCode" jdbcType="VARCHAR" />
+    <result column="SENDJSON" property="sendjson" jdbcType="VARCHAR" />
+    <result column="NOTIFYJSON" property="notifyjson" jdbcType="VARCHAR" />
+    <result column="NOTIFYSTATUS" property="notifystatus" jdbcType="DECIMAL" />
+    <result column="NOTIFYTIME" property="notifytime" jdbcType="TIMESTAMP" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="VERSION" property="version" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, AGENT_ID, BUS_ID, PLATFORM_CODE, SENDJSON, NOTIFYJSON, NOTIFYSTATUS, NOTIFYTIME, 
+    C_TIME, VERSION
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from A_AGENT_PLATFORMSYN
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
+    delete from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    insert into A_AGENT_PLATFORMSYN (ID, AGENT_ID, BUS_ID, 
+      PLATFORM_CODE, SENDJSON, NOTIFYJSON, 
+      NOTIFYSTATUS, NOTIFYTIME, C_TIME, 
+      VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, 
+      #{platformCode,jdbcType=VARCHAR}, #{sendjson,jdbcType=VARCHAR}, #{notifyjson,jdbcType=VARCHAR}, 
+      #{notifystatus,jdbcType=DECIMAL}, #{notifytime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    insert into A_AGENT_PLATFORMSYN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID,
+      </if>
+      <if test="busId != null" >
+        BUS_ID,
+      </if>
+      <if test="platformCode != null" >
+        PLATFORM_CODE,
+      </if>
+      <if test="sendjson != null" >
+        SENDJSON,
+      </if>
+      <if test="notifyjson != null" >
+        NOTIFYJSON,
+      </if>
+      <if test="notifystatus != null" >
+        NOTIFYSTATUS,
+      </if>
+      <if test="notifytime != null" >
+        NOTIFYTIME,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null" >
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="platformCode != null" >
+        #{platformCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sendjson != null" >
+        #{sendjson,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyjson != null" >
+        #{notifyjson,jdbcType=VARCHAR},
+      </if>
+      <if test="notifystatus != null" >
+        #{notifystatus,jdbcType=DECIMAL},
+      </if>
+      <if test="notifytime != null" >
+        #{notifytime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" resultType="java.lang.Integer" >
+    select count(*) from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    update A_AGENT_PLATFORMSYN
+    <set >
+      <if test="agentId != null" >
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null" >
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="platformCode != null" >
+        PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
+      </if>
+      <if test="sendjson != null" >
+        SENDJSON = #{sendjson,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyjson != null" >
+        NOTIFYJSON = #{notifyjson,jdbcType=VARCHAR},
+      </if>
+      <if test="notifystatus != null" >
+        NOTIFYSTATUS = #{notifystatus,jdbcType=DECIMAL},
+      </if>
+      <if test="notifytime != null" >
+        NOTIFYTIME = #{notifytime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null" >
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    update A_AGENT_PLATFORMSYN
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
+      SENDJSON = #{sendjson,jdbcType=VARCHAR},
+      NOTIFYJSON = #{notifyjson,jdbcType=VARCHAR},
+      NOTIFYSTATUS = #{notifystatus,jdbcType=DECIMAL},
+      NOTIFYTIME = #{notifytime,jdbcType=TIMESTAMP},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
