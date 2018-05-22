@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentContract extends AgentContractKey implements Serializable {
+public class AgentContract implements Serializable {
+    private String id;
+
     private String agentId;
 
     private String contNum;
@@ -17,11 +19,25 @@ public class AgentContract extends AgentContractKey implements Serializable {
 
     private String remark;
 
+    private Date cTime;
+
     private String cUser;
 
     private Date cUtime;
 
     private BigDecimal cloReviewStatus;
+
+    private BigDecimal status;
+
+    private BigDecimal version;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
 
     public String getAgentId() {
         return agentId;
@@ -71,6 +87,14 @@ public class AgentContract extends AgentContractKey implements Serializable {
         this.remark = remark == null ? null : remark.trim();
     }
 
+    public Date getcTime() {
+        return cTime;
+    }
+
+    public void setcTime(Date cTime) {
+        this.cTime = cTime;
+    }
+
     public String getcUser() {
         return cUser;
     }
@@ -93,5 +117,21 @@ public class AgentContract extends AgentContractKey implements Serializable {
 
     public void setCloReviewStatus(BigDecimal cloReviewStatus) {
         this.cloReviewStatus = cloReviewStatus;
+    }
+
+    public BigDecimal getStatus() {
+        return status;
+    }
+
+    public void setStatus(BigDecimal status) {
+        this.status = status;
+    }
+
+    public BigDecimal getVersion() {
+        return version;
+    }
+
+    public void setVersion(BigDecimal version) {
+        this.version = version;
     }
 }

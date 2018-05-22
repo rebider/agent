@@ -1,4 +1,4 @@
-package com.ryx.credit.service.impl.agent;
+package com.ryx.credit.service.impl.dict;
 
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.JsonUtil;
@@ -32,7 +32,7 @@ public class RegionServiceImpl implements RegionService {
     private RedisService redisService;
 
 
-    @Autowired
+    @Override
     public List<Tree> selectAllRegion() {
 
         String regionsValue = redisService.getValue(REGIONS_KEY);

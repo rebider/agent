@@ -3,7 +3,6 @@ package com.ryx.credit.dao.agent;
 
 import com.ryx.credit.pojo.admin.agent.AgentContract;
 import com.ryx.credit.pojo.admin.agent.AgentContractExample;
-import com.ryx.credit.pojo.admin.agent.AgentContractKey;
 
 import java.util.List;
 
@@ -18,7 +17,7 @@ public interface AgentContractMapper {
 
     List<AgentContract> selectByExample(AgentContractExample example);
 
-    AgentContract selectByPrimaryKey(AgentContractKey key);
+    AgentContract selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(AgentContract record);
 

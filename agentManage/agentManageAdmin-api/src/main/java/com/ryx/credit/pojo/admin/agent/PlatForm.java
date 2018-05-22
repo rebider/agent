@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class PlatForm implements Serializable {
+public class PlatForm implements Serializable{
+
     private String id;
 
     private String platformNum;

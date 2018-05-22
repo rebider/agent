@@ -208,186 +208,6 @@ public class AgentContractExample {
             return (Criteria) this;
         }
 
-        public Criteria andCTimeIsNull() {
-            addCriterion("C_TIME is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeIsNotNull() {
-            addCriterion("C_TIME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeEqualTo(Date value) {
-            addCriterion("C_TIME =", value, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeNotEqualTo(Date value) {
-            addCriterion("C_TIME <>", value, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeGreaterThan(Date value) {
-            addCriterion("C_TIME >", value, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("C_TIME >=", value, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeLessThan(Date value) {
-            addCriterion("C_TIME <", value, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeLessThanOrEqualTo(Date value) {
-            addCriterion("C_TIME <=", value, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeIn(List<Date> values) {
-            addCriterion("C_TIME in", values, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeNotIn(List<Date> values) {
-            addCriterion("C_TIME not in", values, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeBetween(Date value1, Date value2) {
-            addCriterion("C_TIME between", value1, value2, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andCTimeNotBetween(Date value1, Date value2) {
-            addCriterion("C_TIME not between", value1, value2, "cTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusIsNull() {
-            addCriterion("STATUS is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusIsNotNull() {
-            addCriterion("STATUS is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusEqualTo(BigDecimal value) {
-            addCriterion("STATUS =", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusNotEqualTo(BigDecimal value) {
-            addCriterion("STATUS <>", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusGreaterThan(BigDecimal value) {
-            addCriterion("STATUS >", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("STATUS >=", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusLessThan(BigDecimal value) {
-            addCriterion("STATUS <", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("STATUS <=", value, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusIn(List<BigDecimal> values) {
-            addCriterion("STATUS in", values, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusNotIn(List<BigDecimal> values) {
-            addCriterion("STATUS not in", values, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("STATUS between", value1, value2, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andStatusNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("STATUS not between", value1, value2, "status");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionIsNull() {
-            addCriterion("VERSION is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionIsNotNull() {
-            addCriterion("VERSION is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionEqualTo(BigDecimal value) {
-            addCriterion("VERSION =", value, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionNotEqualTo(BigDecimal value) {
-            addCriterion("VERSION <>", value, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionGreaterThan(BigDecimal value) {
-            addCriterion("VERSION >", value, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("VERSION >=", value, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionLessThan(BigDecimal value) {
-            addCriterion("VERSION <", value, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("VERSION <=", value, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionIn(List<BigDecimal> values) {
-            addCriterion("VERSION in", values, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionNotIn(List<BigDecimal> values) {
-            addCriterion("VERSION not in", values, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("VERSION between", value1, value2, "version");
-            return (Criteria) this;
-        }
-
-        public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("VERSION not between", value1, value2, "version");
-            return (Criteria) this;
-        }
-
         public Criteria andAgentIdIsNull() {
             addCriterion("AGENT_ID is null");
             return (Criteria) this;
@@ -778,6 +598,66 @@ public class AgentContractExample {
             return (Criteria) this;
         }
 
+        public Criteria andCTimeIsNull() {
+            addCriterion("C_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIsNotNull() {
+            addCriterion("C_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeEqualTo(Date value) {
+            addCriterion("C_TIME =", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotEqualTo(Date value) {
+            addCriterion("C_TIME <>", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeGreaterThan(Date value) {
+            addCriterion("C_TIME >", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("C_TIME >=", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeLessThan(Date value) {
+            addCriterion("C_TIME <", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeLessThanOrEqualTo(Date value) {
+            addCriterion("C_TIME <=", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIn(List<Date> values) {
+            addCriterion("C_TIME in", values, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotIn(List<Date> values) {
+            addCriterion("C_TIME not in", values, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeBetween(Date value1, Date value2) {
+            addCriterion("C_TIME between", value1, value2, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotBetween(Date value1, Date value2) {
+            addCriterion("C_TIME not between", value1, value2, "cTime");
+            return (Criteria) this;
+        }
+
         public Criteria andCUserIsNull() {
             addCriterion("C_USER is null");
             return (Criteria) this;
@@ -965,6 +845,126 @@ public class AgentContractExample {
 
         public Criteria andCloReviewStatusNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("CLO_REVIEW_STATUS not between", value1, value2, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusIsNull() {
+            addCriterion("STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusIsNotNull() {
+            addCriterion("STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusEqualTo(BigDecimal value) {
+            addCriterion("STATUS =", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotEqualTo(BigDecimal value) {
+            addCriterion("STATUS <>", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusGreaterThan(BigDecimal value) {
+            addCriterion("STATUS >", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STATUS >=", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusLessThan(BigDecimal value) {
+            addCriterion("STATUS <", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STATUS <=", value, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusIn(List<BigDecimal> values) {
+            addCriterion("STATUS in", values, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotIn(List<BigDecimal> values) {
+            addCriterion("STATUS not in", values, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STATUS between", value1, value2, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STATUS not between", value1, value2, "status");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionIsNull() {
+            addCriterion("VERSION is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionIsNotNull() {
+            addCriterion("VERSION is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionEqualTo(BigDecimal value) {
+            addCriterion("VERSION =", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionNotEqualTo(BigDecimal value) {
+            addCriterion("VERSION <>", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionGreaterThan(BigDecimal value) {
+            addCriterion("VERSION >", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("VERSION >=", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionLessThan(BigDecimal value) {
+            addCriterion("VERSION <", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("VERSION <=", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionIn(List<BigDecimal> values) {
+            addCriterion("VERSION in", values, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionNotIn(List<BigDecimal> values) {
+            addCriterion("VERSION not in", values, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("VERSION between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
     }

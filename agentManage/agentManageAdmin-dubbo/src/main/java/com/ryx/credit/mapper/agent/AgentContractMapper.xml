@@ -3,18 +3,18 @@
 <mapper namespace="com.ryx.credit.dao.agent.AgentContractMapper" >
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentContract" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
-    <id column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
-    <id column="STATUS" property="status" jdbcType="DECIMAL" />
-    <id column="VERSION" property="version" jdbcType="DECIMAL" />
     <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
     <result column="CONT_NUM" property="contNum" jdbcType="VARCHAR" />
     <result column="CONT_TYPE" property="contType" jdbcType="DECIMAL" />
     <result column="CONT_DATE" property="contDate" jdbcType="TIMESTAMP" />
     <result column="CONT_END_DATE" property="contEndDate" jdbcType="TIMESTAMP" />
     <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
     <result column="CLO_REVIEW_STATUS" property="cloReviewStatus" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="VERSION" property="version" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -46,8 +46,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, C_TIME, STATUS, VERSION, AGENT_ID, CONT_NUM, CONT_TYPE, CONT_DATE, CONT_END_DATE, 
-    REMARK, C_USER, C_UTIME, CLO_REVIEW_STATUS
+    ID, AGENT_ID, CONT_NUM, CONT_TYPE, CONT_DATE, CONT_END_DATE, REMARK, C_TIME, C_USER, 
+    C_UTIME, CLO_REVIEW_STATUS, STATUS, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" >
     <include refid="OracleDialectPrefix" />
@@ -65,14 +65,11 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractKey" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from A_AGENT_CONTRACT
     where ID = #{id,jdbcType=VARCHAR}
-      and C_TIME = #{cTime,jdbcType=TIMESTAMP}
-      and STATUS = #{status,jdbcType=DECIMAL}
-      and VERSION = #{version,jdbcType=DECIMAL}
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentContractExample" >
     delete from A_AGENT_CONTRACT
@@ -81,31 +78,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
-    insert into A_AGENT_CONTRACT (ID, C_TIME, STATUS, 
-      VERSION, AGENT_ID, CONT_NUM, 
+    insert into A_AGENT_CONTRACT (ID, AGENT_ID, CONT_NUM, 
       CONT_TYPE, CONT_DATE, CONT_END_DATE, 
-      REMARK, C_USER, C_UTIME, 
-      CLO_REVIEW_STATUS)
-    values (#{id,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, #{contNum,jdbcType=VARCHAR}, 
+      REMARK, C_TIME, C_USER, 
+      C_UTIME, CLO_REVIEW_STATUS, STATUS, 
+      VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{contNum,jdbcType=VARCHAR}, 
       #{contType,jdbcType=DECIMAL}, #{contDate,jdbcType=TIMESTAMP}, #{contEndDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cUtime,jdbcType=TIMESTAMP}, 
-      #{cloReviewStatus,jdbcType=DECIMAL})
+      #{remark,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
+      #{cUtime,jdbcType=TIMESTAMP}, #{cloReviewStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
+      #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
     insert into A_AGENT_CONTRACT
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         ID,
-      </if>
-      <if test="cTime != null" >
-        C_TIME,
-      </if>
-      <if test="status != null" >
-        STATUS,
-      </if>
-      <if test="version != null" >
-        VERSION,
       </if>
       <if test="agentId != null" >
         AGENT_ID,
@@ -125,6 +113,9 @@
       <if test="remark != null" >
         REMARK,
       </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
       <if test="cUser != null" >
         C_USER,
       </if>
@@ -134,19 +125,16 @@
       <if test="cloReviewStatus != null" >
         CLO_REVIEW_STATUS,
       </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="cTime != null" >
-        #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="status != null" >
-        #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null" >
-        #{version,jdbcType=DECIMAL},
       </if>
       <if test="agentId != null" >
         #{agentId,jdbcType=VARCHAR},
@@ -166,6 +154,9 @@
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
       </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
       <if test="cUser != null" >
         #{cUser,jdbcType=VARCHAR},
       </if>
@@ -174,6 +165,12 @@
       </if>
       <if test="cloReviewStatus != null" >
         #{cloReviewStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -204,6 +201,9 @@
       <if test="remark != null" >
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
       <if test="cUser != null" >
         C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
@@ -213,11 +213,14 @@
       <if test="cloReviewStatus != null" >
         CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
-      and C_TIME = #{cTime,jdbcType=TIMESTAMP}
-      and STATUS = #{status,jdbcType=DECIMAL}
-      and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentContract" >
     update A_AGENT_CONTRACT
@@ -227,13 +230,13 @@
       CONT_DATE = #{contDate,jdbcType=TIMESTAMP},
       CONT_END_DATE = #{contEndDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
       C_USER = #{cUser,jdbcType=VARCHAR},
       C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL}
+      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
-      and C_TIME = #{cTime,jdbcType=TIMESTAMP}
-      and STATUS = #{status,jdbcType=DECIMAL}
-      and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >
