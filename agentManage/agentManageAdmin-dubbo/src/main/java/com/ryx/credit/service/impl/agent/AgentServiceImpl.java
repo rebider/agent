@@ -16,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +42,14 @@ public class AgentServiceImpl implements AgentService{
     private IdService idService;
 
 
+    /**
+     * 代理商新曾
+     * @param agent
+     * @param attrId
+     * @return
+     * @throws ProcessException
+     */
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public Agent insertAgent(Agent agent, List<String> attrId) throws ProcessException {
         if(agent==null){
