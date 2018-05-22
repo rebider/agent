@@ -3,6 +3,7 @@ package com.ryx.credit.commons.result;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ public class Tree implements java.io.Serializable {
     private List<Tree> children; // null不输出
     private String iconCls;
     private Long pid;
+    private BigDecimal tType;
     /**
      * ajax,iframe,
      */
@@ -103,4 +105,11 @@ public class Tree implements java.io.Serializable {
         this.openMode = openMode;
     }
 
+    public BigDecimal gettType() {
+        return tType;
+    }
+
+    public void settType(BigDecimal tType) {
+        this.tType = tType;
+    }
 }
