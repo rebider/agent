@@ -175,4 +175,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="sqlId" parameterType="string" resultType="long">select ${tableName}_seqid.nextval from dual</select>
+
 </mapper>
