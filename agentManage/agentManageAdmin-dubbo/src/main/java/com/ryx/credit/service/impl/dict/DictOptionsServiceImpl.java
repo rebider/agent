@@ -1,6 +1,6 @@
 package com.ryx.credit.service.impl.dict;
 
-import com.ryx.credit.common.enumc.STATUS;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.dao.agent.DictMapper;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.agent.DictExample;
@@ -24,7 +24,7 @@ public class DictOptionsServiceImpl implements DictOptionsService {
     @Override
     public List<Dict> dictList(String group, String artifact) {
         DictExample example  = new DictExample();
-        example.or().andDGroupEqualTo(group).andDArtifactEqualTo(artifact).andDStatusEqualTo(STATUS.STATUS_1.status);
+        example.or().andDGroupEqualTo(group).andDArtifactEqualTo(artifact).andDStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" D_sort desc");
         return  dictMapper.selectByExample(example);
     }
