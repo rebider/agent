@@ -38,6 +38,12 @@
             <artifactId>groovy-all</artifactId>
             <version>2.4.3</version>
         </dependency>
+        <!-- 单元测试包 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>agentManageActivity-dubbo</finalName>
