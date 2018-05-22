@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 public enum DictGroup {
 
 
-    AGENT("代理商"),CAPITAL_TYPE("交款类型"),CONTRACT_TYPE("合同类型");
+    AGENT("代理商模块"),CAPITAL_TYPE("交款类型"),CONTRACT_TYPE("合同类型");
 
 
     public String  msg;
