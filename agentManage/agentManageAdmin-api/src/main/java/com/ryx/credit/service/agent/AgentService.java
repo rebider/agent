@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.pojo.admin.agent.Agent;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface AgentService {
      * @param attrId
      * @return
      */
-    public Agent insertAgent(Agent agent,List<String> attrId);
+    public Agent insertAgent(Agent agent,List<String> attrId)throws ProcessException;
 
 
     /**

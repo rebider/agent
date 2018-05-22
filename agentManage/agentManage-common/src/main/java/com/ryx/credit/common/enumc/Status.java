@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  */
 public enum Status {
 
-    STATUS_0(0),STATUS_1(1);
+    STATUS_0(0),STATUS_1(1),STATUS_2(2);
 
     public BigDecimal status;
 
