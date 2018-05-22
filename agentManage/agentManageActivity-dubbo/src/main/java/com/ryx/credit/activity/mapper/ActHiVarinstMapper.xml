@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.activity.dao.ActHiVarinstMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.activity.entity.ActHiVarinst" >
+    <id column="ID_" property="id" jdbcType="OTHER" />
+    <result column="PROC_INST_ID_" property="procInstId" jdbcType="OTHER" />
+    <result column="EXECUTION_ID_" property="executionId" jdbcType="OTHER" />
+    <result column="TASK_ID_" property="taskId" jdbcType="OTHER" />
+    <result column="NAME_" property="name" jdbcType="OTHER" />
+    <result column="VAR_TYPE_" property="varType" jdbcType="OTHER" />
+    <result column="REV_" property="rev" jdbcType="DECIMAL" />
+    <result column="BYTEARRAY_ID_" property="bytearrayId" jdbcType="OTHER" />
+    <result column="DOUBLE_" property="double" jdbcType="DECIMAL" />
+    <result column="LONG_" property="long" jdbcType="DECIMAL" />
+    <result column="TEXT_" property="text" jdbcType="OTHER" />
+    <result column="TEXT2_" property="text2" jdbcType="OTHER" />
+    <result column="CREATE_TIME_" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="LAST_UPDATED_TIME_" property="lastUpdatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, VAR_TYPE_, REV_, BYTEARRAY_ID_, 
+    DOUBLE_, LONG_, TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.activity.entity.ActHiVarinstExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ACT_HI_VARINST
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Object" >
+    select 
+    <include refid="Base_Column_List" />
+    from ACT_HI_VARINST
+    where ID_ = #{id,jdbcType=OTHER}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.activity.entity.ActHiVarinstExample" >
+    delete from ACT_HI_VARINST
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.activity.entity.ActHiVarinst" >
+    insert into ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, 
+      TASK_ID_, NAME_, VAR_TYPE_, REV_, 
+      BYTEARRAY_ID_, DOUBLE_, LONG_, 
+      TEXT_, TEXT2_, CREATE_TIME_, 
+      LAST_UPDATED_TIME_)
+    values (#{id,jdbcType=OTHER}, #{procInstId,jdbcType=OTHER}, #{executionId,jdbcType=OTHER}, 
+      #{taskId,jdbcType=OTHER}, #{name,jdbcType=OTHER}, #{varType,jdbcType=OTHER}, #{rev,jdbcType=DECIMAL}, 
+      #{bytearrayId,jdbcType=OTHER}, #{double,jdbcType=DECIMAL}, #{long,jdbcType=DECIMAL}, 
+      #{text,jdbcType=OTHER}, #{text2,jdbcType=OTHER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastUpdatedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.activity.entity.ActHiVarinst" >
+    insert into ACT_HI_VARINST
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID_,
+      </if>
+      <if test="procInstId != null" >
+        PROC_INST_ID_,
+      </if>
+      <if test="executionId != null" >
+        EXECUTION_ID_,
+      </if>
+      <if test="taskId != null" >
+        TASK_ID_,
+      </if>
+      <if test="name != null" >
+        NAME_,
+      </if>
+      <if test="varType != null" >
+        VAR_TYPE_,
+      </if>
+      <if test="rev != null" >
+        REV_,
+      </if>
+      <if test="bytearrayId != null" >
+        BYTEARRAY_ID_,
+      </if>
+      <if test="double != null" >
+        DOUBLE_,
+      </if>
+      <if test="long != null" >
+        LONG_,
+      </if>
+      <if test="text != null" >
+        TEXT_,
+      </if>
+      <if test="text2 != null" >
+        TEXT2_,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME_,
+      </if>
+      <if test="lastUpdatedTime != null" >
+        LAST_UPDATED_TIME_,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=OTHER},
+      </if>
+      <if test="procInstId != null" >
+        #{procInstId,jdbcType=OTHER},
+      </if>
+      <if test="executionId != null" >
+        #{executionId,jdbcType=OTHER},
+      </if>
+      <if test="taskId != null" >
+        #{taskId,jdbcType=OTHER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=OTHER},
+      </if>
+      <if test="varType != null" >
+        #{varType,jdbcType=OTHER},
+      </if>
+      <if test="rev != null" >
+        #{rev,jdbcType=DECIMAL},
+      </if>
+      <if test="bytearrayId != null" >
+        #{bytearrayId,jdbcType=OTHER},
+      </if>
+      <if test="double != null" >
+        #{double,jdbcType=DECIMAL},
+      </if>
+      <if test="long != null" >
+        #{long,jdbcType=DECIMAL},
+      </if>
+      <if test="text != null" >
+        #{text,jdbcType=OTHER},
+      </if>
+      <if test="text2 != null" >
+        #{text2,jdbcType=OTHER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdatedTime != null" >
+        #{lastUpdatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.ActHiVarinstExample" resultType="java.lang.Integer" >
+    select count(*) from ACT_HI_VARINST
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.activity.entity.ActHiVarinst" >
+    update ACT_HI_VARINST
+    <set >
+      <if test="procInstId != null" >
+        PROC_INST_ID_ = #{procInstId,jdbcType=OTHER},
+      </if>
+      <if test="executionId != null" >
+        EXECUTION_ID_ = #{executionId,jdbcType=OTHER},
+      </if>
+      <if test="taskId != null" >
+        TASK_ID_ = #{taskId,jdbcType=OTHER},
+      </if>
+      <if test="name != null" >
+        NAME_ = #{name,jdbcType=OTHER},
+      </if>
+      <if test="varType != null" >
+        VAR_TYPE_ = #{varType,jdbcType=OTHER},
+      </if>
+      <if test="rev != null" >
+        REV_ = #{rev,jdbcType=DECIMAL},
+      </if>
+      <if test="bytearrayId != null" >
+        BYTEARRAY_ID_ = #{bytearrayId,jdbcType=OTHER},
+      </if>
+      <if test="double != null" >
+        DOUBLE_ = #{double,jdbcType=DECIMAL},
+      </if>
+      <if test="long != null" >
+        LONG_ = #{long,jdbcType=DECIMAL},
+      </if>
+      <if test="text != null" >
+        TEXT_ = #{text,jdbcType=OTHER},
+      </if>
+      <if test="text2 != null" >
+        TEXT2_ = #{text2,jdbcType=OTHER},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME_ = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUpdatedTime != null" >
+        LAST_UPDATED_TIME_ = #{lastUpdatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID_ = #{id,jdbcType=OTHER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.activity.entity.ActHiVarinst" >
+    update ACT_HI_VARINST
+    set PROC_INST_ID_ = #{procInstId,jdbcType=OTHER},
+      EXECUTION_ID_ = #{executionId,jdbcType=OTHER},
+      TASK_ID_ = #{taskId,jdbcType=OTHER},
+      NAME_ = #{name,jdbcType=OTHER},
+      VAR_TYPE_ = #{varType,jdbcType=OTHER},
+      REV_ = #{rev,jdbcType=DECIMAL},
+      BYTEARRAY_ID_ = #{bytearrayId,jdbcType=OTHER},
+      DOUBLE_ = #{double,jdbcType=DECIMAL},
+      LONG_ = #{long,jdbcType=DECIMAL},
+      TEXT_ = #{text,jdbcType=OTHER},
+      TEXT2_ = #{text2,jdbcType=OTHER},
+      CREATE_TIME_ = #{createTime,jdbcType=TIMESTAMP},
+      LAST_UPDATED_TIME_ = #{lastUpdatedTime,jdbcType=TIMESTAMP}
+    where ID_ = #{id,jdbcType=OTHER}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

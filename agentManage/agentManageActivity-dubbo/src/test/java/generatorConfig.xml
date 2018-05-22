@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<context id="generator" targetRuntime="MyBatis3">
+        <!-- 分页插件类 -->
+        <plugin type="${generator.pagePlugin}"></plugin>
+		<commentGenerator>
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+		
+		<!-- 数据库链接URL、用户名、密码 -->
+        <jdbcConnection driverClass="${generator.driverClass}"
+            connectionURL="${generator.connectionURL}" userId="${generator.username}"
+            password="${generator.password}" />
+            
+		<javaTypeResolver>
+			<property name="forceLongs" value="false" />
+		</javaTypeResolver>
+		<!-- 生成模型的包名和位置 -->
+		<javaModelGenerator targetPackage="com.ryx.credit.activity.entity"
+			targetProject="src\main\java">
+			<property name="enableSubPackages" value="true" />
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+		<!-- 生成的映射文件包名和位置 -->
+		<sqlMapGenerator targetPackage="com.ryx.credit.activity.mapper"
+			targetProject="src\main\java">
+			<property name="enableSubPackages" value="true" />
+		</sqlMapGenerator>
+		 <!--生成DAO的包名和位置-->
+		<javaClientGenerator type="XMLMAPPER"
+			targetPackage="com.ryx.credit.activity.dao" targetProject="src\main\java">
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
+		<!--<table tableName="c_apy_card" domainObjectName="CapyCard" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="ACT_RU_TASK" domainObjectName="ActRuTask" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+	</context>
+</generatorConfiguration>

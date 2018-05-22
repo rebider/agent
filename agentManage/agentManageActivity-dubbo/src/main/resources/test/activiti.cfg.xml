@@ -16,9 +16,9 @@
     <bean id="processEngineConfiguration"
           class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
         <property name="jdbcDriver" value="oracle.jdbc.driver.OracleDriver" />
-        <property name="jdbcUrl" value="jdbc:oracle:thin:@127.0.0.1:1521:wq" />
-        <property name="jdbcUsername" value="bcms" />
-        <property name="jdbcPassword" value="bcms" />
+        <property name="jdbcUrl" value="jdbc:oracle:thin:@12.3.10.15:1521/dlsdb" />
+        <property name="jdbcUsername" value="dls" />
+        <property name="jdbcPassword" value="passdls" />
         <property name="databaseSchemaUpdate" value="true"/>
     </bean>
     <!--<bean id="processEngineConfiguration"-->
