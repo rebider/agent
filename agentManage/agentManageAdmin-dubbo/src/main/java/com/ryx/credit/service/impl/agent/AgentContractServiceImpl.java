@@ -118,4 +118,10 @@ public class AgentContractServiceImpl implements AgentContractService {
         logger.info("代理商合同添加:{}","添加代理商合同失败");
         throw new ProcessException("添加代理商合同失败");
     }
+
+
+    @Override
+    public int removeAgentContract(String id) {
+        return 0;
+    }
 }
