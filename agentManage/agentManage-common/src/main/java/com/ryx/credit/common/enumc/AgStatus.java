@@ -8,11 +8,14 @@ import java.math.BigDecimal;
  */
 public enum AgStatus {
 
-    Create("新建"),Approving("审批中"),Approved("审批通过"),Refuse("审批拒绝");
+    Create(1,"新建"),Approving(2,"审批中"),Approved(3,"审批通过"),Refuse(4,"审批拒绝");
+
+    public BigDecimal status;
 
     public String  msg;
 
-    AgStatus(String s){
+    AgStatus(int status,String s){
+        this.status = new BigDecimal(status);
         msg = s;
     }
 }

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 代理商基础信息管理服务类
  * Created by cx on 2018/5/22.
  */
 @Service
@@ -91,6 +92,7 @@ public class AgentServiceImpl implements AgentService{
                     throw new ProcessException("添加代理商附件关系失败");
                 }
             }
+            logger.info("代理商添加:成功");
             return agent;
         }
         logger.info("代理商添加:{}","添加代理商失败");

@@ -24,7 +24,9 @@ public class DictOptionsServiceImpl implements DictOptionsService {
     @Override
     public List<Dict> dictList(String group, String artifact) {
         DictExample example  = new DictExample();
-        example.or().andDGroupEqualTo(group).andDArtifactEqualTo(artifact).andDStatusEqualTo(Status.STATUS_1.status);
+        example.or().andDGroupEqualTo(group)
+                .andDArtifactEqualTo(artifact)
+                .andDStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" D_sort desc");
         return  dictMapper.selectByExample(example);
     }
