@@ -11,5 +11,7 @@ public interface IdService {
 
     public String genId(TabId tablename);
 
+    public String genIdInTran(TabId tablename);
+
 
 }

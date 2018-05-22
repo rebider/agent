@@ -7,6 +7,9 @@ import com.ryx.credit.dao.agent.DictMapper;
 import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
@@ -34,8 +37,10 @@ public class IdServiceImpl implements IdService {
     }
 
 
-
-
-
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public String genIdInTran(TabId tablename) {
+        long id  = dictMapper.sqlId(tablename.name());
+        return String.format(tablename.patt,DateUtil.getDateToString(new Date()),id);
+    }
 }
