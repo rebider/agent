@@ -4,6 +4,35 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ActIdUser implements Serializable{
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ActIdUser)) return false;
+
+        ActIdUser actIdUser = (ActIdUser) o;
+
+        if (getId() != null ? !getId().equals(actIdUser.getId()) : actIdUser.getId() != null) return false;
+        if (getRev() != null ? !getRev().equals(actIdUser.getRev()) : actIdUser.getRev() != null) return false;
+        if (getFirst() != null ? !getFirst().equals(actIdUser.getFirst()) : actIdUser.getFirst() != null) return false;
+        if (getLast() != null ? !getLast().equals(actIdUser.getLast()) : actIdUser.getLast() != null) return false;
+        if (getEmail() != null ? !getEmail().equals(actIdUser.getEmail()) : actIdUser.getEmail() != null) return false;
+        if (getPwd() != null ? !getPwd().equals(actIdUser.getPwd()) : actIdUser.getPwd() != null) return false;
+        return !(getPictureId() != null ? !getPictureId().equals(actIdUser.getPictureId()) : actIdUser.getPictureId() != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId() != null ? getId().hashCode() : 0;
+        result = 31 * result + (getRev() != null ? getRev().hashCode() : 0);
+        result = 31 * result + (getFirst() != null ? getFirst().hashCode() : 0);
+        result = 31 * result + (getLast() != null ? getLast().hashCode() : 0);
+        result = 31 * result + (getEmail() != null ? getEmail().hashCode() : 0);
+        result = 31 * result + (getPwd() != null ? getPwd().hashCode() : 0);
+        result = 31 * result + (getPictureId() != null ? getPictureId().hashCode() : 0);
+        return result;
+    }
+
     private Object id;
 
     private BigDecimal rev;
