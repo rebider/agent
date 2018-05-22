@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.activity.dao.ActRuTaskMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.activity.entity.ActRuTask" >
+    <id column="ID_" property="id" jdbcType="OTHER" />
+    <result column="REV_" property="rev" jdbcType="DECIMAL" />
+    <result column="EXECUTION_ID_" property="executionId" jdbcType="OTHER" />
+    <result column="PROC_INST_ID_" property="procInstId" jdbcType="OTHER" />
+    <result column="PROC_DEF_ID_" property="procDefId" jdbcType="OTHER" />
+    <result column="NAME_" property="name" jdbcType="OTHER" />
+    <result column="PARENT_TASK_ID_" property="parentTaskId" jdbcType="OTHER" />
+    <result column="DESCRIPTION_" property="description" jdbcType="OTHER" />
+    <result column="TASK_DEF_KEY_" property="taskDefKey" jdbcType="OTHER" />
+    <result column="OWNER_" property="owner" jdbcType="OTHER" />
+    <result column="ASSIGNEE_" property="assignee" jdbcType="OTHER" />
+    <result column="DELEGATION_" property="delegation" jdbcType="OTHER" />
+    <result column="PRIORITY_" property="priority" jdbcType="DECIMAL" />
+    <result column="CREATE_TIME_" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="DUE_DATE_" property="dueDate" jdbcType="TIMESTAMP" />
+    <result column="CATEGORY_" property="category" jdbcType="OTHER" />
+    <result column="SUSPENSION_STATE_" property="suspensionState" jdbcType="DECIMAL" />
+    <result column="TENANT_ID_" property="tenantId" jdbcType="OTHER" />
+    <result column="FORM_KEY_" property="formKey" jdbcType="OTHER" />
+    <result column="CLAIM_TIME_" property="claimTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID_, REV_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, 
+    TASK_DEF_KEY_, OWNER_, ASSIGNEE_, DELEGATION_, PRIORITY_, CREATE_TIME_, DUE_DATE_, 
+    CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.activity.entity.ActRuTaskExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ACT_RU_TASK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Object" >
+    select 
+    <include refid="Base_Column_List" />
+    from ACT_RU_TASK
+    where ID_ = #{id,jdbcType=OTHER}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.activity.entity.ActRuTaskExample" >
+    delete from ACT_RU_TASK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.activity.entity.ActRuTask" >
+    insert into ACT_RU_TASK (ID_, REV_, EXECUTION_ID_, 
+      PROC_INST_ID_, PROC_DEF_ID_, NAME_, 
+      PARENT_TASK_ID_, DESCRIPTION_, TASK_DEF_KEY_, 
+      OWNER_, ASSIGNEE_, DELEGATION_, 
+      PRIORITY_, CREATE_TIME_, DUE_DATE_, 
+      CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, 
+      FORM_KEY_, CLAIM_TIME_)
+    values (#{id,jdbcType=OTHER}, #{rev,jdbcType=DECIMAL}, #{executionId,jdbcType=OTHER}, 
+      #{procInstId,jdbcType=OTHER}, #{procDefId,jdbcType=OTHER}, #{name,jdbcType=OTHER}, 
+      #{parentTaskId,jdbcType=OTHER}, #{description,jdbcType=OTHER}, #{taskDefKey,jdbcType=OTHER}, 
+      #{owner,jdbcType=OTHER}, #{assignee,jdbcType=OTHER}, #{delegation,jdbcType=OTHER}, 
+      #{priority,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{dueDate,jdbcType=TIMESTAMP}, 
+      #{category,jdbcType=OTHER}, #{suspensionState,jdbcType=DECIMAL}, #{tenantId,jdbcType=OTHER}, 
+      #{formKey,jdbcType=OTHER}, #{claimTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.activity.entity.ActRuTask" >
+    insert into ACT_RU_TASK
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID_,
+      </if>
+      <if test="rev != null" >
+        REV_,
+      </if>
+      <if test="executionId != null" >
+        EXECUTION_ID_,
+      </if>
+      <if test="procInstId != null" >
+        PROC_INST_ID_,
+      </if>
+      <if test="procDefId != null" >
+        PROC_DEF_ID_,
+      </if>
+      <if test="name != null" >
+        NAME_,
+      </if>
+      <if test="parentTaskId != null" >
+        PARENT_TASK_ID_,
+      </if>
+      <if test="description != null" >
+        DESCRIPTION_,
+      </if>
+      <if test="taskDefKey != null" >
+        TASK_DEF_KEY_,
+      </if>
+      <if test="owner != null" >
+        OWNER_,
+      </if>
+      <if test="assignee != null" >
+        ASSIGNEE_,
+      </if>
+      <if test="delegation != null" >
+        DELEGATION_,
+      </if>
+      <if test="priority != null" >
+        PRIORITY_,
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME_,
+      </if>
+      <if test="dueDate != null" >
+        DUE_DATE_,
+      </if>
+      <if test="category != null" >
+        CATEGORY_,
+      </if>
+      <if test="suspensionState != null" >
+        SUSPENSION_STATE_,
+      </if>
+      <if test="tenantId != null" >
+        TENANT_ID_,
+      </if>
+      <if test="formKey != null" >
+        FORM_KEY_,
+      </if>
+      <if test="claimTime != null" >
+        CLAIM_TIME_,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=OTHER},
+      </if>
+      <if test="rev != null" >
+        #{rev,jdbcType=DECIMAL},
+      </if>
+      <if test="executionId != null" >
+        #{executionId,jdbcType=OTHER},
+      </if>
+      <if test="procInstId != null" >
+        #{procInstId,jdbcType=OTHER},
+      </if>
+      <if test="procDefId != null" >
+        #{procDefId,jdbcType=OTHER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=OTHER},
+      </if>
+      <if test="parentTaskId != null" >
+        #{parentTaskId,jdbcType=OTHER},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=OTHER},
+      </if>
+      <if test="taskDefKey != null" >
+        #{taskDefKey,jdbcType=OTHER},
+      </if>
+      <if test="owner != null" >
+        #{owner,jdbcType=OTHER},
+      </if>
+      <if test="assignee != null" >
+        #{assignee,jdbcType=OTHER},
+      </if>
+      <if test="delegation != null" >
+        #{delegation,jdbcType=OTHER},
+      </if>
+      <if test="priority != null" >
+        #{priority,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dueDate != null" >
+        #{dueDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="category != null" >
+        #{category,jdbcType=OTHER},
+      </if>
+      <if test="suspensionState != null" >
+        #{suspensionState,jdbcType=DECIMAL},
+      </if>
+      <if test="tenantId != null" >
+        #{tenantId,jdbcType=OTHER},
+      </if>
+      <if test="formKey != null" >
+        #{formKey,jdbcType=OTHER},
+      </if>
+      <if test="claimTime != null" >
+        #{claimTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.ActRuTaskExample" resultType="java.lang.Integer" >
+    select count(*) from ACT_RU_TASK
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.activity.entity.ActRuTask" >
+    update ACT_RU_TASK
+    <set >
+      <if test="rev != null" >
+        REV_ = #{rev,jdbcType=DECIMAL},
+      </if>
+      <if test="executionId != null" >
+        EXECUTION_ID_ = #{executionId,jdbcType=OTHER},
+      </if>
+      <if test="procInstId != null" >
+        PROC_INST_ID_ = #{procInstId,jdbcType=OTHER},
+      </if>
+      <if test="procDefId != null" >
+        PROC_DEF_ID_ = #{procDefId,jdbcType=OTHER},
+      </if>
+      <if test="name != null" >
+        NAME_ = #{name,jdbcType=OTHER},
+      </if>
+      <if test="parentTaskId != null" >
+        PARENT_TASK_ID_ = #{parentTaskId,jdbcType=OTHER},
+      </if>
+      <if test="description != null" >
+        DESCRIPTION_ = #{description,jdbcType=OTHER},
+      </if>
+      <if test="taskDefKey != null" >
+        TASK_DEF_KEY_ = #{taskDefKey,jdbcType=OTHER},
+      </if>
+      <if test="owner != null" >
+        OWNER_ = #{owner,jdbcType=OTHER},
+      </if>
+      <if test="assignee != null" >
+        ASSIGNEE_ = #{assignee,jdbcType=OTHER},
+      </if>
+      <if test="delegation != null" >
+        DELEGATION_ = #{delegation,jdbcType=OTHER},
+      </if>
+      <if test="priority != null" >
+        PRIORITY_ = #{priority,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null" >
+        CREATE_TIME_ = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dueDate != null" >
+        DUE_DATE_ = #{dueDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="category != null" >
+        CATEGORY_ = #{category,jdbcType=OTHER},
+      </if>
+      <if test="suspensionState != null" >
+        SUSPENSION_STATE_ = #{suspensionState,jdbcType=DECIMAL},
+      </if>
+      <if test="tenantId != null" >
+        TENANT_ID_ = #{tenantId,jdbcType=OTHER},
+      </if>
+      <if test="formKey != null" >
+        FORM_KEY_ = #{formKey,jdbcType=OTHER},
+      </if>
+      <if test="claimTime != null" >
+        CLAIM_TIME_ = #{claimTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID_ = #{id,jdbcType=OTHER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.activity.entity.ActRuTask" >
+    update ACT_RU_TASK
+    set REV_ = #{rev,jdbcType=DECIMAL},
+      EXECUTION_ID_ = #{executionId,jdbcType=OTHER},
+      PROC_INST_ID_ = #{procInstId,jdbcType=OTHER},
+      PROC_DEF_ID_ = #{procDefId,jdbcType=OTHER},
+      NAME_ = #{name,jdbcType=OTHER},
+      PARENT_TASK_ID_ = #{parentTaskId,jdbcType=OTHER},
+      DESCRIPTION_ = #{description,jdbcType=OTHER},
+      TASK_DEF_KEY_ = #{taskDefKey,jdbcType=OTHER},
+      OWNER_ = #{owner,jdbcType=OTHER},
+      ASSIGNEE_ = #{assignee,jdbcType=OTHER},
+      DELEGATION_ = #{delegation,jdbcType=OTHER},
+      PRIORITY_ = #{priority,jdbcType=DECIMAL},
+      CREATE_TIME_ = #{createTime,jdbcType=TIMESTAMP},
+      DUE_DATE_ = #{dueDate,jdbcType=TIMESTAMP},
+      CATEGORY_ = #{category,jdbcType=OTHER},
+      SUSPENSION_STATE_ = #{suspensionState,jdbcType=DECIMAL},
+      TENANT_ID_ = #{tenantId,jdbcType=OTHER},
+      FORM_KEY_ = #{formKey,jdbcType=OTHER},
+      CLAIM_TIME_ = #{claimTime,jdbcType=TIMESTAMP}
+    where ID_ = #{id,jdbcType=OTHER}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
