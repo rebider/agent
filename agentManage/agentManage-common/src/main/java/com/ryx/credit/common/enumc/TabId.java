@@ -1,6 +1,7 @@
 package com.ryx.credit.common.enumc;
 
 /**
+ * 数据表
  * Created by cx on 2018/5/22.
  */
 public enum TabId {

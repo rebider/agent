@@ -1,6 +1,7 @@
 package com.ryx.credit.common.enumc;
 
 /**
+ * 附件类型
  * Created by cx on 2018/5/22.
  */
 public enum AttachmentRelType {

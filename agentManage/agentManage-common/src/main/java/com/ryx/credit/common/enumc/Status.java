@@ -3,6 +3,7 @@ package com.ryx.credit.common.enumc;
 import java.math.BigDecimal;
 
 /**
+ * 通用状态
  * Created by cx on 2018/5/22.
  */
 public enum Status {
