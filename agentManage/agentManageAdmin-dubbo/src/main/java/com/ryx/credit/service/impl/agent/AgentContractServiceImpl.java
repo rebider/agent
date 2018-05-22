@@ -122,6 +122,11 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Override
     public int removeAgentContract(String id) {
+        AgentContract contract = agentContractMapper.selectByPrimaryKey(id);
+        if(contract!=null){
+            contract.setStatus(Status.STATUS_0.status);
+           return agentContractMapper.updateByPrimaryKeySelective(contract);
+        }
         return 0;
     }
 }
