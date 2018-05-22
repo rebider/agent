@@ -20,9 +20,7 @@ public class ActHiVarinst {
 
     private Object bytearrayId;
 
-    private BigDecimal double;
 
-    private BigDecimal long;
 
     private Object text;
 
@@ -96,21 +94,6 @@ public class ActHiVarinst {
         this.bytearrayId = bytearrayId;
     }
 
-    public BigDecimal getDouble() {
-        return double;
-    }
-
-    public void setDouble(BigDecimal double) {
-        this.double = double;
-    }
-
-    public BigDecimal getLong() {
-        return long;
-    }
-
-    public void setLong(BigDecimal long) {
-        this.long = long;
-    }
 
     public Object getText() {
         return text;
