@@ -390,10 +390,10 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null" >
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION +1 ,
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
     update A_AGENT
@@ -424,8 +424,8 @@
       C_USER = #{cUser,jdbcType=VARCHAR},
       AG_ZBH = #{agZbh,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+      VERSION = VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >

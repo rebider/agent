@@ -21,4 +21,15 @@ public interface AgentContractService {
     public AgentContract insertAgentContract(AgentContract contract, List<String> attr)throws ProcessException;
 
 
+    /**
+     * 删除合同
+     * @param id
+     * @return
+     */
+    public int removeAgentContract(String id);
+
+
+
+
+
 }
