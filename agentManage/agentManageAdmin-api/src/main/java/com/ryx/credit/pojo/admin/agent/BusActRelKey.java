@@ -1,6 +1,8 @@
 package com.ryx.credit.pojo.admin.agent;
 
-public class BusActRelKey {
+import java.io.Serializable;
+
+public class BusActRelKey implements Serializable {
     private String activId;
 
     private String busId;

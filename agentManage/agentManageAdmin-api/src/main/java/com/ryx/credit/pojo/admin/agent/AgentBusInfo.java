@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentBusInfo {
+public class AgentBusInfo implements Serializable {
     private String id;
 
     private String agentId;

@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentContract extends AgentContractKey {
+public class AgentContract extends AgentContractKey implements Serializable {
     private String agentId;
 
     private String contNum;

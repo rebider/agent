@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class BusActRel extends BusActRelKey {
+public class BusActRel extends BusActRelKey implements Serializable {
     private String busType;
 
     private Date cTime;

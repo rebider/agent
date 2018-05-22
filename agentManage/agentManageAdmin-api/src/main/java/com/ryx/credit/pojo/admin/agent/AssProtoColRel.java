@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AssProtoColRel extends AssProtoColRelKey {
+public class AssProtoColRel extends AssProtoColRelKey implements Serializable {
     private String remark;
 
     private Date cTime;

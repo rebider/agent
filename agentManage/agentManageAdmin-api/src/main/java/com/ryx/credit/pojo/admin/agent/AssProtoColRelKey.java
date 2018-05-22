@@ -1,6 +1,8 @@
 package com.ryx.credit.pojo.admin.agent;
 
-public class AssProtoColRelKey {
+import java.io.Serializable;
+
+public class AssProtoColRelKey implements Serializable {
     private String assProtocolId;
 
     private String agentBusinfoId;
