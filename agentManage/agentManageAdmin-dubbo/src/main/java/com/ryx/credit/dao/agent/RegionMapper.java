@@ -1,13 +1,12 @@
 package com.ryx.credit.dao.agent;
 
-
 import com.ryx.credit.pojo.admin.agent.Region;
 import com.ryx.credit.pojo.admin.agent.RegionExample;
-
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface RegionMapper {
+
     int countByExample(RegionExample example);
 
     int deleteByExample(RegionExample example);
@@ -23,4 +22,8 @@ public interface RegionMapper {
     int updateByPrimaryKeySelective(Region record);
 
     int updateByPrimaryKey(Region record);
+
+    Region findByPcode(String pCode);
+
+    List<Region> selectAll();
 }

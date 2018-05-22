@@ -29,4 +29,7 @@
     <dubbo:service interface="com.ryx.credit.service.ICRuleService" ref="cRuleService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.ICStrategyRuleService" ref="cStrategyRuleService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.ICStrategyService" ref="cStrategyService"  timeout="1200000" registry="${zk.group}"/>
+
+    <dubbo:service interface="com.ryx.credit.service.agent.BusinessPlatformService" ref="businessPlatformService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.RegionService" ref="regionService"  timeout="1200000" registry="${zk.group}"/>
 </beans>
