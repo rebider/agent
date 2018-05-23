@@ -62,10 +62,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, AGENT_ID, BUS_NUM, BUS_PLATFORM, BUS_TYPE, BUS_PARENT, BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, 
-    BUS_REGION, BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE, 
-    BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE, 
-    CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME, 
+    ID, AGENT_ID, BUS_NUM, BUS_PLATFORM, BUS_TYPE, BUS_PARENT, BUS_RISK_PARENT, BUS_ACTIVATION_PARENT,
+    BUS_REGION, BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE,
+    BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
+    CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, STATUS, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
@@ -85,7 +85,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_AGENT_BUSINFO
     where ID = #{id,jdbcType=VARCHAR}
@@ -97,26 +97,26 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
-    insert into A_AGENT_BUSINFO (ID, AGENT_ID, BUS_NUM, 
-      BUS_PLATFORM, BUS_TYPE, BUS_PARENT, 
-      BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION, 
-      BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, 
-      BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL, 
-      BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, 
-      CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY, 
-      CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, 
-      C_TIME, C_UTIME, C_USER, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, 
-      #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR}, 
-      #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR}, 
-      #{busSentDirectly,jdbcType=DECIMAL}, #{busDirectCashback,jdbcType=DECIMAL}, #{busIndeAss,jdbcType=DECIMAL}, 
-      #{busContact,jdbcType=VARCHAR}, #{busContactMobile,jdbcType=VARCHAR}, #{busContactEmail,jdbcType=VARCHAR}, 
-      #{busContactPerson,jdbcType=VARCHAR}, #{busRiskEmail,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, 
-      #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR}, 
-      #{cloAgentColinfo,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into A_AGENT_BUSINFO (ID, AGENT_ID, BUS_NUM,
+    BUS_PLATFORM, BUS_TYPE, BUS_PARENT,
+    BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION,
+    BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS,
+    BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL,
+    BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT,
+    CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY,
+    CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS,
+    C_TIME, C_UTIME, C_USER,
+    STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
+    #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
+    #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
+    #{busSentDirectly,jdbcType=DECIMAL}, #{busDirectCashback,jdbcType=DECIMAL}, #{busIndeAss,jdbcType=DECIMAL},
+    #{busContact,jdbcType=VARCHAR}, #{busContactMobile,jdbcType=VARCHAR}, #{busContactEmail,jdbcType=VARCHAR},
+    #{busContactPerson,jdbcType=VARCHAR}, #{busRiskEmail,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL},
+    #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR},
+    #{cloAgentColinfo,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL},
+    #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
     insert into A_AGENT_BUSINFO
@@ -390,46 +390,46 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null" >
-        VERSION = VERSION +1 ,
+        VERSION = #{version,jdbcType=DECIMAL},
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
     update A_AGENT_BUSINFO
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      BUS_NUM = #{busNum,jdbcType=VARCHAR},
-      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
-      BUS_TYPE = #{busType,jdbcType=VARCHAR},
-      BUS_PARENT = #{busParent,jdbcType=VARCHAR},
-      BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
-      BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
-      BUS_REGION = #{busRegion,jdbcType=VARCHAR},
-      BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
-      BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
-      BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
-      BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
-      BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
-      BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
-      BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
-      BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
-      CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
-      CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
-      CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
-      CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
-      CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
-      BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = VERSION +1
-    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+    BUS_NUM = #{busNum,jdbcType=VARCHAR},
+    BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+    BUS_TYPE = #{busType,jdbcType=VARCHAR},
+    BUS_PARENT = #{busParent,jdbcType=VARCHAR},
+    BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
+    BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
+    BUS_REGION = #{busRegion,jdbcType=VARCHAR},
+    BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
+    BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
+    BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
+    BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
+    BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
+    BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
+    BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+    BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
+    CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+    CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+    CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
+    CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
+    CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
+    BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
+    CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix" >
@@ -437,7 +437,6 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
   <select id="queryAgentBusList" parameterType="map" resultType="map">
       select * from (
               select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num
@@ -458,7 +457,6 @@
               <if test="par.page!=null"> datalist.row_count &lt; #{par.page.from}</if>
             </where>
   </select>
-
   <select id="queryAgentBusListCount" parameterType="map" resultType="int">
       select
         count(a.id)
