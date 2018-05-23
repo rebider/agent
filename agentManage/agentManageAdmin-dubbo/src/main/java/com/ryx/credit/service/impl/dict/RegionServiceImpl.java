@@ -5,10 +5,9 @@ import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.RegionMapper;
-import com.ryx.credit.pojo.admin.CResource;
 import com.ryx.credit.pojo.admin.agent.Region;
 import com.ryx.credit.service.agent.RegionService;
-import org.junit.Test;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +24,8 @@ import java.util.List;
 @Service("regionService")
 public class RegionServiceImpl implements RegionService {
 
+    private static final Logger log = Logger.getLogger(RegionServiceImpl.class);
+
     private static final String REGIONS_KEY = "agent_regions_list";
     @Autowired
     private RegionMapper regionMapper;
@@ -34,8 +35,10 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public List<Tree> selectAllRegion() {
-
+        long timeStart = System.currentTimeMillis();
         String regionsValue = redisService.getValue(REGIONS_KEY);
+        long timeEnd = System.currentTimeMillis();
+        log.info("运行时间："+(timeEnd - timeStart)+"ms.");
         List<Region> regionsList = null;
         if(StringUtils.isBlank(regionsValue)){
             regionsList = regionMapper.selectAll();
@@ -64,7 +67,7 @@ public class RegionServiceImpl implements RegionService {
         tree.setId(Long.valueOf(region.getrCode()));
         tree.setPid(Long.valueOf(region.getpCode()));
         tree.setText(region.getrName());
-        tree.setState(String.valueOf(region.getStatus()));
+        tree.setState(1);
         tree.settType(region.gettType());
         return tree;
     }
