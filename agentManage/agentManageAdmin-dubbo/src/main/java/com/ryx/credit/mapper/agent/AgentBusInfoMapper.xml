@@ -472,4 +472,21 @@
       </where>
   </select>
 
+  <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
+     <include refid="OracleDialectPrefix" />
+      select
+        b.bus_num,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+        a.ag_head_mobile,b.bus_status,b.status
+      from A_agent a,A_agent_businfo b
+      where a.id=b.agent_id
+     <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
+      select
+         count(*)
+      from A_agent a,A_agent_businfo b
+      where a.id=b.agent_id
+  </select>
+
 </mapper>

@@ -1,6 +1,7 @@
 package com.ryx.credit.dao.agent;
 
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
 import org.apache.ibatis.annotations.Param;
@@ -39,4 +40,9 @@ public interface AgentBusInfoMapper {
      */
     int queryAgentBusListCount(@Param("par") Map<String,Object> par);
 
+
+    List<Map<String,Object>> queryBusinessPlatformList(@Param("par") Map<String,Object> par,@Param("page")Page page);
+
+
+    int queryBusinessPlatformCount(@Param("par") Map<String,Object> par);
 }
