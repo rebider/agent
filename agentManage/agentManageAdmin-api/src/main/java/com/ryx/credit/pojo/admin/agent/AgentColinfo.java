@@ -23,6 +23,8 @@ public class AgentColinfo implements Serializable {
 
     private Date cUtime;
 
+    private String remark;
+
     private String cUser;
 
     private BigDecimal cloReviewStatus;
@@ -101,6 +103,14 @@ public class AgentColinfo implements Serializable {
 
     public void setcUtime(Date cUtime) {
         this.cUtime = cUtime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 
     public String getcUser() {

@@ -12,6 +12,8 @@
     <result column="C_PLANINTIME" property="cPlanintime" jdbcType="TIMESTAMP" />
     <result column="C_INTIME" property="cIntime" jdbcType="TIMESTAMP" />
     <result column="C_PAYTIME" property="cPaytime" jdbcType="TIMESTAMP" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
     <result column="REMARK" property="remark" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
@@ -48,7 +50,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, C_TYPE, C_AMOUNT, C_ISIN, C_IN_AMOUNT, C_BUS_STATUS, C_SRC, C_PLANINTIME, C_INTIME, 
-    C_PAYTIME, REMARK, STATUS, VERSION, C_AGENT_ID
+    C_PAYTIME, C_TIME, C_UTIME, REMARK, STATUS, VERSION, C_AGENT_ID
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.CapitalExample" >
     <include refid="OracleDialectPrefix" />
@@ -82,13 +84,15 @@
     insert into A_CAPITAL (ID, C_TYPE, C_AMOUNT, 
       C_ISIN, C_IN_AMOUNT, C_BUS_STATUS, 
       C_SRC, C_PLANINTIME, C_INTIME, 
-      C_PAYTIME, REMARK, STATUS, 
-      VERSION, C_AGENT_ID)
+      C_PAYTIME, C_TIME, C_UTIME, 
+      REMARK, STATUS, VERSION, 
+      C_AGENT_ID)
     values (#{id,jdbcType=VARCHAR}, #{cType,jdbcType=VARCHAR}, #{cAmount,jdbcType=DECIMAL}, 
       #{cIsin,jdbcType=DECIMAL}, #{cInAmount,jdbcType=DECIMAL}, #{cBusStatus,jdbcType=DECIMAL}, 
       #{cSrc,jdbcType=VARCHAR}, #{cPlanintime,jdbcType=TIMESTAMP}, #{cIntime,jdbcType=TIMESTAMP}, 
-      #{cPaytime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL}, #{cAgentId,jdbcType=VARCHAR})
+      #{cPaytime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{cAgentId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.Capital" >
     insert into A_CAPITAL
@@ -122,6 +126,12 @@
       </if>
       <if test="cPaytime != null" >
         C_PAYTIME,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="cUtime != null" >
+        C_UTIME,
       </if>
       <if test="remark != null" >
         REMARK,
@@ -166,6 +176,12 @@
       </if>
       <if test="cPaytime != null" >
         #{cPaytime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null" >
+        #{cUtime,jdbcType=TIMESTAMP},
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
@@ -217,6 +233,12 @@
       <if test="cPaytime != null" >
         C_PAYTIME = #{cPaytime,jdbcType=TIMESTAMP},
       </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null" >
+        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      </if>
       <if test="remark != null" >
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
@@ -243,6 +265,8 @@
       C_PLANINTIME = #{cPlanintime,jdbcType=TIMESTAMP},
       C_INTIME = #{cIntime,jdbcType=TIMESTAMP},
       C_PAYTIME = #{cPaytime,jdbcType=TIMESTAMP},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},

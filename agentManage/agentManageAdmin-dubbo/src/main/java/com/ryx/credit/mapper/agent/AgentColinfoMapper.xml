@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.order.dao1.AgentColinfoMapper" >
+<mapper namespace="com.ryx.credit.dao.agent.AgentColinfoMapper" >
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
     <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
@@ -11,6 +11,7 @@
     <result column="CLO_BANK_ACCOUNT" property="cloBankAccount" jdbcType="VARCHAR" />
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
     <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="CLO_REVIEW_STATUS" property="cloReviewStatus" jdbcType="DECIMAL" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
@@ -47,7 +48,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, 
-    C_TIME, C_UTIME, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION
+    C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample" >
     <include refid="OracleDialectPrefix" />
@@ -81,13 +82,13 @@
     insert into A_AGENT_COLINFO (ID, AGENT_ID, CLO_TYPE, 
       CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, 
       CLO_BANK_ACCOUNT, C_TIME, C_UTIME, 
-      C_USER, CLO_REVIEW_STATUS, STATUS, 
-      VARSION)
+      REMARK, C_USER, CLO_REVIEW_STATUS, 
+      STATUS, VARSION)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cloType,jdbcType=DECIMAL}, 
       #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, #{cloBankBranch,jdbcType=VARCHAR}, 
       #{cloBankAccount,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, 
-      #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
-      #{varsion,jdbcType=DECIMAL})
+      #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, 
+      #{status,jdbcType=DECIMAL}, #{varsion,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
     insert into A_AGENT_COLINFO
@@ -118,6 +119,9 @@
       </if>
       <if test="cUtime != null" >
         C_UTIME,
+      </if>
+      <if test="remark != null" >
+        REMARK,
       </if>
       <if test="cUser != null" >
         C_USER,
@@ -159,6 +163,9 @@
       </if>
       <if test="cUtime != null" >
         #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
       </if>
       <if test="cUser != null" >
         #{cUser,jdbcType=VARCHAR},
@@ -207,6 +214,9 @@
       <if test="cUtime != null" >
         C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
       </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
       <if test="cUser != null" >
         C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
@@ -232,6 +242,7 @@
       CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
       C_USER = #{cUser,jdbcType=VARCHAR},
       CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
       STATUS = #{status,jdbcType=DECIMAL},

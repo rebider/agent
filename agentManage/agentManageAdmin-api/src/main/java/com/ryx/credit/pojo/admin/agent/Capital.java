@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class Capital implements Serializable {
+public class Capital implements Serializable{
     private String id;
 
     private String cType;
@@ -24,6 +24,10 @@ public class Capital implements Serializable {
     private Date cIntime;
 
     private Date cPaytime;
+
+    private Date cTime;
+
+    private Date cUtime;
 
     private String remark;
 
@@ -111,6 +115,22 @@ public class Capital implements Serializable {
 
     public void setcPaytime(Date cPaytime) {
         this.cPaytime = cPaytime;
+    }
+
+    public Date getcTime() {
+        return cTime;
+    }
+
+    public void setcTime(Date cTime) {
+        this.cTime = cTime;
+    }
+
+    public Date getcUtime() {
+        return cUtime;
+    }
+
+    public void setcUtime(Date cUtime) {
+        this.cUtime = cUtime;
     }
 
     public String getRemark() {

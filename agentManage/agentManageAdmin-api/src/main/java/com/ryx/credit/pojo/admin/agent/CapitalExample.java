@@ -1,6 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
-import com.ryx.credit.common.util.Page;
+import com.creditease.zm.trade.util.Page;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -765,6 +765,126 @@ public class CapitalExample {
 
         public Criteria andCPaytimeNotBetween(Date value1, Date value2) {
             addCriterion("C_PAYTIME not between", value1, value2, "cPaytime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIsNull() {
+            addCriterion("C_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIsNotNull() {
+            addCriterion("C_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeEqualTo(Date value) {
+            addCriterion("C_TIME =", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotEqualTo(Date value) {
+            addCriterion("C_TIME <>", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeGreaterThan(Date value) {
+            addCriterion("C_TIME >", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("C_TIME >=", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeLessThan(Date value) {
+            addCriterion("C_TIME <", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeLessThanOrEqualTo(Date value) {
+            addCriterion("C_TIME <=", value, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeIn(List<Date> values) {
+            addCriterion("C_TIME in", values, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotIn(List<Date> values) {
+            addCriterion("C_TIME not in", values, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeBetween(Date value1, Date value2) {
+            addCriterion("C_TIME between", value1, value2, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCTimeNotBetween(Date value1, Date value2) {
+            addCriterion("C_TIME not between", value1, value2, "cTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeIsNull() {
+            addCriterion("C_UTIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeIsNotNull() {
+            addCriterion("C_UTIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeEqualTo(Date value) {
+            addCriterion("C_UTIME =", value, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeNotEqualTo(Date value) {
+            addCriterion("C_UTIME <>", value, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeGreaterThan(Date value) {
+            addCriterion("C_UTIME >", value, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("C_UTIME >=", value, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeLessThan(Date value) {
+            addCriterion("C_UTIME <", value, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeLessThanOrEqualTo(Date value) {
+            addCriterion("C_UTIME <=", value, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeIn(List<Date> values) {
+            addCriterion("C_UTIME in", values, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeNotIn(List<Date> values) {
+            addCriterion("C_UTIME not in", values, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeBetween(Date value1, Date value2) {
+            addCriterion("C_UTIME between", value1, value2, "cUtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUtimeNotBetween(Date value1, Date value2) {
+            addCriterion("C_UTIME not between", value1, value2, "cUtime");
             return (Criteria) this;
         }
 
