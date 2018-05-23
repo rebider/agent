@@ -10,5 +10,5 @@ public interface BusinessCAService {
      * @param agentBusinfoName
      * @return ResultVO
      */
-    public ResultVO agentBusinessCA(String agentBusinfoName);
+    public ResultVO agentBusinessCA(String agentBusinfoName, String cUser);
 }
