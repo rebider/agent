@@ -29,9 +29,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
      */
     @Override
     public PageInfo agentBusInfoSelectViewList(Map par, PageInfo page){
-        List<Map<String,Object>> list = agentBusInfoMapper.queryAgentBusList(par);
-        par.put("page",page);
         int count = agentBusInfoMapper.queryAgentBusListCount(par);
+        par.put("page",page);
+        List<Map<String,Object>> list = agentBusInfoMapper.queryAgentBusList(par);
         page.setTotal(count);
         page.setRows(list);
         return page;
