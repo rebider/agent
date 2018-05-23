@@ -1,6 +1,7 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 
 import java.util.Map;
@@ -14,5 +15,5 @@ public interface AgentBusinfoService {
      * @param par
      * @return
      */
-    ResultVO agentBusInfoSelectViewList(Map par, Page page);
+    PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
 }

@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.service.agent.AgentBusinfoService;
@@ -27,12 +28,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
      * @return
      */
     @Override
-    public ResultVO agentBusInfoSelectViewList(Map par, Page page){
+    public PageInfo agentBusInfoSelectViewList(Map par, PageInfo page){
         List<Map<String,Object>> list = agentBusInfoMapper.queryAgentBusList(par);
         par.put("page",page);
         int count = agentBusInfoMapper.queryAgentBusListCount(par);
-        page.setCount(count);
-        return ResultVO.success(FastMap.fastMap("list",list).putKeyV("page",page));
+        page.setTotal(count);
+        page.setRows(list);
+        return page;
     }
 
 
