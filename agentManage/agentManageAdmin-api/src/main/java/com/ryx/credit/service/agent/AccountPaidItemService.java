@@ -1,5 +1,10 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.pojo.admin.agent.Capital;
+
+import java.util.List;
+
 /**
  * @version V1.0
  * @Description:
@@ -7,4 +12,6 @@ package com.ryx.credit.service.agent;
  * @date: 2018/5/23 14:23
  */
 public interface AccountPaidItemService {
+
+    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser);
 }
