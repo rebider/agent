@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by cx on 2018/5/22.
  */
-@Service
+@Service("agentContractService")
 public class AgentContractServiceImpl implements AgentContractService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentContractServiceImpl.class);
@@ -122,6 +122,11 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Override
     public int removeAgentContract(String id) {
+        AgentContract contract = agentContractMapper.selectByPrimaryKey(id);
+        if(contract!=null){
+            contract.setStatus(Status.STATUS_0.status);
+           return agentContractMapper.updateByPrimaryKeySelective(contract);
+        }
         return 0;
     }
 }
