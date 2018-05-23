@@ -36,4 +36,5 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AgentService" ref="agentService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentBusinfoService" ref="agentBusinfoService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AccountPaidItemService" ref="accountPaidItemService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.BusinessCAService" ref="businessCAService"  timeout="1200000" registry="${zk.group}"/>
 </beans>
