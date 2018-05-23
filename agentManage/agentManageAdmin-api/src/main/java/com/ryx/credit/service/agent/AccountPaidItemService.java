@@ -14,4 +14,6 @@ import java.util.List;
 public interface AccountPaidItemService {
 
     AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser);
+
+    int removeAccountPaid(String id);
 }

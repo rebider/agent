@@ -84,5 +84,13 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         return new AgentResult(500,"系统异常","");
     }
 
-
+    @Override
+    public int removeAccountPaid(String id) {
+        AttachmentRel attachmentRel = attachmentRelMapper.selectByPrimaryKey(id);
+        if(attachmentRel!=null){
+            attachmentRel.setStatus(Status.STATUS_0.status);
+            return attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+        }
+        return 0;
+    }
 }
