@@ -78,7 +78,7 @@ public class AgentServiceImpl implements AgentService{
         agent.setId(idService.genId(TabId.a_agent));
         if(1==agentMapper.insertSelective(agent)){
             for (String s : attrId) {
-                if(StringUtils.isEmpty(s))break;
+                if(StringUtils.isEmpty(s))continue;
                 AttachmentRel record  = new AttachmentRel();
                 record.setAttId(s);
                 record.setSrcId(agent.getId());

@@ -98,7 +98,7 @@ public class AgentContractServiceImpl implements AgentContractService {
         contract.setId(idService.genId(TabId.a_agent_contract));
         if(1==agentContractMapper.insertSelective(contract)){
             for (String s : attr) {
-                if(StringUtils.isEmpty(s))break;
+                if(StringUtils.isEmpty(s))continue;
                 AttachmentRel record  = new AttachmentRel();
                 record.setAttId(s);
                 record.setSrcId(contract.getId());
