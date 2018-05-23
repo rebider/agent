@@ -25,8 +25,18 @@ public interface AgentBusInfoMapper {
 
     int updateByPrimaryKey(AgentBusInfo record);
 
+    /**
+     * 代理商业务列表查询
+     * @param par
+     * @return
+     */
     List<Map<String,Object>> queryAgentBusList(@Param("par") Map<String,Object> par);
 
-    long queryAgentBusListCount(@Param("par") Map<String,Object> par);
+    /**
+     * 代理商业务列表统计
+     * @param par
+     * @return
+     */
+    int queryAgentBusListCount(@Param("par") Map<String,Object> par);
 
 }

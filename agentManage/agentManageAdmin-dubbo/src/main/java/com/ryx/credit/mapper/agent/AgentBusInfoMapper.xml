@@ -446,15 +446,16 @@
               and a.clo_review_status = #{par.clo_review_status}
               and b.ag_status = #{par.ag_status}
               and b.c_incom_status  = #{par.c_incom_status}
-              and a.status=1
-              and b.status=1
-              and rownum &lt;= #{par.end}
+              and a.bus_num = #{par.bus_num}
+              and a.status = 1
+              and b.status = 1
+              and rownum &lt;= #{par.page.end}
               order by c_time desc
             ) datalist
-            where datalist.row_count &lt; #{par.start}
+            where datalist.row_count &lt; #{par.page.begin}
   </select>
 
-  <select id="queryAgentBusListCount" parameterType="map" resultType="long">
+  <select id="queryAgentBusListCount" parameterType="map" resultType="int">
     select
       count(a.id)
     from a_agent_businfo a left join a_agent b on a.agent_id = b.id
@@ -462,6 +463,7 @@
       and a.clo_review_status = #{par.clo_review_status}
       and b.ag_status = #{par.ag_status}
       and b.c_incom_status  = #{par.c_incom_status}
+      and a.bus_num = #{par.bus_num}
       and a.status=1
       and b.status=1
   </select>

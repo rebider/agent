@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by cx on 2018/5/22.
  */
-@Service
+@Service("agentContractService")
 public class AgentContractServiceImpl implements AgentContractService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentContractServiceImpl.class);

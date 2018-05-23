@@ -28,7 +28,7 @@ import java.util.List;
  * 代理商基础信息管理服务类
  * Created by cx on 2018/5/22.
  */
-@Service
+@Service("agentService")
 public class AgentServiceImpl implements AgentService{
 
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
