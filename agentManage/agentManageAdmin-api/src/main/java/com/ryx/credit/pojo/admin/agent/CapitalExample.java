@@ -1,6 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
-import com.creditease.zm.trade.util.Page;
+import com.ryx.credit.common.util.Page;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
