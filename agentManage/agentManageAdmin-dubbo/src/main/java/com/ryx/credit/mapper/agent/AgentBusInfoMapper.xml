@@ -449,10 +449,10 @@
               and a.bus_num = #{par.bus_num}
               and a.status = 1
               and b.status = 1
-              and rownum &lt;= #{par.page.end}
+              and rownum &lt;= #{par.page.from} + #{par.page.size}
               order by c_time desc
             ) datalist
-            where datalist.row_count &lt; #{par.page.begin}
+            where datalist.row_count &lt; #{par.page.from}
   </select>
 
   <select id="queryAgentBusListCount" parameterType="map" resultType="int">
