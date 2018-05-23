@@ -442,30 +442,36 @@
       select * from (
               select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num
               from a_agent_businfo a left join a_agent b on a.agent_id = b.id
-              where  b.ag_name like CONCAT('%',#{par.search_name},'%')
-              and a.clo_review_status = #{par.clo_review_status}
-              and b.ag_status = #{par.ag_status}
-              and b.c_incom_status  = #{par.c_incom_status}
-              and a.bus_num = #{par.bus_num}
-              and a.status = 1
-              and b.status = 1
-              and rownum &lt;= #{par.page.from} + #{par.page.size}
+              <where>
+                <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT('%',#{par.search_name},'%')</if>
+                <if test="par.clo_review_status!=null and par.clo_review_status!=''"> and a.clo_review_status = #{par.clo_review_status}</if>
+                <if test="par.ag_status!=null and par.ag_status!=''">and b.ag_status = #{par.ag_status}</if>
+                <if test="par.c_incom_status!=null and par.c_incom_status!=''">and b.c_incom_status  = #{par.c_incom_status}</if>
+                <if test="par.bus_num!=null and par.bus_num!=''">and a.bus_num = #{par.bus_num}</if>
+                <if test="1==1">and a.status = 1</if>
+                <if test="1==1">and b.status = 1</if>
+                <if test="par.page!=null">and rownum &lt;= #{par.page.from} + #{par.page.size}</if>
+              </where>
               order by c_time desc
             ) datalist
-            where datalist.row_count &lt; #{par.page.from}
+            <where>
+              <if test="par.page!=null"> datalist.row_count &lt; #{par.page.from}</if>
+            </where>
   </select>
 
   <select id="queryAgentBusListCount" parameterType="map" resultType="int">
-    select
-      count(a.id)
-    from a_agent_businfo a left join a_agent b on a.agent_id = b.id
-      where  b.ag_name like CONCAT('%',#{par.search_name},'%')
-      and a.clo_review_status = #{par.clo_review_status}
-      and b.ag_status = #{par.ag_status}
-      and b.c_incom_status  = #{par.c_incom_status}
-      and a.bus_num = #{par.bus_num}
-      and a.status=1
-      and b.status=1
+      select
+        count(a.id)
+      from a_agent_businfo a left join a_agent b on a.agent_id = b.id
+      <where>
+        <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT('%',#{par.search_name},'%')</if>
+        <if test="par.clo_review_status!=null and par.clo_review_status!=''"> and a.clo_review_status = #{par.clo_review_status}</if>
+        <if test="par.ag_status!=null and par.ag_status!=''">and b.ag_status = #{par.ag_status}</if>
+        <if test="par.c_incom_status!=null and par.c_incom_status!=''">and b.c_incom_status  = #{par.c_incom_status}</if>
+        <if test="par.bus_num!=null and par.bus_num!=''">and a.bus_num = #{par.bus_num}</if>
+        <if test="1==1">and a.status = 1</if>
+        <if test="1==1">and b.status = 1</if>
+      </where>
   </select>
 
 </mapper>
