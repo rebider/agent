@@ -6,6 +6,7 @@ import com.ryx.credit.activity.entity.ActIdUserExample;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.service.ActIdUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ import java.util.HashMap;
  * @description: ActIdUserServiceImpl
  * To change this template use File | Settings | File Templates.
  */
-
+@Service("actIdUserService")
 public class ActIdUserServiceImpl implements ActIdUserService {
     @Autowired
     private ActIdUserMapper actIdUserMapper;

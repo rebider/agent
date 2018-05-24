@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.service.ActHiVarinstService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
  * @description: ActHiVarinstServiceimpl
  * To change this template use File | Settings | File Templates.
  */
-
+@Service("actHiVarinstService")
 public class ActHiVarinstServiceimpl implements ActHiVarinstService {
     @Autowired
     private ActHiVarinstMapper actHiVarinstMapper;
