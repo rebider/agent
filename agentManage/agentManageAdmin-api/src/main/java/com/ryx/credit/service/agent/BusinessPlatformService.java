@@ -15,4 +15,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 public interface BusinessPlatformService {
 
     PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page);
+
+
+    Agent verifyAgent(Agent agent);
 }
