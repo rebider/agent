@@ -18,6 +18,8 @@ public enum TabId {
     a_platform("PL%s%015d"),
     data_change_request("DC%s%015d"),
     template_agreement("TA%s%015d"),
+    a_agent_colinfo_rel("AR%s%015d"),
+    d_InterfaceRequest_Record("IR%s%015d"),
     a_agent_businfo("AB%s%015d");
 
     TabId(String thePatt){

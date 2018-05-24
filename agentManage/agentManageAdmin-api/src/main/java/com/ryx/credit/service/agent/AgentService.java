@@ -1,34 +1,34 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
- * 代理商基础信息管理服务类
- * Created by cx on 2018/5/22.
+ * Created by cx on 2018/5/23.
  */
 public interface AgentService {
-
+    /**
+     * 查询代理商信息
+     * @param page
+     * @param agent
+     * @return
+     */
+    PageInfo queryAgentList(PageInfo page, Agent agent);
 
     /**
-     * 添加代理商基础信息
+     * 代理商新曾
      * @param agent
      * @param attrId
      * @return
+     * @throws ProcessException
      */
-    public Agent insertAgent(Agent agent,List<String> attrId)throws ProcessException;
+    Agent insertAgent(Agent agent, List<String> attrId) throws ProcessException;
 
-
-    /**
-     * 根据Id获取代理商基础信息
-     * @param id
-     * @return
-     */
-    public Agent getAgentById(String id);
-
-
-
-
+    Agent getAgentById(String id);
 }

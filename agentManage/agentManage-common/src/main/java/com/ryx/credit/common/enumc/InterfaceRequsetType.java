@@ -2,23 +2,17 @@ package com.ryx.credit.common.enumc;
 
 
 /**
- * 资金类型枚举
- * @version V1.0
- * @Description:
- * @author: Liudh
- * @date: 2018/4/17 18:11
+ * 接口请求类型
  */
-public enum FundType {
+public enum InterfaceRequsetType {
 
-    AGGENT("aggent","代理费"),
-    CASH("cash","保证金"),
-    SOCASH("socash","SO保证金");
+	MERCHANT_CA("MERCHANT_CA","代理商工商认证");
 
     public String code;
 
     public String msg;
 
-    FundType(String c, String m){
+    InterfaceRequsetType(String c, String m){
         this.code=c;
         this.msg =m;
     }
@@ -44,8 +38,8 @@ public enum FundType {
      * @return
      */
     public static String getContentByValue(String value){
-        FundType[] fundType = FundType.values();
-        for(FundType cc : fundType){
+        InterfaceRequsetType[] fundType = InterfaceRequsetType.values();
+        for(InterfaceRequsetType cc : fundType){
             if(cc.code.equals(value)){
                 return cc.msg;
             }

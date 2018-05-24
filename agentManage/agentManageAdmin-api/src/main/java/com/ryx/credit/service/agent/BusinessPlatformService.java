@@ -1,5 +1,10 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+
 /**
  * 业务平台管理
  * @version V1.0
@@ -9,4 +14,8 @@ package com.ryx.credit.service.agent;
  */
 public interface BusinessPlatformService {
 
+    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page);
+
+
+    Agent verifyAgent(Agent agent);
 }

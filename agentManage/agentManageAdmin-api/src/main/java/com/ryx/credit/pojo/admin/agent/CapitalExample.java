@@ -1,5 +1,6 @@
 package com.ryx.credit.pojo.admin.agent;
 
+
 import com.ryx.credit.common.util.Page;
 
 import java.math.BigDecimal;

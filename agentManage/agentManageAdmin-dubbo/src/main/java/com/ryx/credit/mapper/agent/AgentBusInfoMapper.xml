@@ -390,10 +390,10 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null" >
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION +1,
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
     update A_AGENT_BUSINFO
@@ -424,8 +424,8 @@
     C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
     C_USER = #{cUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+    VERSION = VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >
@@ -439,31 +439,54 @@
   </sql>
   <select id="queryAgentBusList" parameterType="map" resultType="map">
       select * from (
-              select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num
+              select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num ,rownum as row_count
               from a_agent_businfo a left join a_agent b on a.agent_id = b.id
-              where  b.ag_name like CONCAT('%',#{par.search_name},'%')
-              and a.clo_review_status = #{par.clo_review_status}
-              and b.ag_status = #{par.ag_status}
-              and b.c_incom_status  = #{par.c_incom_status}
-              and a.bus_num = #{par.bus_num}
-              and a.status = 1
-              and b.status = 1
-              and rownum &lt;= #{par.page.end}
-              order by c_time desc
+              <where>
+                <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT(CONCAT('%',#{par.search_name}),'%')</if>
+                <if test="par.clo_review_status!=null and par.clo_review_status!=''"> and a.clo_review_status = #{par.clo_review_status}</if>
+                <if test="par.ag_status!=null and par.ag_status!=''">and b.ag_status = #{par.ag_status}</if>
+                <if test="par.c_incom_status!=null and par.c_incom_status!=''">and b.c_incom_status  = #{par.c_incom_status}</if>
+                <if test="par.bus_num!=null and par.bus_num!=''">and a.bus_num = #{par.bus_num}</if>
+                <if test="1==1">and a.status = 1</if>
+                <if test="1==1">and b.status = 1</if>
+                <if test="par.page!=null">and rownum &lt;= #{par.page.from} + #{par.page.size}</if>
+              </where>
+              order by a.c_time desc
             ) datalist
-            where datalist.row_count &lt; #{par.page.begin}
+            <where>
+              <if test="par.page!=null"> and  datalist.row_count &gt; #{par.page.from}</if>
+            </where>
   </select>
   <select id="queryAgentBusListCount" parameterType="map" resultType="int">
-    select
-      count(a.id)
-    from a_agent_businfo a left join a_agent b on a.agent_id = b.id
-      where  b.ag_name like CONCAT('%',#{par.search_name},'%')
-      and a.clo_review_status = #{par.clo_review_status}
-      and b.ag_status = #{par.ag_status}
-      and b.c_incom_status  = #{par.c_incom_status}
-      and a.bus_num = #{par.bus_num}
-      and a.status=1
-      and b.status=1
+      select
+        count(a.id)
+      from a_agent_businfo a left join a_agent b on a.agent_id = b.id
+      <where>
+        <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT(CONCAT('%',#{par.search_name}),'%')</if>
+        <if test="par.clo_review_status!=null and par.clo_review_status!=''"> and a.clo_review_status = #{par.clo_review_status}</if>
+        <if test="par.ag_status!=null and par.ag_status!=''">and b.ag_status = #{par.ag_status}</if>
+        <if test="par.c_incom_status!=null and par.c_incom_status!=''">and b.c_incom_status  = #{par.c_incom_status}</if>
+        <if test="par.bus_num!=null and par.bus_num!=''">and a.bus_num = #{par.bus_num}</if>
+        <if test="1==1">and a.status = 1</if>
+        <if test="1==1">and b.status = 1</if>
+      </where>
+  </select>
+
+  <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
+     <include refid="OracleDialectPrefix" />
+      select
+        b.bus_num,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+        a.ag_head_mobile,b.bus_status,b.status
+      from A_agent a,A_agent_businfo b
+      where a.id=b.agent_id
+     <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
+      select
+         count(*)
+      from A_agent a,A_agent_businfo b
+      where a.id=b.agent_id
   </select>
 
 </mapper>
