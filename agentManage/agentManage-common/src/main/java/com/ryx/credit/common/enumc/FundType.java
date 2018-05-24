@@ -2,7 +2,7 @@ package com.ryx.credit.common.enumc;
 
 
 /**
- * 银行返回参数枚举类
+ * 资金类型枚举
  * @version V1.0
  * @Description:
  * @author: Liudh
