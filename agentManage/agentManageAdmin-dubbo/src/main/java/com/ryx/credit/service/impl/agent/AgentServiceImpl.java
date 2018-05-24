@@ -55,6 +55,7 @@ public class AgentServiceImpl implements  AgentService {
      */
     @Override
     public PageInfo queryAgentList(PageInfo page, Agent agent){
+
         AgentExample example  = new AgentExample();
         AgentExample.Criteria c = example.or();
         if(agent!=null && StringUtils.isNotEmpty(agent.getAgUniqNum())) {
