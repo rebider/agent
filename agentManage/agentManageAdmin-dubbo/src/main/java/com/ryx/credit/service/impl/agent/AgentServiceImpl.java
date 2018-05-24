@@ -61,7 +61,7 @@ public class AgentServiceImpl implements  AgentService {
             c.andAgUniqNumEqualTo(agent.getAgUniqNum());
         }
         if(agent!=null && StringUtils.isNotEmpty(agent.getAgName())) {
-            c.andAgNameLike(agent.getAgName());
+            c.andAgNameLike("%"+agent.getAgName()+"%");
         }
         if(agent!=null && StringUtils.isNotEmpty(agent.getAgDocPro())) {
             c.andAgDocProEqualTo(agent.getAgDocPro());
@@ -73,7 +73,7 @@ public class AgentServiceImpl implements  AgentService {
             c.andAgStatusEqualTo(agent.getAgStatus());
         }
         if(agent!=null && StringUtils.isNotEmpty(agent.getAgZbh())) {
-            c.andAgZbhLike(agent.getAgZbh());
+            c.andAgZbhLike("%"+agent.getAgZbh()+"%");
         }
         c.andStatusEqualTo(Status.STATUS_1.status);
         int count = agentMapper.countByExample(example);
@@ -82,7 +82,7 @@ public class AgentServiceImpl implements  AgentService {
         List<Agent> list = agentMapper.selectByExample(example);
         page.setRows(list);
         page.setTotal(count);
-        return null;
+        return page;
     }
 
 
