@@ -14,7 +14,7 @@ import java.util.List;
  * 选项服务类
  * Created by cx on 2018/5/22.
  */
-@Service
+@Service("dictOptionsService")
 public class DictOptionsServiceImpl implements DictOptionsService {
 
 

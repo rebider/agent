@@ -18,7 +18,7 @@ import java.util.Date;
  * ID生成服务类
  * Created by cx on 2018/5/22.
  */
-@Service
+@Service("idService")
 public class IdServiceImpl implements IdService {
 
 
