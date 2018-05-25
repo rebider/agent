@@ -6,7 +6,7 @@ import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.pojo.admin.agent.Region;
-import com.ryx.credit.service.agent.RegionService;
+import com.ryx.credit.service.dict.RegionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

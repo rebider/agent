@@ -1,4 +1,4 @@
-package com.ryx.credit.service.agent;
+package com.ryx.credit.service.dict;
 
 import com.ryx.credit.commons.result.Tree;
 
