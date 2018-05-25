@@ -22,4 +22,6 @@ public interface CapitalMapper {
     int updateByPrimaryKeySelective(Capital record);
 
     int updateByPrimaryKey(Capital record);
+
+    public List<Capital> paymentQuery(String id);
 }

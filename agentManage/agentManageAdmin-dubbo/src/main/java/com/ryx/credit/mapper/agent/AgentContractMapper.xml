@@ -248,4 +248,8 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="compactQuery" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from A_AGENT_CONTRACT where AGENT_ID=#{id}
+  </select>
 </mapper>

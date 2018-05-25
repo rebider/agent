@@ -22,4 +22,6 @@ public interface AgentContractMapper {
     int updateByPrimaryKeySelective(AgentContract record);
 
     int updateByPrimaryKey(AgentContract record);
+
+    public List<AgentContract> compactQuery(String id);
 }

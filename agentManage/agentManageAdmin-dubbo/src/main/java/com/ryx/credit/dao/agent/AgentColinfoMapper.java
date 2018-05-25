@@ -22,4 +22,6 @@ public interface AgentColinfoMapper {
     int updateByPrimaryKeySelective(AgentColinfo record);
 
     int updateByPrimaryKey(AgentColinfo record);
+
+    public List<AgentColinfo> proceedsQuery(String id);
 }

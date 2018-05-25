@@ -489,4 +489,7 @@
       where a.id=b.agent_id
   </select>
 
+  <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" /> from A_AGENT_BUSINFO  where AGENT_ID=#{id}
+  </select>
 </mapper>
