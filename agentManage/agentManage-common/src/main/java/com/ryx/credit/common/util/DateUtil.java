@@ -17,7 +17,10 @@ import java.util.TimeZone;
  */
 public class DateUtil {
 
-	/**
+    public final static SimpleDateFormat sdfDays = new SimpleDateFormat(
+            "yyyyMMdd");
+
+    /**
 	 * 将Date类型转换为字符串
 	 * 
 	 * @param date
@@ -353,6 +356,15 @@ public class DateUtil {
 		String parse = sdfDays.format(date);
 		return parse;
 	}
+    /**
+     * 获取YYYYMMDD格式
+     *
+     * @return
+     */
+    public static String getDays(){
+
+        return sdfDays.format(new Date());
+    }
 
    /* @Test
     public void test(){
