@@ -1,10 +1,10 @@
 package com.ryx.credit.service.agent;
 
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
-
+import java.util.List;
 import java.util.Map;
+
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 
 /**
  * Created by cx on 2018/5/23.
@@ -16,4 +16,6 @@ public interface AgentBusinfoService {
      * @return
      */
     PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
+    
+    public void agentBusInfoInsert(List<AgentBusInfo> agentBusInfo);
 }
