@@ -16,6 +16,9 @@ public interface BusinessPlatformService {
 
     PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page);
 
-
     Agent verifyAgent(Agent agent);
+
+    AgentBusInfo findById(String id);
+
+    int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo);
 }

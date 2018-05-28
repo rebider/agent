@@ -66,4 +66,29 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return agents.get(0);
     }
 
+    @Override
+    public AgentBusInfo findById(String id){
+        AgentBusInfo agentBusInfo = null;
+        if(StringUtils.isBlank(id)){
+            return agentBusInfo;
+        }else{
+            agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+        }
+
+        return agentBusInfo;
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo){
+        if(StringUtils.isBlank(agentBusInfo.getId())){
+            return 0;
+        }
+        AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
+        agentBusInfo.setVersion(agbus.getVersion());
+        int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+        return i;
+    }
+
+
+
 }
