@@ -6,6 +6,8 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.agent.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -18,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("agentEnterService")
 public class AgentEnterServiceImpl implements AgentEnterService {
 
+    private static Logger logger = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
+
     @Autowired
     private AgentService agentService;
     @Autowired
@@ -26,6 +30,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AccountPaidItemService accountPaidItemService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
 
 
     /**
@@ -50,6 +56,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                 item.setAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
+                agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
             }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
