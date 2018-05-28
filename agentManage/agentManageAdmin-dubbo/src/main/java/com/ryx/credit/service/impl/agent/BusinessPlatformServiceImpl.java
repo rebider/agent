@@ -1,15 +1,15 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.AgentExample;
+import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
@@ -66,4 +68,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return agents.get(0);
     }
 
+
+    @Override
+    public List<PlatForm> queryAblePlatForm() {
+        PlatFormExample example = new PlatFormExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+        return platFormMapper.selectByExample(example);
+    }
 }
