@@ -188,4 +188,8 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="accessoryQuery" parameterType="string" resultMap="BaseResultMap">
+select * from A_ATTACHMENT_REL  rel left join A_ATTACHMENT a on a.id=rel.ATT_ID where rel.SRC_ID=#{id} and rel.BUS_TYPE=#{busType}
+  </select>
 </mapper>

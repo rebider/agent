@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service("agentQueryService")
-public class AgentQueryServiceImpl implements AgentQueryService{
+public class AgentQueryServiceImpl implements AgentQueryService {
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
     @Autowired
     private AgentMapper agentMapper;
@@ -28,6 +28,9 @@ public class AgentQueryServiceImpl implements AgentQueryService{
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
 
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+
     @Override
     public Agent informationQuery(String id) {
         return agentMapper.selectByPrimaryKey(id);
@@ -35,21 +38,51 @@ public class AgentQueryServiceImpl implements AgentQueryService{
 
     @Override
     public List<AgentColinfo> proceedsQuery(String id) {
-        return agentColinfoMapper.proceedsQuery(id);
+        List<AgentColinfo> agentColinfos = agentColinfoMapper.proceedsQuery(id);
+        if (null != agentColinfos && agentColinfos.size() > 0) {
+            for (AgentColinfo agentColinfo : agentColinfos) {
+                agentColinfo.setAttachmentList(accessoryQuery(agentColinfo.getId(), "Proceeds"));
+            }
+        }
+
+        return agentColinfos;
     }
 
     @Override
     public List<Capital> paymentQuery(String id) {
-        return capitalMapper.paymentQuery(id);
+        List<Capital> capitals = capitalMapper.paymentQuery(id);
+        if (null != capitals && capitals.size() > 0) {
+            for (Capital capital : capitals) {
+                capital.setAttachmentList(accessoryQuery(capital.getId(), "Capital"));
+            }
+        }
+        return capitals;
     }
 
     @Override
     public List<AgentContract> compactQuery(String id) {
-        return agentContractMapper.compactQuery(id);
+        List<AgentContract> agentContracts = agentContractMapper.compactQuery(id);
+        if (null != agentContracts && agentContracts.size() > 0) {
+            for (AgentContract agentContract : agentContracts) {
+                agentContract.setAttachmentList(accessoryQuery(agentContract.getId(), "Contract"));
+            }
+        }
+        return agentContracts;
     }
 
     @Override
     public List<AgentBusInfo> businessQuery(String id) {
-        return agentBusInfoMapper.businessQuery(id);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.businessQuery(id);
+        if (null != agentBusInfos && agentBusInfos.size() > 0) {
+            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                agentBusInfo.setAttachmentList(accessoryQuery(agentBusInfo.getId(), "Business"));
+            }
+        }
+        return agentBusInfos;
+    }
+
+    @Override
+    public List<Attachment> accessoryQuery(String id, String busType) {
+        return attachmentMapper.accessoryQuery(id, busType);
     }
 }

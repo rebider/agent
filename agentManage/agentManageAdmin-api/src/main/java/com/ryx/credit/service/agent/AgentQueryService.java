@@ -33,4 +33,9 @@ public interface AgentQueryService {
      */
     public List<AgentBusInfo> businessQuery(String id);
 
+
+    /**
+     * 查询附件信息
+     */
+    public List<Attachment> accessoryQuery(String id,String busType);
 }
