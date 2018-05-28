@@ -30,4 +30,36 @@ public class AgentVo {
     public void setCapitalVoList(List<CapitalVo> capitalVoList) {
         this.capitalVoList = capitalVoList;
     }
+
+    public List<AgentContractVo> getContractVoList() {
+        return contractVoList;
+    }
+
+    public void setContractVoList(List<AgentContractVo> contractVoList) {
+        this.contractVoList = contractVoList;
+    }
+
+    public List<AgentColinfoVo> getColinfoVoList() {
+        return colinfoVoList;
+    }
+
+    public void setColinfoVoList(List<AgentColinfoVo> colinfoVoList) {
+        this.colinfoVoList = colinfoVoList;
+    }
+
+    public List<AgentBusInfoVo> getBusInfoVoList() {
+        return busInfoVoList;
+    }
+
+    public void setBusInfoVoList(List<AgentBusInfoVo> busInfoVoList) {
+        this.busInfoVoList = busInfoVoList;
+    }
+
+    public List<String> getAgentTableFile() {
+        return agentTableFile;
+    }
+
+    public void setAgentTableFile(List<String> agentTableFile) {
+        this.agentTableFile = agentTableFile;
+    }
 }
