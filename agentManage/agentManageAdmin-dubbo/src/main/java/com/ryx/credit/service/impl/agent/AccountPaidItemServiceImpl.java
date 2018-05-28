@@ -48,9 +48,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         if(StringUtils.isBlank(cUser)){
             return result;
         }
-        if(fileIdList.size()==0){
-            return result;
-        }
+
         if(StringUtils.isBlank(capital.getcType())){
             return result;
         }
@@ -63,19 +61,21 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         capital.setcUtime(nowDate);
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
-            for (String fileId : fileIdList) {
-                AttachmentRel record  = new AttachmentRel();
-                record.setAttId(fileId);
-                record.setSrcId(capital.getId());
-                record.setcUser(cUser);
-                record.setcTime(nowDate);
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Capital.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                int i = attachmentRelMapper.insertSelective(record);
-                if(1!=i){
-                    log.info("insertAccountPaid添加缴纳款项附件关系失败");
-                    return new AgentResult(500,"系统异常","");
+            if(fileIdList!=null) {
+                for (String fileId : fileIdList) {
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(fileId);
+                    record.setSrcId(capital.getId());
+                    record.setcUser(cUser);
+                    record.setcTime(nowDate);
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.Capital.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int i = attachmentRelMapper.insertSelective(record);
+                    if (1 != i) {
+                        log.info("insertAccountPaid添加缴纳款项附件关系失败");
+                        return new AgentResult(500, "系统异常", "");
+                    }
                 }
             }
             log.info("insertAccountPaid缴纳款项添加:成功");

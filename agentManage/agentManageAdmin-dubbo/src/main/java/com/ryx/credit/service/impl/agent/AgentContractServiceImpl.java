@@ -61,6 +61,10 @@ public class AgentContractServiceImpl implements AgentContractService {
             logger.info("代理商合同添加:{}","合同信息为空");
             throw new ProcessException("合同信息为空");
         }
+        if(StringUtils.isEmpty(contract.getAgentId())){
+            logger.info("代理商合同添加:{}","代理商id不能为空");
+            throw new ProcessException("合同代理商信息不能为空");
+        }
         if(StringUtils.isEmpty(contract.getcUser())){
             logger.info("代理商合同添加:{}","操作用户不能为空");
             throw new ProcessException("操作用户不能为空");
@@ -97,19 +101,21 @@ public class AgentContractServiceImpl implements AgentContractService {
         contract.setcUtime(date);
         contract.setId(idService.genId(TabId.a_agent_contract));
         if(1==agentContractMapper.insertSelective(contract)){
-            for (String s : attr) {
-                if(StringUtils.isEmpty(s))continue;
-                AttachmentRel record  = new AttachmentRel();
-                record.setAttId(s);
-                record.setSrcId(contract.getId());
-                record.setcUser(contract.getcUser());
-                record.setcTime(contract.getcTime());
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Contract.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                if(1!=attachmentRelMapper.insertSelective(record)){
-                    logger.info("代理商合同添加:{}","添加合同附件关系失败");
-                    throw new ProcessException("添加合同附件关系失败");
+            if(attr!=null) {
+                for (String s : attr) {
+                    if (StringUtils.isEmpty(s)) continue;
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(s);
+                    record.setSrcId(contract.getId());
+                    record.setcUser(contract.getcUser());
+                    record.setcTime(contract.getcTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.Contract.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    if (1 != attachmentRelMapper.insertSelective(record)) {
+                        logger.info("代理商合同添加:{}", "添加合同附件关系失败");
+                        throw new ProcessException("添加合同附件关系失败");
+                    }
                 }
             }
             logger.info("代理商合同添加:成功");

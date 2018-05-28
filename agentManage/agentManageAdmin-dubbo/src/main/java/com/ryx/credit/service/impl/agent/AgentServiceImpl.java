@@ -123,19 +123,21 @@ public class AgentServiceImpl implements  AgentService {
         agent.setcUtime(date);
         agent.setId(idService.genId(TabId.a_agent));
         if(1==agentMapper.insertSelective(agent)){
-            for (String s : attrId) {
-                if(StringUtils.isEmpty(s))continue;
-                AttachmentRel record  = new AttachmentRel();
-                record.setAttId(s);
-                record.setSrcId(agent.getId());
-                record.setcUser(agent.getcUser());
-                record.setcTime(agent.getcTime());
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Agent.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                if(1!=attachmentRelMapper.insertSelective(record)){
-                    logger.info("代理商添加:{}","添加代理商附件关系失败");
-                    throw new ProcessException("添加代理商附件关系失败");
+            if(attrId!=null) {
+                for (String s : attrId) {
+                    if (StringUtils.isEmpty(s)) continue;
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(s);
+                    record.setSrcId(agent.getId());
+                    record.setcUser(agent.getcUser());
+                    record.setcTime(agent.getcTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.Agent.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    if (1 != attachmentRelMapper.insertSelective(record)) {
+                        logger.info("代理商添加:{}", "添加代理商附件关系失败");
+                        throw new ProcessException("添加代理商附件关系失败");
+                    }
                 }
             }
             logger.info("代理商添加:成功");

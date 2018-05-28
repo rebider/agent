@@ -69,8 +69,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			null == agentBusInfo.getCloTaxPoint() ||
         			null == agentBusInfo.getCloInvoice() ||
         			null == agentBusInfo.getCloReceipt() ||
-        			StringUtils.isEmpty(agentBusInfo.getCloPayCompany()) ||
-        			StringUtils.isEmpty(agentBusInfo.getCloAgentColinfo()) ||
         			StringUtils.isEmpty(agentBusInfo.getcUser())
         			){
                 throw new ProcessException("业务数据不完整");
@@ -81,6 +79,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
         	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
         	agentBusInfo.setStatus(Status.STATUS_1.status);
+			agentBusInfo.setVersion(Status.STATUS_1.status);
         	agentBusInfoMapper.insert(agentBusInfo);
 
     }

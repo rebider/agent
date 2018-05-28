@@ -36,19 +36,30 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
-        Agent agent = agentService.insertAgent(agentVo.getAgent(),agentVo.getAgentTableFile());
-        agentVo.setAgent(agent);
-        for (AgentContractVo item : agentVo.getContractVoList()) {
-            agentContractService.insertAgentContract(item,item.getContractTableFile());
+        try {
+            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile());
+            agentVo.setAgent(agent);
+            for (AgentContractVo item : agentVo.getContractVoList()) {
+                item.setcUser(agent.getcUser());
+                item.setAgentId(agent.getId());
+                agentContractService.insertAgentContract(item, item.getContractTableFile());
+            }
+            for (CapitalVo item : agentVo.getCapitalVoList()) {
+                item.setcAgentId(agent.getId());
+                accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
+            }
+            for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
+                item.setAgentId(agent.getId());
+            }
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                item.setcUser(agent.getcUser());
+                item.setAgentId(agent.getId());
+                agentBusinfoService.agentBusInfoInsert(item);
+            }
+            return ResultVO.success(agentVo);
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new ProcessException("代理商信息录入失败");
         }
-        for (CapitalVo item : agentVo.getCapitalVoList()) {
-            accountPaidItemService.insertAccountPaid(item,item.getCapitalTableFile(),agentVo.getAgent().getcUser());
-        }
-        for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
-        }
-        for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
-            agentBusinfoService.agentBusInfoInsert(item);
-        }
-        return ResultVO.success(agentVo);
     }
 }
