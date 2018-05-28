@@ -4,6 +4,9 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
+
+import java.util.List;
 
 /**
  * 业务平台管理
@@ -21,4 +24,6 @@ public interface BusinessPlatformService {
     AgentBusInfo findById(String id);
 
     int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo);
+
+    List<PlatForm> queryAblePlatForm();
 }
