@@ -2,7 +2,9 @@ package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,4 +33,7 @@ public interface AgentService {
     Agent insertAgent(Agent agent, List<String> attrId) throws ProcessException;
 
     Agent getAgentById(String id);
+
+
+
 }

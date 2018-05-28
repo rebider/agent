@@ -2,12 +2,13 @@ package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by cx on 2018/5/28.
  */
-public class AgentVo {
+public class AgentVo implements Serializable{
 
     private Agent agent;
     private List<CapitalVo> capitalVoList;

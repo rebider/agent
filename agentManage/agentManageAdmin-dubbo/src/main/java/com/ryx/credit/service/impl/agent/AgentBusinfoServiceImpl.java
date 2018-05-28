@@ -50,8 +50,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void agentBusInfoInsert(List<AgentBusInfo> agentBusInfos) {
-    	for (AgentBusInfo agentBusInfo : agentBusInfos) {
+    public void agentBusInfoInsert(AgentBusInfo agentBusInfo) {
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusNum()) ||
@@ -76,17 +75,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			){
                 throw new ProcessException("业务数据不完整");
         	}
-        	
         	agentBusInfo.setId(idService.genId(TabId.a_agent_businfo));
         	agentBusInfo.setcTime(new Date());
         	agentBusInfo.setcUtime(agentBusInfo.getcTime());
         	agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
         	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
         	agentBusInfo.setStatus(Status.STATUS_1.status);
-        	
         	agentBusInfoMapper.insert(agentBusInfo);
-		}
-    	
+
     }
     
 

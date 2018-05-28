@@ -17,5 +17,5 @@ public interface AgentBusinfoService {
      */
     PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
     
-    public void agentBusInfoInsert(List<AgentBusInfo> agentBusInfo);
+    public void agentBusInfoInsert(AgentBusInfo agentBusInfo);
 }
