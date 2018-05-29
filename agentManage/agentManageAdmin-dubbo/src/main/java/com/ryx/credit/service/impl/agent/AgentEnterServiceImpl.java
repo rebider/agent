@@ -65,6 +65,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
                 AgentResult res = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
                 if(!res.isOK()){
                     throw new ProcessException("添加交款项异常");

@@ -17,7 +17,7 @@ public interface AgentBusinfoService {
      */
     PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
     
-    public void agentBusInfoInsert(AgentBusInfo agentBusInfo);
+    void agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception;
 
     /**
      * 代理商业务信息
