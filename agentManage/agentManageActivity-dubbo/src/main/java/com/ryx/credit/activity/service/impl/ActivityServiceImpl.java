@@ -55,7 +55,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
     @Override
-    public void createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath) {
+    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath) {
 
         try {
             ProcessEngine processEngine = processEngineConfiguration
@@ -70,10 +70,12 @@ public class ActivityServiceImpl implements ActivityService {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(workId);
             logger.info("------processInstance:" + processInstance.getId());
             logger.info("------processInstance:" + processInstance.getDeploymentId());
+            return processInstance.getId();
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("createDeloyFlow error", e);
         }
+        return null;
     }
 
     @Override
