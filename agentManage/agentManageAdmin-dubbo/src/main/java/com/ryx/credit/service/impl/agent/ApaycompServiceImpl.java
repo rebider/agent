@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Created by cx on 2018/5/29.
  */
-@Service("ApaycompService")
+@Service("apaycompService")
 public class ApaycompServiceImpl implements com.ryx.credit.service.agent.ApaycompService {
 
     @Autowired
