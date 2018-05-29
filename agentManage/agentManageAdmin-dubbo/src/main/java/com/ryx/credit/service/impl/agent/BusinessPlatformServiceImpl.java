@@ -121,6 +121,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     public AgentResult saveBusinessPlatform(AgentVo agentVo) {
         try {
             Agent agent = agentVo.getAgent();
+            agent.setId(agentVo.getAgentId());
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
@@ -144,10 +145,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 item.setAgentId(agent.getId());
                 agentBusinfoService.agentBusInfoInsert(item);
             }
+            return AgentResult.ok();
         }catch (Exception e){
             e.printStackTrace();
             throw new ProcessException("业务平台信息录入失败");
         }
-        return new AgentResult();
     }
 }

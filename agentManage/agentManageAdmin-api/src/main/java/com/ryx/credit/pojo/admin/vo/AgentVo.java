@@ -16,6 +16,10 @@ public class AgentVo implements Serializable{
     private List<AgentColinfoVo> colinfoVoList;
     private List<AgentBusInfoVo> busInfoVoList;
     private List<String> agentTableFile;
+    private String agentId;
+    private String submitType;
+
+
     public Agent getAgent() {
         return agent;
     }
@@ -62,5 +66,21 @@ public class AgentVo implements Serializable{
 
     public void setAgentTableFile(List<String> agentTableFile) {
         this.agentTableFile = agentTableFile;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getSubmitType() {
+        return submitType;
+    }
+
+    public void setSubmitType(String submitType) {
+        this.submitType = submitType;
     }
 }
