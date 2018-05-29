@@ -348,6 +348,76 @@ public class AssProtoColRelExample {
             return (Criteria) this;
         }
 
+        public Criteria andCUserIsNull() {
+            addCriterion("C_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserIsNotNull() {
+            addCriterion("C_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserEqualTo(String value) {
+            addCriterion("C_USER =", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotEqualTo(String value) {
+            addCriterion("C_USER <>", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserGreaterThan(String value) {
+            addCriterion("C_USER >", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserGreaterThanOrEqualTo(String value) {
+            addCriterion("C_USER >=", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserLessThan(String value) {
+            addCriterion("C_USER <", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserLessThanOrEqualTo(String value) {
+            addCriterion("C_USER <=", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserLike(String value) {
+            addCriterion("C_USER like", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotLike(String value) {
+            addCriterion("C_USER not like", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserIn(List<String> values) {
+            addCriterion("C_USER in", values, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotIn(List<String> values) {
+            addCriterion("C_USER not in", values, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserBetween(String value1, String value2) {
+            addCriterion("C_USER between", value1, value2, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotBetween(String value1, String value2) {
+            addCriterion("C_USER not between", value1, value2, "cUser");
+            return (Criteria) this;
+        }
+
         public Criteria andCTimeIsNull() {
             addCriterion("C_TIME is null");
             return (Criteria) this;

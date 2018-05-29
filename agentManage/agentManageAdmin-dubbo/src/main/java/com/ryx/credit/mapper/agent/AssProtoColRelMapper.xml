@@ -5,6 +5,7 @@
     <id column="ASS_PROTOCOL_ID" property="assProtocolId" jdbcType="VARCHAR" />
     <id column="AGENT_BUSINFO_ID" property="agentBusinfoId" jdbcType="VARCHAR" />
     <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
   </resultMap>
@@ -38,7 +39,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ASS_PROTOCOL_ID, AGENT_BUSINFO_ID, REMARK, C_TIME, STATUS
+    ASS_PROTOCOL_ID, AGENT_BUSINFO_ID, REMARK, C_USER, C_TIME, STATUS
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColRelExample" >
     <include refid="OracleDialectPrefix" />
@@ -71,9 +72,11 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColRel" >
     insert into A_ASS_PROTOCOL_REL (ASS_PROTOCOL_ID, AGENT_BUSINFO_ID, REMARK, 
-      C_TIME, STATUS)
+      C_USER, C_TIME, STATUS
+      )
     values (#{assProtocolId,jdbcType=VARCHAR}, #{agentBusinfoId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL})
+      #{cUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColRel" >
     insert into A_ASS_PROTOCOL_REL
@@ -86,6 +89,9 @@
       </if>
       <if test="remark != null" >
         REMARK,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
       </if>
       <if test="cTime != null" >
         C_TIME,
@@ -103,6 +109,9 @@
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
       </if>
       <if test="cTime != null" >
         #{cTime,jdbcType=TIMESTAMP},
@@ -124,6 +133,9 @@
       <if test="remark != null" >
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
       <if test="cTime != null" >
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
       </if>
@@ -137,6 +149,7 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColRel" >
     update A_ASS_PROTOCOL_REL
     set REMARK = #{remark,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL}
     where ASS_PROTOCOL_ID = #{assProtocolId,jdbcType=VARCHAR}

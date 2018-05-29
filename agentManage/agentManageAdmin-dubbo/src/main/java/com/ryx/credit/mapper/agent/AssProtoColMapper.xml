@@ -9,6 +9,7 @@
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="C_START" property="cStart" jdbcType="TIMESTAMP" />
     <result column="C_END" property="cEnd" jdbcType="TIMESTAMP" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="C_SORT" property="cSort" jdbcType="DECIMAL" />
     <result column="PROTOCOL_STATUS" property="protocolStatus" jdbcType="DECIMAL" />
   </resultMap>
@@ -42,7 +43,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, PLATFORM, PROTOCOL_DES, PROTOCOL_RULE, C_TIME, C_START, C_END, C_SORT, PROTOCOL_STATUS
+    ID, PLATFORM, PROTOCOL_DES, PROTOCOL_RULE, C_TIME, C_START, C_END, C_USER, C_SORT, 
+    PROTOCOL_STATUS
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoColExample" >
     <include refid="OracleDialectPrefix" />
@@ -75,12 +77,12 @@
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
     insert into A_ASS_PROTOCOL (ID, PLATFORM, PROTOCOL_DES, 
       PROTOCOL_RULE, C_TIME, C_START, 
-      C_END, C_SORT, PROTOCOL_STATUS
-      )
+      C_END, C_USER, C_SORT, 
+      PROTOCOL_STATUS)
     values (#{id,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{protocolDes,jdbcType=VARCHAR}, 
       #{protocolRule,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cStart,jdbcType=TIMESTAMP}, 
-      #{cEnd,jdbcType=TIMESTAMP}, #{cSort,jdbcType=DECIMAL}, #{protocolStatus,jdbcType=DECIMAL}
-      )
+      #{cEnd,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{cSort,jdbcType=DECIMAL}, 
+      #{protocolStatus,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AssProtoCol" >
     insert into A_ASS_PROTOCOL
@@ -105,6 +107,9 @@
       </if>
       <if test="cEnd != null" >
         C_END,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
       </if>
       <if test="cSort != null" >
         C_SORT,
@@ -134,6 +139,9 @@
       </if>
       <if test="cEnd != null" >
         #{cEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
       </if>
       <if test="cSort != null" >
         #{cSort,jdbcType=DECIMAL},
@@ -170,6 +178,9 @@
       <if test="cEnd != null" >
         C_END = #{cEnd,jdbcType=TIMESTAMP},
       </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
       <if test="cSort != null" >
         C_SORT = #{cSort,jdbcType=DECIMAL},
       </if>
@@ -187,6 +198,7 @@
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       C_START = #{cStart,jdbcType=TIMESTAMP},
       C_END = #{cEnd,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
       C_SORT = #{cSort,jdbcType=DECIMAL},
       PROTOCOL_STATUS = #{protocolStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}

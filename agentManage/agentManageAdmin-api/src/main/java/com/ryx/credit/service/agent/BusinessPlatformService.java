@@ -1,10 +1,12 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.util.List;
 
@@ -26,4 +28,6 @@ public interface BusinessPlatformService {
     int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo);
 
     List<PlatForm> queryAblePlatForm();
+
+    AgentResult saveBusinessPlatform(AgentVo agentVo);
 }

@@ -50,6 +50,8 @@ public class Capital implements Serializable{
 
     private List<Attachment> attachmentList;
 
+    private String cUser;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -184,5 +186,13 @@ public class Capital implements Serializable{
 
     public void setcAgentId(String cAgentId) {
         this.cAgentId = cAgentId == null ? null : cAgentId.trim();
+    }
+
+    public String getcUser() {
+        return cUser;
+    }
+
+    public void setcUser(String cUser) {
+        this.cUser = cUser;
     }
 }
