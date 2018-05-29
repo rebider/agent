@@ -34,6 +34,8 @@ public interface AgentService {
 
     Agent getAgentById(String id);
 
+    int updateAgent(Agent agent);
+
 
 
 }

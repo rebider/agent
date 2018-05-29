@@ -153,4 +153,8 @@ public class AgentServiceImpl implements  AgentService {
     }
 
 
+    @Override
+    public int updateAgent(Agent agent) {
+        return agentMapper.updateByPrimaryKeySelective(agent);
+    }
 }

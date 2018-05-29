@@ -42,4 +42,7 @@
     <dubbo:service interface="com.ryx.credit.service.dict.MultiFileUploadService" ref="multiFileUploadService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentEnterService" ref="agentEnterService"  timeout="1200000" registry="${zk.group}"/>
 
+
+    <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}"/>
+
 </beans>

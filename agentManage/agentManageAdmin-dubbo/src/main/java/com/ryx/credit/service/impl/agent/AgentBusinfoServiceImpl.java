@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,6 +84,21 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfoMapper.insert(agentBusInfo);
 
     }
-    
 
+
+	@Override
+	public List<AgentBusInfo> agentBusInfoList(String agentId) {
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status);
+		return agentBusInfoMapper.selectByExample(example);
+	}
+
+
+	public int updateAgentBusInfo(AgentBusInfo agentBusInfo){
+    	return agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+	}
+
+	public AgentBusInfo getById(String id){
+		return agentBusInfoMapper.selectByPrimaryKey(id);
+	}
 }

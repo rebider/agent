@@ -18,4 +18,15 @@ public interface AgentBusinfoService {
     PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
     
     public void agentBusInfoInsert(AgentBusInfo agentBusInfo);
+
+    /**
+     * 代理商业务信息
+     * @param agentId
+     * @return
+     */
+    public List<AgentBusInfo> agentBusInfoList(String agentId);
+
+    public int updateAgentBusInfo(AgentBusInfo agentBusInfo);
+
+    public AgentBusInfo getById(String id);
 }
