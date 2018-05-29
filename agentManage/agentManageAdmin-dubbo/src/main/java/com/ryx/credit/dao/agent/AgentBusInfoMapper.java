@@ -47,4 +47,6 @@ public interface AgentBusInfoMapper {
     int queryBusinessPlatformCount(@Param("par") Map<String,Object> par);
 
     public List<AgentBusInfo> businessQuery(String id);
+
+    Map<String,Object> queryAgentName(String id);
 }

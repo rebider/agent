@@ -492,4 +492,21 @@
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
     select <include refid="Base_Column_List" /> from A_AGENT_BUSINFO  where AGENT_ID=#{id}
   </select>
+
+
+  <sql id="agentAll" >
+    agentBus.BUS_ACTIVATION_PARENT,
+    agentBus.BUS_REGION,agentBus.BUS_SENT_DIRECTLY,agentBus.BUS_DIRECT_CASHBACK,agentBus.BUS_INDE_ASS,agentBus.BUS_CONTACT,agentBus.BUS_CONTACT_MOBILE,
+    agentBus.BUS_CONTACT_EMAIL,agentBus.BUS_CONTACT_PERSON,agentBus.BUS_RISK_EMAIL,
+    agentBus.CLO_TAX_POINT,agentBus.CLO_INVOICE,agentBus.CLO_RECEIPT,agentBus.CLO_PAY_COMPANY,agentBus.CLO_AGENT_COLINFO,agentBus.BUS_STATUS,
+    agentBus.CLO_REVIEW_STATUS,agentBus.C_TIME,agentBus.C_UTIME,agentBus.C_USER,agentBus.STATUS as agentBusStatus,agent.AG_UNIQ_NUM,agent.AG_NAME,agent.AG_NATURE,agent.AG_CAPITAL,agent.AG_BUS_LIC,agent.AG_BUS_LICB,agent.AG_BUS_LICE
+    ,agent.AG_LEGAL,agent.AG_LEGAL_CERTYPE,agent.AG_LEGAL_CERNUM,agent.AG_LEGAL_MOBILE,agent.AG_HEAD,agent.AG_HEAD_MOBILE,agent.AG_REG_ADD
+    ,agent.AG_BUS_SCOPE,agent.CLO_TAX_POINT,agent.AG_STATUS,agent.AG_DOC_PRO,agent.AG_DOC_DISTRICT,agent.AG_REMARK,agent.C_INCOM_TIME
+    ,agent.C_TIME,agent.C_UTIME,agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS AS agentStatus
+  </sql>
+  <select id="queryAgentName" parameterType="string" resultType="map">
+  SELECT <include refid="agentAll"/> from A_agent_businfo agentBus left join A_agent agent on agentBus.agent_id= agent.id where 1=1 and agentBus.id=#{id}
+  </select>
+
+
 </mapper>

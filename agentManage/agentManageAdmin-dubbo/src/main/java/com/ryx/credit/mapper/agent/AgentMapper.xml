@@ -437,4 +437,18 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+<sql id="deptName">
+agent.ID,agent.AG_UNIQ_NUM,agent.AG_NAME,agent.AG_NATURE,agent.AG_CAPITAL,agent.AG_BUS_LIC,agent.AG_BUS_LICB,agent.AG_BUS_LICE,
+agent.AG_LEGAL,agent.AG_LEGAL_CERTYPE,agent.AG_LEGAL_CERNUM,agent.AG_LEGAL_MOBILE,agent.AG_HEAD,agent.AG_HEAD_MOBILE,agent.AG_REG_ADD,
+agent.AG_BUS_SCOPE,agent.CLO_TAX_POINT,agent.AG_STATUS,agent.AG_DOC_PRO,agent.AG_DOC_DISTRICT,agent.AG_REMARK,agent.C_INCOM_TIME,agent.C_TIME,agent.C_UTIME,
+agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS,cor.CODE,cor.ICON,cor.PID,cor.SEQ,cor.CREATE_TIME
+</sql>
+
+  <select id="queryDeptName" parameterType="string" resultType="map">
+        select <include refid="deptName"/> from A_AGENT agent left join C_ORGANIZATION cor on agent.AG_DOC_PRO= cor.id where cor.id=#{id}
+  </select>
+
+  <select id="queryDeptNameDis" parameterType="string" resultType="map">
+    select <include refid="deptName"/> from A_AGENT agent left join C_ORGANIZATION cor on agent.AG_DOC_DISTRICT= cor.id where cor.id=#{id}
+  </select>
 </mapper>
