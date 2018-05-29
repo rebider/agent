@@ -1,6 +1,5 @@
 package com.ryx.credit.service.agent;
 
-import java.util.List;
 import java.util.Map;
 
 import com.ryx.credit.common.util.PageInfo;
@@ -17,5 +16,5 @@ public interface AgentBusinfoService {
      */
     PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
     
-    public void agentBusInfoInsert(AgentBusInfo agentBusInfo);
+    void agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception;
 }

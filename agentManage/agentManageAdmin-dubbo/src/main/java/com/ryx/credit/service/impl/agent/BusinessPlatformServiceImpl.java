@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -10,8 +11,8 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.service.agent.BusinessPlatformService;
+import com.ryx.credit.pojo.admin.vo.*;
+import com.ryx.credit.service.agent.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -39,6 +40,15 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentMapper agentMapper;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private AgentContractService agentContractService;
+    @Autowired
+    private AccountPaidItemService accountPaidItemService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
@@ -101,14 +111,42 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return platFormMapper.selectByExample(example);
     }
 
-
+    /**
+     * 平台业务保存
+     * @param agentVo
+     * @return
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) {
         try {
-
-        } catch (Exception e) {
+            Agent agent = agentVo.getAgent();
+            for (AgentContractVo item : agentVo.getContractVoList()) {
+                item.setcUser(agent.getcUser());
+                item.setAgentId(agent.getId());
+                agentContractService.insertAgentContract(item, item.getContractTableFile());
+            }
+            for (CapitalVo item : agentVo.getCapitalVoList()) {
+                item.setcAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
+                AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
+                if(!result.isOK()){
+                    throw new ProcessException("缴纳款项信息录入失败");
+                }
+            }
+            for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
+                item.setAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
+                agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+            }
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                item.setcUser(agent.getcUser());
+                item.setAgentId(agent.getId());
+                agentBusinfoService.agentBusInfoInsert(item);
+            }
+        }catch (Exception e){
             e.printStackTrace();
+            throw new ProcessException("业务平台信息录入失败");
         }
         return new AgentResult();
     }

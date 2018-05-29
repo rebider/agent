@@ -52,6 +52,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
+                item.setcUser(agent.getcUser());
                 accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
