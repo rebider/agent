@@ -19,6 +19,8 @@ public class AssProtoCol implements Serializable {
 
     private Date cEnd;
 
+    private String cUser;
+
     private BigDecimal cSort;
 
     private BigDecimal protocolStatus;
@@ -77,6 +79,14 @@ public class AssProtoCol implements Serializable {
 
     public void setcEnd(Date cEnd) {
         this.cEnd = cEnd;
+    }
+
+    public String getcUser() {
+        return cUser;
+    }
+
+    public void setcUser(String cUser) {
+        this.cUser = cUser == null ? null : cUser.trim();
     }
 
     public BigDecimal getcSort() {

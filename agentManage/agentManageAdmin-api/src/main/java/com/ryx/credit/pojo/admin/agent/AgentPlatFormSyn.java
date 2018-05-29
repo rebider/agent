@@ -21,6 +21,8 @@ public class AgentPlatFormSyn implements Serializable {
 
     private Date notifytime;
 
+    private String cUser;
+
     private Date cTime;
 
     private BigDecimal version;
@@ -87,6 +89,14 @@ public class AgentPlatFormSyn implements Serializable {
 
     public void setNotifytime(Date notifytime) {
         this.notifytime = notifytime;
+    }
+
+    public String getcUser() {
+        return cUser;
+    }
+
+    public void setcUser(String cUser) {
+        this.cUser = cUser == null ? null : cUser.trim();
     }
 
     public Date getcTime() {

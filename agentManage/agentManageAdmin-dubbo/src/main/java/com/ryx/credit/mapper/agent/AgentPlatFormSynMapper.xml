@@ -10,6 +10,7 @@
     <result column="NOTIFYJSON" property="notifyjson" jdbcType="VARCHAR" />
     <result column="NOTIFYSTATUS" property="notifystatus" jdbcType="DECIMAL" />
     <result column="NOTIFYTIME" property="notifytime" jdbcType="TIMESTAMP" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
   </resultMap>
@@ -44,7 +45,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, AGENT_ID, BUS_ID, PLATFORM_CODE, SENDJSON, NOTIFYJSON, NOTIFYSTATUS, NOTIFYTIME, 
-    C_TIME, VERSION
+    C_USER, C_TIME, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
     <include refid="OracleDialectPrefix" />
@@ -77,12 +78,12 @@
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     insert into A_AGENT_PLATFORMSYN (ID, AGENT_ID, BUS_ID, 
       PLATFORM_CODE, SENDJSON, NOTIFYJSON, 
-      NOTIFYSTATUS, NOTIFYTIME, C_TIME, 
-      VERSION)
+      NOTIFYSTATUS, NOTIFYTIME, C_USER, 
+      C_TIME, VERSION)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, 
       #{platformCode,jdbcType=VARCHAR}, #{sendjson,jdbcType=VARCHAR}, #{notifyjson,jdbcType=VARCHAR}, 
-      #{notifystatus,jdbcType=DECIMAL}, #{notifytime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{version,jdbcType=DECIMAL})
+      #{notifystatus,jdbcType=DECIMAL}, #{notifytime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     insert into A_AGENT_PLATFORMSYN
@@ -110,6 +111,9 @@
       </if>
       <if test="notifytime != null" >
         NOTIFYTIME,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
       </if>
       <if test="cTime != null" >
         C_TIME,
@@ -142,6 +146,9 @@
       </if>
       <if test="notifytime != null" >
         #{notifytime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
       </if>
       <if test="cTime != null" >
         #{cTime,jdbcType=TIMESTAMP},
@@ -181,6 +188,9 @@
       <if test="notifytime != null" >
         NOTIFYTIME = #{notifytime,jdbcType=TIMESTAMP},
       </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
       <if test="cTime != null" >
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
       </if>
@@ -199,6 +209,7 @@
       NOTIFYJSON = #{notifyjson,jdbcType=VARCHAR},
       NOTIFYSTATUS = #{notifystatus,jdbcType=DECIMAL},
       NOTIFYTIME = #{notifytime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}

@@ -10,9 +10,13 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +80,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }else{
             agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
         }
-
         return agentBusInfo;
     }
 
@@ -91,13 +94,22 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return i;
     }
 
-
-
-
     @Override
     public List<PlatForm> queryAblePlatForm() {
         PlatFormExample example = new PlatFormExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
         return platFormMapper.selectByExample(example);
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult saveBusinessPlatform(AgentVo agentVo) {
+        try {
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AgentResult();
     }
 }

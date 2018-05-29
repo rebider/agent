@@ -7,6 +7,8 @@ import java.util.Date;
 public class AssProtoColRel extends AssProtoColRelKey implements Serializable {
     private String remark;
 
+    private String cUser;
+
     private Date cTime;
 
     private BigDecimal status;
@@ -17,6 +19,14 @@ public class AssProtoColRel extends AssProtoColRelKey implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getcUser() {
+        return cUser;
+    }
+
+    public void setcUser(String cUser) {
+        this.cUser = cUser == null ? null : cUser.trim();
     }
 
     public Date getcTime() {
