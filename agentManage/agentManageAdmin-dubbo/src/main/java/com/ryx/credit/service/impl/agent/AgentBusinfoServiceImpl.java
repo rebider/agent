@@ -50,7 +50,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void agentBusInfoInsert(AgentBusInfo agentBusInfo) {
+    public void agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception{
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusNum()) ||
