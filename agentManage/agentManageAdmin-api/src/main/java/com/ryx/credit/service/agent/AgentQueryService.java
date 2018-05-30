@@ -3,6 +3,7 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.pojo.admin.agent.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AgentQueryService {
     /**
@@ -38,4 +39,15 @@ public interface AgentQueryService {
      * 查询附件信息
      */
     public List<Attachment> accessoryQuery(String id,String busType);
+
+
+    /**
+     * 根据流程实例Id查询流程对应信息
+     * @param proid
+     * @return
+     */
+    public Map<String,Object> queryInfoByProInsId(String proid);
+
+
+
 }

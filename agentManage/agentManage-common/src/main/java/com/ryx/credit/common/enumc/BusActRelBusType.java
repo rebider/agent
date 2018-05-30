@@ -11,4 +11,15 @@ public enum BusActRelBusType {
     BusActRelBusType(String s){
         msg = s;
     }
+
+
+    public static String getItemString(String key){
+        BusActRelBusType[] valus = BusActRelBusType.values();
+        for (BusActRelBusType busActRelBusType : valus) {
+            if(busActRelBusType.name().equals(key)){
+                return busActRelBusType.msg;
+            }
+        }
+        return null;
+    }
 }

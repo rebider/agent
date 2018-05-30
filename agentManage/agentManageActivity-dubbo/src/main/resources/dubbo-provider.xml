@@ -19,4 +19,7 @@
     <dubbo:service interface="com.ryx.credit.service.ActHiVarinstService" ref="actHiVarinstService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.ActIdUserService" ref="actIdUserService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.ActRuTaskService" ref="actRuTaskService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.ActUtilService" ref="actUtilService"  timeout="1200000" registry="${zk.group}"/>
+
+
 </beans>

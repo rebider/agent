@@ -1,6 +1,9 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.druid.sql.visitor.functions.If;
+import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentQueryService;
@@ -32,6 +35,12 @@ public class AgentQueryServiceImpl implements AgentQueryService {
 
     @Autowired
     private AttachmentMapper attachmentMapper;
+
+    @Autowired
+    private BusActRelMapper busActRelMapper;
+
+
+
 
     @Override
     public Agent informationQuery(String id) {
@@ -108,5 +117,25 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     @Override
     public List<Attachment> accessoryQuery(String id, String busType) {
         return attachmentMapper.accessoryQuery(id, busType);
+    }
+
+
+    @Override
+    public Map<String, Object> queryInfoByProInsId(String proid) {
+        BusActRelExample example = new BusActRelExample();
+        example.or().andActivIdEqualTo(proid);
+        List<BusActRel>  busr = busActRelMapper.selectByExample(example);
+        if(busr.size()==1){
+            BusActRel rel = busr.get(0);
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.Agent.name())){
+                Agent agent =  agentMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("agent",agent).putKeyV("rel",rel);
+            }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.Business.name())){
+                AgentBusInfo angetBusInfo = agentBusInfoMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("angetBusInfo",angetBusInfo).putKeyV("rel",rel);
+            }
+        }
+        return null;
     }
 }
