@@ -17,6 +17,7 @@ public enum DictGroup {
     CERT_TYPE("证件类型"),
     AGNATURE_TYPE("公司类型"),
     COLINFO_TYPE("收款账户类型"),
+    AGENT_IN_STATUS("代理商入网状态"),
     APPROVAL_TYPE("审批结果类型");
 
 
