@@ -19,6 +19,10 @@ public class AgentVo implements Serializable{
     private String agentId;
     private String submitType;
 
+    private String agDocProString;
+
+    private String agDocDistrictString;
+
 
     public Agent getAgent() {
         return agent;
@@ -82,5 +86,22 @@ public class AgentVo implements Serializable{
 
     public void setSubmitType(String submitType) {
         this.submitType = submitType;
+    }
+
+
+    public String getAgDocProString() {
+        return agDocProString;
+    }
+
+    public void setAgDocProString(String agDocProString) {
+        this.agDocProString = agDocProString;
+    }
+
+    public String getAgDocDistrictString() {
+        return agDocDistrictString;
+    }
+
+    public void setAgDocDistrictString(String agDocDistrictString) {
+        this.agDocDistrictString = agDocDistrictString;
     }
 }
