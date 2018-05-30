@@ -4,6 +4,7 @@ import com.alibaba.druid.sql.visitor.functions.If;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentQueryService;
@@ -68,7 +69,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         List<AgentColinfo> agentColinfos = agentColinfoMapper.proceedsQuery(id);
         if (null != agentColinfos && agentColinfos.size() > 0) {
             for (AgentColinfo agentColinfo : agentColinfos) {
-                agentColinfo.setAttachmentList(accessoryQuery(agentColinfo.getId(), "Proceeds"));
+                agentColinfo.setAttachmentList(accessoryQuery(agentColinfo.getId(), AttachmentRelType.Proceeds.name()));
             }
         }
 
@@ -80,7 +81,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         List<Capital> capitals = capitalMapper.paymentQuery(id);
         if (null != capitals && capitals.size() > 0) {
             for (Capital capital : capitals) {
-                capital.setAttachmentList(accessoryQuery(capital.getId(), "Capital"));
+                capital.setAttachmentList(accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
             }
         }
         return capitals;
@@ -91,7 +92,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         List<AgentContract> agentContracts = agentContractMapper.compactQuery(id);
         if (null != agentContracts && agentContracts.size() > 0) {
             for (AgentContract agentContract : agentContracts) {
-                agentContract.setAttachmentList(accessoryQuery(agentContract.getId(), "Contract"));
+                agentContract.setAttachmentList(accessoryQuery(agentContract.getId(), AttachmentRelType.Contract.name()));
             }
         }
         return agentContracts;
@@ -106,9 +107,9 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 Map<String,Object> busRiskParents = agentBusInfoMapper.queryAgentName(agentBusInfo.getBusRiskParent());
                 Map<String,Object> busActivationParents = agentBusInfoMapper.queryAgentName(agentBusInfo.getBusActivationParent());
                 agentBusInfo.setBusParent((String)busParents.get("AG_NAME"));
-                agentBusInfo.setBusRiskParent((String)busParents.get("AG_NAME"));
-                agentBusInfo.setBusActivationParent((String)busParents.get("AG_NAME"));
-                agentBusInfo.setAttachmentList(accessoryQuery(agentBusInfo.getId(), "Business"));
+                agentBusInfo.setBusRiskParent((String)busRiskParents.get("AG_NAME"));
+                agentBusInfo.setBusActivationParent((String)busActivationParents.get("AG_NAME"));
+                agentBusInfo.setAttachmentList(accessoryQuery(agentBusInfo.getId(), AttachmentRelType.Business.name()));
             }
         }
         return agentBusInfos;
