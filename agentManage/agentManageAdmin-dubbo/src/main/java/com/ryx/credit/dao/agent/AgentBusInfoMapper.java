@@ -49,4 +49,6 @@ public interface AgentBusInfoMapper {
     public List<AgentBusInfo> businessQuery(String id);
 
     Map<String,Object> queryAgentName(String id);
+
+    List<Map<String,Object>> queryBusInfoAndRemit(String agentId);
 }
