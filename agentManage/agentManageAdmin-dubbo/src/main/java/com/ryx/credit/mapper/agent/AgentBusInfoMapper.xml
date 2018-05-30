@@ -508,5 +508,11 @@
   SELECT <include refid="agentAll"/> from A_agent_businfo agentBus left join A_agent agent on agentBus.agent_id= agent.id where 1=1 and agentBus.id=#{id}
   </select>
 
+  <select id="queryBusInfoAndRemit" parameterType="string" resultType="map">
+      select * from
+      A_agent_businfo bus,A_pay_comp pc
+      where  bus.clo_pay_company = pc.id
+      and agent_id = #{agentId}
+  </select>
 
 </mapper>
