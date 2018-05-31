@@ -1,7 +1,8 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.util.List;
 import java.util.Map;
@@ -18,4 +19,5 @@ public interface TaskApprovalService {
 
     List<Map<String,Object>> queryBusInfoAndRemitByBusId(String busId);
 
+    AgentResult approvalTask(String approvalRole,AgentVo agentVo,String userId);
 }
