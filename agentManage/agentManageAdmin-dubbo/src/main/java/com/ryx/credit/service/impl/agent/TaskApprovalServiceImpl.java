@@ -77,9 +77,11 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 }
             }
             for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 AgentBusInfo record = new AgentBusInfo();
                 record.setId(agentBusInfoVo.getId());
                 record.setCloPayCompany(agentBusInfoVo.getCloPayCompany());
+                record.setVersion(agentBusInfo.getVersion());
                 int i = agentBusInfoMapper.updateByPrimaryKey(record);
                 if(i!=1){
                     throw new ProcessException("更新打款公司异常");
