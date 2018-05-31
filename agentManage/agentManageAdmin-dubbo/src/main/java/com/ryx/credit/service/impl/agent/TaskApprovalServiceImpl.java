@@ -10,6 +10,7 @@ import com.ryx.credit.service.agent.TaskApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +37,12 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
          return agentBusInfoMapper.queryBusInfoAndRemit(agentBusInfo.getAgentId());
      }
 
+
+    @Override
+    public List<Map<String, Object>> queryBusInfoAndRemitByBusId(String busId) {
+        if(StringUtils.isBlank(busId)){
+            return new ArrayList<>();
+        }
+        return agentBusInfoMapper.queryBusInfoAndRemitByBusId(busId);
+    }
 }

@@ -165,10 +165,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         //检查是否有审批中的代理商新
         Agent agent = agentService.getAgentById(abus.getAgentId());
         if(agent.getAgStatus().equals(AgStatus.Approving.name())){
-            return ResultVO.fail("代理商信息审批中禁止启动业务审批");
+            return ResultVO.fail("代理商信息审批中,禁止启动业务审批");
         }
         if(!agent.getAgStatus().equals(AgStatus.Approved.name())){
-            return ResultVO.fail("代理商信息未审批完成启动业务审批");
+            return ResultVO.fail("代理商信息未审批完成,禁止启动业务审批");
         }
         if(!agent.getStatus().equals(Status.STATUS_1.status)){
             return ResultVO.fail("代理商信息已失效");

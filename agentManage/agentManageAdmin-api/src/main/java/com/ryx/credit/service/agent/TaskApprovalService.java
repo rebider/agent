@@ -16,4 +16,6 @@ public interface TaskApprovalService {
 
     List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo);
 
+    List<Map<String,Object>> queryBusInfoAndRemitByBusId(String busId);
+
 }
