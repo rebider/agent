@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoRelMapper;
@@ -11,12 +12,17 @@ import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +31,7 @@ import java.util.List;
  * Created by cx on 2018/5/28.
  */
 @Service("agentColinfoService")
-public class AgentColinfoServiceImpl implements com.ryx.credit.service.agent.AgentColinfoService {
+public class AgentColinfoServiceImpl implements AgentColinfoService {
 
 
     private static Logger logger = LoggerFactory.getLogger(AgentColinfoServiceImpl.class);
@@ -97,5 +103,32 @@ public class AgentColinfoServiceImpl implements com.ryx.credit.service.agent.Age
         return ac;
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    public AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser){
+
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if(agentColinfoRel==null){
+            return result;
+        }
+        if(StringUtils.isBlank(agentColinfoRel.getAgentid()) || StringUtils.isBlank(agentColinfoRel.getBusPlatform())
+            ||StringUtils.isBlank(agentColinfoRel.getAgentbusid()) || StringUtils.isBlank(agentColinfoRel.getAgentColinfoid())){
+            return result;
+        }
+
+        Date d = Calendar.getInstance().getTime();
+        agentColinfoRel.setcTime(d);
+        agentColinfoRel.setStatus(Status.STATUS_1.status);
+        agentColinfoRel.setId(idService.genId(TabId.a_agent_colinfo_rel));
+        agentColinfoRel.setcUse(cUser);
+        agentColinfoRel.setcSort(new BigDecimal(1));
+
+        int insert = agentColinfoRelMapper.insert(agentColinfoRel);
+        if(insert==1){
+            return AgentResult.ok();
+        }
+        logger.info("saveAgentColinfoRel保存收款关系失败");
+        return new AgentResult(500, "系统异常", "");
+    }
 
 }
