@@ -105,30 +105,32 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser){
+    public AgentResult saveAgentColinfoRel(List<AgentColinfoRel> agentColinfoRelList,String cUser){
 
-        AgentResult result = new AgentResult(500,"参数错误","");
-        if(agentColinfoRel==null){
-            return result;
-        }
-        if(StringUtils.isBlank(agentColinfoRel.getAgentid()) || StringUtils.isBlank(agentColinfoRel.getBusPlatform())
-            ||StringUtils.isBlank(agentColinfoRel.getAgentbusid()) || StringUtils.isBlank(agentColinfoRel.getAgentColinfoid())){
-            return result;
-        }
+        for (AgentColinfoRel agentColinfoRel:agentColinfoRelList){
+            AgentResult result = new AgentResult(500,"参数错误","");
+            if(agentColinfoRel==null){
+                return result;
+            }
+            if(StringUtils.isBlank(agentColinfoRel.getAgentid()) || StringUtils.isBlank(agentColinfoRel.getBusPlatform())
+                ||StringUtils.isBlank(agentColinfoRel.getAgentbusid()) || StringUtils.isBlank(agentColinfoRel.getAgentColinfoid())){
+                return result;
+            }
 
-        Date d = Calendar.getInstance().getTime();
-        agentColinfoRel.setcTime(d);
-        agentColinfoRel.setStatus(Status.STATUS_1.status);
-        agentColinfoRel.setId(idService.genId(TabId.a_agent_colinfo_rel));
-        agentColinfoRel.setcUse(cUser);
-        agentColinfoRel.setcSort(new BigDecimal(1));
+            Date d = Calendar.getInstance().getTime();
+            agentColinfoRel.setcTime(d);
+            agentColinfoRel.setStatus(Status.STATUS_1.status);
+            agentColinfoRel.setId(idService.genId(TabId.a_agent_colinfo_rel));
+            agentColinfoRel.setcUse(cUser);
+            agentColinfoRel.setcSort(new BigDecimal(1));
 
-        int insert = agentColinfoRelMapper.insert(agentColinfoRel);
-        if(insert==1){
-            return AgentResult.ok();
+            int insert = agentColinfoRelMapper.insert(agentColinfoRel);
+            if(insert==1){
+                logger.info("saveAgentColinfoRel保存收款关系失败");
+                throw new ProcessException("保存收款关系失败");
+            }
         }
-        logger.info("saveAgentColinfoRel保存收款关系失败");
-        return new AgentResult(500, "系统异常", "");
+        return AgentResult.ok();
     }
 
 }

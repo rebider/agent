@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.*;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,9 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -198,6 +201,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     }
 
 
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult completeTaskEnterActivity(AgentVo agentVo)throws ProcessException{
 
+        AgentResult result = new AgentResult(500,"系统异常","");
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("rs",agentVo.getApprovalResult());
+        reqMap.put("approvalOpinion",agentVo.getApprovalOpinion());
 
+        Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+        if(resultMap==null){
+            return result;
+        }
+        return AgentResult.ok(resultMap);
+    }
 }

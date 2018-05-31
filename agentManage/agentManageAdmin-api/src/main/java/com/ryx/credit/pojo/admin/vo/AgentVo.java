@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,10 +19,12 @@ public class AgentVo implements Serializable{
     private List<String> agentTableFile;
     private String agentId;
     private String submitType;
-
     private String agDocProString;
-
     private String agDocDistrictString;
+    private List<AgentColinfoRel> agentColinfoRelList;
+    private String approvalOpinion;
+    private String approvalResult;
+    private String taskId;
 
 
     public Agent getAgent() {
@@ -103,5 +106,37 @@ public class AgentVo implements Serializable{
 
     public void setAgDocDistrictString(String agDocDistrictString) {
         this.agDocDistrictString = agDocDistrictString;
+    }
+
+    public List<AgentColinfoRel> getAgentColinfoRelList() {
+        return agentColinfoRelList;
+    }
+
+    public void setAgentColinfoRelList(List<AgentColinfoRel> agentColinfoRelList) {
+        this.agentColinfoRelList = agentColinfoRelList;
+    }
+
+    public String getApprovalOpinion() {
+        return approvalOpinion;
+    }
+
+    public void setApprovalOpinion(String approvalOpinion) {
+        this.approvalOpinion = approvalOpinion;
+    }
+
+    public String getApprovalResult() {
+        return approvalResult;
+    }
+
+    public void setApprovalResult(String approvalResult) {
+        this.approvalResult = approvalResult;
+    }
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
     }
 }

@@ -1,6 +1,7 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
@@ -34,4 +35,14 @@ public interface AgentEnterService {
      * @throws ProcessException
      */
     public ResultVO startAgentBusiEnterActivity(String agentId,String cuser)throws ProcessException;
+
+
+    /**
+     * 提交审批
+     * @param agentVo
+     * @return
+     * @throws ProcessException
+     */
+    AgentResult completeTaskEnterActivity(AgentVo agentVo)throws ProcessException;
+
 }
