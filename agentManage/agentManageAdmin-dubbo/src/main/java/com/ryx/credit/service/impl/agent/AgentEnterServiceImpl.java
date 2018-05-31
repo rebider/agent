@@ -222,4 +222,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
         return AgentResult.ok(resultMap);
     }
+
+
+    @Override
+    public ResultVO completeProcessing(String processingId, String processingStatus) throws ProcessException {
+        return ResultVO.success("");
+    }
 }

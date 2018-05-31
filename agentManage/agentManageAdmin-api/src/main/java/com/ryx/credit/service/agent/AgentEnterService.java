@@ -45,4 +45,13 @@ public interface AgentEnterService {
      */
     AgentResult completeTaskEnterActivity(AgentVo agentVo)throws ProcessException;
 
+
+    /**
+     * 完成流程
+     * @param processingId
+     * @return
+     * @throws ProcessException
+     */
+    ResultVO completeProcessing(String processingId,String processingStatus)throws ProcessException;
+
 }
