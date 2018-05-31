@@ -19,6 +19,7 @@ public enum DictGroup {
     COLINFO_TYPE("收款账户类型"),
     AGENT_IN_STATUS("代理商入网状态"),
     AG_STATUS_S("审核状态"),
+    AG_STATUS_I("审核数字状态"),
     APPROVAL_TYPE("审批结果类型");
 
 

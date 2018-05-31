@@ -476,7 +476,7 @@
      <include refid="OracleDialectPrefix" />
       select
         b.id,b.bus_num,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-        a.ag_head_mobile,b.bus_status,b.status
+        a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
      <include refid="OracleDialectSuffix" />
@@ -510,9 +510,17 @@
 
   <select id="queryBusInfoAndRemit" parameterType="string" resultType="map">
       select * from
-      A_agent_businfo bus,A_pay_comp pc
+      A_agent_businfo bus left join  A_pay_comp pc on bus.clo_pay_company = pc.id
       where  bus.clo_pay_company = pc.id
       and agent_id = #{agentId}
+  </select>
+
+
+  <select id="queryBusInfoAndRemitByBusId" parameterType="string" resultType="map">
+    select * from
+    A_agent_businfo bus
+    left join A_pay_comp pc on bus.clo_pay_company = pc.id
+    where   bus.id = #{id}
   </select>
 
 </mapper>
