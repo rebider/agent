@@ -21,5 +21,5 @@ public interface AgentColinfoService {
      */
     AgentColinfo agentColinfoInsert(AgentColinfo ac, List<String> att)throws ProcessException;
 
-    AgentResult saveAgentColinfoRel(List<AgentColinfoRel> agentColinfoRelList, String cUser);
+    AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser);
 }
