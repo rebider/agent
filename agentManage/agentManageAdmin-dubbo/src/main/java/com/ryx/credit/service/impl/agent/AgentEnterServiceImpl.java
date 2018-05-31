@@ -173,6 +173,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         if(!agent.getStatus().equals(Status.STATUS_1.status)){
             return ResultVO.fail("代理商信息已失效");
         }
+
+        BusActRelExample example = new BusActRelExample();
+        example.or().andBusIdEqualTo(abus.getId()).andBusTypeEqualTo(BusActRelBusType.Business.name()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
+        if(busActRelMapper.selectByExample(example).size()>0){
+            return ResultVO.fail("代理商审批中，禁止重复提交审批");
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"),null,null);
         if(proce==null){
