@@ -46,21 +46,6 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     @Override
     public Agent informationQuery(String id) {
         Agent agent = agentMapper.selectByPrimaryKey(id);
-        List<Map<String,Object>> agDocProList=null;
-        List<Map<String,Object>> agDocDistrictList=null;
-        if(null!=agent.getAgDocPro()){
-            agDocProList = agentMapper.queryDeptName(agent.getAgDocPro());
-        }
-        if(null!=agent.getAgDocDistrict()){
-            agDocDistrictList  = agentMapper.queryDeptNameDis(agent.getAgDocDistrict());
-        }
-        if(null!=agDocProList&&agDocProList.size()>0){
-            Map<String, Object>  agDocProMap= agDocProList.get(0);
-            agent.setAgDocPro((String)agDocProMap.get("NAME"));
-        }if(null!=agDocDistrictList&&agDocDistrictList.size()>0){
-            Map<String, Object> agDocDistrictMap = agDocDistrictList.get(0);
-            agent.setAgDocDistrict((String)agDocDistrictMap.get("NAME"));
-        }
         return agent;
     }
 
@@ -103,12 +88,6 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.businessQuery(id);
         if (null != agentBusInfos && agentBusInfos.size() > 0) {
             for (AgentBusInfo agentBusInfo : agentBusInfos) {
-                Map<String,Object> busParents = agentBusInfoMapper.queryAgentName(agentBusInfo.getBusParent());
-                Map<String,Object> busRiskParents = agentBusInfoMapper.queryAgentName(agentBusInfo.getBusRiskParent());
-                Map<String,Object> busActivationParents = agentBusInfoMapper.queryAgentName(agentBusInfo.getBusActivationParent());
-                agentBusInfo.setBusParent((String)busParents.get("AG_NAME"));
-                agentBusInfo.setBusRiskParent((String)busRiskParents.get("AG_NAME"));
-                agentBusInfo.setBusActivationParent((String)busActivationParents.get("AG_NAME"));
                 agentBusInfo.setAttachmentList(accessoryQuery(agentBusInfo.getId(), AttachmentRelType.Business.name()));
             }
         }

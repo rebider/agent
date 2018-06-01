@@ -190,6 +190,6 @@
   </sql>
 
   <select id="accessoryQuery" parameterType="string" resultMap="BaseResultMap">
-select * from A_ATTACHMENT_REL  rel left join A_ATTACHMENT a on a.id=rel.ATT_ID where rel.SRC_ID=#{id} and rel.BUS_TYPE=#{busType}
+     select a.* from A_ATTACHMENT_REL  rel left join A_ATTACHMENT a on a.id=rel.ATT_ID where rel.SRC_ID=#{id} and rel.BUS_TYPE=#{busType}
   </select>
 </mapper>
