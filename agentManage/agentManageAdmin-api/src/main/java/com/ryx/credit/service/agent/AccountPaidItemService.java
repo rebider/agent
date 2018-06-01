@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface AccountPaidItemService {
 
-    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser);
+    AgentResult insertAccountPaid(Capital capital, List<String> fileIdList, String cUser)throws Exception;
 
     int removeAccountPaid(String id);
 }

@@ -43,6 +43,15 @@ public interface AgentEnterService {
      * @return
      * @throws ProcessException
      */
-    AgentResult completeTaskEnterActivity(AgentVo agentVo)throws ProcessException;
+    AgentResult completeTaskEnterActivity(AgentVo agentVo,String userId)throws ProcessException;
+
+
+    /**
+     * 完成流程
+     * @param processingId
+     * @return
+     * @throws ProcessException
+     */
+    ResultVO completeProcessing(String processingId,String processingStatus)throws ProcessException;
 
 }

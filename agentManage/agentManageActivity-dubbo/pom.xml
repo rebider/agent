@@ -24,6 +24,11 @@
             <version>${agentManage.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageAdmin-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-engine</artifactId>
             <version>5.22.0</version>

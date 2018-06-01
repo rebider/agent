@@ -1,7 +1,9 @@
 package com.ryx.credit.activity.task;
 
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.util.AppConfig;
-import com.ryx.credit.common.util.MailUtil;
+import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
 import org.activiti.engine.delegate.ExecutionListener;
@@ -23,17 +25,22 @@ import org.slf4j.LoggerFactory;
 public class TaskExecutionListener implements TaskListener,ExecutionListener{
     private static final Logger logger = LoggerFactory.getLogger(TaskExecutionListener.class);
 
+
+
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
         String eventName = delegateExecution.getEventName();
-//        AppConfig.sendEmails("ActivityName:"+delegateExecution.getCurrentActivityName()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId(),"Execution工作流通知"+eventName);
         if ("start".equals(eventName)) {
             logger.info("start========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
         }else if ("end".equals(eventName)) {
-            if("EndEvent".equals(delegateExecution.getCurrentActivityName())){
-                AppConfig.sendEmails("ActivityName:"+delegateExecution.getCurrentActivityName()+"  任务结束:"+delegateExecution.getProcessInstanceId(),"Execution工作流结束通知"+eventName);
+            String activityName = delegateExecution.getCurrentActivityName();
+            AgentEnterService aes = (AgentEnterService)MySpringContextHandler.applicationContext.getBean("agentEnterService");
+            if("reject_end".equals(activityName)){
+                aes.completeProcessing(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
             }
-            logger.info("end========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
+            if("finish_end".equals(activityName)){
+                aes.completeProcessing(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
+            }
         }
         else if ("take".equals(eventName)) {
             logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());

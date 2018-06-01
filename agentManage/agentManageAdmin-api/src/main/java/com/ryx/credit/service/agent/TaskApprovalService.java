@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public interface TaskApprovalService {
 
-    List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo);
+    List<Map<String, Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo);
 
-    List<Map<String,Object>> queryBusInfoAndRemitByBusId(String busId);
+    List<Map<String, Object>> queryBusInfoAndRemitByBusId(String busId);
 
-    AgentResult approvalTask(String approvalRole,AgentVo agentVo,String userId);
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 }

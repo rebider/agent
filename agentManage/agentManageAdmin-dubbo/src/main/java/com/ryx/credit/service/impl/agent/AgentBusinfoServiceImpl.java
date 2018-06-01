@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,15 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public List<AgentBusInfo> agentBusInfoList(String agentId) {
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status);
+		return agentBusInfoMapper.selectByExample(example);
+	}
+
+	public List<AgentBusInfo> agentBusInfoList(String agentId, String id, BigDecimal appStatus) {
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria c = example.or().andStatusEqualTo(Status.STATUS_1.status);
+		if(StringUtils.isNotEmpty(agentId))c.andAgentIdEqualTo(agentId);
+		if(StringUtils.isNotEmpty(id))c.andIdEqualTo(id);
+		if(null!=appStatus)c.andCloReviewStatusEqualTo(appStatus);
 		return agentBusInfoMapper.selectByExample(example);
 	}
 

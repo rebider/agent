@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ public interface AgentBusinfoService {
      * @return
      */
     public List<AgentBusInfo> agentBusInfoList(String agentId);
+    public List<AgentBusInfo> agentBusInfoList(String agentId, String id, BigDecimal appStatus);
 
     public int updateAgentBusInfo(AgentBusInfo agentBusInfo);
 
