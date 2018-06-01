@@ -5,6 +5,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -22,4 +23,8 @@ public interface AgentColinfoService {
     AgentColinfo agentColinfoInsert(AgentColinfo ac, List<String> att)throws ProcessException;
 
     AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser);
+
+    public List<AgentColinfo> queryAgentColinfoService(String agentId,String colId,BigDecimal appStatus);
+
+    public int update(AgentColinfo a);
 }

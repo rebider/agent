@@ -5,6 +5,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.dao.agent.AgentContractMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
+import com.ryx.credit.pojo.admin.agent.AgentContractExample;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.agent.AgentContractService;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -134,5 +136,29 @@ public class AgentContractServiceImpl implements AgentContractService {
            return agentContractMapper.updateByPrimaryKeySelective(contract);
         }
         return 0;
+    }
+
+
+
+    @Override
+    public List<AgentContract> queryAgentContract(String agentId, String contractId, BigDecimal approveStatus) {
+        AgentContractExample example  = new AgentContractExample();
+        AgentContractExample.Criteria c = example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotEmpty(agentId)){
+            c.andAgentIdEqualTo(agentId);
+        }
+        if(StringUtils.isNotEmpty(contractId)){
+            c.andIdEqualTo(contractId);
+        }
+        if(null!=approveStatus){
+            c.andCloReviewStatusEqualTo(approveStatus);
+        }
+        return agentContractMapper.selectByExample(example);
+    }
+
+
+    @Override
+    public int update(AgentContract a) {
+        return agentContractMapper.updateByPrimaryKeySelective(a);
     }
 }

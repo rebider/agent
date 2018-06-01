@@ -3,6 +3,7 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -29,7 +30,18 @@ public interface AgentContractService {
     public int removeAgentContract(String id);
 
 
+    /**
+     * 查询代理商的合同信息
+     * @param agentId
+     * @param contractId
+     * @param approveStatus
+     * @return
+     */
+    public List<AgentContract> queryAgentContract(String agentId, String contractId,BigDecimal approveStatus);
 
+
+
+    public int update(AgentContract a);
 
 
 }

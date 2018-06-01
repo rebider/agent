@@ -10,6 +10,7 @@ import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoRelMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfoExample;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -130,5 +131,28 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         logger.info("saveAgentColinfoRel保存收款关系失败");
         return new AgentResult(500, "系统异常", "");
     }
+
+
+    public List<AgentColinfo> queryAgentColinfoService(String agentId,String colId,BigDecimal appStatus){
+        AgentColinfoExample example = new AgentColinfoExample();
+        AgentColinfoExample.Criteria c = example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(agentId)){
+            c.andAgentIdEqualTo(agentId);
+        }
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(colId)){
+            c.andIdEqualTo(colId);
+        }
+        if(appStatus!=null){
+            c.andCloReviewStatusEqualTo(appStatus);
+        }
+        return agentColinfoMapper.selectByExample(example);
+    }
+
+
+    public int update(AgentColinfo a){
+        return agentColinfoMapper.updateByPrimaryKeySelective(a);
+    }
+
+
 
 }
