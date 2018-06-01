@@ -1,6 +1,7 @@
 package com.ryx.credit.service.dict;
 
 import com.ryx.credit.commons.result.Tree;
+import com.ryx.credit.pojo.admin.COrganization;
 
 import java.util.List;
 
@@ -12,4 +13,6 @@ import java.util.List;
  **/
 public interface DepartmentService {
     List<Tree> selectAllDepartment();
+
+    public COrganization getById(String id);
 }

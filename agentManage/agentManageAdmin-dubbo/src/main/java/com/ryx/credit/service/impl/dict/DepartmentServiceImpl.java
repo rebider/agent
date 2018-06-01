@@ -89,4 +89,9 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
         return childList;
     }
+
+    @Override
+    public COrganization getById(String id) {
+        return cOrganizationMapper.selectById(id);
+    }
 }

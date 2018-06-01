@@ -1,6 +1,7 @@
 package com.ryx.credit.service.dict;
 
 import com.ryx.credit.commons.result.Tree;
+import com.ryx.credit.pojo.admin.agent.Region;
 
 import java.util.List;
 
@@ -13,4 +14,8 @@ import java.util.List;
 public interface RegionService {
 
     List<Tree> selectAllRegion();
+
+    public Region queryByCode(String code);
+
+    public String getRegionName(String code);
 }

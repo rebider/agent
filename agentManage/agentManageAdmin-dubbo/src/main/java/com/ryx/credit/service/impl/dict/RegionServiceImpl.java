@@ -6,6 +6,7 @@ import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.pojo.admin.agent.Region;
+import com.ryx.credit.pojo.admin.agent.RegionExample;
 import com.ryx.credit.service.dict.RegionService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class RegionServiceImpl implements RegionService {
     private RegionMapper regionMapper;
     @Autowired
     private RedisService redisService;
+
 
 
     @Override
@@ -101,4 +103,25 @@ public class RegionServiceImpl implements RegionService {
     }
 
 
+    @Override
+    public Region queryByCode(String code) {
+        RegionExample example = new RegionExample();
+        example.or().andRCodeEqualTo(code);
+        List<Region> list = regionMapper.selectByExample(example);
+        return list.size()>0?list.get(0):null;
+    }
+
+
+    @Override
+    public String getRegionName(String code) {
+        String name  = "";
+        Region r =  queryByCode(code);
+        if(r!=null){
+            name = r.getrName();
+            if(org.apache.commons.lang.StringUtils.isNotEmpty(r.getpCode()) && !"0".equals(r.getpCode())){
+                name = getRegionName(r.getpCode())+"-"+name;
+            }
+        }
+        return name;
+    }
 }
