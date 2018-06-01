@@ -22,7 +22,7 @@ public interface AgentColinfoService {
      */
     AgentColinfo agentColinfoInsert(AgentColinfo ac, List<String> att)throws ProcessException;
 
-    AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser);
+    AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser)throws Exception;
 
     public List<AgentColinfo> queryAgentColinfoService(String agentId,String colId,BigDecimal appStatus);
 

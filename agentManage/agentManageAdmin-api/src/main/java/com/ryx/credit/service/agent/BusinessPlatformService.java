@@ -29,5 +29,5 @@ public interface BusinessPlatformService {
 
     List<PlatForm> queryAblePlatForm();
 
-    AgentResult saveBusinessPlatform(AgentVo agentVo);
+    AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception;
 }
