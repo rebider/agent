@@ -6,6 +6,7 @@ import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -21,10 +22,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by cx on 2018/5/28.
@@ -209,12 +207,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult completeTaskEnterActivity(AgentVo agentVo)throws ProcessException{
+    public AgentResult completeTaskEnterActivity(AgentVo agentVo,String userId)throws ProcessException{
 
         AgentResult result = new AgentResult(500,"系统异常","");
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("rs",agentVo.getApprovalResult());
         reqMap.put("approvalOpinion",agentVo.getApprovalOpinion());
+        reqMap.put("approvalPerson",userId);
+        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
 
         Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
         Boolean rs = (Boolean)resultMap.get("rs");

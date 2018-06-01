@@ -43,7 +43,7 @@ public interface AgentEnterService {
      * @return
      * @throws ProcessException
      */
-    AgentResult completeTaskEnterActivity(AgentVo agentVo)throws ProcessException;
+    AgentResult completeTaskEnterActivity(AgentVo agentVo,String userId)throws ProcessException;
 
 
     /**
