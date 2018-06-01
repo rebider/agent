@@ -439,7 +439,7 @@
   </sql>
   <select id="queryAgentBusList" parameterType="map" resultType="map">
       select * from (
-              select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num ,rownum as row_count
+              select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num,a.clo_review_status,b.ag_status ,rownum as row_count
               from a_agent_businfo a left join a_agent b on a.agent_id = b.id
               <where>
                 <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT(CONCAT('%',#{par.search_name}),'%')</if>

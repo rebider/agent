@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryx.credit.common.util.DateJsonDeserializer;
 import com.ryx.credit.common.util.DateJsonSerializer;
+import com.ryx.credit.pojo.admin.vo.AgentExtends;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class Agent implements Serializable {
+public class Agent extends AgentExtends implements Serializable {
     private String id;
 
     private String agUniqNum;
@@ -74,6 +75,7 @@ public class Agent implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
 
     public String getId() {
         return id;

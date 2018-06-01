@@ -10,11 +10,13 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -47,6 +49,8 @@ public class AgentServiceImpl implements  AgentService {
 
     @Autowired
     private IdService idService;
+    @Autowired
+    private DepartmentService departmentService;
 
 
     /**
@@ -83,6 +87,20 @@ public class AgentServiceImpl implements  AgentService {
         example.setOrderByClause(" c_utime desc ");
         example.setPage(new Page(page.getFrom(),page.getPagesize()));
         List<Agent> list = agentMapper.selectByExample(example);
+        for (Agent agent1 : list) {
+            if(StringUtils.isNotEmpty(agent1.getAgDocPro())) {
+                COrganization organization = departmentService.getById(agent1.getAgDocPro());
+                if(null!=organization) {
+                    agent1.setAgDocProTemp(organization.getName());
+                }
+            }
+            if(StringUtils.isNotEmpty(agent1.getAgDocDistrict())) {
+                COrganization organization = departmentService.getById(agent1.getAgDocDistrict());
+                if(null!=organization) {
+                    agent1.setAgDocDistrictTemp(organization.getName());
+                }
+            }
+        }
         page.setRows(list);
         page.setTotal(count);
         return page;
