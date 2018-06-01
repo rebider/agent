@@ -103,7 +103,7 @@ public class ActivityServiceImpl implements ActivityService {
             ProcessEngine processEngine = processEngineConfiguration
                     .buildProcessEngine();
             TaskService taskService = processEngine.getTaskService();
-            taskService.setVariable(taskId,taskId, JSONObject.fromMap(map).toString());
+            taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
             taskService.complete(taskId, map);
             logger.info("完成任务" + taskId);
             rs.put("rs",true);
