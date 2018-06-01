@@ -42,7 +42,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public AgentResult insertAccountPaid(Capital capital,List<String> fileIdList,String cUser){
+    public AgentResult insertAccountPaid(Capital capital,List<String> fileIdList,String cUser)throws Exception{
 
         AgentResult result = new AgentResult(500,"参数错误","");
         if(StringUtils.isBlank(cUser)){

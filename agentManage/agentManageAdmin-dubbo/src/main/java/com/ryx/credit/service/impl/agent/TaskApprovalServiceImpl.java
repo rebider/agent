@@ -66,13 +66,12 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTask(String approvalRole,AgentVo agentVo,String userId) {
+    public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
-            //财务处理判断
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
-                if(result.isOK()){
+                if(!result.isOK()){
                     throw new ProcessException("保存收款关系异常");
                 }
             }
@@ -87,7 +86,6 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("更新打款公司异常");
                 }
             }
-
             agentEnterService.completeTaskEnterActivity(agentVo);
         } catch (ProcessException e) {
             e.printStackTrace();

@@ -118,7 +118,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult saveBusinessPlatform(AgentVo agentVo) {
+    public AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception{
         try {
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());

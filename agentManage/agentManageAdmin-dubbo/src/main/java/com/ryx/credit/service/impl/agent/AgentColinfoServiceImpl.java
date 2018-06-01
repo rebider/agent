@@ -105,7 +105,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    public AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser){
+    public AgentResult saveAgentColinfoRel(AgentColinfoRel agentColinfoRel,String cUser)throws Exception{
 
         AgentResult result = new AgentResult(500,"参数错误","");
         if(agentColinfoRel==null){
