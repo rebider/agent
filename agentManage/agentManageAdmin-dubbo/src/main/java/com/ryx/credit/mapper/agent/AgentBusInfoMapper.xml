@@ -475,7 +475,7 @@
   <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
      <include refid="OracleDialectPrefix" />
       select
-        b.id,b.bus_num,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+        b.id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
         a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
