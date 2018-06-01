@@ -217,7 +217,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("approvalOpinion",agentVo.getApprovalOpinion());
 
         Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+        Boolean rs = (Boolean)resultMap.get("rs");
+        String msg = String.valueOf(resultMap.get("msg"));
         if(resultMap==null){
+            return result;
+        }
+        if(!rs){
+            result.setMsg(msg);
             return result;
         }
         return AgentResult.ok(resultMap);

@@ -86,9 +86,13 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("更新打款公司异常");
                 }
             }
-            agentEnterService.completeTaskEnterActivity(agentVo);
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo);
+            if(!result.isOK()){
+                throw new ProcessException("工作流处理任务异常");
+            }
         } catch (ProcessException e) {
             e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
         }
         return AgentResult.ok();
     }
