@@ -65,7 +65,7 @@ public class ActHiVarinstServiceimpl implements ActHiVarinstService {
                 criteria.andProcInstIdEqualTo(actHiVarinst.getProcInstId());
             }
             if (actHiVarinst.getName() != null && StringUtils.isNotBlank(String.valueOf(actHiVarinst.getName()))) {
-                criteria.andNameEqualTo(actHiVarinst.getName());
+                criteria.andNameLike("%"+actHiVarinst.getName()+"%");
             }
 
             if (actHiVarinst.getExecutionId() != null) {

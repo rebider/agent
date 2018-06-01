@@ -276,6 +276,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("approvalOpinion",agentVo.getApprovalOpinion());
         reqMap.put("approvalPerson",userId);
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+        reqMap.put("taskId",agentVo.getTaskId());
 
         Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
         Boolean rs = (Boolean)resultMap.get("rs");
