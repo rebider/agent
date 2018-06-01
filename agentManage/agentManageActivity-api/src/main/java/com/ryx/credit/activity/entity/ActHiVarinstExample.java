@@ -393,6 +393,11 @@ public class ActHiVarinstExample {
             return (Criteria) this;
         }
 
+        public Criteria andNameLike(Object value) {
+            addCriterion("NAME_  like", value, "name");
+            return (Criteria) this;
+        }
+
         public Criteria andNameNotEqualTo(Object value) {
             addCriterion("NAME_ <>", value, "name");
             return (Criteria) this;
