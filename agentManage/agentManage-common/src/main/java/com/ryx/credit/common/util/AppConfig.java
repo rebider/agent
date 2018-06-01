@@ -134,7 +134,7 @@ public class AppConfig extends Thread {
      * 发送邮件
      * @return
      */
-    public static  ResultVO sendEmail(final String receiveemailaddr,final String msg,final String title) {
+    public static  ResultVO sendEmail(final String[] receiveemailaddr,final String msg,final String title) {
         try {
             ThreadPool.putThreadPool(new Runnable() {
                 @Override
@@ -170,7 +170,12 @@ public class AppConfig extends Thread {
                         bp.setContent(msg,"text/html;charset=UTF-8");
                         mp.addBodyPart(bp);
                         mimeMsg.setContent(mp);
-                        mimeMsg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiveemailaddr));
+                        InternetAddress[] sendTo = new InternetAddress[receiveemailaddr.length];
+                        for (int i = 0; i < receiveemailaddr.length; i++)
+                        {
+                            sendTo[i] = new InternetAddress(receiveemailaddr[i]);
+                        }
+                        mimeMsg.setRecipients(Message.RecipientType.TO, sendTo);
                         MailUtil.sendEmailMsg(mimeMsg);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -260,9 +265,7 @@ public class AppConfig extends Thread {
     
     public static void sendEmails(String msg,String title){
         String emails = AppConfig.getProperty("emails");
-        for(String email:emails.split("\\,")){
-            AppConfig.sendEmail(email, msg, title);
-        }
+        AppConfig.sendEmail(emails.split("\\,"), msg, title);
     }
 
     public static void sendEmailsAtt(String msg,String title,File newFile,String fileName){
