@@ -1,7 +1,10 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentContract;
+import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -42,6 +45,9 @@ public interface AgentContractService {
 
 
     public int update(AgentContract a);
+
+
+    public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent);
 
 
 }

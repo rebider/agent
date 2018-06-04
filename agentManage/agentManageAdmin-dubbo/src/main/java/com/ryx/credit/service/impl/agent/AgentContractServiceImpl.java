@@ -2,12 +2,13 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentContractMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.pojo.admin.agent.AgentContract;
-import com.ryx.credit.pojo.admin.agent.AgentContractExample;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentContractVo;
+import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.agent.AgentContractService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -160,5 +161,75 @@ public class AgentContractServiceImpl implements AgentContractService {
     @Override
     public int update(AgentContract a) {
         return agentContractMapper.updateByPrimaryKeySelective(a);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public ResultVO updateAgentContractVo(List<AgentContractVo> volist, Agent agent) {
+        try {
+            if(agent==null)throw new ProcessException("代理商信息不能为空");
+            for (AgentContractVo agentContractVo : volist) {
+                agentContractVo.setcUser(agent.getcUser());
+                agentContractVo.setAgentId(agent.getId());
+                if(StringUtils.isEmpty(agentContractVo.getId())) {
+                    //直接新曾
+
+                    AgentContract result =   insertAgentContract(agentContractVo, agentContractVo.getContractTableFile());
+                    logger.info("代理商合同添加:{}{}","添加代理商合同成功",result.getId());
+                }else{
+
+                    AgentContract db_AgentContract = agentContractMapper.selectByPrimaryKey(agentContractVo.getId());
+
+                    db_AgentContract.setAgentId(agent.getId());
+                    db_AgentContract.setContNum(agentContractVo.getContNum());
+                    db_AgentContract.setContType(agentContractVo.getContType());
+                    db_AgentContract.setContDate(agentContractVo.getContDate());
+                    db_AgentContract.setContEndDate(agentContractVo.getContEndDate());
+                    db_AgentContract.setRemark(agentContractVo.getRemark());
+                    db_AgentContract.setcUser(agentContractVo.getcUser());
+                    if(1!=agentContractMapper.updateByPrimaryKeySelective(db_AgentContract)){
+                        throw new ProcessException("更新收款信息失败");
+                    }
+
+                    //删除老的附件
+                    AttachmentRelExample example = new AttachmentRelExample();
+                    example.or().andBusTypeEqualTo(AttachmentRelType.Contract.name()).andSrcIdEqualTo(db_AgentContract.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                    List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+                    for (AttachmentRel attachmentRel : list) {
+                        attachmentRel.setStatus(Status.STATUS_0.status);
+                        int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+                        if (1 != i) {
+                            logger.info("修改合同附件关系失败{}",attachmentRel.getId());
+                            throw new ProcessException("更新合同信息失败");
+                        }
+                    }
+
+                    //添加新的附件
+                    List<String> fileIdList = agentContractVo.getContractTableFile();
+                    if(fileIdList!=null) {
+                        for (String fileId : fileIdList) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(fileId);
+                            record.setSrcId(db_AgentContract.getId());
+                            record.setcUser(db_AgentContract.getcUser());
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.Contract.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int i = attachmentRelMapper.insertSelective(record);
+                            if (1 != i) {
+                                logger.info("合同附件关系失败");
+                                throw new ProcessException("更新合同失败");
+                            }
+                        }
+                    }
+
+                }
+            }
+            return ResultVO.success(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

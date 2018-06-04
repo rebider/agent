@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 
 /**
  * Created by cx on 2018/5/23.
@@ -31,4 +34,6 @@ public interface AgentBusinfoService {
     public int updateAgentBusInfo(AgentBusInfo agentBusInfo);
 
     public AgentBusInfo getById(String id);
+
+    public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception;
 }
