@@ -41,7 +41,7 @@ public interface AgentBusInfoMapper {
     int queryAgentBusListCount(@Param("par") Map<String,Object> par);
 
 
-    List<Map<String,Object>> queryBusinessPlatformList(@Param("par") Map<String,Object> par,@Param("page")Page page);
+    List<Map<String,Object>> queryBusinessPlatformList(@Param("reqMap") Map<String,Object> reqMap,@Param("page")Page page);
 
 
     int queryBusinessPlatformCount(@Param("par") Map<String,Object> par);

@@ -54,6 +54,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
 
         Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("agStatus",AgStatus.Approved.name());
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
