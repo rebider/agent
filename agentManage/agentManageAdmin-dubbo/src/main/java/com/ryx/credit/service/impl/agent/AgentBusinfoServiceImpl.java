@@ -55,7 +55,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     public void agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception{
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusNum()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusType()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusParent()) ||

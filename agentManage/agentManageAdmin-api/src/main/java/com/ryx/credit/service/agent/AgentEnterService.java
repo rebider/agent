@@ -54,4 +54,13 @@ public interface AgentEnterService {
      */
     ResultVO completeProcessing(String processingId,String processingStatus)throws ProcessException;
 
+
+    /**
+     * 代理商修改
+     * @param agent
+     * @param userId
+     * @return
+     */
+    public ResultVO updateAgentVo(AgentVo agent,String userId)throws Exception;
+
 }

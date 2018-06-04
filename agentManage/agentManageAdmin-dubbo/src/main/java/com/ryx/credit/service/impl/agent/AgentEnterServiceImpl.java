@@ -88,7 +88,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             return ResultVO.success(agentVo);
         }catch (Exception e){
             e.printStackTrace();
-            throw new ProcessException("代理商信息录入失败");
+            throw new ProcessException(e.getMessage());
         }
     }
 
@@ -516,6 +516,20 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         return ResultVO.success(null);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public ResultVO updateAgentVo(AgentVo agent, String userId)throws Exception {
+        try {
+            Agent ag = agentService.updateAgentVo(agent.getAgent());
 
 
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("修改代理商错误",e);
+            throw e;
+        }
+        return null;
+    }
 }

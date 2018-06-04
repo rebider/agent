@@ -136,6 +136,7 @@ public class AgentServiceImpl implements  AgentService {
         Date date = Calendar.getInstance().getTime();
         agent.setStatus(Status.STATUS_1.status);
         agent.setVersion(Status.STATUS_1.status);
+        agent.setcIncomStatus(Status.STATUS_0.status);
         agent.setAgStatus(AgStatus.Create.name());
         agent.setcTime(date);
         agent.setcUtime(date);
@@ -174,5 +175,41 @@ public class AgentServiceImpl implements  AgentService {
     @Override
     public int updateAgent(Agent agent) {
         return agentMapper.updateByPrimaryKeySelective(agent);
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public Agent updateAgentVo(Agent agent)throws Exception {
+
+        if(null==agent || StringUtils.isEmpty(agent.getId())){
+            throw new ProcessException("代理商信息错误");
+        }
+
+        Agent db_agent = getAgentById(agent.getId());
+
+        db_agent.setAgName(agent.getAgName());
+        db_agent.setAgNature(agent.getAgNature());
+        db_agent.setAgCapital(agent.getAgCapital());
+        db_agent.setAgBusLic(agent.getAgBusLic());
+        db_agent.setAgBusLicb(agent.getAgBusLicb());
+        db_agent.setAgBusLice(agent.getAgBusLice());
+        db_agent.setAgLegal(agent.getAgLegal());
+        db_agent.setAgLegalCertype(agent.getAgLegalCertype());
+        db_agent.setAgLegalCernum(agent.getAgLegalCernum());
+        db_agent.setAgLegalMobile(agent.getAgLegalMobile());
+        db_agent.setAgHead(agent.getAgHead());
+        db_agent.setAgHeadMobile(agent.getAgHeadMobile());
+        db_agent.setAgRegAdd(agent.getAgRegAdd());
+        db_agent.setAgBusScope(agent.getAgBusScope());
+        db_agent.setCloTaxPoint(agent.getCloTaxPoint());
+        db_agent.setAgDocPro(agent.getAgDocPro());
+        db_agent.setAgDocDistrict(agent.getAgDocDistrict());
+        db_agent.setAgRemark(agent.getAgRemark());
+
+        if(1!=agentMapper.updateByPrimaryKeySelective(db_agent)){
+            throw new ProcessException("代理商信息更新失败");
+        }
+        return db_agent;
     }
 }
