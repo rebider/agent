@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,22 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("agStatus",AgStatus.Approved.name());
+        if(!StringUtils.isBlank(agent.getAgName())){
+            reqMap.put("agName",agent.getAgName());
+        }
+        if(!StringUtils.isBlank(agent.getAgUniqNum())){
+            reqMap.put("agUniqNum",agent.getAgUniqNum());
+        }
+        if(!StringUtils.isBlank(agentBusInfo.getBusNum())){
+            reqMap.put("busNum",agentBusInfo.getBusNum());
+        }
+        if(!StringUtils.isBlank(agentBusInfo.getBusPlatform())){
+            reqMap.put("busPlatform",agentBusInfo.getBusPlatform());
+        }
+        if(agentBusInfo.getCloReviewStatus()!=null){
+            reqMap.put("cloReviewStatus",agentBusInfo.getCloReviewStatus());
+        }
+
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
