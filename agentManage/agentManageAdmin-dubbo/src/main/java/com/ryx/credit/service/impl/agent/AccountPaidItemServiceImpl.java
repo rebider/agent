@@ -4,10 +4,13 @@ import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.CapitalMapper;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.agent.Capital;
+import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.agent.AccountPaidItemService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.commons.lang.StringUtils;
@@ -95,9 +98,8 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
     }
 
 
-
-
-
-
-
+    @Override
+    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent) {
+        return null;
+    }
 }
