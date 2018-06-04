@@ -5,14 +5,14 @@ import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoRelMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.pojo.admin.agent.AgentColinfoExample;
-import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
+import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -153,6 +153,71 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         return agentColinfoMapper.updateByPrimaryKeySelective(a);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent) {
+        try {
+            if(agent==null)throw new ProcessException("代理商信息不能为空");
+            for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                agentColinfoVo.setcUser(agent.getcUser());
+                agentColinfoVo.setAgentId(agent.getId());
+                if(org.apache.commons.lang.StringUtils.isEmpty(agentColinfoVo.getId())) {
+                    //直接新曾
+                    AgentColinfo result =   agentColinfoInsert(agentColinfoVo, agentColinfoVo.getColinfoTableFile());
+                    logger.info("代理商收款账户添加:{}{}","添加代理商收款账户成功",result.getId());
+                }else{
 
+                    AgentColinfo db_AgentColinfo = agentColinfoMapper.selectByPrimaryKey(agentColinfoVo.getId());
+                    db_AgentColinfo.setAgentId(agent.getId());
+                    db_AgentColinfo.setCloType(agentColinfoVo.getCloType());
+                    db_AgentColinfo.setCloRealname(agentColinfoVo.getCloRealname());
+                    db_AgentColinfo.setCloBank(agentColinfoVo.getCloBank());
+                    db_AgentColinfo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
+                    db_AgentColinfo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
+                    db_AgentColinfo.setRemark(agentColinfoVo.getRemark());
+                    if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
+                        throw new ProcessException("更新收款信息失败");
+                    }
 
+                    //删除老的附件
+                    AttachmentRelExample example = new AttachmentRelExample();
+                    example.or().andBusTypeEqualTo(AttachmentRelType.Proceeds.name()).andSrcIdEqualTo(db_AgentColinfo.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                    List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+                    for (AttachmentRel attachmentRel : list) {
+                        attachmentRel.setStatus(Status.STATUS_0.status);
+                        int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+                        if (1 != i) {
+                            logger.info("修改收款信息附件关系失败{}",attachmentRel.getId());
+                            throw new ProcessException("更新收款信息信息失败");
+                        }
+                    }
+
+                    //添加新的附件
+                    List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
+                    if(fileIdList!=null) {
+                        for (String fileId : fileIdList) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(fileId);
+                            record.setSrcId(db_AgentColinfo.getId());
+                            record.setcUser(db_AgentColinfo.getcUser());
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.Contract.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int i = attachmentRelMapper.insertSelective(record);
+                            if (1 != i) {
+                                logger.info("收款信息附件关系失败");
+                                throw new ProcessException("更新收款信息失败");
+                            }
+                        }
+                    }
+
+                }
+            }
+            return ResultVO.success(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }

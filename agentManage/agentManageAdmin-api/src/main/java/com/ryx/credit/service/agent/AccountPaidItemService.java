@@ -20,6 +20,5 @@ public interface AccountPaidItemService {
 
     int removeAccountPaid(String id);
 
-
-    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList,Agent agent);
+    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent)throws Exception;
 }

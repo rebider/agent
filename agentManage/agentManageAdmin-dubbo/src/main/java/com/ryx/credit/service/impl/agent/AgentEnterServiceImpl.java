@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
@@ -520,16 +521,33 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId)throws Exception {
         try {
+
+            agent.getAgent().setcUser(userId);
+            logger.info("用户{}{}修改代理商信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = agentService.updateAgentVo(agent.getAgent());
+            logger.info("用户{}{}修改代理商信息结果{}",userId,agent.getAgent().getId(),"成功");
 
+            logger.info("用户{}{}修改代理商收款信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getCapitalVoList()));
+            ResultVO  updateAccountPaidUpdateRes =  accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(),agent.getAgent());
+            logger.info("用户{}{}修改代理商收款信息结果{}",userId,agent.getAgent().getId(), updateAccountPaidUpdateRes.getResInfo());
 
+            logger.info("用户{}{}修改代理商合同信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getContractVoList()));
+            ResultVO  updateAgentContractVoRes =  agentContractService.updateAgentContractVo(agent.getContractVoList(),agent.getAgent());
+            logger.info("用户{}{}修改代理商合同信息结果{}",userId,agent.getAgent().getId(), updateAgentContractVoRes.getResInfo());
 
+            logger.info("用户{}{}修改代理商收款信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getColinfoVoList()));
+            ResultVO  updateAgentColinfoVoRes  =  agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(),agent.getAgent());
+            logger.info("用户{}{}修改代理商收款信息结果{}",userId,agent.getAgent().getId(),updateAgentColinfoVoRes.getResInfo());
 
+            logger.info("用户{}{}修改代理商业务信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
+            ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(),agent.getAgent());
+            logger.info("用户{}{}修改代理商业务信息结果{}",userId,agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
+
+            return ResultVO.success(ag);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("修改代理商错误",e);
             throw e;
         }
-        return null;
     }
 }

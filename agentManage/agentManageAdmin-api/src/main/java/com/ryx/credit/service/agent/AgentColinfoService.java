@@ -2,8 +2,11 @@ package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
+import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,4 +30,6 @@ public interface AgentColinfoService {
     public List<AgentColinfo> queryAgentColinfoService(String agentId,String colId,BigDecimal appStatus);
 
     public int update(AgentColinfo a);
+
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent);
 }
