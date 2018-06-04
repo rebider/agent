@@ -8,12 +8,12 @@
        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
 
-
-    <!-- 使用zookeeper注册中心暴露服务地址 uat-->
-    <dubbo:registry protocol="zookeeper" address="${zk.merchantCA.server}" group="${zk.merchantCA.group}" id="merchantCAGroup"/>
-
+   <!-- 使用zookeeper注册中心暴露服务地址 uat-->
+    <dubbo:registry protocol="zookeeper" address="12.3.10.152:2181" />
+    <!-- 使用zookeeper注册中心暴露服务地址 -->
     <dubbo:consumer check="false" timeout="1200000" />
     
-    <dubbo:reference interface="com.ryx.iom.plugin.entinfo.proxy.IEntInfoProxy" id="iEntInfoProxy"  timeout="1200000"  registry="merchantCAGroup"/>
-   
+    <dubbo:annotation package="com.ryx.iom.plugin.entinfo.proxy.IEntInfoProxy" />
+    <dubbo:reference interface="com.ryx.iom.plugin.entinfo.proxy.IEntInfoProxy" id="iEntInfoProxy" />
+
 </beans>
