@@ -92,7 +92,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         AgentExample example = new AgentExample();
         AgentExample.Criteria criteria = example.createCriteria();
         criteria.andAgUniqNumEqualTo(agent.getAgUniqNum());
-        criteria.andStatusEqualTo(AgStatus.Approved.status);
+        criteria.andAgStatusEqualTo(AgStatus.Approved.name());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> agents = agentMapper.selectByExample(example);
         if(agents.size()!=1){
             return null;
