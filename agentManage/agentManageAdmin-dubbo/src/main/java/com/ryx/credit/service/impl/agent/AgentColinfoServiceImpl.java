@@ -88,7 +88,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 record.setcUser(ac.getcUser());
                 record.setcTime(ac.getcTime());
                 record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Agent.name());
+                record.setBusType(AttachmentRelType.Proceeds.name());
                 record.setId(idService.genId(TabId.a_attachment_rel));
                 if (1 != attachmentRelMapper.insertSelective(record)) {
                     logger.info("收款账号添加:{}", "收款账号添加附件关系失败");
