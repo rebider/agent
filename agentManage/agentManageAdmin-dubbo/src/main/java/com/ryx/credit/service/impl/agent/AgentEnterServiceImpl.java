@@ -9,6 +9,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
@@ -524,24 +525,34 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
             agent.getAgent().setcUser(userId);
             logger.info("用户{}{}修改代理商信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent));
-            Agent ag = agentService.updateAgentVo(agent.getAgent());
+            Agent ag = null;
+            {
+                if(StringUtils.isNotBlank(agent.getAgent().getAgName())) {
+                    ag = agentService.updateAgentVo(agent.getAgent());
+                }
+            }
             logger.info("用户{}{}修改代理商信息结果{}",userId,agent.getAgent().getId(),"成功");
 
-            logger.info("用户{}{}修改代理商收款信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getCapitalVoList()));
-            ResultVO  updateAccountPaidUpdateRes =  accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(),agent.getAgent());
-            logger.info("用户{}{}修改代理商收款信息结果{}",userId,agent.getAgent().getId(), updateAccountPaidUpdateRes.getResInfo());
-
-            logger.info("用户{}{}修改代理商合同信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getContractVoList()));
-            ResultVO  updateAgentContractVoRes =  agentContractService.updateAgentContractVo(agent.getContractVoList(),agent.getAgent());
-            logger.info("用户{}{}修改代理商合同信息结果{}",userId,agent.getAgent().getId(), updateAgentContractVoRes.getResInfo());
-
-            logger.info("用户{}{}修改代理商收款信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getColinfoVoList()));
-            ResultVO  updateAgentColinfoVoRes  =  agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(),agent.getAgent());
-            logger.info("用户{}{}修改代理商收款信息结果{}",userId,agent.getAgent().getId(),updateAgentColinfoVoRes.getResInfo());
-
-            logger.info("用户{}{}修改代理商业务信息{}",userId,agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-            ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(),agent.getAgent());
-            logger.info("用户{}{}修改代理商业务信息结果{}",userId,agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
+            if(agent.getCapitalVoList()!=null && agent.getCapitalVoList().size()>0) {
+                logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getCapitalVoList()));
+                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent());
+                logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAccountPaidUpdateRes.getResInfo());
+            }
+            if(agent.getContractVoList()!=null && agent.getContractVoList().size()>0) {
+                logger.info("用户{}{}修改代理商合同信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getContractVoList()));
+                ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(agent.getContractVoList(), agent.getAgent());
+                logger.info("用户{}{}修改代理商合同信息结果{}", userId, agent.getAgent().getId(), updateAgentContractVoRes.getResInfo());
+            }
+            if(agent.getColinfoVoList()!=null && agent.getColinfoVoList().size()>0) {
+                logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getColinfoVoList()));
+                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent());
+                logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAgentColinfoVoRes.getResInfo());
+            }
+            if(agent.getBusInfoVoList()!=null && agent.getBusInfoVoList().size()>0) {
+                logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent());
+                logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
+            }
 
             return ResultVO.success(ag);
         } catch (Exception e) {
