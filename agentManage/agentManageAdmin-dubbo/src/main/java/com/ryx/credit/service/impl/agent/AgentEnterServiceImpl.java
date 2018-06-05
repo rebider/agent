@@ -48,6 +48,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private ActivityService activityService;
     @Autowired
     private BusActRelMapper busActRelMapper;
+    @Autowired
+    private AgentAssProtocolService agentAssProtocolService;
 
 
     /**
@@ -85,7 +87,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                agentBusinfoService.agentBusInfoInsert(item);
+                AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
+                if(StringUtils.isNotBlank(item.getAgentAssProtocol())){
+                    AssProtoColRel rel = new AssProtoColRel();
+                    rel.setAgentBusinfoId(db_AgentBusInfo.getId());
+                    rel.setAssProtocolId(item.getAgentAssProtocol());
+                    if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
+                        throw new ProcessException("业务分管协议添加失败");
+                    }
+                }
             }
             return ResultVO.success(agentVo);
         }catch (Exception e){

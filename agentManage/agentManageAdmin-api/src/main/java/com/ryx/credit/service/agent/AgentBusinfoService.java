@@ -20,8 +20,8 @@ public interface AgentBusinfoService {
      * @return
      */
     PageInfo agentBusInfoSelectViewList(Map par,  PageInfo page);
-    
-    void agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception;
+
+    AgentBusInfo agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception;
 
     /**
      * 代理商业务信息
@@ -36,4 +36,5 @@ public interface AgentBusinfoService {
     public AgentBusInfo getById(String id);
 
     public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception;
+
 }

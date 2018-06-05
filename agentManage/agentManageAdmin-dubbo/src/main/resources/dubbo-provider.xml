@@ -45,6 +45,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.ApaycompService" ref="apaycompService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.TaskApprovalService" ref="taskApprovalService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.DateChangeReqService" ref="dateChangeReqService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentAssProtocolService" ref="agentAssProtocolService"  timeout="1200000" registry="${zk.group}"/>
 
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}"/>
