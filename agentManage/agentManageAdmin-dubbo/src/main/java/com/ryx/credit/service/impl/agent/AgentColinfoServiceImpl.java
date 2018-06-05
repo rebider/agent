@@ -202,7 +202,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             record.setcUser(db_AgentColinfo.getcUser());
                             record.setcTime(Calendar.getInstance().getTime());
                             record.setStatus(Status.STATUS_1.status);
-                            record.setBusType(AttachmentRelType.Contract.name());
+                            record.setBusType(AttachmentRelType.Proceeds.name());
                             record.setId(idService.genId(TabId.a_attachment_rel));
                             int i = attachmentRelMapper.insertSelective(record);
                             if (1 != i) {
