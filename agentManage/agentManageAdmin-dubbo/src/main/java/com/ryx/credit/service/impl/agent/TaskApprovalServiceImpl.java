@@ -1,16 +1,17 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.pojo.admin.agent.AgentColinfoExample;
-import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
+import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -41,6 +42,10 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private AgentEnterService agentEnterService;
      @Autowired
      private AgentColinfoService agentColinfoService;
+     @Autowired
+     private ActivityService activityService;
+     @Autowired
+     private BusActRelMapper busActRelMapper;
 
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
@@ -97,4 +102,26 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         return AgentResult.ok();
     }
 
+    /**
+     * 查询工作流程
+     * @param busId
+     * @param busType
+     * @return
+     */
+    @Override
+    public Map findBusActByBusId(String busId,String busType){
+        BusActRelExample example = new BusActRelExample();
+        BusActRelExample.Criteria criteria = example.createCriteria();
+        criteria.andBusIdEqualTo(busId);
+        criteria.andBusTypeEqualTo(busType);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andActivStatusEqualTo(AgStatus.Approving.name());
+        List<BusActRel> busActRels = busActRelMapper.selectByExample(example);
+        if(busActRels.size()!=1){
+            return null;
+        }
+        BusActRel busActRel = busActRels.get(0);
+        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
+        return resultMap;
+    }
 }

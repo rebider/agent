@@ -20,4 +20,6 @@ public interface TaskApprovalService {
     List<Map<String, Object>> queryBusInfoAndRemitByBusId(String busId);
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
+
+    Map findBusActByBusId(String busId,String busType);
 }
