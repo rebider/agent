@@ -303,7 +303,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
-            <scope>provided</scope>
+            <!--<scope>provided</scope>-->
         </dependency>
         <!-- json序列化包 -->
         <dependency>
@@ -409,14 +409,14 @@
 
         <!-- 2. 部署环境(测试环境/生产环境) start -->
         <profile>
-            <id>test</id>
+            <id>dev</id>
             <activation>
                 <os>
                     <family>Windows</family>
                 </os>
             </activation>
             <properties>
-                <deploy.env.name>test</deploy.env.name>
+                <deploy.env.name>dev</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
             </properties>
         </profile>
@@ -546,13 +546,13 @@
         <repository>
             <id>pro-release</id>
             <name>Proj Release Repository</name>
-            <url>http://10.106.88.58:8081/nexus/content/repositories/wq-release/</url>
+            <url>http://12.3.10.224:9081/nexus/content/repositories/wq-release/</url>
         </repository>
 
         <snapshotRepository>
             <id>pro-snapshot</id>
             <name>Proj Snapshot Repository</name>
-            <url>http://10.106.88.58:8081/nexus/content/repositories/wq-snapshot/</url>
+            <url>http://12.3.10.224:9081/nexus/content/repositories/wq-snapshot/</url>
         </snapshotRepository>
     </distributionManagement>
 

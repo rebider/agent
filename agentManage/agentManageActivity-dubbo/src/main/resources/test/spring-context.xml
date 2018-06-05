@@ -30,5 +30,6 @@
         </aop:aspect>
     </aop:config>
     <import resource="spring-redis.xml"/>
+    <import resource="activiti.cfg.xml"/>
     <import resource="spring-mybatis.xml"/>
 </beans>

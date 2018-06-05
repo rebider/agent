@@ -1,0 +1,20 @@
+package com.ryx.credit.common.enumc;
+
+import java.math.BigDecimal;
+
+/**
+ * Created by cx on 2018/5/30.
+ */
+public enum AgentInStatus {
+
+    IN(1,"已入网"),NO(0,"未入网");
+
+    public BigDecimal status;
+
+    public String  msg;
+
+    AgentInStatus(int status,String s){
+        this.status = new BigDecimal(status);
+        msg = s;
+    }
+}

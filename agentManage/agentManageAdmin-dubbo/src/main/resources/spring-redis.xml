@@ -30,6 +30,6 @@
         <property name="connectionFactory"   ref="connectionFactory" />  
     </bean>
     
-    <!--<bean id="redisService" class="com.crowdfund.common.redis.RedisService" />-->
+    <bean id="redisService" class="com.ryx.credit.common.redis.RedisService" />
     <!--<bean id="userSessionService" class="com.crowdfund.user.service.UserSessionService" />-->
 </beans>
