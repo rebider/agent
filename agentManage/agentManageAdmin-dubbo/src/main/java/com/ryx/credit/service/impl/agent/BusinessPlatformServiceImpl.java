@@ -139,8 +139,17 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception{
         try {
+
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
+            //先查询业务是否已添加 有个添加过 全部返回
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                item.setAgentId(agent.getId());
+                Boolean busPlatExist = findBusPlatExist(item);
+                if(busPlatExist){
+                    return new AgentResult(500,"业务已添加,请勿重复添加","");
+                }
+            }
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
@@ -170,4 +179,25 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             throw new ProcessException("业务平台信息录入失败");
         }
     }
+
+    /**
+     * 查询代理上次业务是否添加过
+     * @param agentBusInfo
+     * @return
+     */
+    private Boolean findBusPlatExist(AgentBusInfo agentBusInfo){
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+        criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
+        if(null==agentBusInfos){
+            return true;
+        }
+        if(agentBusInfos.size()==0){
+            return false;
+        }
+        return true;
+    }
+
 }
