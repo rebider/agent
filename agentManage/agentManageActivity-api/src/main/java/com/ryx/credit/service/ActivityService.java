@@ -34,4 +34,6 @@ public interface ActivityService {
     Object getValue(String task_id, String key);
 
     Map getImage(String taskId);
+
+    Map getImageByExecuId(String executionId);
 }

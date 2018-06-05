@@ -1,5 +1,8 @@
 package com.ryx.credit.activity.service.impl;
 
+import com.ryx.credit.activity.entity.ActRuTask;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
 import net.sf.json.JSONObject;
 import org.activiti.bpmn.model.BpmnModel;
@@ -42,6 +45,8 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Autowired
     private StandaloneProcessEngineConfiguration processEngineConfiguration;
+    @Autowired
+    private ActRuTaskService actRuTaskService;
 
     @Override
     public void createTable() {
@@ -272,5 +277,22 @@ public class ActivityServiceImpl implements ActivityService {
             }
         }
         return highFlows;
+    }
+
+    @Override
+    public Map getImageByExecuId(String executionId)  {
+        Page page = new Page();
+        page.setCurrent(1);
+        page.setLength(10);
+        page.setBegin(0);
+        page.setEnd(10);
+        ActRuTask actRuTask = new ActRuTask();
+        actRuTask.setExecutionId(executionId);
+        HashMap<String,Object> hashMap = actRuTaskService.configExample(page, actRuTask);
+        List<ActRuTask> actRuTaskList = (List<ActRuTask>) hashMap.get("list");
+        if(actRuTaskList.size()>0){
+            return getImage(actRuTaskList.get(0).getId().toString());
+        }
+        return null;
     }
 }
