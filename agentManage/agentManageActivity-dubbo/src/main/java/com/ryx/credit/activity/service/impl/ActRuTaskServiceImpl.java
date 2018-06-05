@@ -6,6 +6,7 @@ import com.ryx.credit.activity.entity.ActRuTaskExample;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.service.ActRuTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
@@ -19,7 +20,7 @@ import java.util.HashMap;
  * @description: ActRuTaskServiceImpl
  * To change this template use File | Settings | File Templates.
  */
-
+@Service("actRuTaskService")
 public class ActRuTaskServiceImpl implements ActRuTaskService {
     @Autowired
     private ActRuTaskMapper  actRuTaskMapper;

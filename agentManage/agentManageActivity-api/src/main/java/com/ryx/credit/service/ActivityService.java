@@ -19,7 +19,7 @@ import java.util.Map;
 public interface ActivityService {
     void createTable();
 
-    void createDeloyFlow(String deployName, String workId, String activity_path, String activity_image_path);
+    String createDeloyFlow(String deployName, String workId, String activity_path, String activity_image_path);
 
     List<Task> findMyPersonTask(String assignee);
 
@@ -34,4 +34,6 @@ public interface ActivityService {
     Object getValue(String task_id, String key);
 
     Map getImage(String taskId);
+
+    Map getImageByExecuId(String executionId);
 }

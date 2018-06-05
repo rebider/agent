@@ -29,4 +29,25 @@
     <dubbo:service interface="com.ryx.credit.service.ICRuleService" ref="cRuleService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.ICStrategyRuleService" ref="cStrategyRuleService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.ICStrategyService" ref="cStrategyService"  timeout="1200000" registry="${zk.group}"/>
+
+    <dubbo:service interface="com.ryx.credit.service.dict.DictOptionsService" ref="dictOptionsService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.BusinessPlatformService" ref="businessPlatformService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.dict.RegionService" ref="regionService" timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentContractService" ref="agentContractService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentService" ref="agentService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentBusinfoService" ref="agentBusinfoService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AccountPaidItemService" ref="accountPaidItemService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.BusinessCAService" ref="businessCAService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentQueryService" ref="agentQueryService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.dict.MultiFileUploadService" ref="multiFileUploadService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentEnterService" ref="agentEnterService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.dict.DepartmentService" ref="departmentService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.ApaycompService" ref="apaycompService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.TaskApprovalService" ref="taskApprovalService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.DateChangeReqService" ref="dateChangeReqService"  timeout="1200000" registry="${zk.group}"/>
+
+
+    <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}"/>
+
 </beans>

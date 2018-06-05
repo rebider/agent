@@ -32,6 +32,17 @@ public class ResultVO implements Serializable{
 	public ResultVO() {
 	}
 
+	public static ResultVO success(Object data){
+		ResultVO res = new ResultVO(SUCCESS,"成功");
+		res.setObj(data);
+		return res;
+	}
+
+	public static ResultVO fail(String  msg){
+		ResultVO res = new ResultVO(FAIL,msg);
+		return res;
+	}
+
 	public String getResCode() {
 		return resCode;
 	}
