@@ -266,6 +266,6 @@
     <select id="proceedsQuery" parameterType="string" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from A_AGENT_COLINFO where AGENT_ID=#{id}
+        from A_AGENT_COLINFO where AGENT_ID=#{id} and STATUS = 1
     </select>
 </mapper>

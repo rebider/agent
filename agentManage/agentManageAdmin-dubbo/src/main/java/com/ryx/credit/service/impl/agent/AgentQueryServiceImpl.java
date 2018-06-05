@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.druid.sql.visitor.functions.If;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.common.enumc.AttachmentRelType;
@@ -103,7 +104,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     @Override
     public Map<String, Object> queryInfoByProInsId(String proid) {
         BusActRelExample example = new BusActRelExample();
-        example.or().andActivIdEqualTo(proid);
+        example.or().andActivIdEqualTo(proid).andStatusEqualTo(Status.STATUS_1.status);
         List<BusActRel>  busr = busActRelMapper.selectByExample(example);
         if(busr.size()==1){
             BusActRel rel = busr.get(0);

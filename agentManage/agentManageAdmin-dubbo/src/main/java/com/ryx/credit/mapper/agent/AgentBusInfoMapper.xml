@@ -506,7 +506,7 @@
   </select>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" /> from A_AGENT_BUSINFO  where AGENT_ID=#{id}
+    select <include refid="Base_Column_List" /> from A_AGENT_BUSINFO  where AGENT_ID=#{id} and STATUS = 1
   </select>
 
 

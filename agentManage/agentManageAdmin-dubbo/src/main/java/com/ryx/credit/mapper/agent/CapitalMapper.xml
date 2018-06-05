@@ -296,6 +296,6 @@
   </sql>
 
   <select id="paymentQuery" parameterType="string" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" /> from A_CAPITAL where C_AGENT_ID=#{id}
+    select <include refid="Base_Column_List" /> from A_CAPITAL where C_AGENT_ID=#{id} and STATUS = 1
   </select>
 </mapper>
