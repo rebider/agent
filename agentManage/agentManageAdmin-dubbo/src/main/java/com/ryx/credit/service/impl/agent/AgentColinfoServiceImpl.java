@@ -88,7 +88,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 record.setcUser(ac.getcUser());
                 record.setcTime(ac.getcTime());
                 record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Agent.name());
+                record.setBusType(AttachmentRelType.Proceeds.name());
                 record.setId(idService.genId(TabId.a_attachment_rel));
                 if (1 != attachmentRelMapper.insertSelective(record)) {
                     logger.info("收款账号添加:{}", "收款账号添加附件关系失败");
@@ -202,7 +202,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             record.setcUser(db_AgentColinfo.getcUser());
                             record.setcTime(Calendar.getInstance().getTime());
                             record.setStatus(Status.STATUS_1.status);
-                            record.setBusType(AttachmentRelType.Contract.name());
+                            record.setBusType(AttachmentRelType.Proceeds.name());
                             record.setId(idService.genId(TabId.a_attachment_rel));
                             int i = attachmentRelMapper.insertSelective(record);
                             if (1 != i) {
