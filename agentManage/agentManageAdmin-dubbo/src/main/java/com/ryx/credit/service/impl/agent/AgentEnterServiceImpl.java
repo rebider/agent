@@ -97,6 +97,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     }
                 }
             }
+
             return ResultVO.success(agentVo);
         }catch (Exception e){
             e.printStackTrace();
@@ -304,6 +305,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     }
 
 
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public ResultVO completeProcessing(String processingId, String processingStatus) throws ProcessException {
         BusActRelExample example = new BusActRelExample();
@@ -311,6 +313,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<BusActRel> list =  busActRelMapper.selectByExample(example);
         if(list.size()!=1){
             logger.info("审批任务结束{}{}，未找到审批中的审批和数据关系",processingId,processingStatus);
+            return ResultVO.fail("审批任务结束"+processingId+":"+processingStatus+"未找到审批中的审批和数据关系");
         }
         BusActRel rel = list.get(0);
         if(rel.getBusType().equals(BusActRelBusType.Business.name())) {
@@ -538,7 +541,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             Agent ag = null;
             {
                 if(StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                    ag = agentService.updateAgentVo(agent.getAgent());
+                    ag = agentService.updateAgentVo(agent.getAgent(),agent.getAgentTableFile());
                 }
             }
             logger.info("用户{}{}修改代理商信息结果{}",userId,agent.getAgent().getId(),"成功");
