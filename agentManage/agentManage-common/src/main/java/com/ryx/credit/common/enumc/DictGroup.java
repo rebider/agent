@@ -22,6 +22,7 @@ public enum DictGroup {
     AG_STATUS_I("审核数字状态"),
     APPROVAL_TYPE("审批结果类型"),
     BUS_STATUS("业务状态"),
+    DATA_CHANGE_TYPE("数据修改申请"),
     APPROVAL_PASS_TYPE("审批通过");
 
 
