@@ -74,23 +74,24 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
+            //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
                 if(!result.isOK()){
                     throw new ProcessException("保存收款关系异常");
                 }
             }
+            //处理业务修改
             for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                AgentBusInfo record = new AgentBusInfo();
-                record.setId(agentBusInfoVo.getId());
-                record.setCloPayCompany(agentBusInfoVo.getCloPayCompany());
-                record.setVersion(agentBusInfo.getVersion());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(record);
+                agentBusInfoVo.setId(agentBusInfoVo.getId());
+                agentBusInfoVo.setVersion(agentBusInfo.getVersion());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if(i!=1){
-                    throw new ProcessException("更新打款公司异常");
+                    throw new ProcessException("更新打款公司或业务所属上级异常");
                 }
             }
+
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 throw new ProcessException("工作流处理任务异常");
