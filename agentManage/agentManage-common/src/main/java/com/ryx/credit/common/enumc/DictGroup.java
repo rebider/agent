@@ -23,6 +23,7 @@ public enum DictGroup {
     APPROVAL_TYPE("审批结果类型"),
     BUS_STATUS("业务状态"),
     DATA_CHANGE_TYPE("数据修改申请"),
+    DATA_CACTIVITY_TYPE("数据修改对应的启动流程"),
     APPROVAL_PASS_TYPE("审批通过");
 
 
