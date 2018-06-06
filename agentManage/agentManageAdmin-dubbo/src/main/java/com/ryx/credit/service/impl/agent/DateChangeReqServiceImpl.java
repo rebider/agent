@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -32,23 +33,40 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
     private IdService idService;
 
     @Override
-    public ResultVO dateChangeReqIn(String json) {
+    public ResultVO dateChangeReqIn(String json,String oldJson,String srcId,String type,String userId) {
         try {
             logger.info("开始数据变更");
             DateChangeRequest changeRequest = new DateChangeRequest();
             Date date = Calendar.getInstance().getTime();
             changeRequest.setId(idService.genId(TabId.data_change_request));
+            changeRequest.setDataId(srcId);
+            changeRequest.setDataType(type);
+            changeRequest.setDataContent(json);
+            changeRequest.setDataPreContent(oldJson);
+            changeRequest.setcUser(userId);
             changeRequest.setcTime(date);
             changeRequest.setcUpdate(date);
+            changeRequest.setAppyStatus(AgStatus.Create.status);
             changeRequest.setStatus(Status.STATUS_1.status);
             changeRequest.setVersion(Status.STATUS_1.status);
-            changeRequest.setDataContent(json);
-             dateChangeRequestMapper.insertSelective(changeRequest);
-            return ResultVO.success(json);
+             if(1==dateChangeRequestMapper.insertSelective(changeRequest)){
+                 return ResultVO.success(changeRequest);
+             }else{
+                 throw new ProcessException("数据变更申请失败");
+             }
         }catch (Exception e){
             logger.info("数据变更失败");
             e.printStackTrace();
             throw new ProcessException("数据变更失败");
         }
+    }
+
+
+
+
+
+    @Override
+    public DateChangeRequest getById(String id){
+        return dateChangeRequestMapper.selectByPrimaryKey(id);
     }
 }

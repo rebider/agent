@@ -1,7 +1,9 @@
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.iom.plugin.entinfo.proxy.IEntInfoProxy;
@@ -30,6 +32,8 @@ public class DictServiceTest extends BaseSpringTest {
     private DictOptionsService dictOptionsService;
     @Autowired
     private IEntInfoProxy  iEntInfoProxy;
+    @Autowired
+    private DateChangeReqService dateChangeReqService;
     
     @Test
     public void testId(){
@@ -50,6 +54,13 @@ public class DictServiceTest extends BaseSpringTest {
     	logger.info("=======testQuery=====");
     	Map data = iEntInfoProxy.queryEntInfo(null, "瑞银信", "1");
     	logger.info("=======testOptions====="+data);
+    }
+
+    @Test
+    public void testDataChange(){
+        logger.info("=======testDataChange=====");
+        DateChangeRequest data = dateChangeReqService.getById("DC20180606000000000000022");
+        logger.info("=======testDataChange====="+data);
     }
 
 }
