@@ -304,6 +304,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     }
 
 
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public ResultVO completeProcessing(String processingId, String processingStatus) throws ProcessException {
         BusActRelExample example = new BusActRelExample();

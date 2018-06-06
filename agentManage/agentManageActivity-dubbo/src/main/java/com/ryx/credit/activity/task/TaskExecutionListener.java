@@ -41,8 +41,7 @@ public class TaskExecutionListener implements TaskListener,ExecutionListener{
             if("finish_end".equals(activityName)){
                 aes.completeProcessing(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
             }
-        }
-        else if ("take".equals(eventName)) {
+        }else if ("take".equals(eventName)) {
             logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
         }
     }
