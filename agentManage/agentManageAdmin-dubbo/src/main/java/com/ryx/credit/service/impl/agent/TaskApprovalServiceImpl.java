@@ -76,7 +76,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
-            AgentResult result1 = taskApprovalService.updateApproval(agentVo, userId);
+            taskApprovalService.updateApproval(agentVo, userId);
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 throw new ProcessException("工作流处理任务异常");

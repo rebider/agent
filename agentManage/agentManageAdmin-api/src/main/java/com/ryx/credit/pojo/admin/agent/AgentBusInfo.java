@@ -64,6 +64,8 @@ public class AgentBusInfo implements Serializable {
 
     private BigDecimal version;
 
+    private String agZbh;
+
     private List<Attachment> attachmentList;
 
     public List<Attachment> getAttachmentList() {
@@ -304,5 +306,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getAgZbh() {
+        return agZbh;
+    }
+
+    public void setAgZbh(String agZbh) {
+        this.agZbh = agZbh;
     }
 }
