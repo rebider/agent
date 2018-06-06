@@ -224,4 +224,34 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryData" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+      select data.DATA_ID,data.DATA_TYPE,
+    data.C_TIME,data.C_UPDATE,data.APPY_STATUS,
+    agent.ag_name from DATA_CHANGE_REQUEST data , A_AGENT agent
+      where data.DATA_ID=agent.id and data.status=1 and agent.status=1
+    <if test="map.appStatus != null and map.appStatus != '' " >
+      and data.APPY_STATUS = #{map.appStatus}
+    </if>
+    <if test="map.dataType != null and map.dataType != '' " >
+      and data.DATA_TYPE = #{map.dataType}
+    </if>
+      order by data.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryDataCount" parameterType="map" resultType="int">
+     select
+         count(*)
+      from DATA_CHANGE_REQUEST data , A_AGENT agent
+      where data.DATA_ID=agent.id and data.status=1 and agent.status=1
+    <if test="map.appStatus != null and map.appStatus != '' " >
+      and data.APPY_STATUS = #{map.appStatus}
+    </if>
+    <if test="map.dataType != null and map.dataType != '' " >
+      and data.DATA_TYPE = #{map.dataType}
+    </if>
+    order by data.c_time desc
+  </select>
 </mapper>

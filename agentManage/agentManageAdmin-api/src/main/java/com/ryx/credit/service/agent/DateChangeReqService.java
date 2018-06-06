@@ -1,8 +1,9 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
-import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 /**
  * @ClassName DateChangeReqService
@@ -19,4 +20,9 @@ public interface DateChangeReqService {
     public ResultVO dateChangeReqIn(String json,String oldJson,String srcId,String type,String userId);
 
     public DateChangeRequest getById(String id);
+
+    /**
+     * 数据变更的查询
+     */
+    public PageInfo queryData( Page page,DateChangeRequest dateChangeRequest);
 }

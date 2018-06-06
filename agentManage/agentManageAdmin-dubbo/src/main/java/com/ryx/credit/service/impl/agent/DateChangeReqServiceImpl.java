@@ -4,7 +4,10 @@ import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.DateChangeRequestMapper;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -15,8 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @ClassName DateChangeReqServiceImpl
@@ -68,5 +70,21 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
     @Override
     public DateChangeRequest getById(String id){
         return dateChangeRequestMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public PageInfo queryData(Page page, DateChangeRequest dateChangeRequest) {
+        Map<String, Object> map = new HashMap<>();
+        if(null!=dateChangeRequest.getAppyStatus()){
+            map.put("appStatus",dateChangeRequest.getAppyStatus());
+        }
+        if(!StringUtils.isBlank(dateChangeRequest.getDataType())){
+            map.put("dataType",dateChangeRequest.getDataType());
+        }
+        List<Map<String, Object>> dateChangeReqList = dateChangeRequestMapper.queryData(map,page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(dateChangeReqList);
+        pageInfo.setTotal(dateChangeRequestMapper.queryDataCount(map));
+        return pageInfo;
     }
 }
