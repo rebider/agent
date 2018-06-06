@@ -14,6 +14,7 @@ import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.pojo.admin.agent.AttachmentRelExample;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
@@ -180,14 +181,12 @@ public class AgentServiceImpl implements  AgentService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public Agent updateAgentVo(Agent agent)throws Exception {
+    public Agent updateAgentVo(Agent agent,List<String> attrs)throws Exception {
 
         if(null==agent || StringUtils.isEmpty(agent.getId())){
             throw new ProcessException("代理商信息错误");
         }
-
         Agent db_agent = getAgentById(agent.getId());
-
         db_agent.setAgName(agent.getAgName());
         db_agent.setAgNature(agent.getAgNature());
         db_agent.setAgCapital(agent.getAgCapital());
@@ -206,10 +205,43 @@ public class AgentServiceImpl implements  AgentService {
         db_agent.setAgDocPro(agent.getAgDocPro());
         db_agent.setAgDocDistrict(agent.getAgDocDistrict());
         db_agent.setAgRemark(agent.getAgRemark());
-
         if(1!=agentMapper.updateByPrimaryKeySelective(db_agent)){
             throw new ProcessException("代理商信息更新失败");
         }
+
+
+        //删除老的附件
+        AttachmentRelExample example = new AttachmentRelExample();
+        example.or().andBusTypeEqualTo(AttachmentRelType.Agent.name()).andSrcIdEqualTo(db_agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
+        List<AttachmentRel> list = attachmentRelMapper.selectByExample(example);
+        for (AttachmentRel attachmentRel : list) {
+            attachmentRel.setStatus(Status.STATUS_0.status);
+            int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
+            if (1 != i) {
+                logger.info("修改代理商附件关系失败");
+                throw new ProcessException("更新修改代理商失败");
+            }
+        }
+
+        //添加新的附件
+        if(attrs!=null) {
+            for (String fileId : attrs) {
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(fileId);
+                record.setSrcId(db_agent.getId());
+                record.setcUser(agent.getcUser());
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.Agent.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                int i = attachmentRelMapper.insertSelective(record);
+                if (1 != i) {
+                    logger.info("修改代理商附件关系失败");
+                    throw new ProcessException("更新修改代理商失败");
+                }
+            }
+        }
+
         return db_agent;
     }
 }

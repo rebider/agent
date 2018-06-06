@@ -97,6 +97,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     }
                 }
             }
+
             return ResultVO.success(agentVo);
         }catch (Exception e){
             e.printStackTrace();
@@ -540,7 +541,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             Agent ag = null;
             {
                 if(StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                    ag = agentService.updateAgentVo(agent.getAgent());
+                    ag = agentService.updateAgentVo(agent.getAgent(),agent.getAgentTableFile());
                 }
             }
             logger.info("用户{}{}修改代理商信息结果{}",userId,agent.getAgent().getId(),"成功");
