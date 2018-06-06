@@ -69,7 +69,7 @@
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
     C_UTIME, C_USER, STATUS, VERSION, AG_ZBH
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.order.entity.AgentBusInfoExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct" >
@@ -91,7 +91,7 @@
     from A_AGENT_BUSINFO
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.order.entity.AgentBusInfoExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
     delete from A_AGENT_BUSINFO
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
@@ -308,7 +308,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.order.entity.AgentBusInfoExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Integer" >
     select count(*) from A_AGENT_BUSINFO
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
