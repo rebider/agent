@@ -46,6 +46,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private ActivityService activityService;
      @Autowired
      private BusActRelMapper busActRelMapper;
+     @Autowired
+     private TaskApprovalService taskApprovalService;
 
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
@@ -74,7 +76,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
-            AgentResult result1 = updateApproval(agentVo, userId);
+            AgentResult result1 = taskApprovalService.updateApproval(agentVo, userId);
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 throw new ProcessException("工作流处理任务异常");
