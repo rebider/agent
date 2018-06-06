@@ -311,6 +311,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<BusActRel> list =  busActRelMapper.selectByExample(example);
         if(list.size()!=1){
             logger.info("审批任务结束{}{}，未找到审批中的审批和数据关系",processingId,processingStatus);
+            return ResultVO.fail("审批任务结束"+processingId+":"+processingStatus+"未找到审批中的审批和数据关系");
         }
         BusActRel rel = list.get(0);
         if(rel.getBusType().equals(BusActRelBusType.Business.name())) {
