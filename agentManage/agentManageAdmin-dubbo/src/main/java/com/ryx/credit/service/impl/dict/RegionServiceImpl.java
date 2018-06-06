@@ -45,7 +45,7 @@ public class RegionServiceImpl implements RegionService {
         if(StringUtils.isBlank(regionsValue)){
             regionsList = regionMapper.selectAll();
             String regionsJson = JsonUtil.objectToJson(regionsList);
-            redisService.setValue(REGIONS_KEY,regionsJson,86400L);
+            redisService.setNx(REGIONS_KEY,regionsJson);
         }else{
             regionsList = JsonUtil.jsonToList(regionsValue, Region.class);
         }
