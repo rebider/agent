@@ -21,5 +21,7 @@ public interface TaskApprovalService {
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
+    AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception;
+
     Map findBusActByBusId(String busId,String busType);
 }

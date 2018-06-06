@@ -74,6 +74,23 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
+            AgentResult result1 = updateApproval(agentVo, userId);
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
+            if(!result.isOK()){
+                throw new ProcessException("工作流处理任务异常");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
+        }
+        return AgentResult.ok();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
+
+        if(agentVo.getApprovalResult().equals("pass")){
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
@@ -91,18 +108,9 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("更新打款公司或业务所属上级异常");
                 }
             }
-
-            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
-            if(!result.isOK()){
-                throw new ProcessException("工作流处理任务异常");
-            }
-        } catch (ProcessException e) {
-            e.printStackTrace();
-            throw new ProcessException("catch工作流处理任务异常!");
         }
         return AgentResult.ok();
     }
-
     /**
      * 查询工作流程
      * @param busId
