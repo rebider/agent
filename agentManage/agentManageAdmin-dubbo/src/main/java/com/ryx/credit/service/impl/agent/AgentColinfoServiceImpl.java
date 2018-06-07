@@ -175,6 +175,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
                     db_AgentColinfo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
                     db_AgentColinfo.setRemark(agentColinfoVo.getRemark());
+                    db_AgentColinfo.setStatus(agentColinfoVo.getStatus());
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
                         throw new ProcessException("更新收款信息失败");
                     }
