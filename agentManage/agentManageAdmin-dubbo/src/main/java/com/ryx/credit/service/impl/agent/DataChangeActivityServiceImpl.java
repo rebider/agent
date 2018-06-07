@@ -58,6 +58,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     public ResultVO startDataChangeActivity(String dataChangeId,String userId) {
         logger.info("========用户{}启动数据修改申请{}",dataChangeId,userId);
         DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
+
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(dateChangeRequest.getId()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         List<BusActRel> list = busActRelMapper.selectByExample(example);
@@ -72,6 +73,11 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             if(dict.getdItemvalue().equals(dateChangeRequest.getDataType())){
                 workId = dict.getdItemname();
             }
+        }
+        dateChangeRequest.setAppyStatus(AgStatus.Approving.status);
+        if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest)){
+            logger.info("代理商审批，启动审批异常，更新记录状态{}:{}",dateChangeRequest.getId(),userId);
+            throw  new ProcessException("更新记录状态异常");
         }
         if(StringUtils.isEmpty(workId)) {
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
@@ -97,11 +103,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             throw  new ProcessException("添加审批关系失败");
 
         }
-        dateChangeRequest.setAppyStatus(AgStatus.Approving.status);
-        if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest)){
-            logger.info("代理商审批，启动审批异常，更新记录状态{}:{}",dateChangeRequest.getId(),proce);
-            throw  new ProcessException("更新记录状态异常");
-        }
+
         return ResultVO.success(null);
     }
 }
