@@ -68,6 +68,8 @@ public class AgentBusInfo implements Serializable {
 
     private List<Attachment> attachmentList;
 
+    private List<AgentColinfo> agentColinfoList;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -314,5 +316,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setAgZbh(String agZbh) {
         this.agZbh = agZbh;
+    }
+
+    public List<AgentColinfo> getAgentColinfoList() {
+        return agentColinfoList;
+    }
+
+    public void setAgentColinfoList(List<AgentColinfo> agentColinfoList) {
+        this.agentColinfoList = agentColinfoList;
     }
 }
