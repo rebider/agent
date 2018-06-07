@@ -94,6 +94,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setActivStatus(AgStatus.Approving.name());
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
+            throw  new ProcessException("添加审批关系失败");
+
+        }
+        dateChangeRequest.setAppyStatus(AgStatus.Approving.status);
+        if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest)){
+            logger.info("代理商审批，启动审批异常，更新记录状态{}:{}",dateChangeRequest.getId(),proce);
+            throw  new ProcessException("更新记录状态异常");
         }
         return ResultVO.success(null);
     }
