@@ -34,12 +34,9 @@ public class FinanceTaskExecutionListener implements TaskListener,ExecutionListe
             logger.info("start========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
         }else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
-            AgentEnterService aes = (AgentEnterService)MySpringContextHandler.applicationContext.getBean("agentEnterService");
             if("reject_end".equals(activityName)){
-                aes.completeProcessing(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
             }
             if("finish_end".equals(activityName)){
-                aes.completeProcessing(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
             }
         }else if ("take".equals(eventName)) {
             logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
