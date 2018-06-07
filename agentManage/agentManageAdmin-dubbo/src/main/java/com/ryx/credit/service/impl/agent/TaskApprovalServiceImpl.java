@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -120,19 +119,28 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      * @return
      */
     @Override
-    public Map findBusActByBusId(String busId,String busType){
+    public Map findBusActByBusId(String busId,String busType,String activStatus){
+        BusActRel busActRel = queryBusActRel(busId, busId,activStatus);
+        if(busActRel==null){
+            return null;
+        }
+        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
+        return resultMap;
+    }
+
+    @Override
+    public BusActRel queryBusActRel(String busId,String busType,String activStatus){
         BusActRelExample example = new BusActRelExample();
         BusActRelExample.Criteria criteria = example.createCriteria();
         criteria.andBusIdEqualTo(busId);
         criteria.andBusTypeEqualTo(busType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andActivStatusEqualTo(AgStatus.Approving.name());
+        criteria.andActivStatusEqualTo(activStatus);
         List<BusActRel> busActRels = busActRelMapper.selectByExample(example);
         if(busActRels.size()!=1){
             return null;
         }
         BusActRel busActRel = busActRels.get(0);
-        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
-        return resultMap;
+        return busActRel;
     }
 }
