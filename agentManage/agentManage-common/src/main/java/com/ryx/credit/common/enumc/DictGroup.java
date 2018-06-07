@@ -24,6 +24,7 @@ public enum DictGroup {
     BUS_STATUS("业务状态"),
     DATA_CHANGE_TYPE("数据修改申请"),
     DATA_CACTIVITY_TYPE("数据修改对应的启动流程"),
+    BUS_ACT_REL_BUSTYPE("审批关系类型"),
     APPROVAL_PASS_TYPE("审批通过");
 
 

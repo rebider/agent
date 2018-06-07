@@ -16,10 +16,12 @@ public class MySpringContextHandler implements ApplicationContextAware {
 
     public static ApplicationContext applicationContext;
 
+    public static AgentEnterService s_agentEnterService;
+
 
     @PostConstruct
     public void init(){
-        applicationContext.getBean("mySpringContextHandler");
+        s_agentEnterService = agentEnterService;
     }
 
     @Autowired
