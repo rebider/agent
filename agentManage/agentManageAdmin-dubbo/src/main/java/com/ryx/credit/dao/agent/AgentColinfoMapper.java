@@ -23,5 +23,7 @@ public interface AgentColinfoMapper {
 
     int updateByPrimaryKey(AgentColinfo record);
 
-    public List<AgentColinfo> proceedsQuery(String id);
+    List<AgentColinfo> proceedsQuery(String id);
+
+    List<AgentColinfo> queryBusConinfoList(String busId);
 }

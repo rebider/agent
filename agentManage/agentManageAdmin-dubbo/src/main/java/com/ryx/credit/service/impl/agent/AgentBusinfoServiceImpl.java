@@ -5,9 +5,9 @@ import java.util.*;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
-import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -37,9 +37,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     private AgentBusInfoMapper agentBusInfoMapper;
 	@Autowired
     private AgentAssProtocolService agentAssProtocolService;
-
     @Autowired
     private IdService idService;
+    @Autowired
+    private AgentColinfoMapper agentColinfoMapper;
+
     /**
      * 代理商查询插件数据获取
      * @param par
@@ -115,7 +117,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	public AgentBusInfo getById(String id){
-		return agentBusInfoMapper.selectByPrimaryKey(id);
+		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+		//查询业务关联账户
+		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+		return agentBusInfo;
 	}
 
 

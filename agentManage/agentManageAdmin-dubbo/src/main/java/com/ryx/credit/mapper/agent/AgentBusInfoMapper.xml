@@ -517,10 +517,30 @@
          count(*)
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
+      and ag_status = #{reqMap.agStatus}
+      <if test="reqMap.agName != null and reqMap.agName != '' " >
+        and a.ag_name = #{reqMap.agName,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+        and a.ag_uniq_num = #{reqMap.agUniqNum,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+        and b.bus_num = #{reqMap.busNum,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+        and b.bus_platform = #{reqMap.busPlatform,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+        and b.clo_review_status = #{reqMap.cloReviewStatus,jdbcType=DECIMAL}
+      </if>
+      order by b.c_time desc
   </select>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" /> from A_AGENT_BUSINFO  where AGENT_ID=#{id} and STATUS = 1
+    select
+      <include refid="Base_Column_List" />
+    from A_AGENT_BUSINFO
+    where AGENT_ID=#{id} and STATUS = 1
   </select>
 
 
