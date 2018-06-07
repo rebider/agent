@@ -172,7 +172,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setCloPayCompany(agentBusInfoVo.getCloPayCompany());
 					db_AgentBusInfo.setCloAgentColinfo(agentBusInfoVo.getCloAgentColinfo());
 					db_AgentBusInfo.setAgZbh(agentBusInfoVo.getAgZbh());
-
+					db_AgentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new ProcessException("更新业务信息失败");
 					}
