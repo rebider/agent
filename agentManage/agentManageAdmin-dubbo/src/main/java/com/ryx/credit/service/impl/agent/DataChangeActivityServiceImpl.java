@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.DateChangeRequestMapper;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
@@ -55,11 +56,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public ResultVO startDataChangeActivity(String dataChangeId,String userId) {
+        logger.info("========用户{}启动数据修改申请{}",dataChangeId,userId);
         DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(dateChangeRequest.getId()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         List<BusActRel> list = busActRelMapper.selectByExample(example);
         if(list.size()>0){
+            logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"申请进行中，禁止重复提交");
             return ResultVO.fail("申请进行中，禁止重复提交");
         }
         //不同的业务类型找到不同的启动流程
@@ -70,8 +73,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 workId = dict.getdItemname();
             }
         }
+        if(StringUtils.isEmpty(workId)) {
+            logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
+            throw new ProcessException("审批流启动失败字典中未配置部署流程!");
+        }
         String proce = activityService.createDeloyFlow(null,workId,null,null);
         if(proce==null){
+            logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
             logger.info("数据修改审批，审批流启动失败{}:{}",dataChangeId,userId);
             throw new ProcessException("审批流启动失败!");
         }
@@ -87,7 +95,6 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
         }
-
         return ResultVO.success(null);
     }
 }
