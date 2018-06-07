@@ -2,6 +2,7 @@ package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.util.List;
@@ -21,5 +22,9 @@ public interface TaskApprovalService {
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
-    Map findBusActByBusId(String busId,String busType);
+    AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception;
+
+    Map findBusActByBusId(String busId,String busType,String activStatus);
+
+    BusActRel queryBusActRel(String busId, String busType,String activStatus);
 }

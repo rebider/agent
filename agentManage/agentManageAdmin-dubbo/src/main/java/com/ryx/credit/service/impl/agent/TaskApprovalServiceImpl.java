@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -46,6 +45,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private ActivityService activityService;
      @Autowired
      private BusActRelMapper busActRelMapper;
+     @Autowired
+     private TaskApprovalService taskApprovalService;
 
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
@@ -74,6 +75,23 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
+            taskApprovalService.updateApproval(agentVo, userId);
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
+            if(!result.isOK()){
+                throw new ProcessException("工作流处理任务异常");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
+        }
+        return AgentResult.ok();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
+
+        if(agentVo.getApprovalResult().equals("pass")){
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
@@ -91,18 +109,9 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("更新打款公司或业务所属上级异常");
                 }
             }
-
-            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
-            if(!result.isOK()){
-                throw new ProcessException("工作流处理任务异常");
-            }
-        } catch (ProcessException e) {
-            e.printStackTrace();
-            throw new ProcessException("catch工作流处理任务异常!");
         }
         return AgentResult.ok();
     }
-
     /**
      * 查询工作流程
      * @param busId
@@ -110,19 +119,28 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      * @return
      */
     @Override
-    public Map findBusActByBusId(String busId,String busType){
+    public Map findBusActByBusId(String busId,String busType,String activStatus){
+        BusActRel busActRel = queryBusActRel(busId, busType,activStatus);
+        if(busActRel==null){
+            return null;
+        }
+        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
+        return resultMap;
+    }
+
+    @Override
+    public BusActRel queryBusActRel(String busId,String busType,String activStatus){
         BusActRelExample example = new BusActRelExample();
         BusActRelExample.Criteria criteria = example.createCriteria();
         criteria.andBusIdEqualTo(busId);
         criteria.andBusTypeEqualTo(busType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andActivStatusEqualTo(AgStatus.Approving.name());
+        criteria.andActivStatusEqualTo(activStatus);
         List<BusActRel> busActRels = busActRelMapper.selectByExample(example);
         if(busActRels.size()!=1){
             return null;
         }
         BusActRel busActRel = busActRels.get(0);
-        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
-        return resultMap;
+        return busActRel;
     }
 }

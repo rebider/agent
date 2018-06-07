@@ -31,6 +31,7 @@
     <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
+    <result column="AG_ZBH" property="agZbh" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -66,7 +67,7 @@
     BUS_REGION, BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE,
     BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
-    C_UTIME, C_USER, STATUS, VERSION
+    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
     <include refid="OracleDialectPrefix" />
@@ -106,7 +107,8 @@
     CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY,
     CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS,
     C_TIME, C_UTIME, C_USER,
-    STATUS, VERSION)
+    STATUS, VERSION, AG_ZBH
+    )
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -116,7 +118,8 @@
     #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR},
     #{cloAgentColinfo,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
     insert into A_AGENT_BUSINFO
@@ -208,6 +211,9 @@
       <if test="version != null" >
         VERSION,
       </if>
+      <if test="agZbh != null" >
+        AG_ZBH,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -296,6 +302,9 @@
       </if>
       <if test="version != null" >
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="agZbh != null" >
+        #{agZbh,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -392,6 +401,9 @@
       <if test="version != null" >
         VERSION = VERSION +1,
       </if>
+      <if test="agZbh != null" >
+        AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -424,7 +436,8 @@
     C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
     C_USER = #{cUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = VERSION + 1
+    VERSION = VERSION +1,
+    AG_ZBH = #{agZbh,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >
@@ -504,10 +517,30 @@
          count(*)
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
+      and ag_status = #{reqMap.agStatus}
+      <if test="reqMap.agName != null and reqMap.agName != '' " >
+        and a.ag_name = #{reqMap.agName,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+        and a.ag_uniq_num = #{reqMap.agUniqNum,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+        and b.bus_num = #{reqMap.busNum,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+        and b.bus_platform = #{reqMap.busPlatform,jdbcType=DECIMAL}
+      </if>
+      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+        and b.clo_review_status = #{reqMap.cloReviewStatus,jdbcType=DECIMAL}
+      </if>
+      order by b.c_time desc
   </select>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" /> from A_AGENT_BUSINFO  where AGENT_ID=#{id} and STATUS = 1
+    select
+      <include refid="Base_Column_List" />
+    from A_AGENT_BUSINFO
+    where AGENT_ID=#{id} and STATUS = 1
   </select>
 
 
