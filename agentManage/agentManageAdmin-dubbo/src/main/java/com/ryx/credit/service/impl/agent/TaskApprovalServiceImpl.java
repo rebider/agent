@@ -120,7 +120,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      */
     @Override
     public Map findBusActByBusId(String busId,String busType,String activStatus){
-        BusActRel busActRel = queryBusActRel(busId, busId,activStatus);
+        BusActRel busActRel = queryBusActRel(busId, busType,activStatus);
         if(busActRel==null){
             return null;
         }
