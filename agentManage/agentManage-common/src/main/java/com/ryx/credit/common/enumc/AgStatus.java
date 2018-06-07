@@ -18,4 +18,23 @@ public enum AgStatus {
         this.status = new BigDecimal(status);
         msg = s;
     }
+
+
+    public static String getAgStatusString(BigDecimal s){
+        for (AgStatus agStatus : AgStatus.values()) {
+            if(agStatus.status==s){
+                return agStatus.name();
+            }
+        }
+        return "";
+    }
+
+    public static BigDecimal getAgStatusString(String s){
+        for (AgStatus agStatus : AgStatus.values()) {
+            if(agStatus.name().equals(s)){
+                return agStatus.status;
+            }
+        }
+        return new BigDecimal(-1);
+    }
 }
