@@ -179,7 +179,6 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
                         throw new ProcessException("更新收款信息失败");
                     }
-
                     //删除老的附件
                     AttachmentRelExample example = new AttachmentRelExample();
                     example.or().andBusTypeEqualTo(AttachmentRelType.Proceeds.name()).andSrcIdEqualTo(db_AgentColinfo.getId()).andStatusEqualTo(Status.STATUS_1.status);

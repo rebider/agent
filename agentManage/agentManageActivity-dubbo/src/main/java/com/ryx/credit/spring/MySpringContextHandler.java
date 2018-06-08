@@ -1,6 +1,7 @@
 package com.ryx.credit.spring;
 
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.DataChangeActivityService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -18,14 +19,21 @@ public class MySpringContextHandler implements ApplicationContextAware {
 
     public static AgentEnterService s_agentEnterService;
 
+    public static DataChangeActivityService s_dataChangeActivityService;
 
     @PostConstruct
     public void init(){
+
         s_agentEnterService = agentEnterService;
+
+        s_dataChangeActivityService = dataChangeActivityService;
+
     }
 
     @Autowired
     private AgentEnterService agentEnterService;
+    @Autowired
+    private DataChangeActivityService dataChangeActivityService;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -38,5 +46,13 @@ public class MySpringContextHandler implements ApplicationContextAware {
 
     public void setAgentEnterService(AgentEnterService agentEnterService) {
         this.agentEnterService = agentEnterService;
+    }
+
+    public DataChangeActivityService getDataChangeActivityService() {
+        return dataChangeActivityService;
+    }
+
+    public void setDataChangeActivityService(DataChangeActivityService dataChangeActivityService) {
+        this.dataChangeActivityService = dataChangeActivityService;
     }
 }

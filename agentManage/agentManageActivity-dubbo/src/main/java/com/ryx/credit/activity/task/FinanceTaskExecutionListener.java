@@ -2,7 +2,9 @@ package com.ryx.credit.activity.task;
 
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.DataChangeActivityService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public class FinanceTaskExecutionListener implements TaskListener,ExecutionListener{
+
     private static final Logger logger = LoggerFactory.getLogger(FinanceTaskExecutionListener.class);
 
 
@@ -33,13 +36,22 @@ public class FinanceTaskExecutionListener implements TaskListener,ExecutionListe
         if ("start".equals(eventName)) {
             logger.info("start========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
         }else if ("end".equals(eventName)) {
+
+            logger.info("=========FinanceTaskExecutionListener 流程结束 {}",eventName);
+
             String activityName = delegateExecution.getCurrentActivityName();
-            AgentEnterService aes = (AgentEnterService)MySpringContextHandler.applicationContext.getBean("agentEnterService");
+
+            //数据变更服务类
+            DataChangeActivityService aes = (DataChangeActivityService)MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            //审批拒绝
             if("reject_end".equals(activityName)){
-                aes.completeProcessing(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
+               ResultVO res = aes.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(),AgStatus.Refuse.name());
+               logger.info("=========FinanceTaskExecutionListener 流程{}eventName{}res{}",delegateExecution.getProcessInstanceId(),eventName,res.getResInfo());
             }
+            //审批同意更新数据库
             if("finish_end".equals(activityName)){
-                aes.completeProcessing(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
+                ResultVO res = aes.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
+                logger.info("=========FinanceTaskExecutionListener 流程{}eventName{}res{}",delegateExecution.getProcessInstanceId(),eventName,res.getResInfo());
             }
         }else if ("take".equals(eventName)) {
             logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
