@@ -6,7 +6,6 @@ import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.iom.plugin.entinfo.proxy.IEntInfoProxy;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,8 +29,7 @@ public class DictServiceTest extends BaseSpringTest {
     private IdService idService;
     @Autowired
     private DictOptionsService dictOptionsService;
-    @Autowired
-    private IEntInfoProxy  iEntInfoProxy;
+
     @Autowired
     private DateChangeReqService dateChangeReqService;
     
@@ -49,12 +47,7 @@ public class DictServiceTest extends BaseSpringTest {
         logger.info("=======testOptions====="+ JSONObject.toJSONString(list));
     }
     
-    @Test
-    public void testQuery() {
-    	logger.info("=======testQuery=====");
-    	Map data = iEntInfoProxy.queryEntInfo(null, "瑞银信", "1");
-    	logger.info("=======testOptions====="+data);
-    }
+
 
     @Test
     public void testDataChange(){
