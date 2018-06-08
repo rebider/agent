@@ -71,7 +71,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if(agentBusInfo.getCloReviewStatus()!=null){
             reqMap.put("cloReviewStatus",agentBusInfo.getCloReviewStatus());
         }
-
+        reqMap.put("status",Status.STATUS_1.status);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);

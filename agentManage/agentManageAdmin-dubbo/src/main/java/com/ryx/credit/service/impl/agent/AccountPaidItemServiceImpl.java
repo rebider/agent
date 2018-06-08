@@ -125,6 +125,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         db_capital.setcPaytime(capitalVo.getcPaytime());
                         db_capital.setcUser(capitalVo.getcUser());
                         db_capital.setRemark(capitalVo.getRemark());
+                        db_capital.setStatus(capitalVo.getStatus());
                         if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){
                             throw new ProcessException("更新收款信息失败");
                         }
