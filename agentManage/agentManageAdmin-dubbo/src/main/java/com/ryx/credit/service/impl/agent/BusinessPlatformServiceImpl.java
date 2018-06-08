@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -49,7 +50,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private AgentColinfoService agentColinfoService;
-
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
@@ -154,6 +156,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 agentContractService.insertAgentContract(item, item.getContractTableFile());
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
@@ -162,16 +165,19 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if(!result.isOK()){
                     throw new ProcessException("缴纳款项信息录入失败");
                 }
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                 item.setAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
                 agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
             }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 agentBusinfoService.agentBusInfoInsert(item);
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
             return AgentResult.ok();
         }catch (Exception e){
