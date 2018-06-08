@@ -22,6 +22,7 @@
     <dubbo:service interface="com.ryx.credit.service.ActUtilService" ref="actUtilService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentEnterService" id="agentEnterService"   timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.DataChangeActivityService" id="dataChangeActivityService"   timeout="1200000" registry="${zk.group}" check="false"/>
 
 
 </beans>
