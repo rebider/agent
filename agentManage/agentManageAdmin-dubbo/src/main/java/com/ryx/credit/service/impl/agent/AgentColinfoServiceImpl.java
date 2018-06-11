@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AttachmentRelType;
+import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -14,6 +15,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
+import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private AgentColinfoRelMapper agentColinfoRelMapper;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
-
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     /**
      * 代理商入网添加代理商交款项
@@ -213,7 +216,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     }
 
                 }
+                agentDataHistoryService.saveDataHistory(agentColinfoVo, DataHistoryType.GATHER.getValue());
             }
+
             return ResultVO.success(null);
         } catch (Exception e) {
             e.printStackTrace();

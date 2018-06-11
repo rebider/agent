@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AttachmentRelType;
+import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -14,6 +15,7 @@ import com.ryx.credit.pojo.admin.agent.AttachmentRelExample;
 import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.agent.AccountPaidItemService;
+import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.zookeeper.data.Stat;
@@ -46,6 +48,8 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
     private IdService idService;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
@@ -164,6 +168,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         }
 
                     }
+                    agentDataHistoryService.saveDataHistory(capitalVo, DataHistoryType.PAYMENT.getValue());
                 }
                 return ResultVO.success(null);
             } catch (Exception e) {

@@ -1,6 +1,8 @@
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.agent.DateChangeReqService;
@@ -52,8 +54,12 @@ public class DictServiceTest extends BaseSpringTest {
     @Test
     public void testDataChange(){
         logger.info("=======testDataChange=====");
-        DateChangeRequest data = dateChangeReqService.getById("DC20180606000000000000022");
-        logger.info("=======testDataChange====="+data);
+     //   DateChangeRequest data = dateChangeReqService.getById("DC20180606000000000000022");
+        Page page = new Page(0,20);
+        DateChangeRequest dateChangeRequest = new DateChangeRequest();
+        PageInfo pageInfo = dateChangeReqService.queryData(page, dateChangeRequest);
+        System.out.println(pageInfo+"------------------------------------");
+       // logger.info("=======testDataChange====="+data);
     }
 
 }
