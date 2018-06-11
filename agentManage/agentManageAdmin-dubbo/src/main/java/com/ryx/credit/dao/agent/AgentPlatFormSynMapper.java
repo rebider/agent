@@ -34,4 +34,6 @@ public interface AgentPlatFormSynMapper {
     List<Map<String,Object>> queryList(@Param("map") Map<String, Object> map, @Param("page") Page page);
 
     int queryCount(@Param("map")Map<String, Object> map);
+
+    int updateByBusId(AgentPlatFormSyn record);
 }

@@ -311,4 +311,46 @@
             and AGENT_ID = #{map.agentId}
         </if>
     </select>
+    <update id="updateByBusId" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+        update A_AGENT_PLATFORMSYN
+        <set >
+            <if test="agentId != null" >
+                AGENT_ID = #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="busId != null" >
+                BUS_ID = #{busId,jdbcType=VARCHAR},
+            </if>
+            <if test="platformCode != null" >
+                PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
+            </if>
+            <if test="notifyJson != null" >
+                NOTIFY_JSON = #{notifyJson,jdbcType=VARCHAR},
+            </if>
+            <if test="notifyStatus != null" >
+                NOTIFY_STATUS = #{notifyStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="notifyTime != null" >
+                NOTIFY_TIME = #{notifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUser != null" >
+                C_USER = #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="cTime != null" >
+                C_TIME = #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="version != null" >
+                VERSION = #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="succesTime != null" >
+                SUCCES_TIME = #{succesTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="notifyCount != null" >
+                NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL},
+            </if>
+            <if test="sendJson != null" >
+                SEND_JSON = #{sendJson,jdbcType=BLOB},
+            </if>
+        </set>
+        where BUS_ID = #{busId,jdbcType=VARCHAR}
+    </update>
 </mapper>

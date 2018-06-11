@@ -4,7 +4,6 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
 
-import java.util.Map;
 
 /**
  * @version V1.0
@@ -17,4 +16,6 @@ public interface AgentNotifyService {
     void asynNotifyPlatform(String busId);
 
     PageInfo queryList(Page page,AgentPlatFormSyn agentPlatFormSyn);
+
+    AgentPlatFormSyn findByBusId(String busId);
 }
