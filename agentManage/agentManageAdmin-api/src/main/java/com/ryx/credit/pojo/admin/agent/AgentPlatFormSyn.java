@@ -13,19 +13,23 @@ public class AgentPlatFormSyn implements Serializable {
 
     private String platformCode;
 
-    private String sendjson;
+    private String notifyJson;
 
-    private String notifyjson;
+    private BigDecimal notifyStatus;
 
-    private BigDecimal notifystatus;
-
-    private Date notifytime;
+    private Date notifyTime;
 
     private String cUser;
 
     private Date cTime;
 
     private BigDecimal version;
+
+    private Date succesTime;
+
+    private BigDecimal notifyCount;
+
+    private byte[] sendJson;
 
     public String getId() {
         return id;
@@ -59,36 +63,28 @@ public class AgentPlatFormSyn implements Serializable {
         this.platformCode = platformCode == null ? null : platformCode.trim();
     }
 
-    public String getSendjson() {
-        return sendjson;
+    public String getNotifyJson() {
+        return notifyJson;
     }
 
-    public void setSendjson(String sendjson) {
-        this.sendjson = sendjson == null ? null : sendjson.trim();
+    public void setNotifyJson(String notifyJson) {
+        this.notifyJson = notifyJson == null ? null : notifyJson.trim();
     }
 
-    public String getNotifyjson() {
-        return notifyjson;
+    public BigDecimal getNotifyStatus() {
+        return notifyStatus;
     }
 
-    public void setNotifyjson(String notifyjson) {
-        this.notifyjson = notifyjson == null ? null : notifyjson.trim();
+    public void setNotifyStatus(BigDecimal notifyStatus) {
+        this.notifyStatus = notifyStatus;
     }
 
-    public BigDecimal getNotifystatus() {
-        return notifystatus;
+    public Date getNotifyTime() {
+        return notifyTime;
     }
 
-    public void setNotifystatus(BigDecimal notifystatus) {
-        this.notifystatus = notifystatus;
-    }
-
-    public Date getNotifytime() {
-        return notifytime;
-    }
-
-    public void setNotifytime(Date notifytime) {
-        this.notifytime = notifytime;
+    public void setNotifyTime(Date notifyTime) {
+        this.notifyTime = notifyTime;
     }
 
     public String getcUser() {
@@ -113,5 +109,29 @@ public class AgentPlatFormSyn implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public Date getSuccesTime() {
+        return succesTime;
+    }
+
+    public void setSuccesTime(Date succesTime) {
+        this.succesTime = succesTime;
+    }
+
+    public BigDecimal getNotifyCount() {
+        return notifyCount;
+    }
+
+    public void setNotifyCount(BigDecimal notifyCount) {
+        this.notifyCount = notifyCount;
+    }
+
+    public byte[] getSendJson() {
+        return sendJson;
+    }
+
+    public void setSendJson(byte[] sendJson) {
+        this.sendJson = sendJson;
     }
 }

@@ -418,263 +418,193 @@ public class AgentPlatFormSynExample {
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonIsNull() {
-            addCriterion("SENDJSON is null");
+        public Criteria andNotifyJsonIsNull() {
+            addCriterion("NOTIFY_JSON is null");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonIsNotNull() {
-            addCriterion("SENDJSON is not null");
+        public Criteria andNotifyJsonIsNotNull() {
+            addCriterion("NOTIFY_JSON is not null");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonEqualTo(String value) {
-            addCriterion("SENDJSON =", value, "sendjson");
+        public Criteria andNotifyJsonEqualTo(String value) {
+            addCriterion("NOTIFY_JSON =", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonNotEqualTo(String value) {
-            addCriterion("SENDJSON <>", value, "sendjson");
+        public Criteria andNotifyJsonNotEqualTo(String value) {
+            addCriterion("NOTIFY_JSON <>", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonGreaterThan(String value) {
-            addCriterion("SENDJSON >", value, "sendjson");
+        public Criteria andNotifyJsonGreaterThan(String value) {
+            addCriterion("NOTIFY_JSON >", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonGreaterThanOrEqualTo(String value) {
-            addCriterion("SENDJSON >=", value, "sendjson");
+        public Criteria andNotifyJsonGreaterThanOrEqualTo(String value) {
+            addCriterion("NOTIFY_JSON >=", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonLessThan(String value) {
-            addCriterion("SENDJSON <", value, "sendjson");
+        public Criteria andNotifyJsonLessThan(String value) {
+            addCriterion("NOTIFY_JSON <", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonLessThanOrEqualTo(String value) {
-            addCriterion("SENDJSON <=", value, "sendjson");
+        public Criteria andNotifyJsonLessThanOrEqualTo(String value) {
+            addCriterion("NOTIFY_JSON <=", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonLike(String value) {
-            addCriterion("SENDJSON like", value, "sendjson");
+        public Criteria andNotifyJsonLike(String value) {
+            addCriterion("NOTIFY_JSON like", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonNotLike(String value) {
-            addCriterion("SENDJSON not like", value, "sendjson");
+        public Criteria andNotifyJsonNotLike(String value) {
+            addCriterion("NOTIFY_JSON not like", value, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonIn(List<String> values) {
-            addCriterion("SENDJSON in", values, "sendjson");
+        public Criteria andNotifyJsonIn(List<String> values) {
+            addCriterion("NOTIFY_JSON in", values, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonNotIn(List<String> values) {
-            addCriterion("SENDJSON not in", values, "sendjson");
+        public Criteria andNotifyJsonNotIn(List<String> values) {
+            addCriterion("NOTIFY_JSON not in", values, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonBetween(String value1, String value2) {
-            addCriterion("SENDJSON between", value1, value2, "sendjson");
+        public Criteria andNotifyJsonBetween(String value1, String value2) {
+            addCriterion("NOTIFY_JSON between", value1, value2, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andSendjsonNotBetween(String value1, String value2) {
-            addCriterion("SENDJSON not between", value1, value2, "sendjson");
+        public Criteria andNotifyJsonNotBetween(String value1, String value2) {
+            addCriterion("NOTIFY_JSON not between", value1, value2, "notifyJson");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonIsNull() {
-            addCriterion("NOTIFYJSON is null");
+        public Criteria andNotifyStatusIsNull() {
+            addCriterion("NOTIFY_STATUS is null");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonIsNotNull() {
-            addCriterion("NOTIFYJSON is not null");
+        public Criteria andNotifyStatusIsNotNull() {
+            addCriterion("NOTIFY_STATUS is not null");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonEqualTo(String value) {
-            addCriterion("NOTIFYJSON =", value, "notifyjson");
+        public Criteria andNotifyStatusEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_STATUS =", value, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonNotEqualTo(String value) {
-            addCriterion("NOTIFYJSON <>", value, "notifyjson");
+        public Criteria andNotifyStatusNotEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_STATUS <>", value, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonGreaterThan(String value) {
-            addCriterion("NOTIFYJSON >", value, "notifyjson");
+        public Criteria andNotifyStatusGreaterThan(BigDecimal value) {
+            addCriterion("NOTIFY_STATUS >", value, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonGreaterThanOrEqualTo(String value) {
-            addCriterion("NOTIFYJSON >=", value, "notifyjson");
+        public Criteria andNotifyStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_STATUS >=", value, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonLessThan(String value) {
-            addCriterion("NOTIFYJSON <", value, "notifyjson");
+        public Criteria andNotifyStatusLessThan(BigDecimal value) {
+            addCriterion("NOTIFY_STATUS <", value, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonLessThanOrEqualTo(String value) {
-            addCriterion("NOTIFYJSON <=", value, "notifyjson");
+        public Criteria andNotifyStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_STATUS <=", value, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonLike(String value) {
-            addCriterion("NOTIFYJSON like", value, "notifyjson");
+        public Criteria andNotifyStatusIn(List<BigDecimal> values) {
+            addCriterion("NOTIFY_STATUS in", values, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonNotLike(String value) {
-            addCriterion("NOTIFYJSON not like", value, "notifyjson");
+        public Criteria andNotifyStatusNotIn(List<BigDecimal> values) {
+            addCriterion("NOTIFY_STATUS not in", values, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonIn(List<String> values) {
-            addCriterion("NOTIFYJSON in", values, "notifyjson");
+        public Criteria andNotifyStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NOTIFY_STATUS between", value1, value2, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonNotIn(List<String> values) {
-            addCriterion("NOTIFYJSON not in", values, "notifyjson");
+        public Criteria andNotifyStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NOTIFY_STATUS not between", value1, value2, "notifyStatus");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonBetween(String value1, String value2) {
-            addCriterion("NOTIFYJSON between", value1, value2, "notifyjson");
+        public Criteria andNotifyTimeIsNull() {
+            addCriterion("NOTIFY_TIME is null");
             return (Criteria) this;
         }
 
-        public Criteria andNotifyjsonNotBetween(String value1, String value2) {
-            addCriterion("NOTIFYJSON not between", value1, value2, "notifyjson");
+        public Criteria andNotifyTimeIsNotNull() {
+            addCriterion("NOTIFY_TIME is not null");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusIsNull() {
-            addCriterion("NOTIFYSTATUS is null");
+        public Criteria andNotifyTimeEqualTo(Date value) {
+            addCriterion("NOTIFY_TIME =", value, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusIsNotNull() {
-            addCriterion("NOTIFYSTATUS is not null");
+        public Criteria andNotifyTimeNotEqualTo(Date value) {
+            addCriterion("NOTIFY_TIME <>", value, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusEqualTo(BigDecimal value) {
-            addCriterion("NOTIFYSTATUS =", value, "notifystatus");
+        public Criteria andNotifyTimeGreaterThan(Date value) {
+            addCriterion("NOTIFY_TIME >", value, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusNotEqualTo(BigDecimal value) {
-            addCriterion("NOTIFYSTATUS <>", value, "notifystatus");
+        public Criteria andNotifyTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("NOTIFY_TIME >=", value, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusGreaterThan(BigDecimal value) {
-            addCriterion("NOTIFYSTATUS >", value, "notifystatus");
+        public Criteria andNotifyTimeLessThan(Date value) {
+            addCriterion("NOTIFY_TIME <", value, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("NOTIFYSTATUS >=", value, "notifystatus");
+        public Criteria andNotifyTimeLessThanOrEqualTo(Date value) {
+            addCriterion("NOTIFY_TIME <=", value, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusLessThan(BigDecimal value) {
-            addCriterion("NOTIFYSTATUS <", value, "notifystatus");
+        public Criteria andNotifyTimeIn(List<Date> values) {
+            addCriterion("NOTIFY_TIME in", values, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("NOTIFYSTATUS <=", value, "notifystatus");
+        public Criteria andNotifyTimeNotIn(List<Date> values) {
+            addCriterion("NOTIFY_TIME not in", values, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusIn(List<BigDecimal> values) {
-            addCriterion("NOTIFYSTATUS in", values, "notifystatus");
+        public Criteria andNotifyTimeBetween(Date value1, Date value2) {
+            addCriterion("NOTIFY_TIME between", value1, value2, "notifyTime");
             return (Criteria) this;
         }
 
-        public Criteria andNotifystatusNotIn(List<BigDecimal> values) {
-            addCriterion("NOTIFYSTATUS not in", values, "notifystatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifystatusBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("NOTIFYSTATUS between", value1, value2, "notifystatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifystatusNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("NOTIFYSTATUS not between", value1, value2, "notifystatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeIsNull() {
-            addCriterion("NOTIFYTIME is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeIsNotNull() {
-            addCriterion("NOTIFYTIME is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeEqualTo(Date value) {
-            addCriterion("NOTIFYTIME =", value, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeNotEqualTo(Date value) {
-            addCriterion("NOTIFYTIME <>", value, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeGreaterThan(Date value) {
-            addCriterion("NOTIFYTIME >", value, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeGreaterThanOrEqualTo(Date value) {
-            addCriterion("NOTIFYTIME >=", value, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeLessThan(Date value) {
-            addCriterion("NOTIFYTIME <", value, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeLessThanOrEqualTo(Date value) {
-            addCriterion("NOTIFYTIME <=", value, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeIn(List<Date> values) {
-            addCriterion("NOTIFYTIME in", values, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeNotIn(List<Date> values) {
-            addCriterion("NOTIFYTIME not in", values, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeBetween(Date value1, Date value2) {
-            addCriterion("NOTIFYTIME between", value1, value2, "notifytime");
-            return (Criteria) this;
-        }
-
-        public Criteria andNotifytimeNotBetween(Date value1, Date value2) {
-            addCriterion("NOTIFYTIME not between", value1, value2, "notifytime");
+        public Criteria andNotifyTimeNotBetween(Date value1, Date value2) {
+            addCriterion("NOTIFY_TIME not between", value1, value2, "notifyTime");
             return (Criteria) this;
         }
 
@@ -865,6 +795,126 @@ public class AgentPlatFormSynExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeIsNull() {
+            addCriterion("SUCCES_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeIsNotNull() {
+            addCriterion("SUCCES_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeEqualTo(Date value) {
+            addCriterion("SUCCES_TIME =", value, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeNotEqualTo(Date value) {
+            addCriterion("SUCCES_TIME <>", value, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeGreaterThan(Date value) {
+            addCriterion("SUCCES_TIME >", value, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("SUCCES_TIME >=", value, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeLessThan(Date value) {
+            addCriterion("SUCCES_TIME <", value, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeLessThanOrEqualTo(Date value) {
+            addCriterion("SUCCES_TIME <=", value, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeIn(List<Date> values) {
+            addCriterion("SUCCES_TIME in", values, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeNotIn(List<Date> values) {
+            addCriterion("SUCCES_TIME not in", values, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeBetween(Date value1, Date value2) {
+            addCriterion("SUCCES_TIME between", value1, value2, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccesTimeNotBetween(Date value1, Date value2) {
+            addCriterion("SUCCES_TIME not between", value1, value2, "succesTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountIsNull() {
+            addCriterion("NOTIFY_COUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountIsNotNull() {
+            addCriterion("NOTIFY_COUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_COUNT =", value, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountNotEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_COUNT <>", value, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountGreaterThan(BigDecimal value) {
+            addCriterion("NOTIFY_COUNT >", value, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_COUNT >=", value, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountLessThan(BigDecimal value) {
+            addCriterion("NOTIFY_COUNT <", value, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("NOTIFY_COUNT <=", value, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountIn(List<BigDecimal> values) {
+            addCriterion("NOTIFY_COUNT in", values, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountNotIn(List<BigDecimal> values) {
+            addCriterion("NOTIFY_COUNT not in", values, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NOTIFY_COUNT between", value1, value2, "notifyCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyCountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NOTIFY_COUNT not between", value1, value2, "notifyCount");
             return (Criteria) this;
         }
     }

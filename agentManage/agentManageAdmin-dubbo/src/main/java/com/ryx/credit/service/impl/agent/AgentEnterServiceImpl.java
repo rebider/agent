@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -50,7 +51,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private BusActRelMapper busActRelMapper;
     @Autowired
     private AgentAssProtocolService agentAssProtocolService;
-
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     /**
      * 商户入网
@@ -62,12 +64,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile());
+            agentDataHistoryService.saveDataHistory(agent, DataHistoryType.BASICS.getValue());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
                 agentContractService.insertAgentContract(item, item.getContractTableFile());
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
@@ -76,12 +80,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if(!res.isOK()){
                     throw new ProcessException("添加交款项异常");
                 }
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                 item.setAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
                 item.setCloReviewStatus(AgStatus.Create.status);
                 agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
             }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
@@ -96,6 +102,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("业务分管协议添加失败");
                     }
                 }
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
 
             return ResultVO.success(agentVo);
@@ -542,6 +549,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             {
                 if(StringUtils.isNotBlank(agent.getAgent().getAgName())) {
                     ag = agentService.updateAgentVo(agent.getAgent(),agent.getAgentTableFile());
+                    agentDataHistoryService.saveDataHistory(agent.getAgent(), DataHistoryType.BASICS.getValue());
                 }
             }
             logger.info("用户{}{}修改代理商信息结果{}",userId,agent.getAgent().getId(),"成功");

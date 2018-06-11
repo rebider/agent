@@ -3,15 +3,17 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
-import com.ryx.credit.common.util.agentUtil.Constants;
 import com.ryx.credit.common.util.agentUtil.HttpUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.BusinessCAService;
+import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -24,6 +26,8 @@ import java.util.UUID;
 public class BusinessCAServiceImpl implements BusinessCAService{
 
     private static Logger logger = LoggerFactory.getLogger(BusinessCAServiceImpl.class);
+	@Autowired
+	private AgentNotifyService agentNotifyService;
 
 	@Override
 	public AgentResult agentBusinessCA(String agentBusinfoName) {
@@ -45,6 +49,8 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			if(respType.equals("E")){
 				return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
 			}else{
+				//测试使用
+//				agentNotifyService.asynNotifyPlatform("AB20180611000000000000240");
 				return AgentResult.ok(dataMap);
 			}
 		} catch (Exception e) {
