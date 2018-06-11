@@ -7,6 +7,7 @@ import com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample;
 import java.util.List;
 
 public interface AgentPlatFormSynMapper {
+
     int countByExample(AgentPlatFormSynExample example);
 
     int deleteByExample(AgentPlatFormSynExample example);
