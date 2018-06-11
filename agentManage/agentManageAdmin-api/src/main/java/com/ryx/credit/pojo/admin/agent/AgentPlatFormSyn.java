@@ -13,8 +13,6 @@ public class AgentPlatFormSyn implements Serializable {
 
     private String platformCode;
 
-    private String sendJson;
-
     private String notifyJson;
 
     private BigDecimal notifyStatus;
@@ -30,6 +28,8 @@ public class AgentPlatFormSyn implements Serializable {
     private Date succesTime;
 
     private BigDecimal notifyCount;
+
+    private byte[] sendJson;
 
     public String getId() {
         return id;
@@ -61,14 +61,6 @@ public class AgentPlatFormSyn implements Serializable {
 
     public void setPlatformCode(String platformCode) {
         this.platformCode = platformCode == null ? null : platformCode.trim();
-    }
-
-    public String getSendJson() {
-        return sendJson;
-    }
-
-    public void setSendJson(String sendJson) {
-        this.sendJson = sendJson == null ? null : sendJson.trim();
     }
 
     public String getNotifyJson() {
@@ -133,5 +125,13 @@ public class AgentPlatFormSyn implements Serializable {
 
     public void setNotifyCount(BigDecimal notifyCount) {
         this.notifyCount = notifyCount;
+    }
+
+    public byte[] getSendJson() {
+        return sendJson;
+    }
+
+    public void setSendJson(byte[] sendJson) {
+        this.sendJson = sendJson;
     }
 }

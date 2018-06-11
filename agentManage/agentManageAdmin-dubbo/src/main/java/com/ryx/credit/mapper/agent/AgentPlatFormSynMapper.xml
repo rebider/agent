@@ -6,7 +6,6 @@
     <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
     <result column="BUS_ID" property="busId" jdbcType="VARCHAR" />
     <result column="PLATFORM_CODE" property="platformCode" jdbcType="VARCHAR" />
-    <result column="SEND_JSON" property="sendJson" jdbcType="VARCHAR" />
     <result column="NOTIFY_JSON" property="notifyJson" jdbcType="VARCHAR" />
     <result column="NOTIFY_STATUS" property="notifyStatus" jdbcType="DECIMAL" />
     <result column="NOTIFY_TIME" property="notifyTime" jdbcType="TIMESTAMP" />
@@ -15,6 +14,9 @@
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
     <result column="SUCCES_TIME" property="succesTime" jdbcType="TIMESTAMP" />
     <result column="NOTIFY_COUNT" property="notifyCount" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" extends="BaseResultMap" >
+    <result column="SEND_JSON" property="sendJson" jdbcType="BLOB" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -46,9 +48,28 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, AGENT_ID, BUS_ID, PLATFORM_CODE, SEND_JSON, NOTIFY_JSON, NOTIFY_STATUS, NOTIFY_TIME, 
-    C_USER, C_TIME, VERSION, SUCCES_TIME, NOTIFY_COUNT
+    ID, AGENT_ID, BUS_ID, PLATFORM_CODE, NOTIFY_JSON, NOTIFY_STATUS, NOTIFY_TIME, C_USER, 
+    C_TIME, VERSION, SUCCES_TIME, NOTIFY_COUNT
   </sql>
+  <sql id="Blob_Column_List" >
+    SEND_JSON
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
     <include refid="OracleDialectPrefix" />
     select
@@ -65,9 +86,11 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from A_AGENT_PLATFORMSYN
     where ID = #{id,jdbcType=VARCHAR}
   </select>
@@ -79,15 +102,15 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     insert into A_AGENT_PLATFORMSYN (ID, AGENT_ID, BUS_ID, 
-      PLATFORM_CODE, SEND_JSON, NOTIFY_JSON, 
-      NOTIFY_STATUS, NOTIFY_TIME, C_USER, 
-      C_TIME, VERSION, SUCCES_TIME, 
-      NOTIFY_COUNT)
+      PLATFORM_CODE, NOTIFY_JSON, NOTIFY_STATUS, 
+      NOTIFY_TIME, C_USER, C_TIME, 
+      VERSION, SUCCES_TIME, NOTIFY_COUNT, 
+      SEND_JSON)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, 
-      #{platformCode,jdbcType=VARCHAR}, #{sendJson,jdbcType=VARCHAR}, #{notifyJson,jdbcType=VARCHAR}, 
-      #{notifyStatus,jdbcType=DECIMAL}, #{notifyTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{version,jdbcType=DECIMAL}, #{succesTime,jdbcType=TIMESTAMP}, 
-      #{notifyCount,jdbcType=DECIMAL})
+      #{platformCode,jdbcType=VARCHAR}, #{notifyJson,jdbcType=VARCHAR}, #{notifyStatus,jdbcType=DECIMAL}, 
+      #{notifyTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{version,jdbcType=DECIMAL}, #{succesTime,jdbcType=TIMESTAMP}, #{notifyCount,jdbcType=DECIMAL}, 
+      #{sendJson,jdbcType=BLOB})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     insert into A_AGENT_PLATFORMSYN
@@ -103,9 +126,6 @@
       </if>
       <if test="platformCode != null" >
         PLATFORM_CODE,
-      </if>
-      <if test="sendJson != null" >
-        SEND_JSON,
       </if>
       <if test="notifyJson != null" >
         NOTIFY_JSON,
@@ -131,6 +151,9 @@
       <if test="notifyCount != null" >
         NOTIFY_COUNT,
       </if>
+      <if test="sendJson != null" >
+        SEND_JSON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -144,9 +167,6 @@
       </if>
       <if test="platformCode != null" >
         #{platformCode,jdbcType=VARCHAR},
-      </if>
-      <if test="sendJson != null" >
-        #{sendJson,jdbcType=VARCHAR},
       </if>
       <if test="notifyJson != null" >
         #{notifyJson,jdbcType=VARCHAR},
@@ -172,6 +192,9 @@
       <if test="notifyCount != null" >
         #{notifyCount,jdbcType=DECIMAL},
       </if>
+      <if test="sendJson != null" >
+        #{sendJson,jdbcType=BLOB},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" resultType="java.lang.Integer" >
@@ -191,9 +214,6 @@
       </if>
       <if test="platformCode != null" >
         PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
-      </if>
-      <if test="sendJson != null" >
-        SEND_JSON = #{sendJson,jdbcType=VARCHAR},
       </if>
       <if test="notifyJson != null" >
         NOTIFY_JSON = #{notifyJson,jdbcType=VARCHAR},
@@ -219,7 +239,26 @@
       <if test="notifyCount != null" >
         NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL},
       </if>
+      <if test="sendJson != null" >
+        SEND_JSON = #{sendJson,jdbcType=BLOB},
+      </if>
     </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    update A_AGENT_PLATFORMSYN
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
+      NOTIFY_JSON = #{notifyJson,jdbcType=VARCHAR},
+      NOTIFY_STATUS = #{notifyStatus,jdbcType=DECIMAL},
+      NOTIFY_TIME = #{notifyTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      VERSION = #{version,jdbcType=DECIMAL},
+      SUCCES_TIME = #{succesTime,jdbcType=TIMESTAMP},
+      NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL},
+      SEND_JSON = #{sendJson,jdbcType=BLOB}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
@@ -227,7 +266,6 @@
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
       BUS_ID = #{busId,jdbcType=VARCHAR},
       PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
-      SEND_JSON = #{sendJson,jdbcType=VARCHAR},
       NOTIFY_JSON = #{notifyJson,jdbcType=VARCHAR},
       NOTIFY_STATUS = #{notifyStatus,jdbcType=DECIMAL},
       NOTIFY_TIME = #{notifyTime,jdbcType=TIMESTAMP},

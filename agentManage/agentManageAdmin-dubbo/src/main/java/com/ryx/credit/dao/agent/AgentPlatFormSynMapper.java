@@ -16,11 +16,15 @@ public interface AgentPlatFormSynMapper {
 
     int insertSelective(AgentPlatFormSyn record);
 
+    List<AgentPlatFormSyn> selectByExampleWithBLOBs(AgentPlatFormSynExample example);
+
     List<AgentPlatFormSyn> selectByExample(AgentPlatFormSynExample example);
 
     AgentPlatFormSyn selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(AgentPlatFormSyn record);
+
+    int updateByPrimaryKeyWithBLOBs(AgentPlatFormSyn record);
 
     int updateByPrimaryKey(AgentPlatFormSyn record);
 }
