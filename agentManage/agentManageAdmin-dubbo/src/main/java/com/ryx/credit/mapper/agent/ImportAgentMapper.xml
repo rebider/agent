@@ -237,13 +237,13 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null" >
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
       <if test="datacontent != null" >
         DATACONTENT = #{datacontent,jdbcType=CLOB},
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
     update A_IMPORT_AGENT
@@ -257,9 +257,9 @@
       DEALSTATUS = #{dealstatus,jdbcType=DECIMAL},
       DEALMSG = #{dealmsg,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
+      VERSION = VERSION + 1,
       DATACONTENT = #{datacontent,jdbcType=CLOB}
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
     update A_IMPORT_AGENT

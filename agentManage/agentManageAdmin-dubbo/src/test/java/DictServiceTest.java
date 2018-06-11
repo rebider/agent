@@ -1,8 +1,10 @@
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.service.agent.AimportService;
 import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -32,6 +34,9 @@ public class DictServiceTest extends BaseSpringTest {
 
     @Autowired
     private DateChangeReqService dateChangeReqService;
+
+    @Autowired
+    private AimportService aimportService;
     
     @Test
     public void testId(){
@@ -54,6 +59,19 @@ public class DictServiceTest extends BaseSpringTest {
         logger.info("=======testDataChange=====");
         DateChangeRequest data = dateChangeReqService.getById("DC20180606000000000000022");
         logger.info("=======testDataChange====="+data);
+    }
+
+
+    @Test
+    public void testImPortAgent(){
+        logger.info("=======testImPortAgent=====");
+        try {
+          ResultVO data = aimportService.analysisRecode("1");
+          logger.info(data.getResInfo());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logger.info("=======testImPortAgent=====");
     }
 
 }

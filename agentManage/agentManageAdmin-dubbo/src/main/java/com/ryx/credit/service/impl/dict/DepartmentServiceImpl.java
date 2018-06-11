@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName DepartmentServiceImpl
@@ -93,5 +94,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public COrganization getById(String id) {
         return cOrganizationMapper.selectById(id);
+    }
+
+    @Override
+    public COrganization getByName(String name) {
+        List<Map> list = cOrganizationMapper.selectByOrgName(name);
+        if(list.size()>0){
+            return cOrganizationMapper.selectById(list.get(0).get("id")+"");
+        }
+        return null;
     }
 }
