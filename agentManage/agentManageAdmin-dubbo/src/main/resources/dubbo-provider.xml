@@ -47,6 +47,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.DateChangeReqService" ref="dateChangeReqService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentAssProtocolService" ref="agentAssProtocolService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.DataChangeActivityService" ref="dataChangeActivityService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentNotifyService" ref="agentNotifyService"  timeout="1200000" registry="${zk.group}"/>
 
 
 

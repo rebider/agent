@@ -1,10 +1,13 @@
 package com.ryx.credit.dao.agent;
 
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
 import com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AgentPlatFormSynMapper {
 
@@ -27,4 +30,8 @@ public interface AgentPlatFormSynMapper {
     int updateByPrimaryKeyWithBLOBs(AgentPlatFormSyn record);
 
     int updateByPrimaryKey(AgentPlatFormSyn record);
+
+    List<Map<String,Object>> queryList(@Param("map") Map<String, Object> map, @Param("page") Page page);
+
+    int queryCount(@Param("map")Map<String, Object> map);
 }
