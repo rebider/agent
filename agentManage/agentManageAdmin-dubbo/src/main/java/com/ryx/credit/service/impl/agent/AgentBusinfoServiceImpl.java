@@ -9,6 +9,7 @@ import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
+import com.ryx.credit.service.agent.AgentDataHistoryService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     private IdService idService;
     @Autowired
     private AgentColinfoMapper agentColinfoMapper;
+	@Autowired
+	private AgentDataHistoryService agentDataHistoryService;
 
     /**
      * 代理商查询插件数据获取
@@ -213,6 +216,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 					}
 				}
+				agentDataHistoryService.saveDataHistory(agentBusInfoVo, DataHistoryType.BUSINESS.getValue());
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {
