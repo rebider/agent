@@ -32,6 +32,7 @@
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
     <result column="AG_ZBH" property="agZbh" jdbcType="VARCHAR" />
+    <result column="BUS_USE_ORGAN" property="busUseOrgan" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -67,7 +68,7 @@
     BUS_REGION, BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE,
     BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
-    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH
+    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
     <include refid="OracleDialectPrefix" />
@@ -107,8 +108,8 @@
     CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY,
     CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS,
     C_TIME, C_UTIME, C_USER,
-    STATUS, VERSION, AG_ZBH
-    )
+    STATUS, VERSION, AG_ZBH,
+    BUS_USE_ORGAN)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -118,8 +119,8 @@
     #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR},
     #{cloAgentColinfo,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR}
-    )
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR},
+    #{busUseOrgan,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
     insert into A_AGENT_BUSINFO
@@ -214,6 +215,9 @@
       <if test="agZbh != null" >
         AG_ZBH,
       </if>
+      <if test="busUseOrgan != null" >
+        BUS_USE_ORGAN,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -305,6 +309,9 @@
       </if>
       <if test="agZbh != null" >
         #{agZbh,jdbcType=VARCHAR},
+      </if>
+      <if test="busUseOrgan != null" >
+        #{busUseOrgan,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -399,10 +406,13 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null" >
-        VERSION = VERSION +1,
+        VERSION = VERSION + 1,
       </if>
       <if test="agZbh != null" >
         AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+      </if>
+      <if test="busUseOrgan != null" >
+        BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
@@ -436,8 +446,9 @@
     C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
     C_USER = #{cUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = VERSION +1,
-    AG_ZBH = #{agZbh,jdbcType=VARCHAR}
+    VERSION = VERSION + 1,
+    AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+    BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >

@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
@@ -115,7 +116,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 result = httpRequest(agentNotifyVo);
                 record.setNotifyJson(String.valueOf(result.getData()));
             } catch (Exception e) {
-                log.info("");
+                log.info("通知pos手刷http请求异常:{}",e.getMessage());
                 record.setNotifyCount(new BigDecimal(i));
             }
             int czResult = 0;
@@ -132,9 +133,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(czResult==1 && null!=result && result.isOK()){
                 break;
             }
-            System.out.println(czResult);
         }
-
     }
 
     /**
@@ -178,6 +177,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
                 param.put("cityArea",agentNotifyVo.getCity());
             param.put("orgType",agentNotifyVo.getOrgType());
+            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
             param.put("supDorgId",agentNotifyVo.getSupDorgId());
 
             String httpResult = HttpClientUtil.doPost(AGENT_NOTITF_URL, param);
