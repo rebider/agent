@@ -143,4 +143,12 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         BusActRel busActRel = busActRels.get(0);
         return busActRel;
     }
+
+    @Override
+    public List<Map<String, Object>> queryById(AgentBusInfo agentBusInfo) {
+        if(StringUtils.isBlank(agentBusInfo.getAgentId())){
+            return null;
+        }
+        return agentBusInfoMapper.queryById(agentBusInfo.getAgentId());
+    }
 }

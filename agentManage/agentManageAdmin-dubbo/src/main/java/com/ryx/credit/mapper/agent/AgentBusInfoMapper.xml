@@ -499,7 +499,7 @@
   <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
      <include refid="OracleDialectPrefix" />
       select
-        b.id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+        b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
         a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
@@ -588,6 +588,15 @@
     A_agent_businfo bus
     left join A_pay_comp pc on bus.clo_pay_company = pc.id
     where   bus.id = #{id}
+  </select>
+
+  <select id="queryById" parameterType="string" resultType="map">
+    select
+    bus.*,pc.id as payComanyId,pc.com_name,pc.c_time,pc.c_utime,pc.remark,pc.status
+    from
+    A_agent_businfo bus
+    left join  A_pay_comp pc on bus.clo_pay_company = pc.id
+    where bus.id = #{id}
   </select>
 
 </mapper>
