@@ -1,13 +1,12 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.OrgType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AgentPlatFormSynMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -21,6 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -52,19 +54,28 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private IdService idService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentMapper agentMapper;
 
 
     @Override
-    public void asynNotifyPlatform(String busId) {
+    public void asynNotifyPlatform(String busId){
         threadPoolTaskExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                notifyPlatform(busId);
+                try {
+                    notifyPlatform(busId);
+                } catch (Exception e) {
+                    log.info("异步通知pos手刷接口异常:{}",e.getMessage());
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private void notifyPlatform(String busId){
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public void notifyPlatform(String busId)throws Exception{
         if(StringUtils.isBlank(busId)){
             log.info("notifyPlatform业务ID为空");
             return;
@@ -138,6 +149,23 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 czResult = agentPlatFormSynMapper.insert(record);
             }
             if(czResult==1 && null!=result && result.isOK()){
+                //更新入网状态
+                Agent updateAgent = new Agent();
+                updateAgent.setId(agent.getId());
+                updateAgent.setVersion(agent.getVersion());
+                updateAgent.setcIncomStatus(AgentInStatus.IN.status);
+                Date nowDate = new Date();
+                updateAgent.setcIncomTime(nowDate);
+                updateAgent.setcUtime(nowDate);
+                int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
+                //更新业务编号
+                AgentBusInfo updateBusInfo = new AgentBusInfo();
+                JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
+                updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+                int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
+                if(upResult1!=1 || upResult2!=1){
+                    throw new Exception("更新更新入网状态/业务编号异常");
+                }
                 break;
             }
         }
