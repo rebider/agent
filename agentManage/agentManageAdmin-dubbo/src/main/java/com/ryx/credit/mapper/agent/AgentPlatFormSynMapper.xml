@@ -306,6 +306,7 @@
         <if test="map.agentId !=null and map.agentId!=''">
             and AGENT_ID = #{map.agentId}
         </if>
+        order by notify_time desc
     </select>
     <update id="updateByBusId" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
         update A_AGENT_PLATFORMSYN
