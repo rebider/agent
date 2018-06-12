@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentPlatFormSyn implements Serializable {
+public class AgentPlatFormSyn implements Serializable{
     private String id;
 
     private String agentId;
@@ -29,7 +29,7 @@ public class AgentPlatFormSyn implements Serializable {
 
     private BigDecimal notifyCount;
 
-    private byte[] sendJson;
+    private String sendJson;
 
     public String getId() {
         return id;
@@ -127,11 +127,11 @@ public class AgentPlatFormSyn implements Serializable {
         this.notifyCount = notifyCount;
     }
 
-    public byte[] getSendJson() {
+    public String getSendJson() {
         return sendJson;
     }
 
-    public void setSendJson(byte[] sendJson) {
-        this.sendJson = sendJson;
+    public void setSendJson(String sendJson) {
+        this.sendJson = sendJson == null ? null : sendJson.trim();
     }
 }

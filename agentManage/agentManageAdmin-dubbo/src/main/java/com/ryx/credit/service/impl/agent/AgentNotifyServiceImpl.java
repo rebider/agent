@@ -101,7 +101,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             try {
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-                record.setSendJson(sendJson.getBytes("UTF-8"));
+                record.setSendJson(sendJson);
                 record.setNotifyTime(new Date());
                 record.setAgentId(agentBusInfo.getAgentId());
                 record.setBusId(agentBusInfo.getId());
