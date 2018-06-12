@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
@@ -13,6 +14,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
 
     @Override
@@ -92,6 +96,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         agentNotifyVo.setUniqueId(agent.getAgUniqNum());
         agentNotifyVo.setOrgName(agent.getAgName());
+        agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
+        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
+        agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
             agentNotifyVo.setSupDorgId(agentParent.getBusNum());
         }
@@ -168,7 +175,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         try {
             Map<String, String>  param = new HashMap<>();
             param.put("uniqueId",agentNotifyVo.getUniqueId());
-            param.put("useOrgan","");  //885:自营，886：代理商，A00：机构，887：手刷
+            param.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             param.put("orgName",agentNotifyVo.getOrgName());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 param.put("province",agentNotifyVo.getProvince());
