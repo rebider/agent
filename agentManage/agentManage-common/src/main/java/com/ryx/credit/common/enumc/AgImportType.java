@@ -2,7 +2,7 @@ package com.ryx.credit.common.enumc;
 
 
 /**
- * 数据历史类型
+ * 数据处理类型
  * @version V1.0
  * @Description:
  * @author: Liudh
@@ -10,12 +10,14 @@ package com.ryx.credit.common.enumc;
  */
 public enum AgImportType {
 
-    BASICS("basics","基础信息"),
-    BUSINESS("business","业务信息"),
-    CONTRACT("contract","合同信息"),
-    PAYMENT("payment","缴纳款项"),
+    BASICS("BASICS","基础信息"),
+    BUSINESS("BUSINESS","业务信息"),
+    CONTRACT("CONTRACT","合同信息"),
+    PAYMENT("PAYMENT","缴纳款项"),
     BASBUSR("BASBUSR","代理商业务关系"),
-    GATHER("gather","收款账户");
+    GATHER("GATHER","收款账户"),
+    NETINAPP("NETIN","入网业务审批"),
+    BUSAPP("BUSAPP","业务审批");
 
     public String code;
 
