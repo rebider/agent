@@ -83,13 +83,19 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         AgBusCriteria.andAgentIdEqualTo(importAgent.getDataid());
                         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(AgBusExample);
                         for (AgentBusInfo agentBusInfo : agentBusInfos) {
-                            asynNotifyPlatform(agentBusInfo.getId());
+                            try {
+                                agentNotifyService.notifyPlatform(agentBusInfo.getId(),importAgent.getId());
+                            } catch (Exception e) {
+                                log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),agentBusInfo.getId(),AgImportType.NETINAPP.getValue());
+                                e.printStackTrace();
+                            }
                         }
                     }
                     if(importAgent.getDatatype().equals(AgImportType.BUSAPP.getValue())){
                         try {
                             agentNotifyService.notifyPlatform(importAgent.getDataid(),importAgent.getId());
                         } catch (Exception e) {
+                            log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.BUSAPP.getValue());
                             e.printStackTrace();
                         }
                     }
