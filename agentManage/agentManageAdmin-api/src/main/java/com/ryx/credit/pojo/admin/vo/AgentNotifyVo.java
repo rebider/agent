@@ -16,6 +16,7 @@ public class AgentNotifyVo {
     private String cityArea;
     private String orgType;
     private String supDorgId;
+    private String busPlatform;
 
     public String getUniqueId() {
         return uniqueId;
@@ -79,5 +80,13 @@ public class AgentNotifyVo {
 
     public void setSupDorgId(String supDorgId) {
         this.supDorgId = supDorgId;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
     }
 }

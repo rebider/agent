@@ -39,7 +39,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
     private static Logger log = LoggerFactory.getLogger(AgentNotifyServiceImpl.class);
 
-    private final static String AGENT_NOTITF_URL = AppConfig.getProperty("agent_notify_url");
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
     @Autowired
@@ -56,6 +55,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
 
 
     @Override
@@ -64,7 +65,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             @Override
             public void run() {
                 try {
-                    notifyPlatform(busId);
+                    agentNotifyService.notifyPlatform(busId);
                 } catch (Exception e) {
                     log.info("异步通知pos手刷接口异常:{}",e.getMessage());
                     e.printStackTrace();
@@ -82,7 +83,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
         if(agentBusInfo==null){
-            log.info("notifyPlatform记录不存在");
+            log.info("notifyPlatform记录不存在:{}",busId);
             return;
         }
         Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -113,7 +114,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         if(null!=agentParent){
             agentNotifyVo.setSupDorgId(agentParent.getBusNum());
         }
-
+        agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         for(int i = 1 ; i <= 5 ; i++){
             AgentPlatFormSyn record = new AgentPlatFormSyn();
             AgentResult result = null;
@@ -161,6 +162,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 //更新业务编号
                 AgentBusInfo updateBusInfo = new AgentBusInfo();
                 JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
+                updateBusInfo.setVersion(agentBusInfo.getVersion());
+                updateBusInfo.setId(agentBusInfo.getId());
                 updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                 int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
                 if(upResult1!=1 || upResult2!=1){
@@ -215,12 +218,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
             param.put("supDorgId",agentNotifyVo.getSupDorgId());
 
-            String httpResult = HttpClientUtil.doPost(AGENT_NOTITF_URL, param);
+//            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_" + agentNotifyVo.getBusPlatform() + "_notify_url"), param);
+            String httpResult = "{\"orgId\":\"1234564654654\"}";
             if (httpResult.contains("orgId")){
                 return AgentResult.ok(httpResult);
             }else{
                 log.info("http请求超时返回错误:{}",httpResult);
-                throw new Exception("http请求超时");
+                throw new Exception("http返回有误");
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
