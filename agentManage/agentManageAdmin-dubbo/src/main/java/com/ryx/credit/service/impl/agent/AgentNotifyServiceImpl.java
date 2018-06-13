@@ -5,10 +5,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AgentPlatFormSynMapper;
-import com.ryx.credit.dao.agent.RegionMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
@@ -57,7 +54,19 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private AgentMapper agentMapper;
     @Autowired
     private AgentNotifyService agentNotifyService;
+    @Autowired
+    private ImportAgentMapper importAgentMapper;
 
+
+    @Override
+    public void asynNotifyPlatform(){
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        });
+    }
 
     @Override
     public void asynNotifyPlatform(String busId){

@@ -20,4 +20,7 @@ public interface AgentNotifyService {
     PageInfo queryList(Page page,AgentPlatFormSyn agentPlatFormSyn);
 
     AgentPlatFormSyn findByBusId(String busId);
+
+    void asynNotifyPlatform();
+
 }
