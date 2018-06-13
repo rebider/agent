@@ -88,20 +88,20 @@ public class AgentServiceImpl implements  AgentService {
         example.setOrderByClause(" c_utime desc ");
         example.setPage(new Page(page.getFrom(),page.getPagesize()));
         List<Agent> list = agentMapper.selectByExample(example);
-        for (Agent agent1 : list) {
-            if(StringUtils.isNotEmpty(agent1.getAgDocPro())) {
-                COrganization organization = departmentService.getById(agent1.getAgDocPro());
-                if(null!=organization) {
-                    agent1.setAgDocProTemp(organization.getName());
-                }
-            }
-            if(StringUtils.isNotEmpty(agent1.getAgDocDistrict())) {
-                COrganization organization = departmentService.getById(agent1.getAgDocDistrict());
-                if(null!=organization) {
-                    agent1.setAgDocDistrictTemp(organization.getName());
-                }
-            }
-        }
+//        for (Agent agent1 : list) {
+//            if(StringUtils.isNotEmpty(agent1.getAgDocPro())) {
+//                COrganization organization = departmentService.getById(agent1.getAgDocPro());
+//                if(null!=organization) {
+//                    agent1.setAgDocProTemp(organization.getName());
+//                }
+//            }
+//            if(StringUtils.isNotEmpty(agent1.getAgDocDistrict())) {
+//                COrganization organization = departmentService.getById(agent1.getAgDocDistrict());
+//                if(null!=organization) {
+//                    agent1.setAgDocDistrictTemp(organization.getName());
+//                }
+//            }
+//        }
         page.setRows(list);
         page.setTotal(count);
         return page;
