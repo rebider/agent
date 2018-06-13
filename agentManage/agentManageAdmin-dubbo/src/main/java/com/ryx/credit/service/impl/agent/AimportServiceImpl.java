@@ -202,6 +202,12 @@ public class AimportServiceImpl implements AimportService {
     }
 
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public ResultVO parseParent()throws Exception{
+
+        return ResultVO.success(null);
+    }
 
 
 

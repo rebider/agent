@@ -395,6 +395,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             importAgent.setDataid(busId);
             importAgent.setDatatype(AgImportType.BUSAPP.name());
             importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+            importAgent.setcUser(rel.getcUser());
             if(1!=aimportService.insertAgentImportData(importAgent)){
                 logger.info("代理商审批通过-添加开户任务失败");
             }else{
@@ -508,6 +509,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             importAgent.setDataid(busId);
             importAgent.setDatatype(AgImportType.NETINAPP.name());
             importAgent.setBatchcode(UUID.randomUUID().toString().replace("-",""));
+            importAgent.setcUser(rel.getcUser());
             if(1!=aimportService.insertAgentImportData(importAgent)){
                 logger.info("代理商审批通过-添加开户任务失败");
             }else{
