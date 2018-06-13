@@ -1,10 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
@@ -35,6 +32,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
 
+
+
     @Autowired
     private AgentService agentService;
     @Autowired
@@ -53,6 +52,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentAssProtocolService agentAssProtocolService;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AimportService aimportService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
 
     /**
      * 商户入网
@@ -386,6 +389,22 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
 
+        //入网程序调用
+        try {
+            ImportAgent importAgent = new ImportAgent();
+            importAgent.setDataid(busId);
+            importAgent.setDatatype(AgImportType.BUSAPP.name());
+            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+            if(1!=aimportService.insertAgentImportData(importAgent)){
+                logger.info("代理商审批通过-添加开户任务失败");
+            }else{
+                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            agentNotifyService.asynNotifyPlatform();
+        }
         return ResultVO.success(null);
     }
 
@@ -481,6 +500,23 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 logger.info("代理商审批通过，收款状态更新失败{}:{}",processingId,agentColinfo.getId());
                 throw new ProcessException("收款状态更新失败");
             }
+        }
+
+        //入网程序调用
+        try {
+            ImportAgent importAgent = new ImportAgent();
+            importAgent.setDataid(busId);
+            importAgent.setDatatype(AgImportType.NETINAPP.name());
+            importAgent.setBatchcode(UUID.randomUUID().toString().replace("-",""));
+            if(1!=aimportService.insertAgentImportData(importAgent)){
+                logger.info("代理商审批通过-添加开户任务失败");
+            }else{
+                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            agentNotifyService.asynNotifyPlatform();
         }
 
         return ResultVO.success(null);

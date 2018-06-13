@@ -149,16 +149,19 @@ public class AimportServiceImpl implements AimportService {
             success.or().andStatusEqualTo(Status.STATUS_1.status).andDealstatusEqualTo(Status.STATUS_2.status).andDatatypeEqualTo(AgImportType.BASICS.name());
             List<ImportAgent>  successList = importAgentMapper.selectByExampleWithBLOBs(success);
             for (ImportAgent importAgent : successList) {
+
                String uniqnum =   importAgent.getDataid();
                 AgentExample example = new AgentExample();
                 example.or().andAgUniqNumEqualTo(uniqnum);
                 List<Agent>  agents =  agentMapper.selectByExample(example);
+                //更新代理商状态
                 for (Agent agent : agents) {
                     agent.setAgStatus(AgStatus.Approved.name());
                     agent.setcIncomStatus(Status.STATUS_1.status);
                     agent.setcIncomTime(new Date());
                     agentMapper.updateByPrimaryKeySelective(agent);
 
+                    //更新收款账户状态
                     AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
                     agentColinfoExample.or().andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
                     List<AgentColinfo>  colinfos = agentColinfoMapper.selectByExample(agentColinfoExample);
@@ -167,6 +170,7 @@ public class AimportServiceImpl implements AimportService {
                         agentColinfoMapper.updateByPrimaryKeySelective(colinfo);
                     }
 
+                    //更新合同状态
                     AgentContractExample agentContractExample = new AgentContractExample();
                     agentContractExample.or().andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
                     List<AgentContract>  contracts= agentContractMapper.selectByExample(agentContractExample);
@@ -175,6 +179,7 @@ public class AimportServiceImpl implements AimportService {
                         agentContractMapper.updateByPrimaryKeySelective(contract);
                     }
 
+                    //更新业务状态
                     AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                     agentBusInfoExample.or().andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status);
                     List<AgentBusInfo>  agentBusInfos= agentBusInfoMapper.selectByExample(agentBusInfoExample);
@@ -374,18 +379,31 @@ public class AimportServiceImpl implements AimportService {
                     agentContract.setAgentId(agent.getId());
                     agentContract.setcUser(userid);
                     AgentContractExample agentContractExample = new AgentContractExample();
-                    agentContractExample.or().andAgentIdEqualTo(agentContract.getAgentId()).andContNumEqualTo(agentContract.getContNum()).andStatusEqualTo(Status.STATUS_1.status);
+                    agentContractExample.or().andAgentIdEqualTo(agentContract.getAgentId())
+                            .andContNumEqualTo(agentContract.getContNum())
+                            .andStatusEqualTo(Status.STATUS_1.status)
+                            .andContTypeEqualTo(agentContract.getContType());
                     List<AgentContract> agentContractDb =  agentContractMapper.selectByExample(agentContractExample);
+                    ImportAgent con  = importAgentMapper.selectByPrimaryKey(datum.getId());
+
                     if(agentContractDb.size()==0){
                         logger.info("导入代理商合同信息{}",datum.getId());
                         AgentContract ac =  agentContractService.insertAgentContract(agentContract,Arrays.asList());
                         logger.info("导入代理商合同信息{}成功",ac.getId());
+                        con.setDealmsg("添加成功");
                     }else{
+                        AgentContract contract = agentContractDb.get(0);
+                        contract.setContType(agentContract.getContType());
+                        contract.setContNum(agentContract.getContNum());
+                        contract.setContDate(agentContract.getContDate());
+                        contract.setContEndDate(agentContract.getContEndDate());
+                        contract.setRemark(agentContract.getRemark());
+                        contract.setcUser(userid);
                         logger.info("导入代理商合同信息{}记录应存在",datum.getId());
+                        con.setDealmsg("添加成功");
+                        agentContractService.update(contract);
                     }
-                    ImportAgent con  = importAgentMapper.selectByPrimaryKey(datum.getId());
                     con.setDealstatus(Status.STATUS_2.status);
-                    con.setDealmsg("成功");
                     con.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(con)) {
                         logger.info("导入代理商合同信息{}更新记录失败",con.getId());
@@ -422,6 +440,7 @@ public class AimportServiceImpl implements AimportService {
             for (ImportAgent datum : data) {
                 try {
                     datum.setDealstatus(Status.STATUS_1.status);//处理中
+                    datum.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(datum))throw new ProcessException("更新记录失败");
                     //代理商编号
                     String dataId = datum.getDataid();
@@ -448,7 +467,8 @@ public class AimportServiceImpl implements AimportService {
                     List<PayComp>  payCompList = apaycompService.compList();
 
                     for (int i = 0; i < busRelArray.size(); i++) {
-                         AgentBusInfo busItem = parseBusFromJson(busRelArray.getJSONObject(i),platForms,bustype,payCompList);
+
+                        AgentBusInfo busItem = parseBusFromJson(busRelArray.getJSONObject(i),platForms,bustype,payCompList);
 
                         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                         agentBusInfoExample.or()
@@ -459,9 +479,23 @@ public class AimportServiceImpl implements AimportService {
 
                         if(agentBusInfoExamplelist.size()>0) {
                             logger.info("业务已存在{}{}",busItem.getBusPlatform(),busItem.getAgentId());
+                            AgentBusInfo db_agentBusInfo = agentBusInfoExamplelist.get(0);
+                            db_agentBusInfo.setBusRegion(busItem.getBusRegion());
+                            db_agentBusInfo.setBusSentDirectly(busItem.getBusSentDirectly());
+                            db_agentBusInfo.setBusDirectCashback(busItem.getBusDirectCashback());
+                            db_agentBusInfo.setBusIndeAss(busItem.getBusIndeAss());
+                            db_agentBusInfo.setBusContact(busItem.getBusContact());
+                            db_agentBusInfo.setBusContactMobile(busItem.getBusContactMobile());
+                            db_agentBusInfo.setBusContactEmail(busItem.getBusContactEmail());
+                            db_agentBusInfo.setBusContactPerson(busItem.getBusContactPerson());
+                            db_agentBusInfo.setBusRiskEmail(busItem.getBusRiskEmail());
+                            db_agentBusInfo.setCloTaxPoint(busItem.getCloTaxPoint());
+                            db_agentBusInfo.setCloInvoice(busItem.getCloInvoice());
+                            db_agentBusInfo.setCloReceipt(busItem.getCloReceipt());
+                            db_agentBusInfo.setCloPayCompany(busItem.getCloPayCompany());
+                            agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             break;
                         }
-
 
                          busItem.setcUser(userid);
                          busItem =  agentBusinfoService.agentBusInfoInsert(busItem);
@@ -502,6 +536,18 @@ public class AimportServiceImpl implements AimportService {
                             }
                         }
                     }
+
+
+                    //更新业务
+                    ImportAgentExample importAgentExample = new ImportAgentExample();
+                    importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name()).andDealstatusEqualTo(Status.STATUS_0.status).andDataidEqualTo(datum.getDataid());
+                    List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
+                    for (ImportAgent agentsBusiness : importAgentsBusiness) {
+                        agentsBusiness.setDealTime(datum.getDealTime());
+                        agentsBusiness.setDealstatus(Status.STATUS_2.status);
+                        importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
+                    }
+
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     payment.setDealstatus(Status.STATUS_2.status);//处理成功
                     payment.setDealmsg("成功");
@@ -828,26 +874,27 @@ public class AimportServiceImpl implements AimportService {
                 }
             }
 
+            if(StringUtils.isNotBlank(bus_json_array.getString(10)))
             ab.setBusSentDirectly(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(10))));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(11)))
             ab.setBusDirectCashback(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(11))));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(12)))
             ab.setBusIndeAss(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(12))));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(13)))
             ab.setBusContact(bus_json_array.getString(13));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(14)))
             ab.setBusContactMobile(bus_json_array.getString(14));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(15)))
             ab.setBusContactEmail(bus_json_array.getString(15));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(16)))
             ab.setBusContactPerson(bus_json_array.getString(16));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(17)))
             ab.setBusRiskEmail(bus_json_array.getString(17));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(18)))
             ab.setCloTaxPoint(bus_json_array.getBigDecimal(18));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(19)))
             ab.setCloInvoice(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(19))));
-
+            if(StringUtils.isNotBlank(bus_json_array.getString(20)))
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
 
             //打款公司
@@ -860,24 +907,35 @@ public class AimportServiceImpl implements AimportService {
             }
 
             //设置打款账户
-            AgentColinfo colinfo = new AgentColinfo();
-            //收款账户 对公对私
-            colinfo.setCloType(BigDecimal.valueOf(gs.indexOf( bus_json_array.getString(22))));
-            //收款账户 realname
-            colinfo.setCloRealname(bus_json_array.getString(23));
-            //收款账户 卡号
-            colinfo.setCloBankAccount(bus_json_array.getString(24));
-            //收款账户 开户行
-            colinfo.setCloBank(bus_json_array.getString(25));
-            //收款账户 开户支行
-            colinfo.setCloBankBranch(bus_json_array.getString(26));
-            colinfo.setAgentId(ab.getAgentId());
-            colinfo.setRemark("老数据导入");
-            colinfo.setStatus(Status.STATUS_1.status);
-            colinfo.setVarsion(Status.STATUS_1.status);
-            colinfo.setcTime(new Date());
-            colinfo.setcUtime(new Date());
-            ab.setAgentColinfoList(Arrays.asList(colinfo));
+
+            if(StringUtils.isNotBlank(bus_json_array.getString(22))) {
+                AgentColinfo colinfo = new AgentColinfo();
+                //收款账户 对公对私
+                if (StringUtils.isNotBlank(bus_json_array.getString(22)))
+                    colinfo.setCloType(BigDecimal.valueOf(gs.indexOf(bus_json_array.getString(22))));
+                //收款账户 realname
+                if (StringUtils.isNotBlank(bus_json_array.getString(23)))
+                    colinfo.setCloRealname(bus_json_array.getString(23));
+                //收款账户 卡号
+                if (StringUtils.isNotBlank(bus_json_array.getString(24)))
+                    colinfo.setCloBankAccount(bus_json_array.getString(24));
+                //收款账户 开户行
+                if (StringUtils.isNotBlank(bus_json_array.getString(25)))
+                    colinfo.setCloBank(bus_json_array.getString(25));
+                //收款账户 开户支行
+                if (StringUtils.isNotBlank(bus_json_array.getString(26)))
+                    colinfo.setCloBankBranch(bus_json_array.getString(26));
+
+                colinfo.setAgentId(ab.getAgentId());
+                colinfo.setRemark("老数据导入");
+                colinfo.setStatus(Status.STATUS_1.status);
+                colinfo.setVarsion(Status.STATUS_1.status);
+                colinfo.setcTime(new Date());
+                colinfo.setcUtime(new Date());
+                ab.setAgentColinfoList(Arrays.asList(colinfo));
+            }else{
+                ab.setAgentColinfoList(Arrays.asList());
+            }
             return ab;
         } catch (Exception e) {
             logger.info("解析json{}:{}",e.getMessage(),obj.toJSONString());

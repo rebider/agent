@@ -1,6 +1,7 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.spring.MySpringContextHandler;
@@ -10,6 +11,7 @@ import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.delegate.TaskListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 
 /**
  * TaskExecutionListener
@@ -29,20 +31,29 @@ public class TaskExecutionListener implements TaskListener,ExecutionListener{
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
-        String eventName = delegateExecution.getEventName();
-        if ("start".equals(eventName)) {
-            logger.info("start========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
-        }else if ("end".equals(eventName)) {
-            String activityName = delegateExecution.getCurrentActivityName();
-            AgentEnterService aes = (AgentEnterService)MySpringContextHandler.applicationContext.getBean("agentEnterService");
-            if("reject_end".equals(activityName)){
-                aes.completeProcessing(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
+        try {
+            String eventName = delegateExecution.getEventName();
+            if ("start".equals(eventName)) {
+                logger.info("start========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
+            }else if ("end".equals(eventName)) {
+                String activityName = delegateExecution.getCurrentActivityName();
+                AgentEnterService aes = (AgentEnterService)MySpringContextHandler.applicationContext.getBean("agentEnterService");
+                if("reject_end".equals(activityName)){
+                    aes.completeProcessing(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
+                }
+                if("finish_end".equals(activityName)){
+                    aes.completeProcessing(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
+                }
+            }else if ("take".equals(eventName)) {
+                logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
             }
-            if("finish_end".equals(activityName)){
-                aes.completeProcessing(delegateExecution.getProcessInstanceId(),AgStatus.Approved.name());
-            }
-        }else if ("take".equals(eventName)) {
-            logger.info("take========="+"ActivityId:"+delegateExecution.getCurrentActivityId()+"  ProcessInstanceId:"+delegateExecution.getProcessInstanceId()+"  Execution:"+delegateExecution.getId());
+        } catch (BeansException e) {
+            e.printStackTrace();
+            throw e;
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw e;
+        } finally {
         }
     }
 
