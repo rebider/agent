@@ -466,6 +466,7 @@
               select a.id, a.bus_num, a.bus_platform,a.agent_id,a.bus_status,b.ag_name,b.id as agnetid,b.ag_uniq_num,a.clo_review_status,b.ag_status ,rownum as row_count
               from a_agent_businfo a left join a_agent b on a.agent_id = b.id
               <where>
+                <if test="par.busPlatform!=null and par.busPlatform!=''">and a.bus_platform = #{par.busPlatform}</if>
                 <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT(CONCAT('%',#{par.search_name}),'%')</if>
                 <if test="par.clo_review_status!=null and par.clo_review_status!=''"> and a.clo_review_status = #{par.clo_review_status}</if>
                 <if test="par.ag_status!=null and par.ag_status!=''">and b.ag_status = #{par.ag_status}</if>
@@ -486,6 +487,7 @@
         count(a.id)
       from a_agent_businfo a left join a_agent b on a.agent_id = b.id
       <where>
+        <if test="par.busPlatform!=null and par.busPlatform!=''">and a.bus_platform = #{par.busPlatform}</if>
         <if test="par.search_name!=null and par.search_name!=''"> and  b.ag_name like CONCAT(CONCAT('%',#{par.search_name}),'%')</if>
         <if test="par.clo_review_status!=null and par.clo_review_status!=''"> and a.clo_review_status = #{par.clo_review_status}</if>
         <if test="par.ag_status!=null and par.ag_status!=''">and b.ag_status = #{par.ag_status}</if>

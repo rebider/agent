@@ -92,6 +92,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
                 agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
             }
+            //判断平台是否重复
+            List hav = Arrays.asList();
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                    if(hav.contains(item.getBusPlatform())){
+                        throw new ProcessException("开通("+item.getBusPlatform()+")业务平台重复");
+                    }else{
+                        hav.add(item.getBusPlatform());
+                    }
+            }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
