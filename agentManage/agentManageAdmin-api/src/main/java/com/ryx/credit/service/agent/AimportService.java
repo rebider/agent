@@ -27,4 +27,6 @@ public interface AimportService {
     public ResultVO analysisContract(List<ImportAgent>  data,String userid)throws Exception;
 
     public ResultVO analysisBus(List<ImportAgent>  data,String userid)throws Exception;
+
+    public ResultVO parseParent()throws Exception;
 }
