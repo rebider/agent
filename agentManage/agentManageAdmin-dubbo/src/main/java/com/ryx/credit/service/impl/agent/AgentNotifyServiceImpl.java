@@ -63,7 +63,37 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         threadPoolTaskExecutor.execute(new Runnable() {
             @Override
             public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
 
+                }
+                ImportAgentExample example = new ImportAgentExample();
+                ImportAgentExample.Criteria criteria = example.createCriteria();
+                List<String> dataType = new ArrayList<>();
+                dataType.add(AgImportType.NETINAPP.getValue());
+                dataType.add(AgImportType.BUSAPP.getValue());
+                criteria.andDatatypeIn(dataType);
+                criteria.andDealstatusEqualTo(Status.STATUS_0.status);
+                List<ImportAgent> importAgents = importAgentMapper.selectByExample(example);
+                for (ImportAgent importAgent : importAgents) {
+                    if(importAgent.getDatatype().equals(AgImportType.NETINAPP.getValue())){
+                        AgentBusInfoExample AgBusExample = new AgentBusInfoExample();
+                        AgentBusInfoExample.Criteria AgBusCriteria = AgBusExample.createCriteria();
+                        AgBusCriteria.andAgentIdEqualTo(importAgent.getDataid());
+                        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(AgBusExample);
+                        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                            asynNotifyPlatform(agentBusInfo.getId());
+                        }
+                    }
+                    if(importAgent.getDatatype().equals(AgImportType.BUSAPP.getValue())){
+                        try {
+                            agentNotifyService.notifyPlatform(importAgent.getDataid(),importAgent.getId());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         });
     }
@@ -74,9 +104,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             @Override
             public void run() {
                 try {
-                    agentNotifyService.notifyPlatform(busId);
+                    agentNotifyService.notifyPlatform(busId,null);
                 } catch (Exception e) {
-                    log.info("异步通知pos手刷接口异常:{}",e.getMessage());
+                    log.info("异步通知pos手刷接口异常:{},busId:{}",e.getMessage(),busId);
                     e.printStackTrace();
                 }
             }
@@ -85,7 +115,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public void notifyPlatform(String busId)throws Exception{
+    public void notifyPlatform(String busId,String impId)throws Exception{
         if(StringUtils.isBlank(busId)){
             log.info("notifyPlatform业务ID为空");
             return;
@@ -93,6 +123,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
         if(agentBusInfo==null){
             log.info("notifyPlatform记录不存在:{}",busId);
+            if(impId!=null){
+                updateImportAgent(impId,Status.STATUS_1.status,"记录不存在");
+            }
             return;
         }
         Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -176,11 +209,39 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                 int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
                 if(upResult1!=1 || upResult2!=1){
-                    throw new Exception("更新更新入网状态/业务编号异常");
+                    if(i==5){
+                        if(impId!=null) {
+                            updateImportAgent(impId, Status.STATUS_1.status, "更新异常");
+                        }
+                    }
+                    throw new Exception("更新入网状态/业务编号异常");
+                }
+                if(impId!=null){
+                    updateImportAgent(impId,Status.STATUS_2.status,"处理成功");
                 }
                 break;
             }
         }
+    }
+
+    /**
+     * 更新
+     * @param impId
+     * @return
+     */
+    private int updateImportAgent(String impId,BigDecimal dealstatus,String dealMsg){
+        int i = 0;
+        if(impId!=null){
+            ImportAgent importAgent = importAgentMapper.selectByPrimaryKey(impId);
+            ImportAgent impRecord = new ImportAgent();
+            impRecord.setId(impId);
+            impRecord.setVersion(importAgent.getVersion());
+            impRecord.setDealstatus(dealstatus);
+            impRecord.setDealmsg(dealMsg);
+            impRecord.setDealTime(new Date());
+            i = importAgentMapper.updateByPrimaryKeySelective(impRecord);
+        }
+        return i;
     }
 
     /**
