@@ -120,6 +120,19 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             return result;
         }
 
+        AgentColinfoRelExample example = new AgentColinfoRelExample();
+        AgentColinfoRelExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentbusidEqualTo(agentColinfoRel.getAgentbusid());
+        criteria.andAgentidEqualTo(agentColinfoRel.getAgentid());
+        criteria.andBusPlatformEqualTo(agentColinfoRel.getBusPlatform());
+        List<AgentColinfoRel> agentColinfoRels = agentColinfoRelMapper.selectByExample(example);
+        if(null!=agentColinfoRels && agentColinfoRels.size()>=1){
+            int deleteResult = agentColinfoRelMapper.deleteByExample(example);
+            if(deleteResult!=1){
+                new AgentResult(500, "系统异常", "");
+            }
+        }
+
         Date d = Calendar.getInstance().getTime();
         agentColinfoRel.setcTime(d);
         agentColinfoRel.setStatus(Status.STATUS_1.status);

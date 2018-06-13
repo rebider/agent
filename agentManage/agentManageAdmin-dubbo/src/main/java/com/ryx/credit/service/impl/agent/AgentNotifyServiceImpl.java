@@ -1,23 +1,28 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AgentPlatFormSynMapper;
 import com.ryx.credit.dao.agent.RegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -47,19 +52,30 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentMapper agentMapper;
 
 
     @Override
-    public void asynNotifyPlatform(String busId) {
+    public void asynNotifyPlatform(String busId){
         threadPoolTaskExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                notifyPlatform(busId);
+                try {
+                    notifyPlatform(busId);
+                } catch (Exception e) {
+                    log.info("异步通知pos手刷接口异常:{}",e.getMessage());
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private void notifyPlatform(String busId){
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public void notifyPlatform(String busId)throws Exception{
         if(StringUtils.isBlank(busId)){
             log.info("notifyPlatform业务ID为空");
             return;
@@ -91,6 +107,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         agentNotifyVo.setUniqueId(agent.getAgUniqNum());
         agentNotifyVo.setOrgName(agent.getAgName());
+        agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
+        Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
+        agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
             agentNotifyVo.setSupDorgId(agentParent.getBusNum());
         }
@@ -101,7 +120,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             try {
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-                record.setSendJson(sendJson.getBytes("UTF-8"));
+                record.setSendJson(sendJson);
                 record.setNotifyTime(new Date());
                 record.setAgentId(agentBusInfo.getAgentId());
                 record.setBusId(agentBusInfo.getId());
@@ -115,7 +134,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 result = httpRequest(agentNotifyVo);
                 record.setNotifyJson(String.valueOf(result.getData()));
             } catch (Exception e) {
-                log.info("");
+                log.info("通知pos手刷http请求异常:{}",e.getMessage());
                 record.setNotifyCount(new BigDecimal(i));
             }
             int czResult = 0;
@@ -130,11 +149,26 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 czResult = agentPlatFormSynMapper.insert(record);
             }
             if(czResult==1 && null!=result && result.isOK()){
+                //更新入网状态
+                Agent updateAgent = new Agent();
+                updateAgent.setId(agent.getId());
+                updateAgent.setVersion(agent.getVersion());
+                updateAgent.setcIncomStatus(AgentInStatus.IN.status);
+                Date nowDate = new Date();
+                updateAgent.setcIncomTime(nowDate);
+                updateAgent.setcUtime(nowDate);
+                int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
+                //更新业务编号
+                AgentBusInfo updateBusInfo = new AgentBusInfo();
+                JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
+                updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+                int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
+                if(upResult1!=1 || upResult2!=1){
+                    throw new Exception("更新更新入网状态/业务编号异常");
+                }
                 break;
             }
-            System.out.println(czResult);
         }
-
     }
 
     /**
@@ -169,7 +203,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         try {
             Map<String, String>  param = new HashMap<>();
             param.put("uniqueId",agentNotifyVo.getUniqueId());
-            param.put("useOrgan","");  //885:自营，886：代理商，A00：机构，887：手刷
+            param.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             param.put("orgName",agentNotifyVo.getOrgName());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 param.put("province",agentNotifyVo.getProvince());
@@ -178,6 +212,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
                 param.put("cityArea",agentNotifyVo.getCity());
             param.put("orgType",agentNotifyVo.getOrgType());
+            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
             param.put("supDorgId",agentNotifyVo.getSupDorgId());
 
             String httpResult = HttpClientUtil.doPost(AGENT_NOTITF_URL, param);

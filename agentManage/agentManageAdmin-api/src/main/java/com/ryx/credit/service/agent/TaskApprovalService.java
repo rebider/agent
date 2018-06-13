@@ -27,4 +27,6 @@ public interface TaskApprovalService {
     Map findBusActByBusId(String busId,String busType,String activStatus);
 
     BusActRel queryBusActRel(String busId, String busType,String activStatus);
+
+    List<Map<String, Object>> queryById(AgentBusInfo agentBusInfo);
 }

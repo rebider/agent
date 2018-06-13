@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -104,6 +105,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 agentBusInfoVo.setId(agentBusInfoVo.getId());
                 agentBusInfoVo.setVersion(agentBusInfo.getVersion());
+                agentBusInfoVo.setcUtime(new Date());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if(i!=1){
                     throw new ProcessException("更新打款公司或业务所属上级异常");
@@ -142,5 +144,13 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         }
         BusActRel busActRel = busActRels.get(0);
         return busActRel;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryById(AgentBusInfo agentBusInfo) {
+        if(StringUtils.isBlank(agentBusInfo.getAgentId())){
+            return null;
+        }
+        return agentBusInfoMapper.queryById(agentBusInfo.getAgentId());
     }
 }

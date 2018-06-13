@@ -1,109 +1,106 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.agent.AgentPlatFormSynMapper">
-    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn">
-        <id column="ID" property="id" jdbcType="VARCHAR"/>
-        <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR"/>
-        <result column="BUS_ID" property="busId" jdbcType="VARCHAR"/>
-        <result column="PLATFORM_CODE" property="platformCode" jdbcType="VARCHAR"/>
-        <result column="NOTIFY_JSON" property="notifyJson" jdbcType="VARCHAR"/>
-        <result column="NOTIFY_STATUS" property="notifyStatus" jdbcType="DECIMAL"/>
-        <result column="NOTIFY_TIME" property="notifyTime" jdbcType="TIMESTAMP"/>
-        <result column="C_USER" property="cUser" jdbcType="VARCHAR"/>
-        <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP"/>
-        <result column="VERSION" property="version" jdbcType="DECIMAL"/>
-        <result column="SUCCES_TIME" property="succesTime" jdbcType="TIMESTAMP"/>
-        <result column="NOTIFY_COUNT" property="notifyCount" jdbcType="DECIMAL"/>
-    </resultMap>
-    <resultMap id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" extends="BaseResultMap">
-        <result column="SEND_JSON" property="sendJson" jdbcType="BLOB"/>
-    </resultMap>
-    <sql id="Example_Where_Clause">
-        <where>
-            <foreach collection="oredCriteria" item="criteria" separator="or">
-                <if test="criteria.valid">
-                    <trim prefix="(" suffix=")" prefixOverrides="and">
-                        <foreach collection="criteria.criteria" item="criterion">
-                            <choose>
-                                <when test="criterion.noValue">
-                                    and ${criterion.condition}
-                                </when>
-                                <when test="criterion.singleValue">
-                                    and ${criterion.condition} #{criterion.value}
-                                </when>
-                                <when test="criterion.betweenValue">
-                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                                </when>
-                                <when test="criterion.listValue">
-                                    and ${criterion.condition}
-                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
-                                             separator=",">
-                                        #{listItem}
-                                    </foreach>
-                                </when>
-                            </choose>
-                        </foreach>
-                    </trim>
-                </if>
+<mapper namespace="com.ryx.credit.dao.agent.AgentPlatFormSynMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
+    <result column="BUS_ID" property="busId" jdbcType="VARCHAR" />
+    <result column="PLATFORM_CODE" property="platformCode" jdbcType="VARCHAR" />
+    <result column="NOTIFY_JSON" property="notifyJson" jdbcType="VARCHAR" />
+    <result column="NOTIFY_STATUS" property="notifyStatus" jdbcType="DECIMAL" />
+    <result column="NOTIFY_TIME" property="notifyTime" jdbcType="TIMESTAMP" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="VERSION" property="version" jdbcType="DECIMAL" />
+    <result column="SUCCES_TIME" property="succesTime" jdbcType="TIMESTAMP" />
+    <result column="NOTIFY_COUNT" property="notifyCount" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" extends="BaseResultMap" >
+    <result column="SEND_JSON" property="sendJson" jdbcType="CLOB" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
             </foreach>
-        </where>
-    </sql>
-    <sql id="Base_Column_List">
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
     ID, AGENT_ID, BUS_ID, PLATFORM_CODE, NOTIFY_JSON, NOTIFY_STATUS, NOTIFY_TIME, C_USER, 
     C_TIME, VERSION, SUCCES_TIME, NOTIFY_COUNT
   </sql>
-    <sql id="Blob_Column_List">
+  <sql id="Blob_Column_List" >
     SEND_JSON
   </sql>
-    <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs"
-            parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample">
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        ,
-        <include refid="Blob_Column_List"/>
-        from A_AGENT_PLATFORMSYN
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-    </select>
-    <select id="selectByExample" resultMap="BaseResultMap"
-            parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample">
-        <include refid="OracleDialectPrefix"/>
-        select
-        <if test="distinct">
-            distinct
-        </if>
-        <include refid="Base_Column_List"/>
-        from A_AGENT_PLATFORMSYN
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-        <if test="orderByClause != null">
-            order by ${orderByClause}
-        </if>
-        <include refid="OracleDialectSuffix"/>
-    </select>
-    <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String">
-        select
-        <include refid="Base_Column_List"/>
-        ,
-        <include refid="Blob_Column_List"/>
-        from A_AGENT_PLATFORMSYN
-        where ID = #{id,jdbcType=VARCHAR}
-    </select>
-    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample">
-        delete from A_AGENT_PLATFORMSYN
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </delete>
-    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn">
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_AGENT_PLATFORMSYN
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" >
+    delete from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     insert into A_AGENT_PLATFORMSYN (ID, AGENT_ID, BUS_ID, 
       PLATFORM_CODE, NOTIFY_JSON, NOTIFY_STATUS, 
       NOTIFY_TIME, C_USER, C_TIME, 
@@ -113,143 +110,142 @@
       #{platformCode,jdbcType=VARCHAR}, #{notifyJson,jdbcType=VARCHAR}, #{notifyStatus,jdbcType=DECIMAL}, 
       #{notifyTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
       #{version,jdbcType=DECIMAL}, #{succesTime,jdbcType=TIMESTAMP}, #{notifyCount,jdbcType=DECIMAL}, 
-      #{sendJson,jdbcType=BLOB})
+      #{sendJson,jdbcType=CLOB})
   </insert>
-    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn">
-        insert into A_AGENT_PLATFORMSYN
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                ID,
-            </if>
-            <if test="agentId != null">
-                AGENT_ID,
-            </if>
-            <if test="busId != null">
-                BUS_ID,
-            </if>
-            <if test="platformCode != null">
-                PLATFORM_CODE,
-            </if>
-            <if test="notifyJson != null">
-                NOTIFY_JSON,
-            </if>
-            <if test="notifyStatus != null">
-                NOTIFY_STATUS,
-            </if>
-            <if test="notifyTime != null">
-                NOTIFY_TIME,
-            </if>
-            <if test="cUser != null">
-                C_USER,
-            </if>
-            <if test="cTime != null">
-                C_TIME,
-            </if>
-            <if test="version != null">
-                VERSION,
-            </if>
-            <if test="succesTime != null">
-                SUCCES_TIME,
-            </if>
-            <if test="notifyCount != null">
-                NOTIFY_COUNT,
-            </if>
-            <if test="sendJson != null">
-                SEND_JSON,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id,jdbcType=VARCHAR},
-            </if>
-            <if test="agentId != null">
-                #{agentId,jdbcType=VARCHAR},
-            </if>
-            <if test="busId != null">
-                #{busId,jdbcType=VARCHAR},
-            </if>
-            <if test="platformCode != null">
-                #{platformCode,jdbcType=VARCHAR},
-            </if>
-            <if test="notifyJson != null">
-                #{notifyJson,jdbcType=VARCHAR},
-            </if>
-            <if test="notifyStatus != null">
-                #{notifyStatus,jdbcType=DECIMAL},
-            </if>
-            <if test="notifyTime != null">
-                #{notifyTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="cUser != null">
-                #{cUser,jdbcType=VARCHAR},
-            </if>
-            <if test="cTime != null">
-                #{cTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="version != null">
-                #{version,jdbcType=DECIMAL},
-            </if>
-            <if test="succesTime != null">
-                #{succesTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="notifyCount != null">
-                #{notifyCount,jdbcType=DECIMAL},
-            </if>
-            <if test="sendJson != null">
-                #{sendJson,jdbcType=BLOB},
-            </if>
-        </trim>
-    </insert>
-    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample"
-            resultType="java.lang.Integer">
-        select count(*) from A_AGENT_PLATFORMSYN
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
-        </if>
-    </select>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn">
-        update A_AGENT_PLATFORMSYN
-        <set>
-            <if test="agentId != null">
-                AGENT_ID = #{agentId,jdbcType=VARCHAR},
-            </if>
-            <if test="busId != null">
-                BUS_ID = #{busId,jdbcType=VARCHAR},
-            </if>
-            <if test="platformCode != null">
-                PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
-            </if>
-            <if test="notifyJson != null">
-                NOTIFY_JSON = #{notifyJson,jdbcType=VARCHAR},
-            </if>
-            <if test="notifyStatus != null">
-                NOTIFY_STATUS = #{notifyStatus,jdbcType=DECIMAL},
-            </if>
-            <if test="notifyTime != null">
-                NOTIFY_TIME = #{notifyTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="cUser != null">
-                C_USER = #{cUser,jdbcType=VARCHAR},
-            </if>
-            <if test="cTime != null">
-                C_TIME = #{cTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="version != null">
-                VERSION = #{version,jdbcType=DECIMAL},
-            </if>
-            <if test="succesTime != null">
-                SUCCES_TIME = #{succesTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="notifyCount != null">
-                NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL},
-            </if>
-            <if test="sendJson != null">
-                SEND_JSON = #{sendJson,jdbcType=BLOB},
-            </if>
-        </set>
-        where ID = #{id,jdbcType=VARCHAR}
-    </update>
-    <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn">
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    insert into A_AGENT_PLATFORMSYN
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID,
+      </if>
+      <if test="busId != null" >
+        BUS_ID,
+      </if>
+      <if test="platformCode != null" >
+        PLATFORM_CODE,
+      </if>
+      <if test="notifyJson != null" >
+        NOTIFY_JSON,
+      </if>
+      <if test="notifyStatus != null" >
+        NOTIFY_STATUS,
+      </if>
+      <if test="notifyTime != null" >
+        NOTIFY_TIME,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
+      <if test="succesTime != null" >
+        SUCCES_TIME,
+      </if>
+      <if test="notifyCount != null" >
+        NOTIFY_COUNT,
+      </if>
+      <if test="sendJson != null" >
+        SEND_JSON,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null" >
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="platformCode != null" >
+        #{platformCode,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyJson != null" >
+        #{notifyJson,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyStatus != null" >
+        #{notifyStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="notifyTime != null" >
+        #{notifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="succesTime != null" >
+        #{succesTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="notifyCount != null" >
+        #{notifyCount,jdbcType=DECIMAL},
+      </if>
+      <if test="sendJson != null" >
+        #{sendJson,jdbcType=CLOB},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSynExample" resultType="java.lang.Integer" >
+    select count(*) from A_AGENT_PLATFORMSYN
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
+    update A_AGENT_PLATFORMSYN
+    <set >
+      <if test="agentId != null" >
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null" >
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="platformCode != null" >
+        PLATFORM_CODE = #{platformCode,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyJson != null" >
+        NOTIFY_JSON = #{notifyJson,jdbcType=VARCHAR},
+      </if>
+      <if test="notifyStatus != null" >
+        NOTIFY_STATUS = #{notifyStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="notifyTime != null" >
+        NOTIFY_TIME = #{notifyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="version != null" >
+        VERSION = VERSION + 1,
+      </if>
+      <if test="succesTime != null" >
+        SUCCES_TIME = #{succesTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="notifyCount != null" >
+        NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL},
+      </if>
+      <if test="sendJson != null" >
+        SEND_JSON = #{sendJson,jdbcType=CLOB},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     update A_AGENT_PLATFORMSYN
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
       BUS_ID = #{busId,jdbcType=VARCHAR},
@@ -259,13 +255,13 @@
       NOTIFY_TIME = #{notifyTime,jdbcType=TIMESTAMP},
       C_USER = #{cUser,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      VERSION = #{version,jdbcType=DECIMAL},
+      VERSION = VERSION + 1,
       SUCCES_TIME = #{succesTime,jdbcType=TIMESTAMP},
       NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL},
-      SEND_JSON = #{sendJson,jdbcType=BLOB}
-    where ID = #{id,jdbcType=VARCHAR}
+      SEND_JSON = #{sendJson,jdbcType=CLOB}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
-    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn">
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
     update A_AGENT_PLATFORMSYN
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
       BUS_ID = #{busId,jdbcType=VARCHAR},
@@ -280,20 +276,20 @@
       NOTIFY_COUNT = #{notifyCount,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-    <sql id="OracleDialectPrefix">
-        <if test="page != null">
-            select * from ( select row_.*, rownum rownum_ from (
-        </if>
-    </sql>
-    <sql id="OracleDialectSuffix">
-        <if test="page != null">
-            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-        </if>
-    </sql>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
     <select id="queryList" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix" />
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List"/>, dbms_lob.substr(SEND_JSON)AS SEND_JSON
         from a_agent_platformsyn
         WHERE 1=1
         <if test="map.agentId !=null and map.agentId!=''">
@@ -304,12 +300,13 @@
 
     <select id="queryCount" parameterType="map" resultType="int">
         select
-          count(*)
+        count(*)
         from a_agent_platformsyn
         WHERE 1=1
         <if test="map.agentId !=null and map.agentId!=''">
             and AGENT_ID = #{map.agentId}
         </if>
+        order by notify_time desc
     </select>
     <update id="updateByBusId" parameterType="com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn" >
         update A_AGENT_PLATFORMSYN
