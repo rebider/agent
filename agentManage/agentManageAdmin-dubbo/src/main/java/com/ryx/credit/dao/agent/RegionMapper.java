@@ -23,7 +23,7 @@ public interface RegionMapper {
 
     int updateByPrimaryKey(Region record);
 
-    Region findByPcode(String pCode);
+    List<Region> findByPcode(String pCode);
 
     List<Region> selectAll();
 }

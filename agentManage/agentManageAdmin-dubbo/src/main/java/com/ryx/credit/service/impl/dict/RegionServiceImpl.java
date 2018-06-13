@@ -1,7 +1,6 @@
 package com.ryx.credit.service.impl.dict;
 
 import com.ryx.credit.common.redis.RedisService;
-import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.RegionMapper;
@@ -12,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,28 +27,19 @@ public class RegionServiceImpl implements RegionService {
 
     private static final Logger log = Logger.getLogger(RegionServiceImpl.class);
 
-    private static final String REGIONS_KEY = "agent_regions_list";
+    private static final String REGIONS_KEY = "agent_regions_list_bbb";
     @Autowired
     private RegionMapper regionMapper;
     @Autowired
     private RedisService redisService;
 
-
-
     @Override
-    public List<Tree> selectAllRegion() {
-        long timeStart = System.currentTimeMillis();
-        String regionsValue = redisService.getValue(REGIONS_KEY);
-        long timeEnd = System.currentTimeMillis();
-        log.info("运行时间："+(timeEnd - timeStart)+"ms.");
-        List<Region> regionsList = null;
-        if(StringUtils.isBlank(regionsValue)){
-            regionsList = regionMapper.selectAll();
-            String regionsJson = JsonUtil.objectToJson(regionsList);
-            redisService.setNx(REGIONS_KEY,regionsJson);
-        }else{
-            regionsList = JsonUtil.jsonToList(regionsValue, Region.class);
+    public List<Tree> selectAllRegion(String pCode) {
+        if(StringUtils.isBlank(pCode)){
+            pCode = "0";
         }
+        List<Region> regionsList = regionMapper.findByPcode(pCode);
+
         List<Tree> rootTree = new ArrayList<Tree>();
         //根目录
         List<Tree> menuList = new ArrayList<Tree>();
@@ -58,10 +49,7 @@ public class RegionServiceImpl implements RegionService {
                 menuList.add(regionToTree(region));
             }
         }
-        for (Tree tree : menuList) {
-            tree.setChildren(getChild(String.valueOf(tree.getId()),rootTree));
-        }
-        return menuList;
+        return rootTree;
     }
 
     private Tree regionToTree(Region region){
@@ -69,7 +57,7 @@ public class RegionServiceImpl implements RegionService {
         tree.setId(Long.valueOf(region.getrCode()));
         tree.setPid(Long.valueOf(region.getpCode()));
         tree.setText(region.getrName());
-        tree.setState(1);
+        tree.setState(region.gettType().equals(new BigDecimal(3))?1:0);
         tree.settType(region.gettType());
         return tree;
     }
