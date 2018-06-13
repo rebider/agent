@@ -9,6 +9,7 @@ import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 
+import com.ryx.credit.service.impl.agent.AimportServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -73,5 +74,7 @@ public class DictServiceTest extends BaseSpringTest {
         }
         logger.info("=======testImPortAgent=====");
     }
+
+
 
 }

@@ -130,10 +130,10 @@ public class AgentServiceImpl implements  AgentService {
             logger.info("代理商添加:{}","代理商名称不能为空");
             throw new ProcessException("代理商名称不能为空");
         }
-        if(StringUtils.isEmpty(agent.getAgBusLic())){
-            logger.info("代理商添加:{}","营业执照不能为空");
-            throw new ProcessException("营业执照不能为空");
-        }
+//        if(StringUtils.isEmpty(agent.getAgBusLic())){
+//            logger.info("代理商添加:{}","营业执照不能为空");
+//            throw new ProcessException("营业执照不能为空");
+//        }
         Date date = Calendar.getInstance().getTime();
         agent.setStatus(Status.STATUS_1.status);
         agent.setVersion(Status.STATUS_1.status);

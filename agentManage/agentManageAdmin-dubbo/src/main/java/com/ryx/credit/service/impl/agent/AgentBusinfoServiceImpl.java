@@ -67,7 +67,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusType()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusRegion()) ||
         			null == agentBusInfo.getBusSentDirectly() ||
         			null == agentBusInfo.getBusDirectCashback() ||
         			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||

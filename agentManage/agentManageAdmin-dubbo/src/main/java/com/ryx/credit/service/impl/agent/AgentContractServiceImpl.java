@@ -71,10 +71,6 @@ public class AgentContractServiceImpl implements AgentContractService {
             logger.info("代理商合同添加:{}", "代理商id不能为空");
             throw new ProcessException("合同代理商信息不能为空");
         }
-        if (StringUtils.isEmpty(contract.getcUser())) {
-            logger.info("代理商合同添加:{}", "操作用户不能为空");
-            throw new ProcessException("操作用户不能为空");
-        }
         if (StringUtils.isEmpty(contract.getContNum())) {
             logger.info("代理商合同添加:{}", "合同编号不能为空");
             throw new ProcessException("合同编号不能为空");
@@ -95,10 +91,7 @@ public class AgentContractServiceImpl implements AgentContractService {
             logger.info("代理商合同添加:{}", "操作人不能为空");
             throw new ProcessException("操作人不能为空");
         }
-        if (StringUtils.isEmpty(contract.getcUser())) {
-            logger.info("代理商合同添加:{}", "操作人不能为空");
-            throw new ProcessException("操作人不能为空");
-        }
+
         Date date = Calendar.getInstance().getTime();
         contract.setStatus(Status.STATUS_1.status);
         contract.setVersion(Status.STATUS_1.status);

@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     public COrganization getByName(String name) {
         List<Map> list = cOrganizationMapper.selectByOrgName(name);
         if(list.size()>0){
-            return cOrganizationMapper.selectById(list.get(0).get("id")+"");
+
+            try {
+                return cOrganizationMapper.selectById(Integer.valueOf(list.get(0).get("ID")+""));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                throw e;
+            }
+
         }
         return null;
     }
