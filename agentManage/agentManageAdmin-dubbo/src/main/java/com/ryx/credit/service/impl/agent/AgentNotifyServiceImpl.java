@@ -162,13 +162,14 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         if(null!=agentParent){
             agentNotifyVo.setSupDorgId(agentParent.getBusNum());
         }
-        agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         for(int i = 1 ; i <= 5 ; i++){
             AgentPlatFormSyn record = new AgentPlatFormSyn();
             AgentResult result = null;
             try {
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                //busPlatform是http请求使用不保存到sendJson里
+                agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
                 record.setSendJson(sendJson);
                 record.setNotifyTime(new Date());
                 record.setAgentId(agentBusInfo.getAgentId());
