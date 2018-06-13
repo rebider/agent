@@ -147,7 +147,7 @@ public class AimportServiceImpl implements AimportService {
 
             ImportAgentExample success = new ImportAgentExample();
             success.or().andStatusEqualTo(Status.STATUS_1.status).andDealstatusEqualTo(Status.STATUS_2.status).andDatatypeEqualTo(AgImportType.BASICS.name());
-            List<ImportAgent>  successList = importAgentMapper.selectByExampleWithBLOBs(success);
+            List<ImportAgent>  successList = importAgentMapper.selectByExample(success);
             for (ImportAgent importAgent : successList) {
 
                String uniqnum =   importAgent.getDataid();
@@ -192,6 +192,7 @@ public class AimportServiceImpl implements AimportService {
                 }
             }
 
+            parseParent();
             return ResultVO.success(null);
         } catch (Exception e) {
             e.printStackTrace();
@@ -205,6 +206,52 @@ public class AimportServiceImpl implements AimportService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public ResultVO parseParent()throws Exception{
+
+        ImportAgentExample success = new ImportAgentExample();
+        success.or().andStatusEqualTo(Status.STATUS_1.status)
+                .andDealstatusEqualTo(Status.STATUS_2.status)
+                .andDatatypeEqualTo(AgImportType.BASICS.name());
+        List<ImportAgent>  successList = importAgentMapper.selectByExample(success);
+
+        for (ImportAgent importAgent : successList) {
+
+            AgentExample example = new AgentExample();
+            example.or().andAgUniqNumEqualTo(importAgent.getDataid());
+            List<Agent>  agents =  agentMapper.selectByExample(example);
+
+            for (Agent agent : agents) {
+
+                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                agentBusInfoExample.or().andAgentIdEqualTo(agent.getId()).andStatusEqualTo(Status.STATUS_1.status).andAgZbhIsNotNull().andBusPlatformIsNotNull();
+                List<AgentBusInfo>  agentBusInfos= agentBusInfoMapper.selectByExample(agentBusInfoExample);
+
+                for (AgentBusInfo agentBusInfo : agentBusInfos) {
+
+                    String platForm = agentBusInfo.getBusPlatform();
+                    String zbh = agentBusInfo.getAgZbh();
+
+                    if(org.apache.commons.lang3.StringUtils.isNotEmpty(zbh) && zbh.contains("-") && zbh.length()>0){
+                       int index =  zbh.lastIndexOf("-");
+                       if(index!=-1){
+                           String parentCode = zbh.substring(0,index);
+                           if(org.apache.commons.lang3.StringUtils.isNotEmpty(parentCode) && parentCode.length()>0) {
+                               AgentBusInfoExample parentQuery = new AgentBusInfoExample();
+                               parentQuery.or().andStatusEqualTo(Status.STATUS_1.status).andAgZbhEqualTo(parentCode).andBusPlatformEqualTo(platForm);
+                               List<AgentBusInfo> parentQueryList = agentBusInfoMapper.selectByExample(parentQuery);
+                               if(parentQueryList.size()>0){
+                                   agentBusInfo.setBusParent(parentQueryList.get(0).getId());
+                                   agentBusInfo.setBusRiskParent(parentQueryList.get(0).getId());
+                                   agentBusInfo.setBusActivationParent(parentQueryList.get(0).getId());
+                                   agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                               }
+                           }
+
+                       }
+
+                    }
+                }
+            }
+        }
 
         return ResultVO.success(null);
     }
@@ -499,6 +546,7 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setCloInvoice(busItem.getCloInvoice());
                             db_agentBusInfo.setCloReceipt(busItem.getCloReceipt());
                             db_agentBusInfo.setCloPayCompany(busItem.getCloPayCompany());
+                            db_agentBusInfo.setAgZbh(busItem.getAgZbh());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             break;
                         }
