@@ -1,16 +1,15 @@
 package com.ryx.credit.service.impl.agent;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
-import com.ryx.credit.pojo.admin.vo.AgentContractVo;
+import com.ryx.credit.service.agent.AgentAssProtocolService;
+import com.ryx.credit.service.agent.AgentDataHistoryService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +36,15 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
-
+	@Autowired
+    private AgentAssProtocolService agentAssProtocolService;
     @Autowired
     private IdService idService;
+    @Autowired
+    private AgentColinfoMapper agentColinfoMapper;
+	@Autowired
+	private AgentDataHistoryService agentDataHistoryService;
+
     /**
      * 代理商查询插件数据获取
      * @param par
@@ -57,12 +62,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception{
+    public AgentBusInfo agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception{
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusType()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusRegion()) ||
         			null == agentBusInfo.getBusSentDirectly() ||
         			null == agentBusInfo.getBusDirectCashback() ||
         			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||
@@ -84,7 +88,11 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
         	agentBusInfo.setStatus(Status.STATUS_1.status);
 			agentBusInfo.setVersion(Status.STATUS_1.status);
-        	agentBusInfoMapper.insert(agentBusInfo);
+        	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
+        		throw new ProcessException("业务添加失败");
+			}
+            return agentBusInfo;
+
 
     }
 
@@ -111,7 +119,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	public AgentBusInfo getById(String id){
-		return agentBusInfoMapper.selectByPrimaryKey(id);
+		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+		//查询业务关联账户
+		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+		return agentBusInfo;
 	}
 
 
@@ -120,12 +131,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
+
+			outer:
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				agentBusInfoVo.setcUser(agent.getcUser());
 				agentBusInfoVo.setAgentId(agent.getId());
 				if(StringUtils.isEmpty(agentBusInfoVo.getId())) {
 					//直接新曾
-					agentBusInfoInsert(agentBusInfoVo);
+					AgentBusInfo db_AgentBusInfo = agentBusInfoInsert(agentBusInfoVo);
+					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
+						AssProtoColRel rel = new AssProtoColRel();
+						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
+						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
+							throw new ProcessException("业务分管协议添加失败");
+						}
+					}
 					logger.info("代理商业务添加:{}{}","添加代理商合同成功",agentBusInfoVo.getId());
 				}else{
 
@@ -152,11 +173,50 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setCloReceipt(agentBusInfoVo.getCloReceipt());
 					db_AgentBusInfo.setCloPayCompany(agentBusInfoVo.getCloPayCompany());
 					db_AgentBusInfo.setCloAgentColinfo(agentBusInfoVo.getCloAgentColinfo());
-
+					db_AgentBusInfo.setAgZbh(agentBusInfoVo.getAgZbh());
+					db_AgentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
+					db_AgentBusInfo.setStatus(agentBusInfoVo.getStatus());
+					db_AgentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new ProcessException("更新业务信息失败");
 					}
+                    //更新分管协议
+					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
+						List<AssProtoCol> assProtoCol_list = agentAssProtocolService.queryProtoColByBusId(db_AgentBusInfo.getId());
+						for (AssProtoCol assProtoCol : assProtoCol_list) {
+							if(assProtoCol.getId().equals(agentBusInfoVo.getAgentAssProtocol())){
+							 break outer;
+							}
+						}
+
+
+						List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentBusInfo.getId()));
+						for (AssProtoColRel rel : rels) {
+							rel.setStatus(Status.STATUS_0.status);
+							if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
+								throw new ProcessException("业务分管协议更新失败");
+							}
+						}
+
+						AssProtoColRel rel = new AssProtoColRel();
+						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
+						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
+							throw new ProcessException("业务分管协议添加失败");
+						}
+					//删除分管协议
+					}else{
+						List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentBusInfo.getId()));
+						for (AssProtoColRel rel : rels) {
+							rel.setStatus(Status.STATUS_0.status);
+							if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
+								throw new ProcessException("业务分管协议更新失败");
+							}
+						}
+
+					}
 				}
+				agentDataHistoryService.saveDataHistory(agentBusInfoVo, DataHistoryType.BUSINESS.getValue());
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {

@@ -64,7 +64,13 @@ public class AgentBusInfo implements Serializable {
 
     private BigDecimal version;
 
+    private String agZbh;
+
+    private String busUseOrgan;
+
     private List<Attachment> attachmentList;
+
+    private List<AgentColinfo> agentColinfoList;
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;
@@ -304,5 +310,29 @@ public class AgentBusInfo implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getAgZbh() {
+        return agZbh;
+    }
+
+    public void setAgZbh(String agZbh) {
+        this.agZbh = agZbh;
+    }
+
+    public List<AgentColinfo> getAgentColinfoList() {
+        return agentColinfoList;
+    }
+
+    public void setAgentColinfoList(List<AgentColinfo> agentColinfoList) {
+        this.agentColinfoList = agentColinfoList;
+    }
+
+    public String getBusUseOrgan() {
+        return busUseOrgan;
+    }
+
+    public void setBusUseOrgan(String busUseOrgan) {
+        this.busUseOrgan = busUseOrgan;
     }
 }

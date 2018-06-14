@@ -15,4 +15,6 @@ public interface DepartmentService {
     List<Tree> selectAllDepartment();
 
     public COrganization getById(String id);
+
+    public COrganization getByName(String id);
 }

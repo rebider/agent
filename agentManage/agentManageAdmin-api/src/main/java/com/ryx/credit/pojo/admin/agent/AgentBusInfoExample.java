@@ -2047,6 +2047,146 @@ public class AgentBusInfoExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andAgZbhIsNull() {
+            addCriterion("AG_ZBH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhIsNotNull() {
+            addCriterion("AG_ZBH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhEqualTo(String value) {
+            addCriterion("AG_ZBH =", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhNotEqualTo(String value) {
+            addCriterion("AG_ZBH <>", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhGreaterThan(String value) {
+            addCriterion("AG_ZBH >", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_ZBH >=", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhLessThan(String value) {
+            addCriterion("AG_ZBH <", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhLessThanOrEqualTo(String value) {
+            addCriterion("AG_ZBH <=", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhLike(String value) {
+            addCriterion("AG_ZBH like", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhNotLike(String value) {
+            addCriterion("AG_ZBH not like", value, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhIn(List<String> values) {
+            addCriterion("AG_ZBH in", values, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhNotIn(List<String> values) {
+            addCriterion("AG_ZBH not in", values, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhBetween(String value1, String value2) {
+            addCriterion("AG_ZBH between", value1, value2, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgZbhNotBetween(String value1, String value2) {
+            addCriterion("AG_ZBH not between", value1, value2, "agZbh");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganIsNull() {
+            addCriterion("BUS_USE_ORGAN is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganIsNotNull() {
+            addCriterion("BUS_USE_ORGAN is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganEqualTo(String value) {
+            addCriterion("BUS_USE_ORGAN =", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganNotEqualTo(String value) {
+            addCriterion("BUS_USE_ORGAN <>", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganGreaterThan(String value) {
+            addCriterion("BUS_USE_ORGAN >", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_USE_ORGAN >=", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganLessThan(String value) {
+            addCriterion("BUS_USE_ORGAN <", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganLessThanOrEqualTo(String value) {
+            addCriterion("BUS_USE_ORGAN <=", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganLike(String value) {
+            addCriterion("BUS_USE_ORGAN like", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganNotLike(String value) {
+            addCriterion("BUS_USE_ORGAN not like", value, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganIn(List<String> values) {
+            addCriterion("BUS_USE_ORGAN in", values, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganNotIn(List<String> values) {
+            addCriterion("BUS_USE_ORGAN not in", values, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganBetween(String value1, String value2) {
+            addCriterion("BUS_USE_ORGAN between", value1, value2, "busUseOrgan");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusUseOrganNotBetween(String value1, String value2) {
+            addCriterion("BUS_USE_ORGAN not between", value1, value2, "busUseOrgan");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

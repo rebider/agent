@@ -36,7 +36,7 @@ public interface AgentService {
 
     int updateAgent(Agent agent);
 
-    Agent updateAgentVo(Agent agent)throws Exception;
+    Agent updateAgentVo(Agent agent,List<String> attrs)throws Exception;
 
 
 

@@ -1,6 +1,6 @@
 package com.ryx.credit.service.agent;
 
-import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.result.AgentResult;
 
 
 public interface BusinessCAService {
@@ -10,5 +10,5 @@ public interface BusinessCAService {
      * @param agentBusinfoName
      * @return ResultVO
      */
-    public ResultVO agentBusinessCA(String agentBusinfoName, String cUser);
+    AgentResult agentBusinessCA(String agentBusinfoName);
 }

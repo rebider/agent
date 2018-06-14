@@ -20,7 +20,9 @@ public enum TabId {
     template_agreement("TA%s%015d"),
     a_agent_colinfo_rel("AR%s%015d"),
     d_InterfaceRequest_Record("IR%s%015d"),
-    a_agent_businfo("AB%s%015d");
+    a_agent_businfo("AB%s%015d"),
+    a_import_agent("AI%s%015d"),
+    data_history("DH%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;

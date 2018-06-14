@@ -1,6 +1,5 @@
 package com.ryx.credit.common.enumc;
 
-import java.math.BigDecimal;
 
 /**
  * Created by cx on 2018/5/22.
@@ -22,7 +21,11 @@ public enum DictGroup {
     AG_STATUS_I("审核数字状态"),
     APPROVAL_TYPE("审批结果类型"),
     BUS_STATUS("业务状态"),
-    APPROVAL_PASS_TYPE("审批通过");
+    DATA_CHANGE_TYPE("数据修改申请"),
+    DATA_CACTIVITY_TYPE("数据修改对应的启动流程"),
+    BUS_ACT_REL_BUSTYPE("审批关系类型"),
+    APPROVAL_PASS_TYPE("审批通过"),
+    USE_SCOPE("使用范围");
 
 
     public String  msg;

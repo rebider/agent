@@ -51,6 +51,10 @@
     ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, 
     C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION
   </sql>
+    <sql id="Ac_Base_Column_List">
+        ac.ID, ac.AGENT_ID, ac.CLO_TYPE, ac.CLO_REALNAME, ac.CLO_BANK, ac.CLO_BANK_BRANCH, ac.CLO_BANK_ACCOUNT,
+        ac.C_TIME, ac.C_UTIME, ac.REMARK, ac.C_USER, ac.CLO_REVIEW_STATUS, ac.STATUS,ac.VARSION
+    </sql>
     <select id="selectByExample" resultMap="BaseResultMap"
             parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample">
         <include refid="OracleDialectPrefix"/>
@@ -266,6 +270,17 @@
     <select id="proceedsQuery" parameterType="string" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
-        from A_AGENT_COLINFO where AGENT_ID=#{id}
+        from A_AGENT_COLINFO where AGENT_ID=#{id} and STATUS = 1
     </select>
+
+    <select id="queryBusConinfoList" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Ac_Base_Column_List"/>
+        from A_agent_businfo ab,A_agent_colinfo_rel acr,A_agent_colinfo ac
+        where ab.id = acr.agentbusid
+        and acr.agent_colinfoid = ac.id
+        and ab.id = #{busId}
+        and ac.status=1
+    </select>
+
 </mapper>

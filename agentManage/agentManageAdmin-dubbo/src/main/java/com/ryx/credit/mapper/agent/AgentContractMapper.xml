@@ -250,6 +250,6 @@
   </sql>
 
   <select id="compactQuery" parameterType="string" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List" /> from A_AGENT_CONTRACT where AGENT_ID=#{id}
+    select <include refid="Base_Column_List" /> from A_AGENT_CONTRACT where AGENT_ID=#{id} and STATUS = 1
   </select>
 </mapper>
