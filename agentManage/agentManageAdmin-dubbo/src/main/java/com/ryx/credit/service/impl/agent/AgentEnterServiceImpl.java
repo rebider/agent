@@ -93,7 +93,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
             }
             //判断平台是否重复
-            List hav = Arrays.asList();
+
+            List hav = new ArrayList();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                     if(hav.contains(item.getBusPlatform())){
                         throw new ProcessException("开通("+item.getBusPlatform()+")业务平台重复");
