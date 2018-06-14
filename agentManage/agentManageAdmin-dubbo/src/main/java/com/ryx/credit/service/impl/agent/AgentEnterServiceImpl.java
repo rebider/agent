@@ -1,9 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
@@ -34,6 +32,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
 
+
+
     @Autowired
     private AgentService agentService;
     @Autowired
@@ -48,7 +48,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private ActivityService activityService;
     @Autowired
     private BusActRelMapper busActRelMapper;
-
+    @Autowired
+    private AgentAssProtocolService agentAssProtocolService;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AimportService aimportService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
 
     /**
      * 商户入网
@@ -60,12 +67,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile());
+            agentDataHistoryService.saveDataHistory(agent, DataHistoryType.BASICS.getValue());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
                 agentContractService.insertAgentContract(item, item.getContractTableFile());
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
@@ -74,19 +83,41 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if(!res.isOK()){
                     throw new ProcessException("添加交款项异常");
                 }
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                 item.setAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
                 item.setCloReviewStatus(AgStatus.Create.status);
                 agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
+            }
+            //判断平台是否重复
+
+            List hav = new ArrayList();
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                    if(hav.contains(item.getBusPlatform())){
+                        throw new ProcessException("开通("+item.getBusPlatform()+")业务平台重复");
+                    }else{
+                        hav.add(item.getBusPlatform());
+                    }
             }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                agentBusinfoService.agentBusInfoInsert(item);
+                AgentBusInfo db_AgentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
+                if(StringUtils.isNotBlank(item.getAgentAssProtocol())){
+                    AssProtoColRel rel = new AssProtoColRel();
+                    rel.setAgentBusinfoId(db_AgentBusInfo.getId());
+                    rel.setAssProtocolId(item.getAgentAssProtocol());
+                    if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
+                        throw new ProcessException("业务分管协议添加失败");
+                    }
+                }
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
+
             return ResultVO.success(agentVo);
         }catch (Exception e){
             e.printStackTrace();
@@ -294,6 +325,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     }
 
 
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public ResultVO completeProcessing(String processingId, String processingStatus) throws ProcessException {
         BusActRelExample example = new BusActRelExample();
@@ -301,6 +333,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<BusActRel> list =  busActRelMapper.selectByExample(example);
         if(list.size()!=1){
             logger.info("审批任务结束{}{}，未找到审批中的审批和数据关系",processingId,processingStatus);
+            return ResultVO.fail("审批任务结束"+processingId+":"+processingStatus+"未找到审批中的审批和数据关系");
         }
         BusActRel rel = list.get(0);
         if(rel.getBusType().equals(BusActRelBusType.Business.name())) {
@@ -366,6 +399,23 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
 
+        //入网程序调用
+        try {
+            ImportAgent importAgent = new ImportAgent();
+            importAgent.setDataid(busId);
+            importAgent.setDatatype(AgImportType.BUSAPP.name());
+            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+            importAgent.setcUser(rel.getcUser());
+            if(1!=aimportService.insertAgentImportData(importAgent)){
+                logger.info("代理商审批通过-添加开户任务失败");
+            }else{
+                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), busId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            agentNotifyService.asynNotifyPlatform();
+        }
         return ResultVO.success(null);
     }
 
@@ -463,6 +513,24 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
 
+        //入网程序调用
+        try {
+            ImportAgent importAgent = new ImportAgent();
+            importAgent.setDataid(busId);
+            importAgent.setDatatype(AgImportType.NETINAPP.name());
+            importAgent.setBatchcode(UUID.randomUUID().toString().replace("-",""));
+            importAgent.setcUser(rel.getcUser());
+            if(1!=aimportService.insertAgentImportData(importAgent)){
+                logger.info("代理商审批通过-添加开户任务失败");
+            }else{
+                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), busId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            agentNotifyService.asynNotifyPlatform();
+        }
+
         return ResultVO.success(null);
     }
 
@@ -528,7 +596,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             Agent ag = null;
             {
                 if(StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                    ag = agentService.updateAgentVo(agent.getAgent());
+                    ag = agentService.updateAgentVo(agent.getAgent(),agent.getAgentTableFile());
+                    agentDataHistoryService.saveDataHistory(agent.getAgent(), DataHistoryType.BASICS.getValue());
                 }
             }
             logger.info("用户{}{}修改代理商信息结果{}",userId,agent.getAgent().getId(),"成功");

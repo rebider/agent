@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,42 +27,25 @@ import java.util.List;
 public class RegionServiceImpl implements RegionService {
 
     private static final Logger log = Logger.getLogger(RegionServiceImpl.class);
-
     private static final String REGIONS_KEY = "agent_regions_list";
     @Autowired
     private RegionMapper regionMapper;
     @Autowired
     private RedisService redisService;
 
-
-
     @Override
-    public List<Tree> selectAllRegion() {
-        long timeStart = System.currentTimeMillis();
-        String regionsValue = redisService.getValue(REGIONS_KEY);
-        long timeEnd = System.currentTimeMillis();
-        log.info("运行时间："+(timeEnd - timeStart)+"ms.");
-        List<Region> regionsList = null;
-        if(StringUtils.isBlank(regionsValue)){
-            regionsList = regionMapper.selectAll();
-            String regionsJson = JsonUtil.objectToJson(regionsList);
-            redisService.setValue(REGIONS_KEY,regionsJson,86400L);
-        }else{
-            regionsList = JsonUtil.jsonToList(regionsValue, Region.class);
+    public List<Tree> selectAllRegion(String pCode) {
+        if(StringUtils.isBlank(pCode)){
+            pCode = "0";
         }
-        List<Tree> rootTree = new ArrayList<Tree>();
-        //根目录
-        List<Tree> menuList = new ArrayList<Tree>();
+        List<Region> regionsList = regionMapper.findByPcode(pCode);
+        List<Tree> rootTree = new ArrayList<>();
         for (Region region : regionsList) {
             rootTree.add(regionToTree(region));
-            if(region.getpCode().equals("0")){
-                menuList.add(regionToTree(region));
-            }
         }
-        for (Tree tree : menuList) {
-            tree.setChildren(getChild(String.valueOf(tree.getId()),rootTree));
-        }
-        return menuList;
+        String treeJson = JsonUtil.objectToJson(rootTree);
+        redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
+        return rootTree;
     }
 
     private Tree regionToTree(Region region){
@@ -69,7 +53,7 @@ public class RegionServiceImpl implements RegionService {
         tree.setId(Long.valueOf(region.getrCode()));
         tree.setPid(Long.valueOf(region.getpCode()));
         tree.setText(region.getrName());
-        tree.setState(1);
+        tree.setState(regionMapper.findCountByPcode(region.getrCode())==0?1:0);
         tree.settType(region.gettType());
         return tree;
     }

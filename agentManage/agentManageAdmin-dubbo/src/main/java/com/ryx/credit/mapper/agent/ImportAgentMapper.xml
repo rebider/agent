@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.agent.ImportAgentMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.ImportAgent" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="DATAID" property="dataid" jdbcType="VARCHAR" />
+    <result column="DATATYPE" property="datatype" jdbcType="VARCHAR" />
+    <result column="BATCHCODE" property="batchcode" jdbcType="VARCHAR" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="DEAL_TIME" property="dealTime" jdbcType="TIMESTAMP" />
+    <result column="DEAL_USER" property="dealUser" jdbcType="VARCHAR" />
+    <result column="DEALSTATUS" property="dealstatus" jdbcType="DECIMAL" />
+    <result column="DEALMSG" property="dealmsg" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="VERSION" property="version" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.ImportAgent" extends="BaseResultMap" >
+    <result column="DATACONTENT" property="datacontent" jdbcType="CLOB" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, DATAID, DATATYPE, BATCHCODE, C_USER, C_TIME, DEAL_TIME, DEAL_USER, DEALSTATUS, 
+    DEALMSG, STATUS, VERSION
+  </sql>
+  <sql id="Blob_Column_List" >
+    DATACONTENT
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_IMPORT_AGENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgentExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_IMPORT_AGENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from A_IMPORT_AGENT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgentExample" >
+    delete from A_IMPORT_AGENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
+    insert into A_IMPORT_AGENT (ID, DATAID, DATATYPE, 
+      BATCHCODE, C_USER, C_TIME, 
+      DEAL_TIME, DEAL_USER, DEALSTATUS, 
+      DEALMSG, STATUS, VERSION, 
+      DATACONTENT)
+    values (#{id,jdbcType=VARCHAR}, #{dataid,jdbcType=VARCHAR}, #{datatype,jdbcType=VARCHAR}, 
+      #{batchcode,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{dealTime,jdbcType=TIMESTAMP}, #{dealUser,jdbcType=VARCHAR}, #{dealstatus,jdbcType=DECIMAL}, 
+      #{dealmsg,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{datacontent,jdbcType=CLOB})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
+    insert into A_IMPORT_AGENT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="dataid != null" >
+        DATAID,
+      </if>
+      <if test="datatype != null" >
+        DATATYPE,
+      </if>
+      <if test="batchcode != null" >
+        BATCHCODE,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="dealTime != null" >
+        DEAL_TIME,
+      </if>
+      <if test="dealUser != null" >
+        DEAL_USER,
+      </if>
+      <if test="dealstatus != null" >
+        DEALSTATUS,
+      </if>
+      <if test="dealmsg != null" >
+        DEALMSG,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
+      <if test="datacontent != null" >
+        DATACONTENT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="dataid != null" >
+        #{dataid,jdbcType=VARCHAR},
+      </if>
+      <if test="datatype != null" >
+        #{datatype,jdbcType=VARCHAR},
+      </if>
+      <if test="batchcode != null" >
+        #{batchcode,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTime != null" >
+        #{dealTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealUser != null" >
+        #{dealUser,jdbcType=VARCHAR},
+      </if>
+      <if test="dealstatus != null" >
+        #{dealstatus,jdbcType=DECIMAL},
+      </if>
+      <if test="dealmsg != null" >
+        #{dealmsg,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="datacontent != null" >
+        #{datacontent,jdbcType=CLOB},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgentExample" resultType="java.lang.Integer" >
+    select count(*) from A_IMPORT_AGENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
+    update A_IMPORT_AGENT
+    <set >
+      <if test="dataid != null" >
+        DATAID = #{dataid,jdbcType=VARCHAR},
+      </if>
+      <if test="datatype != null" >
+        DATATYPE = #{datatype,jdbcType=VARCHAR},
+      </if>
+      <if test="batchcode != null" >
+        BATCHCODE = #{batchcode,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealTime != null" >
+        DEAL_TIME = #{dealTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dealUser != null" >
+        DEAL_USER = #{dealUser,jdbcType=VARCHAR},
+      </if>
+      <if test="dealstatus != null" >
+        DEALSTATUS = #{dealstatus,jdbcType=DECIMAL},
+      </if>
+      <if test="dealmsg != null" >
+        DEALMSG = #{dealmsg,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        VERSION = VERSION + 1,
+      </if>
+      <if test="datacontent != null" >
+        DATACONTENT = #{datacontent,jdbcType=CLOB},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
+    update A_IMPORT_AGENT
+    set DATAID = #{dataid,jdbcType=VARCHAR},
+      DATATYPE = #{datatype,jdbcType=VARCHAR},
+      BATCHCODE = #{batchcode,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      DEAL_TIME = #{dealTime,jdbcType=TIMESTAMP},
+      DEAL_USER = #{dealUser,jdbcType=VARCHAR},
+      DEALSTATUS = #{dealstatus,jdbcType=DECIMAL},
+      DEALMSG = #{dealmsg,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = VERSION + 1,
+      DATACONTENT = #{datacontent,jdbcType=CLOB}
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.ImportAgent" >
+    update A_IMPORT_AGENT
+    set DATAID = #{dataid,jdbcType=VARCHAR},
+      DATATYPE = #{datatype,jdbcType=VARCHAR},
+      BATCHCODE = #{batchcode,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      DEAL_TIME = #{dealTime,jdbcType=TIMESTAMP},
+      DEAL_USER = #{dealUser,jdbcType=VARCHAR},
+      DEALSTATUS = #{dealstatus,jdbcType=DECIMAL},
+      DEALMSG = #{dealmsg,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

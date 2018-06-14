@@ -1,7 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.alibaba.druid.sql.visitor.functions.If;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.common.enumc.AttachmentRelType;
@@ -19,28 +19,23 @@ import java.util.Map;
 @Service("agentQueryService")
 public class AgentQueryServiceImpl implements AgentQueryService {
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
+
     @Autowired
     private AgentMapper agentMapper;
-
     @Autowired
     private AgentColinfoMapper agentColinfoMapper;
-
     @Autowired
     private CapitalMapper capitalMapper;
-
     @Autowired
     private AgentContractMapper agentContractMapper;
-
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
-
     @Autowired
     private AttachmentMapper attachmentMapper;
-
+    @Autowired
+    private DateChangeRequestMapper dateChangeRequestMapper;
     @Autowired
     private BusActRelMapper busActRelMapper;
-
-
 
 
     @Override
@@ -86,10 +81,14 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     @Override
     public List<AgentBusInfo> businessQuery(String id) {
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.businessQuery(id);
-        if (null != agentBusInfos && agentBusInfos.size() > 0) {
-            for (AgentBusInfo agentBusInfo : agentBusInfos) {
-                agentBusInfo.setAttachmentList(accessoryQuery(agentBusInfo.getId(), AttachmentRelType.Business.name()));
-            }
+        //业务没有附件暂时注释  需要时在解开
+//        if (null != agentBusInfos && agentBusInfos.size() > 0) {
+//            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+//                agentBusInfo.setAttachmentList(accessoryQuery(agentBusInfo.getId(), AttachmentRelType.Business.name()));
+//            }
+//        }
+        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
         }
         return agentBusInfos;
     }
@@ -103,7 +102,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     @Override
     public Map<String, Object> queryInfoByProInsId(String proid) {
         BusActRelExample example = new BusActRelExample();
-        example.or().andActivIdEqualTo(proid);
+        example.or().andActivIdEqualTo(proid).andStatusEqualTo(Status.STATUS_1.status);
         List<BusActRel>  busr = busActRelMapper.selectByExample(example);
         if(busr.size()==1){
             BusActRel rel = busr.get(0);
@@ -114,6 +113,14 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.Business.name())){
                 AgentBusInfo angetBusInfo = agentBusInfoMapper.selectByPrimaryKey(rel.getBusId());
                 return FastMap.fastSuccessMap().putKeyV("angetBusInfo",angetBusInfo).putKeyV("rel",rel);
+            }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Agent.name())){
+                DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel);
+            }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Colinfo.name())){
+                DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel);
             }
         }
         return null;

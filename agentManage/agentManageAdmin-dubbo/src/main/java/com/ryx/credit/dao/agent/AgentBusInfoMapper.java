@@ -44,13 +44,15 @@ public interface AgentBusInfoMapper {
     List<Map<String,Object>> queryBusinessPlatformList(@Param("reqMap") Map<String,Object> reqMap,@Param("page")Page page);
 
 
-    int queryBusinessPlatformCount(@Param("par") Map<String,Object> par);
+    int queryBusinessPlatformCount(@Param("reqMap") Map<String,Object> reqMap);
 
-    public List<AgentBusInfo> businessQuery(String id);
+    List<AgentBusInfo> businessQuery(String id);
 
     Map<String,Object> queryAgentName(String id);
 
     List<Map<String,Object>> queryBusInfoAndRemit(String agentId);
 
     List<Map<String,Object>> queryBusInfoAndRemitByBusId(String busId);
+
+    List<Map<String,Object>> queryById(String agentId);
 }

@@ -10,6 +10,16 @@ import java.util.List;
 public class AgentBusInfoVo extends AgentBusInfo {
     private List<String> busInfoTableFile;
 
+    private String agentAssProtocol;
+
+    public String getAgentAssProtocol() {
+        return agentAssProtocol;
+    }
+
+    public void setAgentAssProtocol(String agentAssProtocol) {
+        this.agentAssProtocol = agentAssProtocol;
+    }
+
     public List<String> getBusInfoTableFile() {
         return busInfoTableFile;
     }

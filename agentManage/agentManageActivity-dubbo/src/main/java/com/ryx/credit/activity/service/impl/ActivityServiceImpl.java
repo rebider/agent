@@ -114,6 +114,7 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("rs",true);
             rs.put("msg","success");
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());

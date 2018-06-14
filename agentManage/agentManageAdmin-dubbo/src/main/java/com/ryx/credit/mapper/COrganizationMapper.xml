@@ -7,4 +7,10 @@
         id, name, address, code, icon, pid, seq, create_time AS createTime
     </sql>
 
+    <select id="selectByOrgName" parameterType="string" resultType="map">
+        select
+        <include refid="Base_Column_List" />
+        from c_organization where c_organization.name =#{name}
+    </select>
+
 </mapper> 

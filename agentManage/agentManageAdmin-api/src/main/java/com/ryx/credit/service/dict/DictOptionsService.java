@@ -10,6 +10,7 @@ import java.util.List;
 public interface DictOptionsService {
 
 
-    public List<Dict> dictList(String group,String artifact);
+    List<Dict> dictList(String group,String artifact);
 
+    Dict findDictByValue(String group, String artifact,String itemValue);
 }

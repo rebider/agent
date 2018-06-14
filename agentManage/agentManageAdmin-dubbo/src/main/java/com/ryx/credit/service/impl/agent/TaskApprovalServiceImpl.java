@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +46,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private ActivityService activityService;
      @Autowired
      private BusActRelMapper busActRelMapper;
+     @Autowired
+     private TaskApprovalService taskApprovalService;
 
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
@@ -74,23 +76,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult approvalTask(AgentVo agentVo,String userId) throws Exception{
 
         try {
-            for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
-                AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
-                if(!result.isOK()){
-                    throw new ProcessException("保存收款关系异常");
-                }
-            }
-            for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                AgentBusInfo record = new AgentBusInfo();
-                record.setId(agentBusInfoVo.getId());
-                record.setCloPayCompany(agentBusInfoVo.getCloPayCompany());
-                record.setVersion(agentBusInfo.getVersion());
-                int i = agentBusInfoMapper.updateByPrimaryKeySelective(record);
-                if(i!=1){
-                    throw new ProcessException("更新打款公司异常");
-                }
-            }
+            taskApprovalService.updateApproval(agentVo, userId);
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 throw new ProcessException("工作流处理任务异常");
@@ -102,6 +88,32 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         return AgentResult.ok();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
+
+        if(agentVo.getApprovalResult().equals("pass")){
+            //处理财务修改
+            for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
+                AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
+                if(!result.isOK()){
+                    throw new ProcessException("保存收款关系异常");
+                }
+            }
+            //处理业务修改
+            for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfoVo.setId(agentBusInfoVo.getId());
+                agentBusInfoVo.setVersion(agentBusInfo.getVersion());
+                agentBusInfoVo.setcUtime(new Date());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                if(i!=1){
+                    throw new ProcessException("更新打款公司或业务所属上级异常");
+                }
+            }
+        }
+        return AgentResult.ok();
+    }
     /**
      * 查询工作流程
      * @param busId
@@ -109,19 +121,36 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      * @return
      */
     @Override
-    public Map findBusActByBusId(String busId,String busType){
+    public Map findBusActByBusId(String busId,String busType,String activStatus){
+        BusActRel busActRel = queryBusActRel(busId, busType,activStatus);
+        if(busActRel==null){
+            return null;
+        }
+        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
+        return resultMap;
+    }
+
+    @Override
+    public BusActRel queryBusActRel(String busId,String busType,String activStatus){
         BusActRelExample example = new BusActRelExample();
         BusActRelExample.Criteria criteria = example.createCriteria();
         criteria.andBusIdEqualTo(busId);
         criteria.andBusTypeEqualTo(busType);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andActivStatusEqualTo(AgStatus.Approving.name());
+        criteria.andActivStatusEqualTo(activStatus);
         List<BusActRel> busActRels = busActRelMapper.selectByExample(example);
         if(busActRels.size()!=1){
             return null;
         }
         BusActRel busActRel = busActRels.get(0);
-        Map resultMap = activityService.getImageByExecuId(busActRel.getActivId());
-        return resultMap;
+        return busActRel;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryById(AgentBusInfo agentBusInfo) {
+        if(StringUtils.isBlank(agentBusInfo.getAgentId())){
+            return null;
+        }
+        return agentBusInfoMapper.queryById(agentBusInfo.getAgentId());
     }
 }
