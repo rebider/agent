@@ -31,26 +31,20 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Autowired
     private COrganizationMapper cOrganizationMapper;
     @Override
-    public List<Tree> selectAllDepartment() {
-
+    public List<Tree> selectAllDepartment(String pCode) {
+        List<Tree> rootTree = new ArrayList<Tree>();
         List<COrganization> cOrganizationList = null;
         EntityWrapper<COrganization> wrapper = new EntityWrapper<COrganization>();
         wrapper.orderBy("seq");
+        if (null!=pCode&&pCode!="")
+        wrapper.eq("PID",pCode);
+        else
+        wrapper.isNull("PID");
         cOrganizationList = cOrganizationMapper.selectList(wrapper);
-
-        List<Tree> rootTree = new ArrayList<Tree>();
-        //根目录
-        List<Tree> menuList = new ArrayList<Tree>();
         for (COrganization cOrganization : cOrganizationList) {
             rootTree.add(departmentToTree(cOrganization));
-            if(null==cOrganization.getPid()){
-                menuList.add(departmentToTree(cOrganization));
-            }
         }
-        for (Tree tree : menuList) {
-            tree.setChildren(getChild(String.valueOf(tree.getId()),rootTree));
-        }
-        return menuList;
+        return rootTree;
     }
 
 
@@ -62,8 +56,17 @@ public class DepartmentServiceImpl implements DepartmentService {
         }else
        tree.setPid(Long.valueOf(cOrganization.getPid()));
         tree.setText(cOrganization.getName());
-        tree.setState(1);
         tree.setIconCls(cOrganization.getIcon());
+        EntityWrapper<COrganization> wrapper = new EntityWrapper<COrganization>();
+        wrapper.orderBy("seq");
+
+        if (null!=cOrganization.getId())
+            wrapper.eq("PID",cOrganization.getId());
+        else
+            wrapper.isNull("PID");
+
+        wrapper.eq("PID",cOrganization.getId());
+        tree.setState(cOrganizationMapper.selectCount(wrapper)==0?1:0);
         return tree;
     }
 
