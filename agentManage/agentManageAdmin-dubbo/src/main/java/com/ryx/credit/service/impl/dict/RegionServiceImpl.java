@@ -53,7 +53,7 @@ public class RegionServiceImpl implements RegionService {
         tree.setId(Long.valueOf(region.getrCode()));
         tree.setPid(Long.valueOf(region.getpCode()));
         tree.setText(region.getrName());
-        tree.setState(region.gettType().equals(new BigDecimal(3))?1:0);
+        tree.setState(regionMapper.findCountByPcode(region.getrCode())==0?1:0);
         tree.settType(region.gettType());
         return tree;
     }

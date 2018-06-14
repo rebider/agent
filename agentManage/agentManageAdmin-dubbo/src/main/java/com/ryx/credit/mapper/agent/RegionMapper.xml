@@ -185,6 +185,13 @@
     where P_CODE = #{pCode,jdbcType=VARCHAR}
   </select>
 
+  <select id="findCountByPcode" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    select
+    count(*)
+    from D_REGION
+    where P_CODE = #{pCode,jdbcType=VARCHAR}
+  </select>
+
   <select id="selectAll" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

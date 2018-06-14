@@ -25,5 +25,7 @@ public interface RegionMapper {
 
     List<Region> findByPcode(String pCode);
 
+    int findCountByPcode(String pCode);
+
     List<Region> selectAll();
 }
