@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.dict;
 
 import com.ryx.credit.common.redis.RedisService;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.RegionMapper;
@@ -26,8 +27,7 @@ import java.util.List;
 public class RegionServiceImpl implements RegionService {
 
     private static final Logger log = Logger.getLogger(RegionServiceImpl.class);
-
-    private static final String REGIONS_KEY = "agent_regions_list_bbb";
+    private static final String REGIONS_KEY = "agent_regions_list";
     @Autowired
     private RegionMapper regionMapper;
     @Autowired
@@ -39,16 +39,12 @@ public class RegionServiceImpl implements RegionService {
             pCode = "0";
         }
         List<Region> regionsList = regionMapper.findByPcode(pCode);
-
-        List<Tree> rootTree = new ArrayList<Tree>();
-        //根目录
-        List<Tree> menuList = new ArrayList<Tree>();
+        List<Tree> rootTree = new ArrayList<>();
         for (Region region : regionsList) {
             rootTree.add(regionToTree(region));
-            if(region.getpCode().equals("0")){
-                menuList.add(regionToTree(region));
-            }
         }
+        String treeJson = JsonUtil.objectToJson(rootTree);
+        redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
         return rootTree;
     }
 
