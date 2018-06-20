@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.common.util.agentUtil.AESUtil;
+import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -12,6 +14,11 @@ import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.util.*;
+import com.ryx.credit.util.Constants;
+import org.apache.commons.codec.binary.*;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,18 +147,20 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             //取出上级业务
             agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
         }
-        List<String> regionList = getParent(agentBusInfo.getBusRegion());
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
-        if(regionList!=null){
-            if(regionList.size()==3){
-                agentNotifyVo.setProvince(regionList.get(0));
-                agentNotifyVo.setCity(regionList.get(1));
-                agentNotifyVo.setCityArea(regionList.get(2));
-            }else if(regionList.size()==2){
-                agentNotifyVo.setProvince(regionList.get(0));
-                agentNotifyVo.setCity(regionList.get(1));
-            }else if(regionList.size()==1){
-                agentNotifyVo.setProvince(regionList.get(0));
+        if(agentBusInfo.getBusRegion()!=null){
+            List<String> regionList = getParent(agentBusInfo.getBusRegion());
+            if(regionList!=null){
+                if(regionList.size()==3){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                    agentNotifyVo.setCityArea(regionList.get(2));
+                }else if(regionList.size()==2){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                }else if(regionList.size()==1){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                }
             }
         }
         agentNotifyVo.setUniqueId(agent.getAgUniqNum());
@@ -281,27 +290,85 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
     private AgentResult httpRequest(AgentNotifyVo agentNotifyVo)throws Exception{
         try {
-            Map<String, String>  param = new HashMap<>();
-            param.put("uniqueId",agentNotifyVo.getUniqueId());
-            param.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
-            param.put("orgName",agentNotifyVo.getOrgName());
-            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
-                param.put("province",agentNotifyVo.getProvince());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-                param.put("city",agentNotifyVo.getCity());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-                param.put("cityArea",agentNotifyVo.getCity());
-            param.put("orgType",agentNotifyVo.getOrgType());
-            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
-            param.put("supDorgId",agentNotifyVo.getSupDorgId());
+            String cooperator = com.ryx.credit.util.Constants.cooperator;
+            String charset = "UTF-8"; // 字符集
+            String tranCode = "ORG001"; // 交易码
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
-//            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_" + agentNotifyVo.getBusPlatform() + "_notify_url"), param);
-            String httpResult = "{\"orgId\":\"1234564654654\"}";
-            if (httpResult.contains("orgId")){
-                return AgentResult.ok(httpResult);
-            }else{
-                log.info("http请求超时返回错误:{}",httpResult);
-                throw new Exception("http返回有误");
+            JSONObject jsonParams = new JSONObject();
+            JSONObject data = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            data.put("uniqueId",agentNotifyVo.getUniqueId());
+            data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
+            data.put("orgName",agentNotifyVo.getOrgName());
+            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
+                data.put("province",agentNotifyVo.getProvince());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                data.put("city",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                data.put("cityArea",agentNotifyVo.getCity());
+            data.put("orgType",agentNotifyVo.getOrgType());
+            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
+                data.put("supDorgId",agentNotifyVo.getSupDorgId());
+
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+
+            System.out.println("请求参数:"+map);
+            System.out.println("请求url"+AppConfig.getProperty("agent_" + agentNotifyVo.getBusPlatform() + "_notify_url"));
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_" + agentNotifyVo.getBusPlatform() + "_notify_url"), map);
+//            String httpResult = "{\"orgId\":\"1234564654654\"}";
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                System.out.println("请求异常======" + httpResult);
+                throw new Exception("http请求异常");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                System.out.println("返回明文======" + respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    System.out.println("签名验证失败");
+                } else {
+                    System.out.println("签名验证成功");
+                    if (respXML.contains("data") && respXML.contains("orgId")){
+                        JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                        JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
+                        System.out.println(dataObj);
+                        return AgentResult.ok(dataObj);
+                    }else{
+                        log.info("http请求超时返回错误:{}",httpResult);
+                        throw new Exception("http返回有误");
+                    }
+                }
+                return new AgentResult(500,"http请求异常","");
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
