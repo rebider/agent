@@ -414,13 +414,6 @@
 
         <!-- 2. 部署环境(测试环境/生产环境) start -->
         <profile>
-            <id>test</id>
-            <properties>
-                <deploy.env.name>test</deploy.env.name>
-                <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
-            </properties>
-        </profile>
-        <profile>
             <id>dev</id>
             <properties>
                 <deploy.env.name>dev</deploy.env.name>
