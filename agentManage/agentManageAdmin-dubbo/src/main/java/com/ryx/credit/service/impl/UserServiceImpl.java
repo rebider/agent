@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -16,10 +17,7 @@ import com.ryx.credit.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -125,4 +123,16 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
 		return userMapper.selectbyName(name);
 	}
 
+
+    @Override
+    public List<Map<String, Object>> orgCode(Long userID) {
+        if(null==userID){
+           return Arrays.asList();
+        }
+        List<Map<String, Object>> cUserOrgCodelist = userMapper.selectOrganizationCodeById(userID);
+        if(cUserOrgCodelist.size()==0){
+            return Arrays.asList();
+        }
+        return cUserOrgCodelist;
+    }
 }

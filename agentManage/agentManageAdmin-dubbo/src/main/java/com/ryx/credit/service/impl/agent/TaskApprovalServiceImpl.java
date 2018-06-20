@@ -14,6 +14,8 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -33,6 +35,8 @@ import java.util.Map;
  */
 @Service("taskApprovalService")
 public class TaskApprovalServiceImpl implements TaskApprovalService {
+
+    private Logger logger = LoggerFactory.getLogger(TaskApprovalServiceImpl.class);
 
      @Autowired
      private AgentBusInfoMapper agentBusInfoMapper;
@@ -79,6 +83,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             taskApprovalService.updateApproval(agentVo, userId);
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
+                logger.error(result.getMsg());
                 throw new ProcessException("工作流处理任务异常");
             }
         } catch (ProcessException e) {

@@ -25,6 +25,8 @@ public enum DictGroup {
     DATA_CACTIVITY_TYPE("数据修改对应的启动流程"),
     BUS_ACT_REL_BUSTYPE("审批关系类型"),
     APPROVAL_PASS_TYPE("审批通过"),
+    ACTIVITY_RESPAR("南北大区部门code正则匹配"),//AGENT模块
+    ACTIVITY_TASK_REX("任务code正则匹配"),//AGENT模块
     USE_SCOPE("使用范围");
 
 

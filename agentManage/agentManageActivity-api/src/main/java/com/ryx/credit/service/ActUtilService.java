@@ -21,7 +21,7 @@ public interface ActUtilService {
      * @param assignee
      * @return
      */
-    List<ActRuTask> queryTaskInfoList(String assignee);
+    List<ActRuTask> queryTaskInfoList(String assignee,String group);
 
     Map<String,Object> querHiTaskInfo(String taskId);
 
