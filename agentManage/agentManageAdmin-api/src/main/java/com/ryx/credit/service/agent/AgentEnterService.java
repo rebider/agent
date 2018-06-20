@@ -5,6 +5,8 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
+import java.util.Map;
+
 /**
  * Created by cx on 2018/5/28.
  */
@@ -62,5 +64,8 @@ public interface AgentEnterService {
      * @return
      */
     public ResultVO updateAgentVo(AgentVo agent,String userId)throws Exception;
+
+
+    public Map startPar(String cuserId);
 
 }

@@ -50,7 +50,8 @@
         phone,
         s.name AS organizationName,
         o.id AS roleId,
-        o.name AS roleName
+        o.name AS roleName,
+        s.code as organizationCode
         FROM
         C_USER t
         LEFT JOIN C_USER_role r ON t.id = r.user_id
@@ -93,4 +94,19 @@
 	<select id="selectbyName" resultType="com.ryx.credit.pojo.admin.vo.UserVo" parameterType="java.lang.String">
 		select * from C_USER where name = #{name}
 	</select>
+
+    <select id="selectOrganizationCodeById" resultType="map" parameterType="java.lang.Long">
+        SELECT
+        t.id,
+        login_name,
+        t.name,
+        user_type,
+        s.code as organizationCode
+        FROM
+        C_USER t
+        LEFT JOIN c_organization s ON s.id = t.organization_id
+        <where>
+            t.id = #{id}
+        </where>
+    </select>
 </mapper>

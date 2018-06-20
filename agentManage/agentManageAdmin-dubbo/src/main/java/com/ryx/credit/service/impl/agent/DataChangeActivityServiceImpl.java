@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/6/6.
@@ -71,6 +72,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"申请进行中，禁止重复提交");
             return ResultVO.fail("申请进行中，禁止重复提交");
         }
+
         //不同的业务类型找到不同的启动流程
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.DATA_CACTIVITY_TYPE.name());
         String workId = null;
@@ -79,6 +81,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 workId = dict.getdItemname();
             }
         }
+
         dateChangeRequest.setAppyStatus(AgStatus.Approving.status);
         if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest)){
             logger.info("代理商审批，启动审批异常，更新记录状态{}:{}",dateChangeRequest.getId(),userId);
@@ -88,7 +91,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
             throw new ProcessException("审批流启动失败字典中未配置部署流程!");
         }
-        String proce = activityService.createDeloyFlow(null,workId,null,null);
+        Map startPar = agentEnterService.startPar(userId);
+        if(null==startPar){
+            logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
+            throw new ProcessException("启动部门参数为空!");
+        }
+
+        String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
             logger.info("数据修改审批，审批流启动失败{}:{}",dataChangeId,userId);

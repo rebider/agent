@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -29,4 +30,6 @@ public interface IUserService extends IService<CUser> {
     void deleteUserById(Long id);
 
     UserVo selectByName(String name);
+
+    List<Map<String, Object>> orgCode(Long userID);
 }

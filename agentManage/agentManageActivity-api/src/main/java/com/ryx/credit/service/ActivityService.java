@@ -21,7 +21,7 @@ public interface ActivityService {
 
     String createDeloyFlow(String deployName, String workId, String activity_path, String activity_image_path,Map<String,Object> map);
 
-    List<Task> findMyPersonTask(String assignee);
+    List<Task> findMyPersonTask(String assignee,String group);
 
     Map completeTask(String taskId, Map<String, Object> map);
 

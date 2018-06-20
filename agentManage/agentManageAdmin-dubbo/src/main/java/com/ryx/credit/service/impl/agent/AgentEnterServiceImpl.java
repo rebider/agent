@@ -6,13 +6,17 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtils;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.dict.DictOptionsService;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by cx on 2018/5/28.
@@ -56,6 +61,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AimportService aimportService;
     @Autowired
     private AgentNotifyService agentNotifyService;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+
+
 
     /**
      * 商户入网
@@ -136,6 +147,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public ResultVO startAgentEnterActivity(String agentId,String cuser)throws ProcessException{
+        if(StringUtils.isBlank(agentId)){
+            logger.info("代理商审批,代理商ID为空{}:{}",agentId,cuser);
+            return ResultVO.fail("代理商审批中，代理商ID为空");
+        }
+        if(StringUtils.isBlank(cuser)){
+            logger.info("代理商审批,操作用户为空{}:{}",agentId,cuser);
+            return ResultVO.fail("代理商审批中，操作用户为空");
+        }
 
         //检查是否有审批中的代理商新
         BusActRelExample example = new BusActRelExample();
@@ -193,8 +212,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
 
+
+        Map startPar = startPar(cuser);
+        if(null==startPar){
+            logger.info("========用户{}{}启动部门参数为空",agentId,cuser);
+            throw new ProcessException("启动部门参数为空!");
+        }
+
         //启动审批
-        String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"),null,null);
+        String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"),null,null, startPar);
         if(proce==null){
             logger.info("代理商审批，审批流启动失败{}:{}",agentId,cuser);
             throw new ProcessException("审批流启动失败!");
@@ -276,9 +302,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
 
-
+        Map startPar = startPar(cuser);
+        if(null==startPar){
+            logger.info("========用户{}{}启动部门参数为空",busid,cuser);
+            throw new ProcessException("启动部门参数为空!");
+        }
         //启动审批
-        String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"),null,null);
+        String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"),null,null,startPar);
         if(proce==null){
             logger.info("代理商业务启动审批异常，审批流启动失败{}:{}",busid,cuser);
             throw new ProcessException("审批流启动失败!");
@@ -310,6 +340,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("approvalPerson",userId);
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
         reqMap.put("taskId",agentVo.getTaskId());
+
+        //传递部门信息
+        Map startPar = startPar(userId);
+        if(null!=startPar){
+            reqMap.put("party", startPar.get("party"));
+        }
 
         Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
         Boolean rs = (Boolean)resultMap.get("rs");
@@ -629,5 +665,25 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.error("修改代理商错误",e);
             throw e;
         }
+    }
+
+    @Override
+    public Map startPar(String cuserId) {
+        if(StringUtils.isBlank(cuserId)){
+            logger.info("startPar用户ID为空");
+            return null;
+        }
+        List<Map<String, Object>>  orgCodeRes =  iUserService.orgCode(Long.valueOf(cuserId));
+        List<Dict>  disc = dictOptionsService.dictList(DictGroup.AGENT.name(),DictGroup.ACTIVITY_RESPAR.name());
+        Map res = null;
+        for (Map<String, Object> orgCodeRe : orgCodeRes) {
+            for (Dict dict : disc) {
+                if(Pattern.matches(dict.getdItemvalue(), orgCodeRe.get("ORGANIZATIONCODE")+"")) {
+                    res = FastMap.fastMap("party",dict.getdItemname());
+                    return res;
+                }
+            }
+        }
+        return res;
     }
 }

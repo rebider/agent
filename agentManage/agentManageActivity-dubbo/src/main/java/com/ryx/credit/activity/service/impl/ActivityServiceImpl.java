@@ -1,7 +1,11 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
+import com.ryx.credit.common.enumc.DictGroup;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
 import net.sf.json.JSONObject;
@@ -29,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * ActivityServiceImpl
@@ -84,10 +89,19 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public List<Task> findMyPersonTask(String assignee) {
+    public List<Task> findMyPersonTask(String assignee,String group) {
         ProcessEngine processEngine = processEngineConfiguration
                 .buildProcessEngine();
-        List<Task> taskList = processEngine.getTaskService().createTaskQuery().taskCandidateOrAssigned(assignee).list();
+        List<Task> taskList = new ArrayList<>();
+        List<Task> taskListGroup = new ArrayList<>();
+
+        if(StringUtils.isNotBlank(assignee)) {
+           taskList = processEngine.getTaskService().createTaskQuery().taskCandidateUser(assignee).list();
+        }
+        if(StringUtils.isNotBlank(group)) {
+            taskListGroup = processEngine.getTaskService().createTaskQuery().taskCandidateGroup(group).list();
+        }
+        taskList.addAll(taskListGroup);
         for (Task task : taskList) {
             logger.info("待办" + task.getId());
             logger.info("任务名" + task.getName());
