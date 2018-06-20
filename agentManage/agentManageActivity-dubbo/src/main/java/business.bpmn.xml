@@ -84,14 +84,14 @@
         <activiti:taskListener event="create" class="com.ryx.credit.activity.task.BusinessTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="sid-9DFA86F9-836A-4521-8D4D-B900FB1A3D60" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='north'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-DF330366-46BD-4F75-B435-FA5CB57203ED" sourceRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F"></sequenceFlow>
-    <sequenceFlow id="sid-8041F0C5-0F6B-49B5-9A17-3745278B1E36" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
+    <sequenceFlow id="sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B" sourceRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='north'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B" sourceRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F">
+    <sequenceFlow id="sid-8041F0C5-0F6B-49B5-9A17-3745278B1E36" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='north'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-9DFA86F9-836A-4521-8D4D-B900FB1A3D60" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='north'}]]></conditionExpression>
     </sequenceFlow>
   </process>

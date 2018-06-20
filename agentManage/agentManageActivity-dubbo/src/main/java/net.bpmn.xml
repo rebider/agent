@@ -101,16 +101,16 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-8041F0C5-0F6B-49B5-9A17-3745278B1E36" sourceRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C" targetRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='north'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='north'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-4A14F4E7-777A-468E-A45E-E8BD43ECF32E" sourceRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C" targetRef="sid-2EA7796E-4176-4E89-A17C-90ED82D86A1C">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='south'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='south'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_net">
     <bpmndi:BPMNPlane bpmnElement="net" id="BPMNPlane_net">
       <bpmndi:BPMNShape bpmnElement="sid-B47A8C68-664B-4C70-8B40-4C7A7D6808FA" id="BPMNShape_sid-B47A8C68-664B-4C70-8B40-4C7A7D6808FA">
-        <omgdc:Bounds height="30.0" width="29.999999999999986" x="0.0" y="320.03658586108"></omgdc:Bounds>
+        <omgdc:Bounds height="30.0" width="30.0" x="0.0" y="320.03658586108"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B" id="BPMNShape_sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
         <omgdc:Bounds height="80.0" width="100.0" x="189.31184704362857" y="295.03658586108"></omgdc:Bounds>
@@ -180,7 +180,7 @@
         <omgdi:waypoint x="354.3118470436286" y="457.24738817451436"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-E43DBEDC-8124-4124-B00A-943DEB598101" id="BPMNEdge_sid-E43DBEDC-8124-4124-B00A-943DEB598101">
-        <omgdi:waypoint x="29.999710667682503" y="335.12975176584825"></omgdi:waypoint>
+        <omgdi:waypoint x="29.999710667682518" y="335.12975176584825"></omgdi:waypoint>
         <omgdi:waypoint x="75.375" y="335.41158586108"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-BF09486E-10F4-48D3-A7B2-C42F2877BC14" id="BPMNEdge_sid-BF09486E-10F4-48D3-A7B2-C42F2877BC14">
