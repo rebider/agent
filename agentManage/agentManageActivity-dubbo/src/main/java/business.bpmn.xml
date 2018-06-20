@@ -43,9 +43,6 @@
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD"></exclusiveGateway>
-    <sequenceFlow id="sid-41FB685E-2F6C-4F66-A2B8-2F54D4924376" name="南北大区拒绝" sourceRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='reject'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-2EA2EE2E-5D51-465C-999F-82E713A293AC" name="未完成" sourceRef="sid-A8979428-5A3A-4946-88E8-CCE5A69D9F4F" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs!='pass'}]]></conditionExpression>
     </sequenceFlow>
@@ -71,9 +68,6 @@
     </sequenceFlow>
     <exclusiveGateway id="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3"></exclusiveGateway>
     <sequenceFlow id="sid-7F65D9B0-6A9C-42FD-AA37-FBE4084F1F82" sourceRef="sid-B47A8C68-664B-4C70-8B40-4C7A7D6808FA" targetRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3"></sequenceFlow>
-    <sequenceFlow id="sid-4217B500-6DD0-44E0-8CFC-BC4AD9390FF2" name="南北大区审批" sourceRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F" targetRef="sid-B164D2C8-D59F-4394-A662-882CB73C01D0">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
-    </sequenceFlow>
     <userTask id="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D" name="南大区" activiti:candidateGroups="south">
       <extensionElements>
         <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.BusinessTaskExecutionListener"></activiti:taskListener>
@@ -81,18 +75,22 @@
         <activiti:taskListener event="create" class="com.ryx.credit.activity.task.BusinessTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
+    <sequenceFlow id="sid-41FB685E-2F6C-4F66-A2B8-2F54D4924376" name="南北大区拒绝" sourceRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='reject'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-4217B500-6DD0-44E0-8CFC-BC4AD9390FF2" name="南北大区审批" sourceRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F" targetRef="sid-B164D2C8-D59F-4394-A662-882CB73C01D0">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B" sourceRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F"></sequenceFlow>
     <sequenceFlow id="sid-DF330366-46BD-4F75-B435-FA5CB57203ED" sourceRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F"></sequenceFlow>
-    <sequenceFlow id="sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B" sourceRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='north'}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="sid-9DFA86F9-836A-4521-8D4D-B900FB1A3D60" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='north'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-8041F0C5-0F6B-49B5-9A17-3745278B1E36" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='north'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-D10B85BA-0E8F-4E86-A8E0-DE87E30153A4" name="完成" sourceRef="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD" targetRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-9DFA86F9-836A-4521-8D4D-B900FB1A3D60" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='south'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_business">
@@ -174,17 +172,17 @@
         <omgdi:waypoint x="374.3118470436286" y="335.03658586108"></omgdi:waypoint>
         <omgdi:waypoint x="419.3118470436286" y="335.03658586108"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-DF330366-46BD-4F75-B435-FA5CB57203ED" id="BPMNEdge_sid-DF330366-46BD-4F75-B435-FA5CB57203ED">
-        <omgdi:waypoint x="280.0" y="307.4897220820909"></omgdi:waypoint>
-        <omgdi:waypoint x="307.1559235218143" y="307.4897220820909"></omgdi:waypoint>
-        <omgdi:waypoint x="307.1559235218143" y="335.03658586108"></omgdi:waypoint>
-        <omgdi:waypoint x="334.3118470436286" y="335.03658586108"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B" id="BPMNEdge_sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B">
         <omgdi:waypoint x="285.18519221067834" y="401.9204571087798"></omgdi:waypoint>
         <omgdi:waypoint x="311.4769516831327" y="401.9204571087798"></omgdi:waypoint>
         <omgdi:waypoint x="311.4769516831327" y="334.70507913313935"></omgdi:waypoint>
         <omgdi:waypoint x="334.64335377156925" y="334.70507913313935"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-DF330366-46BD-4F75-B435-FA5CB57203ED" id="BPMNEdge_sid-DF330366-46BD-4F75-B435-FA5CB57203ED">
+        <omgdi:waypoint x="280.0" y="307.4897220820909"></omgdi:waypoint>
+        <omgdi:waypoint x="307.1559235218143" y="307.4897220820909"></omgdi:waypoint>
+        <omgdi:waypoint x="307.1559235218143" y="335.03658586108"></omgdi:waypoint>
+        <omgdi:waypoint x="334.3118470436286" y="335.03658586108"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-70F11DC8-E92B-400D-8A43-4BEEB0F7F0BE" id="BPMNEdge_sid-70F11DC8-E92B-400D-8A43-4BEEB0F7F0BE">
         <omgdi:waypoint x="519.3118470436286" y="335.2547901174015"></omgdi:waypoint>
