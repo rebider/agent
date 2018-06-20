@@ -49,8 +49,6 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			if(respType.equals("E")){
 				return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
 			}else{
-				//测试使用
-				agentNotifyService.asynNotifyPlatform("AB20180611000000000000240");
 				return AgentResult.ok(dataMap);
 			}
 		} catch (Exception e) {
