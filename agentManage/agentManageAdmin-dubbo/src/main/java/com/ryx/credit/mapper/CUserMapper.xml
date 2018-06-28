@@ -101,6 +101,8 @@
         login_name,
         t.name,
         user_type,
+        s.id as orgid,
+        s.pid as orgpid,
         s.code as organizationCode
         FROM
         C_USER t
