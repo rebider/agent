@@ -13,7 +13,7 @@
     <context:property-placeholder location="classpath*:jdbc.properties" />
 
     <!--自动扫描含有@Service将其注入为bean -->
-    <context:component-scan base-package="com.ryx.**.service,com.ryx.**.service.impl" />
+    <context:component-scan base-package="com.ryx.**.service,com.ryx.**.service.impl,com.ryx.**.task" />
 
     <bean id="logService" class="com.ryx.credit.common.log.LogServiceImpl"></bean>
     <aop:config>

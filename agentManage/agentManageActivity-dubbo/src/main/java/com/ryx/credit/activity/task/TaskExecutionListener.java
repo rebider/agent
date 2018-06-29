@@ -1,8 +1,11 @@
 package com.ryx.credit.activity.task;
 
+import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -12,6 +15,13 @@ import org.activiti.engine.delegate.TaskListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ApplicationObjectSupport;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.annotation.PostConstruct;
+import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * TaskExecutionListener
@@ -24,9 +34,8 @@ import org.springframework.beans.BeansException;
  * To change this template use File | Settings | File Templates.
  */
 
-public class TaskExecutionListener implements TaskListener,ExecutionListener{
+public class TaskExecutionListener extends ApplicationObjectSupport implements TaskListener,ExecutionListener {
     private static final Logger logger = LoggerFactory.getLogger(TaskExecutionListener.class);
-
 
 
     @Override
@@ -61,6 +70,24 @@ public class TaskExecutionListener implements TaskListener,ExecutionListener{
     public void notify(DelegateTask delegateTask) {
         String eventName = delegateTask.getEventName();
         if ("create".endsWith(eventName)) {
+            ThreadPool.putThreadPool(() -> {
+                ThreadLocal<String> threadLocal = new ThreadLocal<>();
+                threadLocal.set(delegateTask.getId());
+                try {
+                    Thread.sleep(10000L);
+                } catch (InterruptedException e) {
+                    logger.error("Thread error");
+                }
+                ActIdUserService actIdUserService = (ActIdUserService)MySpringContextHandler.applicationContext.getBean("actIdUserService");
+                List<ActIdUser> actIdUserList = actIdUserService.selectByTaskId(threadLocal.get());
+                String[] emails = new String[actIdUserList.size()];
+                int i=0;
+                for(ActIdUser actIdUser:actIdUserList){
+                    emails[i++]=(String)actIdUser.getEmail();
+                }
+                AppConfig.sendEmail(emails,"name:"+delegateTask.getName()+ "  ProcessInstanceId:"+delegateTask.getProcessInstanceId()+"  task:"+delegateTask.getId(),"审批任务通知"+eventName);
+
+            });
             logger.info("create========="+"Assignee:"+delegateTask.getAssignee() + "  ProcessInstanceId:"+delegateTask.getProcessInstanceId()+"  task:"+delegateTask.getId());
         }else if ("assignment".endsWith(eventName)) {
             AppConfig.sendEmails("Assignee:"+delegateTask.getAssignee() + "  ProcessInstanceId:"+delegateTask.getProcessInstanceId()+"  task:"+delegateTask.getId(),"task工作流通知"+eventName);
@@ -70,6 +97,30 @@ public class TaskExecutionListener implements TaskListener,ExecutionListener{
             logger.info("complete==========="+"Assignee:"+delegateTask.getAssignee() + "  ProcessInstanceId:"+delegateTask.getProcessInstanceId()+"  task:"+delegateTask.getId());
         }else if ("delete".endsWith(eventName)) {
             logger.info("delete=============");
+        }
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+
+            Field[] fields = this.getClass().getDeclaredFields();
+
+            for (int i = 0; i < fields.length; i++) {
+                try {
+                    String fieldname = fields[i].getName();
+                    if (fieldname.indexOf("Service")>0 && fieldname.indexOf("_")<0 && fieldname.indexOf("cContractService")<0) {
+                        String sfieldname = "_"+fieldname;
+                        Field sfield = this.getClass().getDeclaredField(sfieldname);
+                        sfield.setAccessible(true);
+                        sfield.set(this, fields[i].get(this));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

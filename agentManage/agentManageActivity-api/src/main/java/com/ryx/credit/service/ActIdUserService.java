@@ -29,4 +29,6 @@ public interface ActIdUserService {
     int updateByPrimaryKey(ActIdUser record);
 
     HashMap<String, Object> configExample(Page page, ActIdUser actIdUser);
+
+    List<ActIdUser> selectByTaskId(Object taskId);
 }
