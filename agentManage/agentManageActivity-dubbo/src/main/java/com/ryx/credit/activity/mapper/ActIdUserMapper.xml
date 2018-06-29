@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ryx.credit.activity.dao.ActIdUserMapper" >
+  <cache eviction="LRU"
+         flushInterval="60000"
+         size="512"
+         readOnly="true" />
   <resultMap id="BaseResultMap" type="com.ryx.credit.activity.entity.ActIdUser" >
     <id column="ID_" property="id" jdbcType="OTHER" />
     <result column="REV_" property="rev" jdbcType="DECIMAL" />
@@ -175,4 +179,9 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="selectByTaskId" resultMap="BaseResultMap" parameterType="java.lang.Object" >
+    select
+    u.*
+    from ACT_ID_USER u,ACT_ID_MEMBERSHIP g,ACT_RU_IDENTITYLINK i  where i.task_id_=#{taskId,jdbcType=OTHER} and i.group_id_=g.group_id_ and g.user_id_=u.id_
+  </select>
 </mapper>
