@@ -18,6 +18,8 @@ public class AgentNotifyVo {
     private String supDorgId;
     private String busPlatform;
     private String agHeadMobile;
+    private String baseMessage;
+    private String busMessage;
 
     public String getUniqueId() {
         return uniqueId;
@@ -97,5 +99,21 @@ public class AgentNotifyVo {
 
     public void setAgHeadMobile(String agHeadMobile) {
         this.agHeadMobile = agHeadMobile;
+    }
+
+    public String getBusMessage() {
+        return busMessage;
+    }
+
+    public void setBusMessage(String busMessage) {
+        this.busMessage = busMessage;
+    }
+
+    public String getBaseMessage() {
+        return baseMessage;
+    }
+
+    public void setBaseMessage(String baseMessage) {
+        this.baseMessage = baseMessage;
     }
 }

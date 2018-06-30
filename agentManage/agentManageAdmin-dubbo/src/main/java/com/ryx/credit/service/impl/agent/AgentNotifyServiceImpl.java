@@ -169,6 +169,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setOrgName(agent.getAgName());
         agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
         agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
+        String agentJson = JsonUtil.objectToJson(agent);
+        String busJson = JsonUtil.objectToJson(agentBusInfo);
+        agentNotifyVo.setBaseMessage(agentJson);
+        agentNotifyVo.setBusMessage(busJson);
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
@@ -392,6 +396,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             jsonParams.put("orgName",agentNotifyVo.getOrgName());
             jsonParams.put("busPlatform",agentNotifyVo.getBusPlatform());
             jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
+            jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
+            jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 jsonParams.put("province",agentNotifyVo.getProvince());
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
