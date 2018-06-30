@@ -17,6 +17,7 @@ public class AgentNotifyVo {
     private String orgType;
     private String supDorgId;
     private String busPlatform;
+    private String agHeadMobile;
 
     public String getUniqueId() {
         return uniqueId;
@@ -88,5 +89,13 @@ public class AgentNotifyVo {
 
     public void setBusPlatform(String busPlatform) {
         this.busPlatform = busPlatform;
+    }
+
+    public String getAgHeadMobile() {
+        return agHeadMobile;
+    }
+
+    public void setAgHeadMobile(String agHeadMobile) {
+        this.agHeadMobile = agHeadMobile;
     }
 }

@@ -63,7 +63,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private AgentNotifyService agentNotifyService;
     @Autowired
     private ImportAgentMapper importAgentMapper;
-
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     @Override
     public void asynNotifyPlatform(){
@@ -164,8 +165,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
         }
         agentNotifyVo.setUniqueId(agent.getAgUniqNum());
+        agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
         agentNotifyVo.setOrgName(agent.getAgName());
         agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
+        agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
@@ -177,8 +180,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             try {
                 record.setId(idService.genId(TabId.a_agent_platformsyn));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-                //busPlatform是http请求使用不保存到sendJson里
-                agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
                 record.setSendJson(sendJson);
                 record.setNotifyTime(new Date());
                 record.setAgentId(agentBusInfo.getAgentId());
@@ -190,7 +191,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 record.setNotifyCount(new BigDecimal(i));
                 record.setcUser(agentBusInfo.getcUser());
 
-                result = httpRequest(agentNotifyVo);
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                if(platForm.getPlatformType().equals(PlatformType.POS.getValue())){
+                    result = httpRequestForPos(agentNotifyVo);
+                }
+                if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                    result = httpRequestForMPOS(agentNotifyVo);
+                }
                 record.setNotifyJson(String.valueOf(result.getData()));
             } catch (Exception e) {
                 log.info("通知pos手刷http请求异常:{}",e.getMessage());
@@ -288,8 +295,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         return regions.get(0);
     }
 
-    private AgentResult httpRequest(AgentNotifyVo agentNotifyVo)throws Exception{
+    private AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
         try {
+
             String cooperator = com.ryx.credit.util.Constants.cooperator;
             String charset = "UTF-8"; // 字符集
             String tranCode = "ORG001"; // 交易码
@@ -333,10 +341,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            System.out.println("请求参数:"+map);
-            System.out.println("请求url"+AppConfig.getProperty("agent_" + agentNotifyVo.getBusPlatform() + "_notify_url"));
-            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_" + agentNotifyVo.getBusPlatform() + "_notify_url"), map);
-//            String httpResult = "{\"orgId\":\"1234564654654\"}";
+            log.info("通知pos请求参数:",map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
+            //            String httpResult = "{\"orgId\":\"1234564654654\"}";
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                 System.out.println("请求异常======" + httpResult);
@@ -349,7 +356,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
-                System.out.println("返回明文======" + respXML);
+                System.out.println("通知pos返回明文======" + respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
@@ -374,6 +381,36 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             log.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
+    }
+
+    private AgentResult httpRequestForMPOS(AgentNotifyVo agentNotifyVo)throws Exception{
+
+        try {
+            Map<String,String> jsonParams = new HashMap<>();
+            jsonParams.put("uniqueId",agentNotifyVo.getUniqueId());
+            jsonParams.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
+            jsonParams.put("orgName",agentNotifyVo.getOrgName());
+            jsonParams.put("busPlatform",agentNotifyVo.getBusPlatform());
+            jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
+            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
+                jsonParams.put("province",agentNotifyVo.getProvince());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                jsonParams.put("city",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                jsonParams.put("cityArea",agentNotifyVo.getCity());
+            jsonParams.put("orgType",agentNotifyVo.getOrgType());
+            if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
+                jsonParams.put("supDorgId",agentNotifyVo.getSupDorgId());
+
+            log.info("通知手刷请求参数：{}",jsonParams);
+//            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_mpos_notify_url"), jsonParams);
+            String httpResult = "{\"orgId\":\"123456789\"}";
+            System.out.println("通知手刷httpResult返回："+httpResult);
+            return AgentResult.ok(httpResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AgentResult(500,"http请求异常","http请求异常");
     }
 
     @Override
