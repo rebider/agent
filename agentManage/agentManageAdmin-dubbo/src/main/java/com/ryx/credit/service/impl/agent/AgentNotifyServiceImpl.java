@@ -169,10 +169,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setOrgName(agent.getAgName());
         agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
         agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
-        String agentJson = JsonUtil.objectToJson(agent);
-        String busJson = JsonUtil.objectToJson(agentBusInfo);
-        agentNotifyVo.setBaseMessage(agentJson);
-        agentNotifyVo.setBusMessage(busJson);
+        agentNotifyVo.setBaseMessage(agent);
+        agentNotifyVo.setBusMessage(agentBusInfo);
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
@@ -208,7 +206,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 record.setNotifyCount(new BigDecimal(i));
             }
             int czResult = 0;
-            if(null!=result && result.isOK()){
+            if(null!=result && !"".equals(result) && result.isOK()){
                 record.setSuccesTime(new Date());
                 record.setNotifyStatus(Status.STATUS_1.status);
             }
@@ -218,7 +216,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }else{
                 czResult = agentPlatFormSynMapper.insert(record);
             }
-            if(czResult==1 && null!=result && result.isOK()){
+            if(czResult==1 && null!=result && !"".equals(result) && result.isOK()){
                 //更新入网状态
                 Agent updateAgent = new Agent();
                 updateAgent.setId(agent.getId());
@@ -390,7 +388,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private AgentResult httpRequestForMPOS(AgentNotifyVo agentNotifyVo)throws Exception{
 
         try {
-            Map<String,String> jsonParams = new HashMap<>();
+            Map<String,Object> jsonParams = new HashMap<>();
             jsonParams.put("uniqueId",agentNotifyVo.getUniqueId());
             jsonParams.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             jsonParams.put("orgName",agentNotifyVo.getOrgName());
@@ -407,16 +405,23 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             jsonParams.put("orgType",agentNotifyVo.getOrgType());
             if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
                 jsonParams.put("supDorgId",agentNotifyVo.getSupDorgId());
-
-            log.info("通知手刷请求参数：{}",jsonParams);
-//            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_mpos_notify_url"), jsonParams);
-            String httpResult = "{\"orgId\":\"123456789\"}";
-            System.out.println("通知手刷httpResult返回："+httpResult);
-            return AgentResult.ok(httpResult);
+            String json = JsonUtil.objectToJson(jsonParams);
+            log.info("通知手刷请求参数：{}",json);
+            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("agent_mpos_notify_url"), json);
+//            String httpResult = "{\"orgId\":\"123456789\"}"
+            if (httpResult.contains("data") && httpResult.contains("orgId")){
+                JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+                JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
+                System.out.println(dataObj);
+                return AgentResult.ok(dataObj);
+            }else{
+                log.info("http请求超时返回错误:{}",httpResult);
+                throw new Exception("http返回有误");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info("http请求超时:{}",e.getMessage());
+            throw new Exception("http请求超时");
         }
-        return new AgentResult(500,"http请求异常","http请求异常");
     }
 
     @Override

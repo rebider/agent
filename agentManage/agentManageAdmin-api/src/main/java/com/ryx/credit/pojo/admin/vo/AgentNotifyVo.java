@@ -1,5 +1,8 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+
 /**
  * @version V1.0
  * @Description:
@@ -18,8 +21,8 @@ public class AgentNotifyVo {
     private String supDorgId;
     private String busPlatform;
     private String agHeadMobile;
-    private String baseMessage;
-    private String busMessage;
+    private Agent baseMessage;
+    private AgentBusInfo busMessage;
 
     public String getUniqueId() {
         return uniqueId;
@@ -101,19 +104,19 @@ public class AgentNotifyVo {
         this.agHeadMobile = agHeadMobile;
     }
 
-    public String getBusMessage() {
-        return busMessage;
-    }
-
-    public void setBusMessage(String busMessage) {
-        this.busMessage = busMessage;
-    }
-
-    public String getBaseMessage() {
+    public Agent getBaseMessage() {
         return baseMessage;
     }
 
-    public void setBaseMessage(String baseMessage) {
+    public void setBaseMessage(Agent baseMessage) {
         this.baseMessage = baseMessage;
+    }
+
+    public AgentBusInfo getBusMessage() {
+        return busMessage;
+    }
+
+    public void setBusMessage(AgentBusInfo busMessage) {
+        this.busMessage = busMessage;
     }
 }
