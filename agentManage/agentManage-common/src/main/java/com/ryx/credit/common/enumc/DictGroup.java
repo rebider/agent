@@ -27,7 +27,8 @@ public enum DictGroup {
     APPROVAL_PASS_TYPE("审批通过"),
     ACTIVITY_RESPAR("南北大区部门code正则匹配"),//AGENT模块
     ACTIVITY_TASK_REX("任务code正则匹配"),//AGENT模块
-    USE_SCOPE("使用范围");
+    USE_SCOPE("使用范围"),
+    BUS_SCOPE("业务范围");
 
 
     public String  msg;
