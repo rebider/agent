@@ -2187,6 +2187,76 @@ public class AgentBusInfoExample {
             addCriterion("BUS_USE_ORGAN not between", value1, value2, "busUseOrgan");
             return (Criteria) this;
         }
+
+        public Criteria andBusScopeIsNull() {
+            addCriterion("BUS_SCOPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeIsNotNull() {
+            addCriterion("BUS_SCOPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeEqualTo(String value) {
+            addCriterion("BUS_SCOPE =", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeNotEqualTo(String value) {
+            addCriterion("BUS_SCOPE <>", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeGreaterThan(String value) {
+            addCriterion("BUS_SCOPE >", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_SCOPE >=", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeLessThan(String value) {
+            addCriterion("BUS_SCOPE <", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeLessThanOrEqualTo(String value) {
+            addCriterion("BUS_SCOPE <=", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeLike(String value) {
+            addCriterion("BUS_SCOPE like", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeNotLike(String value) {
+            addCriterion("BUS_SCOPE not like", value, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeIn(List<String> values) {
+            addCriterion("BUS_SCOPE in", values, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeNotIn(List<String> values) {
+            addCriterion("BUS_SCOPE not in", values, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeBetween(String value1, String value2) {
+            addCriterion("BUS_SCOPE between", value1, value2, "busScope");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusScopeNotBetween(String value1, String value2) {
+            addCriterion("BUS_SCOPE not between", value1, value2, "busScope");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
