@@ -31,6 +31,7 @@
     <result column="AG_ZBH" property="agZbh" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
+    <result column="CA_STATUS" property="caStatus" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -62,11 +63,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, AG_UNIQ_NUM, AG_NAME, AG_NATURE, AG_CAPITAL, AG_BUS_LIC, AG_BUS_LICB, AG_BUS_LICE, 
-    AG_LEGAL, AG_LEGAL_CERTYPE, AG_LEGAL_CERNUM, AG_LEGAL_MOBILE, AG_HEAD, AG_HEAD_MOBILE, 
-    AG_REG_ADD, AG_BUS_SCOPE, CLO_TAX_POINT, AG_STATUS, AG_DOC_PRO, AG_DOC_DISTRICT, 
-    AG_REMARK, C_INCOM_TIME, C_TIME, C_UTIME, C_INCOM_STATUS, C_USER, AG_ZBH, STATUS, 
-    VERSION
+    ID, AG_UNIQ_NUM, AG_NAME, AG_NATURE, AG_CAPITAL, AG_BUS_LIC, AG_BUS_LICB, AG_BUS_LICE,
+    AG_LEGAL, AG_LEGAL_CERTYPE, AG_LEGAL_CERNUM, AG_LEGAL_MOBILE, AG_HEAD, AG_HEAD_MOBILE,
+    AG_REG_ADD, AG_BUS_SCOPE, CLO_TAX_POINT, AG_STATUS, AG_DOC_PRO, AG_DOC_DISTRICT,
+    AG_REMARK, C_INCOM_TIME, C_TIME, C_UTIME, C_INCOM_STATUS, C_USER, AG_ZBH, STATUS,
+    VERSION, CA_STATUS
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample" >
     <include refid="OracleDialectPrefix" />
@@ -85,7 +86,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_AGENT
     where ID = #{id,jdbcType=VARCHAR}
@@ -97,26 +98,28 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
-    insert into A_AGENT (ID, AG_UNIQ_NUM, AG_NAME, 
-      AG_NATURE, AG_CAPITAL, AG_BUS_LIC, 
-      AG_BUS_LICB, AG_BUS_LICE, AG_LEGAL, 
-      AG_LEGAL_CERTYPE, AG_LEGAL_CERNUM, AG_LEGAL_MOBILE, 
-      AG_HEAD, AG_HEAD_MOBILE, AG_REG_ADD, 
-      AG_BUS_SCOPE, CLO_TAX_POINT, AG_STATUS, 
-      AG_DOC_PRO, AG_DOC_DISTRICT, AG_REMARK, 
-      C_INCOM_TIME, C_TIME, C_UTIME, 
-      C_INCOM_STATUS, C_USER, AG_ZBH, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{agUniqNum,jdbcType=VARCHAR}, #{agName,jdbcType=VARCHAR}, 
-      #{agNature,jdbcType=DECIMAL}, #{agCapital,jdbcType=DECIMAL}, #{agBusLic,jdbcType=VARCHAR}, 
-      #{agBusLicb,jdbcType=TIMESTAMP}, #{agBusLice,jdbcType=TIMESTAMP}, #{agLegal,jdbcType=VARCHAR}, 
-      #{agLegalCertype,jdbcType=DECIMAL}, #{agLegalCernum,jdbcType=VARCHAR}, #{agLegalMobile,jdbcType=VARCHAR}, 
-      #{agHead,jdbcType=VARCHAR}, #{agHeadMobile,jdbcType=VARCHAR}, #{agRegAdd,jdbcType=VARCHAR}, 
-      #{agBusScope,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, #{agStatus,jdbcType=VARCHAR}, 
-      #{agDocPro,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR}, #{agRemark,jdbcType=VARCHAR}, 
-      #{cIncomTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, 
-      #{cIncomStatus,jdbcType=DECIMAL}, #{cUser,jdbcType=VARCHAR}, #{agZbh,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into A_AGENT (ID, AG_UNIQ_NUM, AG_NAME,
+    AG_NATURE, AG_CAPITAL, AG_BUS_LIC,
+    AG_BUS_LICB, AG_BUS_LICE, AG_LEGAL,
+    AG_LEGAL_CERTYPE, AG_LEGAL_CERNUM, AG_LEGAL_MOBILE,
+    AG_HEAD, AG_HEAD_MOBILE, AG_REG_ADD,
+    AG_BUS_SCOPE, CLO_TAX_POINT, AG_STATUS,
+    AG_DOC_PRO, AG_DOC_DISTRICT, AG_REMARK,
+    C_INCOM_TIME, C_TIME, C_UTIME,
+    C_INCOM_STATUS, C_USER, AG_ZBH,
+    STATUS, VERSION, CA_STATUS
+    )
+    values (#{id,jdbcType=VARCHAR}, #{agUniqNum,jdbcType=VARCHAR}, #{agName,jdbcType=VARCHAR},
+    #{agNature,jdbcType=DECIMAL}, #{agCapital,jdbcType=DECIMAL}, #{agBusLic,jdbcType=VARCHAR},
+    #{agBusLicb,jdbcType=TIMESTAMP}, #{agBusLice,jdbcType=TIMESTAMP}, #{agLegal,jdbcType=VARCHAR},
+    #{agLegalCertype,jdbcType=DECIMAL}, #{agLegalCernum,jdbcType=VARCHAR}, #{agLegalMobile,jdbcType=VARCHAR},
+    #{agHead,jdbcType=VARCHAR}, #{agHeadMobile,jdbcType=VARCHAR}, #{agRegAdd,jdbcType=VARCHAR},
+    #{agBusScope,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, #{agStatus,jdbcType=VARCHAR},
+    #{agDocPro,jdbcType=VARCHAR}, #{agDocDistrict,jdbcType=VARCHAR}, #{agRemark,jdbcType=VARCHAR},
+    #{cIncomTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP},
+    #{cIncomStatus,jdbcType=DECIMAL}, #{cUser,jdbcType=VARCHAR}, #{agZbh,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{caStatus,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
     insert into A_AGENT
@@ -208,6 +211,9 @@
       <if test="version != null" >
         VERSION,
       </if>
+      <if test="caStatus != null" >
+        CA_STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -296,6 +302,9 @@
       </if>
       <if test="version != null" >
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="caStatus != null" >
+        #{caStatus,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -392,44 +401,48 @@
       <if test="version != null" >
         VERSION = VERSION +1 ,
       </if>
+      <if test="caStatus != null" >
+        CA_STATUS = #{caStatus,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
     update A_AGENT
     set AG_UNIQ_NUM = #{agUniqNum,jdbcType=VARCHAR},
-      AG_NAME = #{agName,jdbcType=VARCHAR},
-      AG_NATURE = #{agNature,jdbcType=DECIMAL},
-      AG_CAPITAL = #{agCapital,jdbcType=DECIMAL},
-      AG_BUS_LIC = #{agBusLic,jdbcType=VARCHAR},
-      AG_BUS_LICB = #{agBusLicb,jdbcType=TIMESTAMP},
-      AG_BUS_LICE = #{agBusLice,jdbcType=TIMESTAMP},
-      AG_LEGAL = #{agLegal,jdbcType=VARCHAR},
-      AG_LEGAL_CERTYPE = #{agLegalCertype,jdbcType=DECIMAL},
-      AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR},
-      AG_LEGAL_MOBILE = #{agLegalMobile,jdbcType=VARCHAR},
-      AG_HEAD = #{agHead,jdbcType=VARCHAR},
-      AG_HEAD_MOBILE = #{agHeadMobile,jdbcType=VARCHAR},
-      AG_REG_ADD = #{agRegAdd,jdbcType=VARCHAR},
-      AG_BUS_SCOPE = #{agBusScope,jdbcType=VARCHAR},
-      CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
-      AG_STATUS = #{agStatus,jdbcType=VARCHAR},
-      AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
-      AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
-      AG_REMARK = #{agRemark,jdbcType=VARCHAR},
-      C_INCOM_TIME = #{cIncomTime,jdbcType=TIMESTAMP},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
-      C_INCOM_STATUS = #{cIncomStatus,jdbcType=DECIMAL},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      AG_ZBH = #{agZbh,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = VERSION + 1
+    AG_NAME = #{agName,jdbcType=VARCHAR},
+    AG_NATURE = #{agNature,jdbcType=DECIMAL},
+    AG_CAPITAL = #{agCapital,jdbcType=DECIMAL},
+    AG_BUS_LIC = #{agBusLic,jdbcType=VARCHAR},
+    AG_BUS_LICB = #{agBusLicb,jdbcType=TIMESTAMP},
+    AG_BUS_LICE = #{agBusLice,jdbcType=TIMESTAMP},
+    AG_LEGAL = #{agLegal,jdbcType=VARCHAR},
+    AG_LEGAL_CERTYPE = #{agLegalCertype,jdbcType=DECIMAL},
+    AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR},
+    AG_LEGAL_MOBILE = #{agLegalMobile,jdbcType=VARCHAR},
+    AG_HEAD = #{agHead,jdbcType=VARCHAR},
+    AG_HEAD_MOBILE = #{agHeadMobile,jdbcType=VARCHAR},
+    AG_REG_ADD = #{agRegAdd,jdbcType=VARCHAR},
+    AG_BUS_SCOPE = #{agBusScope,jdbcType=VARCHAR},
+    CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+    AG_STATUS = #{agStatus,jdbcType=VARCHAR},
+    AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+    AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+    AG_REMARK = #{agRemark,jdbcType=VARCHAR},
+    C_INCOM_TIME = #{cIncomTime,jdbcType=TIMESTAMP},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+    C_INCOM_STATUS = #{cIncomStatus,jdbcType=DECIMAL},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = = VERSION +1,
+    CA_STATUS = #{caStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix" >
@@ -437,6 +450,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  
 <sql id="deptName">
 agent.ID,agent.AG_UNIQ_NUM,agent.AG_NAME,agent.AG_NATURE,agent.AG_CAPITAL,agent.AG_BUS_LIC,agent.AG_BUS_LICB,agent.AG_BUS_LICE,
 agent.AG_LEGAL,agent.AG_LEGAL_CERTYPE,agent.AG_LEGAL_CERNUM,agent.AG_LEGAL_MOBILE,agent.AG_HEAD,agent.AG_HEAD_MOBILE,agent.AG_REG_ADD,
