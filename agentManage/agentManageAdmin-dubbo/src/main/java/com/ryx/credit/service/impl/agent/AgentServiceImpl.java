@@ -10,11 +10,9 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentExample;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.AttachmentRelExample;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
@@ -44,15 +42,14 @@ public class AgentServiceImpl implements  AgentService {
 
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
-
     @Autowired
     private AgentMapper agentMapper;
-
     @Autowired
     private IdService idService;
     @Autowired
     private DepartmentService departmentService;
-
+    @Autowired
+    private BusActRelMapper busActRelMapper;
 
     /**
      * 查询代理商信息
@@ -244,5 +241,22 @@ public class AgentServiceImpl implements  AgentService {
         }
 
         return db_agent;
+    }
+
+    /**
+     * 根据实例id查询代理商信息
+     * @param activId
+     * @return
+     */
+    @Override
+    public Agent findAgentByActivId(String activId){
+        if(StringUtils.isBlank(activId)){
+            return null;
+        }
+        BusActRel busActRel = busActRelMapper.findById(activId);
+        Agent agent = agentMapper.selectByPrimaryKey(busActRel.getBusId());
+        agent.setAgDocPro( departmentService.getById(agent.getAgDocPro()).getName());
+        agent.setAgDocDistrict( departmentService.getById(agent.getAgDocDistrict()).getName());
+        return agent;
     }
 }
