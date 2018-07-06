@@ -74,7 +74,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
-        			null == agentBusInfo.getCloTaxPoint() ||
         			null == agentBusInfo.getCloInvoice() ||
         			null == agentBusInfo.getCloReceipt() ||
         			StringUtils.isEmpty(agentBusInfo.getcUser())
