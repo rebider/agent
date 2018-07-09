@@ -183,6 +183,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                     db_AgentContract.setRemark(agentContractVo.getRemark());
                     db_AgentContract.setcUser(agentContractVo.getcUser());
                     db_AgentContract.setStatus(agentContractVo.getStatus());
+                    db_AgentContract.setAppendAgree(agentContractVo.getAppendAgree());
                     if (1 != agentContractMapper.updateByPrimaryKeySelective(db_AgentContract)) {
                         throw new ProcessException("更新收款信息失败");
                     }
