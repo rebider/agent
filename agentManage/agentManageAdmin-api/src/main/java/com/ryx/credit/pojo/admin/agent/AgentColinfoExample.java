@@ -1197,6 +1197,76 @@ public class AgentColinfoExample {
             addCriterion("ALL_LINE_NUM not between", value1, value2, "allLineNum");
             return (Criteria) this;
         }
+
+        public Criteria andBankRegionIsNull() {
+            addCriterion("BANK_REGION is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionIsNotNull() {
+            addCriterion("BANK_REGION is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionEqualTo(String value) {
+            addCriterion("BANK_REGION =", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotEqualTo(String value) {
+            addCriterion("BANK_REGION <>", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionGreaterThan(String value) {
+            addCriterion("BANK_REGION >", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionGreaterThanOrEqualTo(String value) {
+            addCriterion("BANK_REGION >=", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionLessThan(String value) {
+            addCriterion("BANK_REGION <", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionLessThanOrEqualTo(String value) {
+            addCriterion("BANK_REGION <=", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionLike(String value) {
+            addCriterion("BANK_REGION like", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotLike(String value) {
+            addCriterion("BANK_REGION not like", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionIn(List<String> values) {
+            addCriterion("BANK_REGION in", values, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotIn(List<String> values) {
+            addCriterion("BANK_REGION not in", values, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionBetween(String value1, String value2) {
+            addCriterion("BANK_REGION between", value1, value2, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotBetween(String value1, String value2) {
+            addCriterion("BANK_REGION not between", value1, value2, "bankRegion");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

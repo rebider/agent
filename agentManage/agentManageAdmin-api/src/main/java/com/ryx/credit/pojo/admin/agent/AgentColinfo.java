@@ -38,6 +38,8 @@ public class AgentColinfo implements Serializable {
 
     private String allLineNum;
 
+    private String bankRegion;
+
     private List<Attachment> attachmentList;
 
     public List<Attachment> getAttachmentList() {
@@ -174,5 +176,13 @@ public class AgentColinfo implements Serializable {
 
     public void setAllLineNum(String allLineNum) {
         this.allLineNum = allLineNum;
+    }
+
+    public String getBankRegion() {
+        return bankRegion;
+    }
+
+    public void setBankRegion(String bankRegion) {
+        this.bankRegion = bankRegion;
     }
 }
