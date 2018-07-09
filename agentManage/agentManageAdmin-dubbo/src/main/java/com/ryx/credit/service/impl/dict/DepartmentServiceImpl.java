@@ -50,11 +50,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     private Tree departmentToTree(COrganization cOrganization){
         Tree tree = new Tree();
-        tree.setId(Long.valueOf(cOrganization.getId()));
+        tree.setId(Long.valueOf(cOrganization.getId())+"");
         if (null==cOrganization.getPid()){
-            tree.setPid(Long.valueOf(0));
+            tree.setPid(Long.valueOf(0)+"");
         }else
-       tree.setPid(Long.valueOf(cOrganization.getPid()));
+       tree.setPid(Long.valueOf(cOrganization.getPid())+"");
         tree.setText(cOrganization.getName());
         tree.setIconCls(cOrganization.getIcon());
         EntityWrapper<COrganization> wrapper = new EntityWrapper<COrganization>();
