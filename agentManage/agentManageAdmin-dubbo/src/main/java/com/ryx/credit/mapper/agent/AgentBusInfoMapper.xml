@@ -615,12 +615,13 @@
 
   <select id="queryTreeByBusInfo" parameterType="map" resultType="map">
     select
-        A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
-        B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME
-      from
-      a_agent_businfo a
-      left join a_agent b on a.agent_id=b.id
-      left join a_platform c on c.platform_num = a.bus_platform
+    A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME
+    from
+    a_agent_businfo a
+    left join a_agent b on a.agent_id=b.id
+    left join a_platform c on c.platform_num = a.bus_platform
+    left join d_dict d on d.d_group='AGENT' AND d.d_artifact = 'BUS_TYPE' and d.d_itemvalue = a.bus_type
       <where>
          a.status=1 and b.status=1
         <if test="id!=null and id!=''"> and a.id=#{id}</if>
