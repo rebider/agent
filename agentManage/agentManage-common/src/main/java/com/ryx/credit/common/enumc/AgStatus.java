@@ -41,4 +41,15 @@ public enum AgStatus {
         }
         return new BigDecimal(-1);
     }
+
+    public static String getAgStatusByValue(String s){
+        if(StringUtils.isEmpty(s))return null;
+        for (AgStatus agStatus : AgStatus.values()) {
+            if(agStatus.name().equals(s)){
+                return agStatus.msg;
+            }
+        }
+        return "";
+    }
+
 }

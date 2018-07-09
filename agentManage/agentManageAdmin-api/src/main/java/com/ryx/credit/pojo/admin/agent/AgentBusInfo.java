@@ -68,6 +68,8 @@ public class AgentBusInfo implements Serializable {
 
     private String busUseOrgan;
 
+    private String busScope;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -334,5 +336,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setBusUseOrgan(String busUseOrgan) {
         this.busUseOrgan = busUseOrgan;
+    }
+
+    public String getBusScope() {
+        return busScope;
+    }
+
+    public void setBusScope(String busScope) {
+        this.busScope = busScope;
     }
 }

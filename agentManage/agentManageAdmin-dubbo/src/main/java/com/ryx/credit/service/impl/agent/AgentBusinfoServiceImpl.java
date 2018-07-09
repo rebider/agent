@@ -74,7 +74,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
-        			null == agentBusInfo.getCloTaxPoint() ||
         			null == agentBusInfo.getCloInvoice() ||
         			null == agentBusInfo.getCloReceipt() ||
         			StringUtils.isEmpty(agentBusInfo.getcUser())
@@ -177,6 +176,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusStatus(agentBusInfoVo.getBusStatus());
 					db_AgentBusInfo.setStatus(agentBusInfoVo.getStatus());
 					db_AgentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
+					db_AgentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new ProcessException("更新业务信息失败");
 					}

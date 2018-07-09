@@ -99,28 +99,4 @@ public class TaskExecutionListener extends ApplicationObjectSupport implements T
             logger.info("delete=============");
         }
     }
-
-    @PostConstruct
-    public void init() {
-        try {
-
-            Field[] fields = this.getClass().getDeclaredFields();
-
-            for (int i = 0; i < fields.length; i++) {
-                try {
-                    String fieldname = fields[i].getName();
-                    if (fieldname.indexOf("Service")>0 && fieldname.indexOf("_")<0 && fieldname.indexOf("cContractService")<0) {
-                        String sfieldname = "_"+fieldname;
-                        Field sfield = this.getClass().getDeclaredField(sfieldname);
-                        sfield.setAccessible(true);
-                        sfield.set(this, fields[i].get(this));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

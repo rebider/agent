@@ -1057,6 +1057,216 @@ public class AgentColinfoExample {
             addCriterion("VARSION not between", value1, value2, "varsion");
             return (Criteria) this;
         }
+
+        public Criteria andBranchLineNumIsNull() {
+            addCriterion("BRANCH_LINE_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumIsNotNull() {
+            addCriterion("BRANCH_LINE_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumEqualTo(String value) {
+            addCriterion("BRANCH_LINE_NUM =", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumNotEqualTo(String value) {
+            addCriterion("BRANCH_LINE_NUM <>", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumGreaterThan(String value) {
+            addCriterion("BRANCH_LINE_NUM >", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BRANCH_LINE_NUM >=", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumLessThan(String value) {
+            addCriterion("BRANCH_LINE_NUM <", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumLessThanOrEqualTo(String value) {
+            addCriterion("BRANCH_LINE_NUM <=", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumLike(String value) {
+            addCriterion("BRANCH_LINE_NUM like", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumNotLike(String value) {
+            addCriterion("BRANCH_LINE_NUM not like", value, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumIn(List<String> values) {
+            addCriterion("BRANCH_LINE_NUM in", values, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumNotIn(List<String> values) {
+            addCriterion("BRANCH_LINE_NUM not in", values, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumBetween(String value1, String value2) {
+            addCriterion("BRANCH_LINE_NUM between", value1, value2, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBranchLineNumNotBetween(String value1, String value2) {
+            addCriterion("BRANCH_LINE_NUM not between", value1, value2, "branchLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumIsNull() {
+            addCriterion("ALL_LINE_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumIsNotNull() {
+            addCriterion("ALL_LINE_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumEqualTo(String value) {
+            addCriterion("ALL_LINE_NUM =", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumNotEqualTo(String value) {
+            addCriterion("ALL_LINE_NUM <>", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumGreaterThan(String value) {
+            addCriterion("ALL_LINE_NUM >", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumGreaterThanOrEqualTo(String value) {
+            addCriterion("ALL_LINE_NUM >=", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumLessThan(String value) {
+            addCriterion("ALL_LINE_NUM <", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumLessThanOrEqualTo(String value) {
+            addCriterion("ALL_LINE_NUM <=", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumLike(String value) {
+            addCriterion("ALL_LINE_NUM like", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumNotLike(String value) {
+            addCriterion("ALL_LINE_NUM not like", value, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumIn(List<String> values) {
+            addCriterion("ALL_LINE_NUM in", values, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumNotIn(List<String> values) {
+            addCriterion("ALL_LINE_NUM not in", values, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumBetween(String value1, String value2) {
+            addCriterion("ALL_LINE_NUM between", value1, value2, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllLineNumNotBetween(String value1, String value2) {
+            addCriterion("ALL_LINE_NUM not between", value1, value2, "allLineNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionIsNull() {
+            addCriterion("BANK_REGION is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionIsNotNull() {
+            addCriterion("BANK_REGION is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionEqualTo(String value) {
+            addCriterion("BANK_REGION =", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotEqualTo(String value) {
+            addCriterion("BANK_REGION <>", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionGreaterThan(String value) {
+            addCriterion("BANK_REGION >", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionGreaterThanOrEqualTo(String value) {
+            addCriterion("BANK_REGION >=", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionLessThan(String value) {
+            addCriterion("BANK_REGION <", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionLessThanOrEqualTo(String value) {
+            addCriterion("BANK_REGION <=", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionLike(String value) {
+            addCriterion("BANK_REGION like", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotLike(String value) {
+            addCriterion("BANK_REGION not like", value, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionIn(List<String> values) {
+            addCriterion("BANK_REGION in", values, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotIn(List<String> values) {
+            addCriterion("BANK_REGION not in", values, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionBetween(String value1, String value2) {
+            addCriterion("BANK_REGION between", value1, value2, "bankRegion");
+            return (Criteria) this;
+        }
+
+        public Criteria andBankRegionNotBetween(String value1, String value2) {
+            addCriterion("BANK_REGION not between", value1, value2, "bankRegion");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -34,6 +34,12 @@ public class AgentColinfo implements Serializable {
 
     private BigDecimal varsion;
 
+    private String branchLineNum;
+
+    private String allLineNum;
+
+    private String bankRegion;
+
     private List<Attachment> attachmentList;
 
     public List<Attachment> getAttachmentList() {
@@ -154,5 +160,29 @@ public class AgentColinfo implements Serializable {
 
     public void setVarsion(BigDecimal varsion) {
         this.varsion = varsion;
+    }
+
+    public String getBranchLineNum() {
+        return branchLineNum;
+    }
+
+    public void setBranchLineNum(String branchLineNum) {
+        this.branchLineNum = branchLineNum;
+    }
+
+    public String getAllLineNum() {
+        return allLineNum;
+    }
+
+    public void setAllLineNum(String allLineNum) {
+        this.allLineNum = allLineNum;
+    }
+
+    public String getBankRegion() {
+        return bankRegion;
+    }
+
+    public void setBankRegion(String bankRegion) {
+        this.bankRegion = bankRegion;
     }
 }

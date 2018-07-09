@@ -2,7 +2,6 @@ package com.ryx.credit.pojo.admin.agent;
 
 import com.ryx.credit.common.util.Page;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -716,6 +715,76 @@ public class PlatFormExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIsNull() {
+            addCriterion("PLATFORM_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIsNotNull() {
+            addCriterion("PLATFORM_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE =", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE <>", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeGreaterThan(String value) {
+            addCriterion("PLATFORM_TYPE >", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE >=", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLessThan(String value) {
+            addCriterion("PLATFORM_TYPE <", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLessThanOrEqualTo(String value) {
+            addCriterion("PLATFORM_TYPE <=", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLike(String value) {
+            addCriterion("PLATFORM_TYPE like", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotLike(String value) {
+            addCriterion("PLATFORM_TYPE not like", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIn(List<String> values) {
+            addCriterion("PLATFORM_TYPE in", values, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotIn(List<String> values) {
+            addCriterion("PLATFORM_TYPE not in", values, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeBetween(String value1, String value2) {
+            addCriterion("PLATFORM_TYPE between", value1, value2, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotBetween(String value1, String value2) {
+            addCriterion("PLATFORM_TYPE not between", value1, value2, "platformType");
             return (Criteria) this;
         }
     }

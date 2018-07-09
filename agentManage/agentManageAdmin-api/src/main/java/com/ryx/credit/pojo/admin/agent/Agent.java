@@ -79,6 +79,7 @@ public class Agent extends AgentExtends implements Serializable {
 
     private BigDecimal version;
 
+    private BigDecimal caStatus;
 
     public String getId() {
         return id;
@@ -310,5 +311,13 @@ public class Agent extends AgentExtends implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getCaStatus() {
+        return caStatus;
+    }
+
+    public void setCaStatus(BigDecimal caStatus) {
+        this.caStatus = caStatus;
     }
 }

@@ -1,42 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.agent.AgentColinfoMapper">
-    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentColinfo">
-        <id column="ID" property="id" jdbcType="VARCHAR"/>
-        <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR"/>
-        <result column="CLO_TYPE" property="cloType" jdbcType="DECIMAL"/>
-        <result column="CLO_REALNAME" property="cloRealname" jdbcType="VARCHAR"/>
-        <result column="CLO_BANK" property="cloBank" jdbcType="VARCHAR"/>
-        <result column="CLO_BANK_BRANCH" property="cloBankBranch" jdbcType="VARCHAR"/>
-        <result column="CLO_BANK_ACCOUNT" property="cloBankAccount" jdbcType="VARCHAR"/>
-        <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP"/>
-        <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP"/>
-        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
-        <result column="C_USER" property="cUser" jdbcType="VARCHAR"/>
-        <result column="CLO_REVIEW_STATUS" property="cloReviewStatus" jdbcType="DECIMAL"/>
-        <result column="STATUS" property="status" jdbcType="DECIMAL"/>
-        <result column="VARSION" property="varsion" jdbcType="DECIMAL"/>
+<mapper namespace="com.ryx.credit.dao.agent.AgentColinfoMapper" >
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
+        <id column="ID" property="id" jdbcType="VARCHAR" />
+        <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
+        <result column="CLO_TYPE" property="cloType" jdbcType="DECIMAL" />
+        <result column="CLO_REALNAME" property="cloRealname" jdbcType="VARCHAR" />
+        <result column="CLO_BANK" property="cloBank" jdbcType="VARCHAR" />
+        <result column="CLO_BANK_BRANCH" property="cloBankBranch" jdbcType="VARCHAR" />
+        <result column="CLO_BANK_ACCOUNT" property="cloBankAccount" jdbcType="VARCHAR" />
+        <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+        <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
+        <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+        <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
+        <result column="CLO_REVIEW_STATUS" property="cloReviewStatus" jdbcType="DECIMAL" />
+        <result column="STATUS" property="status" jdbcType="DECIMAL" />
+        <result column="VARSION" property="varsion" jdbcType="DECIMAL" />
+        <result column="BRANCH_LINE_NUM" property="branchLineNum" jdbcType="VARCHAR" />
+        <result column="ALL_LINE_NUM" property="allLineNum" jdbcType="VARCHAR" />
+        <result column="BANK_REGION" property="bankRegion" jdbcType="VARCHAR" />
     </resultMap>
-    <sql id="Example_Where_Clause">
-        <where>
-            <foreach collection="oredCriteria" item="criteria" separator="or">
-                <if test="criteria.valid">
-                    <trim prefix="(" suffix=")" prefixOverrides="and">
-                        <foreach collection="criteria.criteria" item="criterion">
-                            <choose>
-                                <when test="criterion.noValue">
+    <sql id="Example_Where_Clause" >
+        <where >
+            <foreach collection="oredCriteria" item="criteria" separator="or" >
+                <if test="criteria.valid" >
+                    <trim prefix="(" suffix=")" prefixOverrides="and" >
+                        <foreach collection="criteria.criteria" item="criterion" >
+                            <choose >
+                                <when test="criterion.noValue" >
                                     and ${criterion.condition}
                                 </when>
-                                <when test="criterion.singleValue">
+                                <when test="criterion.singleValue" >
                                     and ${criterion.condition} #{criterion.value}
                                 </when>
-                                <when test="criterion.betweenValue">
+                                <when test="criterion.betweenValue" >
                                     and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                                 </when>
-                                <when test="criterion.listValue">
+                                <when test="criterion.listValue" >
                                     and ${criterion.condition}
-                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
-                                             separator=",">
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
                                         #{listItem}
                                     </foreach>
                                 </when>
@@ -47,222 +49,254 @@
             </foreach>
         </where>
     </sql>
-    <sql id="Base_Column_List">
-    ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, 
-    C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION
-  </sql>
+    <sql id="Base_Column_List" >
+        ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT,
+        C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION, BRANCH_LINE_NUM,
+        ALL_LINE_NUM, BANK_REGION
+    </sql>
     <sql id="Ac_Base_Column_List">
         ac.ID, ac.AGENT_ID, ac.CLO_TYPE, ac.CLO_REALNAME, ac.CLO_BANK, ac.CLO_BANK_BRANCH, ac.CLO_BANK_ACCOUNT,
-        ac.C_TIME, ac.C_UTIME, ac.REMARK, ac.C_USER, ac.CLO_REVIEW_STATUS, ac.STATUS,ac.VARSION
+        ac.C_TIME, ac.C_UTIME, ac.REMARK, ac.C_USER, ac.CLO_REVIEW_STATUS, ac.STATUS,ac.VARSION, ac.BRANCH_LINE_NUM,
+        ac.ALL_LINE_NUM
     </sql>
-    <select id="selectByExample" resultMap="BaseResultMap"
-            parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample">
-        <include refid="OracleDialectPrefix"/>
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample" >
+        <include refid="OracleDialectPrefix" />
         select
-        <if test="distinct">
+        <if test="distinct" >
             distinct
         </if>
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from A_AGENT_COLINFO
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+        <if test="_parameter != null" >
+            <include refid="Example_Where_Clause" />
         </if>
-        <if test="orderByClause != null">
+        <if test="orderByClause != null" >
             order by ${orderByClause}
         </if>
-        <include refid="OracleDialectSuffix"/>
+        <include refid="OracleDialectSuffix" />
     </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from A_AGENT_COLINFO
         where ID = #{id,jdbcType=VARCHAR}
     </select>
-    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample">
+    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample" >
         delete from A_AGENT_COLINFO
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+        <if test="_parameter != null" >
+            <include refid="Example_Where_Clause" />
         </if>
     </delete>
-    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo">
-    insert into A_AGENT_COLINFO (ID, AGENT_ID, CLO_TYPE, 
-      CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, 
-      CLO_BANK_ACCOUNT, C_TIME, C_UTIME, 
-      REMARK, C_USER, CLO_REVIEW_STATUS, 
-      STATUS, VARSION)
-    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cloType,jdbcType=DECIMAL}, 
-      #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, #{cloBankBranch,jdbcType=VARCHAR}, 
-      #{cloBankAccount,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, 
-      #{status,jdbcType=DECIMAL}, #{varsion,jdbcType=DECIMAL})
-  </insert>
-    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo">
+    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
+        insert into A_AGENT_COLINFO (ID, AGENT_ID, CLO_TYPE,
+        CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH,
+        CLO_BANK_ACCOUNT, C_TIME, C_UTIME,
+        REMARK, C_USER, CLO_REVIEW_STATUS,
+        STATUS, VARSION, BRANCH_LINE_NUM,
+        ALL_LINE_NUM, BANK_REGION)
+        values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cloType,jdbcType=DECIMAL},
+        #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, #{cloBankBranch,jdbcType=VARCHAR},
+        #{cloBankAccount,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP},
+        #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL},
+        #{status,jdbcType=DECIMAL}, #{varsion,jdbcType=DECIMAL}, #{branchLineNum,jdbcType=VARCHAR},
+        #{allLineNum,jdbcType=VARCHAR}, #{bankRegion,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
         insert into A_AGENT_COLINFO
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
                 ID,
             </if>
-            <if test="agentId != null">
+            <if test="agentId != null" >
                 AGENT_ID,
             </if>
-            <if test="cloType != null">
+            <if test="cloType != null" >
                 CLO_TYPE,
             </if>
-            <if test="cloRealname != null">
+            <if test="cloRealname != null" >
                 CLO_REALNAME,
             </if>
-            <if test="cloBank != null">
+            <if test="cloBank != null" >
                 CLO_BANK,
             </if>
-            <if test="cloBankBranch != null">
+            <if test="cloBankBranch != null" >
                 CLO_BANK_BRANCH,
             </if>
-            <if test="cloBankAccount != null">
+            <if test="cloBankAccount != null" >
                 CLO_BANK_ACCOUNT,
             </if>
-            <if test="cTime != null">
+            <if test="cTime != null" >
                 C_TIME,
             </if>
-            <if test="cUtime != null">
+            <if test="cUtime != null" >
                 C_UTIME,
             </if>
-            <if test="remark != null">
+            <if test="remark != null" >
                 REMARK,
             </if>
-            <if test="cUser != null">
+            <if test="cUser != null" >
                 C_USER,
             </if>
-            <if test="cloReviewStatus != null">
+            <if test="cloReviewStatus != null" >
                 CLO_REVIEW_STATUS,
             </if>
-            <if test="status != null">
+            <if test="status != null" >
                 STATUS,
             </if>
-            <if test="varsion != null">
+            <if test="varsion != null" >
                 VARSION,
             </if>
+            <if test="branchLineNum != null" >
+                BRANCH_LINE_NUM,
+            </if>
+            <if test="allLineNum != null" >
+                ALL_LINE_NUM,
+            </if>
+            <if test="bankRegion != null" >
+                BANK_REGION,
+            </if>
         </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
                 #{id,jdbcType=VARCHAR},
             </if>
-            <if test="agentId != null">
+            <if test="agentId != null" >
                 #{agentId,jdbcType=VARCHAR},
             </if>
-            <if test="cloType != null">
+            <if test="cloType != null" >
                 #{cloType,jdbcType=DECIMAL},
             </if>
-            <if test="cloRealname != null">
+            <if test="cloRealname != null" >
                 #{cloRealname,jdbcType=VARCHAR},
             </if>
-            <if test="cloBank != null">
+            <if test="cloBank != null" >
                 #{cloBank,jdbcType=VARCHAR},
             </if>
-            <if test="cloBankBranch != null">
+            <if test="cloBankBranch != null" >
                 #{cloBankBranch,jdbcType=VARCHAR},
             </if>
-            <if test="cloBankAccount != null">
+            <if test="cloBankAccount != null" >
                 #{cloBankAccount,jdbcType=VARCHAR},
             </if>
-            <if test="cTime != null">
+            <if test="cTime != null" >
                 #{cTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="cUtime != null">
+            <if test="cUtime != null" >
                 #{cUtime,jdbcType=TIMESTAMP},
             </if>
-            <if test="remark != null">
+            <if test="remark != null" >
                 #{remark,jdbcType=VARCHAR},
             </if>
-            <if test="cUser != null">
+            <if test="cUser != null" >
                 #{cUser,jdbcType=VARCHAR},
             </if>
-            <if test="cloReviewStatus != null">
+            <if test="cloReviewStatus != null" >
                 #{cloReviewStatus,jdbcType=DECIMAL},
             </if>
-            <if test="status != null">
+            <if test="status != null" >
                 #{status,jdbcType=DECIMAL},
             </if>
-            <if test="varsion != null">
+            <if test="varsion != null" >
                 #{varsion,jdbcType=DECIMAL},
+            </if>
+            <if test="branchLineNum != null" >
+                #{branchLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="allLineNum != null" >
+                #{allLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="bankRegion != null" >
+                #{bankRegion,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample"
-            resultType="java.lang.Integer">
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfoExample" resultType="java.lang.Integer" >
         select count(*) from A_AGENT_COLINFO
-        <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+        <if test="_parameter != null" >
+            <include refid="Example_Where_Clause" />
         </if>
     </select>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
         update A_AGENT_COLINFO
-        <set>
-            <if test="agentId != null">
+        <set >
+            <if test="agentId != null" >
                 AGENT_ID = #{agentId,jdbcType=VARCHAR},
             </if>
-            <if test="cloType != null">
+            <if test="cloType != null" >
                 CLO_TYPE = #{cloType,jdbcType=DECIMAL},
             </if>
-            <if test="cloRealname != null">
+            <if test="cloRealname != null" >
                 CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
             </if>
-            <if test="cloBank != null">
+            <if test="cloBank != null" >
                 CLO_BANK = #{cloBank,jdbcType=VARCHAR},
             </if>
-            <if test="cloBankBranch != null">
+            <if test="cloBankBranch != null" >
                 CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
             </if>
-            <if test="cloBankAccount != null">
+            <if test="cloBankAccount != null" >
                 CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
             </if>
-            <if test="cTime != null">
+            <if test="cTime != null" >
                 C_TIME = #{cTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="cUtime != null">
+            <if test="cUtime != null" >
                 C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
             </if>
-            <if test="remark != null">
+            <if test="remark != null" >
                 REMARK = #{remark,jdbcType=VARCHAR},
             </if>
-            <if test="cUser != null">
+            <if test="cUser != null" >
                 C_USER = #{cUser,jdbcType=VARCHAR},
             </if>
-            <if test="cloReviewStatus != null">
+            <if test="cloReviewStatus != null" >
                 CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
             </if>
-            <if test="status != null">
+            <if test="status != null" >
                 STATUS = #{status,jdbcType=DECIMAL},
             </if>
-            <if test="varsion != null">
+            <if test="varsion != null" >
                 VARSION = #{varsion,jdbcType=DECIMAL},
+            </if>
+            <if test="branchLineNum != null" >
+                BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="allLineNum != null" >
+                ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="bankRegion != null" >
+                BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
             </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo">
-    update A_AGENT_COLINFO
-    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      CLO_TYPE = #{cloType,jdbcType=DECIMAL},
-      CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
-      CLO_BANK = #{cloBank,jdbcType=VARCHAR},
-      CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
-      CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VARSION = #{varsion,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-    <sql id="OracleDialectPrefix">
-        <if test="page != null">
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
+        update A_AGENT_COLINFO
+        set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+        CLO_TYPE = #{cloType,jdbcType=DECIMAL},
+        CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
+        CLO_BANK = #{cloBank,jdbcType=VARCHAR},
+        CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
+        CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        C_USER = #{cUser,jdbcType=VARCHAR},
+        CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+        STATUS = #{status,jdbcType=DECIMAL},
+        VARSION = #{varsion,jdbcType=DECIMAL},
+        BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+        ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+        BANK_REGION = #{bankRegion,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <sql id="OracleDialectPrefix" >
+        <if test="page != null" >
             select * from ( select row_.*, rownum rownum_ from (
         </if>
     </sql>
-    <sql id="OracleDialectSuffix">
-        <if test="page != null">
+    <sql id="OracleDialectSuffix" >
+        <if test="page != null" >
             <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
         </if>
     </sql>
