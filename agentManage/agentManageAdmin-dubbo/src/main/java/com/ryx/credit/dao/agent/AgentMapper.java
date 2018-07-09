@@ -3,6 +3,8 @@ package com.ryx.credit.dao.agent;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -27,4 +29,6 @@ public interface AgentMapper {
     List<Map<String,Object>> queryDeptName(String agDocPro);
 
     List<Map<String,Object>> queryDeptNameDis(String agDocDistrict);
+
+    List<AgentoutVo> excelAgent( @Param("agent")Agent agent);
 }

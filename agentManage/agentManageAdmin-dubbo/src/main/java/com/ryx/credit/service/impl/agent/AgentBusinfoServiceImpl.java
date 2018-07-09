@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -223,5 +224,38 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+
+
+	@Override
+	public List<Map> agentBusChild(String platformCode, String angetId) {
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andAgentIdEqualTo(angetId).andStatusEqualTo(Status.STATUS_1.status).andBusPlatformEqualTo(platformCode);
+		example.setOrderByClause(" C_TIME asc ");
+		List<AgentBusInfo>  busInfos = agentBusInfoMapper.selectByExample(example);
+		if(busInfos.size()==1){
+			return agentBusChild(busInfos.get(0).getId());
+		}
+		return Arrays.asList();
+	}
+
+	@Override
+	public List<Map> agentBusChild(String busId) {
+		AgentBusInfo info = agentBusInfoMapper.selectByPrimaryKey(busId);
+		if(null==info)return Arrays.asList();
+		return agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("busParent",busId).putKeyV("busPlatform",info.getBusPlatform()));
+	}
+
+
+	@Override
+	public Map getRootFromBusInfo(String busId) {
+		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		if(map.size()>0 && map.get(0).get("BUS_PARENT")!=null &&  StringUtils.isNotEmpty(map.get(0).get("BUS_PARENT")+"")){
+			return getRootFromBusInfo(map.get(0).get("BUS_PARENT")+"");
+		}
+        if(map.size()!=1){
+			return null;
+		}
+		return map.get(0);
 	}
 }

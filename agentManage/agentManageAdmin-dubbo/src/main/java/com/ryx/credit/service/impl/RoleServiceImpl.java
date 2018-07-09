@@ -56,7 +56,7 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
         List<CRole> roles = this.selectAll();
         for (CRole role : roles) {
             Tree tree = new Tree();
-            tree.setId(role.getId());
+            tree.setId(role.getId()+"");
             tree.setText(role.getName());
 
             trees.add(tree);

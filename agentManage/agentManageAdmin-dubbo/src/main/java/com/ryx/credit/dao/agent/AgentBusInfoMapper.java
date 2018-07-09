@@ -55,4 +55,7 @@ public interface AgentBusInfoMapper {
     List<Map<String,Object>> queryBusInfoAndRemitByBusId(String busId);
 
     List<Map<String,Object>> queryById(String agentId);
+
+
+    List<Map<String,Object>> queryTreeByBusInfo(Map<String,Object> reqMap);
 }

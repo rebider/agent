@@ -1,103 +1,104 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.agent.AgentMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.Agent" >
-    <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR" />
-    <result column="AG_NAME" property="agName" jdbcType="VARCHAR" />
-    <result column="AG_NATURE" property="agNature" jdbcType="DECIMAL" />
-    <result column="AG_CAPITAL" property="agCapital" jdbcType="DECIMAL" />
-    <result column="AG_BUS_LIC" property="agBusLic" jdbcType="VARCHAR" />
-    <result column="AG_BUS_LICB" property="agBusLicb" jdbcType="TIMESTAMP" />
-    <result column="AG_BUS_LICE" property="agBusLice" jdbcType="TIMESTAMP" />
-    <result column="AG_LEGAL" property="agLegal" jdbcType="VARCHAR" />
-    <result column="AG_LEGAL_CERTYPE" property="agLegalCertype" jdbcType="DECIMAL" />
-    <result column="AG_LEGAL_CERNUM" property="agLegalCernum" jdbcType="VARCHAR" />
-    <result column="AG_LEGAL_MOBILE" property="agLegalMobile" jdbcType="VARCHAR" />
-    <result column="AG_HEAD" property="agHead" jdbcType="VARCHAR" />
-    <result column="AG_HEAD_MOBILE" property="agHeadMobile" jdbcType="VARCHAR" />
-    <result column="AG_REG_ADD" property="agRegAdd" jdbcType="VARCHAR" />
-    <result column="AG_BUS_SCOPE" property="agBusScope" jdbcType="VARCHAR" />
-    <result column="CLO_TAX_POINT" property="cloTaxPoint" jdbcType="DECIMAL" />
-    <result column="AG_STATUS" property="agStatus" jdbcType="VARCHAR" />
-    <result column="AG_DOC_PRO" property="agDocPro" jdbcType="VARCHAR" />
-    <result column="AG_DOC_DISTRICT" property="agDocDistrict" jdbcType="VARCHAR" />
-    <result column="AG_REMARK" property="agRemark" jdbcType="VARCHAR" />
-    <result column="C_INCOM_TIME" property="cIncomTime" jdbcType="TIMESTAMP" />
-    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
-    <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
-    <result column="C_INCOM_STATUS" property="cIncomStatus" jdbcType="DECIMAL" />
-    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
-    <result column="AG_ZBH" property="agZbh" jdbcType="VARCHAR" />
-    <result column="STATUS" property="status" jdbcType="DECIMAL" />
-    <result column="VERSION" property="version" jdbcType="DECIMAL" />
-    <result column="CA_STATUS" property="caStatus" jdbcType="DECIMAL" />
-  </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue" >
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue" >
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue" >
-                  and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+<mapper namespace="com.ryx.credit.dao.agent.AgentMapper">
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.Agent">
+        <id column="ID" property="id" jdbcType="VARCHAR"/>
+        <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR"/>
+        <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+        <result column="AG_NATURE" property="agNature" jdbcType="DECIMAL"/>
+        <result column="AG_CAPITAL" property="agCapital" jdbcType="DECIMAL"/>
+        <result column="AG_BUS_LIC" property="agBusLic" jdbcType="VARCHAR"/>
+        <result column="AG_BUS_LICB" property="agBusLicb" jdbcType="TIMESTAMP"/>
+        <result column="AG_BUS_LICE" property="agBusLice" jdbcType="TIMESTAMP"/>
+        <result column="AG_LEGAL" property="agLegal" jdbcType="VARCHAR"/>
+        <result column="AG_LEGAL_CERTYPE" property="agLegalCertype" jdbcType="DECIMAL"/>
+        <result column="AG_LEGAL_CERNUM" property="agLegalCernum" jdbcType="VARCHAR"/>
+        <result column="AG_LEGAL_MOBILE" property="agLegalMobile" jdbcType="VARCHAR"/>
+        <result column="AG_HEAD" property="agHead" jdbcType="VARCHAR"/>
+        <result column="AG_HEAD_MOBILE" property="agHeadMobile" jdbcType="VARCHAR"/>
+        <result column="AG_REG_ADD" property="agRegAdd" jdbcType="VARCHAR"/>
+        <result column="AG_BUS_SCOPE" property="agBusScope" jdbcType="VARCHAR"/>
+        <result column="CLO_TAX_POINT" property="cloTaxPoint" jdbcType="DECIMAL"/>
+        <result column="AG_STATUS" property="agStatus" jdbcType="VARCHAR"/>
+        <result column="AG_DOC_PRO" property="agDocPro" jdbcType="VARCHAR"/>
+        <result column="AG_DOC_DISTRICT" property="agDocDistrict" jdbcType="VARCHAR"/>
+        <result column="AG_REMARK" property="agRemark" jdbcType="VARCHAR"/>
+        <result column="C_INCOM_TIME" property="cIncomTime" jdbcType="TIMESTAMP"/>
+        <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP"/>
+        <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP"/>
+        <result column="C_INCOM_STATUS" property="cIncomStatus" jdbcType="DECIMAL"/>
+        <result column="C_USER" property="cUser" jdbcType="VARCHAR"/>
+        <result column="AG_ZBH" property="agZbh" jdbcType="VARCHAR"/>
+        <result column="STATUS" property="status" jdbcType="DECIMAL"/>
+        <result column="VERSION" property="version" jdbcType="DECIMAL"/>
+        <result column="CA_STATUS" property="caStatus" jdbcType="DECIMAL"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List" >
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
     ID, AG_UNIQ_NUM, AG_NAME, AG_NATURE, AG_CAPITAL, AG_BUS_LIC, AG_BUS_LICB, AG_BUS_LICE,
     AG_LEGAL, AG_LEGAL_CERTYPE, AG_LEGAL_CERNUM, AG_LEGAL_MOBILE, AG_HEAD, AG_HEAD_MOBILE,
     AG_REG_ADD, AG_BUS_SCOPE, CLO_TAX_POINT, AG_STATUS, AG_DOC_PRO, AG_DOC_DISTRICT,
     AG_REMARK, C_INCOM_TIME, C_TIME, C_UTIME, C_INCOM_STATUS, C_USER, AG_ZBH, STATUS,
     VERSION, CA_STATUS
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample" >
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct" >
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from A_AGENT
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select
-    <include refid="Base_Column_List" />
-    from A_AGENT
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample" >
-    delete from A_AGENT
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample">
+        <include refid="OracleDialectPrefix"/>
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from A_AGENT
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix"/>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from A_AGENT
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample">
+        delete from A_AGENT
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.Agent">
     insert into A_AGENT (ID, AG_UNIQ_NUM, AG_NAME,
     AG_NATURE, AG_CAPITAL, AG_BUS_LIC,
     AG_BUS_LICB, AG_BUS_LICE, AG_LEGAL,
@@ -121,293 +122,294 @@
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{caStatus,jdbcType=DECIMAL}
     )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
-    insert into A_AGENT
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        ID,
-      </if>
-      <if test="agUniqNum != null" >
-        AG_UNIQ_NUM,
-      </if>
-      <if test="agName != null" >
-        AG_NAME,
-      </if>
-      <if test="agNature != null" >
-        AG_NATURE,
-      </if>
-      <if test="agCapital != null" >
-        AG_CAPITAL,
-      </if>
-      <if test="agBusLic != null" >
-        AG_BUS_LIC,
-      </if>
-      <if test="agBusLicb != null" >
-        AG_BUS_LICB,
-      </if>
-      <if test="agBusLice != null" >
-        AG_BUS_LICE,
-      </if>
-      <if test="agLegal != null" >
-        AG_LEGAL,
-      </if>
-      <if test="agLegalCertype != null" >
-        AG_LEGAL_CERTYPE,
-      </if>
-      <if test="agLegalCernum != null" >
-        AG_LEGAL_CERNUM,
-      </if>
-      <if test="agLegalMobile != null" >
-        AG_LEGAL_MOBILE,
-      </if>
-      <if test="agHead != null" >
-        AG_HEAD,
-      </if>
-      <if test="agHeadMobile != null" >
-        AG_HEAD_MOBILE,
-      </if>
-      <if test="agRegAdd != null" >
-        AG_REG_ADD,
-      </if>
-      <if test="agBusScope != null" >
-        AG_BUS_SCOPE,
-      </if>
-      <if test="cloTaxPoint != null" >
-        CLO_TAX_POINT,
-      </if>
-      <if test="agStatus != null" >
-        AG_STATUS,
-      </if>
-      <if test="agDocPro != null" >
-        AG_DOC_PRO,
-      </if>
-      <if test="agDocDistrict != null" >
-        AG_DOC_DISTRICT,
-      </if>
-      <if test="agRemark != null" >
-        AG_REMARK,
-      </if>
-      <if test="cIncomTime != null" >
-        C_INCOM_TIME,
-      </if>
-      <if test="cTime != null" >
-        C_TIME,
-      </if>
-      <if test="cUtime != null" >
-        C_UTIME,
-      </if>
-      <if test="cIncomStatus != null" >
-        C_INCOM_STATUS,
-      </if>
-      <if test="cUser != null" >
-        C_USER,
-      </if>
-      <if test="agZbh != null" >
-        AG_ZBH,
-      </if>
-      <if test="status != null" >
-        STATUS,
-      </if>
-      <if test="version != null" >
-        VERSION,
-      </if>
-      <if test="caStatus != null" >
-        CA_STATUS,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="agUniqNum != null" >
-        #{agUniqNum,jdbcType=VARCHAR},
-      </if>
-      <if test="agName != null" >
-        #{agName,jdbcType=VARCHAR},
-      </if>
-      <if test="agNature != null" >
-        #{agNature,jdbcType=DECIMAL},
-      </if>
-      <if test="agCapital != null" >
-        #{agCapital,jdbcType=DECIMAL},
-      </if>
-      <if test="agBusLic != null" >
-        #{agBusLic,jdbcType=VARCHAR},
-      </if>
-      <if test="agBusLicb != null" >
-        #{agBusLicb,jdbcType=TIMESTAMP},
-      </if>
-      <if test="agBusLice != null" >
-        #{agBusLice,jdbcType=TIMESTAMP},
-      </if>
-      <if test="agLegal != null" >
-        #{agLegal,jdbcType=VARCHAR},
-      </if>
-      <if test="agLegalCertype != null" >
-        #{agLegalCertype,jdbcType=DECIMAL},
-      </if>
-      <if test="agLegalCernum != null" >
-        #{agLegalCernum,jdbcType=VARCHAR},
-      </if>
-      <if test="agLegalMobile != null" >
-        #{agLegalMobile,jdbcType=VARCHAR},
-      </if>
-      <if test="agHead != null" >
-        #{agHead,jdbcType=VARCHAR},
-      </if>
-      <if test="agHeadMobile != null" >
-        #{agHeadMobile,jdbcType=VARCHAR},
-      </if>
-      <if test="agRegAdd != null" >
-        #{agRegAdd,jdbcType=VARCHAR},
-      </if>
-      <if test="agBusScope != null" >
-        #{agBusScope,jdbcType=VARCHAR},
-      </if>
-      <if test="cloTaxPoint != null" >
-        #{cloTaxPoint,jdbcType=DECIMAL},
-      </if>
-      <if test="agStatus != null" >
-        #{agStatus,jdbcType=VARCHAR},
-      </if>
-      <if test="agDocPro != null" >
-        #{agDocPro,jdbcType=VARCHAR},
-      </if>
-      <if test="agDocDistrict != null" >
-        #{agDocDistrict,jdbcType=VARCHAR},
-      </if>
-      <if test="agRemark != null" >
-        #{agRemark,jdbcType=VARCHAR},
-      </if>
-      <if test="cIncomTime != null" >
-        #{cIncomTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cTime != null" >
-        #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cUtime != null" >
-        #{cUtime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cIncomStatus != null" >
-        #{cIncomStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="cUser != null" >
-        #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="agZbh != null" >
-        #{agZbh,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null" >
-        #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="caStatus != null" >
-        #{caStatus,jdbcType=DECIMAL},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample" resultType="java.lang.Integer" >
-    select count(*) from A_AGENT
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
-    update A_AGENT
-    <set >
-      <if test="agUniqNum != null" >
-        AG_UNIQ_NUM = #{agUniqNum,jdbcType=VARCHAR},
-      </if>
-      <if test="agName != null" >
-        AG_NAME = #{agName,jdbcType=VARCHAR},
-      </if>
-      <if test="agNature != null" >
-        AG_NATURE = #{agNature,jdbcType=DECIMAL},
-      </if>
-      <if test="agCapital != null" >
-        AG_CAPITAL = #{agCapital,jdbcType=DECIMAL},
-      </if>
-      <if test="agBusLic != null" >
-        AG_BUS_LIC = #{agBusLic,jdbcType=VARCHAR},
-      </if>
-      <if test="agBusLicb != null" >
-        AG_BUS_LICB = #{agBusLicb,jdbcType=TIMESTAMP},
-      </if>
-      <if test="agBusLice != null" >
-        AG_BUS_LICE = #{agBusLice,jdbcType=TIMESTAMP},
-      </if>
-      <if test="agLegal != null" >
-        AG_LEGAL = #{agLegal,jdbcType=VARCHAR},
-      </if>
-      <if test="agLegalCertype != null" >
-        AG_LEGAL_CERTYPE = #{agLegalCertype,jdbcType=DECIMAL},
-      </if>
-      <if test="agLegalCernum != null" >
-        AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR},
-      </if>
-      <if test="agLegalMobile != null" >
-        AG_LEGAL_MOBILE = #{agLegalMobile,jdbcType=VARCHAR},
-      </if>
-      <if test="agHead != null" >
-        AG_HEAD = #{agHead,jdbcType=VARCHAR},
-      </if>
-      <if test="agHeadMobile != null" >
-        AG_HEAD_MOBILE = #{agHeadMobile,jdbcType=VARCHAR},
-      </if>
-      <if test="agRegAdd != null" >
-        AG_REG_ADD = #{agRegAdd,jdbcType=VARCHAR},
-      </if>
-      <if test="agBusScope != null" >
-        AG_BUS_SCOPE = #{agBusScope,jdbcType=VARCHAR},
-      </if>
-      <if test="cloTaxPoint != null" >
-        CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
-      </if>
-      <if test="agStatus != null" >
-        AG_STATUS = #{agStatus,jdbcType=VARCHAR},
-      </if>
-      <if test="agDocPro != null" >
-        AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
-      </if>
-      <if test="agDocDistrict != null" >
-        AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
-      </if>
-      <if test="agRemark != null" >
-        AG_REMARK = #{agRemark,jdbcType=VARCHAR},
-      </if>
-      <if test="cIncomTime != null" >
-        C_INCOM_TIME = #{cIncomTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cTime != null" >
-        C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cUtime != null" >
-        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="cIncomStatus != null" >
-        C_INCOM_STATUS = #{cIncomStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="cUser != null" >
-        C_USER = #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="agZbh != null" >
-        AG_ZBH = #{agZbh,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        STATUS = #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null" >
-        VERSION = VERSION +1 ,
-      </if>
-      <if test="caStatus != null" >
-        CA_STATUS = #{caStatus,jdbcType=DECIMAL},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Agent" >
+    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.Agent">
+        insert into A_AGENT
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="agUniqNum != null">
+                AG_UNIQ_NUM,
+            </if>
+            <if test="agName != null">
+                AG_NAME,
+            </if>
+            <if test="agNature != null">
+                AG_NATURE,
+            </if>
+            <if test="agCapital != null">
+                AG_CAPITAL,
+            </if>
+            <if test="agBusLic != null">
+                AG_BUS_LIC,
+            </if>
+            <if test="agBusLicb != null">
+                AG_BUS_LICB,
+            </if>
+            <if test="agBusLice != null">
+                AG_BUS_LICE,
+            </if>
+            <if test="agLegal != null">
+                AG_LEGAL,
+            </if>
+            <if test="agLegalCertype != null">
+                AG_LEGAL_CERTYPE,
+            </if>
+            <if test="agLegalCernum != null">
+                AG_LEGAL_CERNUM,
+            </if>
+            <if test="agLegalMobile != null">
+                AG_LEGAL_MOBILE,
+            </if>
+            <if test="agHead != null">
+                AG_HEAD,
+            </if>
+            <if test="agHeadMobile != null">
+                AG_HEAD_MOBILE,
+            </if>
+            <if test="agRegAdd != null">
+                AG_REG_ADD,
+            </if>
+            <if test="agBusScope != null">
+                AG_BUS_SCOPE,
+            </if>
+            <if test="cloTaxPoint != null">
+                CLO_TAX_POINT,
+            </if>
+            <if test="agStatus != null">
+                AG_STATUS,
+            </if>
+            <if test="agDocPro != null">
+                AG_DOC_PRO,
+            </if>
+            <if test="agDocDistrict != null">
+                AG_DOC_DISTRICT,
+            </if>
+            <if test="agRemark != null">
+                AG_REMARK,
+            </if>
+            <if test="cIncomTime != null">
+                C_INCOM_TIME,
+            </if>
+            <if test="cTime != null">
+                C_TIME,
+            </if>
+            <if test="cUtime != null">
+                C_UTIME,
+            </if>
+            <if test="cIncomStatus != null">
+                C_INCOM_STATUS,
+            </if>
+            <if test="cUser != null">
+                C_USER,
+            </if>
+            <if test="agZbh != null">
+                AG_ZBH,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="version != null">
+                VERSION,
+            </if>
+            <if test="caStatus != null">
+                CA_STATUS,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="agUniqNum != null">
+                #{agUniqNum,jdbcType=VARCHAR},
+            </if>
+            <if test="agName != null">
+                #{agName,jdbcType=VARCHAR},
+            </if>
+            <if test="agNature != null">
+                #{agNature,jdbcType=DECIMAL},
+            </if>
+            <if test="agCapital != null">
+                #{agCapital,jdbcType=DECIMAL},
+            </if>
+            <if test="agBusLic != null">
+                #{agBusLic,jdbcType=VARCHAR},
+            </if>
+            <if test="agBusLicb != null">
+                #{agBusLicb,jdbcType=TIMESTAMP},
+            </if>
+            <if test="agBusLice != null">
+                #{agBusLice,jdbcType=TIMESTAMP},
+            </if>
+            <if test="agLegal != null">
+                #{agLegal,jdbcType=VARCHAR},
+            </if>
+            <if test="agLegalCertype != null">
+                #{agLegalCertype,jdbcType=DECIMAL},
+            </if>
+            <if test="agLegalCernum != null">
+                #{agLegalCernum,jdbcType=VARCHAR},
+            </if>
+            <if test="agLegalMobile != null">
+                #{agLegalMobile,jdbcType=VARCHAR},
+            </if>
+            <if test="agHead != null">
+                #{agHead,jdbcType=VARCHAR},
+            </if>
+            <if test="agHeadMobile != null">
+                #{agHeadMobile,jdbcType=VARCHAR},
+            </if>
+            <if test="agRegAdd != null">
+                #{agRegAdd,jdbcType=VARCHAR},
+            </if>
+            <if test="agBusScope != null">
+                #{agBusScope,jdbcType=VARCHAR},
+            </if>
+            <if test="cloTaxPoint != null">
+                #{cloTaxPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="agStatus != null">
+                #{agStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="agDocPro != null">
+                #{agDocPro,jdbcType=VARCHAR},
+            </if>
+            <if test="agDocDistrict != null">
+                #{agDocDistrict,jdbcType=VARCHAR},
+            </if>
+            <if test="agRemark != null">
+                #{agRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="cIncomTime != null">
+                #{cIncomTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cTime != null">
+                #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUtime != null">
+                #{cUtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cIncomStatus != null">
+                #{cIncomStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="cUser != null">
+                #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="agZbh != null">
+                #{agZbh,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="caStatus != null">
+                #{caStatus,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentExample"
+            resultType="java.lang.Integer">
+        select count(*) from A_AGENT
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Agent">
+        update A_AGENT
+        <set>
+            <if test="agUniqNum != null">
+                AG_UNIQ_NUM = #{agUniqNum,jdbcType=VARCHAR},
+            </if>
+            <if test="agName != null">
+                AG_NAME = #{agName,jdbcType=VARCHAR},
+            </if>
+            <if test="agNature != null">
+                AG_NATURE = #{agNature,jdbcType=DECIMAL},
+            </if>
+            <if test="agCapital != null">
+                AG_CAPITAL = #{agCapital,jdbcType=DECIMAL},
+            </if>
+            <if test="agBusLic != null">
+                AG_BUS_LIC = #{agBusLic,jdbcType=VARCHAR},
+            </if>
+            <if test="agBusLicb != null">
+                AG_BUS_LICB = #{agBusLicb,jdbcType=TIMESTAMP},
+            </if>
+            <if test="agBusLice != null">
+                AG_BUS_LICE = #{agBusLice,jdbcType=TIMESTAMP},
+            </if>
+            <if test="agLegal != null">
+                AG_LEGAL = #{agLegal,jdbcType=VARCHAR},
+            </if>
+            <if test="agLegalCertype != null">
+                AG_LEGAL_CERTYPE = #{agLegalCertype,jdbcType=DECIMAL},
+            </if>
+            <if test="agLegalCernum != null">
+                AG_LEGAL_CERNUM = #{agLegalCernum,jdbcType=VARCHAR},
+            </if>
+            <if test="agLegalMobile != null">
+                AG_LEGAL_MOBILE = #{agLegalMobile,jdbcType=VARCHAR},
+            </if>
+            <if test="agHead != null">
+                AG_HEAD = #{agHead,jdbcType=VARCHAR},
+            </if>
+            <if test="agHeadMobile != null">
+                AG_HEAD_MOBILE = #{agHeadMobile,jdbcType=VARCHAR},
+            </if>
+            <if test="agRegAdd != null">
+                AG_REG_ADD = #{agRegAdd,jdbcType=VARCHAR},
+            </if>
+            <if test="agBusScope != null">
+                AG_BUS_SCOPE = #{agBusScope,jdbcType=VARCHAR},
+            </if>
+            <if test="cloTaxPoint != null">
+                CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="agStatus != null">
+                AG_STATUS = #{agStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="agDocPro != null">
+                AG_DOC_PRO = #{agDocPro,jdbcType=VARCHAR},
+            </if>
+            <if test="agDocDistrict != null">
+                AG_DOC_DISTRICT = #{agDocDistrict,jdbcType=VARCHAR},
+            </if>
+            <if test="agRemark != null">
+                AG_REMARK = #{agRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="cIncomTime != null">
+                C_INCOM_TIME = #{cIncomTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cTime != null">
+                C_TIME = #{cTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cUtime != null">
+                C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cIncomStatus != null">
+                C_INCOM_STATUS = #{cIncomStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="cUser != null">
+                C_USER = #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="agZbh != null">
+                AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                VERSION = VERSION +1 ,
+            </if>
+            <if test="caStatus != null">
+                CA_STATUS = #{caStatus,jdbcType=DECIMAL},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Agent">
     update A_AGENT
     set AG_UNIQ_NUM = #{agUniqNum,jdbcType=VARCHAR},
     AG_NAME = #{agName,jdbcType=VARCHAR},
@@ -440,29 +442,81 @@
     CA_STATUS = #{caStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
-  <sql id="OracleDialectPrefix" >
-    <if test="page != null" >
-      select * from ( select row_.*, rownum rownum_ from (
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix" >
-    <if test="page != null" >
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
-  
-<sql id="deptName">
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
+
+    <sql id="deptName">
 agent.ID,agent.AG_UNIQ_NUM,agent.AG_NAME,agent.AG_NATURE,agent.AG_CAPITAL,agent.AG_BUS_LIC,agent.AG_BUS_LICB,agent.AG_BUS_LICE,
 agent.AG_LEGAL,agent.AG_LEGAL_CERTYPE,agent.AG_LEGAL_CERNUM,agent.AG_LEGAL_MOBILE,agent.AG_HEAD,agent.AG_HEAD_MOBILE,agent.AG_REG_ADD,
 agent.AG_BUS_SCOPE,agent.CLO_TAX_POINT,agent.AG_STATUS,agent.AG_DOC_PRO,agent.AG_DOC_DISTRICT,agent.AG_REMARK,agent.C_INCOM_TIME,agent.C_TIME,agent.C_UTIME,
 agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS,cor.CODE,cor.ICON,cor.PID,cor.SEQ,cor.CREATE_TIME
 </sql>
 
-  <select id="queryDeptName" parameterType="string" resultType="map">
-        select <include refid="deptName"/> from A_AGENT agent left join C_ORGANIZATION cor on agent.AG_DOC_PRO= cor.id where cor.id=#{id}
-  </select>
+    <select id="queryDeptName" parameterType="string" resultType="map">
+        select
+        <include refid="deptName"/>
+        from A_AGENT agent left join C_ORGANIZATION cor on agent.AG_DOC_PRO= cor.id where cor.id=#{id}
+    </select>
 
-  <select id="queryDeptNameDis" parameterType="string" resultType="map">
-    select <include refid="deptName"/> from A_AGENT agent left join C_ORGANIZATION cor on agent.AG_DOC_DISTRICT= cor.id where cor.id=#{id}
-  </select>
+    <select id="queryDeptNameDis" parameterType="string" resultType="map">
+        select
+        <include refid="deptName"/>
+        from A_AGENT agent left join C_ORGANIZATION cor on agent.AG_DOC_DISTRICT= cor.id where cor.id=#{id}
+    </select>
+
+    <select id="excelAgent" parameterType="com.ryx.credit.pojo.admin.agent.Agent" resultMap="AgentoutVo">
+        select agent.id,agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
+        agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
+        ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_parent
+        ,bus.bus_risk_parent,bus.bus_activation_parent,bus.bus_Inde_ass,
+        bus.bus_scope,bus.bus_region,bus.bus_risk_email
+        from A_AGENT agent left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+        <where>
+            1=1
+            <if test='null!= agent.agUniqNum and agent.agUniqNum !="" '>
+                AND agent.AG_UNIQ_NUM = #{agent.agUniqNum}
+            </if>
+
+            <if test='null!= agent.agName and agent.agName !="" '>
+                AND agent.AG_NAME LIKE #{agent.agName}||'%'
+            </if>
+            <if test='null!= agent.agDocPro and agent.agDocPro !="" '>
+                AND agent.AG_DOC_PRO = #{agent.agDocPro}
+            </if>
+            <if test='null!= agent.agDocDistrict and agent.agDocDistrict !="" '>
+                AND agent.AG_DOC_DISTRICT = #{agent.agDocDistrict}
+            </if>
+        </where>
+
+
+        order by agent.c_utime desc
+    </select>
+    <resultMap id="AgentoutVo" type="com.ryx.credit.pojo.admin.vo.AgentoutVo">
+        <id column="ID" property="id" jdbcType="VARCHAR"/>
+        <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR"/>
+        <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+        <result column="AG_HEAD" property="agHead" jdbcType="VARCHAR"/>
+        <result column="AG_HEAD_MOBILE" property="agHeadMobile" jdbcType="VARCHAR"/>
+        <result column="AG_REG_ADD" property="agRegAdd" jdbcType="VARCHAR"/>
+
+        <result column="BUS_NUM" property="busNum" jdbcType="VARCHAR"/>
+        <result column="BUS_PLATFORM" property="busPlatform" jdbcType="VARCHAR"/>
+        <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR"/>
+        <result column="BUS_PARENT" property="busParent" jdbcType="VARCHAR"/>
+        <result column="BUS_RISK_PARENT" property="busRiskParent" jdbcType="VARCHAR"/>
+        <result column="BUS_ACTIVATION_PARENT" property="busActivationParent" jdbcType="VARCHAR"/>
+        <result column="BUS_REGION" property="busRegion" jdbcType="VARCHAR"/>
+        <result column="BUS_INDE_ASS" property="busIndeAss" jdbcType="VARCHAR"/>
+        <result column="BUS_RISK_EMAIL" property="busRiskEmail" jdbcType="VARCHAR"/>
+        <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR"/>
+    </resultMap>
+
 </mapper>
