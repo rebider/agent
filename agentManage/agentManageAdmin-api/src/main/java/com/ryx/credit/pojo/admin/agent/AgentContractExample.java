@@ -967,6 +967,66 @@ public class AgentContractExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andAppendAgreeIsNull() {
+            addCriterion("APPEND_AGREE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeIsNotNull() {
+            addCriterion("APPEND_AGREE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeEqualTo(BigDecimal value) {
+            addCriterion("APPEND_AGREE =", value, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeNotEqualTo(BigDecimal value) {
+            addCriterion("APPEND_AGREE <>", value, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeGreaterThan(BigDecimal value) {
+            addCriterion("APPEND_AGREE >", value, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("APPEND_AGREE >=", value, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeLessThan(BigDecimal value) {
+            addCriterion("APPEND_AGREE <", value, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("APPEND_AGREE <=", value, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeIn(List<BigDecimal> values) {
+            addCriterion("APPEND_AGREE in", values, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeNotIn(List<BigDecimal> values) {
+            addCriterion("APPEND_AGREE not in", values, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("APPEND_AGREE between", value1, value2, "appendAgree");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppendAgreeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("APPEND_AGREE not between", value1, value2, "appendAgree");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

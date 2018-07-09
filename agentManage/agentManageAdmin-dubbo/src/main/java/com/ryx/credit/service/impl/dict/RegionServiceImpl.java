@@ -44,7 +44,11 @@ public class RegionServiceImpl implements RegionService {
             rootTree.add(regionToTree(region));
         }
         String treeJson = JsonUtil.objectToJson(rootTree);
-        redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
+        try {
+            redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
+        } catch (Exception e) {
+            log.info("redis异常");
+        }
         return rootTree;
     }
 

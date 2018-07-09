@@ -47,6 +47,8 @@ public class AgentContract implements Serializable {
 
     private BigDecimal version;
 
+    private BigDecimal appendAgree;
+
     private List<Attachment> attachmentList;
 
     public List<Attachment> getAttachmentList() {
@@ -159,5 +161,13 @@ public class AgentContract implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getAppendAgree() {
+        return appendAgree;
+    }
+
+    public void setAppendAgree(BigDecimal appendAgree) {
+        this.appendAgree = appendAgree;
     }
 }
