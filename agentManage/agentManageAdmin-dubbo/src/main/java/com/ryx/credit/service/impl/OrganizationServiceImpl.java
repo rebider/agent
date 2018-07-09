@@ -31,10 +31,10 @@ public class OrganizationServiceImpl extends ServiceImpl<COrganizationMapper, CO
         if (organizationList != null) {
             for (COrganization organization : organizationList) {
                 Tree tree = new Tree();
-                tree.setId(organization.getId());
+                tree.setId(organization.getId()+"");
                 tree.setText(organization.getName());
                 tree.setIconCls(organization.getIcon());
-                tree.setPid(organization.getPid());
+                tree.setPid(organization.getPid()+"");
                 trees.add(tree);
             }
         }

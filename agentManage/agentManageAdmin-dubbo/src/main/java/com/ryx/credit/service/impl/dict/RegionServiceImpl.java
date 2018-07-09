@@ -44,14 +44,18 @@ public class RegionServiceImpl implements RegionService {
             rootTree.add(regionToTree(region));
         }
         String treeJson = JsonUtil.objectToJson(rootTree);
-        redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
+        try {
+            redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
+        } catch (Exception e) {
+            log.info("redis异常");
+        }
         return rootTree;
     }
 
     private Tree regionToTree(Region region){
         Tree tree = new Tree();
-        tree.setId(Long.valueOf(region.getrCode()));
-        tree.setPid(Long.valueOf(region.getpCode()));
+        tree.setId(Long.valueOf(region.getrCode())+"");
+        tree.setPid(Long.valueOf(region.getpCode())+"");
         tree.setText(region.getrName());
         tree.setState(regionMapper.findCountByPcode(region.getrCode())==0?1:0);
         tree.settType(region.gettType());

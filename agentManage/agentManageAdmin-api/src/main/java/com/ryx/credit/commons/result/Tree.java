@@ -14,7 +14,7 @@ import java.util.List;
 public class Tree implements java.io.Serializable {
 
     private static final long serialVersionUID = 980682543891282923L;
-    private Long id;
+    private String id;
     private String text;
     private String state = "open";// open,closed
     private boolean checked = false;
@@ -22,19 +22,27 @@ public class Tree implements java.io.Serializable {
     @JsonInclude(Include.NON_NULL)
     private List<Tree> children; // null不输出
     private String iconCls;
-    private Long pid;
+    private String pid;
     private BigDecimal tType;
     /**
      * ajax,iframe,
      */
     private String openMode;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
+
+    public String getPid() {
+        return pid;
     }
 
     public String getText() {
@@ -89,13 +97,6 @@ public class Tree implements java.io.Serializable {
         this.iconCls = iconCls;
     }
 
-    public Long getPid() {
-        return pid;
-    }
-
-    public void setPid(Long pid) {
-        this.pid = pid;
-    }
 
     public String getOpenMode() {
         return openMode;
