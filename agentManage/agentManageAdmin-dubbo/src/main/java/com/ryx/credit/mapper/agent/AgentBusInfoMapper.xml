@@ -532,6 +532,9 @@
       <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
         and b.clo_review_status = #{reqMap.cloReviewStatus}
       </if>
+      <if test="reqMap.id != null and reqMap.id != '' " >
+        and b.id = #{reqMap.id}
+      </if>
       and b.status = #{reqMap.status}
       order by b.c_time desc
     <include refid="OracleDialectSuffix" />

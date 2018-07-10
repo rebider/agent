@@ -58,6 +58,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("agStatus",AgStatus.Approved.name());
+        if(!StringUtils.isBlank(agent.getId())){
+            reqMap.put("id",agent.getId());
+        }
         if(!StringUtils.isBlank(agent.getAgName())){
             reqMap.put("agName",agent.getAgName());
         }

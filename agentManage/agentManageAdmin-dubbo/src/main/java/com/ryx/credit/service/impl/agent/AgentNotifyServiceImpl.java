@@ -194,6 +194,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 record.setcUser(agentBusInfo.getcUser());
 
                 PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                if(platForm==null){
+                    log.info("通知pos手刷业务平台未知");
+                    break;
+                }
                 if(platForm.getPlatformType().equals(PlatformType.POS.getValue())){
                     result = httpRequestForPos(agentNotifyVo);
                 }
