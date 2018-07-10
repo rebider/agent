@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,33 +158,41 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             for (AgentContractVo item : agentVo.getContractVoList()) {
-                item.setcUser(agent.getcUser());
-                item.setAgentId(agent.getId());
-                agentContractService.insertAgentContract(item, item.getContractTableFile());
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                if(StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())){
+                    item.setcUser(agent.getcUser());
+                    item.setAgentId(agent.getId());
+                    agentContractService.insertAgentContract(item, item.getContractTableFile());
+                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
-                item.setcAgentId(agent.getId());
-                item.setcUser(agent.getcUser());
-                AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
-                if(!result.isOK()){
-                    throw new ProcessException("缴纳款项信息录入失败");
+                if(StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
+                    item.setcAgentId(agent.getId());
+                    item.setcUser(agent.getcUser());
+                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
+                    if (!result.isOK()) {
+                        throw new ProcessException("缴纳款项信息录入失败");
+                    }
+                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
                 }
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
             }
-            for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
-                item.setAgentId(agent.getId());
-                item.setcUser(agent.getcUser());
-                agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
+            if(null!=agentVo.getColinfoVoList()){
+                for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
+                    item.setAgentId(agent.getId());
+                    item.setcUser(agent.getcUser());
+                    agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
+                }
             }
+            List<AgentBusInfo> agentBusInfoList = new ArrayList<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
-                agentBusinfoService.agentBusInfoInsert(item);
+                AgentBusInfo agentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
+                agentBusInfoList.add(agentBusInfo);
                 agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
-            return AgentResult.ok();
+            return AgentResult.ok(agentBusInfoList);
         }catch (Exception e){
             e.printStackTrace();
             throw new ProcessException("业务平台信息录入失败");

@@ -250,13 +250,18 @@ public class AgentServiceImpl implements  AgentService {
      */
     @Override
     public Agent findAgentByActivId(String activId){
-        if(StringUtils.isBlank(activId)){
+         if(StringUtils.isBlank(activId)){
             return null;
         }
         BusActRel busActRel = busActRelMapper.findById(activId);
+        if(busActRel==null){
+            return null;
+        }
         Agent agent = agentMapper.selectByPrimaryKey(busActRel.getBusId());
-        agent.setAgDocPro( departmentService.getById(agent.getAgDocPro()).getName());
-        agent.setAgDocDistrict( departmentService.getById(agent.getAgDocDistrict()).getName());
+        if(agent!=null){
+            agent.setAgDocPro( departmentService.getById(agent.getAgDocPro()).getName());
+            agent.setAgDocDistrict( departmentService.getById(agent.getAgDocDistrict()).getName());
+        }
         return agent;
     }
 }
