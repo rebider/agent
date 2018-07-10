@@ -18,6 +18,7 @@
         <result column="VARSION" property="varsion" jdbcType="DECIMAL" />
         <result column="BRANCH_LINE_NUM" property="branchLineNum" jdbcType="VARCHAR" />
         <result column="ALL_LINE_NUM" property="allLineNum" jdbcType="VARCHAR" />
+        <result column="BANK_REGION" property="bankRegion" jdbcType="VARCHAR" />
     </resultMap>
     <sql id="Example_Where_Clause" >
         <where >
@@ -51,7 +52,7 @@
     <sql id="Base_Column_List" >
         ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT,
         C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION, BRANCH_LINE_NUM,
-        ALL_LINE_NUM
+        ALL_LINE_NUM, BANK_REGION
     </sql>
     <sql id="Ac_Base_Column_List">
         ac.ID, ac.AGENT_ID, ac.CLO_TYPE, ac.CLO_REALNAME, ac.CLO_BANK, ac.CLO_BANK_BRANCH, ac.CLO_BANK_ACCOUNT,
@@ -92,13 +93,13 @@
         CLO_BANK_ACCOUNT, C_TIME, C_UTIME,
         REMARK, C_USER, CLO_REVIEW_STATUS,
         STATUS, VARSION, BRANCH_LINE_NUM,
-        ALL_LINE_NUM)
+        ALL_LINE_NUM, BANK_REGION)
         values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cloType,jdbcType=DECIMAL},
         #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, #{cloBankBranch,jdbcType=VARCHAR},
         #{cloBankAccount,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP},
         #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL},
         #{status,jdbcType=DECIMAL}, #{varsion,jdbcType=DECIMAL}, #{branchLineNum,jdbcType=VARCHAR},
-        #{allLineNum,jdbcType=VARCHAR})
+        #{allLineNum,jdbcType=VARCHAR}, #{bankRegion,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
         insert into A_AGENT_COLINFO
@@ -151,6 +152,9 @@
             <if test="allLineNum != null" >
                 ALL_LINE_NUM,
             </if>
+            <if test="bankRegion != null" >
+                BANK_REGION,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="id != null" >
@@ -200,6 +204,9 @@
             </if>
             <if test="allLineNum != null" >
                 #{allLineNum,jdbcType=VARCHAR},
+            </if>
+            <if test="bankRegion != null" >
+                #{bankRegion,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -257,6 +264,9 @@
             <if test="allLineNum != null" >
                 ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
             </if>
+            <if test="bankRegion != null" >
+                BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -276,7 +286,8 @@
         STATUS = #{status,jdbcType=DECIMAL},
         VARSION = #{varsion,jdbcType=DECIMAL},
         BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
-        ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR}
+        ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+        BANK_REGION = #{bankRegion,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <sql id="OracleDialectPrefix" >

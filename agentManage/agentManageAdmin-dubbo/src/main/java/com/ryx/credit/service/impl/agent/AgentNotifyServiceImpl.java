@@ -343,9 +343,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            log.info("通知pos请求参数:",map);
+            log.info("通知pos请求参数:{}",map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
-            //            String httpResult = "{\"orgId\":\"1234564654654\"}";
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                 System.out.println("请求异常======" + httpResult);
@@ -358,7 +357,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
-                System.out.println("通知pos返回明文======" + respXML);
+                log.info("通知pos返回参数：{}",respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
@@ -408,7 +407,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             String json = JsonUtil.objectToJson(jsonParams);
             log.info("通知手刷请求参数：{}",json);
             String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("agent_mpos_notify_url"), json);
-//            String httpResult = "{\"orgId\":\"123456789\"}"
+            log.info("通知手刷返回参数：{}",httpResult);
             if (httpResult.contains("data") && httpResult.contains("orgId")){
                 JSONObject respXMLObj = JSONObject.parseObject(httpResult);
                 JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());

@@ -37,4 +37,12 @@ public interface AgentBusinfoService {
 
     public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception;
 
+
+    public List<Map> agentBusChild(String platformCode,String angetId);
+
+    public List<Map> agentBusChild(String busId);
+
+
+    public Map getRootFromBusInfo(String busId);
+
 }
