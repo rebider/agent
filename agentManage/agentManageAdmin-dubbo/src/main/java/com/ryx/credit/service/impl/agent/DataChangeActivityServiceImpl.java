@@ -7,10 +7,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.DateChangeRequestMapper;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.agent.BusActRelExample;
-import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.*;
@@ -26,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created by cx on 2018/6/6.
@@ -57,6 +55,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentEnterService agentEnterService;
+    @Autowired
+    private AimportService aimportService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
@@ -177,6 +179,25 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 throw new ProcessException("更新数据申请失败");
                             }
                         }
+
+                        //入网程序调用
+                        try {
+                            ImportAgent importAgent = new ImportAgent();
+                            importAgent.setDataid(vo.getAgent().getId());
+                            importAgent.setDatatype(AgImportType.NETINAPP.name());
+                            importAgent.setBatchcode(UUID.randomUUID().toString().replace("-", ""));
+                            importAgent.setcUser(rel.getcUser());
+                            if (1 != aimportService.insertAgentImportData(importAgent)) {
+                                logger.info("代理商修改审批通过-添加开户任务失败");
+                            } else {
+                                logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), vo.getAgent().getId());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        } finally {
+                            agentNotifyService.asynNotifyPlatform();
+                        }
+
                     }
                 //拒绝更新数据状态
                 }else if(AgStatus.Refuse.name().equals(agStatus)){
