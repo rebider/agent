@@ -40,6 +40,10 @@ public class AgentColinfo implements Serializable {
 
     private String bankRegion;
 
+    private BigDecimal cloTaxPoint;
+
+    private BigDecimal cloInvoice;
+
     private List<Attachment> attachmentList;
 
     public List<Attachment> getAttachmentList() {
@@ -184,5 +188,21 @@ public class AgentColinfo implements Serializable {
 
     public void setBankRegion(String bankRegion) {
         this.bankRegion = bankRegion;
+    }
+
+    public BigDecimal getCloTaxPoint() {
+        return cloTaxPoint;
+    }
+
+    public void setCloTaxPoint(BigDecimal cloTaxPoint) {
+        this.cloTaxPoint = cloTaxPoint;
+    }
+
+    public BigDecimal getCloInvoice() {
+        return cloInvoice;
+    }
+
+    public void setCloInvoice(BigDecimal cloInvoice) {
+        this.cloInvoice = cloInvoice;
     }
 }

@@ -1267,6 +1267,126 @@ public class AgentColinfoExample {
             addCriterion("BANK_REGION not between", value1, value2, "bankRegion");
             return (Criteria) this;
         }
+
+        public Criteria andCloTaxPointIsNull() {
+            addCriterion("CLO_TAX_POINT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointIsNotNull() {
+            addCriterion("CLO_TAX_POINT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointEqualTo(BigDecimal value) {
+            addCriterion("CLO_TAX_POINT =", value, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointNotEqualTo(BigDecimal value) {
+            addCriterion("CLO_TAX_POINT <>", value, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointGreaterThan(BigDecimal value) {
+            addCriterion("CLO_TAX_POINT >", value, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CLO_TAX_POINT >=", value, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointLessThan(BigDecimal value) {
+            addCriterion("CLO_TAX_POINT <", value, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CLO_TAX_POINT <=", value, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointIn(List<BigDecimal> values) {
+            addCriterion("CLO_TAX_POINT in", values, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointNotIn(List<BigDecimal> values) {
+            addCriterion("CLO_TAX_POINT not in", values, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CLO_TAX_POINT between", value1, value2, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloTaxPointNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CLO_TAX_POINT not between", value1, value2, "cloTaxPoint");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceIsNull() {
+            addCriterion("CLO_INVOICE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceIsNotNull() {
+            addCriterion("CLO_INVOICE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceEqualTo(BigDecimal value) {
+            addCriterion("CLO_INVOICE =", value, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceNotEqualTo(BigDecimal value) {
+            addCriterion("CLO_INVOICE <>", value, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceGreaterThan(BigDecimal value) {
+            addCriterion("CLO_INVOICE >", value, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CLO_INVOICE >=", value, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceLessThan(BigDecimal value) {
+            addCriterion("CLO_INVOICE <", value, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CLO_INVOICE <=", value, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceIn(List<BigDecimal> values) {
+            addCriterion("CLO_INVOICE in", values, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceNotIn(List<BigDecimal> values) {
+            addCriterion("CLO_INVOICE not in", values, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CLO_INVOICE between", value1, value2, "cloInvoice");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloInvoiceNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CLO_INVOICE not between", value1, value2, "cloInvoice");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

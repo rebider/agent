@@ -19,6 +19,8 @@
         <result column="BRANCH_LINE_NUM" property="branchLineNum" jdbcType="VARCHAR" />
         <result column="ALL_LINE_NUM" property="allLineNum" jdbcType="VARCHAR" />
         <result column="BANK_REGION" property="bankRegion" jdbcType="VARCHAR" />
+        <result column="CLO_TAX_POINT" property="cloTaxPoint" jdbcType="DECIMAL" />
+        <result column="CLO_INVOICE" property="cloInvoice" jdbcType="DECIMAL" />
     </resultMap>
     <sql id="Example_Where_Clause" >
         <where >
@@ -52,7 +54,7 @@
     <sql id="Base_Column_List" >
         ID, AGENT_ID, CLO_TYPE, CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT,
         C_TIME, C_UTIME, REMARK, C_USER, CLO_REVIEW_STATUS, STATUS, VARSION, BRANCH_LINE_NUM,
-        ALL_LINE_NUM, BANK_REGION
+        ALL_LINE_NUM, BANK_REGION, CLO_TAX_POINT, CLO_INVOICE
     </sql>
     <sql id="Ac_Base_Column_List">
         ac.ID, ac.AGENT_ID, ac.CLO_TYPE, ac.CLO_REALNAME, ac.CLO_BANK, ac.CLO_BANK_BRANCH, ac.CLO_BANK_ACCOUNT,
@@ -93,13 +95,15 @@
         CLO_BANK_ACCOUNT, C_TIME, C_UTIME,
         REMARK, C_USER, CLO_REVIEW_STATUS,
         STATUS, VARSION, BRANCH_LINE_NUM,
-        ALL_LINE_NUM, BANK_REGION)
+        ALL_LINE_NUM, BANK_REGION, CLO_TAX_POINT,
+        CLO_INVOICE)
         values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cloType,jdbcType=DECIMAL},
         #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, #{cloBankBranch,jdbcType=VARCHAR},
         #{cloBankAccount,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP},
         #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL},
         #{status,jdbcType=DECIMAL}, #{varsion,jdbcType=DECIMAL}, #{branchLineNum,jdbcType=VARCHAR},
-        #{allLineNum,jdbcType=VARCHAR}, #{bankRegion,jdbcType=VARCHAR})
+        #{allLineNum,jdbcType=VARCHAR}, #{bankRegion,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL},
+        #{cloInvoice,jdbcType=DECIMAL})
     </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentColinfo" >
         insert into A_AGENT_COLINFO
@@ -155,6 +159,12 @@
             <if test="bankRegion != null" >
                 BANK_REGION,
             </if>
+            <if test="cloTaxPoint != null" >
+                CLO_TAX_POINT,
+            </if>
+            <if test="cloInvoice != null" >
+                CLO_INVOICE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="id != null" >
@@ -207,6 +217,12 @@
             </if>
             <if test="bankRegion != null" >
                 #{bankRegion,jdbcType=VARCHAR},
+            </if>
+            <if test="cloTaxPoint != null" >
+                #{cloTaxPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="cloInvoice != null" >
+                #{cloInvoice,jdbcType=DECIMAL},
             </if>
         </trim>
     </insert>
@@ -267,6 +283,12 @@
             <if test="bankRegion != null" >
                 BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
             </if>
+            <if test="cloTaxPoint != null" >
+                CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+            </if>
+            <if test="cloInvoice != null" >
+                CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -287,7 +309,9 @@
         VARSION = #{varsion,jdbcType=DECIMAL},
         BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
         ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
-        BANK_REGION = #{bankRegion,jdbcType=VARCHAR}
+        BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+        CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+        CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <sql id="OracleDialectPrefix" >
