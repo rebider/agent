@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.order.OAddressMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OAddress" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="U_ID" property="uId" jdbcType="VARCHAR" />
+    <result column="U_TYPE" property="uType" jdbcType="DECIMAL" />
+    <result column="ADDR_REALNAME" property="addrRealname" jdbcType="VARCHAR" />
+    <result column="ADDR_MOBILE" property="addrMobile" jdbcType="VARCHAR" />
+    <result column="ADDR_PROVINCE" property="addrProvince" jdbcType="VARCHAR" />
+    <result column="ADDR_CITY" property="addrCity" jdbcType="VARCHAR" />
+    <result column="ADDR_DISTRICT" property="addrDistrict" jdbcType="VARCHAR" />
+    <result column="ADDR_DETAIL" property="addrDetail" jdbcType="VARCHAR" />
+    <result column="ZIP_CODE" property="zipCode" jdbcType="VARCHAR" />
+    <result column="ISDEFAULT" property="isdefault" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="U_TIME" property="uTime" jdbcType="TIMESTAMP" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
+    <result column="U_USER" property="uUser" jdbcType="VARCHAR" />
+    <result column="VERSION" property="version" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, U_ID, U_TYPE, ADDR_REALNAME, ADDR_MOBILE, ADDR_PROVINCE, ADDR_CITY, ADDR_DISTRICT, 
+    ADDR_DETAIL, ZIP_CODE, ISDEFAULT, REMARK, STATUS, C_TIME, U_TIME, C_USER, U_USER, 
+    VERSION
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OAddressExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_ADDRESS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from O_ADDRESS
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OAddressExample" >
+    delete from O_ADDRESS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OAddress" >
+    insert into O_ADDRESS (ID, U_ID, U_TYPE, 
+      ADDR_REALNAME, ADDR_MOBILE, ADDR_PROVINCE, 
+      ADDR_CITY, ADDR_DISTRICT, ADDR_DETAIL, 
+      ZIP_CODE, ISDEFAULT, REMARK, 
+      STATUS, C_TIME, U_TIME, 
+      C_USER, U_USER, VERSION
+      )
+    values (#{id,jdbcType=VARCHAR}, #{uId,jdbcType=VARCHAR}, #{uType,jdbcType=DECIMAL}, 
+      #{addrRealname,jdbcType=VARCHAR}, #{addrMobile,jdbcType=VARCHAR}, #{addrProvince,jdbcType=VARCHAR}, 
+      #{addrCity,jdbcType=VARCHAR}, #{addrDistrict,jdbcType=VARCHAR}, #{addrDetail,jdbcType=VARCHAR}, 
+      #{zipCode,jdbcType=VARCHAR}, #{isdefault,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
+      #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OAddress" >
+    insert into O_ADDRESS
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="uId != null" >
+        U_ID,
+      </if>
+      <if test="uType != null" >
+        U_TYPE,
+      </if>
+      <if test="addrRealname != null" >
+        ADDR_REALNAME,
+      </if>
+      <if test="addrMobile != null" >
+        ADDR_MOBILE,
+      </if>
+      <if test="addrProvince != null" >
+        ADDR_PROVINCE,
+      </if>
+      <if test="addrCity != null" >
+        ADDR_CITY,
+      </if>
+      <if test="addrDistrict != null" >
+        ADDR_DISTRICT,
+      </if>
+      <if test="addrDetail != null" >
+        ADDR_DETAIL,
+      </if>
+      <if test="zipCode != null" >
+        ZIP_CODE,
+      </if>
+      <if test="isdefault != null" >
+        ISDEFAULT,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="uTime != null" >
+        U_TIME,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
+      </if>
+      <if test="uUser != null" >
+        U_USER,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="uId != null" >
+        #{uId,jdbcType=VARCHAR},
+      </if>
+      <if test="uType != null" >
+        #{uType,jdbcType=DECIMAL},
+      </if>
+      <if test="addrRealname != null" >
+        #{addrRealname,jdbcType=VARCHAR},
+      </if>
+      <if test="addrMobile != null" >
+        #{addrMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="addrProvince != null" >
+        #{addrProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="addrCity != null" >
+        #{addrCity,jdbcType=VARCHAR},
+      </if>
+      <if test="addrDistrict != null" >
+        #{addrDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="addrDetail != null" >
+        #{addrDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="zipCode != null" >
+        #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isdefault != null" >
+        #{isdefault,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null" >
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null" >
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OAddressExample" resultType="java.lang.Integer" >
+    select count(*) from O_ADDRESS
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OAddress" >
+    update O_ADDRESS
+    <set >
+      <if test="uId != null" >
+        U_ID = #{uId,jdbcType=VARCHAR},
+      </if>
+      <if test="uType != null" >
+        U_TYPE = #{uType,jdbcType=DECIMAL},
+      </if>
+      <if test="addrRealname != null" >
+        ADDR_REALNAME = #{addrRealname,jdbcType=VARCHAR},
+      </if>
+      <if test="addrMobile != null" >
+        ADDR_MOBILE = #{addrMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="addrProvince != null" >
+        ADDR_PROVINCE = #{addrProvince,jdbcType=VARCHAR},
+      </if>
+      <if test="addrCity != null" >
+        ADDR_CITY = #{addrCity,jdbcType=VARCHAR},
+      </if>
+      <if test="addrDistrict != null" >
+        ADDR_DISTRICT = #{addrDistrict,jdbcType=VARCHAR},
+      </if>
+      <if test="addrDetail != null" >
+        ADDR_DETAIL = #{addrDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="zipCode != null" >
+        ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isdefault != null" >
+        ISDEFAULT = #{isdefault,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null" >
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null" >
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="version != null" >
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OAddress" >
+    update O_ADDRESS
+    set U_ID = #{uId,jdbcType=VARCHAR},
+      U_TYPE = #{uType,jdbcType=DECIMAL},
+      ADDR_REALNAME = #{addrRealname,jdbcType=VARCHAR},
+      ADDR_MOBILE = #{addrMobile,jdbcType=VARCHAR},
+      ADDR_PROVINCE = #{addrProvince,jdbcType=VARCHAR},
+      ADDR_CITY = #{addrCity,jdbcType=VARCHAR},
+      ADDR_DISTRICT = #{addrDistrict,jdbcType=VARCHAR},
+      ADDR_DETAIL = #{addrDetail,jdbcType=VARCHAR},
+      ZIP_CODE = #{zipCode,jdbcType=VARCHAR},
+      ISDEFAULT = #{isdefault,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
