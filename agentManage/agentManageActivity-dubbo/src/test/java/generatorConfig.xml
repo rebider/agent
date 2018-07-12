@@ -35,7 +35,25 @@
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
 		<!--<table tableName="c_apy_card" domainObjectName="CapyCard" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="a_agent_platformsyn" domainObjectName="AgentPlatFormSyn" enableUpdateByExample="false"
+		<table tableName="O_ACTIVITY" domainObjectName="OActivity" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_ADDRESS" domainObjectName="OAddress" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_ORDER" domainObjectName="OOrder" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_PAYMENT" domainObjectName="OPayment" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_PRODUCT" domainObjectName="OProduct" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_RECEIPT_ORDER" domainObjectName="OReceiptOrder" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_RECEIPT_PRO" domainObjectName="OReceiptPro" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_SUB_ORDER" domainObjectName="OSubOrder" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="O_SUB_ORDER_ACTIVITY" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>

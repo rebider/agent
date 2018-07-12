@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.order.OSubOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OSubOrder" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR" />
+    <result column="PRO_ID" property="proId" jdbcType="VARCHAR" />
+    <result column="PRO_CODE" property="proCode" jdbcType="VARCHAR" />
+    <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
+    <result column="PRO_TYPE" property="proType" jdbcType="VARCHAR" />
+    <result column="PRO_PRICE" property="proPrice" jdbcType="DECIMAL" />
+    <result column="IS_DEPOSIT" property="isDeposit" jdbcType="DECIMAL" />
+    <result column="DEPOSIT" property="deposit" jdbcType="DECIMAL" />
+    <result column="MODEL" property="model" jdbcType="CHAR" />
+    <result column="PRO_NUM" property="proNum" jdbcType="DECIMAL" />
+    <result column="PRO_REL_PRICE" property="proRelPrice" jdbcType="DECIMAL" />
+    <result column="SEND_NUM" property="sendNum" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="U_USER" property="uUser" jdbcType="VARCHAR" />
+    <result column="U_TIME" property="uTime" jdbcType="TIMESTAMP" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+    <result column="VERSION" property="version" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, ORDER_ID, PRO_ID, PRO_CODE, PRO_NAME, PRO_TYPE, PRO_PRICE, IS_DEPOSIT, DEPOSIT, 
+    MODEL, PRO_NUM, PRO_REL_PRICE, SEND_NUM, REMARK, C_USER, C_TIME, U_USER, U_TIME, 
+    STATUS, VERSION
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_SUB_ORDER
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from O_SUB_ORDER
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderExample" >
+    delete from O_SUB_ORDER
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OSubOrder" >
+    insert into O_SUB_ORDER (ID, ORDER_ID, PRO_ID, 
+      PRO_CODE, PRO_NAME, PRO_TYPE, 
+      PRO_PRICE, IS_DEPOSIT, DEPOSIT, 
+      MODEL, PRO_NUM, PRO_REL_PRICE, 
+      SEND_NUM, REMARK, C_USER, 
+      C_TIME, U_USER, U_TIME, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR}, 
+      #{proCode,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, 
+      #{proPrice,jdbcType=DECIMAL}, #{isDeposit,jdbcType=DECIMAL}, #{deposit,jdbcType=DECIMAL}, 
+      #{model,jdbcType=CHAR}, #{proNum,jdbcType=DECIMAL}, #{proRelPrice,jdbcType=DECIMAL}, 
+      #{sendNum,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{uUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSubOrder" >
+    insert into O_SUB_ORDER
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="orderId != null" >
+        ORDER_ID,
+      </if>
+      <if test="proId != null" >
+        PRO_ID,
+      </if>
+      <if test="proCode != null" >
+        PRO_CODE,
+      </if>
+      <if test="proName != null" >
+        PRO_NAME,
+      </if>
+      <if test="proType != null" >
+        PRO_TYPE,
+      </if>
+      <if test="proPrice != null" >
+        PRO_PRICE,
+      </if>
+      <if test="isDeposit != null" >
+        IS_DEPOSIT,
+      </if>
+      <if test="deposit != null" >
+        DEPOSIT,
+      </if>
+      <if test="model != null" >
+        MODEL,
+      </if>
+      <if test="proNum != null" >
+        PRO_NUM,
+      </if>
+      <if test="proRelPrice != null" >
+        PRO_REL_PRICE,
+      </if>
+      <if test="sendNum != null" >
+        SEND_NUM,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="cUser != null" >
+        C_USER,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="uUser != null" >
+        U_USER,
+      </if>
+      <if test="uTime != null" >
+        U_TIME,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="version != null" >
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="proId != null" >
+        #{proId,jdbcType=VARCHAR},
+      </if>
+      <if test="proCode != null" >
+        #{proCode,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null" >
+        #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="proType != null" >
+        #{proType,jdbcType=VARCHAR},
+      </if>
+      <if test="proPrice != null" >
+        #{proPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="isDeposit != null" >
+        #{isDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="deposit != null" >
+        #{deposit,jdbcType=DECIMAL},
+      </if>
+      <if test="model != null" >
+        #{model,jdbcType=CHAR},
+      </if>
+      <if test="proNum != null" >
+        #{proNum,jdbcType=DECIMAL},
+      </if>
+      <if test="proRelPrice != null" >
+        #{proRelPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="sendNum != null" >
+        #{sendNum,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null" >
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uUser != null" >
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uTime != null" >
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderExample" resultType="java.lang.Integer" >
+    select count(*) from O_SUB_ORDER
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OSubOrder" >
+    update O_SUB_ORDER
+    <set >
+      <if test="orderId != null" >
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="proId != null" >
+        PRO_ID = #{proId,jdbcType=VARCHAR},
+      </if>
+      <if test="proCode != null" >
+        PRO_CODE = #{proCode,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null" >
+        PRO_NAME = #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="proType != null" >
+        PRO_TYPE = #{proType,jdbcType=VARCHAR},
+      </if>
+      <if test="proPrice != null" >
+        PRO_PRICE = #{proPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="isDeposit != null" >
+        IS_DEPOSIT = #{isDeposit,jdbcType=DECIMAL},
+      </if>
+      <if test="deposit != null" >
+        DEPOSIT = #{deposit,jdbcType=DECIMAL},
+      </if>
+      <if test="model != null" >
+        MODEL = #{model,jdbcType=CHAR},
+      </if>
+      <if test="proNum != null" >
+        PRO_NUM = #{proNum,jdbcType=DECIMAL},
+      </if>
+      <if test="proRelPrice != null" >
+        PRO_REL_PRICE = #{proRelPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="sendNum != null" >
+        SEND_NUM = #{sendNum,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uUser != null" >
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uTime != null" >
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OSubOrder" >
+    update O_SUB_ORDER
+    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      PRO_ID = #{proId,jdbcType=VARCHAR},
+      PRO_CODE = #{proCode,jdbcType=VARCHAR},
+      PRO_NAME = #{proName,jdbcType=VARCHAR},
+      PRO_TYPE = #{proType,jdbcType=VARCHAR},
+      PRO_PRICE = #{proPrice,jdbcType=DECIMAL},
+      IS_DEPOSIT = #{isDeposit,jdbcType=DECIMAL},
+      DEPOSIT = #{deposit,jdbcType=DECIMAL},
+      MODEL = #{model,jdbcType=CHAR},
+      PRO_NUM = #{proNum,jdbcType=DECIMAL},
+      PRO_REL_PRICE = #{proRelPrice,jdbcType=DECIMAL},
+      SEND_NUM = #{sendNum,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

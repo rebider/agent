@@ -195,6 +195,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setBranchLineNum(agentColinfoVo.getBranchLineNum());
                     db_AgentColinfo.setAllLineNum(agentColinfoVo.getAllLineNum());
                     db_AgentColinfo.setBankRegion(agentColinfoVo.getBankRegion());
+                    db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
+                    db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
                         throw new ProcessException("更新收款信息失败");
                     }
