@@ -76,4 +76,12 @@ public class ProductServiceImpl implements ProductService {
         }
         return result;
     }
+
+    @Override
+    public OProduct findById(String id){
+        if(StringUtils.isBlank(id)){
+            return null;
+        }
+        return productMapper.selectByPrimaryKey(id);
+    }
 }

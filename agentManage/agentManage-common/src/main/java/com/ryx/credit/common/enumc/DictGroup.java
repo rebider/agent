@@ -9,6 +9,7 @@ public enum DictGroup {
     ALL("所有模块"),
     YESORNO("yesorno"),
     AGENT("代理商模块"),
+    ORDER("订单模块"),
     AGENT_AUDIT("代理商审核模块"),
     BUS_TYPE("业务模块类型或者级别"),
     CAPITAL_TYPE("交款类型"),
@@ -28,8 +29,9 @@ public enum DictGroup {
     ACTIVITY_RESPAR("南北大区部门code正则匹配"),//AGENT模块
     ACTIVITY_TASK_REX("任务code正则匹配"),//AGENT模块
     USE_SCOPE("使用范围"),
-    BUS_SCOPE("业务范围");
-
+    BUS_SCOPE("业务范围"),
+    //订单
+    MODEL_TYPE("机具类型");
 
     public String  msg;
 
