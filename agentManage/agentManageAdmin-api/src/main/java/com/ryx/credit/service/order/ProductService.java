@@ -16,4 +16,6 @@ public interface ProductService {
     AgentResult saveProduct(OProduct product);
 
     AgentResult updateProduct(OProduct product);
+
+    OProduct findById(String id);
 }
