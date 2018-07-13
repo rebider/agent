@@ -58,5 +58,6 @@
     <!--订单系统-->
     <dubbo:service interface="com.ryx.credit.service.order.ProductService" ref="productService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.OrderService" ref="orderService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.AddressService" ref="addressService"  timeout="1200000" registry="${zk.group}"/>
 
 </beans>

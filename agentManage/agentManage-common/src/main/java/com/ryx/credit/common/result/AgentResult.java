@@ -35,6 +35,13 @@ public class AgentResult implements Serializable{
         return new AgentResult(null);
     }
 
+    public static AgentResult fail() {
+        return build(500,"失败");
+    }
+
+    public static AgentResult fail(String msg) {
+        return build(500,msg);
+    }
     public AgentResult() {
 
     }
