@@ -41,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
             criteria.andProNameEqualTo(product.getProName());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        example.setPage(page);
         List<OProduct> oProducts = productMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oProducts);
