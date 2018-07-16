@@ -18,4 +18,7 @@ public interface RegionService {
     public Region queryByCode(String code);
 
     public String getRegionName(String code);
+
+
+    public List<Region> queryRegion(Region region);
 }

@@ -111,7 +111,9 @@ public class AddressServiceImpl implements AddressService {
         if(StringUtils.isBlank(oAddress.getAddrRealname())) return AgentResult.fail("真实姓名不能为空");
         if(StringUtils.isBlank(oAddress.getAddrMobile())) return AgentResult.fail("联系方式不能为空");
         if(StringUtils.isBlank(oAddress.getuId())) return AgentResult.fail("用户信息不能为空");
-        if(null==oAddress.getuType()) return AgentResult.fail("用户类型不能为空");
+        if(null==oAddress.getuType()) oAddress.setuType(Status.STATUS_0.status);
+        if(null==oAddress.getIsdefault()) oAddress.setIsdefault(Status.STATUS_0.status);
+
         Date date = Calendar.getInstance().getTime();
         oAddress.setId(idService.genId(TabId.o_address));
         oAddress.setcTime(date);
@@ -120,6 +122,16 @@ public class AddressServiceImpl implements AddressService {
         oAddress.setuTime(date);
         oAddress.setuUser(user);
         oAddress.setVersion(Status.STATUS_0.status);
+        //更新默认地址
+        if(oAddress.getIsdefault().equals(Status.STATUS_1.status)){
+            OAddressExample example = new OAddressExample();
+            example.or().andUIdEqualTo(oAddress.getuId()).andIsdefaultEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+            List<OAddress>  oas = oAddressMapper.selectByExample(example);
+            for (OAddress oa : oas) {
+                    oa.setIsdefault(Status.STATUS_0.status);
+                    oAddressMapper.updateByPrimaryKeySelective(oa);
+            }
+        }
         if(1==oAddressMapper.insertSelective(oAddress)){
             return AgentResult.ok(oAddress);
         }
@@ -137,7 +149,21 @@ public class AddressServiceImpl implements AddressService {
         if(StringUtils.isBlank(oAddress.getAddrRealname())) return AgentResult.fail("真实姓名不能为空");
         if(StringUtils.isBlank(oAddress.getAddrMobile())) return AgentResult.fail("联系方式不能为空");
         if(StringUtils.isBlank(oAddress.getuId())) return AgentResult.fail("用户信息不能为空");
-        if(null==oAddress.getuType()) return AgentResult.fail("用户类型不能为空");
+        if(null==oAddress.getuType()) oAddress.setuType(Status.STATUS_0.status);
+        if(null==oAddress.getIsdefault()) oAddress.setIsdefault(Status.STATUS_0.status);
+        //更新默认地址
+        if(oAddress.getIsdefault().equals(Status.STATUS_1.status)){
+            OAddressExample example = new OAddressExample();
+            example.or().andUIdEqualTo(oAddress.getuId()).andIsdefaultEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+            List<OAddress>  oas = oAddressMapper.selectByExample(example);
+            for (OAddress oa : oas) {
+                if(!oa.getId().equals(oAddress.getId())) {
+                    oa.setIsdefault(Status.STATUS_0.status);
+                    oAddressMapper.updateByPrimaryKeySelective(oa);
+                }
+            }
+        }
+
         OAddress db = oAddressMapper.selectByPrimaryKey(oAddress.getId());
         db.setAddrRealname(oAddress.getAddrRealname());
         db.setAddrMobile(oAddress.getAddrMobile());
@@ -157,5 +183,11 @@ public class AddressServiceImpl implements AddressService {
             return AgentResult.ok(oAddress);
         }
         return AgentResult.fail();
+    }
+
+
+    @Override
+    public OAddress queryById(String id) {
+        return oAddressMapper.selectByPrimaryKey(id);
     }
 }

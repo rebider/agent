@@ -23,6 +23,8 @@ public interface AddressService {
 
     AgentResult updateAddress(OAddress oAddress,String user);
 
+    OAddress  queryById(String id);
+
 
 
 }
