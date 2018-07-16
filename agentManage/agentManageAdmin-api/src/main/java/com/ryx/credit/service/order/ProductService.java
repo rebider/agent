@@ -18,4 +18,6 @@ public interface ProductService {
     AgentResult updateProduct(OProduct product);
 
     OProduct findById(String id);
+
+    AgentResult deleteById(String id);
 }

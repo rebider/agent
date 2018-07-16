@@ -34,7 +34,13 @@ public class ProductServiceImpl implements ProductService {
 
         OProductExample example = new OProductExample();
         OProductExample.Criteria criteria = example.createCriteria();
-
+        if(StringUtils.isNotBlank(product.getProCode())){
+            criteria.andProCodeEqualTo(product.getProCode());
+        }
+        if(StringUtils.isNotBlank(product.getProName())){
+            criteria.andProNameEqualTo(product.getProName());
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<OProduct> oProducts = productMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oProducts);
@@ -84,4 +90,22 @@ public class ProductServiceImpl implements ProductService {
         }
         return productMapper.selectByPrimaryKey(id);
     }
+
+    @Override
+    public AgentResult deleteById(String id){
+        AgentResult result = new AgentResult(500, "参数错误", "");
+        if(StringUtils.isBlank(id)){
+            return result;
+        }
+        OProduct product = new OProduct();
+        product.setId(id);
+        product.setuTime(new Date());
+        product.setStatus(Status.STATUS_0.status);
+        int update = productMapper.updateByPrimaryKeySelective(product);
+        if(update==1){
+            return AgentResult.ok();
+        }
+        return result;
+    }
+
 }
