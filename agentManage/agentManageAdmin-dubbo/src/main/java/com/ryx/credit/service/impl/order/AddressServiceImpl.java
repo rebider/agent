@@ -58,6 +58,9 @@ public class AddressServiceImpl implements AddressService {
         if(StringUtils.isNotBlank(oAddress.getAddrMobile())){
             c.andAddrMobileLike("%"+oAddress.getAddrMobile()+"%");
         }
+        if(StringUtils.isNotBlank(oAddress.getRemark())){
+            c.andRemarkLike("%"+oAddress.getRemark()+"%");
+        }
         if(StringUtils.isNotBlank(oAddress.getAddrProvince())){
             c.andAddrProvinceEqualTo(oAddress.getAddrProvince());
         }
