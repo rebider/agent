@@ -108,4 +108,13 @@ public class ProductServiceImpl implements ProductService {
         return result;
     }
 
+    @Override
+    public List<OProduct> allProductList(OProduct product){
+        OProductExample example = new OProductExample();
+        OProductExample.Criteria criteria = example.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OProduct> oProducts = productMapper.selectByExample(example);
+        return oProducts;
+    }
+
 }
