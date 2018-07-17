@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.bank.EtbSysCardBinNoMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNo" >
+    <result column="BANK_ID" property="bankId" jdbcType="VARCHAR" />
+    <result column="ISS_USERS" property="issUsers" jdbcType="VARCHAR" />
+    <result column="CARD_NO" property="cardNo" jdbcType="VARCHAR" />
+    <result column="CARD_LEN" property="cardLen" jdbcType="DECIMAL" />
+    <result column="CARD_BIN" property="cardBin" jdbcType="VARCHAR" />
+    <result column="CARD_NAME" property="cardName" jdbcType="VARCHAR" />
+    <result column="BANK_NAME" property="bankName" jdbcType="VARCHAR" />
+    <result column="BRANCH_ID" property="branchId" jdbcType="VARCHAR" />
+    <result column="BRANCH_ID2" property="branchId2" jdbcType="VARCHAR" />
+    <result column="CARD_TYPE" property="cardType" jdbcType="VARCHAR" />
+    <result column="CARD_ORG" property="cardOrg" jdbcType="VARCHAR" />
+    <result column="CARD_TAG" property="cardTag" jdbcType="DECIMAL" />
+    <result column="CARD_TAG2" property="cardTag2" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    BANK_ID, ISS_USERS, CARD_NO, CARD_LEN, CARD_BIN, CARD_NAME, BANK_NAME, BRANCH_ID, 
+    BRANCH_ID2, CARD_TYPE, CARD_ORG, CARD_TAG, CARD_TAG2
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNoExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from ETB_SYSCARDBINNO
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNoExample" >
+    delete from ETB_SYSCARDBINNO
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNo" >
+    insert into ETB_SYSCARDBINNO (BANK_ID, ISS_USERS, CARD_NO, 
+      CARD_LEN, CARD_BIN, CARD_NAME, 
+      BANK_NAME, BRANCH_ID, BRANCH_ID2, 
+      CARD_TYPE, CARD_ORG, CARD_TAG, 
+      CARD_TAG2)
+    values (#{bankId,jdbcType=VARCHAR}, #{issUsers,jdbcType=VARCHAR}, #{cardNo,jdbcType=VARCHAR}, 
+      #{cardLen,jdbcType=DECIMAL}, #{cardBin,jdbcType=VARCHAR}, #{cardName,jdbcType=VARCHAR}, 
+      #{bankName,jdbcType=VARCHAR}, #{branchId,jdbcType=VARCHAR}, #{branchId2,jdbcType=VARCHAR}, 
+      #{cardType,jdbcType=VARCHAR}, #{cardOrg,jdbcType=VARCHAR}, #{cardTag,jdbcType=DECIMAL}, 
+      #{cardTag2,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNo" >
+    insert into ETB_SYSCARDBINNO
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bankId != null" >
+        BANK_ID,
+      </if>
+      <if test="issUsers != null" >
+        ISS_USERS,
+      </if>
+      <if test="cardNo != null" >
+        CARD_NO,
+      </if>
+      <if test="cardLen != null" >
+        CARD_LEN,
+      </if>
+      <if test="cardBin != null" >
+        CARD_BIN,
+      </if>
+      <if test="cardName != null" >
+        CARD_NAME,
+      </if>
+      <if test="bankName != null" >
+        BANK_NAME,
+      </if>
+      <if test="branchId != null" >
+        BRANCH_ID,
+      </if>
+      <if test="branchId2 != null" >
+        BRANCH_ID2,
+      </if>
+      <if test="cardType != null" >
+        CARD_TYPE,
+      </if>
+      <if test="cardOrg != null" >
+        CARD_ORG,
+      </if>
+      <if test="cardTag != null" >
+        CARD_TAG,
+      </if>
+      <if test="cardTag2 != null" >
+        CARD_TAG2,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bankId != null" >
+        #{bankId,jdbcType=VARCHAR},
+      </if>
+      <if test="issUsers != null" >
+        #{issUsers,jdbcType=VARCHAR},
+      </if>
+      <if test="cardNo != null" >
+        #{cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="cardLen != null" >
+        #{cardLen,jdbcType=DECIMAL},
+      </if>
+      <if test="cardBin != null" >
+        #{cardBin,jdbcType=VARCHAR},
+      </if>
+      <if test="cardName != null" >
+        #{cardName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="branchId != null" >
+        #{branchId,jdbcType=VARCHAR},
+      </if>
+      <if test="branchId2 != null" >
+        #{branchId2,jdbcType=VARCHAR},
+      </if>
+      <if test="cardType != null" >
+        #{cardType,jdbcType=VARCHAR},
+      </if>
+      <if test="cardOrg != null" >
+        #{cardOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="cardTag != null" >
+        #{cardTag,jdbcType=DECIMAL},
+      </if>
+      <if test="cardTag2 != null" >
+        #{cardTag2,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNoExample" resultType="java.lang.Integer" >
+    select count(*) from ETB_SYSCARDBINNO
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
