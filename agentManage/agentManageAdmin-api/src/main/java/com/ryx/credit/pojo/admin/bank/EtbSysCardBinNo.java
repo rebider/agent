@@ -1,8 +1,9 @@
 package com.ryx.credit.pojo.admin.bank;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class EtbSysCardBinNo {
+public class EtbSysCardBinNo implements Serializable{
     private String bankId;
 
     private String issUsers;

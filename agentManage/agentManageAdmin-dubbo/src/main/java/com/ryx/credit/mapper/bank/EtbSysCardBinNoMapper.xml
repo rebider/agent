@@ -184,4 +184,12 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="getCardBinByCardNo" parameterType="string"
+          resultType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNo">
+    select
+    <include refid="Base_Column_List" />
+    from ETB_SYSCARDBINNO e
+    where e.CARD_BIN = #{card_no}
+  </select>
 </mapper>
