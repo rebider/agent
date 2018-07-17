@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.dict;
 
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.result.Tree;
@@ -111,5 +112,19 @@ public class RegionServiceImpl implements RegionService {
             }
         }
         return name;
+    }
+
+    @Override
+    public List<Region> queryRegion(Region region) {
+        if(region==null)return new ArrayList<>();
+        RegionExample example = new RegionExample();
+        RegionExample.Criteria c=  example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(region.gettType()!=null)c.andTTypeEqualTo(region.gettType());
+        if(region.getId()!=null)c.andIdEqualTo(region.getId());
+        if(region.getrName()!=null)c.andRNameEqualTo(region.getrName());
+        if(region.getrCode()!=null)c.andRCodeEqualTo(region.getrCode());
+        if(region.getpCode()!=null)c.andPCodeEqualTo(region.getpCode());
+        example.setOrderByClause(" r_sort desc ");
+        return regionMapper.selectByExample(example);
     }
 }
