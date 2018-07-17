@@ -185,8 +185,7 @@
     </if>
   </sql>
 
-  <select id="getCardBinByCardNo" parameterType="string"
-          resultType="com.ryx.credit.pojo.admin.bank.EtbSysCardBinNo">
+  <select id="getCardBinByCardNo" parameterType="string"  resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from ETB_SYSCARDBINNO e

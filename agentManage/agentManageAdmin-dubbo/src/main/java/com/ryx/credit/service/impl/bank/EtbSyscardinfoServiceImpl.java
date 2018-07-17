@@ -24,7 +24,7 @@ public class EtbSyscardinfoServiceImpl implements EtbSyscardinfoService {
     @Override
     public EtbSysCardBinNo findCardBinByCardNo(String cardNo) throws ProcessorException {
         LOG.debug("BaseCardServiceImpl findByCardNo cardNo: " + cardNo);
-        EtbSysCardBinNo etbSyscardbinno = new EtbSysCardBinNo();
+        EtbSysCardBinNo etbSyscardbinno = null;
         String cardBinStr = cardNo.substring(0, 10);
         List<EtbSysCardBinNo> result = new ArrayList<EtbSysCardBinNo>();
         for (int i = cardBinStr.length(); i > 1; i--) {
@@ -45,7 +45,6 @@ public class EtbSyscardinfoServiceImpl implements EtbSyscardinfoService {
                 }
             }
             if (etbSyscardbinno == null) {
-                LOG.error("AccHead:" + etbSyscardbinno.getCardBin() + "|cardNo.length():"+ cardNo.length());
                 throw new ProcessorException("验证账户状态找不到卡bin");
             }
         }
