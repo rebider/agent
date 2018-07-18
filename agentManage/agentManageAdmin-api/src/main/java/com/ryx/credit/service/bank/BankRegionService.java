@@ -5,6 +5,8 @@ package com.ryx.credit.service.bank;
  */
 public interface BankRegionService {
 
-    String findNameById(String regionName);
+    String findNameByRegionName(String regionName);
+
+    String findNameByRegionId(String regionName);
 
 }
