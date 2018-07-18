@@ -1,10 +1,9 @@
 package com.ryx.credit.pojo.admin.order;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OPayment implements Serializable {
+public class OPayment {
     private String id;
 
     private String userId;
@@ -40,6 +39,12 @@ public class OPayment implements Serializable {
     private String deductionType;
 
     private BigDecimal deductionAmount;
+
+    private BigDecimal downPayment;
+
+    private BigDecimal downPaymentCount;
+
+    private Date downPaymentDate;
 
     private String remark;
 
@@ -189,6 +194,30 @@ public class OPayment implements Serializable {
 
     public void setDeductionAmount(BigDecimal deductionAmount) {
         this.deductionAmount = deductionAmount;
+    }
+
+    public BigDecimal getDownPayment() {
+        return downPayment;
+    }
+
+    public void setDownPayment(BigDecimal downPayment) {
+        this.downPayment = downPayment;
+    }
+
+    public BigDecimal getDownPaymentCount() {
+        return downPaymentCount;
+    }
+
+    public void setDownPaymentCount(BigDecimal downPaymentCount) {
+        this.downPaymentCount = downPaymentCount;
+    }
+
+    public Date getDownPaymentDate() {
+        return downPaymentDate;
+    }
+
+    public void setDownPaymentDate(Date downPaymentDate) {
+        this.downPaymentDate = downPaymentDate;
     }
 
     public String getRemark() {

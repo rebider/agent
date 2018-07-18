@@ -24,7 +24,7 @@ public class MBGexecute {
     /** 分页插件类 */
     private static final String GENERATOR_PAGEPLUGIN="generator.pagePlugin";
     /** 生成配置文件名称 */
-    private static final String CONFIG_NAME="generatorConfig.xml";
+    private static final String CONFIG_NAME= "generatorConfig.xml";
     /** 生成配置文件路径 */
     private static final String CONFIG_URL= MBGexecute.class.getResource("/").getPath()+"/";
     /** 数据库配置文件名称 */

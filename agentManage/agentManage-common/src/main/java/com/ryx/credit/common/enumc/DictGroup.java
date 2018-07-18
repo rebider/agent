@@ -31,7 +31,8 @@ public enum DictGroup {
     USE_SCOPE("使用范围"),
     BUS_SCOPE("业务范围"),
     //订单
-    MODEL_TYPE("机具类型");
+    MODEL_TYPE("机具类型"),
+    SETTLEMENT_TYPE("结算类型");
 
     public String  msg;
 

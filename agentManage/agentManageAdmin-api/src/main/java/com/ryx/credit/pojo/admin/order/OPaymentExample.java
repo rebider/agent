@@ -1308,6 +1308,186 @@ public class OPaymentExample {
             return (Criteria) this;
         }
 
+        public Criteria andDownPaymentIsNull() {
+            addCriterion("DOWN_PAYMENT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentIsNotNull() {
+            addCriterion("DOWN_PAYMENT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT =", value, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentNotEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT <>", value, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentGreaterThan(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT >", value, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT >=", value, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentLessThan(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT <", value, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT <=", value, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentIn(List<BigDecimal> values) {
+            addCriterion("DOWN_PAYMENT in", values, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentNotIn(List<BigDecimal> values) {
+            addCriterion("DOWN_PAYMENT not in", values, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DOWN_PAYMENT between", value1, value2, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DOWN_PAYMENT not between", value1, value2, "downPayment");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountIsNull() {
+            addCriterion("DOWN_PAYMENT_COUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountIsNotNull() {
+            addCriterion("DOWN_PAYMENT_COUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT_COUNT =", value, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountNotEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT_COUNT <>", value, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountGreaterThan(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT_COUNT >", value, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT_COUNT >=", value, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountLessThan(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT_COUNT <", value, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DOWN_PAYMENT_COUNT <=", value, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountIn(List<BigDecimal> values) {
+            addCriterion("DOWN_PAYMENT_COUNT in", values, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountNotIn(List<BigDecimal> values) {
+            addCriterion("DOWN_PAYMENT_COUNT not in", values, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DOWN_PAYMENT_COUNT between", value1, value2, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentCountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DOWN_PAYMENT_COUNT not between", value1, value2, "downPaymentCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateIsNull() {
+            addCriterion("DOWN_PAYMENT_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateIsNotNull() {
+            addCriterion("DOWN_PAYMENT_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateEqualTo(Date value) {
+            addCriterion("DOWN_PAYMENT_DATE =", value, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateNotEqualTo(Date value) {
+            addCriterion("DOWN_PAYMENT_DATE <>", value, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateGreaterThan(Date value) {
+            addCriterion("DOWN_PAYMENT_DATE >", value, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateGreaterThanOrEqualTo(Date value) {
+            addCriterion("DOWN_PAYMENT_DATE >=", value, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateLessThan(Date value) {
+            addCriterion("DOWN_PAYMENT_DATE <", value, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateLessThanOrEqualTo(Date value) {
+            addCriterion("DOWN_PAYMENT_DATE <=", value, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateIn(List<Date> values) {
+            addCriterion("DOWN_PAYMENT_DATE in", values, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateNotIn(List<Date> values) {
+            addCriterion("DOWN_PAYMENT_DATE not in", values, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateBetween(Date value1, Date value2) {
+            addCriterion("DOWN_PAYMENT_DATE between", value1, value2, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentDateNotBetween(Date value1, Date value2) {
+            addCriterion("DOWN_PAYMENT_DATE not between", value1, value2, "downPaymentDate");
+            return (Criteria) this;
+        }
+
         public Criteria andRemarkIsNull() {
             addCriterion("REMARK is null");
             return (Criteria) this;
