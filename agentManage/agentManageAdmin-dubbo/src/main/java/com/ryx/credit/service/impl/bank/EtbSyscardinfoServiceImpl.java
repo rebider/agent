@@ -35,7 +35,6 @@ public class EtbSyscardinfoServiceImpl implements EtbSyscardinfoService {
             }
         }
         if (result.size() == 0) {
-            LOG.error("etbSyscardbinno.AccHead:" + etbSyscardbinno.getCardBin());
             throw new ProcessorException("验证账户状态找不到卡bin");
         } else {
             for (int j = 0; j < result.size(); j++) {
