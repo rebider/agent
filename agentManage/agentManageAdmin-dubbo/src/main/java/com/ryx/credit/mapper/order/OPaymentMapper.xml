@@ -20,6 +20,9 @@
     <result column="IS_CLO_INVOICE" property="isCloInvoice" jdbcType="DECIMAL" />
     <result column="DEDUCTION_TYPE" property="deductionType" jdbcType="VARCHAR" />
     <result column="DEDUCTION_AMOUNT" property="deductionAmount" jdbcType="DECIMAL" />
+    <result column="DOWN_PAYMENT" property="downPayment" jdbcType="DECIMAL" />
+    <result column="DOWN_PAYMENT_COUNT" property="downPaymentCount" jdbcType="DECIMAL" />
+    <result column="DOWN_PAYMENT_DATE" property="downPaymentDate" jdbcType="TIMESTAMP" />
     <result column="REMARK" property="remark" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
@@ -56,7 +59,8 @@
   <sql id="Base_Column_List" >
     ID, USER_ID, ORDER_ID, AGENT_ID, PAY_METHOD, C_TIME, PAY_AMOUNT, REAL_AMOUNT, PAY_COMPLET_TIME, 
     PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE, SHARE_TEMPLET, 
-    IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, REMARK, STATUS, VERSION
+    IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT, 
+    DOWN_PAYMENT_DATE, REMARK, STATUS, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OPaymentExample" >
     <include refid="OracleDialectPrefix" />
@@ -93,6 +97,7 @@
       PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, 
       GUARANTEE_AGENT, SETTLEMENT_PRICE, SHARE_TEMPLET, 
       IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, 
+      DOWN_PAYMENT, DOWN_PAYMENT_COUNT, DOWN_PAYMENT_DATE, 
       REMARK, STATUS, VERSION
       )
     values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
@@ -101,6 +106,7 @@
       #{payStatus,jdbcType=DECIMAL}, #{planSucTime,jdbcType=TIMESTAMP}, #{payRule,jdbcType=VARCHAR}, 
       #{guaranteeAgent,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL}, #{shareTemplet,jdbcType=VARCHAR}, 
       #{isCloInvoice,jdbcType=DECIMAL}, #{deductionType,jdbcType=VARCHAR}, #{deductionAmount,jdbcType=DECIMAL}, 
+      #{downPayment,jdbcType=DECIMAL}, #{downPaymentCount,jdbcType=DECIMAL}, #{downPaymentDate,jdbcType=TIMESTAMP}, 
       #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
       )
   </insert>
@@ -160,6 +166,15 @@
       </if>
       <if test="deductionAmount != null" >
         DEDUCTION_AMOUNT,
+      </if>
+      <if test="downPayment != null" >
+        DOWN_PAYMENT,
+      </if>
+      <if test="downPaymentCount != null" >
+        DOWN_PAYMENT_COUNT,
+      </if>
+      <if test="downPaymentDate != null" >
+        DOWN_PAYMENT_DATE,
       </if>
       <if test="remark != null" >
         REMARK,
@@ -225,6 +240,15 @@
       </if>
       <if test="deductionAmount != null" >
         #{deductionAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="downPayment != null" >
+        #{downPayment,jdbcType=DECIMAL},
+      </if>
+      <if test="downPaymentCount != null" >
+        #{downPaymentCount,jdbcType=DECIMAL},
+      </if>
+      <if test="downPaymentDate != null" >
+        #{downPaymentDate,jdbcType=TIMESTAMP},
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
@@ -297,6 +321,15 @@
       <if test="deductionAmount != null" >
         DEDUCTION_AMOUNT = #{deductionAmount,jdbcType=DECIMAL},
       </if>
+      <if test="downPayment != null" >
+        DOWN_PAYMENT = #{downPayment,jdbcType=DECIMAL},
+      </if>
+      <if test="downPaymentCount != null" >
+        DOWN_PAYMENT_COUNT = #{downPaymentCount,jdbcType=DECIMAL},
+      </if>
+      <if test="downPaymentDate != null" >
+        DOWN_PAYMENT_DATE = #{downPaymentDate,jdbcType=TIMESTAMP},
+      </if>
       <if test="remark != null" >
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
@@ -328,6 +361,9 @@
       IS_CLO_INVOICE = #{isCloInvoice,jdbcType=DECIMAL},
       DEDUCTION_TYPE = #{deductionType,jdbcType=VARCHAR},
       DEDUCTION_AMOUNT = #{deductionAmount,jdbcType=DECIMAL},
+      DOWN_PAYMENT = #{downPayment,jdbcType=DECIMAL},
+      DOWN_PAYMENT_COUNT = #{downPaymentCount,jdbcType=DECIMAL},
+      DOWN_PAYMENT_DATE = #{downPaymentDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL}
