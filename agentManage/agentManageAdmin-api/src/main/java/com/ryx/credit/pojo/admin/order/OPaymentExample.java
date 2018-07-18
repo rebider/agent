@@ -1677,6 +1677,76 @@ public class OPaymentExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andCollectCompanyIsNull() {
+            addCriterion("COLLECT_COMPANY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIsNotNull() {
+            addCriterion("COLLECT_COMPANY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY =", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY <>", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyGreaterThan(String value) {
+            addCriterion("COLLECT_COMPANY >", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyGreaterThanOrEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY >=", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLessThan(String value) {
+            addCriterion("COLLECT_COMPANY <", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLessThanOrEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY <=", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLike(String value) {
+            addCriterion("COLLECT_COMPANY like", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotLike(String value) {
+            addCriterion("COLLECT_COMPANY not like", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIn(List<String> values) {
+            addCriterion("COLLECT_COMPANY in", values, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotIn(List<String> values) {
+            addCriterion("COLLECT_COMPANY not in", values, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyBetween(String value1, String value2) {
+            addCriterion("COLLECT_COMPANY between", value1, value2, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotBetween(String value1, String value2) {
+            addCriterion("COLLECT_COMPANY not between", value1, value2, "collectCompany");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

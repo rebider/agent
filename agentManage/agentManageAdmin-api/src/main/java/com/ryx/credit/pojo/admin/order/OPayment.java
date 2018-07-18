@@ -52,6 +52,8 @@ public class OPayment {
 
     private BigDecimal version;
 
+    private String collectCompany;
+
     public String getId() {
         return id;
     }
@@ -242,5 +244,13 @@ public class OPayment {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getCollectCompany() {
+        return collectCompany;
+    }
+
+    public void setCollectCompany(String collectCompany) {
+        this.collectCompany = collectCompany == null ? null : collectCompany.trim();
     }
 }
