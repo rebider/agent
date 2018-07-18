@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AttachmentRelType;
+import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -14,6 +15,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
+import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private AgentColinfoRelMapper agentColinfoRelMapper;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
-
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     /**
      * 代理商入网添加代理商交款项
@@ -117,6 +120,19 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             return result;
         }
 
+        AgentColinfoRelExample example = new AgentColinfoRelExample();
+        AgentColinfoRelExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentbusidEqualTo(agentColinfoRel.getAgentbusid());
+        criteria.andAgentidEqualTo(agentColinfoRel.getAgentid());
+        criteria.andBusPlatformEqualTo(agentColinfoRel.getBusPlatform());
+        List<AgentColinfoRel> agentColinfoRels = agentColinfoRelMapper.selectByExample(example);
+        if(null!=agentColinfoRels && agentColinfoRels.size()>=1){
+            int deleteResult = agentColinfoRelMapper.deleteByExample(example);
+            if(deleteResult!=1){
+                new AgentResult(500, "系统异常", "");
+            }
+        }
+
         Date d = Calendar.getInstance().getTime();
         agentColinfoRel.setcTime(d);
         agentColinfoRel.setStatus(Status.STATUS_1.status);
@@ -175,10 +191,15 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setCloBankBranch(agentColinfoVo.getCloBankBranch());
                     db_AgentColinfo.setCloBankAccount(agentColinfoVo.getCloBankAccount());
                     db_AgentColinfo.setRemark(agentColinfoVo.getRemark());
+                    db_AgentColinfo.setStatus(agentColinfoVo.getStatus());
+                    db_AgentColinfo.setBranchLineNum(agentColinfoVo.getBranchLineNum());
+                    db_AgentColinfo.setAllLineNum(agentColinfoVo.getAllLineNum());
+                    db_AgentColinfo.setBankRegion(agentColinfoVo.getBankRegion());
+                    db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
+                    db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
                         throw new ProcessException("更新收款信息失败");
                     }
-
                     //删除老的附件
                     AttachmentRelExample example = new AttachmentRelExample();
                     example.or().andBusTypeEqualTo(AttachmentRelType.Proceeds.name()).andSrcIdEqualTo(db_AgentColinfo.getId()).andStatusEqualTo(Status.STATUS_1.status);
@@ -213,7 +234,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     }
 
                 }
+                agentDataHistoryService.saveDataHistory(agentColinfoVo, DataHistoryType.GATHER.getValue());
             }
+
             return ResultVO.success(null);
         } catch (Exception e) {
             e.printStackTrace();

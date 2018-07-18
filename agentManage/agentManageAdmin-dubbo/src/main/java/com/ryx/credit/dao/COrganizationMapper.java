@@ -2,6 +2,10 @@ package com.ryx.credit.dao;
 
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 import com.ryx.credit.pojo.admin.COrganization;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -9,5 +13,8 @@ import com.ryx.credit.pojo.admin.COrganization;
  *
  */
 public interface COrganizationMapper extends BaseMapper<COrganization> {
+
+    public List<Map> selectByOrgName(@Param("name") String name);
+
 
 }

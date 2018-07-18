@@ -13,9 +13,12 @@ import java.util.List;
  */
 public interface RegionService {
 
-    List<Tree> selectAllRegion();
+    List<Tree> selectAllRegion(String pCode);
 
     public Region queryByCode(String code);
 
     public String getRegionName(String code);
+
+
+    public List<Region> queryRegion(Region region);
 }

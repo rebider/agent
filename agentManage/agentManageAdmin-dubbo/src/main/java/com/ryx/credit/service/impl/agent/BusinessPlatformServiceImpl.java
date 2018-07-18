@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,13 +51,17 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private AgentColinfoService agentColinfoService;
-
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
 
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("agStatus",AgStatus.Approved.name());
+        if(!StringUtils.isBlank(agent.getId())){
+            reqMap.put("id",agent.getId());
+        }
         if(!StringUtils.isBlank(agent.getAgName())){
             reqMap.put("agName",agent.getAgName());
         }
@@ -71,7 +77,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if(agentBusInfo.getCloReviewStatus()!=null){
             reqMap.put("cloReviewStatus",agentBusInfo.getCloReviewStatus());
         }
-
+        reqMap.put("status",Status.STATUS_1.status);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
@@ -127,6 +133,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     public List<PlatForm> queryAblePlatForm() {
         PlatFormExample example = new PlatFormExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
+        example.setOrderByClause(" c_time asc ");
         return platFormMapper.selectByExample(example);
     }
 
@@ -139,35 +146,77 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception{
         try {
+
             Agent agent = agentVo.getAgent();
             agent.setId(agentVo.getAgentId());
-            for (AgentContractVo item : agentVo.getContractVoList()) {
-                item.setcUser(agent.getcUser());
+            //先查询业务是否已添加 有个添加过 全部返回
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setAgentId(agent.getId());
-                agentContractService.insertAgentContract(item, item.getContractTableFile());
-            }
-            for (CapitalVo item : agentVo.getCapitalVoList()) {
-                item.setcAgentId(agent.getId());
-                item.setcUser(agent.getcUser());
-                AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
-                if(!result.isOK()){
-                    throw new ProcessException("缴纳款项信息录入失败");
+                Boolean busPlatExist = findBusPlatExist(item);
+                if(busPlatExist){
+                    return new AgentResult(500,"业务已添加,请勿重复添加","");
                 }
             }
-            for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
-                item.setAgentId(agent.getId());
-                item.setcUser(agent.getcUser());
-                agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+            for (AgentContractVo item : agentVo.getContractVoList()) {
+                if(StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())){
+                    item.setcUser(agent.getcUser());
+                    item.setAgentId(agent.getId());
+                    agentContractService.insertAgentContract(item, item.getContractTableFile());
+                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                }
             }
+            for (CapitalVo item : agentVo.getCapitalVoList()) {
+                if(StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
+                    item.setcAgentId(agent.getId());
+                    item.setcUser(agent.getcUser());
+                    AgentResult result = accountPaidItemService.insertAccountPaid(item, item.getCapitalTableFile(), agentVo.getAgent().getcUser());
+                    if (!result.isOK()) {
+                        throw new ProcessException("缴纳款项信息录入失败");
+                    }
+                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
+                }
+            }
+            if(null!=agentVo.getColinfoVoList()){
+                for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
+                    item.setAgentId(agent.getId());
+                    item.setcUser(agent.getcUser());
+                    agentColinfoService.agentColinfoInsert(item,item.getColinfoTableFile());
+                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
+                }
+            }
+            List<AgentBusInfo> agentBusInfoList = new ArrayList<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
-                agentBusinfoService.agentBusInfoInsert(item);
+                AgentBusInfo agentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
+                agentBusInfoList.add(agentBusInfo);
+                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
-            return AgentResult.ok();
+            return AgentResult.ok(agentBusInfoList);
         }catch (Exception e){
             e.printStackTrace();
             throw new ProcessException("业务平台信息录入失败");
         }
     }
+
+    /**
+     * 查询代理上次业务是否添加过
+     * @param agentBusInfo
+     * @return
+     */
+    private Boolean findBusPlatExist(AgentBusInfo agentBusInfo){
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentBusInfo.getAgentId());
+        criteria.andBusPlatformEqualTo(agentBusInfo.getBusPlatform());
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
+        if(null==agentBusInfos){
+            return true;
+        }
+        if(agentBusInfos.size()==0){
+            return false;
+        }
+        return true;
+    }
+
 }

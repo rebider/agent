@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.bank.BankRegionMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.bank.BankRegion" >
+    <result column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="B_REGION" property="bRegion" jdbcType="VARCHAR" />
+    <result column="B_LEVEL" property="bLevel" jdbcType="VARCHAR" />
+    <result column="B_CITY" property="bCity" jdbcType="VARCHAR" />
+    <result column="B_PROVINCE" property="bProvince" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, B_REGION, B_LEVEL, B_CITY, B_PROVINCE
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.bank.BankRegionExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from D_BANK_REGION
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.bank.BankRegionExample" >
+    delete from D_BANK_REGION
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.bank.BankRegion" >
+    insert into D_BANK_REGION (ID, B_REGION, B_LEVEL, 
+      B_CITY, B_PROVINCE)
+    values (#{id,jdbcType=VARCHAR}, #{bRegion,jdbcType=VARCHAR}, #{bLevel,jdbcType=VARCHAR}, 
+      #{bCity,jdbcType=VARCHAR}, #{bProvince,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.bank.BankRegion" >
+    insert into D_BANK_REGION
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="bRegion != null" >
+        B_REGION,
+      </if>
+      <if test="bLevel != null" >
+        B_LEVEL,
+      </if>
+      <if test="bCity != null" >
+        B_CITY,
+      </if>
+      <if test="bProvince != null" >
+        B_PROVINCE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="bRegion != null" >
+        #{bRegion,jdbcType=VARCHAR},
+      </if>
+      <if test="bLevel != null" >
+        #{bLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="bCity != null" >
+        #{bCity,jdbcType=VARCHAR},
+      </if>
+      <if test="bProvince != null" >
+        #{bProvince,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.bank.BankRegionExample" resultType="java.lang.Integer" >
+    select count(*) from D_BANK_REGION
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

@@ -59,8 +59,8 @@ public class ResourceServiceImpl extends ServiceImpl<CResourceMapper, CResource>
         }
         for (CResource resource : resources) {
             Tree tree = new Tree();
-            tree.setId(resource.getId());
-            tree.setPid(resource.getPid());
+            tree.setId(resource.getId()+"");
+            tree.setPid(resource.getPid()+"");
             tree.setText(resource.getName());
             tree.setIconCls(resource.getIcon());
             tree.setAttributes(resource.getUrl());
@@ -80,8 +80,8 @@ public class ResourceServiceImpl extends ServiceImpl<CResourceMapper, CResource>
         }
         for (CResource resource : resources) {
             Tree tree = new Tree();
-            tree.setId(resource.getId());
-            tree.setPid(resource.getPid());
+            tree.setId(resource.getId()+"");
+            tree.setPid(resource.getPid()+"");
             tree.setText(resource.getName());
             tree.setIconCls(resource.getIcon());
             tree.setAttributes(resource.getUrl());
@@ -107,8 +107,8 @@ public class ResourceServiceImpl extends ServiceImpl<CResourceMapper, CResource>
             }
             for (CResource resource : resourceList) {
                 Tree tree = new Tree();
-                tree.setId(resource.getId());
-                tree.setPid(resource.getPid());
+                tree.setId(resource.getId()+"");
+                tree.setPid(resource.getPid()+"");
                 tree.setText(resource.getName());
                 tree.setIconCls(resource.getIcon());
                 tree.setAttributes(resource.getUrl());
@@ -129,8 +129,8 @@ public class ResourceServiceImpl extends ServiceImpl<CResourceMapper, CResource>
         }
         for (CResource resource : resourceLists) {
             Tree tree = new Tree();
-            tree.setId(resource.getId());
-            tree.setPid(resource.getPid());
+            tree.setId(resource.getId()+"");
+            tree.setPid(resource.getPid()+"");
             tree.setText(resource.getName());
             tree.setIconCls(resource.getIcon());
             tree.setAttributes(resource.getUrl());

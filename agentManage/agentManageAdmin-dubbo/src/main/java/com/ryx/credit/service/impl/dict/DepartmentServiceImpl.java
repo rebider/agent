@@ -13,8 +13,10 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName DepartmentServiceImpl
@@ -29,39 +31,42 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Autowired
     private COrganizationMapper cOrganizationMapper;
     @Override
-    public List<Tree> selectAllDepartment() {
-
+    public List<Tree> selectAllDepartment(String pCode) {
+        List<Tree> rootTree = new ArrayList<Tree>();
         List<COrganization> cOrganizationList = null;
         EntityWrapper<COrganization> wrapper = new EntityWrapper<COrganization>();
         wrapper.orderBy("seq");
+        if (null!=pCode&&pCode!="")
+        wrapper.eq("PID",pCode);
+        else
+        wrapper.isNull("PID");
         cOrganizationList = cOrganizationMapper.selectList(wrapper);
-
-        List<Tree> rootTree = new ArrayList<Tree>();
-        //根目录
-        List<Tree> menuList = new ArrayList<Tree>();
         for (COrganization cOrganization : cOrganizationList) {
             rootTree.add(departmentToTree(cOrganization));
-            if(null==cOrganization.getPid()){
-                menuList.add(departmentToTree(cOrganization));
-            }
         }
-        for (Tree tree : menuList) {
-            tree.setChildren(getChild(String.valueOf(tree.getId()),rootTree));
-        }
-        return menuList;
+        return rootTree;
     }
 
 
     private Tree departmentToTree(COrganization cOrganization){
         Tree tree = new Tree();
-        tree.setId(Long.valueOf(cOrganization.getId()));
+        tree.setId(Long.valueOf(cOrganization.getId())+"");
         if (null==cOrganization.getPid()){
-            tree.setPid(Long.valueOf(0));
+            tree.setPid(Long.valueOf(0)+"");
         }else
-       tree.setPid(Long.valueOf(cOrganization.getPid()));
+       tree.setPid(Long.valueOf(cOrganization.getPid())+"");
         tree.setText(cOrganization.getName());
-        tree.setState(1);
         tree.setIconCls(cOrganization.getIcon());
+        EntityWrapper<COrganization> wrapper = new EntityWrapper<COrganization>();
+        wrapper.orderBy("seq");
+
+        if (null!=cOrganization.getId())
+            wrapper.eq("PID",cOrganization.getId());
+        else
+            wrapper.isNull("PID");
+
+        wrapper.eq("PID",cOrganization.getId());
+        tree.setState(cOrganizationMapper.selectCount(wrapper)==0?1:0);
         return tree;
     }
 
@@ -93,5 +98,21 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public COrganization getById(String id) {
         return cOrganizationMapper.selectById(id);
+    }
+
+    @Override
+    public COrganization getByName(String name) {
+        List<Map> list = cOrganizationMapper.selectByOrgName(name);
+        if(list.size()>0){
+
+            try {
+                return cOrganizationMapper.selectById(Integer.valueOf(list.get(0).get("ID")+""));
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                throw e;
+            }
+
+        }
+        return null;
     }
 }

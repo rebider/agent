@@ -3,7 +3,13 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
+import sun.management.resources.agent;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -62,5 +68,14 @@ public interface AgentEnterService {
      * @return
      */
     public ResultVO updateAgentVo(AgentVo agent,String userId)throws Exception;
+
+
+    public Map startPar(String cuserId);
+
+    /**
+     * 代理商入网导出
+     */
+
+    public List<AgentoutVo> exportAgent(Agent agent);
 
 }

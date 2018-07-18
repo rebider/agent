@@ -25,6 +25,11 @@
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.8.7</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>2.9.5</version>
         </dependency>
@@ -380,6 +385,11 @@
             <version>1.3</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.50</version>
+        </dependency>
     </dependencies>
     <profiles>
         <!-- 1. 操作系统环境 start -->
@@ -410,23 +420,20 @@
         <!-- 2. 部署环境(测试环境/生产环境) start -->
         <profile>
             <id>dev</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
             <properties>
                 <deploy.env.name>dev</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
             </properties>
         </profile>
         <profile>
+            <id>test</id>
+            <properties>
+                <deploy.env.name>test</deploy.env.name>
+                <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->
+            </properties>
+        </profile>
+        <profile>
             <id>production</id>
-            <activation>
-                <os>
-                    <family>Linux</family>
-                </os>
-            </activation>
             <properties>
                 <deploy.env.name>production</deploy.env.name>
                 <deploy.env.host.name>node</deploy.env.host.name><!-- 测试环境下，所有节点相同 -->

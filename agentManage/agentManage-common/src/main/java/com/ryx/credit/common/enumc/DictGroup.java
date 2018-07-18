@@ -1,6 +1,5 @@
 package com.ryx.credit.common.enumc;
 
-import java.math.BigDecimal;
 
 /**
  * Created by cx on 2018/5/22.
@@ -10,6 +9,7 @@ public enum DictGroup {
     ALL("所有模块"),
     YESORNO("yesorno"),
     AGENT("代理商模块"),
+    ORDER("订单模块"),
     AGENT_AUDIT("代理商审核模块"),
     BUS_TYPE("业务模块类型或者级别"),
     CAPITAL_TYPE("交款类型"),
@@ -22,8 +22,17 @@ public enum DictGroup {
     AG_STATUS_I("审核数字状态"),
     APPROVAL_TYPE("审批结果类型"),
     BUS_STATUS("业务状态"),
-    APPROVAL_PASS_TYPE("审批通过");
-
+    DATA_CHANGE_TYPE("数据修改申请"),
+    DATA_CACTIVITY_TYPE("数据修改对应的启动流程"),
+    BUS_ACT_REL_BUSTYPE("审批关系类型"),
+    APPROVAL_PASS_TYPE("审批通过"),
+    ACTIVITY_RESPAR("南北大区部门code正则匹配"),//AGENT模块
+    ACTIVITY_TASK_REX("任务code正则匹配"),//AGENT模块
+    USE_SCOPE("使用范围"),
+    BUS_SCOPE("业务范围"),
+    //订单
+    MODEL_TYPE("机具类型"),
+    SETTLEMENT_TYPE("结算类型");
 
     public String  msg;
 

@@ -16,4 +16,6 @@ public interface PlatFormMapper {
     int insertSelective(PlatForm record);
 
     List<PlatForm> selectByExample(PlatFormExample example);
+
+    PlatForm selectByPlatFormNum(String platFormNum);
 }

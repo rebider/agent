@@ -20,4 +20,6 @@ public interface ActIdUserMapper {
     int updateByPrimaryKeySelective(ActIdUser record);
 
     int updateByPrimaryKey(ActIdUser record);
+
+    List<ActIdUser> selectByTaskId(Object taskId);
 }

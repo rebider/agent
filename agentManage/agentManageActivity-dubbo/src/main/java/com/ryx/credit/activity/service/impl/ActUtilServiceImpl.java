@@ -39,8 +39,8 @@ public class ActUtilServiceImpl implements com.ryx.credit.service.ActUtilService
      * @return
      */
     @Override
-    public List<ActRuTask> queryTaskInfoList(String assignee){
-        List<Task> taskList = activityService.findMyPersonTask(assignee);
+    public List<ActRuTask> queryTaskInfoList(String assignee,String group){
+        List<Task> taskList = activityService.findMyPersonTask(assignee,group);
         List<ActRuTask> taskListActRuTask = new ArrayList<>();
         for (Task task : taskList) {
           String taskId =  task.getId();

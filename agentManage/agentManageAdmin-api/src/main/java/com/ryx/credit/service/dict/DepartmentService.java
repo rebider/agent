@@ -12,7 +12,9 @@ import java.util.List;
  * @Date 2018/5/29
  **/
 public interface DepartmentService {
-    List<Tree> selectAllDepartment();
+    List<Tree> selectAllDepartment(String pCode);
 
     public COrganization getById(String id);
+
+    public COrganization getByName(String id);
 }

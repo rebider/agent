@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class PlatForm implements Serializable{
-
     private String id;
 
     private String platformNum;
@@ -23,6 +22,8 @@ public class PlatForm implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String platformType;
 
     public String getId() {
         return id;
@@ -94,5 +95,13 @@ public class PlatForm implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getPlatformType() {
+        return platformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        this.platformType = platformType == null ? null : platformType.trim();
     }
 }

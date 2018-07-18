@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * ActIdUserServiceImpl
@@ -48,6 +49,11 @@ public class ActIdUserServiceImpl implements ActIdUserService {
     @Override
     public int updateByPrimaryKey(ActIdUser record) {
         return actIdUserMapper.updateByPrimaryKey(record);
+    }
+
+    @Override
+    public List<ActIdUser> selectByTaskId(Object taskId){
+        return  actIdUserMapper.selectByTaskId(taskId);
     }
 
     @Override

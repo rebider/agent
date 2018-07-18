@@ -1,7 +1,11 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
+import com.ryx.credit.common.enumc.DictGroup;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
 import net.sf.json.JSONObject;
@@ -29,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * ActivityServiceImpl
@@ -60,7 +65,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
     @Override
-    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath) {
+    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map) {
 
         try {
             ProcessEngine processEngine = processEngineConfiguration
@@ -72,7 +77,7 @@ public class ActivityServiceImpl implements ActivityService {
                 logger.info("------processEngine:" + deployment.getName());
             }
             RuntimeService runtimeService = processEngine.getRuntimeService();
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(workId);
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(workId,map);
             logger.info("------processInstance:" + processInstance.getId());
             logger.info("------processInstance:" + processInstance.getDeploymentId());
             return processInstance.getId();
@@ -84,10 +89,19 @@ public class ActivityServiceImpl implements ActivityService {
     }
 
     @Override
-    public List<Task> findMyPersonTask(String assignee) {
+    public List<Task> findMyPersonTask(String assignee,String group) {
         ProcessEngine processEngine = processEngineConfiguration
                 .buildProcessEngine();
-        List<Task> taskList = processEngine.getTaskService().createTaskQuery().taskCandidateOrAssigned(assignee).list();
+        List<Task> taskList = new ArrayList<>();
+        List<Task> taskListGroup = new ArrayList<>();
+
+        if(StringUtils.isNotBlank(assignee)) {
+           taskList = processEngine.getTaskService().createTaskQuery().taskCandidateUser(assignee).list();
+        }
+        if(StringUtils.isNotBlank(group)) {
+            taskListGroup = processEngine.getTaskService().createTaskQuery().taskCandidateGroup(group).list();
+        }
+        taskList.addAll(taskListGroup);
         for (Task task : taskList) {
             logger.info("待办" + task.getId());
             logger.info("任务名" + task.getName());
@@ -114,6 +128,7 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("rs",true);
             rs.put("msg","success");
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());

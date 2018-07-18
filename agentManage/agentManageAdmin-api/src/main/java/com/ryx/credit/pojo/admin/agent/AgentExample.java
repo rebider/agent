@@ -1,6 +1,5 @@
 package com.ryx.credit.pojo.admin.agent;
 
-
 import com.ryx.credit.common.util.Page;
 
 import java.math.BigDecimal;
@@ -2046,6 +2045,66 @@ public class AgentExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusIsNull() {
+            addCriterion("CA_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusIsNotNull() {
+            addCriterion("CA_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusEqualTo(BigDecimal value) {
+            addCriterion("CA_STATUS =", value, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusNotEqualTo(BigDecimal value) {
+            addCriterion("CA_STATUS <>", value, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusGreaterThan(BigDecimal value) {
+            addCriterion("CA_STATUS >", value, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CA_STATUS >=", value, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusLessThan(BigDecimal value) {
+            addCriterion("CA_STATUS <", value, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CA_STATUS <=", value, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusIn(List<BigDecimal> values) {
+            addCriterion("CA_STATUS in", values, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusNotIn(List<BigDecimal> values) {
+            addCriterion("CA_STATUS not in", values, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CA_STATUS between", value1, value2, "caStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCaStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CA_STATUS not between", value1, value2, "caStatus");
             return (Criteria) this;
         }
     }
