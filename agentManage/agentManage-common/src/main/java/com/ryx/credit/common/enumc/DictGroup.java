@@ -10,6 +10,7 @@ public enum DictGroup {
     YESORNO("yesorno"),
     AGENT("代理商模块"),
     ORDER("订单模块"),
+    RELATION("关系模块"),
     AGENT_AUDIT("代理商审核模块"),
     BUS_TYPE("业务模块类型或者级别"),
     CAPITAL_TYPE("交款类型"),
