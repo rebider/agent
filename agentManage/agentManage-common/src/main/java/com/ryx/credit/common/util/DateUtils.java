@@ -1,6 +1,5 @@
 package com.ryx.credit.common.util;
 
-import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -54,7 +53,23 @@ public class DateUtils {
 		Date date = dealTimeYMD(parse);
 		return date;
 	}
-	
+
+	/**
+	 * 将String时间（2017-04-02）类型转换成Date时间
+	 */
+	public static Date stringToDate(String time){
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		Date parse = null;
+		try {
+			parse = sdf.parse(time);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Date date = dealTimeYMD(parse);
+		return date;
+	}
+
 	/**
 	 * 将date时间转换成String时间类型
 	 */
