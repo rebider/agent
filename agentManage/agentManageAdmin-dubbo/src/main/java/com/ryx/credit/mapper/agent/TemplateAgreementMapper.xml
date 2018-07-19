@@ -51,7 +51,7 @@
   <sql id="Blob_Column_List" >
     AGRE_CONTENT
   </sql>
-  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" >
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreementExample" >
     select
     <if test="distinct" >
       distinct
@@ -67,7 +67,7 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreementExample" >
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct" >
@@ -91,7 +91,7 @@
     from TEMPLATE_AGREEMENT
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreementExample" >
     delete from TEMPLATE_AGREEMENT
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
@@ -174,7 +174,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreementExample" resultType="java.lang.Integer" >
     select count(*) from TEMPLATE_AGREEMENT
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
