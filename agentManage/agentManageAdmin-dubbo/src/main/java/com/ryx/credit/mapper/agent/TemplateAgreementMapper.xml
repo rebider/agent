@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.dao.agent.TemplateAgreementMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.TemplateAgreement" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="AGRE_NAME" property="agreName" jdbcType="VARCHAR" />
+    <result column="AGRE_VERSION" property="agreVersion" jdbcType="VARCHAR" />
+    <result column="AGRE_TYPE" property="agreType" jdbcType="CHAR" />
+    <result column="ATTRID" property="attrid" jdbcType="VARCHAR" />
+    <result column="AGRE_VIEW_TYPE" property="agreViewType" jdbcType="DECIMAL" />
+    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
+    <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
+    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.ryx.credit.pojo.admin.agent.TemplateAgreement" extends="BaseResultMap" >
+    <result column="AGRE_CONTENT" property="agreContent" jdbcType="CLOB" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, AGRE_NAME, AGRE_VERSION, AGRE_TYPE, ATTRID, AGRE_VIEW_TYPE, C_TIME, C_UTIME, 
+    STATUS
+  </sql>
+  <sql id="Blob_Column_List" >
+    AGRE_CONTENT
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from TEMPLATE_AGREEMENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from TEMPLATE_AGREEMENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from TEMPLATE_AGREEMENT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" >
+    delete from TEMPLATE_AGREEMENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreement" >
+    insert into TEMPLATE_AGREEMENT (ID, AGRE_NAME, AGRE_VERSION, 
+      AGRE_TYPE, ATTRID, AGRE_VIEW_TYPE, 
+      C_TIME, C_UTIME, STATUS, 
+      AGRE_CONTENT)
+    values (#{id,jdbcType=VARCHAR}, #{agreName,jdbcType=VARCHAR}, #{agreVersion,jdbcType=VARCHAR}, 
+      #{agreType,jdbcType=CHAR}, #{attrid,jdbcType=VARCHAR}, #{agreViewType,jdbcType=DECIMAL}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL}, 
+      #{agreContent,jdbcType=CLOB})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreement" >
+    insert into TEMPLATE_AGREEMENT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="agreName != null" >
+        AGRE_NAME,
+      </if>
+      <if test="agreVersion != null" >
+        AGRE_VERSION,
+      </if>
+      <if test="agreType != null" >
+        AGRE_TYPE,
+      </if>
+      <if test="attrid != null" >
+        ATTRID,
+      </if>
+      <if test="agreViewType != null" >
+        AGRE_VIEW_TYPE,
+      </if>
+      <if test="cTime != null" >
+        C_TIME,
+      </if>
+      <if test="cUtime != null" >
+        C_UTIME,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="agreContent != null" >
+        AGRE_CONTENT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agreName != null" >
+        #{agreName,jdbcType=VARCHAR},
+      </if>
+      <if test="agreVersion != null" >
+        #{agreVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="agreType != null" >
+        #{agreType,jdbcType=CHAR},
+      </if>
+      <if test="attrid != null" >
+        #{attrid,jdbcType=VARCHAR},
+      </if>
+      <if test="agreViewType != null" >
+        #{agreViewType,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null" >
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null" >
+        #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="agreContent != null" >
+        #{agreContent,jdbcType=CLOB},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.TemplateAgreementExample" resultType="java.lang.Integer" >
+    select count(*) from TEMPLATE_AGREEMENT
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreement" >
+    update TEMPLATE_AGREEMENT
+    <set >
+      <if test="agreName != null" >
+        AGRE_NAME = #{agreName,jdbcType=VARCHAR},
+      </if>
+      <if test="agreVersion != null" >
+        AGRE_VERSION = #{agreVersion,jdbcType=VARCHAR},
+      </if>
+      <if test="agreType != null" >
+        AGRE_TYPE = #{agreType,jdbcType=CHAR},
+      </if>
+      <if test="attrid != null" >
+        ATTRID = #{attrid,jdbcType=VARCHAR},
+      </if>
+      <if test="agreViewType != null" >
+        AGRE_VIEW_TYPE = #{agreViewType,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null" >
+        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="agreContent != null" >
+        AGRE_CONTENT = #{agreContent,jdbcType=CLOB},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreement" >
+    update TEMPLATE_AGREEMENT
+    set AGRE_NAME = #{agreName,jdbcType=VARCHAR},
+      AGRE_VERSION = #{agreVersion,jdbcType=VARCHAR},
+      AGRE_TYPE = #{agreType,jdbcType=CHAR},
+      ATTRID = #{attrid,jdbcType=VARCHAR},
+      AGRE_VIEW_TYPE = #{agreViewType,jdbcType=DECIMAL},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      STATUS = #{status,jdbcType=DECIMAL},
+      AGRE_CONTENT = #{agreContent,jdbcType=CLOB}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.TemplateAgreement" >
+    update TEMPLATE_AGREEMENT
+    set AGRE_NAME = #{agreName,jdbcType=VARCHAR},
+      AGRE_VERSION = #{agreVersion,jdbcType=VARCHAR},
+      AGRE_TYPE = #{agreType,jdbcType=CHAR},
+      ATTRID = #{attrid,jdbcType=VARCHAR},
+      AGRE_VIEW_TYPE = #{agreViewType,jdbcType=DECIMAL},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      STATUS = #{status,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
