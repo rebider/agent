@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.data;
 
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.common.util.Page;
@@ -18,10 +19,13 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Autowired
     private AttachmentMapper attachmentMapper;
     @Override
-    public PageInfo selectAll(Page page, Attachment attachment) {
+    public PageInfo selectAll(Page page, Attachment attachment,AttachmentRel attachmentRel) {
         Map<String, Object> map = new HashMap<>();
-        if (null!=attachment.getAttName()){
+        if (null!=attachment.getAttName() && !attachment.getAttName().equals("")){
             map.put("attName",attachment.getAttName());
+        }
+        if (null!=attachmentRel.getBusType()&& !attachmentRel.getBusType().equals("")){
+            map.put("busType",attachmentRel.getBusType());
         }
         List<Map<String,Object>> attachmentList=  attachmentMapper.selectAll(map,page);
         for (Map<String, Object> maps : attachmentList) {
