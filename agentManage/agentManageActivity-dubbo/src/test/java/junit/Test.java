@@ -1,6 +1,8 @@
 package junit;
 
 
+import com.ryx.credit.activity.entity.ActIdUser;
+import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.ActivityService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
@@ -30,11 +32,14 @@ import java.util.Map;
  * @since 1.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:/test/activiti.cfg.xml" })
+@ContextConfiguration(locations = { "classpath*:/test/spring-context.xml" })
 public class Test {
     @Autowired
     StandaloneProcessEngineConfiguration processEngineConfiguration;
-
+    @Autowired
+    ActivityService activityService;
+    @Autowired
+    ActIdUserService actIdUserService;
 
     /**
      * 测试
@@ -129,6 +134,13 @@ public class Test {
             System.out.println("部署ID"+execution.getSuperExecutionId());
             System.out.println("=================");
         }
+    }
+
+    @org.junit.Test
+    public void getExecution() throws Exception{
+//        Map map = activityService.getImageByExecuId("40010");
+        List<ActIdUser> a =actIdUserService.selectByTaskId("240144");
+        System.out.print(a.size());
     }
 
 //    @org.junit.Test
