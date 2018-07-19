@@ -30,4 +30,14 @@ public class ApaycompServiceImpl implements com.ryx.credit.service.agent.Apaycom
         return payCompMapper.selectByExample(example);
     }
 
+    /**
+     * 收款公司
+     * @return
+     */
+    @Override
+    public List<PayComp> recCompList() {
+        PayCompExample example = new PayCompExample();
+        example.or().andStatusEqualTo(Status.STATUS_2.status);
+        return payCompMapper.selectByExample(example);
+    }
 }
