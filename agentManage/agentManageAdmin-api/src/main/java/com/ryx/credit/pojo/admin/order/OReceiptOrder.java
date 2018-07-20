@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OReceiptOrder {
+public class OReceiptOrder implements Serializable{
     private String id;
 
     private String orderId;
