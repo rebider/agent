@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.OrderStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -86,6 +83,13 @@ public class OrderServiceImpl implements OrderService {
         OPayment oPayment = orderFormVo.getoPayment();
         oPayment.setId(idService.genId(TabId.o_payment));
         oPayment.setUserId(userId);
+        oPayment.setOrderId(orderFormVo.getId());
+        oPayment.setAgentId(orderFormVo.getAgentId());
+        oPayment.setcTime(d);
+        //TODO 需要手动计算付款金额
+        //oPayment.setPayAmount();
+        oPayment.setRealAmount(Status.STATUS_0.status);
+        oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
         return orderFormVo;
     }
 }
