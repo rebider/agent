@@ -18,4 +18,15 @@ public enum AttachmentRelType {
     AttachmentRelType(String s){
         msg = s;
     }
+
+    public static String getItemsString(String key){
+        AttachmentRelType[] valus = AttachmentRelType.values();
+        for (AttachmentRelType busActRelBusType : valus) {
+            if(busActRelBusType.name().equals(key)){
+                return busActRelBusType.msg;
+            }
+        }
+        return null;
+    }
+
 }
