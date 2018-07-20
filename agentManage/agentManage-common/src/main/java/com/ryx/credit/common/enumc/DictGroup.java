@@ -33,7 +33,9 @@ public enum DictGroup {
     BUS_SCOPE("业务范围"),
     //订单
     MODEL_TYPE("机具类型"),
-    SETTLEMENT_TYPE("结算类型");
+    SETTLEMENT_TYPE("结算类型"),
+    TEMP_AGREE("协议模板"),
+    AGREE_TYPE("协议类型");
 
     public String  msg;
 
