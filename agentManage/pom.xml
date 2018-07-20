@@ -16,6 +16,8 @@
         <module>agentManageActivity-api</module>
         <module>agentManageActivity-dubbo</module>
         <module>agentManageAdmin-dubbo</module>
+        <module>agentManageProfit-api</module>
+        <module>agentManageProfit-dubbo</module>
     </modules>
     <properties>
         <spring.version>4.3.7.RELEASE</spring.version>
