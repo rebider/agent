@@ -30,8 +30,7 @@ public class PlannerServiceImpl implements PlannerService {
     public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page){
 
         Map<String,Object> reqMap = new HashMap<>();
-
-        List<Map<String,Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap);
+        List<Map<String,Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(plannerList);
         pageInfo.setTotal(receiptOrderMapper.queryPlannerCount(reqMap));
