@@ -1298,62 +1298,52 @@ public class OReceiptOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andUTimeEqualTo(String value) {
+        public Criteria andUTimeEqualTo(Date value) {
             addCriterion("U_TIME =", value, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeNotEqualTo(String value) {
+        public Criteria andUTimeNotEqualTo(Date value) {
             addCriterion("U_TIME <>", value, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeGreaterThan(String value) {
+        public Criteria andUTimeGreaterThan(Date value) {
             addCriterion("U_TIME >", value, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeGreaterThanOrEqualTo(String value) {
+        public Criteria andUTimeGreaterThanOrEqualTo(Date value) {
             addCriterion("U_TIME >=", value, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeLessThan(String value) {
+        public Criteria andUTimeLessThan(Date value) {
             addCriterion("U_TIME <", value, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeLessThanOrEqualTo(String value) {
+        public Criteria andUTimeLessThanOrEqualTo(Date value) {
             addCriterion("U_TIME <=", value, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeLike(String value) {
-            addCriterion("U_TIME like", value, "uTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUTimeNotLike(String value) {
-            addCriterion("U_TIME not like", value, "uTime");
-            return (Criteria) this;
-        }
-
-        public Criteria andUTimeIn(List<String> values) {
+        public Criteria andUTimeIn(List<Date> values) {
             addCriterion("U_TIME in", values, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeNotIn(List<String> values) {
+        public Criteria andUTimeNotIn(List<Date> values) {
             addCriterion("U_TIME not in", values, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeBetween(String value1, String value2) {
+        public Criteria andUTimeBetween(Date value1, Date value2) {
             addCriterion("U_TIME between", value1, value2, "uTime");
             return (Criteria) this;
         }
 
-        public Criteria andUTimeNotBetween(String value1, String value2) {
+        public Criteria andUTimeNotBetween(Date value1, Date value2) {
             addCriterion("U_TIME not between", value1, value2, "uTime");
             return (Criteria) this;
         }
@@ -1605,6 +1595,76 @@ public class OReceiptOrderExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
             return (Criteria) this;
         }
     }
