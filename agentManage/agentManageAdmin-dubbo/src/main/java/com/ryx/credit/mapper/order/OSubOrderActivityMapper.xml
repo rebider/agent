@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.order.OSubOrderActivityMapper" >
+<mapper namespace="com.ryx.credit.activity.dao.OSubOrderActivityMapper" >
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OSubOrderActivity" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
     <result column="ACTIVITY_ID" property="activityId" jdbcType="VARCHAR" />

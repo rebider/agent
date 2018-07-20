@@ -1,6 +1,8 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.OrderStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -8,6 +10,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OOrderExample;
+import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
@@ -54,23 +57,35 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult buildOrder(OrderFormVo orderFormVo,String userId) {
-        Date d = Calendar.getInstance().getTime();
         orderFormVo.setUserId(userId);
-        orderFormVo.setcTime(d);
-        orderFormVo =  setOrderFormValue(orderFormVo);
+        orderFormVo =  setOrderFormValue(orderFormVo,userId);
 
         return null;
     }
 
-    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo){
-
+    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo,String userId){
+        //订单基础数据
+         Date d = Calendar.getInstance().getTime();
         orderFormVo.setId(idService.genId(TabId.o_order));
         orderFormVo.setoNum(orderFormVo.getId());
         orderFormVo.setoApytime(orderFormVo.getcTime());
-//        orderFormVo.setIncentiveAmo(new BigDecimal(0));
+        orderFormVo.setUserId(userId);
+        //orderFormVo.setIncentiveAmo(new BigDecimal(0));
         orderFormVo.setPayAmo(orderFormVo.getoAmo());
         orderFormVo.setReviewStatus(AgStatus.Create.status);
+        orderFormVo.setOrderStatus(OrderStatus.CREATE.status);
+        orderFormVo.setClearStatus(Status.STATUS_0.status);
+        orderFormVo.setStatus(Status.STATUS_1.status);
+        orderFormVo.setcTime(d);
+        orderFormVo.setuUser(userId);
+        orderFormVo.setuTime(d);
+        orderFormVo.setVersion(Status.STATUS_0.status);
 
+
+        //支付方式
+        OPayment oPayment = orderFormVo.getoPayment();
+        oPayment.setId(idService.genId(TabId.o_payment));
+        oPayment.setUserId(userId);
         return orderFormVo;
     }
 }

@@ -1,8 +1,7 @@
 package com.ryx.credit.dao.order;
 
-
-import com.ryx.credit.pojo.admin.order.OReceiptPro;
-import com.ryx.credit.pojo.admin.order.OReceiptProExample;
+import com.ryx.credit.activity.entity.OReceiptPro;
+import com.ryx.credit.activity.entity.OReceiptProExample;
 
 import java.util.List;
 

@@ -43,6 +43,8 @@ public class OActivity implements Serializable{
 
     private BigDecimal version;
 
+    private BigDecimal gTime;
+
     public String getId() {
         return id;
     }
@@ -193,5 +195,13 @@ public class OActivity implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getgTime() {
+        return gTime;
+    }
+
+    public void setgTime(BigDecimal gTime) {
+        this.gTime = gTime;
     }
 }

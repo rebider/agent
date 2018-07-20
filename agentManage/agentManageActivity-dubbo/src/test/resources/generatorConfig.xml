@@ -35,16 +35,16 @@
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
 		<!--<table tableName="c_apy_card" domainObjectName="CapyCard" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="O_ACTIVITY" domainObjectName="OActivity" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="O_ACTIVITY" domainObjectName="OActivity" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
 		<!--<table tableName="O_ADDRESS" domainObjectName="OAddress" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_ORDER" domainObjectName="OOrder" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_PAYMENT" domainObjectName="OPayment" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="O_SUPPLEMENT" domainObjectName="OSupplement" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="O_SUPPLEMENT" domainObjectName="OSupplement" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_PRODUCT" domainObjectName="OProduct" enableUpdateByExample="false"-->
@@ -57,5 +57,6 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_SUB_ORDER_ACTIVITY" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
+
 	</context>
 </generatorConfiguration>
