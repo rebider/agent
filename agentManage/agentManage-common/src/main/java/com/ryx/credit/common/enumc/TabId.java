@@ -32,6 +32,7 @@ public enum TabId {
     o_receipt_order("ORE%s%014d"),
     o_payment("OPA%s%014d"),
     o_payment_detail("OPD%s%014d"),
+    o_Supplement("OS%s%014d"),//补款表
     o_product("OP%s%015d");
 
     TabId(String thePatt){
