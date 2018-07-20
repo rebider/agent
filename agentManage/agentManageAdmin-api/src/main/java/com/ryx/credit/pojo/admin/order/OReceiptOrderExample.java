@@ -1238,62 +1238,52 @@ public class OReceiptOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andCUserEqualTo(String value) {
+        public Criteria andCUserEqualTo(Date value) {
             addCriterion("C_USER =", value, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserNotEqualTo(String value) {
+        public Criteria andCUserNotEqualTo(Date value) {
             addCriterion("C_USER <>", value, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserGreaterThan(String value) {
+        public Criteria andCUserGreaterThan(Date value) {
             addCriterion("C_USER >", value, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserGreaterThanOrEqualTo(String value) {
+        public Criteria andCUserGreaterThanOrEqualTo(Date value) {
             addCriterion("C_USER >=", value, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserLessThan(String value) {
+        public Criteria andCUserLessThan(Date value) {
             addCriterion("C_USER <", value, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserLessThanOrEqualTo(String value) {
+        public Criteria andCUserLessThanOrEqualTo(Date value) {
             addCriterion("C_USER <=", value, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserLike(String value) {
-            addCriterion("C_USER like", value, "cUser");
-            return (Criteria) this;
-        }
-
-        public Criteria andCUserNotLike(String value) {
-            addCriterion("C_USER not like", value, "cUser");
-            return (Criteria) this;
-        }
-
-        public Criteria andCUserIn(List<String> values) {
+        public Criteria andCUserIn(List<Date> values) {
             addCriterion("C_USER in", values, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserNotIn(List<String> values) {
+        public Criteria andCUserNotIn(List<Date> values) {
             addCriterion("C_USER not in", values, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserBetween(String value1, String value2) {
+        public Criteria andCUserBetween(Date value1, Date value2) {
             addCriterion("C_USER between", value1, value2, "cUser");
             return (Criteria) this;
         }
 
-        public Criteria andCUserNotBetween(String value1, String value2) {
+        public Criteria andCUserNotBetween(Date value1, Date value2) {
             addCriterion("C_USER not between", value1, value2, "cUser");
             return (Criteria) this;
         }
