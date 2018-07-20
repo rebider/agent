@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 public enum OReceiptStatus {
 
     TEMPORARY_STORAGE("0","暂存"),
-    WAITING_LIST("1","待派单"),
-    DISPATCHED_ORDER("2","待派单");
+    WAITING_LIST("1","待排单"),
+    DISPATCHED_ORDER("2","待排单");
 
     public BigDecimal code;
 
