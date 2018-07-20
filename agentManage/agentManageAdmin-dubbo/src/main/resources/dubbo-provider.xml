@@ -65,5 +65,7 @@
     <dubbo:service interface="com.ryx.credit.service.bank.BankLineNumService" ref="bankLineNumService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentDataHistoryService" ref="agentDataHistoryService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService"  timeout="1200000" registry="${zk.group}"/>
-
+    <!-- 基础资源维护-->
+    <dubbo:service interface="com.ryx.credit.service.dict.PayCompService" ref="payCompService" timeout="1200000" registry="${zk.group}"></dubbo:service>
+    <dubbo:service interface="com.ryx.credit.service.dict.TemplateAgreementService" ref="templateAgreementService" timeout="1200000" registry="${zk.group}"></dubbo:service>
 </beans>
