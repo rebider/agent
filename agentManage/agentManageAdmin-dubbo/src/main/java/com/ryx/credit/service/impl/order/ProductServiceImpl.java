@@ -110,6 +110,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public String findNameById(String id){
+        if(StringUtils.isBlank(id)){
+            return "";
+        }
+        OProduct oProduct = productMapper.selectByPrimaryKey(id);
+        if(oProduct==null){
+            return "";
+        }
+        return oProduct.getProName();
+    }
+
+    @Override
     public AgentResult deleteById(String id){
         AgentResult result = new AgentResult(500, "参数错误", "");
         if(StringUtils.isBlank(id)){
