@@ -1,7 +1,8 @@
 package com.ryx.credit.dao.order;
 
-import com.ryx.credit.activity.entity.OSubOrderActivity;
-import com.ryx.credit.activity.entity.OSubOrderActivityExample;
+
+import com.ryx.credit.pojo.admin.order.OSubOrderActivity;
+import com.ryx.credit.pojo.admin.order.OSubOrderActivityExample;
 
 import java.util.List;
 

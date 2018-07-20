@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.activity.dao.OReceiptProMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.activity.entity.OReceiptPro" >
+<mapper namespace="com.ryx.credit.dao.order.OReceiptProMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OReceiptPro" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
     <result column="ORDERID" property="orderid" jdbcType="VARCHAR" />
     <result column="RECEIPT_ID" property="receiptId" jdbcType="VARCHAR" />
