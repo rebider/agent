@@ -100,7 +100,7 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
         if (null != dataHistory.getDataType()) {
             map.put("dataType", dataHistory.getDataType());
         }
-        if (null != time && time!="") {
+        if (null != time && !time.equals("")) {
             String reltime = time.substring(0, 10);
             map.put("time",reltime);
         }

@@ -208,6 +208,9 @@
         <if test="map.attName != null and map.attName != '' ">
             AND att.ATT_NAME LIKE #{map.attName}||'%'
         </if>
+        <if test="map.busType != null and map.busType != '' ">
+            AND attrel.BUS_TYPE=#{map.busType}
+        </if>
         <include refid="OracleDialectSuffix"/>
     </select>
 
@@ -217,6 +220,9 @@
         where att.STATUS=1 and attrel.STATUS=1
         <if test="map.attName != null and map.attName != '' ">
             and att.ATT_NAME = #{map.attName}
+        </if>
+        <if test="map.busType != null and map.busType != '' ">
+            AND attrel.BUS_TYPE=#{map.busType}
         </if>
     </select>
 </mapper>

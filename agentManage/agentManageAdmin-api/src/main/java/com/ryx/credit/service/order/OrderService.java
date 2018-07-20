@@ -1,8 +1,10 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OOrder;
+import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -11,4 +13,15 @@ import com.ryx.credit.pojo.admin.order.OOrder;
 public interface OrderService {
 
     PageInfo orderList(OOrder product, Page page);
+
+
+    /**
+     * 订单构建
+     * @param orderFormVo
+     * @return
+     */
+    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId);
+
+
+
 }
