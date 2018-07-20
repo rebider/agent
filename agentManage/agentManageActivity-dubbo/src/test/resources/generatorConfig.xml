@@ -41,8 +41,8 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_ORDER" domainObjectName="OOrder" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="O_PAYMENT" domainObjectName="OPayment" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="O_PAYMENT" domainObjectName="OPayment" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_SUPPLEMENT" domainObjectName="OSupplement" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"-->

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OReceiptOrder implements Serializable{
+public class OReceiptOrder implements Serializable {
     private String id;
 
     private String orderId;
@@ -37,7 +37,7 @@ public class OReceiptOrder implements Serializable{
 
     private Date cTime;
 
-    private Date cUser;
+    private String cUser;
 
     private Date uTime;
 
@@ -179,12 +179,12 @@ public class OReceiptOrder implements Serializable{
         this.cTime = cTime;
     }
 
-    public Date getcUser() {
+    public String getcUser() {
         return cUser;
     }
 
-    public void setcUser(Date cUser) {
-        this.cUser = cUser;
+    public void setcUser(String cUser) {
+        this.cUser = cUser == null ? null : cUser.trim();
     }
 
     public Date getuTime() {
