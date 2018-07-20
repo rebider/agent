@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.agent.PlatFormExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PlatFormMapper {
     int countByExample(PlatFormExample example);
@@ -18,4 +19,20 @@ public interface PlatFormMapper {
     List<PlatForm> selectByExample(PlatFormExample example);
 
     PlatForm selectByPlatFormNum(String platFormNum);
+
+    ////////////////////////////////////////////////////////////////////
+
+    int countPlatForm(Map<String, Object> condition);
+
+    List<PlatForm> selectPlatForm(Map<String, Object> condition);
+
+    PlatForm selectByPrimaryKey(String id);
+
+    long seqId();   // id自增
+
+    int insertPlatForm(PlatForm platForm);
+
+    int updateByPrimaryKeySelective(PlatForm record);  // 删除（编辑）状态
+
+    int updateByPrimaryKey(PlatForm record);
 }
