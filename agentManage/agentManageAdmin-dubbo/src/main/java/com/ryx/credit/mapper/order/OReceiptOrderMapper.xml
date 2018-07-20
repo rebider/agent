@@ -370,21 +370,19 @@
   <select id="queryPlannerList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
       select
-          ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
-          ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM, ro.EXPRESS_REMARK,
-          ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
-          ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM, rp.SEND_NUM
+        ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
+        ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
+        ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
+        ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM, rp.SEND_NUM
       from O_Receipt_order ro,o_Receipt_pro rp
       where ro.id = rp.receipt_id
     <include refid="OracleDialectSuffix" />
   </select>
 
-  <select id="queryPlannerCount" parameterType="map" resultType="map">
-    <include refid="OracleDialectPrefix" />
+  <select id="queryPlannerCount" parameterType="map" resultType="java.lang.Integer">
       select
         count(*)
       from O_Receipt_order ro,o_Receipt_pro rp
       where ro.id = rp.receipt_id
-    <include refid="OracleDialectSuffix" />
   </select>
 </mapper>
