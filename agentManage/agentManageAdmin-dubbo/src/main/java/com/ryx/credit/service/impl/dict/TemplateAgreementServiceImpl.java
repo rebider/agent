@@ -1,11 +1,13 @@
 package com.ryx.credit.service.impl.dict;
 
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.TemplateAgreementMapper;
 import com.ryx.credit.pojo.admin.agent.TemplateAgreement;
 import com.ryx.credit.pojo.admin.agent.TemplateAgreementExample;
+import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.dict.TemplateAgreementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,27 +22,32 @@ import java.util.List;
  */
 @Service("templateAgreementService")
 public class TemplateAgreementServiceImpl implements TemplateAgreementService {
+    private static BigDecimal SUCCESS_STATUS = BigDecimal.ONE;
     @Autowired
     private TemplateAgreementMapper templateAgreementMapper;
+    @Autowired
+    private IdService idService;
 
     @Override
     public PageInfo getTempAgreeList(Page page, TemplateAgreement templateAgreement) {
-        TemplateAgreementExample.Criteria example = new TemplateAgreementExample().createCriteria();
+        TemplateAgreementExample example = new TemplateAgreementExample();
+        TemplateAgreementExample.Criteria criteria = new TemplateAgreementExample().createCriteria();
         if(StringUtils.isNotBlank(templateAgreement.getAgreName())){
-            example.andAgreNameLike(templateAgreement.getAgreName());
+            criteria.andAgreNameLike(templateAgreement.getAgreName());
         }
         if(StringUtils.isNotBlank(templateAgreement.getAgreVersion())){
-            example.andAgreVersionEqualTo(templateAgreement.getAgreVersion());
+            criteria.andAgreVersionEqualTo(templateAgreement.getAgreVersion());
         }
         if(StringUtils.isNotBlank(templateAgreement.getStatus())){
-            example.andStatusEqualTo(new BigDecimal(templateAgreement.getStatus()));
+            criteria.andStatusEqualTo(new BigDecimal(templateAgreement.getStatus()));
         }
 
-//        int count = templateAgreementMapper.countByExample(example);
+        int count = templateAgreementMapper.countByExample(example);
+        List<TemplateAgreement> list = templateAgreementMapper.selectByExample(example);
         PageInfo info = new PageInfo();
-//        info.setRows();
-//        info.setTotal(count);
-        return null;
+        info.setTotal(count);
+        info.setRows(list);
+        return info;
     }
 
     @Override
@@ -50,8 +57,10 @@ public class TemplateAgreementServiceImpl implements TemplateAgreementService {
 
     @Override
     public List<TemplateAgreement> getTempAgreeSuccessList() {
-
-        return null;
+        TemplateAgreementExample example = new TemplateAgreementExample();
+        TemplateAgreementExample.Criteria criteria = new TemplateAgreementExample().createCriteria();
+        criteria.andStatusEqualTo(SUCCESS_STATUS);
+        return templateAgreementMapper.selectByExample(example);
     }
 
     @Override
@@ -59,6 +68,7 @@ public class TemplateAgreementServiceImpl implements TemplateAgreementService {
         if(templateAgreement != null){
             templateAgreement.setcUtime(new Date());
             templateAgreement.setcUtime(new Date());
+            templateAgreement.setId(idService.genId(TabId.template_agreement));
             templateAgreementMapper.insertSelective(templateAgreement);
         }
     }

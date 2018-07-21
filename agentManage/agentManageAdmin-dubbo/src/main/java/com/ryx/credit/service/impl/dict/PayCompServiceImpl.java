@@ -1,11 +1,13 @@
 package com.ryx.credit.service.impl.dict;
 
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.pojo.admin.agent.PayComp;
 import com.ryx.credit.pojo.admin.agent.PayCompExample;
+import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.dict.PayCompService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,9 +22,11 @@ import java.util.List;
  */
 @Service("payCompService")
 public class PayCompServiceImpl implements PayCompService {
-    private static BigDecimal SUCC_STATUS = BigDecimal.ONE;
+    private static BigDecimal SUCCESS_STATUS = BigDecimal.ONE;
     @Autowired
     private PayCompMapper payCompMapper;
+    @Autowired
+    private IdService idService;
 
     @Override
     public PageInfo getPayCompList(Page page, PayComp payComp) {
@@ -51,7 +55,7 @@ public class PayCompServiceImpl implements PayCompService {
     public List<PayComp> getPayCompSuccessList() {
         PayCompExample example = new PayCompExample();
         PayCompExample.Criteria criteria = example.createCriteria();
-        criteria.andStatusNotEqualTo(SUCC_STATUS);
+        criteria.andStatusNotEqualTo(SUCCESS_STATUS);
         return payCompMapper.selectByExample(example);
     }
 
@@ -60,6 +64,7 @@ public class PayCompServiceImpl implements PayCompService {
         if(payComp != null){
             payComp.setcTime(new Date());
             payComp.setcUtime(new Date());
+            idService.genId(TabId.a_pay_comp);
             payCompMapper.insertSelective(payComp);
         }
     }

@@ -1,0 +1,7 @@
+agentManage/agentManageAdmin-api/target/
+agentManage/agentManageAdmin-dubbo/target/
+agentManage/agentManageActivity-dubbo/target/
+agentManage/agentManageAccount-dubbo/target/
+agentManage/agentManage-common/target/
+.idea/
+agentManage/agentManageActivity-api/target/
