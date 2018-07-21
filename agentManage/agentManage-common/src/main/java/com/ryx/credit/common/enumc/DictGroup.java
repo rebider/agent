@@ -34,7 +34,10 @@ public enum DictGroup {
     //订单
     MODEL_TYPE("机具类型"),
     PAYMENTSTATUS("分期计划状态"),
-    SETTLEMENT_TYPE("结算类型");
+    PAYMENTTYPE("付款明细类型"),
+    SETTLEMENT_TYPE("结算类型"),
+    TEMP_AGREE("协议模板"),
+    AGREE_TYPE("协议类型");
 
     public String  msg;
 
