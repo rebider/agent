@@ -11,6 +11,7 @@ public enum AttachmentRelType {
     Capital("缴款项"),
     Business("业务"),
     Proceeds("收款"),
+    Order("订单"),
     Clear("结算附件");
 
     public String  msg;

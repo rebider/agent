@@ -7,7 +7,10 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.agent.Attachment;
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
@@ -54,6 +57,8 @@ public class OrderServiceImpl implements OrderService {
     private OAddressMapper oAddressMapper;
     @Autowired
     private OReceiptOrderMapper  oReceiptOrderMapper;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
 
     @Override
     public PageInfo orderList(OOrder product, Page page) {
@@ -300,6 +305,7 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setId(idService.genId(TabId.o_sub_order));
             OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
             if(oSubOrder.getProPrice()==null || oSubOrder.getProPrice().compareTo(product.getProPrice())!=0){
+                logger.info("下订单:{}","商品价格数据错误");
                 throw new ProcessException("商品价格数据错误");
             }
             if(oSubOrder.getProRelPrice()==null){
@@ -321,6 +327,7 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setVersion(Status.STATUS_0.status);
             //插入订单商品信息
             if(1!=oSubOrderMapper.insertSelective(oSubOrder)){
+                logger.info("下订单:{}","oSubOrder添加失败");
                 throw new ProcessException("oPayment添加失败");
             }
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice());
@@ -352,6 +359,7 @@ public class OrderServiceImpl implements OrderService {
             BigDecimal b = new BigDecimal(0);
             List<OReceiptPro>  pros =  oReceiptOrderVo.getoReceiptPros();
             if(pros.size()==0){
+                logger.info("下订单:{}","请为收货地址["+address.getRemark()+"]配置上商品明细");
                 throw new ProcessException("请为收货地址["+address.getRemark()+"]配置上商品明细");
             }
             for (OReceiptPro pro : pros) {
@@ -371,6 +379,7 @@ public class OrderServiceImpl implements OrderService {
                 pro.setVersion(Status.STATUS_0.status);
                 //插入收货地址明细
                 if(1!=oReceiptProMapper.insertSelective(pro)){
+                    logger.info("下订单:{}", "oReceiptPro添加失败");
                     throw new ProcessException("oPayment添加失败");
                 }
                 b =  b.add(pro.getProNum());
@@ -378,10 +387,27 @@ public class OrderServiceImpl implements OrderService {
             oReceiptOrderVo.setProNum(b);
             //插入收货地址
             if(1!=oReceiptOrderMapper.insertSelective(oReceiptOrderVo)){
-                throw new ProcessException("oPayment添加失败");
+                logger.info("下订单:{}", "oReceiptOrderVo添加失败");
+                throw new ProcessException("oReceiptOrderVo添加失败");
             }
         }
-
+        List<Attachment> attr =  orderFormVo.getAttachments();
+        for (Attachment attachment : attr) {
+                if (org.apache.commons.lang.StringUtils.isEmpty(attachment.getId())) continue;
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(attachment.getId());
+                record.setSrcId(orderFormVo.getId());
+                record.setcUser(userId);
+                record.setcTime(d);
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.Order.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                if (1 != attachmentRelMapper.insertSelective(record)) {
+                    logger.info("下订单:{}", "附件添加失败");
+                    throw new ProcessException("下订单附件添加失败");
+                }
+        }
+        
         //需要手动计算付款金额
         oPayment.setPayAmount(forRealPayAmount);//应付金额
         oPayment.setOutstandingAmount(forRealPayAmount);//待付金额
@@ -390,7 +416,6 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
         orderFormVo.setoAmo(forRealPayAmount);//订单总金额
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
-
         //插入订单
         if(1!=orderMapper.insertSelective(orderFormVo)){
             throw new ProcessException("订单添加失败");
@@ -399,7 +424,6 @@ public class OrderServiceImpl implements OrderService {
         if(1!=oPaymentMapper.insertSelective(oPayment)){
             throw new ProcessException("oPayment添加失败");
         }
-
         return orderFormVo;
     }
 }
