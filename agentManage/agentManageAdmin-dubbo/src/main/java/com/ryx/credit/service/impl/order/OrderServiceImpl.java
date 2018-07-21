@@ -80,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId) {
+    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId) throws Exception{
         if(StringUtils.isBlank(orderFormVo.getAgentId())){
             return AgentResult.fail("请选择代理商");
         }
@@ -104,7 +104,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult paymentPlan(OPayment oPayment) {
+    public AgentResult paymentPlan(OPayment oPayment) throws Exception{
         Date d = Calendar.getInstance().getTime();
         BigDecimal allPay = oPayment.getPayAmount();//总金额
         BigDecimal down = oPayment.getDownPayment();//首付

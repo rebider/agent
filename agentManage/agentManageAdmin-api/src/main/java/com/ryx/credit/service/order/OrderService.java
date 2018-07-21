@@ -21,7 +21,7 @@ public interface OrderService {
      * @param orderFormVo
      * @return
      */
-    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId);
+    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId)throws Exception;
 
 
     /**
@@ -29,7 +29,7 @@ public interface OrderService {
      * @param oPayment
      * @return
      */
-    public AgentResult paymentPlan(OPayment oPayment);
+    public AgentResult paymentPlan(OPayment oPayment)throws Exception;
 
 
 
