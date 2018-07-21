@@ -28,6 +28,8 @@ public class OPayment implements Serializable{
 
     private BigDecimal realAmount;
 
+    private BigDecimal outstandingAmount;
+
     private Date payCompletTime;
 
     private BigDecimal payStatus;
@@ -51,19 +53,20 @@ public class OPayment implements Serializable{
     private BigDecimal downPayment;
 
     private BigDecimal downPaymentCount;
+
     @JSONField(format="yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @JsonDeserialize(using = DateJsonDeserializer.class)
     @JsonSerialize(using = DateJsonSerializer.class)
     private Date downPaymentDate;
 
+    private String collectCompany;
+
     private String remark;
 
     private BigDecimal status;
 
     private BigDecimal version;
-
-    private String collectCompany;
 
     public String getId() {
         return id;
@@ -127,6 +130,14 @@ public class OPayment implements Serializable{
 
     public void setRealAmount(BigDecimal realAmount) {
         this.realAmount = realAmount;
+    }
+
+    public BigDecimal getOutstandingAmount() {
+        return outstandingAmount;
+    }
+
+    public void setOutstandingAmount(BigDecimal outstandingAmount) {
+        this.outstandingAmount = outstandingAmount;
     }
 
     public Date getPayCompletTime() {
@@ -233,6 +244,14 @@ public class OPayment implements Serializable{
         this.downPaymentDate = downPaymentDate;
     }
 
+    public String getCollectCompany() {
+        return collectCompany;
+    }
+
+    public void setCollectCompany(String collectCompany) {
+        this.collectCompany = collectCompany == null ? null : collectCompany.trim();
+    }
+
     public String getRemark() {
         return remark;
     }
@@ -255,13 +274,5 @@ public class OPayment implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
-    }
-
-    public String getCollectCompany() {
-        return collectCompany;
-    }
-
-    public void setCollectCompany(String collectCompany) {
-        this.collectCompany = collectCompany == null ? null : collectCompany.trim();
     }
 }

@@ -19,11 +19,12 @@
     <result column="EXPRESS_SUC_DATE" property="expressSucDate" jdbcType="TIMESTAMP" />
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
-    <result column="U_TIME" property="uTime" jdbcType="VARCHAR" />
+    <result column="U_TIME" property="uTime" jdbcType="TIMESTAMP" />
     <result column="RECEIPT_STATUS" property="receiptStatus" jdbcType="DECIMAL" />
     <result column="U_USER" property="uUser" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -57,7 +58,8 @@
   <sql id="Base_Column_List" >
     ID, ORDER_ID, RECEIPT_NUM, ADDRESS_ID, ADDR_REALNAME, ADDR_MOBILE, ADDR_PROVINCE, 
     ADDR_CITY, ADDR_DISTRICT, ADDR_DETAIL, REMARK, ZIP_CODE, PRO_NUM, EXPRESS_REMARK, 
-    EXPRESS_SUC_DATE, C_TIME, C_USER, U_TIME, RECEIPT_STATUS, U_USER, STATUS, VERSION
+    EXPRESS_SUC_DATE, C_TIME, C_USER, U_TIME, RECEIPT_STATUS, U_USER, STATUS, VERSION, 
+    AGENT_ID
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OReceiptOrderExample" >
     <include refid="OracleDialectPrefix" />
@@ -95,15 +97,15 @@
       PRO_NUM, EXPRESS_REMARK, EXPRESS_SUC_DATE, 
       C_TIME, C_USER, U_TIME, 
       RECEIPT_STATUS, U_USER, STATUS, 
-      VERSION)
+      VERSION, AGENT_ID)
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{receiptNum,jdbcType=VARCHAR}, 
       #{addressId,jdbcType=VARCHAR}, #{addrRealname,jdbcType=VARCHAR}, #{addrMobile,jdbcType=VARCHAR}, 
       #{addrProvince,jdbcType=VARCHAR}, #{addrCity,jdbcType=VARCHAR}, #{addrDistrict,jdbcType=VARCHAR}, 
       #{addrDetail,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{zipCode,jdbcType=VARCHAR}, 
       #{proNum,jdbcType=DECIMAL}, #{expressRemark,jdbcType=VARCHAR}, #{expressSucDate,jdbcType=TIMESTAMP}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uTime,jdbcType=VARCHAR}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP}, 
       #{receiptStatus,jdbcType=DECIMAL}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReceiptOrder" >
     insert into O_RECEIPT_ORDER
@@ -174,6 +176,9 @@
       <if test="version != null" >
         VERSION,
       </if>
+      <if test="agentId != null" >
+        AGENT_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -228,7 +233,7 @@
         #{cUser,jdbcType=VARCHAR},
       </if>
       <if test="uTime != null" >
-        #{uTime,jdbcType=VARCHAR},
+        #{uTime,jdbcType=TIMESTAMP},
       </if>
       <if test="receiptStatus != null" >
         #{receiptStatus,jdbcType=DECIMAL},
@@ -241,6 +246,9 @@
       </if>
       <if test="version != null" >
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -302,7 +310,7 @@
         C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
       <if test="uTime != null" >
-        U_TIME = #{uTime,jdbcType=VARCHAR},
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
       </if>
       <if test="receiptStatus != null" >
         RECEIPT_STATUS = #{receiptStatus,jdbcType=DECIMAL},
@@ -315,6 +323,9 @@
       </if>
       <if test="version != null" >
         VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -337,11 +348,12 @@
       EXPRESS_SUC_DATE = #{expressSucDate,jdbcType=TIMESTAMP},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       C_USER = #{cUser,jdbcType=VARCHAR},
-      U_TIME = #{uTime,jdbcType=VARCHAR},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
       RECEIPT_STATUS = #{receiptStatus,jdbcType=DECIMAL},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
@@ -354,4 +366,23 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryPlannerList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+      select
+        ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
+        ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
+        ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
+        ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM, rp.SEND_NUM
+      from O_Receipt_order ro,o_Receipt_pro rp
+      where ro.id = rp.receipt_id
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryPlannerCount" parameterType="map" resultType="java.lang.Integer">
+      select
+        count(*)
+      from O_Receipt_order ro,o_Receipt_pro rp
+      where ro.id = rp.receipt_id
+  </select>
 </mapper>
