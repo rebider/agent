@@ -22,15 +22,18 @@ public class StageUtil {
             temp = new BigDecimal(0);
         }
         List<Map> data = new ArrayList<>();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_MONTH,day);
         for (int i=1;i<= count;i++){
+            //第一个月
             FastMap map = FastMap.fastSuccessMap();
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            c.set(Calendar.DAY_OF_MONTH,day);
             map.putKeyV("date",c.getTime());
             map.putKeyV("count",new BigDecimal(i));
             map.putKeyV("item",i==1?item.add(temp):item);
             data.add(map);
+            //累加1个月
+            c.add(Calendar.MONTH,1);
         }
         return data;
     }

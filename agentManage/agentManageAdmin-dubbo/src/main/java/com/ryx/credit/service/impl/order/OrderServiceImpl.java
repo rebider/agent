@@ -106,7 +106,9 @@ public class OrderServiceImpl implements OrderService {
                 if(downPaymentDate.compareTo(new Date())<0){
                     return AgentResult.fail("分期日期错误");
                 }
+
                 List<Map> SF1_data =  StageUtil.stageOrder(allPay.subtract(down),paymentCount.intValue(),downPaymentDate,16);
+
                 //明细处理
                 for (Map datum : SF1_data) {
                     OPaymentDetail record =  new OPaymentDetail();
