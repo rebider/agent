@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 /**
  * Created by RYX on 2018/7/21.
- * 付款明细类型
+ * 付款明细类型 PAYMENTTYPE
  */
 public enum PaymentType {
 
