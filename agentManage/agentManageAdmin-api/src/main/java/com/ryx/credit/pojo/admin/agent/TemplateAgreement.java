@@ -4,7 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @author RYX
+ */
 public class TemplateAgreement implements Serializable{
+
+    private static final long serialVersionUID = 473836471697788554L;
     private String id;
 
     private String agreName;
@@ -15,13 +20,13 @@ public class TemplateAgreement implements Serializable{
 
     private String attrid;
 
-    private BigDecimal agreViewType;
+    private String agreViewType;
 
     private Date cTime;
 
     private Date cUtime;
 
-    private BigDecimal status;
+    private String status;
 
     private String agreContent;
 
@@ -65,14 +70,6 @@ public class TemplateAgreement implements Serializable{
         this.attrid = attrid == null ? null : attrid.trim();
     }
 
-    public BigDecimal getAgreViewType() {
-        return agreViewType;
-    }
-
-    public void setAgreViewType(BigDecimal agreViewType) {
-        this.agreViewType = agreViewType;
-    }
-
     public Date getcTime() {
         return cTime;
     }
@@ -89,19 +86,27 @@ public class TemplateAgreement implements Serializable{
         this.cUtime = cUtime;
     }
 
-    public BigDecimal getStatus() {
-        return status;
-    }
-
-    public void setStatus(BigDecimal status) {
-        this.status = status;
-    }
-
     public String getAgreContent() {
         return agreContent;
     }
 
     public void setAgreContent(String agreContent) {
         this.agreContent = agreContent == null ? null : agreContent.trim();
+    }
+
+    public String getAgreViewType() {
+        return agreViewType;
+    }
+
+    public void setAgreViewType(String agreViewType) {
+        this.agreViewType = agreViewType;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

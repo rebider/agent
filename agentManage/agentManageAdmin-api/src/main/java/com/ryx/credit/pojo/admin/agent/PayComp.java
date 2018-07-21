@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class PayComp implements Serializable {
+    private static final long serialVersionUID = 2229394685270488799L;
     private String id;
 
     private String comName;
@@ -15,7 +16,7 @@ public class PayComp implements Serializable {
 
     private String remark;
 
-    private BigDecimal status;
+    private String status;
 
     public String getId() {
         return id;
@@ -57,11 +58,11 @@ public class PayComp implements Serializable {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public BigDecimal getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(BigDecimal status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 }
