@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OReceiptPro  implements Serializable {
+public class OReceiptPro implements Serializable{
     private String id;
 
     private String orderid;
@@ -32,6 +32,8 @@ public class OReceiptPro  implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String receiptProStatus;
 
     public String getId() {
         return id;
@@ -143,5 +145,13 @@ public class OReceiptPro  implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getReceiptProStatus() {
+        return receiptProStatus;
+    }
+
+    public void setReceiptProStatus(String receiptProStatus) {
+        this.receiptProStatus = receiptProStatus == null ? null : receiptProStatus.trim();
     }
 }
