@@ -14,6 +14,14 @@ public enum SchStatus {
     private BigDecimal status;
     private String msg;
 
+    public BigDecimal getValue() {
+        return this.status;
+    }
+
+    public String getContent() {
+        return this.msg;
+    }
+
     SchStatus(int status, String s) {
         this.status = new BigDecimal(status);
         msg = s;
@@ -49,10 +57,11 @@ public enum SchStatus {
         }
         return new BigDecimal(-1);
     }
-    public static String getMsg(BigDecimal s){
-        if(s==null)return null;
+
+    public static String getMsg(BigDecimal s) {
+        if (s == null) return null;
         for (SchStatus schStatus : SchStatus.values()) {
-            if(schStatus.status.compareTo(s)==0){
+            if (schStatus.status.compareTo(s) == 0) {
                 return schStatus.msg;
             }
         }
