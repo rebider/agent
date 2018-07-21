@@ -7,6 +7,7 @@ import java.math.BigDecimal;
  */
 public enum OReceiptStatus {
 
+
     TEMPORARY_STORAGE("0","暂存"),
     WAITING_LIST("1","待排单"),
     DISPATCHED_ORDER("2","已排单");
