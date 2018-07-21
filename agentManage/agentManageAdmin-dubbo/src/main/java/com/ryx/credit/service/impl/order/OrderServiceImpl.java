@@ -217,6 +217,9 @@ public class OrderServiceImpl implements OrderService {
             case "XXDK"://线下打款
                 break;
             case "QT"://其他
+
+
+
                 break;
         }
         return AgentResult.ok();
