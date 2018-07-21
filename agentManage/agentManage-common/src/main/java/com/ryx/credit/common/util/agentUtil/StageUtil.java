@@ -16,8 +16,8 @@ public class StageUtil {
         for (int i=1;i<= count;i++){
             temp = temp.add(item);
         }
-        if(temp.compareTo(item) < 0){
-            temp = item.subtract(temp);
+        if(temp.compareTo(amount) < 0){
+            temp = amount.subtract(temp);
         }else{
             temp = new BigDecimal(0);
         }
