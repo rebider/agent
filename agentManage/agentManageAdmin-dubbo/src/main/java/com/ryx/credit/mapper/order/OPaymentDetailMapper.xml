@@ -6,7 +6,7 @@
     <result column="PAYMENT_ID" property="paymentId" jdbcType="VARCHAR" />
     <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR" />
     <result column="C_ORDER_ID" property="cOrderId" jdbcType="VARCHAR" />
-    <result column="PAY_METHOD" property="payMethod" jdbcType="VARCHAR" />
+    <result column="PAY_TYPE" property="payType" jdbcType="VARCHAR" />
     <result column="PAY_AMOUNT" property="payAmount" jdbcType="DECIMAL" />
     <result column="REAL_PAY_AMOUNT" property="realPayAmount" jdbcType="DECIMAL" />
     <result column="PAY_TIME" property="payTime" jdbcType="TIMESTAMP" />
@@ -57,7 +57,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, PAYMENT_ID, ORDER_ID, C_ORDER_ID, PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT, PAY_TIME, 
+    ID, PAYMENT_ID, ORDER_ID, C_ORDER_ID, PAY_TYPE, PAY_AMOUNT, REAL_PAY_AMOUNT, PAY_TIME, 
     SRC_ID, SRC_TYPE, PLAN_PAY_TIME, PLAN_NUM, ACCOUNT_USER, ACCOUNTPAY_TYPE, PAY_ACCOUNT, 
     PAYMENT_STATUS, DEFERRED_RID, AGENT_ID, COLLECT_COMPANY, C_USER, C_DATE, REMARK, 
     STATUS, VERSION
@@ -92,7 +92,7 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetail" >
     insert into O_PAYMENT_DETAIL (ID, PAYMENT_ID, ORDER_ID, 
-      C_ORDER_ID, PAY_METHOD, PAY_AMOUNT, 
+      C_ORDER_ID, PAY_TYPE, PAY_AMOUNT, 
       REAL_PAY_AMOUNT, PAY_TIME, SRC_ID, 
       SRC_TYPE, PLAN_PAY_TIME, PLAN_NUM, 
       ACCOUNT_USER, ACCOUNTPAY_TYPE, PAY_ACCOUNT, 
@@ -101,7 +101,7 @@
       REMARK, STATUS, VERSION
       )
     values (#{id,jdbcType=VARCHAR}, #{paymentId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
-      #{cOrderId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, 
+      #{cOrderId,jdbcType=VARCHAR}, #{payType,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, 
       #{realPayAmount,jdbcType=DECIMAL}, #{payTime,jdbcType=TIMESTAMP}, #{srcId,jdbcType=VARCHAR}, 
       #{srcType,jdbcType=VARCHAR}, #{planPayTime,jdbcType=TIMESTAMP}, #{planNum,jdbcType=DECIMAL}, 
       #{accountUser,jdbcType=VARCHAR}, #{accountpayType,jdbcType=VARCHAR}, #{payAccount,jdbcType=VARCHAR}, 
@@ -125,8 +125,8 @@
       <if test="cOrderId != null" >
         C_ORDER_ID,
       </if>
-      <if test="payMethod != null" >
-        PAY_METHOD,
+      <if test="payType != null" >
+        PAY_TYPE,
       </if>
       <if test="payAmount != null" >
         PAY_AMOUNT,
@@ -199,8 +199,8 @@
       <if test="cOrderId != null" >
         #{cOrderId,jdbcType=VARCHAR},
       </if>
-      <if test="payMethod != null" >
-        #{payMethod,jdbcType=VARCHAR},
+      <if test="payType != null" >
+        #{payType,jdbcType=VARCHAR},
       </if>
       <if test="payAmount != null" >
         #{payAmount,jdbcType=DECIMAL},
@@ -279,8 +279,8 @@
       <if test="cOrderId != null" >
         C_ORDER_ID = #{cOrderId,jdbcType=VARCHAR},
       </if>
-      <if test="payMethod != null" >
-        PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+      <if test="payType != null" >
+        PAY_TYPE = #{payType,jdbcType=VARCHAR},
       </if>
       <if test="payAmount != null" >
         PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
@@ -347,7 +347,7 @@
     set PAYMENT_ID = #{paymentId,jdbcType=VARCHAR},
       ORDER_ID = #{orderId,jdbcType=VARCHAR},
       C_ORDER_ID = #{cOrderId,jdbcType=VARCHAR},
-      PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+      PAY_TYPE = #{payType,jdbcType=VARCHAR},
       PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
       REAL_PAY_AMOUNT = #{realPayAmount,jdbcType=DECIMAL},
       PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
@@ -379,4 +379,10 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List"/>
+    from O_PAYMENT_DETAIL
+    where ID = #{id,jdbcType=VARCHAR} and STATUS=1
+  </select>
 </mapper>

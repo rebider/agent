@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OSubOrderActivity implements Serializable {
+public class OSubOrderActivity implements Serializable{
     private String id;
 
     private String activityId;

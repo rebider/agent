@@ -3,26 +3,19 @@
 <mapper namespace="com.ryx.credit.dao.order.OReceiptProMapper" >
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OReceiptPro" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="ORDERID" property="orderid" jdbcType="VARCHAR" />
     <result column="RECEIPT_ID" property="receiptId" jdbcType="VARCHAR" />
     <result column="PRO_ID" property="proId" jdbcType="VARCHAR" />
     <result column="PRO_CODE" property="proCode" jdbcType="VARCHAR" />
     <result column="PRO_NAME" property="proName" jdbcType="VARCHAR" />
-    <result column="PRO_TYPE" property="proType" jdbcType="VARCHAR" />
-    <result column="PRO_PRICE" property="proPrice" jdbcType="DECIMAL" />
-    <result column="IS_DEPOSIT" property="isDeposit" jdbcType="DECIMAL" />
-    <result column="DEPOSIT" property="deposit" jdbcType="DECIMAL" />
-    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
     <result column="PRO_NUM" property="proNum" jdbcType="DECIMAL" />
-    <result column="PRO_REL_PRICE" property="proRelPrice" jdbcType="DECIMAL" />
     <result column="SEND_NUM" property="sendNum" jdbcType="DECIMAL" />
-    <result column="RULEID" property="ruleid" jdbcType="VARCHAR" />
     <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="U_USER" property="uUser" jdbcType="VARCHAR" />
     <result column="U_TIME" property="uTime" jdbcType="TIMESTAMP" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
-    <result column="活动ID" property="活动id" jdbcType="CHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -54,9 +47,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, RECEIPT_ID, PRO_ID, PRO_CODE, PRO_NAME, PRO_TYPE, PRO_PRICE, IS_DEPOSIT, DEPOSIT, 
-    REMARK, PRO_NUM, PRO_REL_PRICE, SEND_NUM, RULEID, C_USER, C_TIME, U_USER, U_TIME, 
-    STATUS, VERSION, 活动ID
+    ID, ORDERID, RECEIPT_ID, PRO_ID, PRO_CODE, PRO_NAME, PRO_NUM, SEND_NUM, C_USER, C_TIME, 
+    U_USER, U_TIME, STATUS, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OReceiptProExample" >
     <include refid="OracleDialectPrefix" />
@@ -87,26 +79,25 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OReceiptPro" >
-    insert into O_RECEIPT_PRO (ID, RECEIPT_ID, PRO_ID, 
-      PRO_CODE, PRO_NAME, PRO_TYPE, 
-      PRO_PRICE, IS_DEPOSIT, DEPOSIT, 
-      REMARK, PRO_NUM, PRO_REL_PRICE, 
-      SEND_NUM, RULEID, C_USER, 
+    insert into O_RECEIPT_PRO (ID, ORDERID, RECEIPT_ID, 
+      PRO_ID, PRO_CODE, PRO_NAME, 
+      PRO_NUM, SEND_NUM, C_USER, 
       C_TIME, U_USER, U_TIME, 
-      STATUS, VERSION, 活动ID)
-    values (#{id,jdbcType=VARCHAR}, #{receiptId,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR}, 
-      #{proCode,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, 
-      #{proPrice,jdbcType=DECIMAL}, #{isDeposit,jdbcType=DECIMAL}, #{deposit,jdbcType=DECIMAL}, 
-      #{remark,jdbcType=VARCHAR}, #{proNum,jdbcType=DECIMAL}, #{proRelPrice,jdbcType=DECIMAL}, 
-      #{sendNum,jdbcType=DECIMAL}, #{ruleid,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{orderid,jdbcType=VARCHAR}, #{receiptId,jdbcType=VARCHAR}, 
+      #{proId,jdbcType=VARCHAR}, #{proCode,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, 
+      #{proNum,jdbcType=DECIMAL}, #{sendNum,jdbcType=DECIMAL}, #{cUser,jdbcType=VARCHAR}, 
       #{cTime,jdbcType=TIMESTAMP}, #{uUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{活动id,jdbcType=CHAR})
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReceiptPro" >
     insert into O_RECEIPT_PRO
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         ID,
+      </if>
+      <if test="orderid != null" >
+        ORDERID,
       </if>
       <if test="receiptId != null" >
         RECEIPT_ID,
@@ -120,32 +111,11 @@
       <if test="proName != null" >
         PRO_NAME,
       </if>
-      <if test="proType != null" >
-        PRO_TYPE,
-      </if>
-      <if test="proPrice != null" >
-        PRO_PRICE,
-      </if>
-      <if test="isDeposit != null" >
-        IS_DEPOSIT,
-      </if>
-      <if test="deposit != null" >
-        DEPOSIT,
-      </if>
-      <if test="remark != null" >
-        REMARK,
-      </if>
       <if test="proNum != null" >
         PRO_NUM,
       </if>
-      <if test="proRelPrice != null" >
-        PRO_REL_PRICE,
-      </if>
       <if test="sendNum != null" >
         SEND_NUM,
-      </if>
-      <if test="ruleid != null" >
-        RULEID,
       </if>
       <if test="cUser != null" >
         C_USER,
@@ -165,13 +135,13 @@
       <if test="version != null" >
         VERSION,
       </if>
-      <if test="活动id != null" >
-        活动ID,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orderid != null" >
+        #{orderid,jdbcType=VARCHAR},
       </if>
       <if test="receiptId != null" >
         #{receiptId,jdbcType=VARCHAR},
@@ -185,32 +155,11 @@
       <if test="proName != null" >
         #{proName,jdbcType=VARCHAR},
       </if>
-      <if test="proType != null" >
-        #{proType,jdbcType=VARCHAR},
-      </if>
-      <if test="proPrice != null" >
-        #{proPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="isDeposit != null" >
-        #{isDeposit,jdbcType=DECIMAL},
-      </if>
-      <if test="deposit != null" >
-        #{deposit,jdbcType=DECIMAL},
-      </if>
-      <if test="remark != null" >
-        #{remark,jdbcType=VARCHAR},
-      </if>
       <if test="proNum != null" >
         #{proNum,jdbcType=DECIMAL},
       </if>
-      <if test="proRelPrice != null" >
-        #{proRelPrice,jdbcType=DECIMAL},
-      </if>
       <if test="sendNum != null" >
         #{sendNum,jdbcType=DECIMAL},
-      </if>
-      <if test="ruleid != null" >
-        #{ruleid,jdbcType=VARCHAR},
       </if>
       <if test="cUser != null" >
         #{cUser,jdbcType=VARCHAR},
@@ -230,9 +179,6 @@
       <if test="version != null" >
         #{version,jdbcType=DECIMAL},
       </if>
-      <if test="活动id != null" >
-        #{活动id,jdbcType=CHAR},
-      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OReceiptProExample" resultType="java.lang.Integer" >
@@ -244,6 +190,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OReceiptPro" >
     update O_RECEIPT_PRO
     <set >
+      <if test="orderid != null" >
+        ORDERID = #{orderid,jdbcType=VARCHAR},
+      </if>
       <if test="receiptId != null" >
         RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
       </if>
@@ -256,32 +205,11 @@
       <if test="proName != null" >
         PRO_NAME = #{proName,jdbcType=VARCHAR},
       </if>
-      <if test="proType != null" >
-        PRO_TYPE = #{proType,jdbcType=VARCHAR},
-      </if>
-      <if test="proPrice != null" >
-        PRO_PRICE = #{proPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="isDeposit != null" >
-        IS_DEPOSIT = #{isDeposit,jdbcType=DECIMAL},
-      </if>
-      <if test="deposit != null" >
-        DEPOSIT = #{deposit,jdbcType=DECIMAL},
-      </if>
-      <if test="remark != null" >
-        REMARK = #{remark,jdbcType=VARCHAR},
-      </if>
       <if test="proNum != null" >
         PRO_NUM = #{proNum,jdbcType=DECIMAL},
       </if>
-      <if test="proRelPrice != null" >
-        PRO_REL_PRICE = #{proRelPrice,jdbcType=DECIMAL},
-      </if>
       <if test="sendNum != null" >
         SEND_NUM = #{sendNum,jdbcType=DECIMAL},
-      </if>
-      <if test="ruleid != null" >
-        RULEID = #{ruleid,jdbcType=VARCHAR},
       </if>
       <if test="cUser != null" >
         C_USER = #{cUser,jdbcType=VARCHAR},
@@ -301,34 +229,24 @@
       <if test="version != null" >
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
-      <if test="活动id != null" >
-        活动ID = #{活动id,jdbcType=CHAR},
-      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReceiptPro" >
     update O_RECEIPT_PRO
-    set RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
+    set ORDERID = #{orderid,jdbcType=VARCHAR},
+      RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
       PRO_ID = #{proId,jdbcType=VARCHAR},
       PRO_CODE = #{proCode,jdbcType=VARCHAR},
       PRO_NAME = #{proName,jdbcType=VARCHAR},
-      PRO_TYPE = #{proType,jdbcType=VARCHAR},
-      PRO_PRICE = #{proPrice,jdbcType=DECIMAL},
-      IS_DEPOSIT = #{isDeposit,jdbcType=DECIMAL},
-      DEPOSIT = #{deposit,jdbcType=DECIMAL},
-      REMARK = #{remark,jdbcType=VARCHAR},
       PRO_NUM = #{proNum,jdbcType=DECIMAL},
-      PRO_REL_PRICE = #{proRelPrice,jdbcType=DECIMAL},
       SEND_NUM = #{sendNum,jdbcType=DECIMAL},
-      RULEID = #{ruleid,jdbcType=VARCHAR},
       C_USER = #{cUser,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       U_USER = #{uUser,jdbcType=VARCHAR},
       U_TIME = #{uTime,jdbcType=TIMESTAMP},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      活动ID = #{活动id,jdbcType=CHAR}
+      VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >

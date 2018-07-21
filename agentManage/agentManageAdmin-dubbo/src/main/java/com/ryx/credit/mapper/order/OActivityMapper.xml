@@ -21,6 +21,7 @@
     <result column="U_USER" property="uUser" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
+    <result column="G_TIME" property="gTime" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -54,7 +55,7 @@
   <sql id="Base_Column_List" >
     ID, PRODUCT_ID, RULE_ID, ACTIVITY_NAME, PRO_TYPE, ACTIVITY_WAY, ACTIVITY_RULE, PLATFORM, 
     PRICE, BEGIN_TIME, END_TIME, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS, 
-    VERSION
+    VERSION, G_TIME
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" >
     <include refid="OracleDialectPrefix" />
@@ -91,14 +92,14 @@
       BEGIN_TIME, END_TIME, VENDER, 
       PRO_MODEL, C_TIME, U_TIME, 
       C_USER, U_USER, STATUS, 
-      VERSION)
+      VERSION, G_TIME)
     values (#{id,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, 
       #{activityName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR}, 
       #{activityRule,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
       #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{vender,jdbcType=VARCHAR}, 
       #{proModel,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
       #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+      #{version,jdbcType=DECIMAL}, #{gTime,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OActivity" >
     insert into O_ACTIVITY
@@ -160,6 +161,9 @@
       <if test="version != null" >
         VERSION,
       </if>
+      <if test="gTime != null" >
+        G_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -218,6 +222,9 @@
       </if>
       <if test="version != null" >
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="gTime != null" >
+        #{gTime,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -284,6 +291,9 @@
       <if test="version != null" >
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="gTime != null" >
+        G_TIME = #{gTime,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -306,7 +316,8 @@
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      G_TIME = #{gTime,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >

@@ -1,16 +1,23 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.dao.order.OOrderMapper;
-import com.ryx.credit.pojo.admin.order.OOrder;
-import com.ryx.credit.pojo.admin.order.OOrderExample;
+import com.ryx.credit.common.util.agentUtil.StageUtil;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.agent.Attachment;
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -21,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -28,10 +36,29 @@ import java.util.List;
 @Service("orderService")
 public class OrderServiceImpl implements OrderService {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+
+
     @Autowired
     private OOrderMapper orderMapper;
     @Autowired
+    private OSubOrderMapper oSubOrderMapper;
+    @Autowired
+    private OReceiptProMapper  oReceiptProMapper;
+    @Autowired
+    private OPaymentMapper oPaymentMapper;
+    @Autowired
+    private OPaymentDetailMapper oPaymentDetailMapper;
+    @Autowired
     private IdService idService;
+    @Autowired
+    private OProductMapper oProductMapper;
+    @Autowired
+    private OAddressMapper oAddressMapper;
+    @Autowired
+    private OReceiptOrderMapper  oReceiptOrderMapper;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
 
     @Override
     public PageInfo orderList(OOrder product, Page page) {
@@ -53,24 +80,350 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId) {
-        Date d = Calendar.getInstance().getTime();
+    public AgentResult buildOrder(OrderFormVo orderFormVo,String userId) throws Exception{
+        if(StringUtils.isBlank(orderFormVo.getAgentId())){
+            return AgentResult.fail("请选择代理商");
+        }
+        if(StringUtils.isBlank(orderFormVo.getOrderPlatform())){
+            return AgentResult.fail("请选择平台");
+        }
         orderFormVo.setUserId(userId);
-        orderFormVo.setcTime(d);
-        orderFormVo =  setOrderFormValue(orderFormVo);
-
-        return null;
+        //保存订单数据
+        orderFormVo =  setOrderFormValue(orderFormVo,userId);
+        //支付方式处理
+        OPayment oPayment = orderFormVo.getoPayment();
+        //分期处理
+        AgentResult oPayment_res = paymentPlan(oPayment);
+        return AgentResult.ok();
     }
 
-    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo){
+    /**
+     * 分期处理
+     * @param oPayment
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult paymentPlan(OPayment oPayment) throws Exception{
+        Date d = Calendar.getInstance().getTime();
+        BigDecimal allPay = oPayment.getPayAmount();//总金额
+        BigDecimal down = oPayment.getDownPayment();//首付
+        BigDecimal paymentCount = oPayment.getDownPaymentCount();//分期
+        Date downPaymentDate = oPayment.getDownPaymentDate();//起始日期
+        switch (oPayment.getPayMethod()){
+            case "SF1"://首付+分润分期
+                if(down==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(paymentCount==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate.compareTo(new Date())<0){
+                    return AgentResult.fail("分期日期错误");
+                }
+                List<Map> SF1_data =  StageUtil.stageOrder(allPay.subtract(down),paymentCount.intValue(),downPaymentDate,16);
+                //明细处理
+                for (Map datum : SF1_data) {
+                    OPaymentDetail record =  new OPaymentDetail();
+                    record.setId(idService.genId(TabId.o_payment_detail));
+                    record.setPaymentId(oPayment.getId());
+                    record.setOrderId(oPayment.getOrderId());
+                    record.setPayType(PaymentType.FRFQ.code);
+                    record.setPayAmount((BigDecimal) datum.get("item"));
+                    record.setRealPayAmount(new BigDecimal(0));
+                    record.setPlanPayTime((Date)datum.get("date"));
+                    record.setPlanNum((BigDecimal) datum.get("count"));
+                    record.setAgentId(oPayment.getAgentId());
+                    record.setCollectCompany(oPayment.getCollectCompany());
+                    record.setPaymentStatus(PaymentStatus.DS.code);
+                    record.setcUser(oPayment.getUserId());
+                    record.setcDate(d);
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setVersion(Status.STATUS_1.status);
+                    if(1!=oPaymentDetailMapper.insert(record)){
+                       throw new ProcessException("分期处理");
+                    }
+                }
+                break;
+            case "SF2": //首付+打款分期
+                if(down==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(paymentCount==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate.compareTo(new Date())<0){
+                    return AgentResult.fail("分期日期错误");
+                }
+                List<Map> SF2_data =  StageUtil.stageOrder(allPay.subtract(down),paymentCount.intValue(),downPaymentDate,16);
+                //明细处理
+                for (Map datum : SF2_data) {
+                    OPaymentDetail record =  new OPaymentDetail();
+                    record.setId(idService.genId(TabId.o_payment_detail));
+                    record.setPaymentId(oPayment.getId());
+                    record.setOrderId(oPayment.getOrderId());
+                    record.setPayType(PaymentType.DKFQ.code);
+                    record.setPayAmount((BigDecimal) datum.get("item"));
+                    record.setRealPayAmount(new BigDecimal(0));
+                    record.setPlanNum((BigDecimal) datum.get("count"));
+                    record.setAgentId(oPayment.getAgentId());
+                    record.setCollectCompany(oPayment.getCollectCompany());
+                    record.setPaymentStatus(PaymentStatus.DS.code);
+                    record.setcUser(oPayment.getUserId());
+                    record.setcDate(d);
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setVersion(Status.STATUS_1.status);
+                    if(1!=oPaymentDetailMapper.insert(record)){
+                        throw new ProcessException("分期处理");
+                    }
+                }
+                break;
+            case "FKFQ"://付款分期
+                if(down==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(paymentCount==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate.compareTo(new Date())<0){
+                    return AgentResult.fail("分期日期错误");
+                }
+                List<Map> FKFQ_data =  StageUtil.stageOrder(allPay,paymentCount.intValue(),downPaymentDate,16);
+                //明细处理
+                for (Map datum : FKFQ_data) {
+                    OPaymentDetail record =  new OPaymentDetail();
+                    record.setId(idService.genId(TabId.o_payment_detail));
+                    record.setPaymentId(oPayment.getId());
+                    record.setOrderId(oPayment.getOrderId());
+                    record.setPayType(PaymentType.DKFQ.code);
+                    record.setPayAmount((BigDecimal) datum.get("item"));
+                    record.setRealPayAmount(new BigDecimal(0));
+                    record.setPlanNum((BigDecimal) datum.get("count"));
+                    record.setAgentId(oPayment.getAgentId());
+                    record.setCollectCompany(oPayment.getCollectCompany());
+                    record.setPaymentStatus(PaymentStatus.DS.code);
+                    record.setcUser(oPayment.getUserId());
+                    record.setcDate(d);
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setVersion(Status.STATUS_1.status);
+                    if(1!=oPaymentDetailMapper.insert(record)){
+                        throw new ProcessException("分期处理");
+                    }
+                }
+                break;
+            case "FRFQ"://分润分期
+                if(down==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(paymentCount==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate==null){
+                    return AgentResult.fail("分期数据错误");
+                }
+                if(downPaymentDate.compareTo(new Date())<0){
+                    return AgentResult.fail("分期日期错误");
+                }
+                List<Map> FRFQ_data =  StageUtil.stageOrder(allPay,paymentCount.intValue(),downPaymentDate,16);
+                //明细处理
+                for (Map datum : FRFQ_data) {
+                    OPaymentDetail record =  new OPaymentDetail();
+                    record.setId(idService.genId(TabId.o_payment_detail));
+                    record.setPaymentId(oPayment.getId());
+                    record.setOrderId(oPayment.getOrderId());
+                    record.setPayType(PaymentType.FRFQ.code);
+                    record.setPayAmount((BigDecimal) datum.get("item"));
+                    record.setRealPayAmount(new BigDecimal(0));
+                    record.setPlanNum((BigDecimal) datum.get("count"));
+                    record.setAgentId(oPayment.getAgentId());
+                    record.setCollectCompany(oPayment.getCollectCompany());
+                    record.setPaymentStatus(PaymentStatus.DS.code);
+                    record.setcUser(oPayment.getUserId());
+                    record.setcDate(d);
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setVersion(Status.STATUS_1.status);
+                    if(1!=oPaymentDetailMapper.insert(record)){
+                        throw new ProcessException("分期处理");
+                    }
+                }
+                break;
+            case "XXDK"://线下打款
+                break;
+            case "QT"://其他
+                break;
+        }
+        return AgentResult.ok();
 
+    }
+
+    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo, String userId){
+
+        //订单基础数据
+        Date d = Calendar.getInstance().getTime();
         orderFormVo.setId(idService.genId(TabId.o_order));
         orderFormVo.setoNum(orderFormVo.getId());
         orderFormVo.setoApytime(orderFormVo.getcTime());
-//        orderFormVo.setIncentiveAmo(new BigDecimal(0));
+        orderFormVo.setUserId(userId);
         orderFormVo.setPayAmo(orderFormVo.getoAmo());
         orderFormVo.setReviewStatus(AgStatus.Create.status);
+        orderFormVo.setOrderStatus(OrderStatus.CREATE.status);
+        orderFormVo.setClearStatus(Status.STATUS_0.status);
+        orderFormVo.setStatus(Status.STATUS_1.status);
+        orderFormVo.setcTime(d);
+        orderFormVo.setuUser(userId);
+        orderFormVo.setuTime(d);
+        orderFormVo.setVersion(Status.STATUS_0.status);
 
+        //支付方式
+        OPayment oPayment = orderFormVo.getoPayment();
+        oPayment.setId(idService.genId(TabId.o_payment));
+        oPayment.setUserId(userId);
+        oPayment.setOrderId(orderFormVo.getId());
+        oPayment.setAgentId(orderFormVo.getAgentId());
+        oPayment.setcTime(d);
+        oPayment.setRealAmount(Status.STATUS_0.status);//已付金额
+        oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
+        oPayment.setStatus(Status.STATUS_1.status);
+
+        //订单总金额
+        BigDecimal forPayAmount =  new BigDecimal(0);
+        //订单应付金额
+        BigDecimal forRealPayAmount =  new BigDecimal(0);
+
+        //子订单接口 计算整个订单数据
+        List<OSubOrder> OSubOrders = orderFormVo.getoSubOrder();
+        for (OSubOrder oSubOrder : OSubOrders) {
+            oSubOrder.setId(idService.genId(TabId.o_sub_order));
+            OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
+            if(oSubOrder.getProPrice()==null || oSubOrder.getProPrice().compareTo(product.getProPrice())!=0){
+                logger.info("下订单:{}","商品价格数据错误");
+                throw new ProcessException("商品价格数据错误");
+            }
+            if(oSubOrder.getProRelPrice()==null){
+                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+            }
+            oSubOrder.setOrderId(orderFormVo.getId());
+            oSubOrder.setProCode(product.getProCode());
+            oSubOrder.setProName(product.getProName());
+            oSubOrder.setProType(product.getProType());
+            oSubOrder.setProPrice(product.getProPrice());
+            oSubOrder.setIsDeposit(product.getIsDeposit());
+            oSubOrder.setDeposit(product.getDeposit());
+            oSubOrder.setModel(product.getProModel());
+            oSubOrder.setcTime(d);
+            oSubOrder.setuUser(userId);
+            oSubOrder.setcUser(userId);
+            oSubOrder.setuTime(d);
+            oSubOrder.setStatus(Status.STATUS_1.status);
+            oSubOrder.setVersion(Status.STATUS_0.status);
+            //插入订单商品信息
+            if(1!=oSubOrderMapper.insertSelective(oSubOrder)){
+                logger.info("下订单:{}","oSubOrder添加失败");
+                throw new ProcessException("oPayment添加失败");
+            }
+            forPayAmount = forPayAmount.add(oSubOrder.getProPrice());
+            forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice());
+        }
+        //收货地址
+        List<OReceiptOrderVo> OReceiptOrderVos = orderFormVo.getoReceiptOrderList();
+        for (OReceiptOrderVo oReceiptOrderVo : OReceiptOrderVos) {
+            oReceiptOrderVo.setId(idService.genId(TabId.o_receipt_order));
+            oReceiptOrderVo.setOrderId(orderFormVo.getId());
+            oReceiptOrderVo.setReceiptNum(oReceiptOrderVo.getId());
+            OAddress address = oAddressMapper.selectByPrimaryKey(oReceiptOrderVo.getAddressId());
+            oReceiptOrderVo.setAddrRealname(address.getAddrRealname());
+            oReceiptOrderVo.setAddrMobile(address.getAddrMobile());
+            oReceiptOrderVo.setAddrProvince(address.getAddrProvince());
+            oReceiptOrderVo.setAddrCity(address.getAddrCity());
+            oReceiptOrderVo.setAddrDistrict(address.getAddrDistrict());
+            oReceiptOrderVo.setAddrDetail(address.getAddrDetail());
+            oReceiptOrderVo.setRemark(address.getRemark());
+            oReceiptOrderVo.setZipCode(address.getZipCode());
+            oReceiptOrderVo.setcTime(d);
+            oReceiptOrderVo.setuTime(d);
+            oReceiptOrderVo.setReceiptStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+            oReceiptOrderVo.setuUser(userId);
+            oReceiptOrderVo.setcUser(userId);
+            oReceiptOrderVo.setStatus(Status.STATUS_1.status);
+            oReceiptOrderVo.setVersion(Status.STATUS_0.status);
+            oReceiptOrderVo.setAgentId(orderFormVo.getAgentId());
+            BigDecimal b = new BigDecimal(0);
+            List<OReceiptPro>  pros =  oReceiptOrderVo.getoReceiptPros();
+            if(pros.size()==0){
+                logger.info("下订单:{}","请为收货地址["+address.getRemark()+"]配置上商品明细");
+                throw new ProcessException("请为收货地址["+address.getRemark()+"]配置上商品明细");
+            }
+            for (OReceiptPro pro : pros) {
+                pro.setId(idService.genId(TabId.o_receipt_pro));
+                pro.setcTime(d);
+                pro.setOrderid(orderFormVo.getId());
+                pro.setReceiptId(oReceiptOrderVo.getId());
+                String proid = pro.getProId();
+                OProduct product = oProductMapper.selectByPrimaryKey(proid);
+                pro.setProCode(product.getProCode());
+                pro.setProName(product.getProName());
+                pro.setSendNum(new BigDecimal(0));
+                pro.setcUser(userId);
+                pro.setuTime(d);
+                pro.setuUser(userId);
+                pro.setStatus(Status.STATUS_1.status);
+                pro.setVersion(Status.STATUS_0.status);
+                //插入收货地址明细
+                if(1!=oReceiptProMapper.insertSelective(pro)){
+                    logger.info("下订单:{}", "oReceiptPro添加失败");
+                    throw new ProcessException("oPayment添加失败");
+                }
+                b =  b.add(pro.getProNum());
+            }
+            oReceiptOrderVo.setProNum(b);
+            //插入收货地址
+            if(1!=oReceiptOrderMapper.insertSelective(oReceiptOrderVo)){
+                logger.info("下订单:{}", "oReceiptOrderVo添加失败");
+                throw new ProcessException("oReceiptOrderVo添加失败");
+            }
+        }
+        List<Attachment> attr =  orderFormVo.getAttachments();
+        for (Attachment attachment : attr) {
+                if (org.apache.commons.lang.StringUtils.isEmpty(attachment.getId())) continue;
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(attachment.getId());
+                record.setSrcId(orderFormVo.getId());
+                record.setcUser(userId);
+                record.setcTime(d);
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.Order.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                if (1 != attachmentRelMapper.insertSelective(record)) {
+                    logger.info("下订单:{}", "附件添加失败");
+                    throw new ProcessException("下订单附件添加失败");
+                }
+        }
+        
+        //需要手动计算付款金额
+        oPayment.setPayAmount(forRealPayAmount);//应付金额
+        oPayment.setOutstandingAmount(forRealPayAmount);//待付金额
+        oPayment.setRealAmount(new BigDecimal(0));//已付金额
+        //需要手动计算付款金额
+        orderFormVo.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
+        orderFormVo.setoAmo(forRealPayAmount);//订单总金额
+        orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
+        //插入订单
+        if(1!=orderMapper.insertSelective(orderFormVo)){
+            throw new ProcessException("订单添加失败");
+        }
+        //插入付款单
+        if(1!=oPaymentMapper.insertSelective(oPayment)){
+            throw new ProcessException("oPayment添加失败");
+        }
         return orderFormVo;
     }
 }

@@ -1397,6 +1397,66 @@ public class OActivityExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andGTimeIsNull() {
+            addCriterion("G_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeIsNotNull() {
+            addCriterion("G_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeEqualTo(BigDecimal value) {
+            addCriterion("G_TIME =", value, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeNotEqualTo(BigDecimal value) {
+            addCriterion("G_TIME <>", value, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeGreaterThan(BigDecimal value) {
+            addCriterion("G_TIME >", value, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("G_TIME >=", value, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeLessThan(BigDecimal value) {
+            addCriterion("G_TIME <", value, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("G_TIME <=", value, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeIn(List<BigDecimal> values) {
+            addCriterion("G_TIME in", values, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeNotIn(List<BigDecimal> values) {
+            addCriterion("G_TIME not in", values, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("G_TIME between", value1, value2, "gTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGTimeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("G_TIME not between", value1, value2, "gTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
