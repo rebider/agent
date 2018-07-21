@@ -379,6 +379,9 @@
       <if test="par.receiptStatus != null and par.receiptStatus!=''" >
         and receipt_status = #{par.receiptStatus}
       </if>
+      <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
+        and receipt_pro_status = #{par.receiptProStatus}
+      </if>
     <include refid="OracleDialectSuffix" />
   </select>
 
@@ -389,6 +392,9 @@
       where ro.id = rp.receipt_id
       <if test="par.receiptStatus != null and par.receiptStatus!=''" >
         and receipt_status = #{par.receiptStatus}
+      </if>
+      <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
+        and receipt_pro_status = #{par.receiptProStatus}
       </if>
   </select>
 </mapper>

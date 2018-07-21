@@ -51,6 +51,7 @@ public class PlannerServiceImpl implements PlannerService {
 
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put("receiptStatus",OReceiptStatus.WAITING_LIST.code);
+        reqMap.put("receiptProStatus",OReceiptStatus.WAITING_LIST.code);
         List<Map<String,Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(plannerList);
@@ -87,10 +88,21 @@ public class PlannerServiceImpl implements PlannerService {
             OReceiptPro receiptPro = new OReceiptPro();
             receiptPro.setId(receiptProId);
             receiptPro.setSendNum(oReceiptPro.getSendNum().add(receiptPlan.getPlanProNum()));
+            if(receiptPro.getSendNum().equals(oReceiptPro.getProNum())){
+                receiptPro.setReceiptProStatus(String.valueOf(OReceiptStatus.DISPATCHED_ORDER.code));
+            }
             int receiptProUpdate = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
-
-            OReceiptOrder oReceiptOrder = receiptOrderMapper.selectByPrimaryKey(receiptPlan.getReceiptId());
-            if(receiptPro.getSendNum().equals(oReceiptOrder.getProNum())){
+            if(receiptInsert!=1 || receiptProUpdate!=1){
+                log.info("保存排单异常");
+                throw new ProcessException("保存排单异常");
+            }
+            //没有待排单的商品更新收货单状态
+            OReceiptProExample oReceiptProExample = new OReceiptProExample();
+            OReceiptProExample.Criteria criteria = oReceiptProExample.createCriteria();
+            criteria.andReceiptIdEqualTo(receiptPlan.getReceiptId());
+            criteria.andReceiptProStatusEqualTo(String.valueOf(OReceiptStatus.WAITING_LIST.code));
+            List<OReceiptPro> oReceiptPros = receiptProMapper.selectByExample(oReceiptProExample);
+            if(oReceiptPros.size()==0){
                 OReceiptOrder receiptOrder = new OReceiptOrder();
                 receiptOrder.setId(receiptPlan.getReceiptId());
                 receiptOrder.setReceiptStatus(OReceiptStatus.DISPATCHED_ORDER.code);
@@ -98,10 +110,6 @@ public class PlannerServiceImpl implements PlannerService {
                 if(receiptOrdUpdate!=1){
                     throw new ProcessException("保存排单异常");
                 }
-            }
-            if(receiptInsert!=1 || receiptProUpdate!=1){
-                log.info("保存排单异常");
-                throw new ProcessException("保存排单异常");
             }
             result.setStatus(200);
             result.setMsg("处理成功");
