@@ -31,6 +31,8 @@ public class ORefundPriceDiffDetail implements Serializable {
 
     private BigDecimal version;
 
+    private BigDecimal changeCount;
+
     public String getId() {
         return id;
     }
@@ -133,5 +135,13 @@ public class ORefundPriceDiffDetail implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getChangeCount() {
+        return changeCount;
+    }
+
+    public void setChangeCount(BigDecimal changeCount) {
+        this.changeCount = changeCount;
     }
 }

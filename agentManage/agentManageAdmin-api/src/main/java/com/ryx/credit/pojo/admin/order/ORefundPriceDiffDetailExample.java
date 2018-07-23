@@ -997,6 +997,66 @@ public class ORefundPriceDiffDetailExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andChangeCountIsNull() {
+            addCriterion("CHANGE_COUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountIsNotNull() {
+            addCriterion("CHANGE_COUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountEqualTo(BigDecimal value) {
+            addCriterion("CHANGE_COUNT =", value, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountNotEqualTo(BigDecimal value) {
+            addCriterion("CHANGE_COUNT <>", value, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountGreaterThan(BigDecimal value) {
+            addCriterion("CHANGE_COUNT >", value, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CHANGE_COUNT >=", value, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountLessThan(BigDecimal value) {
+            addCriterion("CHANGE_COUNT <", value, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CHANGE_COUNT <=", value, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountIn(List<BigDecimal> values) {
+            addCriterion("CHANGE_COUNT in", values, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountNotIn(List<BigDecimal> values) {
+            addCriterion("CHANGE_COUNT not in", values, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CHANGE_COUNT between", value1, value2, "changeCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andChangeCountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CHANGE_COUNT not between", value1, value2, "changeCount");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

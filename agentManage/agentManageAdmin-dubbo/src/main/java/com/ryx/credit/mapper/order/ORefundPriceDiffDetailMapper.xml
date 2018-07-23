@@ -15,6 +15,7 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="CHANGE_COUNT" jdbcType="DECIMAL" property="changeCount" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -46,8 +47,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID, 
-    S_TIME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+    ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID,
+    S_TIME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, CHANGE_COUNT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -66,7 +67,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_REFUND_PRICE_DIFF_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -78,16 +79,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
-    insert into O_REFUND_PRICE_DIFF_DETAIL (ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID, 
-      ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID, 
-      S_TIME, C_TIME, U_TIME, 
-      C_USER, U_USER, STATUS, 
-      VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{activityFrontId,jdbcType=VARCHAR}, 
-      #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
-      #{sTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
-      #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+    insert into O_REFUND_PRICE_DIFF_DETAIL (ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID,
+    ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID,
+    S_TIME, C_TIME, U_TIME,
+    C_USER, U_USER, STATUS,
+    VERSION, CHANGE_COUNT)
+    values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{activityFrontId,jdbcType=VARCHAR},
+    #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
+    #{sTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{changeCount,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -131,6 +132,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="changeCount != null">
+        CHANGE_COUNT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -171,6 +175,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="changeCount != null">
+        #{changeCount,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -219,6 +226,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="changeCount != null">
+        CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -235,12 +245,13 @@
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
