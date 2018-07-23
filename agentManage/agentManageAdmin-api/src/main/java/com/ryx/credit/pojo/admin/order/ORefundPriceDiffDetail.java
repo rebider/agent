@@ -33,6 +33,16 @@ public class ORefundPriceDiffDetail implements Serializable {
 
     private BigDecimal changeCount;
 
+    private String beginSn;
+
+    private String endSn;
+
+    private String agentId;
+
+    private String vender;
+
+    private String proModel;
+
     public String getId() {
         return id;
     }
@@ -143,5 +153,45 @@ public class ORefundPriceDiffDetail implements Serializable {
 
     public void setChangeCount(BigDecimal changeCount) {
         this.changeCount = changeCount;
+    }
+
+    public String getBeginSn() {
+        return beginSn;
+    }
+
+    public void setBeginSn(String beginSn) {
+        this.beginSn = beginSn == null ? null : beginSn.trim();
+    }
+
+    public String getEndSn() {
+        return endSn;
+    }
+
+    public void setEndSn(String endSn) {
+        this.endSn = endSn == null ? null : endSn.trim();
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId == null ? null : agentId.trim();
+    }
+
+    public String getVender() {
+        return vender;
+    }
+
+    public void setVender(String vender) {
+        this.vender = vender == null ? null : vender.trim();
+    }
+
+    public String getProModel() {
+        return proModel;
+    }
+
+    public void setProModel(String proModel) {
+        this.proModel = proModel == null ? null : proModel.trim();
     }
 }
