@@ -45,5 +45,13 @@ public enum PkType {
         }
         return "";
     }
-
+    public static String getContentByValue(String value){
+        PkType[] fundType = PkType.values();
+        for(PkType cc : fundType){
+            if(cc.code.equals(value)){
+                return cc.name();
+            }
+        }
+        return "";
+    }
 }
