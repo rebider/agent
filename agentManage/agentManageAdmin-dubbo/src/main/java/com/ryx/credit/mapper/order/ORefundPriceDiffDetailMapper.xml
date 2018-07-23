@@ -16,6 +16,11 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="CHANGE_COUNT" jdbcType="DECIMAL" property="changeCount" />
+    <result column="BEGIN_SN" jdbcType="VARCHAR" property="beginSn" />
+    <result column="END_SN" jdbcType="VARCHAR" property="endSn" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="VENDER" jdbcType="VARCHAR" property="vender" />
+    <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -48,7 +53,8 @@
   </sql>
   <sql id="Base_Column_List">
     ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID,
-    S_TIME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, CHANGE_COUNT
+    S_TIME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, CHANGE_COUNT, BEGIN_SN,
+    END_SN, AGENT_ID, VENDER, PRO_MODEL
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -83,12 +89,16 @@
     ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID,
     S_TIME, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, CHANGE_COUNT)
+    VERSION, CHANGE_COUNT, BEGIN_SN,
+    END_SN, AGENT_ID, VENDER,
+    PRO_MODEL)
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{activityFrontId,jdbcType=VARCHAR},
     #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
     #{sTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{changeCount,jdbcType=DECIMAL})
+    #{version,jdbcType=DECIMAL}, #{changeCount,jdbcType=DECIMAL}, #{beginSn,jdbcType=VARCHAR},
+    #{endSn,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR},
+    #{proModel,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -135,6 +145,21 @@
       <if test="changeCount != null">
         CHANGE_COUNT,
       </if>
+      <if test="beginSn != null">
+        BEGIN_SN,
+      </if>
+      <if test="endSn != null">
+        END_SN,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="vender != null">
+        VENDER,
+      </if>
+      <if test="proModel != null">
+        PRO_MODEL,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -178,6 +203,21 @@
       </if>
       <if test="changeCount != null">
         #{changeCount,jdbcType=DECIMAL},
+      </if>
+      <if test="beginSn != null">
+        #{beginSn,jdbcType=VARCHAR},
+      </if>
+      <if test="endSn != null">
+        #{endSn,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="vender != null">
+        #{vender,jdbcType=VARCHAR},
+      </if>
+      <if test="proModel != null">
+        #{proModel,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -229,24 +269,44 @@
       <if test="changeCount != null">
         CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
       </if>
+      <if test="beginSn != null">
+        BEGIN_SN = #{beginSn,jdbcType=VARCHAR},
+      </if>
+      <if test="endSn != null">
+        END_SN = #{endSn,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="vender != null">
+        VENDER = #{vender,jdbcType=VARCHAR},
+      </if>
+      <if test="proModel != null">
+        PRO_MODEL = #{proModel,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     update O_REFUND_PRICE_DIFF_DETAIL
     set SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
-      ACTIVITY_FRONT_ID = #{activityFrontId,jdbcType=VARCHAR},
-      ACTIVITY_REAL_ID = #{activityRealId,jdbcType=VARCHAR},
-      REFUND_PRICE_DIFF_ID = #{refundPriceDiffId,jdbcType=VARCHAR},
-      ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      S_TIME = #{sTime,jdbcType=TIMESTAMP},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL}
+    ACTIVITY_FRONT_ID = #{activityFrontId,jdbcType=VARCHAR},
+    ACTIVITY_REAL_ID = #{activityRealId,jdbcType=VARCHAR},
+    REFUND_PRICE_DIFF_ID = #{refundPriceDiffId,jdbcType=VARCHAR},
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    S_TIME = #{sTime,jdbcType=TIMESTAMP},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
+    BEGIN_SN = #{beginSn,jdbcType=VARCHAR},
+    END_SN = #{endSn,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    VENDER = #{vender,jdbcType=VARCHAR},
+    PRO_MODEL = #{proModel,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
