@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OReceiptOrderMapper;
 import com.ryx.credit.dao.order.OReceiptProMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
@@ -52,6 +53,15 @@ public class PlannerServiceImpl implements PlannerService {
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put("receiptStatus",OReceiptStatus.WAITING_LIST.code);
         reqMap.put("receiptProStatus",OReceiptStatus.WAITING_LIST.code);
+        if(StringUtils.isNotBlank(receiptOrder.getOrderId())){
+            reqMap.put("orderId",receiptOrder.getOrderId());
+        }
+        if(StringUtils.isNotBlank(receiptOrder.getReceiptNum())){
+            reqMap.put("receiptNum",receiptOrder.getReceiptNum());
+        }
+        if(StringUtils.isNotBlank(receiptOrder.getAddrRealname())){
+            reqMap.put("addrRealname",receiptOrder.getAddrRealname());
+        }
         List<Map<String,Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(plannerList);

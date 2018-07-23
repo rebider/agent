@@ -9,9 +9,11 @@ public class OPaymentDetail implements Serializable{
 
     private String paymentId;
 
+    private String paymentType;
+
     private String orderId;
 
-    private String cOrderId;
+    private String batchCode;
 
     private String payType;
 
@@ -29,19 +31,9 @@ public class OPaymentDetail implements Serializable{
 
     private BigDecimal planNum;
 
-    private String accountUser;
-
-    private String accountpayType;
-
-    private String payAccount;
-
     private BigDecimal paymentStatus;
 
-    private String deferredRid;
-
     private String agentId;
-
-    private String collectCompany;
 
     private String cUser;
 
@@ -69,6 +61,14 @@ public class OPaymentDetail implements Serializable{
         this.paymentId = paymentId == null ? null : paymentId.trim();
     }
 
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType == null ? null : paymentType.trim();
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -77,12 +77,12 @@ public class OPaymentDetail implements Serializable{
         this.orderId = orderId == null ? null : orderId.trim();
     }
 
-    public String getcOrderId() {
-        return cOrderId;
+    public String getBatchCode() {
+        return batchCode;
     }
 
-    public void setcOrderId(String cOrderId) {
-        this.cOrderId = cOrderId == null ? null : cOrderId.trim();
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode == null ? null : batchCode.trim();
     }
 
     public String getPayType() {
@@ -149,30 +149,6 @@ public class OPaymentDetail implements Serializable{
         this.planNum = planNum;
     }
 
-    public String getAccountUser() {
-        return accountUser;
-    }
-
-    public void setAccountUser(String accountUser) {
-        this.accountUser = accountUser == null ? null : accountUser.trim();
-    }
-
-    public String getAccountpayType() {
-        return accountpayType;
-    }
-
-    public void setAccountpayType(String accountpayType) {
-        this.accountpayType = accountpayType == null ? null : accountpayType.trim();
-    }
-
-    public String getPayAccount() {
-        return payAccount;
-    }
-
-    public void setPayAccount(String payAccount) {
-        this.payAccount = payAccount == null ? null : payAccount.trim();
-    }
-
     public BigDecimal getPaymentStatus() {
         return paymentStatus;
     }
@@ -181,28 +157,12 @@ public class OPaymentDetail implements Serializable{
         this.paymentStatus = paymentStatus;
     }
 
-    public String getDeferredRid() {
-        return deferredRid;
-    }
-
-    public void setDeferredRid(String deferredRid) {
-        this.deferredRid = deferredRid == null ? null : deferredRid.trim();
-    }
-
     public String getAgentId() {
         return agentId;
     }
 
     public void setAgentId(String agentId) {
         this.agentId = agentId == null ? null : agentId.trim();
-    }
-
-    public String getCollectCompany() {
-        return collectCompany;
-    }
-
-    public void setCollectCompany(String collectCompany) {
-        this.collectCompany = collectCompany == null ? null : collectCompany.trim();
     }
 
     public String getcUser() {

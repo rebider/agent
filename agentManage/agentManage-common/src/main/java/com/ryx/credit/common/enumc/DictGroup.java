@@ -36,8 +36,10 @@ public enum DictGroup {
     PAYMENTSTATUS("分期计划状态"),
     PAYMENTTYPE("付款明细类型"),
     SETTLEMENT_TYPE("结算类型"),
+    ACT_RETURN_FINANCE("补款审批流名称"),
     TEMP_AGREE("协议模板"),
-    AGREE_TYPE("协议类型");
+    AGREE_TYPE("协议类型"),
+    ACTIVITY_DIS_TYPE("活动优惠方式");
 
     public String  msg;
 

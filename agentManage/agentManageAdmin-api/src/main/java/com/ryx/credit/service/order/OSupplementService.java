@@ -1,8 +1,10 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
@@ -31,4 +33,14 @@ public interface OSupplementService {
      * 添加补款
      */
     public ResultVO supplementSave(OsupplementVo osupplementVo);
+
+    /**
+     * 提交审批
+     */
+    public ResultVO startSuppActivity(String id,String userId)throws ProcessException;
+
+    /**
+     * 查询基本信息
+     */
+    public OSupplement informationQuery(String id);
 }
