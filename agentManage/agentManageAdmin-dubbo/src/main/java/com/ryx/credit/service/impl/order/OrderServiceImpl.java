@@ -527,6 +527,13 @@ public class OrderServiceImpl implements OrderService {
         return  AgentResult.ok(f);
     }
 
+    /**
+     * 启动订单审批流程
+     * @param id
+     * @param cuser
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult startOrderActiviy(String id,String cuser) throws Exception {
         if (StringUtils.isBlank(id)) {
@@ -571,7 +578,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.DATA_CACTIVITY_TYPE.name());
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.ACT_ORDER.name());
         String workId = null;
         for (Dict dict : actlist) {
                 workId = dict.getdItemvalue();
@@ -590,12 +597,11 @@ public class OrderServiceImpl implements OrderService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(cuser);
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.Agent.name());
+        record.setBusType(BusActRelBusType.ORDER.name());
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
-//            logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
+            logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
         }
-
-        return AgentResult.ok(null);
+        return AgentResult.ok();
     }
 }
