@@ -5,8 +5,8 @@ package com.ryx.credit.common.enumc;
  */
 public enum BusActRelBusType {
     //数据修改申请类型需要加入到此枚举中
-    Agent("代理商入网审批"),Business("业务审批"),DC_Agent("代理商修改"),DC_Colinfo("代理商账户修改申请");;
-
+    Agent("代理商入网审批"),Business("业务审批"),DC_Agent("代理商修改"),DC_Colinfo("代理商账户修改申请"),
+    PkType("订单补款");
     public String  msg;
 
     BusActRelBusType(String s){
