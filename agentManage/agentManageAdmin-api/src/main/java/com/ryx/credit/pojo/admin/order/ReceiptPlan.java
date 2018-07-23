@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 排单规划表(计划发货单)
+ */
 public class ReceiptPlan implements Serializable{
+    private static final long serialVersionUID = 4490760522848977254L;
     private String id;
 
     private String planNum;

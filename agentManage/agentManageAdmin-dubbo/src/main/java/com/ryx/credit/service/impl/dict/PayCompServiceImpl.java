@@ -33,12 +33,13 @@ public class PayCompServiceImpl implements PayCompService {
         PayCompExample example = new PayCompExample();
         PayCompExample.Criteria criteria = example.createCriteria();
         if(StringUtils.isNotBlank(payComp.getComName())){
-            criteria.andComNameLike(payComp.getComName());
+            criteria.andComNameLike("%"+payComp.getComName()+"%");
         }
         if(StringUtils.isNotBlank(payComp.getStatus())){
-            criteria.andStatusNotEqualTo(new BigDecimal(payComp.getStatus()));
+            criteria.andStatusEqualTo(new BigDecimal(payComp.getStatus()));
         }
         int cont = payCompMapper.countByExample(example);
+        example.setPage(page);
         List<PayComp> list = payCompMapper.selectByExample(example);
         PageInfo info = new PageInfo();
         info.setTotal(cont);
@@ -64,7 +65,7 @@ public class PayCompServiceImpl implements PayCompService {
         if(payComp != null){
             payComp.setcTime(new Date());
             payComp.setcUtime(new Date());
-            idService.genId(TabId.a_pay_comp);
+            payComp.setId(idService.genId(TabId.a_pay_comp));
             payCompMapper.insertSelective(payComp);
         }
     }

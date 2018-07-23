@@ -4,7 +4,9 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.TemplateAgreementMapper;
+import com.ryx.credit.pojo.admin.agent.Attachment;
 import com.ryx.credit.pojo.admin.agent.TemplateAgreement;
 import com.ryx.credit.pojo.admin.agent.TemplateAgreementExample;
 import com.ryx.credit.service.dict.IdService;
@@ -27,13 +29,15 @@ public class TemplateAgreementServiceImpl implements TemplateAgreementService {
     private TemplateAgreementMapper templateAgreementMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
     @Override
     public PageInfo getTempAgreeList(Page page, TemplateAgreement templateAgreement) {
         TemplateAgreementExample example = new TemplateAgreementExample();
-        TemplateAgreementExample.Criteria criteria = new TemplateAgreementExample().createCriteria();
+        TemplateAgreementExample.Criteria criteria = example.createCriteria();
         if(StringUtils.isNotBlank(templateAgreement.getAgreName())){
-            criteria.andAgreNameLike(templateAgreement.getAgreName());
+            criteria.andAgreNameLike("%"+templateAgreement.getAgreName()+"%");
         }
         if(StringUtils.isNotBlank(templateAgreement.getAgreVersion())){
             criteria.andAgreVersionEqualTo(templateAgreement.getAgreVersion());
@@ -43,7 +47,12 @@ public class TemplateAgreementServiceImpl implements TemplateAgreementService {
         }
 
         int count = templateAgreementMapper.countByExample(example);
+        example.setPage(page);
         List<TemplateAgreement> list = templateAgreementMapper.selectByExample(example);
+        for (TemplateAgreement templateAgreement1:list) {
+            Attachment attachment = attachmentMapper.selectByPrimaryKey(templateAgreement1.getAttrid());
+            templateAgreement1.setAttrid(attachment == null ? null :attachment.getAttDbpath());
+        }
         PageInfo info = new PageInfo();
         info.setTotal(count);
         info.setRows(list);
@@ -67,7 +76,7 @@ public class TemplateAgreementServiceImpl implements TemplateAgreementService {
     public void insertTempAgreement(TemplateAgreement templateAgreement) {
         if(templateAgreement != null){
             templateAgreement.setcUtime(new Date());
-            templateAgreement.setcUtime(new Date());
+            templateAgreement.setcTime(new Date());
             templateAgreement.setId(idService.genId(TabId.template_agreement));
             templateAgreementMapper.insertSelective(templateAgreement);
         }

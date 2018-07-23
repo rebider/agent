@@ -330,4 +330,57 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="getReceipPlanList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+      SELECT R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,P.PRO_CODE,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,R.PRO_COM,
+      R.PLAN_PRO_NUM,R.SEND_PRO_NUM,R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
+      O.ADDR_REALNAME,O.ADDR_MOBILE,O.ADDR_PROVINCE,O.ADDR_CITY,O.ADDR_DISTRICT,O.ADDR_DETAIL,
+      O.REMARK,O.ZIP_CODE,O.EXPRESS_REMARK,R.C_DATE,O.RECEIPT_STATUS
+      FROM O_RECEIPT_PLAN R
+      LEFT JOIN O_RECEIPT_ORDER O
+      ON R.RECEIPT_ID = O.ID
+      LEFT JOIN O_RECEIPT_PRO P
+      ON O.ID = P.RECEIPT_ID
+    <include refid="BASE_WHERE_SQL"></include>
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getReceipPlanCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM O_RECEIPT_PLAN R
+    LEFT JOIN O_RECEIPT_ORDER O
+    ON R.RECEIPT_ID = O.ID
+    LEFT JOIN O_RECEIPT_PRO P
+    ON O.ID = P.RECEIPT_ID
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      <trim prefixOverrides="and">
+        <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
+        <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
+        <if test="C_DATE_START != null and C_DATE_START != ''">R.C_DATE >= TO_DATE(#{C_DATE},'yyyy-MM-dd') </if>
+        <if test="C_DATE_END != null and C_DATE_END != ''">R.C_DATE &lt;= TO_DATE(#{C_DATE},'yyyy-MM-dd')</if>
+      </trim>
+    </where>
+  </sql>
+
+  <sql id='SORTING'>
+    ORDER BY R.C_DATE DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
 </mapper>
