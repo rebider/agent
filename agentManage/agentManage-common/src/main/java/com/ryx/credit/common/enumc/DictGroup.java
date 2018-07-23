@@ -38,6 +38,7 @@ public enum DictGroup {
     SETTLEMENT_TYPE("结算类型"),
     ACT_RETURN_FINANCE("补款审批流名称"),
     TEMP_AGREE("协议模板"),
+    ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型");
 
     public String  msg;
