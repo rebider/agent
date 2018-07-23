@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.profit.dao.ProfitSupplyMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitSupply" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="AGENT_PID" property="agentPid" jdbcType="VARCHAR" />
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
+    <result column="AGENT_NAME" property="agentName" jdbcType="VARCHAR" />
+    <result column="SUPPLY_TYPE" property="supplyType" jdbcType="CHAR" />
+    <result column="SUPPLY_AMT" property="supplyAmt" jdbcType="DECIMAL" />
+    <result column="SUPPLY_DATE" property="supplyDate" jdbcType="VARCHAR" />
+    <result column="REMERK" property="remerk" jdbcType="VARCHAR" />
+    <result column="SOURCE_ID" property="sourceId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, SUPPLY_DATE, REMERK, 
+    SOURCE_ID
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_PROFIT_SUPPLY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from P_PROFIT_SUPPLY
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
+    delete from P_PROFIT_SUPPLY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
+    insert into P_PROFIT_SUPPLY (ID, AGENT_PID, AGENT_ID, 
+      AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, 
+      SUPPLY_DATE, REMERK, SOURCE_ID
+      )
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{supplyType,jdbcType=CHAR}, #{supplyAmt,jdbcType=DECIMAL}, 
+      #{supplyDate,jdbcType=VARCHAR}, #{remerk,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
+    insert into P_PROFIT_SUPPLY
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="agentPid != null" >
+        AGENT_PID,
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID,
+      </if>
+      <if test="agentName != null" >
+        AGENT_NAME,
+      </if>
+      <if test="supplyType != null" >
+        SUPPLY_TYPE,
+      </if>
+      <if test="supplyAmt != null" >
+        SUPPLY_AMT,
+      </if>
+      <if test="supplyDate != null" >
+        SUPPLY_DATE,
+      </if>
+      <if test="remerk != null" >
+        REMERK,
+      </if>
+      <if test="sourceId != null" >
+        SOURCE_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null" >
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null" >
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyType != null" >
+        #{supplyType,jdbcType=CHAR},
+      </if>
+      <if test="supplyAmt != null" >
+        #{supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyDate != null" >
+        #{supplyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="remerk != null" >
+        #{remerk,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceId != null" >
+        #{sourceId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" resultType="java.lang.Integer" >
+    select count(*) from P_PROFIT_SUPPLY
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
+    update P_PROFIT_SUPPLY
+    <set >
+      <if test="agentPid != null" >
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null" >
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyType != null" >
+        SUPPLY_TYPE = #{supplyType,jdbcType=CHAR},
+      </if>
+      <if test="supplyAmt != null" >
+        SUPPLY_AMT = #{supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyDate != null" >
+        SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="remerk != null" >
+        REMERK = #{remerk,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceId != null" >
+        SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
+    update P_PROFIT_SUPPLY
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      SUPPLY_TYPE = #{supplyType,jdbcType=CHAR},
+      SUPPLY_AMT = #{supplyAmt,jdbcType=DECIMAL},
+      SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR},
+      REMERK = #{remerk,jdbcType=VARCHAR},
+      SOURCE_ID = #{sourceId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
