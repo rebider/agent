@@ -45,8 +45,8 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_SUPPLEMENT" domainObjectName="OSupplement" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"-->
-			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
 		<!--<table tableName="O_PRODUCT" domainObjectName="OProduct" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_RECEIPT_ORDER" domainObjectName="OReceiptOrder" enableUpdateByExample="false"-->
@@ -57,8 +57,8 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_SUB_ORDER_ACTIVITY" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="O_LOGISTICS" domainObjectName="OLogistics" enableUpdateByExample="false"
-			enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="O_LOGISTICS" domainObjectName="OLogistics" enableUpdateByExample="false"-->
+			<!--enableDeleteByPrimaryKey="false"/>-->
 
 
 	</context>

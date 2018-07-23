@@ -32,5 +32,13 @@ public interface OrderService {
     public AgentResult paymentPlan(OPayment oPayment)throws Exception;
 
 
+    /**
+     * 加载订单信息
+     * @param id
+     * @return
+     */
+    public AgentResult loadAgentInfo(String id)throws Exception;
+
+
 
 }
