@@ -134,6 +134,7 @@ public class OrderServiceImpl implements OrderService {
                     OPaymentDetail record =  new OPaymentDetail();
                     record.setId(idService.genId(TabId.o_payment_detail));
                     record.setPaymentId(oPayment.getId());
+                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
                     record.setOrderId(oPayment.getOrderId());
                     record.setPayType(PaymentType.FRFQ.code);
                     record.setPayAmount((BigDecimal) datum.get("item"));
@@ -170,6 +171,7 @@ public class OrderServiceImpl implements OrderService {
                     OPaymentDetail record =  new OPaymentDetail();
                     record.setId(idService.genId(TabId.o_payment_detail));
                     record.setPaymentId(oPayment.getId());
+                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
                     record.setOrderId(oPayment.getOrderId());
                     record.setPayType(PaymentType.DKFQ.code);
                     record.setPayAmount((BigDecimal) datum.get("item"));
@@ -205,6 +207,7 @@ public class OrderServiceImpl implements OrderService {
                     OPaymentDetail record =  new OPaymentDetail();
                     record.setId(idService.genId(TabId.o_payment_detail));
                     record.setPaymentId(oPayment.getId());
+                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
                     record.setOrderId(oPayment.getOrderId());
                     record.setPayType(PaymentType.DKFQ.code);
                     record.setPayAmount((BigDecimal) datum.get("item"));
@@ -240,6 +243,7 @@ public class OrderServiceImpl implements OrderService {
                     OPaymentDetail record =  new OPaymentDetail();
                     record.setId(idService.genId(TabId.o_payment_detail));
                     record.setPaymentId(oPayment.getId());
+                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
                     record.setOrderId(oPayment.getOrderId());
                     record.setPayType(PaymentType.FRFQ.code);
                     record.setPayAmount((BigDecimal) datum.get("item"));
