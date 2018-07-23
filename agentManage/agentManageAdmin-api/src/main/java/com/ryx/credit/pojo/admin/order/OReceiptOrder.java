@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OReceiptOrder {
+public class OReceiptOrder implements Serializable {
     private String id;
 
     private String orderId;
@@ -36,7 +37,7 @@ public class OReceiptOrder {
 
     private Date cTime;
 
-    private Date cUser;
+    private String cUser;
 
     private Date uTime;
 
@@ -178,12 +179,12 @@ public class OReceiptOrder {
         this.cTime = cTime;
     }
 
-    public Date getcUser() {
+    public String getcUser() {
         return cUser;
     }
 
-    public void setcUser(Date cUser) {
-        this.cUser = cUser;
+    public void setcUser(String cUser) {
+        this.cUser = cUser == null ? null : cUser.trim();
     }
 
     public Date getuTime() {

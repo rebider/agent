@@ -1057,6 +1057,76 @@ public class OReceiptProExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andReceiptProStatusIsNull() {
+            addCriterion("RECEIPT_PRO_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusIsNotNull() {
+            addCriterion("RECEIPT_PRO_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS =", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusNotEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS <>", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusGreaterThan(String value) {
+            addCriterion("RECEIPT_PRO_STATUS >", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS >=", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusLessThan(String value) {
+            addCriterion("RECEIPT_PRO_STATUS <", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusLessThanOrEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS <=", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusLike(String value) {
+            addCriterion("RECEIPT_PRO_STATUS like", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusNotLike(String value) {
+            addCriterion("RECEIPT_PRO_STATUS not like", value, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusIn(List<String> values) {
+            addCriterion("RECEIPT_PRO_STATUS in", values, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusNotIn(List<String> values) {
+            addCriterion("RECEIPT_PRO_STATUS not in", values, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusBetween(String value1, String value2) {
+            addCriterion("RECEIPT_PRO_STATUS between", value1, value2, "receiptProStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andReceiptProStatusNotBetween(String value1, String value2) {
+            addCriterion("RECEIPT_PRO_STATUS not between", value1, value2, "receiptProStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
