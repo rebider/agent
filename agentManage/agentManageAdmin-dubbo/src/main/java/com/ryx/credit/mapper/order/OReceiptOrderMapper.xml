@@ -382,6 +382,15 @@
       <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
         and receipt_pro_status = #{par.receiptProStatus}
       </if>
+      <if test="par.orderId != null and par.orderId!=''" >
+        and ro.ORDER_ID = #{par.orderId}
+      </if>
+      <if test="par.receiptNum != null and par.receiptNum!=''" >
+        and ro.RECEIPT_NUM = #{par.receiptNum}
+      </if>
+      <if test="par.addrRealname != null and par.addrRealname!=''" >
+        and ro.ADDR_REALNAME = #{par.addrRealname}
+      </if>
     <include refid="OracleDialectSuffix" />
   </select>
 
