@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OReturnOrderMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OReturnOrder">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="APPLY_REMARK" jdbcType="VARCHAR" property="applyRemark" />
+    <result column="RET_INVOICE" jdbcType="DECIMAL" property="retInvoice" />
+    <result column="RET_RECEIPT" jdbcType="DECIMAL" property="retReceipt" />
+    <result column="RET_SCHEDULE" jdbcType="DECIMAL" property="retSchedule" />
+    <result column="RETURN_AMO" jdbcType="DECIMAL" property="returnAmo" />
+    <result column="GOODS_RETURN_AMO" jdbcType="DECIMAL" property="goodsReturnAmo" />
+    <result column="CUT_AMO" jdbcType="DECIMAL" property="cutAmo" />
+    <result column="REL_RETURN_AMO" jdbcType="DECIMAL" property="relReturnAmo" />
+    <result column="TAKE_OUT_AMO" jdbcType="DECIMAL" property="takeOutAmo" />
+    <result column="RETURN_ADDRESS" jdbcType="VARCHAR" property="returnAddress" />
+    <result column="RET_TIME" jdbcType="TIMESTAMP" property="retTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="BATCH_CODE" jdbcType="VARCHAR" property="batchCode" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, APPLY_REMARK, RET_INVOICE, RET_RECEIPT, RET_SCHEDULE, RETURN_AMO, GOODS_RETURN_AMO, 
+    CUT_AMO, REL_RETURN_AMO, TAKE_OUT_AMO, RETURN_ADDRESS, RET_TIME, REMARK, BATCH_CODE, 
+    C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_RETURN_ORDER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_RETURN_ORDER
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderExample">
+    delete from O_RETURN_ORDER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
+    insert into O_RETURN_ORDER (ID, AGENT_ID, APPLY_REMARK, 
+      RET_INVOICE, RET_RECEIPT, RET_SCHEDULE, 
+      RETURN_AMO, GOODS_RETURN_AMO, CUT_AMO, 
+      REL_RETURN_AMO, TAKE_OUT_AMO, RETURN_ADDRESS, 
+      RET_TIME, REMARK, BATCH_CODE, 
+      C_TIME, U_TIME, C_USER, 
+      U_USER, STATUS, VERSION
+      )
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{applyRemark,jdbcType=VARCHAR}, 
+      #{retInvoice,jdbcType=DECIMAL}, #{retReceipt,jdbcType=DECIMAL}, #{retSchedule,jdbcType=DECIMAL}, 
+      #{returnAmo,jdbcType=DECIMAL}, #{goodsReturnAmo,jdbcType=DECIMAL}, #{cutAmo,jdbcType=DECIMAL}, 
+      #{relReturnAmo,jdbcType=DECIMAL}, #{takeOutAmo,jdbcType=DECIMAL}, #{returnAddress,jdbcType=VARCHAR}, 
+      #{retTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
+      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
+    insert into O_RETURN_ORDER
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="applyRemark != null">
+        APPLY_REMARK,
+      </if>
+      <if test="retInvoice != null">
+        RET_INVOICE,
+      </if>
+      <if test="retReceipt != null">
+        RET_RECEIPT,
+      </if>
+      <if test="retSchedule != null">
+        RET_SCHEDULE,
+      </if>
+      <if test="returnAmo != null">
+        RETURN_AMO,
+      </if>
+      <if test="goodsReturnAmo != null">
+        GOODS_RETURN_AMO,
+      </if>
+      <if test="cutAmo != null">
+        CUT_AMO,
+      </if>
+      <if test="relReturnAmo != null">
+        REL_RETURN_AMO,
+      </if>
+      <if test="takeOutAmo != null">
+        TAKE_OUT_AMO,
+      </if>
+      <if test="returnAddress != null">
+        RETURN_ADDRESS,
+      </if>
+      <if test="retTime != null">
+        RET_TIME,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="batchCode != null">
+        BATCH_CODE,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="uTime != null">
+        U_TIME,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="applyRemark != null">
+        #{applyRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="retInvoice != null">
+        #{retInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="retReceipt != null">
+        #{retReceipt,jdbcType=DECIMAL},
+      </if>
+      <if test="retSchedule != null">
+        #{retSchedule,jdbcType=DECIMAL},
+      </if>
+      <if test="returnAmo != null">
+        #{returnAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsReturnAmo != null">
+        #{goodsReturnAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="cutAmo != null">
+        #{cutAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="relReturnAmo != null">
+        #{relReturnAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="takeOutAmo != null">
+        #{takeOutAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="returnAddress != null">
+        #{returnAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="retTime != null">
+        #{retTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderExample" resultType="java.lang.Long">
+    select count(*) from O_RETURN_ORDER
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
+    update O_RETURN_ORDER
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="applyRemark != null">
+        APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="retInvoice != null">
+        RET_INVOICE = #{retInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="retReceipt != null">
+        RET_RECEIPT = #{retReceipt,jdbcType=DECIMAL},
+      </if>
+      <if test="retSchedule != null">
+        RET_SCHEDULE = #{retSchedule,jdbcType=DECIMAL},
+      </if>
+      <if test="returnAmo != null">
+        RETURN_AMO = #{returnAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="goodsReturnAmo != null">
+        GOODS_RETURN_AMO = #{goodsReturnAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="cutAmo != null">
+        CUT_AMO = #{cutAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="relReturnAmo != null">
+        REL_RETURN_AMO = #{relReturnAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="takeOutAmo != null">
+        TAKE_OUT_AMO = #{takeOutAmo,jdbcType=DECIMAL},
+      </if>
+      <if test="returnAddress != null">
+        RETURN_ADDRESS = #{returnAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="retTime != null">
+        RET_TIME = #{retTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
+    update O_RETURN_ORDER
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
+      RET_INVOICE = #{retInvoice,jdbcType=DECIMAL},
+      RET_RECEIPT = #{retReceipt,jdbcType=DECIMAL},
+      RET_SCHEDULE = #{retSchedule,jdbcType=DECIMAL},
+      RETURN_AMO = #{returnAmo,jdbcType=DECIMAL},
+      GOODS_RETURN_AMO = #{goodsReturnAmo,jdbcType=DECIMAL},
+      CUT_AMO = #{cutAmo,jdbcType=DECIMAL},
+      REL_RETURN_AMO = #{relReturnAmo,jdbcType=DECIMAL},
+      TAKE_OUT_AMO = #{takeOutAmo,jdbcType=DECIMAL},
+      RETURN_ADDRESS = #{returnAddress,jdbcType=VARCHAR},
+      RET_TIME = #{retTime,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
