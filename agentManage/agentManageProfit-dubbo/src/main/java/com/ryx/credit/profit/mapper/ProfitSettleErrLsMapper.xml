@@ -46,6 +46,7 @@
     <result column="PROVINCES" property="provinces" jdbcType="VARCHAR" />
     <result column="FENRUN_FLAG" property="fenrunFlag" jdbcType="VARCHAR" />
     <result column="INST_ID" property="instId" jdbcType="VARCHAR" />
+    <result column="SOURCE_ID" property="sourceId" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -83,7 +84,7 @@
     BALANCE_AMT, NET_AMT, REPAYMENT_TYPE, LONG_SHORT_TYPE, RECORD_STATUS, CHARGEOFF_TYPE, 
     HB_MERCH_ID, HB_ORG, HB_PHONE, HB_NAME, HB_TERM_ID, BALANCE_DATE, NETTING_STATUS, 
     REAL_DEDUCT_AMT, MAKE_AMT, LOSS_AMT, HB_ORG_ID, OFFSET_LOSS_AMT, PROVINCES, FENRUN_FLAG, 
-    INST_ID
+    INST_ID, SOURCE_ID
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSettleErrLsExample" >
     <include refid="OracleDialectPrefix" />
@@ -128,7 +129,7 @@
       HB_TERM_ID, BALANCE_DATE, NETTING_STATUS, 
       REAL_DEDUCT_AMT, MAKE_AMT, LOSS_AMT, 
       HB_ORG_ID, OFFSET_LOSS_AMT, PROVINCES, 
-      FENRUN_FLAG, INST_ID)
+      FENRUN_FLAG, INST_ID, SOURCE_ID)
     values (#{id,jdbcType=VARCHAR}, #{errCode,jdbcType=VARCHAR}, #{tranLs,jdbcType=VARCHAR}, 
       #{tranDate,jdbcType=VARCHAR}, #{businessType,jdbcType=VARCHAR}, #{cooperationMode,jdbcType=VARCHAR}, 
       #{merchId,jdbcType=VARCHAR}, #{merchType,jdbcType=VARCHAR}, #{errDate,jdbcType=VARCHAR}, 
@@ -143,7 +144,7 @@
       #{hbTermId,jdbcType=VARCHAR}, #{balanceDate,jdbcType=VARCHAR}, #{nettingStatus,jdbcType=CHAR}, 
       #{realDeductAmt,jdbcType=DECIMAL}, #{makeAmt,jdbcType=DECIMAL}, #{lossAmt,jdbcType=DECIMAL}, 
       #{hbOrgId,jdbcType=VARCHAR}, #{offsetLossAmt,jdbcType=DECIMAL}, #{provinces,jdbcType=VARCHAR}, 
-      #{fenrunFlag,jdbcType=VARCHAR}, #{instId,jdbcType=VARCHAR})
+      #{fenrunFlag,jdbcType=VARCHAR}, #{instId,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSettleErrLs" >
     insert into P_SETTLE_ERR_LS
@@ -280,6 +281,9 @@
       <if test="instId != null" >
         INST_ID,
       </if>
+      <if test="sourceId != null" >
+        SOURCE_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -413,6 +417,9 @@
       </if>
       <if test="instId != null" >
         #{instId,jdbcType=VARCHAR},
+      </if>
+      <if test="sourceId != null" >
+        SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -554,6 +561,9 @@
       <if test="instId != null" >
         INST_ID = #{instId,jdbcType=VARCHAR},
       </if>
+      <if test="sourceId != null" >
+        SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -601,7 +611,8 @@
       OFFSET_LOSS_AMT = #{offsetLossAmt,jdbcType=DECIMAL},
       PROVINCES = #{provinces,jdbcType=VARCHAR},
       FENRUN_FLAG = #{fenrunFlag,jdbcType=VARCHAR},
-      INST_ID = #{instId,jdbcType=VARCHAR}
+      INST_ID = #{instId,jdbcType=VARCHAR},
+      SOURCE_ID = #{sourceId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >

@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeductionExample;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 public interface ProfitDeductionMapper {
