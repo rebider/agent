@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProfitStagingDetail {
+public class ProfitStagingDetail implements Serializable {
     private String id;
 
     private String stagId;
