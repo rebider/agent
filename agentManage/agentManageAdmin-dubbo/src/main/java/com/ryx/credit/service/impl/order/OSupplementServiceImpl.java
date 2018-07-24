@@ -132,7 +132,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     record.setcUser(oSupplement.getcUser());
                     record.setcTime(oSupplement.getcTime());
                     record.setStatus(Status.STATUS_1.status);
-                    record.setBusType(AttachmentRelType.Agent.name());
+                    record.setBusType(AttachmentRelType.Order.name());
                     record.setId(idService.genId(TabId.a_attachment_rel));
                     if (1 != attachmentRelMapper.insertSelective(record)) {
                         logger.info("补款添加:{}", "上传打款截图失败");
