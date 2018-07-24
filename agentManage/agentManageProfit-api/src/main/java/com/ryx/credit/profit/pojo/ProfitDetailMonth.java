@@ -1,16 +1,15 @@
 package com.ryx.credit.profit.pojo;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
-
-/**
- * @author yangmx
- * 月分润明细数据
- */
-public class ProfitDetailMonth implements Serializable{
-    private static final long serialVersionUID = -964728828652810991L;
+public class ProfitDetailMonth {
     private String id;
+
+    private String agentPid;
+
+    private String agentId;
+
+    private String agentName;
 
     private String profitId;
 
@@ -112,6 +111,30 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
+    }
+
+    public String getAgentPid() {
+        return agentPid;
+    }
+
+    public void setAgentPid(String agentPid) {
+        this.agentPid = agentPid == null ? null : agentPid.trim();
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId == null ? null : agentId.trim();
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName == null ? null : agentName.trim();
     }
 
     public String getProfitId() {

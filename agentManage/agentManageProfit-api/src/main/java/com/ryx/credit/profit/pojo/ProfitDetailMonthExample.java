@@ -207,6 +207,216 @@ public class ProfitDetailMonthExample {
             return (Criteria) this;
         }
 
+        public Criteria andAgentPidIsNull() {
+            addCriterion("AGENT_PID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidIsNotNull() {
+            addCriterion("AGENT_PID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidEqualTo(String value) {
+            addCriterion("AGENT_PID =", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidNotEqualTo(String value) {
+            addCriterion("AGENT_PID <>", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidGreaterThan(String value) {
+            addCriterion("AGENT_PID >", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_PID >=", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidLessThan(String value) {
+            addCriterion("AGENT_PID <", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_PID <=", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidLike(String value) {
+            addCriterion("AGENT_PID like", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidNotLike(String value) {
+            addCriterion("AGENT_PID not like", value, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidIn(List<String> values) {
+            addCriterion("AGENT_PID in", values, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidNotIn(List<String> values) {
+            addCriterion("AGENT_PID not in", values, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidBetween(String value1, String value2) {
+            addCriterion("AGENT_PID between", value1, value2, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentPidNotBetween(String value1, String value2) {
+            addCriterion("AGENT_PID not between", value1, value2, "agentPid");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameIsNull() {
+            addCriterion("AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameIsNotNull() {
+            addCriterion("AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameEqualTo(String value) {
+            addCriterion("AGENT_NAME =", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotEqualTo(String value) {
+            addCriterion("AGENT_NAME <>", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameGreaterThan(String value) {
+            addCriterion("AGENT_NAME >", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_NAME >=", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameLessThan(String value) {
+            addCriterion("AGENT_NAME <", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_NAME <=", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameLike(String value) {
+            addCriterion("AGENT_NAME like", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotLike(String value) {
+            addCriterion("AGENT_NAME not like", value, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameIn(List<String> values) {
+            addCriterion("AGENT_NAME in", values, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotIn(List<String> values) {
+            addCriterion("AGENT_NAME not in", values, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameBetween(String value1, String value2) {
+            addCriterion("AGENT_NAME between", value1, value2, "agentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentNameNotBetween(String value1, String value2) {
+            addCriterion("AGENT_NAME not between", value1, value2, "agentName");
+            return (Criteria) this;
+        }
+
         public Criteria andProfitIdIsNull() {
             addCriterion("PROFIT_ID is null");
             return (Criteria) this;
