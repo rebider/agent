@@ -1,5 +1,7 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
 
@@ -34,4 +36,7 @@ public interface IProfitDService {
 
     int updateByPrimaryKey(ProfitDay record);
 
+    PageInfo profitDList(ProfitDay record, Page page);
+
+    public List<ProfitDay> exportProfitD(ProfitDay profitD);
 }

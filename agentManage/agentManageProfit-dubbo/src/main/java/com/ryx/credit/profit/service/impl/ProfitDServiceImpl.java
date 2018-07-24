@@ -1,9 +1,18 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.util.ConvertUtils;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.pojo.admin.*;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.order.OOrder;
+import com.ryx.credit.pojo.admin.order.OOrderExample;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
@@ -93,4 +102,24 @@ public class ProfitDServiceImpl implements IProfitDService {
     public int updateByPrimaryKey(ProfitDay record) {
         return profitDMapper.updateByPrimaryKey(record);
     }
+
+    @Override
+    public PageInfo profitDList(ProfitDay record, Page page) {
+        ProfitDayExample example = new ProfitDayExample();
+        ProfitDayExample.Criteria criteria = example.createCriteria();
+
+        List<ProfitDay> profitD = profitDMapper.selectByExample(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(profitD);
+        pageInfo.setTotal(profitDMapper.countByExample(example));
+        return pageInfo;
+    }
+
+    @Override
+    public List<ProfitDay> exportProfitD(ProfitDay profitD) {
+        List<ProfitDay> profitDs = profitDMapper.selectByWhere(profitD);
+
+        return profitDs;
+    }
+
 }

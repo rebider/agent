@@ -15,6 +15,8 @@ public interface ProfitDayMapper {
 
     List<ProfitDay> selectByExample(ProfitDayExample example);
 
+    List<ProfitDay> selectByWhere(ProfitDay record);
+
     ProfitDay selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(ProfitDay record);

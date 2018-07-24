@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProfitSettleErrLs {
+public class ProfitSettleErrLs implements Serializable {
     private String id;
 
     private String errCode;

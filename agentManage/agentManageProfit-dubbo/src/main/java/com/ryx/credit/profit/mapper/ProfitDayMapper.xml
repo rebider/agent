@@ -61,6 +61,23 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+
+  <select id="selectByWhere" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDay" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_D
+    <where>
+      1=1
+      <if test='null!= transDate and transDate !="" '>
+        AND TRANS_DATE = #{transDate}
+      </if>
+      <if test='null!= remitDate and remitDate !="" '>
+        AND REMIT_DATE = #{remitDate}
+      </if>
+    </where>
+    order by TRANS_DATE
+  </select>
+
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
