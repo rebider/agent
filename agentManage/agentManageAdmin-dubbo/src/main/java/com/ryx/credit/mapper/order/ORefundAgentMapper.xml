@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.ORefundAgentMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.ORefundAgent">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ADJUST_ID" jdbcType="VARCHAR" property="adjustId" />
+    <result column="REFUND_TYPE" jdbcType="VARCHAR" property="refundType" />
+    <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
+    <result column="REFUND_AMOUNT" jdbcType="DECIMAL" property="refundAmount" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="CLO_TYPE" jdbcType="DECIMAL" property="cloType" />
+    <result column="CLO_REALNAME" jdbcType="VARCHAR" property="cloRealname" />
+    <result column="CLO_BANK" jdbcType="VARCHAR" property="cloBank" />
+    <result column="CLO_BANK_BRANCH" jdbcType="VARCHAR" property="cloBankBranch" />
+    <result column="CLO_BANK_ACCOUNT" jdbcType="VARCHAR" property="cloBankAccount" />
+    <result column="BRANCH_LINE_NUM" jdbcType="VARCHAR" property="branchLineNum" />
+    <result column="ALL_LINE_NUM" jdbcType="VARCHAR" property="allLineNum" />
+    <result column="CLO_TAX_POINT" jdbcType="DECIMAL" property="cloTaxPoint" />
+    <result column="CLO_INVOICE" jdbcType="DECIMAL" property="cloInvoice" />
+    <result column="BANK_REGION" jdbcType="VARCHAR" property="bankRegion" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="C_DATE" jdbcType="TIMESTAMP" property="cDate" />
+    <result column="PAY_USER" jdbcType="VARCHAR" property="payUser" />
+    <result column="PAY_TIME" jdbcType="TIMESTAMP" property="payTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ADJUST_ID, REFUND_TYPE, SRC_ID, REFUND_AMOUNT, AGENT_ID, CLO_TYPE, CLO_REALNAME, 
+    CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, BRANCH_LINE_NUM, ALL_LINE_NUM, CLO_TAX_POINT, 
+    CLO_INVOICE, BANK_REGION, C_USER, C_DATE, PAY_USER, PAY_TIME, REMARK, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgentExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_REFUND_AGENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_REFUND_AGENT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgentExample">
+    delete from O_REFUND_AGENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgent">
+    insert into O_REFUND_AGENT (ID, ADJUST_ID, REFUND_TYPE, 
+      SRC_ID, REFUND_AMOUNT, AGENT_ID, 
+      CLO_TYPE, CLO_REALNAME, CLO_BANK, 
+      CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, BRANCH_LINE_NUM, 
+      ALL_LINE_NUM, CLO_TAX_POINT, CLO_INVOICE, 
+      BANK_REGION, C_USER, C_DATE, 
+      PAY_USER, PAY_TIME, REMARK, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{adjustId,jdbcType=VARCHAR}, #{refundType,jdbcType=VARCHAR}, 
+      #{srcId,jdbcType=VARCHAR}, #{refundAmount,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, 
+      #{cloType,jdbcType=DECIMAL}, #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, 
+      #{cloBankBranch,jdbcType=VARCHAR}, #{cloBankAccount,jdbcType=VARCHAR}, #{branchLineNum,jdbcType=VARCHAR}, 
+      #{allLineNum,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, #{cloInvoice,jdbcType=DECIMAL}, 
+      #{bankRegion,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cDate,jdbcType=TIMESTAMP}, 
+      #{payUser,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgent">
+    insert into O_REFUND_AGENT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="adjustId != null">
+        ADJUST_ID,
+      </if>
+      <if test="refundType != null">
+        REFUND_TYPE,
+      </if>
+      <if test="srcId != null">
+        SRC_ID,
+      </if>
+      <if test="refundAmount != null">
+        REFUND_AMOUNT,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="cloType != null">
+        CLO_TYPE,
+      </if>
+      <if test="cloRealname != null">
+        CLO_REALNAME,
+      </if>
+      <if test="cloBank != null">
+        CLO_BANK,
+      </if>
+      <if test="cloBankBranch != null">
+        CLO_BANK_BRANCH,
+      </if>
+      <if test="cloBankAccount != null">
+        CLO_BANK_ACCOUNT,
+      </if>
+      <if test="branchLineNum != null">
+        BRANCH_LINE_NUM,
+      </if>
+      <if test="allLineNum != null">
+        ALL_LINE_NUM,
+      </if>
+      <if test="cloTaxPoint != null">
+        CLO_TAX_POINT,
+      </if>
+      <if test="cloInvoice != null">
+        CLO_INVOICE,
+      </if>
+      <if test="bankRegion != null">
+        BANK_REGION,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="cDate != null">
+        C_DATE,
+      </if>
+      <if test="payUser != null">
+        PAY_USER,
+      </if>
+      <if test="payTime != null">
+        PAY_TIME,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustId != null">
+        #{adjustId,jdbcType=VARCHAR},
+      </if>
+      <if test="refundType != null">
+        #{refundType,jdbcType=VARCHAR},
+      </if>
+      <if test="srcId != null">
+        #{srcId,jdbcType=VARCHAR},
+      </if>
+      <if test="refundAmount != null">
+        #{refundAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="cloType != null">
+        #{cloType,jdbcType=DECIMAL},
+      </if>
+      <if test="cloRealname != null">
+        #{cloRealname,jdbcType=VARCHAR},
+      </if>
+      <if test="cloBank != null">
+        #{cloBank,jdbcType=VARCHAR},
+      </if>
+      <if test="cloBankBranch != null">
+        #{cloBankBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="cloBankAccount != null">
+        #{cloBankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="branchLineNum != null">
+        #{branchLineNum,jdbcType=VARCHAR},
+      </if>
+      <if test="allLineNum != null">
+        #{allLineNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cloTaxPoint != null">
+        #{cloTaxPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="cloInvoice != null">
+        #{cloInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="bankRegion != null">
+        #{bankRegion,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cDate != null">
+        #{cDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payUser != null">
+        #{payUser,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null">
+        #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgentExample" resultType="java.lang.Long">
+    select count(*) from O_REFUND_AGENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgent">
+    update O_REFUND_AGENT
+    <set>
+      <if test="adjustId != null">
+        ADJUST_ID = #{adjustId,jdbcType=VARCHAR},
+      </if>
+      <if test="refundType != null">
+        REFUND_TYPE = #{refundType,jdbcType=VARCHAR},
+      </if>
+      <if test="srcId != null">
+        SRC_ID = #{srcId,jdbcType=VARCHAR},
+      </if>
+      <if test="refundAmount != null">
+        REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="cloType != null">
+        CLO_TYPE = #{cloType,jdbcType=DECIMAL},
+      </if>
+      <if test="cloRealname != null">
+        CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
+      </if>
+      <if test="cloBank != null">
+        CLO_BANK = #{cloBank,jdbcType=VARCHAR},
+      </if>
+      <if test="cloBankBranch != null">
+        CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
+      </if>
+      <if test="cloBankAccount != null">
+        CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="branchLineNum != null">
+        BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+      </if>
+      <if test="allLineNum != null">
+        ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+      </if>
+      <if test="cloTaxPoint != null">
+        CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="cloInvoice != null">
+        CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="bankRegion != null">
+        BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cDate != null">
+        C_DATE = #{cDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payUser != null">
+        PAY_USER = #{payUser,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null">
+        PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORefundAgent">
+    update O_REFUND_AGENT
+    set ADJUST_ID = #{adjustId,jdbcType=VARCHAR},
+      REFUND_TYPE = #{refundType,jdbcType=VARCHAR},
+      SRC_ID = #{srcId,jdbcType=VARCHAR},
+      REFUND_AMOUNT = #{refundAmount,jdbcType=DECIMAL},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      CLO_TYPE = #{cloType,jdbcType=DECIMAL},
+      CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
+      CLO_BANK = #{cloBank,jdbcType=VARCHAR},
+      CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
+      CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
+      BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+      ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+      CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+      CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+      BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_DATE = #{cDate,jdbcType=TIMESTAMP},
+      PAY_USER = #{payUser,jdbcType=VARCHAR},
+      PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -12,8 +13,8 @@ import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.order.OPaymentDetail;
-import com.ryx.credit.pojo.admin.order.OSupplement;
+import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -85,9 +86,16 @@ public class OSupplementServiceImpl implements OSupplementService {
     }
 
     @Override
-    public OPaymentDetail selectById(String id) {
-        OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectById(id);
-        return oPaymentDetail;
+    public OSupplement selectById(String id) {
+        OSupplementExample oSupplementExample = new OSupplementExample();
+        OSupplementExample.Criteria criteria = oSupplementExample.createCriteria();
+        criteria.andIdEqualTo(id);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OSupplement> oSupplements = oSupplementMapper.selectByExample(oSupplementExample);
+        if (oSupplements.size() != 1) {
+            return null;
+        }
+        return oSupplements.get(0);
     }
 
     @Override
@@ -109,6 +117,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
         oSupplement.setPkType("1");
+        oSupplement.setSrcId("OPD2018072300000000000069");
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
         if (1 == oSupplementMapper.insertSelective(oSupplement)) {
@@ -123,7 +132,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     record.setcUser(oSupplement.getcUser());
                     record.setcTime(oSupplement.getcTime());
                     record.setStatus(Status.STATUS_1.status);
-                    record.setBusType(AttachmentRelType.Agent.name());
+                    record.setBusType(AttachmentRelType.Order.name());
                     record.setId(idService.genId(TabId.a_attachment_rel));
                     if (1 != attachmentRelMapper.insertSelective(record)) {
                         logger.info("补款添加:{}", "上传打款截图失败");
@@ -202,6 +211,87 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Override
     public OSupplement informationQuery(String id) {
-        return  oSupplementMapper.selectByPrimaryKey(id);
+        return oSupplementMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public OPaymentDetail selectByOPaymentId(String id) {
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+        criteria.andIdEqualTo(id);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OPaymentDetail> details = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        if (details.size() != 1) {
+            return null;
+        }
+        return details.get(0);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
+        try {
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
+            if (!result.isOK()) {
+                logger.error(result.getMsg());
+                throw new ProcessException("工作流处理任务异常");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
+        }
+        return AgentResult.ok();
+    }
+
+
+    @Override
+    public ResultVO updateByActivId(String id, String activityName) {
+        BusActRel busActRel = selectByActivId(id);
+        OSupplement oSupplement = new OSupplement();
+        String srcId = "";
+        if (StringUtils.isNotBlank(busActRel.getBusId())) {
+            srcId = busActRel.getBusId();
+        }
+        busActRel.setActivId(id);
+        busActRel.setBusId(srcId);
+        oSupplement.setId(srcId);
+        if ("reject_end".equals(activityName)) {//审批拒绝
+            busActRel.setActivStatus(AgStatus.Refuse.name());
+            if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
+                logger.info("业务流程状态修改失败{}:", busActRel.getActivId());
+                return ResultVO.fail("业务流程状态修改失败");
+            }
+            oSupplement.setSchstatus(SchStatus.FOUR.getValue());
+
+            if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
+                logger.info("补款状态修改失败{}:", busActRel.getActivId());
+                return ResultVO.fail("补款状态修改失败");
+            }
+        } else if ("finish_end".equals(activityName)) {//审批同意
+            busActRel.setActivStatus(AgStatus.Approved.name());
+            if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
+                logger.info("业务流程状态修改失败{}", busActRel.getActivId());
+                return ResultVO.fail("业务流程状态修改失败");
+            }
+            oSupplement.setSchstatus(SchStatus.THREE.getValue());
+            if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
+                logger.info("补款状态修改失败{}:", busActRel.getActivId());
+                return ResultVO.fail("补款状态修改失败");
+            }
+        }
+        return ResultVO.success(null);
+    }
+
+
+    public BusActRel selectByActivId(String id) {
+        BusActRelExample busActRelExample = new BusActRelExample();
+        BusActRelExample.Criteria criteria = busActRelExample.createCriteria();
+        criteria.andActivIdEqualTo(id);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<BusActRel> busActRels = busActRelMapper.selectByExample(busActRelExample);
+        if (busActRels.size() != 1) {
+            return null;
+        }
+        return busActRels.get(0);
     }
 }

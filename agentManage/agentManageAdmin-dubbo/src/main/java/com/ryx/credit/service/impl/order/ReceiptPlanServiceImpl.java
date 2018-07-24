@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.pojo.admin.order.ReceiptPlan;
 import com.ryx.credit.service.dict.IdService;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 排单计划
@@ -38,5 +41,14 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
             return AgentResult.ok();
         }
         return result;
+    }
+
+    @Override
+    public PageInfo  getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = receiptPlanMapper.getReceipPlanCount(param);
+        List<Map<String, Object>> list = receiptPlanMapper.getReceipPlanList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
     }
 }

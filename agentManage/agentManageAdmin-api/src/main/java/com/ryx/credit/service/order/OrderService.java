@@ -40,5 +40,13 @@ public interface OrderService {
     public AgentResult loadAgentInfo(String id)throws Exception;
 
 
+    /**
+     * 启动订单审批
+     * @return
+     * @throws Exception
+     */
+    public AgentResult startOrderActiviy(String id,String cuser)throws Exception;
+
+
 
 }
