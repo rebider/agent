@@ -303,8 +303,6 @@ public class RedisService {
 
     }
 
-    // Hash（哈希表）
-
     /**
      * 实现命令：HSET key field value，将哈希表 key中的域 field的值设为 value
      *
