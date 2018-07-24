@@ -1,8 +1,13 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProfitDetailMonth {
+/**
+ * @author RYX
+ */
+public class ProfitDetailMonth implements Serializable{
+    private static final long serialVersionUID = 2347411248960514038L;
     private String id;
 
     private String agentPid;

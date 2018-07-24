@@ -60,7 +60,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
-
         ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
         ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
         profitDetailMonthExample.setPage(page);
@@ -69,7 +68,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth) {
-
         return 0;
     }
 }
