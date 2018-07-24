@@ -341,7 +341,7 @@
       LEFT JOIN O_RECEIPT_ORDER O
       ON R.RECEIPT_ID = O.ID
       LEFT JOIN O_RECEIPT_PRO P
-      ON O.ID = P.RECEIPT_ID
+      ON R.pro_ID = P.id
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />
@@ -353,7 +353,7 @@
     LEFT JOIN O_RECEIPT_ORDER O
     ON R.RECEIPT_ID = O.ID
     LEFT JOIN O_RECEIPT_PRO P
-    ON O.ID = P.RECEIPT_ID
+    ON R.pro_ID = P.id
     <include refid="BASE_WHERE_SQL"></include>
   </select>
 
