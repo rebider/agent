@@ -10,7 +10,7 @@ import java.math.BigDecimal;
  * @Description:补款状态
  */
 public enum SchStatus {
-    ONE(1, "暂存"), TWO(2, "有效"), THREE(3, "已完成"), FOUR(4, "异常");
+    ONE(1, "暂存"), TWO(2, "有效"), THREE(3, "已完成"), FOUR(4, "失败");
     private BigDecimal status;
     private String msg;
 

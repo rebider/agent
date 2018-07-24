@@ -3,7 +3,9 @@ package com.ryx.credit.activity.task;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.service.agent.DataChangeActivityService;
+import com.ryx.credit.service.order.OSupplementService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -16,6 +18,7 @@ import org.slf4j.LoggerFactory;
  * ReturnFinanceTaskExecutionListener
  * Created by IntelliJ IDEA.
  * 补款审批
+ *
  * @author Wang Qi
  * @version 1.0 2018/7/19 11:37
  * @see ReturnFinanceTaskExecutionListener
@@ -33,17 +36,18 @@ public class ReturnFinanceTaskExecutionListener implements TaskListener, Executi
             logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
+            OSupplementService oSupplementService = (OSupplementService) MySpringContextHandler.applicationContext.getBean("oSupplementService");
             //数据变更服务类
-            DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
-                logger.info("=========ReturnFinanceTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                logger.info("=========ReturnFinanceTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
+                //更新业务流程关系表--状态
+                 oSupplementService.updateByActivId(delegateExecution.getProcessInstanceId(),activityName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.name());
-                logger.info("=========ReturnFinanceTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                logger.info("=========ReturnFinanceTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
+                oSupplementService.updateByActivId(delegateExecution.getProcessInstanceId(),activityName);
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
