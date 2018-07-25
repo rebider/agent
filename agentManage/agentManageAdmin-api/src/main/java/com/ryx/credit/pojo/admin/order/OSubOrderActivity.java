@@ -11,6 +11,24 @@ public class OSubOrderActivity implements Serializable{
 
     private String subOrderId;
 
+    private String activityName;
+
+    private String ruleId;
+
+    private String activityRule;
+
+    private String activityWay;
+
+    private BigDecimal price;
+
+    private String proModel;
+
+    private String vender;
+
+    private String platform;
+
+    private BigDecimal gTime;
+
     private Date cTime;
 
     private Date uTime;
@@ -43,6 +61,78 @@ public class OSubOrderActivity implements Serializable{
 
     public void setSubOrderId(String subOrderId) {
         this.subOrderId = subOrderId == null ? null : subOrderId.trim();
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName == null ? null : activityName.trim();
+    }
+
+    public String getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(String ruleId) {
+        this.ruleId = ruleId == null ? null : ruleId.trim();
+    }
+
+    public String getActivityRule() {
+        return activityRule;
+    }
+
+    public void setActivityRule(String activityRule) {
+        this.activityRule = activityRule == null ? null : activityRule.trim();
+    }
+
+    public String getActivityWay() {
+        return activityWay;
+    }
+
+    public void setActivityWay(String activityWay) {
+        this.activityWay = activityWay == null ? null : activityWay.trim();
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public String getProModel() {
+        return proModel;
+    }
+
+    public void setProModel(String proModel) {
+        this.proModel = proModel == null ? null : proModel.trim();
+    }
+
+    public String getVender() {
+        return vender;
+    }
+
+    public void setVender(String vender) {
+        this.vender = vender == null ? null : vender.trim();
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform == null ? null : platform.trim();
+    }
+
+    public BigDecimal getgTime() {
+        return gTime;
+    }
+
+    public void setgTime(BigDecimal gTime) {
+        this.gTime = gTime;
     }
 
     public Date getcTime() {
