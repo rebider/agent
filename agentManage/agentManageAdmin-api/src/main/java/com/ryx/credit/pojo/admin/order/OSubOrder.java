@@ -45,6 +45,8 @@ public class OSubOrder implements Serializable {
 
     private BigDecimal version;
 
+    private OSubOrderActivity subOrderActivity;
+
     public String getId() {
         return id;
     }
@@ -203,5 +205,13 @@ public class OSubOrder implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public OSubOrderActivity getSubOrderActivity() {
+        return subOrderActivity;
+    }
+
+    public void setSubOrderActivity(OSubOrderActivity subOrderActivity) {
+        this.subOrderActivity = subOrderActivity;
     }
 }
