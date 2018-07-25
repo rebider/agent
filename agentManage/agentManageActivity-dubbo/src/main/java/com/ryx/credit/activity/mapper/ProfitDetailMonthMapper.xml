@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.profit.dao.ProfitDetailMonthMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+<mapper namespace="com.ryx.credit.activity.dao.ProfitDetailMonthMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.activity.entity.ProfitDetailMonth" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="AGENT_PID" property="agentPid" jdbcType="VARCHAR" />
-    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
-    <result column="AGENT_NAME" property="agentName" jdbcType="VARCHAR" />
     <result column="PROFIT_ID" property="profitId" jdbcType="VARCHAR" />
-    <result column="PROFIT_DATE" property="profitDate" jdbcType="VARCHAR" />
     <result column="TRAN_AMT" property="tranAmt" jdbcType="DECIMAL" />
     <result column="PAY_AMT" property="payAmt" jdbcType="DECIMAL" />
     <result column="TRAN_PROFIT_SCALE" property="tranProfitScale" jdbcType="VARCHAR" />
@@ -85,19 +81,19 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE, 
-    PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, 
-    TP_PROFIT_AMT, RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, 
-    MPOS_ZQ_SUPPLY_PROFIT_AMT, PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT, 
-    MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT, RHB_DG_MUST_DEDUCTION_AMT, 
-    RHB_DG_REAL_DEDUCTION_AMT, POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT, 
-    ZPOS_DG_MUST_DEDUCTION_AMT, ZPOS_TD_REAL_DEDUCTION_AMT, POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT, 
-    BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT, 
-    POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT, 
-    REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL, 
-    BANK_CODE, PAY_STATUS, REMARK
+    ID, PROFIT_ID, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE, PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, 
+    PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, TP_PROFIT_AMT, RS_PROFIT_AMT, 
+    RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, MPOS_ZQ_SUPPLY_PROFIT_AMT, 
+    PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT, MPOS_TD_MUST_DEDUCTION_AMT, 
+    MPOS_TD_REAL_DEDUCTION_AMT, RHB_DG_MUST_DEDUCTION_AMT, RHB_DG_REAL_DEDUCTION_AMT, 
+    POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT, ZPOS_DG_MUST_DEDUCTION_AMT, 
+    ZPOS_TD_REAL_DEDUCTION_AMT, POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT, BU_DEDUCTION_AMT, 
+    OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT, POS_REWARD_AMT, 
+    DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT, REAL_PROFIT_AMT, 
+    PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL, BANK_CODE, PAY_STATUS, 
+    REMARK
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonthExample" >
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct" >
@@ -119,20 +115,19 @@
     from P_PROFIT_DETAIL_M
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonthExample" >
     delete from P_PROFIT_DETAIL_M
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-    insert into P_PROFIT_DETAIL_M (ID, AGENT_PID, AGENT_ID, 
-      AGENT_NAME, PROFIT_ID, PROFIT_DATE, 
-      TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE, 
-      PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, 
-      RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, TP_PROFIT_AMT, 
-      RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, 
-      ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, MPOS_ZQ_SUPPLY_PROFIT_AMT, 
+  <insert id="insert" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonth" >
+    insert into P_PROFIT_DETAIL_M (ID, PROFIT_ID, TRAN_AMT, 
+      PAY_AMT, TRAN_PROFIT_SCALE, PAY_PROFIT_SCALE, 
+      TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, 
+      RYX_HD_PROFIT_AMT, TP_PROFIT_AMT, RS_PROFIT_AMT, 
+      RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, 
+      POS_ZQ_SUPPLY_PROFIT_AMT, MPOS_ZQ_SUPPLY_PROFIT_AMT, 
       PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT, 
       MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT, 
       RHB_DG_MUST_DEDUCTION_AMT, RHB_DG_REAL_DEDUCTION_AMT, 
@@ -146,13 +141,12 @@
       ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, 
       EMAIL, BANK_CODE, PAY_STATUS, 
       REMARK)
-    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, 
-      #{tranAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR}, 
-      #{payProfitScale,jdbcType=VARCHAR}, #{tranProfitAmt,jdbcType=DECIMAL}, #{payProfitAmt,jdbcType=DECIMAL}, 
-      #{ryxProfitAmt,jdbcType=DECIMAL}, #{ryxHdProfitAmt,jdbcType=DECIMAL}, #{tpProfitAmt,jdbcType=DECIMAL}, 
-      #{rsProfitAmt,jdbcType=DECIMAL}, #{rsHdProfitAmt,jdbcType=DECIMAL}, #{rhbProfitAmt,jdbcType=DECIMAL}, 
-      #{zfProfitAmt,jdbcType=DECIMAL}, #{posZqSupplyProfitAmt,jdbcType=DECIMAL}, #{mposZqSupplyProfitAmt,jdbcType=DECIMAL}, 
+    values (#{id,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{tranAmt,jdbcType=DECIMAL}, 
+      #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR}, #{payProfitScale,jdbcType=VARCHAR}, 
+      #{tranProfitAmt,jdbcType=DECIMAL}, #{payProfitAmt,jdbcType=DECIMAL}, #{ryxProfitAmt,jdbcType=DECIMAL}, 
+      #{ryxHdProfitAmt,jdbcType=DECIMAL}, #{tpProfitAmt,jdbcType=DECIMAL}, #{rsProfitAmt,jdbcType=DECIMAL}, 
+      #{rsHdProfitAmt,jdbcType=DECIMAL}, #{rhbProfitAmt,jdbcType=DECIMAL}, #{zfProfitAmt,jdbcType=DECIMAL}, 
+      #{posZqSupplyProfitAmt,jdbcType=DECIMAL}, #{mposZqSupplyProfitAmt,jdbcType=DECIMAL}, 
       #{profitSumAmt,jdbcType=DECIMAL}, #{posTdMustDeductionAmt,jdbcType=DECIMAL}, #{posTdRealDeductionAmt,jdbcType=DECIMAL}, 
       #{mposTdMustDeductionAmt,jdbcType=DECIMAL}, #{mposTdRealDeductionAmt,jdbcType=DECIMAL}, 
       #{rhbDgMustDeductionAmt,jdbcType=DECIMAL}, #{rhbDgRealDeductionAmt,jdbcType=DECIMAL}, 
@@ -167,26 +161,14 @@
       #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR}, 
       #{remark,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+  <insert id="insertSelective" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonth" >
     insert into P_PROFIT_DETAIL_M
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         ID,
       </if>
-      <if test="agentPid != null" >
-        AGENT_PID,
-      </if>
-      <if test="agentId != null" >
-        AGENT_ID,
-      </if>
-      <if test="agentName != null" >
-        AGENT_NAME,
-      </if>
       <if test="profitId != null" >
         PROFIT_ID,
-      </if>
-      <if test="profitDate != null" >
-        PROFIT_DATE,
       </if>
       <if test="tranAmt != null" >
         TRAN_AMT,
@@ -331,20 +313,8 @@
       <if test="id != null" >
         #{id,jdbcType=VARCHAR},
       </if>
-      <if test="agentPid != null" >
-        #{agentPid,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null" >
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="agentName != null" >
-        #{agentName,jdbcType=VARCHAR},
-      </if>
       <if test="profitId != null" >
         #{profitId,jdbcType=VARCHAR},
-      </if>
-      <if test="profitDate != null" >
-        #{profitDate,jdbcType=VARCHAR},
       </if>
       <if test="tranAmt != null" >
         #{tranAmt,jdbcType=DECIMAL},
@@ -486,29 +456,17 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonthExample" resultType="java.lang.Integer" >
     select count(*) from P_PROFIT_DETAIL_M
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonth" >
     update P_PROFIT_DETAIL_M
     <set >
-      <if test="agentPid != null" >
-        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null" >
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="agentName != null" >
-        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      </if>
       <if test="profitId != null" >
         PROFIT_ID = #{profitId,jdbcType=VARCHAR},
-      </if>
-      <if test="profitDate != null" >
-        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
       </if>
       <if test="tranAmt != null" >
         TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
@@ -651,13 +609,9 @@
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.activity.entity.ProfitDetailMonth" >
     update P_PROFIT_DETAIL_M
-    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      PROFIT_ID = #{profitId,jdbcType=VARCHAR},
-      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+    set PROFIT_ID = #{profitId,jdbcType=VARCHAR},
       TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
       PAY_AMT = #{payAmt,jdbcType=DECIMAL},
       TRAN_PROFIT_SCALE = #{tranProfitScale,jdbcType=VARCHAR},
