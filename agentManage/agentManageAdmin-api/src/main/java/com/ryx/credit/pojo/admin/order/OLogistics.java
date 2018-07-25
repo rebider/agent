@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OLogistics implements Serializable{
+public class OLogistics implements Serializable {
     private String id;
 
     private String orderId;
@@ -17,9 +17,15 @@ public class OLogistics implements Serializable{
 
     private String proId;
 
+    private String proName;
+
     private String proType;
 
     private BigDecimal sendNum;
+
+    private BigDecimal proPrice;
+
+    private String proModel;
 
     private Date sendDate;
 
@@ -89,6 +95,14 @@ public class OLogistics implements Serializable{
         this.proId = proId == null ? null : proId.trim();
     }
 
+    public String getProName() {
+        return proName;
+    }
+
+    public void setProName(String proName) {
+        this.proName = proName == null ? null : proName.trim();
+    }
+
     public String getProType() {
         return proType;
     }
@@ -103,6 +117,22 @@ public class OLogistics implements Serializable{
 
     public void setSendNum(BigDecimal sendNum) {
         this.sendNum = sendNum;
+    }
+
+    public BigDecimal getProPrice() {
+        return proPrice;
+    }
+
+    public void setProPrice(BigDecimal proPrice) {
+        this.proPrice = proPrice;
+    }
+
+    public String getProModel() {
+        return proModel;
+    }
+
+    public void setProModel(String proModel) {
+        this.proModel = proModel == null ? null : proModel.trim();
     }
 
     public Date getSendDate() {

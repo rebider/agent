@@ -1,22 +1,15 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OLogisticsDetail {
+public class OLogisticsDetail implements Serializable{
     private String id;
 
     private String logisticsId;
 
-    private String proId;
-
-    private String orderId;
-
     private String snNum;
-
-    private String proCom;
-
-    private String proModel;
 
     private Date cTime;
 
@@ -29,8 +22,6 @@ public class OLogisticsDetail {
     private BigDecimal status;
 
     private BigDecimal version;
-
-    private String proName;
 
     public String getId() {
         return id;
@@ -48,44 +39,12 @@ public class OLogisticsDetail {
         this.logisticsId = logisticsId == null ? null : logisticsId.trim();
     }
 
-    public String getProId() {
-        return proId;
-    }
-
-    public void setProId(String proId) {
-        this.proId = proId == null ? null : proId.trim();
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
-    }
-
     public String getSnNum() {
         return snNum;
     }
 
     public void setSnNum(String snNum) {
         this.snNum = snNum == null ? null : snNum.trim();
-    }
-
-    public String getProCom() {
-        return proCom;
-    }
-
-    public void setProCom(String proCom) {
-        this.proCom = proCom == null ? null : proCom.trim();
-    }
-
-    public String getProModel() {
-        return proModel;
-    }
-
-    public void setProModel(String proModel) {
-        this.proModel = proModel == null ? null : proModel.trim();
     }
 
     public Date getcTime() {
@@ -134,13 +93,5 @@ public class OLogisticsDetail {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
-    }
-
-    public String getProName() {
-        return proName;
-    }
-
-    public void setProName(String proName) {
-        this.proName = proName == null ? null : proName.trim();
     }
 }
