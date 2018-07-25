@@ -1,8 +1,10 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -15,6 +17,7 @@ import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
@@ -76,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
     private ActivityService activityService;
     @Autowired
     private DictOptionsService dictOptionsService;
+
 
     @Override
     public PageInfo orderList(OOrder product, Page page) {
@@ -534,6 +538,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startOrderActiviy(String id,String cuser) throws Exception {
         if (StringUtils.isBlank(id)) {
@@ -564,9 +569,9 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("订单信息已失效");
         }
 
-
         //更新代理商审批中
         order.setReviewStatus(AgStatus.Approving.status);
+        order.setoApytime(new Date());
         if (1 != orderMapper.updateByPrimaryKeySelective(order)) {
             logger.info("订单提交审批，更新订单基本信息失败{}:{}", id, cuser);
             throw new ProcessException("订单提交审批，更新订单基本信息失败");
@@ -578,7 +583,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         //不同的业务类型找到不同的启动流程
-        List<Dict> actlist = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.ACT_ORDER.name());
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER.name());
         String workId = null;
         for (Dict dict : actlist) {
                 workId = dict.getdItemvalue();
@@ -601,7 +606,59 @@ public class OrderServiceImpl implements OrderService {
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            throw new ProcessException("审批流启动失败:添加审批关系失败");
         }
         return AgentResult.ok();
+    }
+
+    /**
+     * 审批订单任务
+     * @param agentVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
+        try {
+            //处理审批数据
+            logger.info("订单提交审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
+            //完成任务
+            AgentResult result = new AgentResult(500, "系统异常", "");
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("rs", agentVo.getApprovalResult());
+            reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
+            reqMap.put("approvalPerson", userId);
+            reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+            reqMap.put("taskId", agentVo.getTaskId());
+            //下一个节点参数
+            if(org.apache.commons.lang.StringUtils.isNotEmpty(agentVo.getOrderAprDept()))
+            reqMap.put("dept", agentVo.getOrderAprDept());
+
+            //传递部门信息
+            Map startPar = agentEnterService.startPar(userId);
+            if (null != startPar) {
+                reqMap.put("party", startPar.get("party"));
+            }
+
+            //完成任务
+            Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+            Boolean rs = (Boolean) resultMap.get("rs");
+            String msg = String.valueOf(resultMap.get("msg"));
+            if (resultMap == null) {
+                return result;
+            }
+
+            if (!rs) {
+                result.setMsg(msg);
+                return result;
+            }
+
+            return AgentResult.ok(resultMap);
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
+        }
     }
 }
