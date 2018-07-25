@@ -24,7 +24,7 @@ public interface ProfitMonthService {
      * @param profitMonth
      * @return
      */
-    public Long getProfitMonthCount(ProfitMonth profitMonth);
+    public int getProfitMonthCount(ProfitMonth profitMonth);
 
     /**
      * 查询月分润明细
@@ -39,5 +39,5 @@ public interface ProfitMonthService {
      * @param profitDetailMonth
      * @return
      */
-    public Long getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth);
+    public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth);
 }

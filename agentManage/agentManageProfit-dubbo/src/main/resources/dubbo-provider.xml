@@ -16,6 +16,6 @@
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.credit.service.*,com.ryx.credit.profit.service.*" />
     <dubbo:reference interface="com.ryx.credit.service.agent.BusActRelService" id="busActRelService"  timeout="1200000" registry="${zk.group}" check="false"/>
-
-    <dubbo:service interface="com.ryx.credit.profit.service.IProfitDService" ref="iProfitDService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ProfitMonthService" ref="profitMonthService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.profit.service.IProfitDService" ref="iProfitDService"  timeout="1200000" registry="${zk.group}"  />
 </beans>
