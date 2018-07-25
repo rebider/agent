@@ -487,6 +487,76 @@ public class ProfitDetailMonthExample {
             return (Criteria) this;
         }
 
+        public Criteria andProfitDateIsNull() {
+            addCriterion("PROFIT_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateIsNotNull() {
+            addCriterion("PROFIT_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateEqualTo(String value) {
+            addCriterion("PROFIT_DATE =", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotEqualTo(String value) {
+            addCriterion("PROFIT_DATE <>", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateGreaterThan(String value) {
+            addCriterion("PROFIT_DATE >", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateGreaterThanOrEqualTo(String value) {
+            addCriterion("PROFIT_DATE >=", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateLessThan(String value) {
+            addCriterion("PROFIT_DATE <", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateLessThanOrEqualTo(String value) {
+            addCriterion("PROFIT_DATE <=", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateLike(String value) {
+            addCriterion("PROFIT_DATE like", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotLike(String value) {
+            addCriterion("PROFIT_DATE not like", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateIn(List<String> values) {
+            addCriterion("PROFIT_DATE in", values, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotIn(List<String> values) {
+            addCriterion("PROFIT_DATE not in", values, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateBetween(String value1, String value2) {
+            addCriterion("PROFIT_DATE between", value1, value2, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotBetween(String value1, String value2) {
+            addCriterion("PROFIT_DATE not between", value1, value2, "profitDate");
+            return (Criteria) this;
+        }
+
         public Criteria andTranAmtIsNull() {
             addCriterion("TRAN_AMT is null");
             return (Criteria) this;

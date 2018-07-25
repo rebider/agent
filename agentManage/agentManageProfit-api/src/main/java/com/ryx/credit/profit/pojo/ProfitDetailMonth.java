@@ -18,6 +18,8 @@ public class ProfitDetailMonth implements Serializable{
 
     private String profitId;
 
+    private String profitDate;
+
     private BigDecimal tranAmt;
 
     private BigDecimal payAmt;
@@ -516,5 +518,13 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getProfitDate() {
+        return profitDate;
+    }
+
+    public void setProfitDate(String profitDate) {
+        this.profitDate = profitDate;
     }
 }

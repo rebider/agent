@@ -92,6 +92,8 @@ public class ProfitSettleErrLs implements Serializable {
 
     private String instId;
 
+    private String sourceId;
+
     public String getId() {
         return id;
     }
@@ -130,6 +132,13 @@ public class ProfitSettleErrLs implements Serializable {
 
     public void setBusinessType(String businessType) {
         this.businessType = businessType == null ? null : businessType.trim();
+    }
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId == null ? null : sourceId.trim();
     }
 
     public String getCooperationMode() {

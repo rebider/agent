@@ -3137,6 +3137,65 @@ public class ProfitSettleErrLsExample implements Serializable {
             addCriterion("INST_ID not between", value1, value2, "instId");
             return (Criteria) this;
         }
+        public Criteria andSourceIdEqualTo(String value) {
+            addCriterion("SOURCE_ID =", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotEqualTo(String value) {
+            addCriterion("SOURCE_ID <>", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdGreaterThan(String value) {
+            addCriterion("SOURCE_ID >", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdGreaterThanOrEqualTo(String value) {
+            addCriterion("SOURCE_ID >=", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdLessThan(String value) {
+            addCriterion("SOURCE_ID <", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdLessThanOrEqualTo(String value) {
+            addCriterion("SOURCE_ID <=", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdLike(String value) {
+            addCriterion("SOURCE_ID like", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotLike(String value) {
+            addCriterion("SOURCE_ID not like", value, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdIn(List<String> values) {
+            addCriterion("SOURCE_ID in", values, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotIn(List<String> values) {
+            addCriterion("SOURCE_ID not in", values, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdBetween(String value1, String value2) {
+            addCriterion("SOURCE_ID between", value1, value2, "sourceId");
+           return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotBetween(String value1, String value2) {
+            addCriterion("SOURCE_ID not between", value1, value2, "sourceId");
+           return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
