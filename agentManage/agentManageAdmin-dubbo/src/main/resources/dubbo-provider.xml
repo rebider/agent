@@ -11,10 +11,11 @@
    	<!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="pms-dubbo-server"/>
  
-   <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
+    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
     <!-- 用dubbo协议在22880端口暴露服务 -->
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.credit.service.*" />
+    <dubbo:service interface="com.ryx.credit.service.dict.IdService" ref="idService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.IOrganizationService" ref="organizationService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.IResourceService" ref="resourceService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.IRoleResourceService" ref="roleResourceService"  timeout="1200000" registry="${zk.group}"/>

@@ -22,6 +22,7 @@ import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
@@ -79,6 +80,8 @@ public class OrderServiceImpl implements OrderService {
     private ActivityService activityService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private BusActRelService busActRelService;
 
 
     @Override
@@ -660,5 +663,87 @@ public class OrderServiceImpl implements OrderService {
             e.printStackTrace();
             throw new ProcessException("catch工作流处理任务异常!");
         }
+    }
+
+    //订单审批通过
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult approveFinish(String insid, String actname) throws Exception{
+        //审批流关系
+        BusActRel rel =  busActRelService.findById(insid);
+        if(actname.equals("finish_end")){
+        //订单信息
+        OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
+        OPaymentExample example = new OPaymentExample();
+        example.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
+        List<OPayment>  payments = oPaymentMapper.selectByExample(example);
+        if(payments.size()!=1)throw new ProcessException("支付单信息错误");
+        OPayment oPayment =  payments.get(0);
+        //更新订单状态 审批状态，结算状态 订单生效时间
+        order.setOrderStatus(OrderStatus.ENABLE.status);
+        order.setReviewStatus(AgStatus.Approved.status);
+
+        //付款单设置
+        switch (order.getPaymentMethod()){
+            case "FKFQ":
+                //结算单 已付金额，代付金额，付款状态
+                oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);//付款状态
+                oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                //处理付款明细
+                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                oPaymentDetailExample.or()
+                        .andOrderIdEqualTo(oPayment.getOrderId())
+                        .andPaymentIdEqualTo(oPayment.getId())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                  oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+
+                break;
+            case "FRFQ":
+                //结算单 已付金额，代付金额，付款状态
+                oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
+                oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+
+                break;
+            case "XXDK":
+                //结算单 已付金额，代付金额，付款状态
+                oPayment.setPayStatus(PayStatus.CLOSED.code);
+                oPayment.setRealAmount(oPayment.getPayAmount());//已付款
+                oPayment.setOutstandingAmount(Status.STATUS_0.status);//待付
+
+
+                break;
+            case "SF1":
+                //结算单 已付金额，代付金额，付款状态
+                oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+                break;
+            case "SF2":
+                //结算单 已付金额，代付金额，付款状态
+                oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+
+                break;
+            case "QT":
+                oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+                break;
+        }
+
+
+        //付款明细 首付类型已结清，线下打款类型已结清，分期类型待付款
+
+        }else if(actname.equals("reject_end")){
+
+        }
+
+
+
+
+        return null;
     }
 }

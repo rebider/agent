@@ -58,5 +58,13 @@ public interface OrderService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
 
+    /**
+     * 订单审批
+     * @param insid
+     * @param actname
+     * @return
+     */
+    public AgentResult approveFinish(String insid,String actname)throws Exception;
+
 
 }
