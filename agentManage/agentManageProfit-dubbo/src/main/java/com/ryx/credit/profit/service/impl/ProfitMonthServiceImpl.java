@@ -35,6 +35,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     private ProfitMonthExample profitMonthEqualsTo(ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample = new ProfitMonthExample();
+        if(profitMonth == null ){
+            return profitMonthExample;
+        }
         ProfitMonthExample.Criteria criteria = profitMonthExample.createCriteria();
         if(StringUtils.isNotBlank(profitMonth.getAgentName())){
             criteria.andAgentNameEqualTo(profitMonth.getAgentName());
@@ -51,7 +54,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitMonthExample;
     }
 
-
     @Override
     public int getProfitMonthCount(ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
@@ -60,14 +62,29 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
-        ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
-        ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
         profitDetailMonthExample.setPage(page);
         return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
     }
 
+    private ProfitDetailMonthExample profitDetailMonthEqualsTo(ProfitDetailMonth profitDetailMonth) {
+        ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
+        if(profitDetailMonth == null){
+            return profitDetailMonthExample;
+        }
+        ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+        if(StringUtils.isNotBlank(profitDetailMonth.getAgentId())){
+            criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
+        }
+        if(StringUtils.isNotBlank(profitDetailMonth.getProfitId())){
+            criteria.andProfitIdEqualTo(profitDetailMonth.getProfitId());
+        }
+        return profitDetailMonthExample;
+    }
+
     @Override
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth) {
-        return 0;
+        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
+        return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
     }
 }
