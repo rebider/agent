@@ -669,81 +669,455 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public AgentResult approveFinish(String insid, String actname) throws Exception{
+        logger.info("代理商订单审批完成:{},{}",insid,actname);
         //审批流关系
         BusActRel rel =  busActRelService.findById(insid);
+        Calendar d =Calendar.getInstance();
         if(actname.equals("finish_end")){
-        //订单信息
-        OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
-        OPaymentExample example = new OPaymentExample();
-        example.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
-        List<OPayment>  payments = oPaymentMapper.selectByExample(example);
-        if(payments.size()!=1)throw new ProcessException("支付单信息错误");
-        OPayment oPayment =  payments.get(0);
-        //更新订单状态 审批状态，结算状态 订单生效时间
-        order.setOrderStatus(OrderStatus.ENABLE.status);
-        order.setReviewStatus(AgStatus.Approved.status);
+            //订单信息
+            OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
+            OPaymentExample example = new OPaymentExample();
+            example.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OPayment>  payments = oPaymentMapper.selectByExample(example);
+            if(payments.size()!=1)throw new ProcessException("支付单信息错误");
+            OPayment oPayment =  payments.get(0);
+            //更新订单状态 审批状态，结算状态 订单生效时间
+            order.setOrderStatus(OrderStatus.ENABLE.status);
+            order.setReviewStatus(AgStatus.Approved.status);
 
-        //付款单设置
-        switch (order.getPaymentMethod()){
-            case "FKFQ":
-                //结算单 已付金额，代付金额，付款状态
-                oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);//付款状态
-                oPayment.setRealAmount(Status.STATUS_0.status);//已付款
-                oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
-                //处理付款明细
-                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-                oPaymentDetailExample.or()
-                        .andOrderIdEqualTo(oPayment.getOrderId())
-                        .andPaymentIdEqualTo(oPayment.getId())
-                        .andStatusEqualTo(Status.STATUS_1.status);
-                  oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+            //付款单设置
+            switch (order.getPaymentMethod()){
+                case "FKFQ":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);//付款状态
+                    oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    logger.info("代理商订单审批完成处理明细完成:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                    oPaymentDetailExample.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                    for (OPaymentDetail detail : details) {
+                        detail.setPaymentStatus(PaymentStatus.DF.code);
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            logger.error("代理商订单审批完成处理明细{}:{},{},{},{}",order.getId(),detail.getId(),detail.getBatchCode(),detail.getPayAmount(),detail.getPaymentStatus());
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",order.getId(),detail.getId(),detail.getBatchCode(),detail.getPayAmount(),detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
 
-                break;
-            case "FRFQ":
-                //结算单 已付金额，代付金额，付款状态
-                oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
-                oPayment.setRealAmount(Status.STATUS_0.status);//已付款
-                oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    break;
+                case "FRFQ":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
+                    oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    logger.info("代理商订单审批完成处理明细完成:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_FRFQ = new OPaymentDetailExample();
+                    oPaymentDetailExample_FRFQ.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_FRFQ_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_FRFQ);
+                    for (OPaymentDetail detail : oPaymentDetailExample_FRFQ_details) {
+                        detail.setPaymentStatus(PaymentStatus.DF.code);
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",order.getId(),detail.getId(),detail.getBatchCode(),detail.getPayAmount(),detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "XXDK":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.CLOSED.code);
+                    oPayment.setRealAmount(oPayment.getPayAmount());//已付款
+                    oPayment.setOutstandingAmount(Status.STATUS_0.status);//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_XXDK= new OPaymentDetailExample();
+                    oPaymentDetailExample_XXDK.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_XXDK_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_XXDK);
+                    for (OPaymentDetail detail : oPaymentDetailExample_XXDK_details) {
+                        detail.setPaymentStatus(PaymentStatus.DS.code);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        detail.setStatus(Status.STATUS_0.status);
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "SF1":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                    oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
 
-                break;
-            case "XXDK":
-                //结算单 已付金额，代付金额，付款状态
-                oPayment.setPayStatus(PayStatus.CLOSED.code);
-                oPayment.setRealAmount(oPayment.getPayAmount());//已付款
-                oPayment.setOutstandingAmount(Status.STATUS_0.status);//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_SF1= new OPaymentDetailExample();
+                    oPaymentDetailExample_SF1.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_SF1_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_SF1);
+                    for (OPaymentDetail detail : oPaymentDetailExample_SF1_details) {
+                        detail.setPaymentStatus(PaymentStatus.DF.code);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    if(oPayment.getDownPayment()!=null && oPayment.getDownPayment().compareTo(BigDecimal.ZERO)>0) {
+                        //添加首付明细
+                        OPaymentDetail record_SF1 = new OPaymentDetail();
+                        record_SF1.setId(idService.genId(TabId.o_payment_detail));
+                        record_SF1.setBatchCode(d.getTime() + "");
+                        record_SF1.setPaymentId(oPayment.getId());
+                        record_SF1.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_SF1.setOrderId(oPayment.getOrderId());
+                        record_SF1.setPayType(PaymentType.SF.code);
+                        record_SF1.setPayAmount(oPayment.getDownPayment());
+                        record_SF1.setRealPayAmount(oPayment.getDownPayment());
+                        record_SF1.setPlanPayTime(d.getTime());
+                        record_SF1.setPlanNum(Status.STATUS_0.status);
+                        record_SF1.setAgentId(oPayment.getAgentId());
+                        record_SF1.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_SF1.setcUser(oPayment.getUserId());
+                        record_SF1.setcDate(d.getTime());
+                        record_SF1.setStatus(Status.STATUS_1.status);
+                        record_SF1.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record_SF1)) {
+                            throw new ProcessException("首付错误");
+                        }
+                        logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "SF2":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                    oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_SF2= new OPaymentDetailExample();
+                    oPaymentDetailExample_SF2.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_SF2_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_SF2);
+                    for (OPaymentDetail detail : oPaymentDetailExample_SF2_details) {
+                        detail.setPaymentStatus(PaymentStatus.DF.code);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    if(oPayment.getDownPayment()!=null && oPayment.getDownPayment().compareTo(BigDecimal.ZERO)>0) {
+                        //添加首付明细
+                        OPaymentDetail record_SF2 = new OPaymentDetail();
+                        record_SF2.setId(idService.genId(TabId.o_payment_detail));
+                        record_SF2.setBatchCode(d.getTime() + "");
+                        record_SF2.setPaymentId(oPayment.getId());
+                        record_SF2.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_SF2.setOrderId(oPayment.getOrderId());
+                        record_SF2.setPayType(PaymentType.SF.code);
+                        record_SF2.setPayAmount(oPayment.getDownPayment());
+                        record_SF2.setRealPayAmount(oPayment.getDownPayment());
+                        record_SF2.setPlanPayTime(d.getTime());
+                        record_SF2.setPlanNum(Status.STATUS_0.status);
+                        record_SF2.setAgentId(oPayment.getAgentId());
+                        record_SF2.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_SF2.setcUser(oPayment.getUserId());
+                        record_SF2.setcDate(d.getTime());
+                        record_SF2.setStatus(Status.STATUS_1.status);
+                        record_SF2.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record_SF2)) {
+                            throw new ProcessException("首付错误");
+                        }
+                        logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "QT":
+                    oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                    oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_QT= new OPaymentDetailExample();
+                    oPaymentDetailExample_QT.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_QT_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_QT);
+                    for (OPaymentDetail detail : oPaymentDetailExample_QT_details) {
+                        detail.setPaymentStatus(PaymentStatus.DF.code);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    if(oPayment.getDownPayment()!=null && oPayment.getDownPayment().compareTo(BigDecimal.ZERO)>0) {
+                        //添加首付明细
+                        OPaymentDetail record_QT = new OPaymentDetail();
+                        record_QT.setId(idService.genId(TabId.o_payment_detail));
+                        record_QT.setBatchCode(d.getTime() + "");
+                        record_QT.setPaymentId(oPayment.getId());
+                        record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_QT.setOrderId(oPayment.getOrderId());
+                        record_QT.setPayType(PaymentType.SF.code);
+                        record_QT.setPayAmount(oPayment.getDownPayment());
+                        record_QT.setRealPayAmount(oPayment.getDownPayment());
+                        record_QT.setPlanPayTime(d.getTime());
+                        record_QT.setPlanNum(Status.STATUS_0.status);
+                        record_QT.setAgentId(oPayment.getAgentId());
+                        record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_QT.setcUser(oPayment.getUserId());
+                        record_QT.setcDate(d.getTime());
+                        record_QT.setStatus(Status.STATUS_1.status);
+                        record_QT.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record_QT)) {
+                            throw new ProcessException("首付错误");
+                        }
+                        logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+            }
 
-
-                break;
-            case "SF1":
-                //结算单 已付金额，代付金额，付款状态
-                oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
-                oPayment.setRealAmount(oPayment.getDownPayment());//已付款
-                oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
-                break;
-            case "SF2":
-                //结算单 已付金额，代付金额，付款状态
-                oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
-                oPayment.setRealAmount(oPayment.getDownPayment());//已付款
-                oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
-
-                break;
-            case "QT":
-                oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
-                oPayment.setRealAmount(oPayment.getDownPayment());//已付款
-                oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
-                break;
-        }
-
-
-        //付款明细 首付类型已结清，线下打款类型已结清，分期类型待付款
+            //订单更新
+            if(1!=orderMapper.updateByPrimaryKeySelective(order)){
+                throw new ProcessException("订单更新异常");
+            }
+            //付款单处理
+            if(1!=oPaymentMapper.updateByPrimaryKeySelective(oPayment)){
+                throw new ProcessException("订单更新异常");
+            }
 
         }else if(actname.equals("reject_end")){
 
+
+            //订单信息
+            OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
+            OPaymentExample example = new OPaymentExample();
+            example.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OPayment>  payments = oPaymentMapper.selectByExample(example);
+            if(payments.size()!=1)throw new ProcessException("支付单信息错误");
+            OPayment oPayment =  payments.get(0);
+            //更新订单状态 审批状态，结算状态 订单生效时间
+            order.setOrderStatus(OrderStatus.UNENABLE.status);
+            order.setReviewStatus(AgStatus.Refuse.status);
+
+            //付款单设置
+            switch (order.getPaymentMethod()){
+                case "FKFQ":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);//付款状态
+                    oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    logger.info("代理商订单审批完成处理明细完成:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                    oPaymentDetailExample.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                    for (OPaymentDetail detail : details) {
+                        detail.setStatus(Status.STATUS_0.status);
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            logger.error("代理商订单审批完成处理明细{}:{},{},{},{}",order.getId(),detail.getId(),detail.getBatchCode(),detail.getPayAmount(),detail.getPaymentStatus());
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",order.getId(),detail.getId(),detail.getBatchCode(),detail.getPayAmount(),detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+
+                    break;
+                case "FRFQ":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
+                    oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    logger.info("代理商订单审批完成处理明细完成:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_FRFQ = new OPaymentDetailExample();
+                    oPaymentDetailExample_FRFQ.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_FRFQ_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_FRFQ);
+                    for (OPaymentDetail detail : oPaymentDetailExample_FRFQ_details) {
+                        detail.setStatus(Status.STATUS_0.status);
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",order.getId(),detail.getId(),detail.getBatchCode(),detail.getPayAmount(),detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "XXDK":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
+                    oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_XXDK= new OPaymentDetailExample();
+                    oPaymentDetailExample_XXDK.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_XXDK_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_XXDK);
+                    for (OPaymentDetail detail : oPaymentDetailExample_XXDK_details) {
+                        detail.setPaymentStatus(PaymentStatus.DS.code);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        detail.setStatus(Status.STATUS_0.status);
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "SF1":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
+                    oPayment.setRealAmount(Status.STATUS_0.status);//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount());//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_SF1= new OPaymentDetailExample();
+                    oPaymentDetailExample_SF1.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_SF1_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_SF1);
+                    for (OPaymentDetail detail : oPaymentDetailExample_SF1_details) {
+                        detail.setStatus(Status.STATUS_0.status);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "SF2":
+                    //结算单 已付金额，代付金额，付款状态
+                    oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                    oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_SF2= new OPaymentDetailExample();
+                    oPaymentDetailExample_SF2.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_SF2_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_SF2);
+                    for (OPaymentDetail detail : oPaymentDetailExample_SF2_details) {
+                        detail.setStatus(Status.STATUS_0.status);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+                case "QT":
+                    oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
+                    oPayment.setRealAmount(oPayment.getDownPayment());//已付款
+                    oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
+                    //处理付款明细
+                    OPaymentDetailExample oPaymentDetailExample_QT= new OPaymentDetailExample();
+                    oPaymentDetailExample_QT.or()
+                            .andOrderIdEqualTo(oPayment.getOrderId())
+                            .andPaymentIdEqualTo(oPayment.getId())
+                            .andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetailExample_QT_details =  oPaymentDetailMapper.selectByExample(oPaymentDetailExample_QT);
+                    for (OPaymentDetail detail : oPaymentDetailExample_QT_details) {
+                        detail.setStatus(Status.STATUS_0.status);
+                        logger.info("代理商订单审批完成处理明细完成{}:{},{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod(),"线下付款禁止付款明细");
+                        if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(detail)){
+                            throw new ProcessException("明细处理异常");
+                        }else{
+                            logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
+                                    order.getId(),
+                                    detail.getId(),
+                                    detail.getBatchCode(),
+                                    detail.getPayAmount(),
+                                    detail.getPaymentStatus());
+                        }
+                    }
+                    logger.info("代理商订单审批完成处理明细完成{}:{},{}",order.getId(),oPayment.getId(),oPayment.getPayMethod());
+                    break;
+            }
+
+            //订单更新
+            if(1!=orderMapper.updateByPrimaryKeySelective(order)){
+                throw new ProcessException("订单更新异常");
+            }
+            //付款单处理
+            if(1!=oPaymentMapper.updateByPrimaryKeySelective(oPayment)){
+                throw new ProcessException("订单更新异常");
+            }
         }
-
-
-
-
-        return null;
+        return AgentResult.ok();
     }
 }
