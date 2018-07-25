@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -19,6 +20,8 @@ public class ProfitDeduction implements Serializable {
     private String agentName;
 
     private String deductionDate;
+    private String deductionDateStart;
+    private String deductionDateEnd;
 
     private String deductionType;
 
@@ -36,7 +39,15 @@ public class ProfitDeduction implements Serializable {
 
     private String remark;
 
-    private String sourceId;
+    private BigDecimal upperNotDeductionAmt;
+
+    public BigDecimal getUpperNotDeductionAmt() {
+        return upperNotDeductionAmt;
+    }
+
+    public void setUpperNotDeductionAmt(BigDecimal upperNotDeductionAmt) {
+        this.upperNotDeductionAmt = upperNotDeductionAmt;
+    }
 
     public String getId() {
         return id;
@@ -166,11 +177,19 @@ public class ProfitDeduction implements Serializable {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public String getSourceId() {
-        return sourceId;
+    public String getDeductionDateStart() {
+        return deductionDateStart;
     }
 
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId == null ? null : sourceId.trim();
+    public void setDeductionDateStart(String deductionDateStart) {
+        this.deductionDateStart = deductionDateStart;
+    }
+
+    public String getDeductionDateEnd() {
+        return deductionDateEnd;
+    }
+
+    public void setDeductionDateEnd(String deductionDateEnd) {
+        this.deductionDateEnd = deductionDateEnd;
     }
 }
