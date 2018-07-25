@@ -276,16 +276,12 @@ public class AppConfig extends Thread {
     }
 
     /**
-     * 机具退款通知
+     * 机具扣款调整通知
      * @param msg
      * @param title
-     * @param newFile
-     * @param fileName
      */
-    public static void sendEmailsPosBack(String msg,String title,File newFile,String fileName){
+    public static void sendEmailsPosBack(String msg,String title){
         String emails = PropUtils.getProp("posBackEmails");
-        for(String email:emails.split("\\,")){
-            AppConfig.sendEmailAndAtt(email, msg, title, newFile,fileName);
-        }
+        AppConfig.sendEmail(emails.split("\\,"), msg, title);
     }
 }
