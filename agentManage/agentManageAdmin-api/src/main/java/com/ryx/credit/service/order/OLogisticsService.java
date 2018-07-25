@@ -18,7 +18,5 @@ public interface OLogisticsService {
 
     OLogistics selectByPrimaryKey(String id);
 
-    public List<OLogisticsUtil> exportOLogistics(OLogistics oLogistics);
-
     PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo);
 }

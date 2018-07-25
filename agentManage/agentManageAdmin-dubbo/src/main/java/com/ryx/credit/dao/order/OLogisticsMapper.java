@@ -33,7 +33,6 @@ public interface OLogisticsMapper {
 
     OLogistics selectByPrimaryKey(String id);
 
-    List<OLogisticsUtil> selectExprotOLogistics(@Param("oLogistics")OLogistics oLogistics);
 
     List<Map<String,Object>> getOLogisticsList(Map <String, Object> param);
 
