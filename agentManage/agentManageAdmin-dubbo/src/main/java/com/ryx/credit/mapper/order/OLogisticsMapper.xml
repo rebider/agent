@@ -307,4 +307,78 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="countOLogistics" parameterType="map" resultType="java.lang.Integer">
+    select count(*)
+    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo
+    where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
+  </select>
+
+  <select id="selectOLogistics" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    ro.ID, ro.ORDER_ID, ro.RECEIPT_ID, ro.SEND_PRO_NUM, ro.SEND_DATE, oo.AGENT_ID, oo.O_APYTIME,
+    rp.PRO_COM, rp.SEND_NUM, rp.LOG_COM, rp.W_NUMBER, rp.SN_BEGIN_NUM, rp.SN_END_NUM, rp.SEND_NUM,
+    rp.id as RECEIPT_PLAN_ID, rp.id as ORDER_ID
+    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
+    <where>
+      <if test="SEND_DATE != null and SEND_DATE !=''">AND ro.SEND_DATE = #{SEND_DATE}</if>
+      <if test="O_APYTIME != null and O_APYTIME !=''">AND oo.O_APYTIME = #{O_APYTIME}</if>
+    </where>
+    order by oo.O_APYTIME desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="getOLogisticsCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    select count(*)
+    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo
+    where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
+  </select>
+
+  <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select
+    ro.ID, ro.ORDER_ID, ro.RECEIPT_ID, ro.SEND_PRO_NUM, ro.SEND_DATE, oo.AGENT_ID, oo.O_APYTIME,
+    rp.PRO_COM, rp.SEND_NUM, rp.LOG_COM, rp.W_NUMBER, rp.SN_BEGIN_NUM, rp.SN_END_NUM, rp.SEND_NUM,
+    rp.id as RECEIPT_PLAN_ID, rp.id as ORDER_ID
+    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
+    order by oo.O_APYTIME desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OLogistics" >
+    select
+    <include refid="Base_Column_List" />
+    from O_LOGISTICS
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <!--物流信息：导出物流信息-->
+  <select id="selectExprotOLogistics" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsUtil" resultMap="OLogisticsExport">
+    select
+    ro.ORDER_ID, ro.RECEIPT_ID, ro.SEND_PRO_NUM, ro.SEND_DATE, oo.AGENT_ID, oo.O_APYTIME,
+    rp.PRO_COM, rp.SEND_NUM, rp.LOG_COM, rp.W_NUMBER, rp.SN_BEGIN_NUM, rp.SN_END_NUM, rp.SEND_NUM,
+    rp.id as RECEIPT_PLAN_ID, rp.id as ORDER_ID
+    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
+    order by oo.O_APYTIME desc
+  </select>
+
+  <resultMap id="OLogisticsExport" type="com.ryx.credit.pojo.admin.order.OLogisticsUtil">
+    <id column="ID" property="id" jdbcType="VARCHAR"/>
+    <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR" />
+    <result column="RECEIPT_ID" property="receiptId" jdbcType="VARCHAR" />
+    <result column="SEND_PRO_NUM" property="sendProNum" jdbcType="DECIMAL" />
+    <result column="SEND_DATE" property="sendDate" jdbcType="TIMESTAMP" />
+
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
+    <result column="O_APYTIME" property="oApytime" jdbcType="TIMESTAMP" />
+
+    <result column="PRO_COM" property="proCom" jdbcType="VARCHAR" />
+    <result column="SEND_NUM" property="sendNum" jdbcType="DECIMAL" />
+    <result column="LOG_COM" property="logCom" jdbcType="VARCHAR" />
+    <result column="W_NUMBER" property="wNumber" jdbcType="VARCHAR" />
+    <result column="SN_BEGIN_NUM" property="snBeginNum" jdbcType="VARCHAR" />
+    <result column="SN_END_NUM" property="snEndNum" jdbcType="VARCHAR" />
+  </resultMap>
 </mapper>

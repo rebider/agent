@@ -4,8 +4,11 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsExample;
+import com.ryx.credit.pojo.admin.order.OLogisticsUtil;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OLogisticsMapper {
     int countByExample(OLogisticsExample example);
@@ -18,9 +21,21 @@ public interface OLogisticsMapper {
 
     List<OLogistics> selectByExample(OLogisticsExample example);
 
-    OLogistics selectByPrimaryKey(String id);
-
     int updateByPrimaryKeySelective(OLogistics record);
 
     int updateByPrimaryKey(OLogistics record);
+
+    ////////////////////////////////////////////////////////////////////
+
+    int countOLogistics(Map<String, Object> condition);
+
+    List<OLogisticsUtil> selectOLogistics(Map<String, Object> condition);
+
+    OLogistics selectByPrimaryKey(String id);
+
+    List<OLogisticsUtil> selectExprotOLogistics(@Param("oLogistics")OLogistics oLogistics);
+
+    List<Map<String,Object>> getOLogisticsList(Map <String, Object> param);
+
+    Long getOLogisticsCount(Map <String, Object> param);
 }
