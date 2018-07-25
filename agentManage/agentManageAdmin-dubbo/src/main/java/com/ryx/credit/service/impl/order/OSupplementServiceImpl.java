@@ -108,15 +108,13 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款添加:{}", "操作用户不能为空");
             throw new ProcessException("操作用户不能为空");
         }
-        if (StringUtils.isEmpty(oSupplement.getReviewStatus())) {
-            logger.info("补款添加：{}", "审批状态不能为空");
-            throw new ProcessException("审批状态不能为空");
-        }
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
         oSupplement.setPkType("1");
         oSupplement.setSrcId("OPD2018072300000000000069");
+        oSupplement.setReviewStatus(AgStatus.Create.status);//审批状态
+        oSupplement.setSchstatus(SchStatus.ONE.getValue());//补款状态
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
         if (1 == oSupplementMapper.insertSelective(oSupplement)) {
@@ -169,8 +167,8 @@ public class OSupplementServiceImpl implements OSupplementService {
         OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
         BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
         if (!paymentStatus.equals(PaymentStatus.DF.code)){
-            logger.info("补款审批未待付款{}:{}", id, userId);
-            throw new ProcessException("补款审批中，补款审批未待付款");
+            logger.info("订单还未生效{}:{}", id, userId);
+            throw new ProcessException("订单还未生效");
         }
 
         if (oSupplement.getPkType().equals(PkType.OfflineMoney.code) || oSupplement.getPkType().equals(PkType.FenRunOverdue.code)) {
