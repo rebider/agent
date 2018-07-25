@@ -41,7 +41,7 @@ public class OLogisticServiceImpl implements OLogisticsService{
         int size = oLogisticsMapper.countOLogistics(condition);
 
         List<OLogisticsUtil> configShareList = oLogisticsMapper.selectOLogistics(condition);
-        System.out.println("-----------------------------------------" + JSONObject.toJSON(configShareList));
+        System.out.println("------------------------------------------" + JSONObject.toJSON(configShareList));
         pageInfo.setRows((ArrayList) configShareList);
         pageInfo.setTotal(size);
         return pageInfo;
@@ -59,12 +59,6 @@ public class OLogisticServiceImpl implements OLogisticsService{
     /**
      * 物流信息---导出排单信息
      */
-    @Override
-    public List<OLogisticsUtil> exportOLogistics(OLogistics oLogistics) {
-        List<OLogisticsUtil> oLogisticsUtils = oLogisticsMapper.selectExprotOLogistics(oLogistics);
-        return oLogisticsUtils;
-    }
-
     @Override
     public PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = oLogisticsMapper.getOLogisticsCount(param);

@@ -23,4 +23,13 @@ public enum PaymentType {
         this.code=c;
         this.msg =m;
     }
+    public static String getPaymentTypeValue(String value){
+        PaymentType[] paymentType = PaymentType.values();
+        for(PaymentType cc : paymentType){
+            if(cc.code.equals(value)){
+                return cc.msg;
+            }
+        }
+        return "";
+    }
 }
