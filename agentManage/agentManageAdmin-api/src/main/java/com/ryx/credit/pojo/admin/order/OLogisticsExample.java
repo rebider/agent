@@ -558,6 +558,76 @@ public class OLogisticsExample {
             return (Criteria) this;
         }
 
+        public Criteria andProNameIsNull() {
+            addCriterion("PRO_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameIsNotNull() {
+            addCriterion("PRO_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameEqualTo(String value) {
+            addCriterion("PRO_NAME =", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotEqualTo(String value) {
+            addCriterion("PRO_NAME <>", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameGreaterThan(String value) {
+            addCriterion("PRO_NAME >", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameGreaterThanOrEqualTo(String value) {
+            addCriterion("PRO_NAME >=", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameLessThan(String value) {
+            addCriterion("PRO_NAME <", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameLessThanOrEqualTo(String value) {
+            addCriterion("PRO_NAME <=", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameLike(String value) {
+            addCriterion("PRO_NAME like", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotLike(String value) {
+            addCriterion("PRO_NAME not like", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameIn(List<String> values) {
+            addCriterion("PRO_NAME in", values, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotIn(List<String> values) {
+            addCriterion("PRO_NAME not in", values, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameBetween(String value1, String value2) {
+            addCriterion("PRO_NAME between", value1, value2, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotBetween(String value1, String value2) {
+            addCriterion("PRO_NAME not between", value1, value2, "proName");
+            return (Criteria) this;
+        }
+
         public Criteria andProTypeIsNull() {
             addCriterion("PRO_TYPE is null");
             return (Criteria) this;
@@ -685,6 +755,136 @@ public class OLogisticsExample {
 
         public Criteria andSendNumNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("SEND_NUM not between", value1, value2, "sendNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceIsNull() {
+            addCriterion("PRO_PRICE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceIsNotNull() {
+            addCriterion("PRO_PRICE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceEqualTo(BigDecimal value) {
+            addCriterion("PRO_PRICE =", value, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceNotEqualTo(BigDecimal value) {
+            addCriterion("PRO_PRICE <>", value, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceGreaterThan(BigDecimal value) {
+            addCriterion("PRO_PRICE >", value, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_PRICE >=", value, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceLessThan(BigDecimal value) {
+            addCriterion("PRO_PRICE <", value, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRO_PRICE <=", value, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceIn(List<BigDecimal> values) {
+            addCriterion("PRO_PRICE in", values, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceNotIn(List<BigDecimal> values) {
+            addCriterion("PRO_PRICE not in", values, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_PRICE between", value1, value2, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProPriceNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRO_PRICE not between", value1, value2, "proPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelIsNull() {
+            addCriterion("PRO_MODEL is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelIsNotNull() {
+            addCriterion("PRO_MODEL is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelEqualTo(String value) {
+            addCriterion("PRO_MODEL =", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelNotEqualTo(String value) {
+            addCriterion("PRO_MODEL <>", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelGreaterThan(String value) {
+            addCriterion("PRO_MODEL >", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelGreaterThanOrEqualTo(String value) {
+            addCriterion("PRO_MODEL >=", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelLessThan(String value) {
+            addCriterion("PRO_MODEL <", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelLessThanOrEqualTo(String value) {
+            addCriterion("PRO_MODEL <=", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelLike(String value) {
+            addCriterion("PRO_MODEL like", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelNotLike(String value) {
+            addCriterion("PRO_MODEL not like", value, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelIn(List<String> values) {
+            addCriterion("PRO_MODEL in", values, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelNotIn(List<String> values) {
+            addCriterion("PRO_MODEL not in", values, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelBetween(String value1, String value2) {
+            addCriterion("PRO_MODEL between", value1, value2, "proModel");
+            return (Criteria) this;
+        }
+
+        public Criteria andProModelNotBetween(String value1, String value2) {
+            addCriterion("PRO_MODEL not between", value1, value2, "proModel");
             return (Criteria) this;
         }
 
