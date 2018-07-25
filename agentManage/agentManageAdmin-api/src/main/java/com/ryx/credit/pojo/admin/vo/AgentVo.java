@@ -27,6 +27,10 @@ public class AgentVo implements Serializable{
     private String taskId;
 
 
+    //订单审批下个审批部门参数
+    private String orderAprDept;
+
+
     public Agent getAgent() {
         return agent;
     }
@@ -138,5 +142,13 @@ public class AgentVo implements Serializable{
 
     public void setTaskId(String taskId) {
         this.taskId = taskId;
+    }
+
+    public String getOrderAprDept() {
+        return orderAprDept;
+    }
+
+    public void setOrderAprDept(String orderAprDept) {
+        this.orderAprDept = orderAprDept;
     }
 }
