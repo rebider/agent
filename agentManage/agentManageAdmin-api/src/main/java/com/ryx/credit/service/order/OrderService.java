@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OPayment;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 
 /**
@@ -46,6 +47,15 @@ public interface OrderService {
      * @throws Exception
      */
     public AgentResult startOrderActiviy(String id,String cuser)throws Exception;
+
+    /**
+     * 订单审批处理
+     * @param agentVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
 
 

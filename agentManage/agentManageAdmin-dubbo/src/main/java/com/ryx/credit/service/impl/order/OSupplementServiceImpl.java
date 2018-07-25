@@ -3,7 +3,6 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -20,17 +19,13 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.impl.agent.AgentServiceImpl;
 import com.ryx.credit.service.order.OSupplementService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.management.resources.agent;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -87,6 +82,10 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Override
     public OSupplement selectById(String id) {
+        return selectOSupplement(id);
+    }
+
+    public OSupplement  selectOSupplement(String id){
         OSupplementExample oSupplementExample = new OSupplementExample();
         OSupplementExample.Criteria criteria = oSupplementExample.createCriteria();
         criteria.andIdEqualTo(id);
@@ -151,19 +150,44 @@ public class OSupplementServiceImpl implements OSupplementService {
         logger.info("========用户{}启动补款审核{}", userId, id);
         if (StringUtils.isBlank(id)) {
             logger.info("补款审批,补款ID为空{}:{}", id, userId);
-            return ResultVO.fail("补款审批中，补款ID为空");
+            throw new ProcessException("补款审批中，补款ID为空");
         }
         if (StringUtils.isBlank(userId)) {
             logger.info("补款审批,操作用户为空{}:{}", id, userId);
-            return ResultVO.fail("补款审批中，操作用户为空");
+            throw new ProcessException("补款审批中，操作用户为空");
         }
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
+        //获取资源id
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+        criteria.andIdEqualTo(oSupplement.getSrcId());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        if (oPaymentDetails.size()!=1){
+            return null;
+        }
+        OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
+        BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
+        if (!paymentStatus.equals(PaymentStatus.DF.code)){
+            logger.info("补款审批未待付款{}:{}", id, userId);
+            throw new ProcessException("补款审批中，补款审批未待付款");
+        }
+
+        if (oSupplement.getPkType().equals(PkType.OfflineMoney.code) || oSupplement.getPkType().equals(PkType.FenRunOverdue.code)) {
+            //只有是待付款状态才可以启动流程   并修改状态为付款中
+            oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                logger.info("订单付款状态修改失败{}:", oPaymentDetail.getId());
+                throw new ProcessException("订单付款状态修改失败");
+            }
+
+        }
         //检查是否有审批中补款
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(id).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         if (busActRelMapper.selectByExample(example).size() > 0) {
             logger.info("补款审批,禁止重复提交审批{}:{}", id, userId);
-            return ResultVO.fail("补款审批中，禁止重复提交审批");
+            throw new ProcessException("补款审批中，禁止重复提交审批");
         }
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_RETURN_FINANCE.name());
         String workId = null;
@@ -185,7 +209,6 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("========用户{}启动补款审批{}{}启动部门参数为空", id, userId, "审批流启动失败字典中未配置部署流程");
             throw new ProcessException("启动部门参数为空!");
         }
-
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {
             logger.info("========用户{}启动补款审批申请{}{}", id, userId, "补款审批，审批流启动失败");
@@ -224,7 +247,12 @@ public class OSupplementServiceImpl implements OSupplementService {
         if (details.size() != 1) {
             return null;
         }
-        return details.get(0);
+        OPaymentDetail oPaymentDetail = details.get(0);
+        oPaymentDetail.setPayType(PaymentType.getPaymentTypeValue(oPaymentDetail.getPayType()));
+        if (StringUtils.isNotBlank(oPaymentDetail.getSrcType())){
+            oPaymentDetail.setSrcType(PamentSrcType.getSrcTypeValue(oPaymentDetail.getSrcType()));
+        }
+        return oPaymentDetail;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -243,7 +271,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         return AgentResult.ok();
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO updateByActivId(String id, String activityName) {
         BusActRel busActRel = selectByActivId(id);
@@ -259,24 +287,50 @@ public class OSupplementServiceImpl implements OSupplementService {
             busActRel.setActivStatus(AgStatus.Refuse.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}:", busActRel.getActivId());
-                return ResultVO.fail("业务流程状态修改失败");
+                throw new ProcessException("业务流程状态修改失败");
             }
             oSupplement.setSchstatus(SchStatus.FOUR.getValue());
-
+            oSupplement.setReviewStatus(AgStatus.Refuse.status);
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("补款状态修改失败{}:", busActRel.getActivId());
-                return ResultVO.fail("补款状态修改失败");
+                throw new ProcessException("补款状态修改失败");
+            }
+            OSupplement supplement = selectOSupplement(oSupplement.getId());
+            if (supplement.getPkType().equals(PkType.OfflineMoney.code) || supplement.getPkType().equals(PkType.FenRunOverdue.code)) {
+                OPaymentDetail oPaymentDetail = new OPaymentDetail();
+                oPaymentDetail.setId(supplement.getSrcId());
+                oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
+                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                    logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
+                    throw new ProcessException("订单付款状态修改失败");
+                }
             }
         } else if ("finish_end".equals(activityName)) {//审批同意
             busActRel.setActivStatus(AgStatus.Approved.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}", busActRel.getActivId());
-                return ResultVO.fail("业务流程状态修改失败");
+                throw new ProcessException("业务流程状态修改失败");
             }
             oSupplement.setSchstatus(SchStatus.THREE.getValue());
+            oSupplement.setReviewStatus(AgStatus.Approved.status);
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("补款状态修改失败{}:", busActRel.getActivId());
-                return ResultVO.fail("补款状态修改失败");
+                throw new ProcessException("补款状态修改失败");
+            }
+            //修改订单明细付款状态
+            OSupplement supplement = selectOSupplement(oSupplement.getId());
+            if (supplement.getPkType().equals(PkType.OfflineMoney.code) || supplement.getPkType().equals(PkType.FenRunOverdue.code)) {
+                OPaymentDetail oPaymentDetail = new OPaymentDetail();
+                oPaymentDetail.setId(supplement.getSrcId());
+                oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                //审批通过还需要更新srcId,srcType,实际付款时间
+                oPaymentDetail.setSrcId(supplement.getId());
+                oPaymentDetail.setSrcType(PamentSrcType.PamentSrcType_XXBK.code);
+                oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
+                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                    logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
+                    throw new ProcessException("订单付款状态修改失败");
+                }
             }
         }
         return ResultVO.success(null);
