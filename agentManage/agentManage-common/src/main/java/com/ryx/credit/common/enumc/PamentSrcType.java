@@ -17,5 +17,13 @@ public enum PamentSrcType {
         this.msg =m;
     }
 
-
+    public static String getSrcTypeValue(String value){
+        PamentSrcType[] srcType = PamentSrcType.values();
+        for(PamentSrcType cc : srcType){
+            if(cc.code.equals(value)){
+                return cc.msg;
+            }
+        }
+        return "";
+    }
 }
