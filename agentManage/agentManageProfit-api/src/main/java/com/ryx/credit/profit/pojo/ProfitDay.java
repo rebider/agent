@@ -22,6 +22,8 @@ public class ProfitDay implements Serializable {
 
     private BigDecimal totalProfit;
 
+    private BigDecimal dailyMakeup;
+
     public String getId() {
         return id;
     }
@@ -92,5 +94,13 @@ public class ProfitDay implements Serializable {
 
     public void setTotalProfit(BigDecimal totalProfit) {
         this.totalProfit = totalProfit;
+    }
+
+    public BigDecimal getDailyMakeup() {
+        return dailyMakeup;
+    }
+
+    public void setDailyMakeup(BigDecimal dailyMakeup) {
+        this.dailyMakeup = dailyMakeup;
     }
 }

@@ -10,6 +10,7 @@
     <result column="REMIT_DATE" property="remitDate" jdbcType="VARCHAR" />
     <result column="RHB_PROFIT" property="rhbProfit" jdbcType="DECIMAL" />
     <result column="ZF_PROFIT" property="zfProfit" jdbcType="DECIMAL" />
+    <result column="DAILY_MAKEUP" property="dailyMakeup" jdbcType="DECIMAL" />
     <result column="TOTAL_PROFIT" property="totalProfit" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Example_Where_Clause" >
@@ -43,7 +44,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, TRANS_DATE, REMIT_DATE, RHB_PROFIT, ZF_PROFIT, 
-    TOTAL_PROFIT
+    TOTAL_PROFIT,DAILY_MAKEUP
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" >
     <include refid="OracleDialectPrefix" />
@@ -93,12 +94,12 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDay" >
     insert into P_PROFIT_D (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, TRANS_DATE, REMIT_DATE, 
-      RHB_PROFIT, ZF_PROFIT, TOTAL_PROFIT
+      RHB_PROFIT, ZF_PROFIT, TOTAL_PROFIT,DAILY_MAKEUP
       )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{transDate,jdbcType=VARCHAR}, #{remitDate,jdbcType=VARCHAR}, 
       #{rhbProfit,jdbcType=DECIMAL}, #{zfProfit,jdbcType=DECIMAL}, #{totalProfit,jdbcType=DECIMAL}
-      )
+      , #{dailyMakeup,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay" >
     insert into P_PROFIT_D
@@ -130,6 +131,9 @@
       <if test="totalProfit != null" >
         TOTAL_PROFIT,
       </if>
+      <if test="dailyMakeup != null" >
+        DAILY_MAKEUP,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -158,6 +162,9 @@
       </if>
       <if test="totalProfit != null" >
         #{totalProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="dailyMakeup != null" >
+        #{dailyMakeup,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -194,6 +201,9 @@
       <if test="totalProfit != null" >
         TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
       </if>
+      <if test="dailyMakeup != null" >
+        DAILY_MAKEUP = #{dailyMakeup,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -207,6 +217,7 @@
       RHB_PROFIT = #{rhbProfit,jdbcType=DECIMAL},
       ZF_PROFIT = #{zfProfit,jdbcType=DECIMAL},
       TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL}
+      DAILY_MAKEUP = #{dailyMakeup,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
