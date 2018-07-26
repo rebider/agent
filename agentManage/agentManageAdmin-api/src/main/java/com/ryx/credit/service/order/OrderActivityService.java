@@ -5,6 +5,8 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OActivity;
 
+import java.util.List;
+
 /**
  * Created by RYX on 2018/7/13.
  * 订单活动
@@ -20,4 +22,6 @@ public interface OrderActivityService {
     OActivity findById(String id);
 
     AgentResult deleteById(String id);
+
+    List<OActivity> allActivity();
 }
