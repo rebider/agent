@@ -3,6 +3,8 @@ package com.ryx.credit.profit.service;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitMonth;
+import com.ryx.credit.profit.pojo.ProfitUnfreeze;
+
 import java.util.List;
 
 /**
@@ -49,8 +51,28 @@ public interface ProfitMonthService {
     public ProfitMonth getProfitMonth(String id);
 
     /**
-     * 修改数据
+     * 修改月分润数据
      * @param profitMonth
      */
     public void updateProfitMonth(ProfitMonth profitMonth);
+
+    /**
+     *查找
+     * @param id
+     * @return
+     */
+    ProfitMonth selectByPrimaryKey(String id);
+
+    /**
+     *更新
+     * @param record
+     * @return
+     */
+    int updateByPrimaryKeySelective(ProfitMonth record);
+
+    /**
+     * 新增解冻记录
+     * @param profitUnfreeze
+     */
+    public void insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
 }

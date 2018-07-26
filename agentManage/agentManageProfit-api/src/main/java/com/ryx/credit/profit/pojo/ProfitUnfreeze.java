@@ -1,9 +1,14 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class ProfitUnfreeze {
+/**
+ * @author RYX
+ */
+public class ProfitUnfreeze implements Serializable{
+    private static final long serialVersionUID = -1926128916274264639L;
     private String id;
 
     private String profitId;
