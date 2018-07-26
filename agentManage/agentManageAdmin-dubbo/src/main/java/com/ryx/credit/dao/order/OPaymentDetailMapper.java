@@ -25,4 +25,5 @@ public interface OPaymentDetailMapper {
     int updateByPrimaryKey(OPaymentDetail record);
 
     OPaymentDetail selectById(String id);
+
 }

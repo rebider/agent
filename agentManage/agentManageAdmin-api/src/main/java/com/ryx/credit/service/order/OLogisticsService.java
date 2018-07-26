@@ -1,6 +1,9 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,6 +15,5 @@ public interface OLogisticsService {
 
     PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo);
 
-
-
+    List<Map<String, Object>> getLogisticsBySn(String startSn, String endSn, String agentId) throws ProcessException;
 }

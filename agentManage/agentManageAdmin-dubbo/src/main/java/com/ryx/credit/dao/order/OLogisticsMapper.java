@@ -26,6 +26,9 @@ public interface OLogisticsMapper {
 
     Long getOLogisticsCount(Map <String, Object> param);
 
+    Map<String, Object> getOrderAndLogisticsBySn(@Param("SN") String SN, @Param("agentId") String agentId);
+
+    List<Map<String, Object>> getOrderAndLogisticsBySns(@Param("startSn") String startSn, @Param("endSn") String endSn, @Param("agentId") String agentId);
     List<Map<String,Object>> queryLogisticsList(Map <String, Object> param);
 
 }
