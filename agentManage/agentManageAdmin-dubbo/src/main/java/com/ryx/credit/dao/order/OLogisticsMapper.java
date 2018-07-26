@@ -2,6 +2,8 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ public interface OLogisticsMapper {
     Map<String, Object> getOrderAndLogisticsBySn(@Param("SN") String SN, @Param("agentId") String agentId);
 
     List<Map<String, Object>> getOrderAndLogisticsBySns(@Param("startSn") String startSn, @Param("endSn") String endSn, @Param("agentId") String agentId);
+
     List<Map<String,Object>> queryLogisticsList(Map <String, Object> param);
 
 }
