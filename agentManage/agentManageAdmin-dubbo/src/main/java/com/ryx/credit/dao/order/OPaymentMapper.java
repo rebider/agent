@@ -1,13 +1,14 @@
 package com.ryx.credit.dao.order;
 
 
+
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentExample;
 
 import java.util.List;
 
 public interface OPaymentMapper {
-    int countByExample(OPaymentExample example);
+    long countByExample(OPaymentExample example);
 
     int deleteByExample(OPaymentExample example);
 
