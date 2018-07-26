@@ -1,6 +1,7 @@
 package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsUtil;
 
@@ -19,4 +20,5 @@ public interface OLogisticsService {
     OLogistics selectByPrimaryKey(String id);
 
     PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo);
+    ResultVO insert(String startSn,String endSn,Integer begins,Integer finish);
 }
