@@ -41,7 +41,7 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_ORDER" domainObjectName="OOrder" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="P_DEDUCTION" domainObjectName="ProfitDeduction" enableUpdateByExample="false"
+		<table tableName="P_PROFIT_UNFREEZE" domainObjectName="ProfitUnfreeze" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
