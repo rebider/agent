@@ -397,13 +397,8 @@
             ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
         </if>
     </sql>
-  <sql id="PAGING_END">
-    <if test="begin != null  and end != null and end >0">
-      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
-    </if>
-  </sql>
 
-  <select id="queryLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
+   <select id="queryLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
     select * from  o_logistics where
     id = (
       select
@@ -415,6 +410,6 @@
       and status = #{status}
       group by logistics_id
     )
-  </select>
+   </select>
 
 </mapper>
