@@ -343,72 +343,55 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-  <select id="countOLogistics" parameterType="map" resultType="java.lang.Integer">
-    select count(*)
-    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo
-    where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
-  </select>
 
-  <select id="selectOLogistics" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsUtil" resultMap="OLogisticsExport">
-    <include refid="OracleDialectPrefix" />
-    select ro.ID, ro.ORDER_ID, ro.RECEIPT_ID, ro.SEND_PRO_NUM, ro.SEND_DATE, ro.PRO_COM, ro.MODEL, ro.PLAN_PRO_NUM,
-    oo.ID, oo.AGENT_ID, oo.O_APYTIME,
-    rp.ID, rp.LOG_COM, rp.W_NUMBER, rp.SN_BEGIN_NUM, rp.SN_END_NUM, rp.SEND_NUM
-    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo where ro.ID = rp.RECEIPT_PLAN_ID and oo.ID = rp.ORDER_ID
-    <where>
-      <if test="SEND_DATE != null and SEND_DATE !=''">AND ro.SEND_DATE = #{SEND_DATE}</if>
-      <if test="O_APYTIME != null and O_APYTIME !=''">AND oo.O_APYTIME = #{O_APYTIME}</if>
-    </where>
-    order by oo.O_APYTIME desc
-    <include refid="OracleDialectSuffix" />
+
+  <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,
+      R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
+      P.PRO_CODE,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
+      O.ADDR_REALNAME,O.RECEIPT_STATUS,
+      L.LOG_COM,L.LOG_TYPE,L.W_NUMBER,L.SN_BEGIN_NUM,L.SN_END_NUM
+      FROM O_LOGISTICS L
+      LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
+      LEFT JOIN O_RECEIPT_ORDER O ON O.ID = R.RECEIPT_ID
+      LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
+    <include refid="BASE_WHERE_SQL"></include>
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
   </select>
 
   <select id="getOLogisticsCount" parameterType="java.util.Map" resultType="java.lang.Long">
-    select count(*)
-    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo
-    where ro.id = rp.RECEIPT_PLAN_ID and oo.id = rp.ORDER_ID
+    SELECT COUNT(1)
+      FROM O_LOGISTICS L
+      LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
+      LEFT JOIN O_RECEIPT_ORDER O ON O.ID = R.RECEIPT_ID
+      LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
+    <include refid="BASE_WHERE_SQL"></include>
   </select>
 
-  <!--物流信息：导出物流信息-->
-  <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
-    <include refid="OracleDialectPrefix" />
-    select ro.ID, ro.ORDER_ID, ro.RECEIPT_ID, ro.SEND_PRO_NUM, ro.SEND_DATE, ro.PRO_COM, ro.MODEL, ro.PLAN_PRO_NUM,
-    oo.ID, oo.AGENT_ID, oo.O_APYTIME,
-    rp.ID, rp.LOG_COM, rp.W_NUMBER, rp.SN_BEGIN_NUM, rp.SN_END_NUM, rp.SEND_NUM
-    from O_RECEIPT_PLAN ro, O_LOGISTICS rp, O_ORDER oo where ro.ID = rp.RECEIPT_PLAN_ID and oo.ID = rp.ORDER_ID
+  <sql id="BASE_WHERE_SQL">
     <where>
-      <if test="SEND_DATE != null and SEND_DATE !=''">AND ro.SEND_DATE = #{SEND_DATE}</if>
-      <if test="O_APYTIME != null and O_APYTIME !=''">AND oo.O_APYTIME = #{O_APYTIME}</if>
+      <trim prefixOverrides="and">
+        <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
+        <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
+      </trim>
     </where>
-    order by oo.O_APYTIME desc
-    <include refid="OracleDialectSuffix" />
-  </select>
+  </sql>
 
-  <resultMap id="OLogisticsExport" type="com.ryx.credit.pojo.admin.order.OLogisticsUtil">
-    <id column="ID" property="id" jdbcType="VARCHAR"/>
-    <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR" />
-    <result column="RECEIPT_ID" property="receiptId" jdbcType="VARCHAR" />
-    <result column="SEND_PRO_NUM" property="sendProNum" jdbcType="DECIMAL" />
-    <result column="SEND_DATE" property="sendDate" jdbcType="TIMESTAMP" />
-    <result column="PRO_COM" jdbcType="VARCHAR" property="proCom" />
-    <result column="MODEL" jdbcType="VARCHAR" property="model" />
-    <result column="PLAN_PRO_NUM" jdbcType="DECIMAL" property="planProNum" />
+  <sql id='SORTING'>
+    ORDER BY R.SEND_DATE DESC
+  </sql>
 
-    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
-    <result column="O_APYTIME" property="oApytime" jdbcType="TIMESTAMP" />
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
 
-    <result column="PRO_ID" property="proId" jdbcType="VARCHAR" />
-    <result column="LOG_TYPE" property="logType" jdbcType="VARCHAR" />
-    <result column="LOG_COM" property="logCom" jdbcType="VARCHAR" />
-    <result column="W_NUMBER" property="wNumber" jdbcType="VARCHAR" />
-    <result column="SN_BEGIN_NUM" property="snBeginNum" jdbcType="VARCHAR" />
-    <result column="SN_END_NUM" property="snEndNum" jdbcType="VARCHAR" />
-  </resultMap>
-
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OLogistics" >
-    select
-    <include refid="Base_Column_List" />
-    from O_LOGISTICS
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
 </mapper>
