@@ -2,12 +2,11 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfitDeductionExample implements Serializable {
+public class ProfitDeductionExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -1215,6 +1214,196 @@ public class ProfitDeductionExample implements Serializable {
 
         public Criteria andSourceIdIsNotNull() {
             addCriterion("SOURCE_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdEqualTo(String value) {
+            addCriterion("SOURCE_ID =", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotEqualTo(String value) {
+            addCriterion("SOURCE_ID <>", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdGreaterThan(String value) {
+            addCriterion("SOURCE_ID >", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdGreaterThanOrEqualTo(String value) {
+            addCriterion("SOURCE_ID >=", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdLessThan(String value) {
+            addCriterion("SOURCE_ID <", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdLessThanOrEqualTo(String value) {
+            addCriterion("SOURCE_ID <=", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdLike(String value) {
+            addCriterion("SOURCE_ID like", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotLike(String value) {
+            addCriterion("SOURCE_ID not like", value, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdIn(List<String> values) {
+            addCriterion("SOURCE_ID in", values, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotIn(List<String> values) {
+            addCriterion("SOURCE_ID not in", values, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdBetween(String value1, String value2) {
+            addCriterion("SOURCE_ID between", value1, value2, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceIdNotBetween(String value1, String value2) {
+            addCriterion("SOURCE_ID not between", value1, value2, "sourceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtIsNull() {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtIsNotNull() {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT =", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT <>", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT >", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT >=", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT <", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT <=", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT in", values, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT not in", values, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT between", value1, value2, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT not between", value1, value2, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusIsNull() {
+            addCriterion("STAGING_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusIsNotNull() {
+            addCriterion("STAGING_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusEqualTo(String value) {
+            addCriterion("STAGING_STATUS =", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusNotEqualTo(String value) {
+            addCriterion("STAGING_STATUS <>", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusGreaterThan(String value) {
+            addCriterion("STAGING_STATUS >", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("STAGING_STATUS >=", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusLessThan(String value) {
+            addCriterion("STAGING_STATUS <", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusLessThanOrEqualTo(String value) {
+            addCriterion("STAGING_STATUS <=", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusLike(String value) {
+            addCriterion("STAGING_STATUS like", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusNotLike(String value) {
+            addCriterion("STAGING_STATUS not like", value, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusIn(List<String> values) {
+            addCriterion("STAGING_STATUS in", values, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusNotIn(List<String> values) {
+            addCriterion("STAGING_STATUS not in", values, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusBetween(String value1, String value2) {
+            addCriterion("STAGING_STATUS between", value1, value2, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andStagingStatusNotBetween(String value1, String value2) {
+            addCriterion("STAGING_STATUS not between", value1, value2, "stagingStatus");
             return (Criteria) this;
         }
     }

@@ -13,7 +13,7 @@
     <context:property-placeholder location="classpath*:jdbc.properties" />
 
     <!--自动扫描含有@Service将其注入为bean -->
-    <context:component-scan base-package="com.ryx.**.service,com.ryx.**.service.impl,com.ryx.**.batch" />
+    <context:component-scan base-package="com.ryx.**.service,com.ryx.**.service.impl" />
     <bean id="logService" class="com.ryx.credit.common.log.LogServiceImpl"></bean>
     <aop:config>
         <!-- 切入点 -->
@@ -30,5 +30,6 @@
     </aop:config>
     <!--<bean id="loginAuthFilter" class="com.ryx.common.filter.AuthFilter"></bean>-->
     <import resource="dubbo-provider.xml"/>
+    <import resource="dubbo-consumer.xml"/>
     <import resource="spring-redis.xml"/>
 </beans>

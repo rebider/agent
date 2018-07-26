@@ -32,7 +32,11 @@ public enum TabId {
     o_receipt_order("ORE%s%014d"),
     o_payment("OPA%s%014d"),
     o_payment_detail("OPD%s%014d"),
-    o_product("OP%s%015d");
+    o_product("OP%s%015d"),
+
+    P_STAGING_DETAIL("P_STAGING_DETAIL%s%015d"),
+    P_STAGING("P_STAGING%s%015d"),
+    P_DEDUCTION("P_DEDUCTION%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;

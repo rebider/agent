@@ -75,7 +75,7 @@
     insert into P_STAGING (ID, STAG_TYPE, STAG_COUNT, 
       SUM_AMT, STAG_AMT, STATUS, 
       SOURCE_ID, REMARK)
-    values (#{id,jdbcType=VARCHAR}, #{stagType,jdbcType=CHAR}, #{stagCount,jdbcType=DECIMAL}, 
+    values (#{id,jdbcType=VARCHAR}, #{stagType,jdbcType=CHAR}, #{stagCount,jdbcType=DECIMAL},
       #{sumAmt,jdbcType=DECIMAL}, #{stagAmt,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, 
       #{sourceId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
   </insert>
