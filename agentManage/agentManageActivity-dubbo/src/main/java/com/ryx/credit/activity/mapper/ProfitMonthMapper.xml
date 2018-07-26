@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ryx.credit.activity.dao.ProfitMonthMapper" >
+  <resultMap id="BaseResultMap" type="com.ryx.credit.activity.entity.ProfitMonth" >
+    <id column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="AGENT_PID" property="agentPid" jdbcType="VARCHAR" />
+    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
+    <result column="AGENT_NAME" property="agentName" jdbcType="VARCHAR" />
+    <result column="PROFIT_DATE" property="profitDate" jdbcType="VARCHAR" />
+    <result column="TRANS_PROFIT_POS" property="transProfitPos" jdbcType="DECIMAL" />
+    <result column="TRANS_SUPPLY_PROFIT_POS" property="transSupplyProfitPos" jdbcType="DECIMAL" />
+    <result column="POS_REWARD" property="posReward" jdbcType="DECIMAL" />
+    <result column="TRANS_SUPPLY_PROFIT_MPOS" property="transSupplyProfitMpos" jdbcType="DECIMAL" />
+    <result column="TRANS_PROFIT_MPOS" property="transProfitMpos" jdbcType="DECIMAL" />
+    <result column="PROFIT_DEDUCTION" property="profitDeduction" jdbcType="DECIMAL" />
+    <result column="PROFIT_SUPPLY" property="profitSupply" jdbcType="DECIMAL" />
+    <result column="TAX_DEDUCTION" property="taxDeduction" jdbcType="DECIMAL" />
+    <result column="STATUS" property="status" jdbcType="CHAR" />
+    <result column="PAY_PROFIT" property="payProfit" jdbcType="DECIMAL" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_DATE, TRANS_PROFIT_POS, TRANS_SUPPLY_PROFIT_POS, 
+    POS_REWARD, TRANS_SUPPLY_PROFIT_MPOS, TRANS_PROFIT_MPOS, PROFIT_DEDUCTION, PROFIT_SUPPLY, 
+    TAX_DEDUCTION, STATUS, PAY_PROFIT, REMARK
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.activity.entity.ProfitMonthExample" >
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_PROFIT_M
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from P_PROFIT_M
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.activity.entity.ProfitMonthExample" >
+    delete from P_PROFIT_M
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.activity.entity.ProfitMonth" >
+    insert into P_PROFIT_M (ID, AGENT_PID, AGENT_ID, 
+      AGENT_NAME, PROFIT_DATE, TRANS_PROFIT_POS, 
+      TRANS_SUPPLY_PROFIT_POS, POS_REWARD, TRANS_SUPPLY_PROFIT_MPOS, 
+      TRANS_PROFIT_MPOS, PROFIT_DEDUCTION, PROFIT_SUPPLY, 
+      TAX_DEDUCTION, STATUS, PAY_PROFIT, 
+      REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, #{transProfitPos,jdbcType=DECIMAL}, 
+      #{transSupplyProfitPos,jdbcType=DECIMAL}, #{posReward,jdbcType=DECIMAL}, #{transSupplyProfitMpos,jdbcType=DECIMAL}, 
+      #{transProfitMpos,jdbcType=DECIMAL}, #{profitDeduction,jdbcType=DECIMAL}, #{profitSupply,jdbcType=DECIMAL}, 
+      #{taxDeduction,jdbcType=DECIMAL}, #{status,jdbcType=CHAR}, #{payProfit,jdbcType=DECIMAL}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.activity.entity.ProfitMonth" >
+    insert into P_PROFIT_M
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="agentPid != null" >
+        AGENT_PID,
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID,
+      </if>
+      <if test="agentName != null" >
+        AGENT_NAME,
+      </if>
+      <if test="profitDate != null" >
+        PROFIT_DATE,
+      </if>
+      <if test="transProfitPos != null" >
+        TRANS_PROFIT_POS,
+      </if>
+      <if test="transSupplyProfitPos != null" >
+        TRANS_SUPPLY_PROFIT_POS,
+      </if>
+      <if test="posReward != null" >
+        POS_REWARD,
+      </if>
+      <if test="transSupplyProfitMpos != null" >
+        TRANS_SUPPLY_PROFIT_MPOS,
+      </if>
+      <if test="transProfitMpos != null" >
+        TRANS_PROFIT_MPOS,
+      </if>
+      <if test="profitDeduction != null" >
+        PROFIT_DEDUCTION,
+      </if>
+      <if test="profitSupply != null" >
+        PROFIT_SUPPLY,
+      </if>
+      <if test="taxDeduction != null" >
+        TAX_DEDUCTION,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="payProfit != null" >
+        PAY_PROFIT,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null" >
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null" >
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null" >
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="transProfitPos != null" >
+        #{transProfitPos,jdbcType=DECIMAL},
+      </if>
+      <if test="transSupplyProfitPos != null" >
+        #{transSupplyProfitPos,jdbcType=DECIMAL},
+      </if>
+      <if test="posReward != null" >
+        #{posReward,jdbcType=DECIMAL},
+      </if>
+      <if test="transSupplyProfitMpos != null" >
+        #{transSupplyProfitMpos,jdbcType=DECIMAL},
+      </if>
+      <if test="transProfitMpos != null" >
+        #{transProfitMpos,jdbcType=DECIMAL},
+      </if>
+      <if test="profitDeduction != null" >
+        #{profitDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="profitSupply != null" >
+        #{profitSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="taxDeduction != null" >
+        #{taxDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="payProfit != null" >
+        #{payProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.ProfitMonthExample" resultType="java.lang.Integer" >
+    select count(*) from P_PROFIT_M
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.activity.entity.ProfitMonth" >
+    update P_PROFIT_M
+    <set >
+      <if test="agentPid != null" >
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null" >
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null" >
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null" >
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="transProfitPos != null" >
+        TRANS_PROFIT_POS = #{transProfitPos,jdbcType=DECIMAL},
+      </if>
+      <if test="transSupplyProfitPos != null" >
+        TRANS_SUPPLY_PROFIT_POS = #{transSupplyProfitPos,jdbcType=DECIMAL},
+      </if>
+      <if test="posReward != null" >
+        POS_REWARD = #{posReward,jdbcType=DECIMAL},
+      </if>
+      <if test="transSupplyProfitMpos != null" >
+        TRANS_SUPPLY_PROFIT_MPOS = #{transSupplyProfitMpos,jdbcType=DECIMAL},
+      </if>
+      <if test="transProfitMpos != null" >
+        TRANS_PROFIT_MPOS = #{transProfitMpos,jdbcType=DECIMAL},
+      </if>
+      <if test="profitDeduction != null" >
+        PROFIT_DEDUCTION = #{profitDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="profitSupply != null" >
+        PROFIT_SUPPLY = #{profitSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="taxDeduction != null" >
+        TAX_DEDUCTION = #{taxDeduction,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="payProfit != null" >
+        PAY_PROFIT = #{payProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.activity.entity.ProfitMonth" >
+    update P_PROFIT_M
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      TRANS_PROFIT_POS = #{transProfitPos,jdbcType=DECIMAL},
+      TRANS_SUPPLY_PROFIT_POS = #{transSupplyProfitPos,jdbcType=DECIMAL},
+      POS_REWARD = #{posReward,jdbcType=DECIMAL},
+      TRANS_SUPPLY_PROFIT_MPOS = #{transSupplyProfitMpos,jdbcType=DECIMAL},
+      TRANS_PROFIT_MPOS = #{transProfitMpos,jdbcType=DECIMAL},
+      PROFIT_DEDUCTION = #{profitDeduction,jdbcType=DECIMAL},
+      PROFIT_SUPPLY = #{profitSupply,jdbcType=DECIMAL},
+      TAX_DEDUCTION = #{taxDeduction,jdbcType=DECIMAL},
+      STATUS = #{status,jdbcType=CHAR},
+      PAY_PROFIT = #{payProfit,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix" >
+    <if test="page != null" >
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix" >
+    <if test="page != null" >
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
