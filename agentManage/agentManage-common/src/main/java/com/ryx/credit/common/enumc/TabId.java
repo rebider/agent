@@ -32,7 +32,10 @@ public enum TabId {
     o_receipt_order("ORE%s%014d"),
     o_payment("OPA%s%014d"),
     o_payment_detail("OPD%s%014d"),
+    o_Supplement("OS%s%014d"),//补款表
     o_product("OP%s%015d"),
+    o_logistics("LG%s%014d"),//发货物流
+    o_receipt_plan("ORP%s%015d"),
 
     P_STAGING_DETAIL("P_STAGING_DETAIL%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
