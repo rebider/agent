@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
@@ -90,5 +91,20 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
         return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
+    }
+
+    @Override
+    public ProfitMonth getProfitMonth(String id) {
+        if(StringUtils.isNotBlank(id)){
+            return profitMonthMapper.selectByPrimaryKey(id);
+        }
+        return null;
+    }
+
+    @Override
+    public void updateProfitMonth(ProfitMonth profitMonth) {
+        if(profitMonth != null){
+            profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+        }
     }
 }

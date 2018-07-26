@@ -40,4 +40,17 @@ public interface ProfitMonthService {
      * @return
      */
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth);
+
+    /**
+     * 查询一条数据
+     * @param id
+     * @return
+     */
+    public ProfitMonth getProfitMonth(String id);
+
+    /**
+     * 修改数据
+     * @param profitMonth
+     */
+    public void updateProfitMonth(ProfitMonth profitMonth);
 }
