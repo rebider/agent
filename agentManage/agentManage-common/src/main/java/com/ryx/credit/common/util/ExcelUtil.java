@@ -116,9 +116,7 @@ public class ExcelUtil {
                 for (int j = 0; j < columnNames.size(); ++j) {
                     Cell cell = row.createCell(j);
                     cell.setCellStyle(cellStyle);
-                    cell.setCellValue(arg11.get(j) == null
-                            ? ""
-                            : (String) arg11.get(j));
+                    cell.setCellValue(arg11.get(j) == null ? "" : arg11.get(j).toString());
                 }
             }
         }
