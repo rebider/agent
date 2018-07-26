@@ -1,10 +1,10 @@
 package com.ryx.credit.profit.pojo;
 
-import java.awt.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitDeduction implements Serializable {
+    private static final long serialVersionUID = 3158600493041170535L;
     private String id;
 
     private String parentAgentPid;
@@ -20,7 +20,9 @@ public class ProfitDeduction implements Serializable {
     private String agentName;
 
     private String deductionDate;
+
     private String deductionDateStart;
+
     private String deductionDateEnd;
 
     private String deductionType;
@@ -39,15 +41,11 @@ public class ProfitDeduction implements Serializable {
 
     private String remark;
 
+    private String sourceId;
+
     private BigDecimal upperNotDeductionAmt;
 
-    public BigDecimal getUpperNotDeductionAmt() {
-        return upperNotDeductionAmt;
-    }
-
-    public void setUpperNotDeductionAmt(BigDecimal upperNotDeductionAmt) {
-        this.upperNotDeductionAmt = upperNotDeductionAmt;
-    }
+    private String stagingStatus;
 
     public String getId() {
         return id;
@@ -175,6 +173,30 @@ public class ProfitDeduction implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId == null ? null : sourceId.trim();
+    }
+
+    public BigDecimal getUpperNotDeductionAmt() {
+        return upperNotDeductionAmt;
+    }
+
+    public void setUpperNotDeductionAmt(BigDecimal upperNotDeductionAmt) {
+        this.upperNotDeductionAmt = upperNotDeductionAmt;
+    }
+
+    public String getStagingStatus() {
+        return stagingStatus;
+    }
+
+    public void setStagingStatus(String stagingStatus) {
+        this.stagingStatus = stagingStatus == null ? null : stagingStatus.trim();
     }
 
     public String getDeductionDateStart() {

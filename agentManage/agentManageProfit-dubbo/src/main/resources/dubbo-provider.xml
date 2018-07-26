@@ -17,4 +17,5 @@
     <dubbo:annotation package="com.ryx.credit.service.*,com.ryx.credit.profit.service.*" />
 
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitDeductionService" ref="profitDeductionServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.StagingService" ref="stagingServiceImpl"  timeout="1200000" registry="${zk.group}"/>
 </beans>

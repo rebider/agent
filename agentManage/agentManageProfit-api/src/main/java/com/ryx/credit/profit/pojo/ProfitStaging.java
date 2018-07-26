@@ -4,11 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitStaging implements Serializable {
+    private static final long serialVersionUID = -8298708678919533809L;
     private String id;
 
     private String stagType;
 
-    private Short stagCount;
+    private BigDecimal stagCount;
 
     private BigDecimal sumAmt;
 
@@ -36,11 +37,11 @@ public class ProfitStaging implements Serializable {
         this.stagType = stagType == null ? null : stagType.trim();
     }
 
-    public Short getStagCount() {
+    public BigDecimal getStagCount() {
         return stagCount;
     }
 
-    public void setStagCount(Short stagCount) {
+    public void setStagCount(BigDecimal stagCount) {
         this.stagCount = stagCount;
     }
 

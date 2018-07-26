@@ -4,11 +4,12 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitStagingDetail implements Serializable {
+    private static final long serialVersionUID = -1490060185777401444L;
     private String id;
 
     private String stagId;
 
-    private Short currentStagCount;
+    private Integer currentStagCount;
 
     private BigDecimal mustAmt;
 
@@ -38,11 +39,11 @@ public class ProfitStagingDetail implements Serializable {
         this.stagId = stagId == null ? null : stagId.trim();
     }
 
-    public Short getCurrentStagCount() {
+    public Integer getCurrentStagCount() {
         return currentStagCount;
     }
 
-    public void setCurrentStagCount(Short currentStagCount) {
+    public void setCurrentStagCount(Integer currentStagCount) {
         this.currentStagCount = currentStagCount;
     }
 

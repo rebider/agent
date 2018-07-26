@@ -78,7 +78,7 @@
       MUST_AMT, REAL_AMT, STATUS, 
       SOURCE_ID, DEDUCTION_DATE, REMARK
       )
-    values (#{id,jdbcType=VARCHAR}, #{stagId,jdbcType=VARCHAR}, #{currentStagCount,jdbcType=DECIMAL}, 
+    values (#{id,jdbcType=VARCHAR}, #{stagId,jdbcType=VARCHAR}, #{currentStagCount,jdbcType=DECIMAL},
       #{mustAmt,jdbcType=DECIMAL}, #{realAmt,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, 
       #{sourceId,jdbcType=VARCHAR}, #{deductionDate,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
       )
