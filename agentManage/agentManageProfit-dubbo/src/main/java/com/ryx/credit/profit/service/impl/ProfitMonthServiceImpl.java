@@ -107,4 +107,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
         }
     }
+
+    @Override
+    public ProfitMonth selectByPrimaryKey(String id) {
+        return profitMonthMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(ProfitMonth record) {
+        return profitMonthMapper.updateByPrimaryKeySelective(record);
+    }
 }

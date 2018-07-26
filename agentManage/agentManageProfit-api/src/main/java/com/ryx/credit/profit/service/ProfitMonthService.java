@@ -53,4 +53,8 @@ public interface ProfitMonthService {
      * @param profitMonth
      */
     public void updateProfitMonth(ProfitMonth profitMonth);
+
+    ProfitMonth selectByPrimaryKey(String id);
+
+    int updateByPrimaryKeySelective(ProfitMonth record);
 }
