@@ -71,10 +71,10 @@ public class AgentContractServiceImpl implements AgentContractService {
             logger.info("代理商合同添加:{}", "代理商id不能为空");
             throw new ProcessException("合同代理商信息不能为空");
         }
-        if (StringUtils.isEmpty(contract.getContNum())) {
-            logger.info("代理商合同添加:{}", "合同编号不能为空");
-            throw new ProcessException("合同编号不能为空");
-        }
+//        if (StringUtils.isEmpty(contract.getContNum())) {
+//            logger.info("代理商合同添加:{}", "合同编号不能为空");
+//            throw new ProcessException("合同编号不能为空");
+//        }
         if (null == contract.getContType()) {
             logger.info("代理商合同添加:{}", "合同类型不能为空");
             throw new ProcessException("合同类型不能为空");

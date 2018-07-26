@@ -1,17 +1,9 @@
 package com.ryx.credit.pojo.admin.order;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.ryx.credit.common.util.DateJsonDeserializer;
-import com.ryx.credit.common.util.DateJsonSerializer;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OPayment implements Serializable{
+public class OPayment {
     private String id;
 
     private String userId;
@@ -54,10 +46,6 @@ public class OPayment implements Serializable{
 
     private BigDecimal downPaymentCount;
 
-    @JSONField(format="yyyy-MM-dd")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @JsonDeserialize(using = DateJsonDeserializer.class)
-    @JsonSerialize(using = DateJsonSerializer.class)
     private Date downPaymentDate;
 
     private String collectCompany;
@@ -67,6 +55,10 @@ public class OPayment implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private BigDecimal actualReceipt;
+
+    private Date actualReceiptDate;
 
     public String getId() {
         return id;
@@ -274,5 +266,21 @@ public class OPayment implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getActualReceipt() {
+        return actualReceipt;
+    }
+
+    public void setActualReceipt(BigDecimal actualReceipt) {
+        this.actualReceipt = actualReceipt;
+    }
+
+    public Date getActualReceiptDate() {
+        return actualReceiptDate;
+    }
+
+    public void setActualReceiptDate(Date actualReceiptDate) {
+        this.actualReceiptDate = actualReceiptDate;
     }
 }
