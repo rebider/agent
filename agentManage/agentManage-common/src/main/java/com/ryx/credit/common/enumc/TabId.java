@@ -35,6 +35,7 @@ public enum TabId {
     o_Supplement("OS%s%014d"),//补款表
     o_product("OP%s%015d"),
     o_logistics("LG%s%014d"),//发货物流
+    o_logistics_detail("LD%s%014d"),
     o_receipt_plan("ORP%s%015d");
 
 
