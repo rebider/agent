@@ -18,8 +18,41 @@ import java.util.Map;
 @Service("oLogisticService")
 public class OLogisticServiceImpl implements OLogisticsService{
 
+public class OLogisticServiceImpl implements OLogisticsService {
+    public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     @Autowired
     private OLogisticsMapper oLogisticsMapper;
+
+
+    @Override
+    public Object oLogisticsList(PageInfo pageInfo) {
+        Map<String, Object> condition = new HashMap<>();
+        int offset = pageInfo.getNowpage();
+        int pageSize = pageInfo.getPagesize();
+        condition = pageInfo.getCondition();
+        condition.put("pageNumBegin", (offset - 1) * pageSize + 1);
+        if (offset <= 1) {
+            condition.put("pageNumStop", pageSize);
+        } else {
+            condition.put("pageNumStop", offset * pageSize);
+        }
+        int size = oLogisticsMapper.countOLogistics(condition);
+
+        List<OLogisticsUtil> configShareList = oLogisticsMapper.selectOLogistics(condition);
+        System.out.println("------------------------------------------" + JSONObject.toJSON(configShareList));
+        pageInfo.setRows((ArrayList) configShareList);
+        pageInfo.setTotal(size);
+        return pageInfo;
+    }
+
+    @Override
+    public OLogistics selectByPrimaryKey(String id) {
+        OLogistics oLogistics = oLogisticsMapper.selectByPrimaryKey(id);
+        if (oLogistics == null) {
+            return oLogistics;
+        }
+        return oLogistics;
+    }
 
     /**
      * 物流信息:
@@ -36,6 +69,31 @@ public class OLogisticServiceImpl implements OLogisticsService{
         return pageInfo;
     }
 
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 退货时根据起止Sn号查询订单、物流信息
+     * @Date: 14:13 2018/7/26
+     */
+    @Override
+    public List<Map<String, Object>> getLogisticsBySn(String startSn, String endSn, String agentId) throws ProcessException {
+        //查询起始SN、终止SN是否存在
+        Map<String, Object> map = oLogisticsMapper.getOrderAndLogisticsBySn(startSn, agentId);
+        if (map == null || map.size() <= 0) {
+            throw new ProcessException("sn号" + startSn + "不在您的订单内");
+        }
+
+        if (!startSn.equals(endSn)) {
+            Map<String, Object> map2 = oLogisticsMapper.getOrderAndLogisticsBySn(endSn, agentId);
+            if (map2 == null || map2.size() <= 0) {
+                throw new ProcessException("sn号" + endSn + "不在您的订单内");
+            }
+        }
+
+        List<Map<String, Object>> list = oLogisticsMapper.getOrderAndLogisticsBySns(startSn, endSn, agentId);
+
+        return list;
+    }
 
 
 }
