@@ -394,4 +394,19 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
     </if>
   </sql>
+
+  <select id="queryLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
+    select * from  o_logistics where
+    id = (
+      select
+        logistics_id
+      from o_logistics_detail
+      where
+      sn_num &gt;= #{snBegin}
+      and sn_num &lt;= #{snEnd}
+      and status = #{status}
+      group by logistics_id
+    )
+  </select>
+
 </mapper>

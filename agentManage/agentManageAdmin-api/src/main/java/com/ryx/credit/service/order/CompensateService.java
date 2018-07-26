@@ -9,7 +9,7 @@ import java.util.List;
  */
 public interface CompensateService {
 
-    List<OSubOrder> getOrderMsgByExcel(List<Object> excelList);
+    OSubOrder getOrderMsgByExcel(List<Object> excelList);
 
 }
 

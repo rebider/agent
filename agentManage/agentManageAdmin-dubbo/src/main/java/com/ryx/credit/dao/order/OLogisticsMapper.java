@@ -26,4 +26,6 @@ public interface OLogisticsMapper {
 
     Long getOLogisticsCount(Map <String, Object> param);
 
+    List<Map<String,Object>> queryLogisticsList(Map <String, Object> param);
+
 }
