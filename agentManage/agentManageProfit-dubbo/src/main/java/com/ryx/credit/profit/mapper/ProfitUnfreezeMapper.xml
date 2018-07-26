@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitUnfreezeMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitUnfreeze">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PROFIT_ID" jdbcType="VARCHAR" property="profitId" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
+    <result column="PAY_PROFIT" jdbcType="DECIMAL" property="payProfit" />
+    <result column="FREEZE_STATUS" jdbcType="CHAR" property="freezeStatus" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ATTACH_INFO" jdbcType="VARCHAR" property="attachInfo" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PROFIT_ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_DATE, PAY_PROFIT, FREEZE_STATUS, 
+    REMARK, ATTACH_INFO, CREATE_TIME, UPDATE_TIME
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreezeExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_PROFIT_UNFREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_PROFIT_UNFREEZE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreezeExample">
+    delete from P_PROFIT_UNFREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreeze">
+    insert into P_PROFIT_UNFREEZE (ID, PROFIT_ID, AGENT_PID, 
+      AGENT_ID, AGENT_NAME, PROFIT_DATE, 
+      PAY_PROFIT, FREEZE_STATUS, REMARK, 
+      ATTACH_INFO, CREATE_TIME, UPDATE_TIME
+      )
+    values (#{id,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, 
+      #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, 
+      #{payProfit,jdbcType=DECIMAL}, #{freezeStatus,jdbcType=CHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{attachInfo,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreeze">
+    insert into P_PROFIT_UNFREEZE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE,
+      </if>
+      <if test="payProfit != null">
+        PAY_PROFIT,
+      </if>
+      <if test="freezeStatus != null">
+        FREEZE_STATUS,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="attachInfo != null">
+        ATTACH_INFO,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="profitId != null">
+        #{profitId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null">
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="payProfit != null">
+        #{payProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="freezeStatus != null">
+        #{freezeStatus,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="attachInfo != null">
+        #{attachInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreezeExample" resultType="java.lang.Long">
+    select count(*) from P_PROFIT_UNFREEZE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreeze">
+    update P_PROFIT_UNFREEZE
+    <set>
+      <if test="profitId != null">
+        PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="payProfit != null">
+        PAY_PROFIT = #{payProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="freezeStatus != null">
+        FREEZE_STATUS = #{freezeStatus,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="attachInfo != null">
+        ATTACH_INFO = #{attachInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitUnfreeze">
+    update P_PROFIT_UNFREEZE
+    set PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      PAY_PROFIT = #{payProfit,jdbcType=DECIMAL},
+      FREEZE_STATUS = #{freezeStatus,jdbcType=CHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ATTACH_INFO = #{attachInfo,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
