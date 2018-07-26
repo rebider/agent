@@ -1,10 +1,6 @@
 package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.pojo.admin.order.OLogistics;
-import com.ryx.credit.pojo.admin.order.OLogisticsUtil;
-
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,9 +10,8 @@ import java.util.Map;
  */
 public interface OLogisticsService {
 
-    Object oLogisticsList(PageInfo pageInfo);
-
-    OLogistics selectByPrimaryKey(String id);
-
     PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo);
+
+
+
 }

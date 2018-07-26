@@ -24,14 +24,8 @@ public interface OLogisticsMapper {
 
     ////////////////////////////////////////////////////////////////////
 
-    int countOLogistics(Map<String, Object> condition);
-
-    List<OLogisticsUtil> selectOLogistics(Map<String, Object> condition);
-
-    OLogistics selectByPrimaryKey(String id);
-
-
     List<Map<String,Object>> getOLogisticsList(Map <String, Object> param);
 
     Long getOLogisticsCount(Map <String, Object> param);
+
 }
