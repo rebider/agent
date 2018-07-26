@@ -29,7 +29,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
-        profitMonthExample.setPage(page);
+        if(page != null){
+            profitMonthExample.setPage(page);
+        }
         return profitMonthMapper.selectByExample(profitMonthExample);
     }
 
@@ -63,7 +65,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
-        profitDetailMonthExample.setPage(page);
+        if(page != null){
+            profitDetailMonthExample.setPage(page);
+        }
         return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
     }
 
