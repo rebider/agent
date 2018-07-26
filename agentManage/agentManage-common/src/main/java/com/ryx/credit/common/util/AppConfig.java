@@ -274,4 +274,14 @@ public class AppConfig extends Thread {
             AppConfig.sendEmailAndAtt(email, msg, title, newFile,fileName);
         }
     }
+
+    /**
+     * 机具扣款调整通知
+     * @param msg
+     * @param title
+     */
+    public static void sendEmailsPosBack(String msg,String title){
+        String emails = PropUtils.getProp("posBackEmails");
+        AppConfig.sendEmail(emails.split("\\,"), msg, title);
+    }
 }
