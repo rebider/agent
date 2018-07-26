@@ -1,6 +1,5 @@
 package com.ryx.credit.dao.order;
 
-
 import com.ryx.credit.pojo.admin.order.OReceiptPro;
 import com.ryx.credit.pojo.admin.order.OReceiptProExample;
 

@@ -1,6 +1,7 @@
 package com.ryx.credit.dao.order;
 
 
+
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.order.OPaymentDetailExample;
 
@@ -22,4 +23,6 @@ public interface OPaymentDetailMapper {
     int updateByPrimaryKeySelective(OPaymentDetail record);
 
     int updateByPrimaryKey(OPaymentDetail record);
+
+    OPaymentDetail selectById(String id);
 }

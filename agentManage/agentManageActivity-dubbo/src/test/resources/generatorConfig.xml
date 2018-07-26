@@ -41,10 +41,12 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_ORDER" domainObjectName="OOrder" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="P_SETTLE_ERR_LS" domainObjectName="ProfitSettleErrLs" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
-		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"-->
+		<!--<table tableName="O_PAYMENT" domainObjectName="OPayment" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="O_SUPPLEMENT" domainObjectName="OSupplement" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_PRODUCT" domainObjectName="OProduct" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_RECEIPT_ORDER" domainObjectName="OReceiptOrder" enableUpdateByExample="false"-->
@@ -55,5 +57,23 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_SUB_ORDER_ACTIVITY" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="O_LOGISTICS" domainObjectName="OLogistics" enableUpdateByExample="false"-->
+			<!--enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="o_Payment_detail_his" domainObjectName="OPaymentDetailHis" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_Account_adjust" domainObjectName="OAccountAdjust" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_Account_adjust_detail" domainObjectName="OAccountAdjustDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_Refund_agent" domainObjectName="ORefundAgent" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_return_order_rel" domainObjectName="OReturnOrderRel" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_return_order_detail" domainObjectName="OReturnOrderDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+
+
 	</context>
 </generatorConfiguration>

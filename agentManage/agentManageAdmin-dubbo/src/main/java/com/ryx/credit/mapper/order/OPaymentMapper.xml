@@ -10,6 +10,7 @@
     <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
     <result column="PAY_AMOUNT" property="payAmount" jdbcType="DECIMAL" />
     <result column="REAL_AMOUNT" property="realAmount" jdbcType="DECIMAL" />
+    <result column="OUTSTANDING_AMOUNT" property="outstandingAmount" jdbcType="DECIMAL" />
     <result column="PAY_COMPLET_TIME" property="payCompletTime" jdbcType="TIMESTAMP" />
     <result column="PAY_STATUS" property="payStatus" jdbcType="DECIMAL" />
     <result column="PLAN_SUC_TIME" property="planSucTime" jdbcType="TIMESTAMP" />
@@ -23,6 +24,7 @@
     <result column="DOWN_PAYMENT" property="downPayment" jdbcType="DECIMAL" />
     <result column="DOWN_PAYMENT_COUNT" property="downPaymentCount" jdbcType="DECIMAL" />
     <result column="DOWN_PAYMENT_DATE" property="downPaymentDate" jdbcType="TIMESTAMP" />
+    <result column="COLLECT_COMPANY" property="collectCompany" jdbcType="VARCHAR" />
     <result column="REMARK" property="remark" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="DECIMAL" />
     <result column="VERSION" property="version" jdbcType="DECIMAL" />
@@ -57,10 +59,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, USER_ID, ORDER_ID, AGENT_ID, PAY_METHOD, C_TIME, PAY_AMOUNT, REAL_AMOUNT, PAY_COMPLET_TIME, 
-    PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE, SHARE_TEMPLET, 
-    IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT, 
-    DOWN_PAYMENT_DATE, REMARK, STATUS, VERSION
+    ID, USER_ID, ORDER_ID, AGENT_ID, PAY_METHOD, C_TIME, PAY_AMOUNT, REAL_AMOUNT, OUTSTANDING_AMOUNT, 
+    PAY_COMPLET_TIME, PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE, 
+    SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT, 
+    DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK, STATUS, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OPaymentExample" >
     <include refid="OracleDialectPrefix" />
@@ -93,22 +95,22 @@
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OPayment" >
     insert into O_PAYMENT (ID, USER_ID, ORDER_ID, 
       AGENT_ID, PAY_METHOD, C_TIME, 
-      PAY_AMOUNT, REAL_AMOUNT, PAY_COMPLET_TIME, 
-      PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, 
-      GUARANTEE_AGENT, SETTLEMENT_PRICE, SHARE_TEMPLET, 
-      IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, 
-      DOWN_PAYMENT, DOWN_PAYMENT_COUNT, DOWN_PAYMENT_DATE, 
-      REMARK, STATUS, VERSION
-      )
+      PAY_AMOUNT, REAL_AMOUNT, OUTSTANDING_AMOUNT, 
+      PAY_COMPLET_TIME, PAY_STATUS, PLAN_SUC_TIME, 
+      PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE, 
+      SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE, 
+      DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT, 
+      DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK, 
+      STATUS, VERSION)
     values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{payAmount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL}, #{payCompletTime,jdbcType=TIMESTAMP}, 
-      #{payStatus,jdbcType=DECIMAL}, #{planSucTime,jdbcType=TIMESTAMP}, #{payRule,jdbcType=VARCHAR}, 
-      #{guaranteeAgent,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL}, #{shareTemplet,jdbcType=VARCHAR}, 
-      #{isCloInvoice,jdbcType=DECIMAL}, #{deductionType,jdbcType=VARCHAR}, #{deductionAmount,jdbcType=DECIMAL}, 
-      #{downPayment,jdbcType=DECIMAL}, #{downPaymentCount,jdbcType=DECIMAL}, #{downPaymentDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+      #{payAmount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL}, #{outstandingAmount,jdbcType=DECIMAL}, 
+      #{payCompletTime,jdbcType=TIMESTAMP}, #{payStatus,jdbcType=DECIMAL}, #{planSucTime,jdbcType=TIMESTAMP}, 
+      #{payRule,jdbcType=VARCHAR}, #{guaranteeAgent,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL}, 
+      #{shareTemplet,jdbcType=VARCHAR}, #{isCloInvoice,jdbcType=DECIMAL}, #{deductionType,jdbcType=VARCHAR}, 
+      #{deductionAmount,jdbcType=DECIMAL}, #{downPayment,jdbcType=DECIMAL}, #{downPaymentCount,jdbcType=DECIMAL}, 
+      #{downPaymentDate,jdbcType=TIMESTAMP}, #{collectCompany,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPayment" >
     insert into O_PAYMENT
@@ -136,6 +138,9 @@
       </if>
       <if test="realAmount != null" >
         REAL_AMOUNT,
+      </if>
+      <if test="outstandingAmount != null" >
+        OUTSTANDING_AMOUNT,
       </if>
       <if test="payCompletTime != null" >
         PAY_COMPLET_TIME,
@@ -176,6 +181,9 @@
       <if test="downPaymentDate != null" >
         DOWN_PAYMENT_DATE,
       </if>
+      <if test="collectCompany != null" >
+        COLLECT_COMPANY,
+      </if>
       <if test="remark != null" >
         REMARK,
       </if>
@@ -210,6 +218,9 @@
       </if>
       <if test="realAmount != null" >
         #{realAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="outstandingAmount != null" >
+        #{outstandingAmount,jdbcType=DECIMAL},
       </if>
       <if test="payCompletTime != null" >
         #{payCompletTime,jdbcType=TIMESTAMP},
@@ -249,6 +260,9 @@
       </if>
       <if test="downPaymentDate != null" >
         #{downPaymentDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="collectCompany != null" >
+        #{collectCompany,jdbcType=VARCHAR},
       </if>
       <if test="remark != null" >
         #{remark,jdbcType=VARCHAR},
@@ -291,6 +305,9 @@
       <if test="realAmount != null" >
         REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
       </if>
+      <if test="outstandingAmount != null" >
+        OUTSTANDING_AMOUNT = #{outstandingAmount,jdbcType=DECIMAL},
+      </if>
       <if test="payCompletTime != null" >
         PAY_COMPLET_TIME = #{payCompletTime,jdbcType=TIMESTAMP},
       </if>
@@ -330,6 +347,9 @@
       <if test="downPaymentDate != null" >
         DOWN_PAYMENT_DATE = #{downPaymentDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="collectCompany != null" >
+        COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
+      </if>
       <if test="remark != null" >
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
@@ -351,6 +371,7 @@
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
       REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
+      OUTSTANDING_AMOUNT = #{outstandingAmount,jdbcType=DECIMAL},
       PAY_COMPLET_TIME = #{payCompletTime,jdbcType=TIMESTAMP},
       PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
       PLAN_SUC_TIME = #{planSucTime,jdbcType=TIMESTAMP},
@@ -364,6 +385,7 @@
       DOWN_PAYMENT = #{downPayment,jdbcType=DECIMAL},
       DOWN_PAYMENT_COUNT = #{downPaymentCount,jdbcType=DECIMAL},
       DOWN_PAYMENT_DATE = #{downPaymentDate,jdbcType=TIMESTAMP},
+      COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL}

@@ -668,6 +668,66 @@ public class OPaymentExample {
             return (Criteria) this;
         }
 
+        public Criteria andOutstandingAmountIsNull() {
+            addCriterion("OUTSTANDING_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountIsNotNull() {
+            addCriterion("OUTSTANDING_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT =", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountNotEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT <>", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountGreaterThan(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT >", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT >=", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountLessThan(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT <", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT <=", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountIn(List<BigDecimal> values) {
+            addCriterion("OUTSTANDING_AMOUNT in", values, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountNotIn(List<BigDecimal> values) {
+            addCriterion("OUTSTANDING_AMOUNT not in", values, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("OUTSTANDING_AMOUNT between", value1, value2, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("OUTSTANDING_AMOUNT not between", value1, value2, "outstandingAmount");
+            return (Criteria) this;
+        }
+
         public Criteria andPayCompletTimeIsNull() {
             addCriterion("PAY_COMPLET_TIME is null");
             return (Criteria) this;
@@ -1485,6 +1545,76 @@ public class OPaymentExample {
 
         public Criteria andDownPaymentDateNotBetween(Date value1, Date value2) {
             addCriterion("DOWN_PAYMENT_DATE not between", value1, value2, "downPaymentDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIsNull() {
+            addCriterion("COLLECT_COMPANY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIsNotNull() {
+            addCriterion("COLLECT_COMPANY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY =", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY <>", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyGreaterThan(String value) {
+            addCriterion("COLLECT_COMPANY >", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyGreaterThanOrEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY >=", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLessThan(String value) {
+            addCriterion("COLLECT_COMPANY <", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLessThanOrEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY <=", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLike(String value) {
+            addCriterion("COLLECT_COMPANY like", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotLike(String value) {
+            addCriterion("COLLECT_COMPANY not like", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIn(List<String> values) {
+            addCriterion("COLLECT_COMPANY in", values, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotIn(List<String> values) {
+            addCriterion("COLLECT_COMPANY not in", values, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyBetween(String value1, String value2) {
+            addCriterion("COLLECT_COMPANY between", value1, value2, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotBetween(String value1, String value2) {
+            addCriterion("COLLECT_COMPANY not between", value1, value2, "collectCompany");
             return (Criteria) this;
         }
 

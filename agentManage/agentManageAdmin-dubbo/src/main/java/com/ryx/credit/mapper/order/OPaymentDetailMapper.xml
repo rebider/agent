@@ -4,9 +4,10 @@
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OPaymentDetail" >
     <id column="ID" property="id" jdbcType="VARCHAR" />
     <result column="PAYMENT_ID" property="paymentId" jdbcType="VARCHAR" />
+    <result column="PAYMENT_TYPE" property="paymentType" jdbcType="VARCHAR" />
     <result column="ORDER_ID" property="orderId" jdbcType="VARCHAR" />
-    <result column="C_ORDER_ID" property="cOrderId" jdbcType="VARCHAR" />
-    <result column="PAY_METHOD" property="payMethod" jdbcType="VARCHAR" />
+    <result column="BATCH_CODE" property="batchCode" jdbcType="VARCHAR" />
+    <result column="PAY_TYPE" property="payType" jdbcType="VARCHAR" />
     <result column="PAY_AMOUNT" property="payAmount" jdbcType="DECIMAL" />
     <result column="REAL_PAY_AMOUNT" property="realPayAmount" jdbcType="DECIMAL" />
     <result column="PAY_TIME" property="payTime" jdbcType="TIMESTAMP" />
@@ -14,13 +15,8 @@
     <result column="SRC_TYPE" property="srcType" jdbcType="VARCHAR" />
     <result column="PLAN_PAY_TIME" property="planPayTime" jdbcType="TIMESTAMP" />
     <result column="PLAN_NUM" property="planNum" jdbcType="DECIMAL" />
-    <result column="ACCOUNT_USER" property="accountUser" jdbcType="VARCHAR" />
-    <result column="ACCOUNTPAY_TYPE" property="accountpayType" jdbcType="VARCHAR" />
-    <result column="PAY_ACCOUNT" property="payAccount" jdbcType="VARCHAR" />
     <result column="PAYMENT_STATUS" property="paymentStatus" jdbcType="DECIMAL" />
-    <result column="DEFERRED_RID" property="deferredRid" jdbcType="VARCHAR" />
     <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
-    <result column="COLLECT_COMPANY" property="collectCompany" jdbcType="VARCHAR" />
     <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
     <result column="C_DATE" property="cDate" jdbcType="TIMESTAMP" />
     <result column="REMARK" property="remark" jdbcType="VARCHAR" />
@@ -57,10 +53,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, PAYMENT_ID, ORDER_ID, C_ORDER_ID, PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT, PAY_TIME, 
-    SRC_ID, SRC_TYPE, PLAN_PAY_TIME, PLAN_NUM, ACCOUNT_USER, ACCOUNTPAY_TYPE, PAY_ACCOUNT, 
-    PAYMENT_STATUS, DEFERRED_RID, AGENT_ID, COLLECT_COMPANY, C_USER, C_DATE, REMARK, 
-    STATUS, VERSION
+    ID, PAYMENT_ID, PAYMENT_TYPE, ORDER_ID, BATCH_CODE, PAY_TYPE, PAY_AMOUNT, REAL_PAY_AMOUNT, 
+    PAY_TIME, SRC_ID, SRC_TYPE, PLAN_PAY_TIME, PLAN_NUM, PAYMENT_STATUS, AGENT_ID, C_USER, 
+    C_DATE, REMARK, STATUS, VERSION
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetailExample" >
     <include refid="OracleDialectPrefix" />
@@ -91,24 +86,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetail" >
-    insert into O_PAYMENT_DETAIL (ID, PAYMENT_ID, ORDER_ID, 
-      C_ORDER_ID, PAY_METHOD, PAY_AMOUNT, 
-      REAL_PAY_AMOUNT, PAY_TIME, SRC_ID, 
-      SRC_TYPE, PLAN_PAY_TIME, PLAN_NUM, 
-      ACCOUNT_USER, ACCOUNTPAY_TYPE, PAY_ACCOUNT, 
-      PAYMENT_STATUS, DEFERRED_RID, AGENT_ID, 
-      COLLECT_COMPANY, C_USER, C_DATE, 
-      REMARK, STATUS, VERSION
-      )
-    values (#{id,jdbcType=VARCHAR}, #{paymentId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, 
-      #{cOrderId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, 
-      #{realPayAmount,jdbcType=DECIMAL}, #{payTime,jdbcType=TIMESTAMP}, #{srcId,jdbcType=VARCHAR}, 
-      #{srcType,jdbcType=VARCHAR}, #{planPayTime,jdbcType=TIMESTAMP}, #{planNum,jdbcType=DECIMAL}, 
-      #{accountUser,jdbcType=VARCHAR}, #{accountpayType,jdbcType=VARCHAR}, #{payAccount,jdbcType=VARCHAR}, 
-      #{paymentStatus,jdbcType=DECIMAL}, #{deferredRid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{collectCompany,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{cDate,jdbcType=TIMESTAMP}, 
-      #{remark,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+    insert into O_PAYMENT_DETAIL (ID, PAYMENT_ID, PAYMENT_TYPE, 
+      ORDER_ID, BATCH_CODE, PAY_TYPE, 
+      PAY_AMOUNT, REAL_PAY_AMOUNT, PAY_TIME, 
+      SRC_ID, SRC_TYPE, PLAN_PAY_TIME, 
+      PLAN_NUM, PAYMENT_STATUS, AGENT_ID, 
+      C_USER, C_DATE, REMARK, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{paymentId,jdbcType=VARCHAR}, #{paymentType,jdbcType=VARCHAR}, 
+      #{orderId,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{payType,jdbcType=VARCHAR}, 
+      #{payAmount,jdbcType=DECIMAL}, #{realPayAmount,jdbcType=DECIMAL}, #{payTime,jdbcType=TIMESTAMP}, 
+      #{srcId,jdbcType=VARCHAR}, #{srcType,jdbcType=VARCHAR}, #{planPayTime,jdbcType=TIMESTAMP}, 
+      #{planNum,jdbcType=DECIMAL}, #{paymentStatus,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, 
+      #{cUser,jdbcType=VARCHAR}, #{cDate,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetail" >
     insert into O_PAYMENT_DETAIL
@@ -119,14 +110,17 @@
       <if test="paymentId != null" >
         PAYMENT_ID,
       </if>
+      <if test="paymentType != null" >
+        PAYMENT_TYPE,
+      </if>
       <if test="orderId != null" >
         ORDER_ID,
       </if>
-      <if test="cOrderId != null" >
-        C_ORDER_ID,
+      <if test="batchCode != null" >
+        BATCH_CODE,
       </if>
-      <if test="payMethod != null" >
-        PAY_METHOD,
+      <if test="payType != null" >
+        PAY_TYPE,
       </if>
       <if test="payAmount != null" >
         PAY_AMOUNT,
@@ -149,26 +143,11 @@
       <if test="planNum != null" >
         PLAN_NUM,
       </if>
-      <if test="accountUser != null" >
-        ACCOUNT_USER,
-      </if>
-      <if test="accountpayType != null" >
-        ACCOUNTPAY_TYPE,
-      </if>
-      <if test="payAccount != null" >
-        PAY_ACCOUNT,
-      </if>
       <if test="paymentStatus != null" >
         PAYMENT_STATUS,
       </if>
-      <if test="deferredRid != null" >
-        DEFERRED_RID,
-      </if>
       <if test="agentId != null" >
         AGENT_ID,
-      </if>
-      <if test="collectCompany != null" >
-        COLLECT_COMPANY,
       </if>
       <if test="cUser != null" >
         C_USER,
@@ -193,14 +172,17 @@
       <if test="paymentId != null" >
         #{paymentId,jdbcType=VARCHAR},
       </if>
+      <if test="paymentType != null" >
+        #{paymentType,jdbcType=VARCHAR},
+      </if>
       <if test="orderId != null" >
         #{orderId,jdbcType=VARCHAR},
       </if>
-      <if test="cOrderId != null" >
-        #{cOrderId,jdbcType=VARCHAR},
+      <if test="batchCode != null" >
+        #{batchCode,jdbcType=VARCHAR},
       </if>
-      <if test="payMethod != null" >
-        #{payMethod,jdbcType=VARCHAR},
+      <if test="payType != null" >
+        #{payType,jdbcType=VARCHAR},
       </if>
       <if test="payAmount != null" >
         #{payAmount,jdbcType=DECIMAL},
@@ -223,26 +205,11 @@
       <if test="planNum != null" >
         #{planNum,jdbcType=DECIMAL},
       </if>
-      <if test="accountUser != null" >
-        #{accountUser,jdbcType=VARCHAR},
-      </if>
-      <if test="accountpayType != null" >
-        #{accountpayType,jdbcType=VARCHAR},
-      </if>
-      <if test="payAccount != null" >
-        #{payAccount,jdbcType=VARCHAR},
-      </if>
       <if test="paymentStatus != null" >
         #{paymentStatus,jdbcType=DECIMAL},
       </if>
-      <if test="deferredRid != null" >
-        #{deferredRid,jdbcType=VARCHAR},
-      </if>
       <if test="agentId != null" >
         #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="collectCompany != null" >
-        #{collectCompany,jdbcType=VARCHAR},
       </if>
       <if test="cUser != null" >
         #{cUser,jdbcType=VARCHAR},
@@ -273,14 +240,17 @@
       <if test="paymentId != null" >
         PAYMENT_ID = #{paymentId,jdbcType=VARCHAR},
       </if>
+      <if test="paymentType != null" >
+        PAYMENT_TYPE = #{paymentType,jdbcType=VARCHAR},
+      </if>
       <if test="orderId != null" >
         ORDER_ID = #{orderId,jdbcType=VARCHAR},
       </if>
-      <if test="cOrderId != null" >
-        C_ORDER_ID = #{cOrderId,jdbcType=VARCHAR},
+      <if test="batchCode != null" >
+        BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
       </if>
-      <if test="payMethod != null" >
-        PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+      <if test="payType != null" >
+        PAY_TYPE = #{payType,jdbcType=VARCHAR},
       </if>
       <if test="payAmount != null" >
         PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
@@ -303,26 +273,11 @@
       <if test="planNum != null" >
         PLAN_NUM = #{planNum,jdbcType=DECIMAL},
       </if>
-      <if test="accountUser != null" >
-        ACCOUNT_USER = #{accountUser,jdbcType=VARCHAR},
-      </if>
-      <if test="accountpayType != null" >
-        ACCOUNTPAY_TYPE = #{accountpayType,jdbcType=VARCHAR},
-      </if>
-      <if test="payAccount != null" >
-        PAY_ACCOUNT = #{payAccount,jdbcType=VARCHAR},
-      </if>
       <if test="paymentStatus != null" >
         PAYMENT_STATUS = #{paymentStatus,jdbcType=DECIMAL},
       </if>
-      <if test="deferredRid != null" >
-        DEFERRED_RID = #{deferredRid,jdbcType=VARCHAR},
-      </if>
       <if test="agentId != null" >
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="collectCompany != null" >
-        COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
       </if>
       <if test="cUser != null" >
         C_USER = #{cUser,jdbcType=VARCHAR},
@@ -345,9 +300,10 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetail" >
     update O_PAYMENT_DETAIL
     set PAYMENT_ID = #{paymentId,jdbcType=VARCHAR},
+      PAYMENT_TYPE = #{paymentType,jdbcType=VARCHAR},
       ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      C_ORDER_ID = #{cOrderId,jdbcType=VARCHAR},
-      PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+      BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+      PAY_TYPE = #{payType,jdbcType=VARCHAR},
       PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
       REAL_PAY_AMOUNT = #{realPayAmount,jdbcType=DECIMAL},
       PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
@@ -355,13 +311,8 @@
       SRC_TYPE = #{srcType,jdbcType=VARCHAR},
       PLAN_PAY_TIME = #{planPayTime,jdbcType=TIMESTAMP},
       PLAN_NUM = #{planNum,jdbcType=DECIMAL},
-      ACCOUNT_USER = #{accountUser,jdbcType=VARCHAR},
-      ACCOUNTPAY_TYPE = #{accountpayType,jdbcType=VARCHAR},
-      PAY_ACCOUNT = #{payAccount,jdbcType=VARCHAR},
       PAYMENT_STATUS = #{paymentStatus,jdbcType=DECIMAL},
-      DEFERRED_RID = #{deferredRid,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
       C_USER = #{cUser,jdbcType=VARCHAR},
       C_DATE = #{cDate,jdbcType=TIMESTAMP},
       REMARK = #{remark,jdbcType=VARCHAR},
@@ -379,4 +330,10 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List"/>
+    from O_PAYMENT_DETAIL
+    where ID = #{id,jdbcType=VARCHAR} and STATUS=1
+  </select>
 </mapper>

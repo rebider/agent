@@ -6,7 +6,11 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.OOrderMapper;
+import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OOrder;
+import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.service.agent.AgentQueryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +40,10 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private DateChangeRequestMapper dateChangeRequestMapper;
     @Autowired
     private BusActRelMapper busActRelMapper;
+    @Autowired
+    private OSupplementMapper oSupplementMapper;
+    @Autowired
+    private OOrderMapper oOrderMapper;
 
 
     @Override
@@ -121,6 +129,14 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Colinfo.name())){
                 DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
                 return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel);
+            }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.PkType.name())){
+                OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("OSupplement",oSupplement).putKeyV("rel",rel);
+            }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.ORDER.name())){
+                OOrder order = oOrderMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("OOrder",order).putKeyV("rel",rel);
             }
         }
         return null;

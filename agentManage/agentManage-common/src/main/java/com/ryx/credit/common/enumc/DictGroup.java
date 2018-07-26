@@ -10,6 +10,7 @@ public enum DictGroup {
     YESORNO("yesorno"),
     AGENT("代理商模块"),
     ORDER("订单模块"),
+    RELATION("关系模块"),
     AGENT_AUDIT("代理商审核模块"),
     BUS_TYPE("业务模块类型或者级别"),
     CAPITAL_TYPE("交款类型"),
@@ -32,7 +33,17 @@ public enum DictGroup {
     BUS_SCOPE("业务范围"),
     //订单
     MODEL_TYPE("机具类型"),
-    SETTLEMENT_TYPE("结算类型");
+    PAYMENTSTATUS("分期计划状态"),
+    PAYMENTTYPE("付款明细类型"),
+    SETTLEMENT_TYPE("结算类型"),
+    ACT_RETURN_FINANCE("补款审批流名称"),
+    ACT_ORDER("订单审批对应的启动流程"),
+    ORDER_APR_MARKET("订单审批市场部参数"),
+    ORDER_APR_BUSNISS("订单审批业务部参数"),
+    TEMP_AGREE("协议模板"),
+    ORDER_STATUS("订单状态"),
+    AGREE_TYPE("协议类型"),
+    ACTIVITY_DIS_TYPE("活动优惠方式");
 
     public String  msg;
 

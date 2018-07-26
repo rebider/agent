@@ -14,6 +14,7 @@ import com.ryx.credit.service.order.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,22 @@ public class ProductServiceImpl implements ProductService {
         }
         if(StringUtils.isNotBlank(product.getProName())){
             criteria.andProNameEqualTo(product.getProName());
+        }
+        if(StringUtils.isNotBlank(product.getProType())){
+            String proType = product.getProType();
+            if(proType.contains(",")){
+                List<String> proCodeList = new ArrayList<>();
+                String[] split = proType.split(",");
+                for(int i = 0 ; i < split.length ; i++){
+                    proCodeList.add(split[i]);
+                }
+                criteria.andProTypeIn(proCodeList);
+            }else{
+                criteria.andProTypeEqualTo(proType);
+            }
+        }
+        if(null!=product.getProStatus()){
+            criteria.andProStatusEqualTo(product.getProStatus());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setPage(page);
@@ -90,6 +107,18 @@ public class ProductServiceImpl implements ProductService {
             return null;
         }
         return productMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public String findNameById(String id){
+        if(StringUtils.isBlank(id)){
+            return "";
+        }
+        OProduct oProduct = productMapper.selectByPrimaryKey(id);
+        if(oProduct==null){
+            return "";
+        }
+        return oProduct.getProName();
     }
 
     @Override

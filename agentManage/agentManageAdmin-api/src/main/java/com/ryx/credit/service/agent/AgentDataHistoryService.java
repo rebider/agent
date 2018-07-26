@@ -1,6 +1,12 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.DataHistory;
+
+import java.util.List;
 
 /**
  * @version V1.0
@@ -11,4 +17,10 @@ import com.ryx.credit.common.result.AgentResult;
 public interface AgentDataHistoryService {
 
     AgentResult saveDataHistory(Object object,String dataType);
+
+    /**
+     *查询所有的历史数据
+     * @return
+     */
+    PageInfo selectAll(Page page, DataHistory dataHistory,String time);
 }

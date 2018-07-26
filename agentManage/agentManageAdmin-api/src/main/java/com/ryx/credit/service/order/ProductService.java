@@ -24,4 +24,6 @@ public interface ProductService {
     AgentResult deleteById(String id);
 
     List<OProduct> allProductList(OProduct product);
+
+    String findNameById(String id);
 }

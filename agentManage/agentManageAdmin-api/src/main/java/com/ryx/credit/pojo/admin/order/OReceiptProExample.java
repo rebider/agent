@@ -208,6 +208,76 @@ public class OReceiptProExample {
             return (Criteria) this;
         }
 
+        public Criteria andOrderidIsNull() {
+            addCriterion("ORDERID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidIsNotNull() {
+            addCriterion("ORDERID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidEqualTo(String value) {
+            addCriterion("ORDERID =", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidNotEqualTo(String value) {
+            addCriterion("ORDERID <>", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidGreaterThan(String value) {
+            addCriterion("ORDERID >", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidGreaterThanOrEqualTo(String value) {
+            addCriterion("ORDERID >=", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidLessThan(String value) {
+            addCriterion("ORDERID <", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidLessThanOrEqualTo(String value) {
+            addCriterion("ORDERID <=", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidLike(String value) {
+            addCriterion("ORDERID like", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidNotLike(String value) {
+            addCriterion("ORDERID not like", value, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidIn(List<String> values) {
+            addCriterion("ORDERID in", values, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidNotIn(List<String> values) {
+            addCriterion("ORDERID not in", values, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidBetween(String value1, String value2) {
+            addCriterion("ORDERID between", value1, value2, "orderid");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderidNotBetween(String value1, String value2) {
+            addCriterion("ORDERID not between", value1, value2, "orderid");
+            return (Criteria) this;
+        }
+
         public Criteria andReceiptIdIsNull() {
             addCriterion("RECEIPT_ID is null");
             return (Criteria) this;
@@ -488,326 +558,6 @@ public class OReceiptProExample {
             return (Criteria) this;
         }
 
-        public Criteria andProTypeIsNull() {
-            addCriterion("PRO_TYPE is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeIsNotNull() {
-            addCriterion("PRO_TYPE is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeEqualTo(String value) {
-            addCriterion("PRO_TYPE =", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeNotEqualTo(String value) {
-            addCriterion("PRO_TYPE <>", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeGreaterThan(String value) {
-            addCriterion("PRO_TYPE >", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeGreaterThanOrEqualTo(String value) {
-            addCriterion("PRO_TYPE >=", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeLessThan(String value) {
-            addCriterion("PRO_TYPE <", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeLessThanOrEqualTo(String value) {
-            addCriterion("PRO_TYPE <=", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeLike(String value) {
-            addCriterion("PRO_TYPE like", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeNotLike(String value) {
-            addCriterion("PRO_TYPE not like", value, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeIn(List<String> values) {
-            addCriterion("PRO_TYPE in", values, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeNotIn(List<String> values) {
-            addCriterion("PRO_TYPE not in", values, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeBetween(String value1, String value2) {
-            addCriterion("PRO_TYPE between", value1, value2, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProTypeNotBetween(String value1, String value2) {
-            addCriterion("PRO_TYPE not between", value1, value2, "proType");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceIsNull() {
-            addCriterion("PRO_PRICE is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceIsNotNull() {
-            addCriterion("PRO_PRICE is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceEqualTo(BigDecimal value) {
-            addCriterion("PRO_PRICE =", value, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceNotEqualTo(BigDecimal value) {
-            addCriterion("PRO_PRICE <>", value, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceGreaterThan(BigDecimal value) {
-            addCriterion("PRO_PRICE >", value, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("PRO_PRICE >=", value, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceLessThan(BigDecimal value) {
-            addCriterion("PRO_PRICE <", value, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("PRO_PRICE <=", value, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceIn(List<BigDecimal> values) {
-            addCriterion("PRO_PRICE in", values, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceNotIn(List<BigDecimal> values) {
-            addCriterion("PRO_PRICE not in", values, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PRO_PRICE between", value1, value2, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProPriceNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PRO_PRICE not between", value1, value2, "proPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositIsNull() {
-            addCriterion("IS_DEPOSIT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositIsNotNull() {
-            addCriterion("IS_DEPOSIT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositEqualTo(BigDecimal value) {
-            addCriterion("IS_DEPOSIT =", value, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositNotEqualTo(BigDecimal value) {
-            addCriterion("IS_DEPOSIT <>", value, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositGreaterThan(BigDecimal value) {
-            addCriterion("IS_DEPOSIT >", value, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("IS_DEPOSIT >=", value, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositLessThan(BigDecimal value) {
-            addCriterion("IS_DEPOSIT <", value, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("IS_DEPOSIT <=", value, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositIn(List<BigDecimal> values) {
-            addCriterion("IS_DEPOSIT in", values, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositNotIn(List<BigDecimal> values) {
-            addCriterion("IS_DEPOSIT not in", values, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("IS_DEPOSIT between", value1, value2, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andIsDepositNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("IS_DEPOSIT not between", value1, value2, "isDeposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositIsNull() {
-            addCriterion("DEPOSIT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositIsNotNull() {
-            addCriterion("DEPOSIT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositEqualTo(BigDecimal value) {
-            addCriterion("DEPOSIT =", value, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositNotEqualTo(BigDecimal value) {
-            addCriterion("DEPOSIT <>", value, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositGreaterThan(BigDecimal value) {
-            addCriterion("DEPOSIT >", value, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("DEPOSIT >=", value, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositLessThan(BigDecimal value) {
-            addCriterion("DEPOSIT <", value, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("DEPOSIT <=", value, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositIn(List<BigDecimal> values) {
-            addCriterion("DEPOSIT in", values, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositNotIn(List<BigDecimal> values) {
-            addCriterion("DEPOSIT not in", values, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("DEPOSIT between", value1, value2, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andDepositNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("DEPOSIT not between", value1, value2, "deposit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkIsNull() {
-            addCriterion("REMARK is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkIsNotNull() {
-            addCriterion("REMARK is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkEqualTo(String value) {
-            addCriterion("REMARK =", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkNotEqualTo(String value) {
-            addCriterion("REMARK <>", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkGreaterThan(String value) {
-            addCriterion("REMARK >", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkGreaterThanOrEqualTo(String value) {
-            addCriterion("REMARK >=", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkLessThan(String value) {
-            addCriterion("REMARK <", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkLessThanOrEqualTo(String value) {
-            addCriterion("REMARK <=", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkLike(String value) {
-            addCriterion("REMARK like", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkNotLike(String value) {
-            addCriterion("REMARK not like", value, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkIn(List<String> values) {
-            addCriterion("REMARK in", values, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkNotIn(List<String> values) {
-            addCriterion("REMARK not in", values, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkBetween(String value1, String value2) {
-            addCriterion("REMARK between", value1, value2, "remark");
-            return (Criteria) this;
-        }
-
-        public Criteria andRemarkNotBetween(String value1, String value2) {
-            addCriterion("REMARK not between", value1, value2, "remark");
-            return (Criteria) this;
-        }
-
         public Criteria andProNumIsNull() {
             addCriterion("PRO_NUM is null");
             return (Criteria) this;
@@ -868,66 +618,6 @@ public class OReceiptProExample {
             return (Criteria) this;
         }
 
-        public Criteria andProRelPriceIsNull() {
-            addCriterion("PRO_REL_PRICE is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceIsNotNull() {
-            addCriterion("PRO_REL_PRICE is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceEqualTo(BigDecimal value) {
-            addCriterion("PRO_REL_PRICE =", value, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceNotEqualTo(BigDecimal value) {
-            addCriterion("PRO_REL_PRICE <>", value, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceGreaterThan(BigDecimal value) {
-            addCriterion("PRO_REL_PRICE >", value, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("PRO_REL_PRICE >=", value, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceLessThan(BigDecimal value) {
-            addCriterion("PRO_REL_PRICE <", value, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("PRO_REL_PRICE <=", value, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceIn(List<BigDecimal> values) {
-            addCriterion("PRO_REL_PRICE in", values, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceNotIn(List<BigDecimal> values) {
-            addCriterion("PRO_REL_PRICE not in", values, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PRO_REL_PRICE between", value1, value2, "proRelPrice");
-            return (Criteria) this;
-        }
-
-        public Criteria andProRelPriceNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PRO_REL_PRICE not between", value1, value2, "proRelPrice");
-            return (Criteria) this;
-        }
-
         public Criteria andSendNumIsNull() {
             addCriterion("SEND_NUM is null");
             return (Criteria) this;
@@ -985,76 +675,6 @@ public class OReceiptProExample {
 
         public Criteria andSendNumNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("SEND_NUM not between", value1, value2, "sendNum");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidIsNull() {
-            addCriterion("RULEID is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidIsNotNull() {
-            addCriterion("RULEID is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidEqualTo(String value) {
-            addCriterion("RULEID =", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidNotEqualTo(String value) {
-            addCriterion("RULEID <>", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidGreaterThan(String value) {
-            addCriterion("RULEID >", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidGreaterThanOrEqualTo(String value) {
-            addCriterion("RULEID >=", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidLessThan(String value) {
-            addCriterion("RULEID <", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidLessThanOrEqualTo(String value) {
-            addCriterion("RULEID <=", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidLike(String value) {
-            addCriterion("RULEID like", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidNotLike(String value) {
-            addCriterion("RULEID not like", value, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidIn(List<String> values) {
-            addCriterion("RULEID in", values, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidNotIn(List<String> values) {
-            addCriterion("RULEID not in", values, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidBetween(String value1, String value2) {
-            addCriterion("RULEID between", value1, value2, "ruleid");
-            return (Criteria) this;
-        }
-
-        public Criteria andRuleidNotBetween(String value1, String value2) {
-            addCriterion("RULEID not between", value1, value2, "ruleid");
             return (Criteria) this;
         }
 
@@ -1438,73 +1058,73 @@ public class OReceiptProExample {
             return (Criteria) this;
         }
 
-        public Criteria and活动idIsNull() {
-            addCriterion("活动ID is null");
+        public Criteria andReceiptProStatusIsNull() {
+            addCriterion("RECEIPT_PRO_STATUS is null");
             return (Criteria) this;
         }
 
-        public Criteria and活动idIsNotNull() {
-            addCriterion("活动ID is not null");
+        public Criteria andReceiptProStatusIsNotNull() {
+            addCriterion("RECEIPT_PRO_STATUS is not null");
             return (Criteria) this;
         }
 
-        public Criteria and活动idEqualTo(String value) {
-            addCriterion("活动ID =", value, "活动id");
+        public Criteria andReceiptProStatusEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS =", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idNotEqualTo(String value) {
-            addCriterion("活动ID <>", value, "活动id");
+        public Criteria andReceiptProStatusNotEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS <>", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idGreaterThan(String value) {
-            addCriterion("活动ID >", value, "活动id");
+        public Criteria andReceiptProStatusGreaterThan(String value) {
+            addCriterion("RECEIPT_PRO_STATUS >", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idGreaterThanOrEqualTo(String value) {
-            addCriterion("活动ID >=", value, "活动id");
+        public Criteria andReceiptProStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS >=", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idLessThan(String value) {
-            addCriterion("活动ID <", value, "活动id");
+        public Criteria andReceiptProStatusLessThan(String value) {
+            addCriterion("RECEIPT_PRO_STATUS <", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idLessThanOrEqualTo(String value) {
-            addCriterion("活动ID <=", value, "活动id");
+        public Criteria andReceiptProStatusLessThanOrEqualTo(String value) {
+            addCriterion("RECEIPT_PRO_STATUS <=", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idLike(String value) {
-            addCriterion("活动ID like", value, "活动id");
+        public Criteria andReceiptProStatusLike(String value) {
+            addCriterion("RECEIPT_PRO_STATUS like", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idNotLike(String value) {
-            addCriterion("活动ID not like", value, "活动id");
+        public Criteria andReceiptProStatusNotLike(String value) {
+            addCriterion("RECEIPT_PRO_STATUS not like", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idIn(List<String> values) {
-            addCriterion("活动ID in", values, "活动id");
+        public Criteria andReceiptProStatusIn(List<String> values) {
+            addCriterion("RECEIPT_PRO_STATUS in", values, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idNotIn(List<String> values) {
-            addCriterion("活动ID not in", values, "活动id");
+        public Criteria andReceiptProStatusNotIn(List<String> values) {
+            addCriterion("RECEIPT_PRO_STATUS not in", values, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idBetween(String value1, String value2) {
-            addCriterion("活动ID between", value1, value2, "活动id");
+        public Criteria andReceiptProStatusBetween(String value1, String value2) {
+            addCriterion("RECEIPT_PRO_STATUS between", value1, value2, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria and活动idNotBetween(String value1, String value2) {
-            addCriterion("活动ID not between", value1, value2, "活动id");
+        public Criteria andReceiptProStatusNotBetween(String value1, String value2) {
+            addCriterion("RECEIPT_PRO_STATUS not between", value1, value2, "receiptProStatus");
             return (Criteria) this;
         }
     }

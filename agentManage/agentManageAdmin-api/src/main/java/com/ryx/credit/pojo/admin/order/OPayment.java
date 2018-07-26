@@ -1,9 +1,17 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryx.credit.common.util.DateJsonDeserializer;
+import com.ryx.credit.common.util.DateJsonSerializer;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OPayment {
+public class OPayment implements Serializable{
     private String id;
 
     private String userId;
@@ -19,6 +27,8 @@ public class OPayment {
     private BigDecimal payAmount;
 
     private BigDecimal realAmount;
+
+    private BigDecimal outstandingAmount;
 
     private Date payCompletTime;
 
@@ -44,7 +54,13 @@ public class OPayment {
 
     private BigDecimal downPaymentCount;
 
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
     private Date downPaymentDate;
+
+    private String collectCompany;
 
     private String remark;
 
@@ -114,6 +130,14 @@ public class OPayment {
 
     public void setRealAmount(BigDecimal realAmount) {
         this.realAmount = realAmount;
+    }
+
+    public BigDecimal getOutstandingAmount() {
+        return outstandingAmount;
+    }
+
+    public void setOutstandingAmount(BigDecimal outstandingAmount) {
+        this.outstandingAmount = outstandingAmount;
     }
 
     public Date getPayCompletTime() {
@@ -218,6 +242,14 @@ public class OPayment {
 
     public void setDownPaymentDate(Date downPaymentDate) {
         this.downPaymentDate = downPaymentDate;
+    }
+
+    public String getCollectCompany() {
+        return collectCompany;
+    }
+
+    public void setCollectCompany(String collectCompany) {
+        this.collectCompany = collectCompany == null ? null : collectCompany.trim();
     }
 
     public String getRemark() {

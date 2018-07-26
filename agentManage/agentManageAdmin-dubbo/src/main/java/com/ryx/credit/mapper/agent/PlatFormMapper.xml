@@ -168,4 +168,199 @@
     from A_PLATFORM
     where PLATFORM_NUM = #{platFormNum}
   </select>
+
+  <!--=====================================================================================-->
+
+  <select id="countPlatForm" parameterType="map" resultType="Integer">
+    select count(ID)
+    from
+    A_PLATFORM
+    <where>
+      <if test="id != null and  ''!=id" >
+        and ID=#{id}
+      </if>
+      <if test="platformNum != null and  ''!=platformNum">
+        and PLATFORM_NUM=#{platformNum}
+      </if>
+      <if test="platformName != null and  ''!=platformName">
+        and PLATFORM_NAME=#{platformName}
+      </if>
+      <if test="cTime != null and  ''!=cTime">
+        and C_TIME=#{cTime}
+      </if>
+      <if test="cUtime != null and  ''!=cUtime">
+        and C_UTIME=#{cUtime}
+      </if>
+      <if test="cUser != null and  ''!=cUser">
+        and C_USER=#{cUser}
+      </if>
+      <if test="platformStatus != null and  ''!=platformStatus">
+        and PLATFORM_STATUS=#{platformStatus}
+      </if>
+      <if test="status != null and  ''!=status">
+        and STATUS=#{status}
+      </if>
+      <if test="version != null and  ''!=version">
+        and VERSION=#{version}
+      </if>
+      <if test="platformType != null and  ''!=platformType">
+        and PLATFORM_TYPE=#{platformType}
+      </if>
+    </where>
+    order by C_TIME desc
+  </select>
+
+  <!--查询-->
+  <select id="selectPlatForm" parameterType="map" resultMap="BaseResultMap">
+    select
+    B.*
+    from
+    (
+    select A.* ,ROWNUM rn from (select
+    <include refid="Base_Column_List" />
+    from
+    A_PLATFORM
+    <where>
+      <if test="id != null and  ''!=id" >
+        and ID=#{id}
+      </if>
+      <if test="platformNum != null and  ''!=platformNum">
+        and PLATFORM_NUM=#{platformNum}
+      </if>
+      <if test="platformName != null and  ''!=platformName">
+        and PLATFORM_NAME=#{platformName}
+      </if>
+      <if test="cTime != null and  ''!=cTime">
+        and C_TIME=#{cTime}
+      </if>
+      <if test="cUtime != null and  ''!=cUtime">
+        and C_UTIME=#{cUtime}
+      </if>
+      <if test="cUser != null and  ''!=cUser">
+        and C_USER=#{cUser}
+      </if>
+      <if test="platformStatus != null and  ''!=platformStatus">
+        and PLATFORM_STATUS=#{platformStatus}
+      </if>
+      <if test="status != null and  ''!=status">
+        and STATUS=#{status}
+      </if>
+      <if test="version != null and  ''!=version">
+        and VERSION=#{version}
+      </if>
+      <if test="platformType != null and  ''!=platformType">
+        and PLATFORM_TYPE=#{platformType}
+      </if>
+    </where>
+    order by C_TIME desc
+    )A
+    <if test='pageNumStop != null and pageNumStop!=""'>
+      <![CDATA[where ROWNUM <=#{pageNumStop}]]>
+    </if>
+    )B
+    <if test='pageNumBegin != null and pageNumBegin!=""'>
+      Where rn >=#{pageNumBegin}
+    </if>
+  </select>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
+    select
+    <include refid="Base_Column_List" />
+    from A_PLATFORM
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <!--删除（编辑）状态-->
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
+    update A_PLATFORM
+    <set >
+      <if test="id != null" >
+        ID = #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="platformNum != null" >
+        PLATFORM_NUM = #{platformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="platformName != null" >
+        PLATFORM_NAME = #{platformName,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null" >
+        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="platformStatus != null" >
+        PLATFORM_STATUS = #{platformStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="platformType != null" >
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <!--id自增-->
+  <select id="seqId" resultType="long">SELECT A_PLATFORM_SEQ.Nextval FROM dual </select>
+
+  <insert id="insertPlatForm" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
+    insert into A_PLATFORM (
+    ID, PLATFORM_NUM, PLATFORM_NAME, C_TIME, C_UTIME, C_USER,
+    PLATFORM_STATUS, STATUS, VERSION, PLATFORM_TYPE)
+    values (
+    #{id,jdbcType=VARCHAR}, #{platformNum,jdbcType=VARCHAR}, #{platformName,jdbcType=VARCHAR},
+    #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{platformStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{platformType,jdbcType=VARCHAR})
+  </insert>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from A_PLATFORM where ID = #{id}
+  </delete>
+
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
+    update A_PLATFORM
+    <set >
+      <if test="id != null" >
+        ID = #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="platformNum != null" >
+        PLATFORM_NUM = #{platformNum,jdbcType=VARCHAR},
+      </if>
+      <if test="platformName != null" >
+        PLATFORM_NAME = #{platformName,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null" >
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null" >
+        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null" >
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="platformStatus != null" >
+        PLATFORM_STATUS = #{platformStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null" >
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="platformType != null" >
+        PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

@@ -11,6 +11,7 @@ public enum AttachmentRelType {
     Capital("缴款项"),
     Business("业务"),
     Proceeds("收款"),
+    Order("订单"),
     Clear("结算附件");
 
     public String  msg;
@@ -18,4 +19,15 @@ public enum AttachmentRelType {
     AttachmentRelType(String s){
         msg = s;
     }
+
+    public static String getItemsString(String key){
+        AttachmentRelType[] valus = AttachmentRelType.values();
+        for (AttachmentRelType busActRelBusType : valus) {
+            if(busActRelBusType.name().equals(key)){
+                return busActRelBusType.msg;
+            }
+        }
+        return null;
+    }
+
 }
