@@ -1,5 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -22,10 +24,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @version V1.0
@@ -157,5 +156,70 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             return null;
         }
         return agentBusInfoMapper.queryById(agentBusInfo.getAgentId());
+    }
+
+
+    @Override
+    public int addABusActRel(BusActRel busActRel)throws Exception {
+        if(StringUtils.isBlank(busActRel.getBusId()))throw new ProcessException("BusId不能为空");
+        if(StringUtils.isBlank(busActRel.getActivId()))throw new ProcessException("ActivId不能为空");
+        if(StringUtils.isBlank(busActRel.getcUser()))throw new ProcessException("cUser不能为空");
+        if(StringUtils.isBlank(busActRel.getBusType()))throw new ProcessException("BusType不能为空");
+        //代理商业务视频关系
+        BusActRel record = new BusActRel();
+        record.setBusId(busActRel.getBusId());
+        record.setActivId(busActRel.getActivId());
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(busActRel.getcUser());
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(busActRel.getBusType());
+        record.setActivStatus(AgStatus.Approving.name());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("启动审批异常，添加审批关系失败{}:{}:{}", busActRel.getActivId(), busActRel.getBusId(),busActRel.getBusType());
+        }
+        return 1;
+    }
+
+    @Override
+    public int updateABusActRel(BusActRel busActRel) {
+        if(StringUtils.isBlank(busActRel.getBusId()))throw new ProcessException("BusId不能为空");
+        if(StringUtils.isBlank(busActRel.getActivId()))throw new ProcessException("ActivId不能为空");
+        if(StringUtils.isBlank(busActRel.getcUser()))throw new ProcessException("cUser不能为空");
+        if(StringUtils.isBlank(busActRel.getBusType()))throw new ProcessException("BusType不能为空");
+        BusActRelKey key = new BusActRelKey();
+        key.setActivId(busActRel.getActivId());
+        key.setBusId(busActRel.getBusId());
+        BusActRel rel = busActRelMapper.selectByPrimaryKey(key);
+        if(rel==null){
+           return 0;
+        }
+        rel.setActivStatus(busActRel.getActivStatus());
+        if(1==busActRelMapper.updateByPrimaryKeySelective(rel)){
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public BusActRel queryBusActRel(BusActRel busActRel) {
+        BusActRelExample example = new BusActRelExample();
+        BusActRelExample.Criteria c = example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(busActRel.getBusId())) {
+            c.andBusIdEqualTo(busActRel.getBusId());
+        }
+        if(StringUtils.isNotBlank(busActRel.getActivId())){
+            c.andActivIdEqualTo(busActRel.getActivId());
+        }
+        if(StringUtils.isNotBlank(busActRel.getcUser())){
+            c.andCUserEqualTo(busActRel.getcUser());
+        }
+        if(StringUtils.isNotBlank(busActRel.getActivStatus())){
+            c.andActivStatusEqualTo(busActRel.getActivStatus());
+        }
+        if(StringUtils.isNotBlank(busActRel.getBusType())){
+            c.andBusTypeEqualTo(busActRel.getBusType());
+        }
+        List<BusActRel>  list = busActRelMapper.selectByExample(example);
+        return list.size()==1?list.get(0):null;
     }
 }
