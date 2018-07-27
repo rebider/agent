@@ -16,17 +16,17 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * PosCheckTaskExecutionListener
+ * TaxPoinTaskExecutionListener
  * Created by IntelliJ IDEA.
- *pos考核
+ * 税点调整
  * @author Wang Qi
  * @version 1.0 2018/7/27 19:08
- * @see PosCheckTaskExecutionListener
+ * @see TaxPoinTaskExecutionListener
  * To change this template use File | Settings | File Templates.
  */
 
-public class PosCheckTaskExecutionListener implements TaskListener, ExecutionListener {
-    private static final Logger logger = LoggerFactory.getLogger(PosCheckTaskExecutionListener.class);
+public class TaxPoinTaskExecutionListener implements TaskListener, ExecutionListener {
+    private static final Logger logger = LoggerFactory.getLogger(TaxPoinTaskExecutionListener.class);
 
 
     @Override

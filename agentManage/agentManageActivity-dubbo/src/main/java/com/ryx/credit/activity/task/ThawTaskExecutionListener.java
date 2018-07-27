@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * PosRewardaskExecutionListener
+ * ThawTaskExecutionListener
  * Created by IntelliJ IDEA.
  * 解冻分润
  * @author Wang Qi
