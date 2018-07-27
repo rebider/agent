@@ -1,6 +1,8 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.order.OActivityMapper;
 import com.ryx.credit.dao.order.OLogisticsMapper;
 import com.ryx.credit.dao.order.OSubOrderActivityMapper;
 import com.ryx.credit.dao.order.OSubOrderMapper;
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +34,8 @@ public class CompensateServiceImpl implements CompensateService {
     private OSubOrderMapper subOrderMapper;
     @Autowired
     private OSubOrderActivityMapper subOrderActivityMapper;
+    @Autowired
+    private OActivityMapper activityMapper;
 
 
     @Override
@@ -45,8 +50,8 @@ public class CompensateServiceImpl implements CompensateService {
         String orderNum =  String.valueOf(excelList.get(7));
 
         Map<String, Object> reqParam = new HashMap<>();
-        reqParam.put("snBegin","888gg1000");
-        reqParam.put("snEnd","888gg1005");
+        reqParam.put("snBegin",snBegin);
+        reqParam.put("snEnd",snEnd);
         reqParam.put("status",Status.STATUS_1.status);
         List<Map<String,Object>> oLogistics = logisticsMapper.queryLogisticsList(reqParam);
         if(oLogistics==null && oLogistics.size()==0 && oLogistics.size()!=1){
@@ -67,6 +72,7 @@ public class CompensateServiceImpl implements CompensateService {
             return null;
         }
         OSubOrder oSubOrder = oSubOrders.get(0);
+        oSubOrder.setProNum(new BigDecimal(count));
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         OSubOrderActivityExample.Criteria criteria2 = oSubOrderActivityExample.createCriteria();
         criteria2.andSubOrderIdEqualTo(oSubOrder.getId());
@@ -76,4 +82,59 @@ public class CompensateServiceImpl implements CompensateService {
         }
         return oSubOrder;
     }
+
+    /**
+     * 计算变更差价
+     * @param subOrderId
+     * @param oldActivityId
+     * @param activityId
+     * @param proNum
+     * @return
+     */
+    @Override
+    public BigDecimal calculatePriceDiff(String subOrderId,String oldActivityId,String activityId,BigDecimal proNum){
+
+        OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+        OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
+        criteria.andSubOrderIdEqualTo(subOrderId);
+        criteria.andActivityIdEqualTo(oldActivityId);
+        List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+        if(null==oSubOrderActivities){
+            log.info("calculatePriceDiff数据有误异常返回1");
+            return null;
+        }
+        if(oSubOrderActivities.size()!=1){
+            log.info("calculatePriceDiff数据有误异常返回2");
+            return null;
+        }
+        OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+        OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oSubOrderActivity.getSubOrderId());
+
+        BigDecimal oldPrice = oSubOrderActivity.getPrice().multiply(oSubOrder.getProNum());
+        BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
+        BigDecimal resultPrice = oldPrice.subtract(newPrice);
+
+        return resultPrice;
+    }
+
+    /**
+     * 计算总金额
+     * @param activityId  活动id
+     * @param count
+     * @return
+     */
+    @Override
+    public BigDecimal calculateTotalPrice(String activityId,BigDecimal count){
+
+        if(StringUtils.isBlank(activityId)){
+            return null;
+        }
+        OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
+        //判断是否满足  暂未实现
+
+        BigDecimal sumPrice = count.multiply(oActivity.getPrice());
+        return sumPrice;
+    }
+
+
 }
