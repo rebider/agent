@@ -1,8 +1,8 @@
-package com.ryx.credit.pojo.msg;
+package com.ryx.credit.profit.pojo;
 
 
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.JsonUtils;
-import com.ryx.credit.pojo.util.DateUtil;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -11,8 +11,8 @@ import java.util.Map;
  * ResultObject
  * Created by IntelliJ IDEA.
  *
- * @Author Liudh
- * @Date 2018/4/17
+ * @Author WANGY
+ * @Date 2018/7/17
  * @Time: 18:06
  * To change this template use File | Settings | File Templates.
  */
@@ -39,18 +39,18 @@ public class ResultObject implements Serializable{
         this.page = map.get("page"); }
 
     public ResultObject(String code, String msg) {
-    	this.sysdate = DateUtil.getTime();
+    	this.sysdate = DateUtil.getDays();
         this.code = code;
         this.msg = msg; }
 
     public ResultObject(String code, String msg, Object result) {
-    	this.sysdate = DateUtil.getTime();
+    	this.sysdate = DateUtil.getDays();
         this.code = code;
         this.msg = msg;
         this.result = result; }
 
     public ResultObject(String code, String msg, Object result, Object page) {
-    	this.sysdate = DateUtil.getTime();
+    	this.sysdate = DateUtil.getDays();
         this.code = code;
         this.msg = msg;
         this.result = result;
