@@ -1,18 +1,18 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.ProfitMonthMapper;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
-import com.ryx.credit.profit.pojo.ProfitMonth;
-import com.ryx.credit.profit.pojo.ProfitMonthExample;
+import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
+import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,6 +26,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitMonthMapper profitMonthMapper;
     @Autowired
     private ProfitDetailMonthMapper profitDetailMonthMapper;
+    @Autowired
+    private ProfitUnfreezeMapper profitUnfreezeMapper;
+    @Autowired
+    private IdService idService;
 
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
@@ -48,11 +52,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(profitMonth.getAgentId())){
             criteria.andAgentIdEqualTo(profitMonth.getAgentId());
         }
-        if(StringUtils.isNotBlank(profitMonth.getProfitDate())){
-            criteria.andProfitDateEqualTo(profitMonth.getProfitDate());
-        }
         if(StringUtils.isNotBlank(profitMonth.getStatus())){
             criteria.andStatusEqualTo(profitMonth.getStatus());
+        } else {
+            criteria.andStatusNotEqualTo("0");
+        }
+        if(StringUtils.isNotBlank(profitMonth.getProfitDateStart())&& StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
+            criteria.andProfitDateBetween(profitMonth.getProfitDateStart(),profitMonth.getProfitDateEnd());
+        } else if(StringUtils.isNotBlank(profitMonth.getProfitDateStart())){
+            criteria.andProfitDateEqualTo(profitMonth.getProfitDateStart());
+        } else if(StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
+            criteria.andProfitDateEqualTo(profitMonth.getProfitDateEnd());
         }
         return profitMonthExample;
     }
@@ -116,5 +126,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public int updateByPrimaryKeySelective(ProfitMonth record) {
         return profitMonthMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public void insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze) {
+        if(profitUnfreeze != null){
+            profitUnfreeze.setCreateTime(new Date());
+            profitUnfreeze.setUpdateTime(new Date());
+            profitUnfreeze.setId(idService.genId(TabId.p_profit_unfreeze));
+            profitUnfreezeMapper.insertSelective(profitUnfreeze);
+        }
     }
 }

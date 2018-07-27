@@ -366,6 +366,24 @@ public class DateUtil {
         return sdfDays.format(new Date());
     }
 
+    /**
+     * 得到n天之后的日期
+     * @param days
+     * "yyyy-MM-dd HH:mm:ss"
+     * @return
+     */
+    public static String getAfterDayDate(String days , SimpleDateFormat starttime2) {
+        int daysInt = Integer.parseInt(days);
+
+        Calendar canlendar = Calendar.getInstance(); // java.util�?
+        canlendar.add(Calendar.DATE, daysInt); // 日期�?如果不够减会将月变动
+        Date date = canlendar.getTime();
+
+        String dateStr = starttime2.format(date);
+
+        return dateStr;
+    }
+
    /* @Test
     public void test(){
         try {
