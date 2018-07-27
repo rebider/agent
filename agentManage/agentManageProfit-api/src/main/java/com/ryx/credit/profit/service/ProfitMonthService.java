@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitMonth;
@@ -72,7 +73,12 @@ public interface ProfitMonthService {
 
     /**
      * 新增解冻记录
+     */
+    public ProfitUnfreeze insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
+
+    /**
+     * 申请解冻，启动审批流
      * @param profitUnfreeze
      */
-    public void insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
+    public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId) throws ProcessException;
 }

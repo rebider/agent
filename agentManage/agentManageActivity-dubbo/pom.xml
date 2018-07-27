@@ -15,6 +15,11 @@
     <dependencies>
         <dependency>
             <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageProfit-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
             <artifactId>agentManage-common</artifactId>
             <version>${agentManage.version}</version>
         </dependency>

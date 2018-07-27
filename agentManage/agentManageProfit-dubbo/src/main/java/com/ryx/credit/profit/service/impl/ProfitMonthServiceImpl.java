@@ -1,17 +1,27 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.ProfitStatus;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +31,7 @@ import java.util.List;
  */
 @Service("profitMonthService")
 public class ProfitMonthServiceImpl implements ProfitMonthService {
-
+    Logger LOG = LoggerFactory.getLogger(ProfitMonthServiceImpl.class);
     @Autowired
     private ProfitMonthMapper profitMonthMapper;
     @Autowired
@@ -30,6 +40,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitUnfreezeMapper profitUnfreezeMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private TaskApprovalService taskApprovalService;
 
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
@@ -129,12 +143,53 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public void insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze) {
-        if(profitUnfreeze != null){
-            profitUnfreeze.setCreateTime(new Date());
+    public ProfitUnfreeze insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze) {
+        profitUnfreeze.setId(idService.genId(TabId.p_profit_unfreeze));
+        profitUnfreeze.setCreateTime(new Date());
+        profitUnfreeze.setUpdateTime(new Date());
+        profitUnfreezeMapper.insertSelective(profitUnfreeze);
+        return profitUnfreeze;
+    }
+
+    /**
+     * 事务控制
+     * 月分润解冻审批流
+     * @param profitUnfreeze
+     */
+    @Override
+    public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId) throws ProcessException{
+        //启动审批流
+        String proceId = activityService.createDeloyFlow(null, "null", null, null, null);
+        if (proceId == null) {
+            LOG.error("月分润解冻审批流启动失败，代理商ID：{}", profitUnfreeze.getAgentId());
             profitUnfreeze.setUpdateTime(new Date());
-            profitUnfreeze.setId(idService.genId(TabId.p_profit_unfreeze));
-            profitUnfreezeMapper.insertSelective(profitUnfreeze);
+            profitUnfreeze.setFreezeStatus("4");
+            profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
+            throw new ProcessException("月分润解冻审批流启动失败!");
         }
+        BusActRel record = new BusActRel();
+        record.setBusId(profitUnfreeze.getId());
+        record.setActivId(proceId);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(userId);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType("月分润解冻申请");
+        record.setActivStatus(AgStatus.Approving.name());
+        try {
+            taskApprovalService.addABusActRel(record);
+            LOG.info("月分润解冻申请审批流启动成功");
+        } catch (Exception e) {
+            LOG.error("月分润解冻申请审批流启动失败{}");
+            profitUnfreeze.setUpdateTime(new Date());
+            profitUnfreeze.setFreezeStatus("4");
+            profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
+            throw new ProcessException("月分润解冻申请审批流启动失败!");
+        }
+
+        ProfitMonth profitMonth = new ProfitMonth();
+        profitMonth.setId(profitUnfreeze.getProfitId());
+        profitMonth.setStatus(ProfitStatus.STATUS_2.status.toString());
+        profitMonth.setRemark(profitUnfreeze.getRemark());
+        profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
     }
 }
