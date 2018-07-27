@@ -6,7 +6,6 @@ package com.ryx.credit.common.enumc;
  */
 public enum TabId {
 
-
     a_agent("AG%s%015d"),
     a_agent_colinfo("AC%s%015d"),
     a_agent_contract("AO%s%015d"),
@@ -41,10 +40,9 @@ public enum TabId {
     P_STAGING_DETAIL("P_STAGING_DETAIL%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
     P_DEDUCTION("P_DEDUCTION%s%015d"),
-    p_profir_detail("P_PROFIT_DETAIL_M%s%015d"),
-    p_profir_m("P_PROFIT_M%s%015d"),
-    p_profit_unfreeze("P_PROFIT_UNFREEZE%s%015d"),
-    p_profit_adjust("P_PA%s%015d");
+    p_profir_detail("PDE%s%015d"),
+    p_profir_m("PRM%s%015d"),
+    p_profit_unfreeze("UNF%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;
