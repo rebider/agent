@@ -23,25 +23,25 @@
         <activiti:executionListener event="end" class="com.ryx.credit.activity.task.RefundByStagesTaskExecutionListener"></activiti:executionListener>
       </extensionElements>
     </endEvent>
-    <userTask id="sid-A407481B-69A7-4BF2-A8DF-17845E491B0B" name="财务部" activiti:candidateGroups="finance">
+    <userTask id="sid-A407481B-69A7-4BF2-A8DF-17845E491B0B" name="客户拓展部" activiti:candidateGroups="expan">
       <extensionElements>
         <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.RefundByStagesTaskExecutionListener"></activiti:taskListener>
         <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.RefundByStagesTaskExecutionListener"></activiti:taskListener>
         <activiti:taskListener event="create" class="com.ryx.credit.activity.task.RefundByStagesTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="sid-4191C6FE-EA3F-4D79-AA11-D13E68354647" name="市场部审批" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-A407481B-69A7-4BF2-A8DF-17845E491B0B">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-57364038-AE1A-4FEE-A42C-EA3744216C8E" sourceRef="sid-A407481B-69A7-4BF2-A8DF-17845E491B0B" targetRef="sid-8758BC09-6E09-4DA3-825B-FD4800CFDB19"></sequenceFlow>
-    <sequenceFlow id="sid-A00D9E5B-0CC1-46CF-94CE-1A60EE588C56" name="财务部审批" sourceRef="sid-8758BC09-6E09-4DA3-825B-FD4800CFDB19" targetRef="sid-E8DA750B-2BE7-4151-8C25-514B2AA07692">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-6632BF3B-2217-469C-91CB-A3D57DAF9BA8" name="市场部拒绝" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='reject'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-FCB2E0A9-6AA7-4700-8386-B4C6FBF05A57" name="财务部拒绝" sourceRef="sid-8758BC09-6E09-4DA3-825B-FD4800CFDB19" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
+    <sequenceFlow id="sid-4191C6FE-EA3F-4D79-AA11-D13E68354647" name="市场部审批" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-A407481B-69A7-4BF2-A8DF-17845E491B0B">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-FCB2E0A9-6AA7-4700-8386-B4C6FBF05A57" name="拓展部拒绝" sourceRef="sid-8758BC09-6E09-4DA3-825B-FD4800CFDB19" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='reject'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-A00D9E5B-0CC1-46CF-94CE-1A60EE588C56" name="拓展部审批" sourceRef="sid-8758BC09-6E09-4DA3-825B-FD4800CFDB19" targetRef="sid-E8DA750B-2BE7-4151-8C25-514B2AA07692">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_refundByStages">
