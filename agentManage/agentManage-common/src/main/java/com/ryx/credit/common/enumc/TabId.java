@@ -43,7 +43,7 @@ public enum TabId {
     p_profir_detail("PDE%s%015d"),
     p_profir_m("PRM%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
-    p_profit_adjust("P_PA%s%015d");
+    p_profit_adjust("PPA%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;
