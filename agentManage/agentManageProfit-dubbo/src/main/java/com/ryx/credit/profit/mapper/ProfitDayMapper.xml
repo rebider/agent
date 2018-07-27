@@ -69,6 +69,12 @@
     from P_PROFIT_D
     <where>
       1=1
+      <if test='null!= agentName and agentName !="" '>
+        AND AGENT_NAME = #{agentName}
+      </if>
+      <if test='null!= agentPid and agentPid !="" '>
+        AND AGENT_PID = #{agentPid}
+      </if>
       <if test='null!= transDate and transDate !="" '>
         AND TRANS_DATE = #{transDate}
       </if>
