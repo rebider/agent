@@ -41,6 +41,26 @@ public class ProfitMonth implements Serializable{
 
     private String remark;
 
+    private String profitDateStart;
+
+    private String profitDateEnd;
+
+    public String getProfitDateStart() {
+        return profitDateStart;
+    }
+
+    public void setProfitDateStart(String profitDateStart) {
+        this.profitDateStart = profitDateStart;
+    }
+
+    public String getProfitDateEnd() {
+        return profitDateEnd;
+    }
+
+    public void setProfitDateEnd(String profitDateEnd) {
+        this.profitDateEnd = profitDateEnd;
+    }
+
     public String getId() {
         return id;
     }

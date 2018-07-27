@@ -52,13 +52,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(profitMonth.getAgentId())){
             criteria.andAgentIdEqualTo(profitMonth.getAgentId());
         }
-        if(StringUtils.isNotBlank(profitMonth.getProfitDate())){
-            criteria.andProfitDateEqualTo(profitMonth.getProfitDate());
-        }
         if(StringUtils.isNotBlank(profitMonth.getStatus())){
             criteria.andStatusEqualTo(profitMonth.getStatus());
         } else {
             criteria.andStatusNotEqualTo("0");
+        }
+        if(StringUtils.isNotBlank(profitMonth.getProfitDateStart())&& StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
+            criteria.andProfitDateBetween(profitMonth.getProfitDateStart(),profitMonth.getProfitDateEnd());
+        } else if(StringUtils.isNotBlank(profitMonth.getProfitDateStart())){
+            criteria.andProfitDateEqualTo(profitMonth.getProfitDateStart());
+        } else if(StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
+            criteria.andProfitDateEqualTo(profitMonth.getProfitDateEnd());
         }
         return profitMonthExample;
     }
