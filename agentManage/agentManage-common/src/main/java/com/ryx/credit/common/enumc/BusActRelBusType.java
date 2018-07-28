@@ -10,6 +10,7 @@ public enum BusActRelBusType {
     DC_Agent("代理商修改"),
     DC_Colinfo("代理商账户修改申请"),
     ORDER("订单审批"),
+    STAGING("退单分期"),
     PkType("订单补款");
     public String  msg;
 

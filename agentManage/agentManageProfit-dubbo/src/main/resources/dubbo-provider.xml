@@ -20,4 +20,10 @@
     <dubbo:service interface="com.ryx.credit.profit.service.IProfitDService" ref="iProfitDService"  timeout="1200000" registry="${zk.group}"  />
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitDeductionService" ref="profitDeductionServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.StagingService" ref="stagingServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ProfitSettleErrLsService" ref="profitSettleErrLsServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+
+    <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.TaskApprovalService" id="taskApprovalService"  timeout="1200000" registry="${zk.group}"/>
+
 </beans>

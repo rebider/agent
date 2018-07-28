@@ -1,20 +1,24 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
 import com.ryx.credit.profit.dao.ProfitStagingMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
 import com.ryx.credit.profit.exceptions.StagingException;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitStaging;
-import com.ryx.credit.profit.pojo.ProfitStagingDetail;
-import com.ryx.credit.profit.pojo.ProfitStagingDetailExample;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.StagingService;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -50,6 +55,12 @@ public class StagingServiceImpl implements StagingService {
     @Autowired
     private ProfitStagingDetailMapper profitStagingDetailMapper;
 
+    @Autowired
+    private ActivityService activityService;
+
+    @Autowired
+    private TaskApprovalService taskApprovalService;
+
     @Override
     public PageInfo getStagingList(ProfitStaging profitStaging, Page page) {
         return null;
@@ -66,9 +77,12 @@ public class StagingServiceImpl implements StagingService {
         LOG.info("分期id："+profitStagingDetail.getStagId());
         if (StringUtils.isNotBlank(profitStagingDetail.getStagId())) {
             criteria.andStagIdEqualTo(profitStagingDetail.getStagId());
-            profitDeductions = profitStagingDetailMapper.selectByExample(example);
-            total = profitStagingDetailMapper.countByExample(example);
+        }else if (StringUtils.isNotBlank(profitStagingDetail.getSourceId())){
+            criteria.andSourceIdEqualTo(profitStagingDetail.getSourceId());
         }
+        example.setOrderByClause("DEDUCTION_DATE");
+        profitDeductions = profitStagingDetailMapper.selectByExample(example);
+        total = profitStagingDetailMapper.countByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
         pageInfo.setTotal(total);
@@ -85,22 +99,67 @@ public class StagingServiceImpl implements StagingService {
     }
 
     @Override
+    public ProfitStaging getStagingBySourceId(String sourceId) {
+
+        ProfitStagingExample example = new ProfitStagingExample();
+        ProfitStagingExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(sourceId)) {
+            criteria.andSourceIdEqualTo(sourceId);
+            List<ProfitStaging> stags = profitStagingMapper.selectByExample(example);
+            if (stags != null && stags.size() > 0) {
+                return stags.get(0);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 删除分期
+     * @param id 分期id
+     */
+    private void deleteStaging(String id) {
+        LOG.info("删除审核拒绝的分期，id："+id);
+        ProfitStagingExample example = new ProfitStagingExample();
+        ProfitStagingExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(id)){
+            criteria.andIdEqualTo(id);
+        } else {
+            LOG.error("删除分期失败。");
+            throw new StagingException("删除失败");
+        }
+        profitStagingMapper.deleteByExample(example);
+    }
+
+    /**
+     * 删除分期
+     * @param stagId 分期id
+     */
+    private void deleteStagDetail(String stagId) {
+        LOG.info("删除审核拒绝的分期明细，id："+stagId);
+        ProfitStagingDetailExample example = new ProfitStagingDetailExample();
+        ProfitStagingDetailExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(stagId)){
+            criteria.andStagIdEqualTo(stagId);
+        } else {
+            LOG.error("删除审核拒绝的分期明细失败。");
+            throw new StagingException("删除审核拒绝的分期明细失败");
+        }
+        profitStagingDetailMapper.deleteByExample(example);
+    }
+
+    @Override
     public void addStaging(ProfitStaging profitStaging) {
         LOG.info("新建分期");
         try {
-            if (profitStaging.getSumAmt()== null || StringUtils.isBlank(profitStaging.getSumAmt().toString())) {
-                throw new StagingException("分期总金额不能为空");
-            }
-            if (profitStaging.getStagCount()==null || StringUtils.isBlank(profitStaging.getStagCount().toString())) {
-                throw new StagingException("分期期数不能为空");
-            }
-            if (profitStaging.getSourceId()==null || StringUtils.isBlank(profitStaging.getSourceId())) {
-                throw new StagingException("分期原始产品流水不能为空");
-            }
-            // 增加扣款分期状态为分期审核中
+            validate(profitStaging);
             profitDeductionServiceImpl.updateStagingStatusById(profitStaging.getSourceId(), DeductionStatus.UNREVIEWED.getStatus());
             profitStaging.setId(idService.genId(TabId.P_STAGING));
             profitStagingMapper.insert(profitStaging);
+            startActivity(profitStaging);
+            // 增加扣款分期状态为分期审核中
+            LOG.info("生成分期明细");
+            splitStaging(profitStaging);
         }catch (StagingException e){
             LOG.error(e.getMessage());
             e.printStackTrace();
@@ -110,10 +169,104 @@ public class StagingServiceImpl implements StagingService {
             e.printStackTrace();
             throw new StagingException("新建分期失败");
         }
-
-        LOG.info("生成分期明细");
-        splitStaging(profitStaging);
     }
+
+    /**
+     * 校验参数
+     * @param profitStaging 分期对象
+     */
+    private void validate(ProfitStaging profitStaging) {
+        if (profitStaging.getSumAmt()== null || StringUtils.isBlank(profitStaging.getSumAmt().toString())) {
+            throw new StagingException("分期总金额不能为空");
+        }
+        if (profitStaging.getStagCount()==null || StringUtils.isBlank(profitStaging.getStagCount().toString())) {
+            throw new StagingException("分期期数不能为空");
+        }
+        if (profitStaging.getSourceId()==null || StringUtils.isBlank(profitStaging.getSourceId())) {
+            throw new StagingException("分期原始产品流水不能为空");
+        }
+        ProfitDeduction profitDeduction = profitDeductionServiceImpl.getProfitDeductionById(profitStaging.getSourceId());
+        if (profitDeduction==null) {
+            throw new StagingException("分期原始产品不存在");
+        }
+        if (profitDeduction==null) {
+            throw new StagingException("分期原始产品不存在");
+        }
+        if (!"0".equals(profitDeduction.getStagingStatus())) {
+            throw new StagingException("已经存在分期");
+        }
+    }
+
+    /**
+     *启动审批流
+     * @param  profitStaging 分期对象
+     */
+    private void startActivity(ProfitStaging profitStaging) {
+            //启动审批
+            String proceId = activityService.createDeloyFlow(null, "refundByStages", null, null, null);
+            if (proceId == null) {
+                LOG.error("审批流启动失败{}");
+                throw new ProcessException("审批流启动失败!");
+            }
+            addABusActRel(profitStaging,proceId);
+
+    }
+
+    @Override
+    public void completeTaskEnterActivity(String insid, String status) throws ProcessException {
+
+        BusActRel busActRel = new BusActRel();
+        busActRel.setActivId(insid);
+        try {
+
+            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            if (rel != null) {
+                ProfitStaging staging = getStagingById(rel.getBusId());
+                String deductionStatus = DeductionStatus.PASS.getStatus();
+                rel.setStatus(Status.STATUS_2.status);
+                //拒绝
+                if ("reject_end".equals(status)) {
+                    LOG.info("1.更新扣款分期状态为审核不通过");
+                    deductionStatus = DeductionStatus.UN_PASS.getStatus();
+                    rel.setStatus(Status.STATUS_3.status);
+                    LOG.info("2.删除分期");
+                    deleteStaging(staging.getId());
+                    LOG.info("3.删除分期明细");
+                   deleteStagDetail(staging.getId());
+                }
+                profitDeductionServiceImpl.updateStagingStatusById(staging.getSourceId(), deductionStatus);
+                LOG.info("更新审批流与业务对象");
+
+                taskApprovalService.updateABusActRel(rel);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 审批流与业务关联对象
+     * @param profitStaging 分期对象
+     * @param proce 审批实例
+     */
+    private void addABusActRel(ProfitStaging profitStaging, String proce) {
+        BusActRel record = new BusActRel();
+        record.setBusId(profitStaging.getId());
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(profitStaging.getUserId());
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.STAGING.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        try {
+            taskApprovalService.addABusActRel(record);
+        } catch (Exception e) {
+            LOG.error("审批流启动失败{}");
+            throw new ProcessException("审批流启动失败!");
+        }
+    }
+
 
     /**
      * 按照分期信息对金额进行生成分期明细
@@ -122,10 +275,10 @@ public class StagingServiceImpl implements StagingService {
     private void splitStaging(ProfitStaging profitStaging) {
         ProfitStagingDetail detail = null;
         LocalDate date = LocalDate.now();
-        BigDecimal mustAmt = profitStaging.getSumAmt().divide(profitStaging.getStagCount());
-        int stagCount = profitStaging.getStagCount().intValue();
         // 对分期生成明细
         try{
+            int stagCount = profitStaging.getStagCount().intValue();
+            BigDecimal mustAmt = profitStaging.getSumAmt().divide(profitStaging.getStagCount(), 2, BigDecimal.ROUND_HALF_EVEN);
             for (int i=1; i<=stagCount; i++){
                 detail = new ProfitStagingDetail();
                 detail.setId(idService.genId(TabId.P_STAGING_DETAIL));
