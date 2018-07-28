@@ -3,6 +3,7 @@ package com.ryx.credit.activity.task;
 import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.agent.DataChangeActivityService;
 import com.ryx.credit.spring.MySpringContextHandler;
@@ -37,15 +38,16 @@ public class ThawTaskExecutionListener implements TaskListener, ExecutionListene
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            ProfitMonthService profitMonthService = (ProfitMonthService) MySpringContextHandler.applicationContext.getBean("profitMonthService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
             //审批同意更新数据库
-            if ("finish_end".equals(activityName)) {
+           else if ("finish_end".equals(activityName)) {
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
+            profitMonthService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), activityName);
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         }

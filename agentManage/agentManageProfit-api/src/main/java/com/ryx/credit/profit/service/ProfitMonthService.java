@@ -81,4 +81,21 @@ public interface ProfitMonthService {
      * @param profitUnfreeze
      */
     public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId) throws ProcessException;
+
+    /**
+     * @author zhaodw
+     * @param id 解冻审批对象id 不能为空
+     * @return 解冻审批对象
+     */
+    ProfitUnfreeze getProfitUnfreezeById(String id);
+
+    /**
+     *
+     * 功能描述: 任务完成执行业务接口方法
+     *
+     * @param: insid 流程实例id status 状态
+     * @auther: zhaodw
+     * @date: 2018/7/28
+     */
+    void completeTaskEnterActivity(String insid, String status );
 }

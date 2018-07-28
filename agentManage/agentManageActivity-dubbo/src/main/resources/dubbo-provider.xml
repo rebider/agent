@@ -25,6 +25,8 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.DataChangeActivityService" id="dataChangeActivityService"   timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OSupplementService" id="oSupplementService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OrderService" id="orderService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.profit.service.StagingService" id="stagingServiceImpl"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.profit.service.ProfitMonthService" id="profitMonthService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
 
 </beans>

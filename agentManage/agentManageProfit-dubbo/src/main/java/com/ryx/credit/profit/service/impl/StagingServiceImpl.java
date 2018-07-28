@@ -222,25 +222,27 @@ public class StagingServiceImpl implements StagingService {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 ProfitStaging staging = getStagingById(rel.getBusId());
-                String deductionStatus = DeductionStatus.PASS.getStatus();
-                rel.setStatus(Status.STATUS_2.status);
-                //拒绝
-                if ("reject_end".equals(status)) {
-                    LOG.info("1.更新扣款分期状态为审核不通过");
-                    deductionStatus = DeductionStatus.UN_PASS.getStatus();
-                    rel.setStatus(Status.STATUS_3.status);
-                    LOG.info("2.删除分期");
-                    deleteStaging(staging.getId());
-                    LOG.info("3.删除分期明细");
-                   deleteStagDetail(staging.getId());
+                if (staging !=null) {
+                    String deductionStatus = DeductionStatus.PASS.getStatus();
+                    rel.setStatus(Status.STATUS_2.status);
+                    //拒绝
+                    if ("reject_end".equals(status)) {
+                        LOG.info("1.更新扣款分期状态为审核不通过");
+                        deductionStatus = DeductionStatus.UN_PASS.getStatus();
+                        rel.setStatus(Status.STATUS_3.status);
+                        LOG.info("2.删除分期");
+                        deleteStaging(staging.getId());
+                        LOG.info("3.删除分期明细");
+                        deleteStagDetail(staging.getId());
+                    }
+                    profitDeductionServiceImpl.updateStagingStatusById(staging.getSourceId(), deductionStatus);
+                    LOG.info("更新审批流与业务对象");
+                    taskApprovalService.updateABusActRel(rel);
                 }
-                profitDeductionServiceImpl.updateStagingStatusById(staging.getSourceId(), deductionStatus);
-                LOG.info("更新审批流与业务对象");
-
-                taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {
             e.printStackTrace();
+            LOG.info("任务执行完成处理业务逻辑报错。");
         }
 
     }

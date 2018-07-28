@@ -1,9 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.ProfitStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -11,6 +8,7 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
+import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
@@ -151,6 +149,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitUnfreeze;
     }
 
+
+
     /**
      * 事务控制
      * 月分润解冻审批流
@@ -172,7 +172,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         record.setActivId(proceId);
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(userId);
-        record.setBusType("分润解冻申请");
+        record.setBusType(BusActRelBusType.THAW.name());
         try {
             taskApprovalService.addABusActRel(record);
             LOG.info("月分润解冻申请审批流启动成功");
@@ -189,5 +189,51 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitMonth.setStatus(ProfitStatus.STATUS_2.status.toString());
         profitMonth.setRemark(profitUnfreeze.getRemark());
         profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+    }
+
+    @Override
+    public ProfitUnfreeze getProfitUnfreezeById(String id) {
+        if (StringUtils.isNotBlank(id)) {
+           return profitUnfreezeMapper.selectByPrimaryKey(id);
+        }
+        return null;
+    }
+
+    @Override
+    public void completeTaskEnterActivity(String insid, String status) {
+        BusActRel busActRel = new BusActRel();
+        busActRel.setActivId(insid);
+        try {
+
+            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            if (rel != null) {
+                ProfitUnfreeze profitUnfreeze = getProfitUnfreezeById(rel.getBusId());
+                if (profitUnfreeze != null) {
+                    String profitStatus = "4";
+                    String thawStatus = "1";
+                    rel.setStatus(Status.STATUS_2.status);
+                    //拒绝
+                    if ("reject_end".equals(status)) {
+                        profitStatus = "3";
+                        thawStatus = "2";
+                        rel.setStatus(Status.STATUS_3.status);
+                    }
+                    LOG.info("1.更新分润状态为解冻失败");
+                    ProfitMonth profitMonth = new ProfitMonth();
+                    profitMonth.setId(profitUnfreeze.getProfitId());
+                    profitMonth.setStatus(profitStatus);
+                    profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+                    LOG.info("2.更新解冻审批对象解冻拒绝");
+                    profitUnfreeze.setUpdateTime(new Date());
+                    profitUnfreeze.setFreezeStatus(thawStatus);
+                    profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
+
+                    LOG.info("3更新审批流与业务对象");
+                    taskApprovalService.updateABusActRel(rel);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
