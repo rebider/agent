@@ -1,5 +1,8 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OSubOrder;
 
 import java.math.BigDecimal;
@@ -16,5 +19,6 @@ public interface CompensateService {
 
     BigDecimal calculatePriceDiff(String subOrderId,String oldActivityId,String activityId,BigDecimal proNum);
 
+    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
 }
 

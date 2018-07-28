@@ -968,6 +968,66 @@ public class ORefundPriceDiffDetailExample {
             return (Criteria) this;
         }
 
+        public Criteria andFrontPriceIsNull() {
+            addCriterion("FRONT_PRICE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceIsNotNull() {
+            addCriterion("FRONT_PRICE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceEqualTo(BigDecimal value) {
+            addCriterion("FRONT_PRICE =", value, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceNotEqualTo(BigDecimal value) {
+            addCriterion("FRONT_PRICE <>", value, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceGreaterThan(BigDecimal value) {
+            addCriterion("FRONT_PRICE >", value, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FRONT_PRICE >=", value, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceLessThan(BigDecimal value) {
+            addCriterion("FRONT_PRICE <", value, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FRONT_PRICE <=", value, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceIn(List<BigDecimal> values) {
+            addCriterion("FRONT_PRICE in", values, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceNotIn(List<BigDecimal> values) {
+            addCriterion("FRONT_PRICE not in", values, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FRONT_PRICE between", value1, value2, "frontPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrontPriceNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FRONT_PRICE not between", value1, value2, "frontPrice");
+            return (Criteria) this;
+        }
+
         public Criteria andPriceIsNull() {
             addCriterion("PRICE is null");
             return (Criteria) this;

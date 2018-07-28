@@ -14,6 +14,7 @@
     <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
     <result column="ACTIVITY_WAY" jdbcType="VARCHAR" property="activityWay" />
     <result column="ACTIVITY_RULE" jdbcType="VARCHAR" property="activityRule" />
+    <result column="FRONT_PRICE" jdbcType="DECIMAL" property="frontPrice" />
     <result column="PRICE" jdbcType="DECIMAL" property="price" />
     <result column="S_TIME" jdbcType="TIMESTAMP" property="sTime" />
     <result column="BEGIN_SN" jdbcType="VARCHAR" property="beginSn" />
@@ -58,9 +59,9 @@
   </sql>
   <sql id="Base_Column_List">
     ID, SUB_ORDER_ID, AGENT_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
-    ORDER_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, PRICE,
-    S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
-    VERSION
+    ORDER_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, FRONT_PRICE,
+    PRICE, S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER,
+    STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,20 +96,20 @@
     ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
     ORDER_ID, PRO_NAME, CHANGE_COUNT,
     ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE,
-    PRICE, S_TIME, BEGIN_SN,
-    END_SN, VENDER, PRO_MODEL,
-    C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, VERSION
-    )
+    FRONT_PRICE, PRICE, S_TIME,
+    BEGIN_SN, END_SN, VENDER,
+    PRO_MODEL, C_TIME, U_TIME,
+    C_USER, U_USER, STATUS,
+    VERSION)
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
     #{orderId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
     #{activityName,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR},
-    #{price,jdbcType=DECIMAL}, #{sTime,jdbcType=TIMESTAMP}, #{beginSn,jdbcType=VARCHAR},
-    #{endSn,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR},
-    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-    )
+    #{frontPrice,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, #{sTime,jdbcType=TIMESTAMP},
+    #{beginSn,jdbcType=VARCHAR}, #{endSn,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR},
+    #{proModel,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -148,6 +149,9 @@
       </if>
       <if test="activityRule != null">
         ACTIVITY_RULE,
+      </if>
+      <if test="frontPrice != null">
+        FRONT_PRICE,
       </if>
       <if test="price != null">
         PRICE,
@@ -222,6 +226,9 @@
       </if>
       <if test="activityRule != null">
         #{activityRule,jdbcType=VARCHAR},
+      </if>
+      <if test="frontPrice != null">
+        #{frontPrice,jdbcType=DECIMAL},
       </if>
       <if test="price != null">
         #{price,jdbcType=DECIMAL},
@@ -303,6 +310,9 @@
       <if test="activityRule != null">
         ACTIVITY_RULE = #{activityRule,jdbcType=VARCHAR},
       </if>
+      <if test="frontPrice != null">
+        FRONT_PRICE = #{frontPrice,jdbcType=DECIMAL},
+      </if>
       <if test="price != null">
         PRICE = #{price,jdbcType=DECIMAL},
       </if>
@@ -355,6 +365,7 @@
     ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
     ACTIVITY_WAY = #{activityWay,jdbcType=VARCHAR},
     ACTIVITY_RULE = #{activityRule,jdbcType=VARCHAR},
+    FRONT_PRICE = #{frontPrice,jdbcType=DECIMAL},
     PRICE = #{price,jdbcType=DECIMAL},
     S_TIME = #{sTime,jdbcType=TIMESTAMP},
     BEGIN_SN = #{beginSn,jdbcType=VARCHAR},

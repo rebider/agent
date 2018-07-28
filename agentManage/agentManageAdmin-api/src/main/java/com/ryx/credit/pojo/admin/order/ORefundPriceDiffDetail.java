@@ -29,6 +29,8 @@ public class ORefundPriceDiffDetail implements Serializable{
 
     private String activityRule;
 
+    private BigDecimal frontPrice;
+
     private BigDecimal price;
 
     private Date sTime;
@@ -147,6 +149,14 @@ public class ORefundPriceDiffDetail implements Serializable{
 
     public void setActivityRule(String activityRule) {
         this.activityRule = activityRule == null ? null : activityRule.trim();
+    }
+
+    public BigDecimal getFrontPrice() {
+        return frontPrice;
+    }
+
+    public void setFrontPrice(BigDecimal frontPrice) {
+        this.frontPrice = frontPrice;
     }
 
     public BigDecimal getPrice() {
