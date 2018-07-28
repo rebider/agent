@@ -3,6 +3,7 @@ package com.ryx.credit.pojo.admin.vo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
+import com.ryx.credit.pojo.admin.order.OPayment;
 
 import java.io.Serializable;
 import java.util.List;
@@ -32,6 +33,8 @@ public class AgentVo implements Serializable{
     private String orderAprDept;
 
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
+    //付款单
+    private OPayment oPayment;
 
     public Agent getAgent() {
         return agent;
@@ -152,6 +155,14 @@ public class AgentVo implements Serializable{
 
     public void setOrderAprDept(String orderAprDept) {
         this.orderAprDept = orderAprDept;
+    }
+
+    public OPayment getoPayment() {
+        return oPayment;
+    }
+
+    public void setoPayment(OPayment oPayment) {
+        this.oPayment = oPayment;
     }
 
     public List<ORefundPriceDiffDetail> getRefundPriceDiffDetailList() {
