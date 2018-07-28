@@ -4,23 +4,28 @@
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="SUB_ORDER_ID" jdbcType="VARCHAR" property="subOrderId" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="ACTIVITY_FRONT_ID" jdbcType="VARCHAR" property="activityFrontId" />
     <result column="ACTIVITY_REAL_ID" jdbcType="VARCHAR" property="activityRealId" />
     <result column="REFUND_PRICE_DIFF_ID" jdbcType="VARCHAR" property="refundPriceDiffId" />
     <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
+    <result column="CHANGE_COUNT" jdbcType="DECIMAL" property="changeCount" />
+    <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
+    <result column="ACTIVITY_WAY" jdbcType="VARCHAR" property="activityWay" />
+    <result column="ACTIVITY_RULE" jdbcType="VARCHAR" property="activityRule" />
+    <result column="PRICE" jdbcType="DECIMAL" property="price" />
     <result column="S_TIME" jdbcType="TIMESTAMP" property="sTime" />
+    <result column="BEGIN_SN" jdbcType="VARCHAR" property="beginSn" />
+    <result column="END_SN" jdbcType="VARCHAR" property="endSn" />
+    <result column="VENDER" jdbcType="VARCHAR" property="vender" />
+    <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel" />
     <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="CHANGE_COUNT" jdbcType="DECIMAL" property="changeCount" />
-    <result column="BEGIN_SN" jdbcType="VARCHAR" property="beginSn" />
-    <result column="END_SN" jdbcType="VARCHAR" property="endSn" />
-    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
-    <result column="VENDER" jdbcType="VARCHAR" property="vender" />
-    <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -52,9 +57,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID,
-    S_TIME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, CHANGE_COUNT, BEGIN_SN,
-    END_SN, AGENT_ID, VENDER, PRO_MODEL
+    ID, SUB_ORDER_ID, AGENT_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
+    ORDER_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, PRICE,
+    S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
+    VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -85,20 +91,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
-    insert into O_REFUND_PRICE_DIFF_DETAIL (ID, SUB_ORDER_ID, ACTIVITY_FRONT_ID,
-    ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID, ORDER_ID,
-    S_TIME, C_TIME, U_TIME,
-    C_USER, U_USER, STATUS,
-    VERSION, CHANGE_COUNT, BEGIN_SN,
-    END_SN, AGENT_ID, VENDER,
-    PRO_MODEL)
-    values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{activityFrontId,jdbcType=VARCHAR},
-    #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
-    #{sTime,jdbcType=TIMESTAMP}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
-    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{changeCount,jdbcType=DECIMAL}, #{beginSn,jdbcType=VARCHAR},
-    #{endSn,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR},
-    #{proModel,jdbcType=VARCHAR})
+    insert into O_REFUND_PRICE_DIFF_DETAIL (ID, SUB_ORDER_ID, AGENT_ID,
+    ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
+    ORDER_ID, PRO_NAME, CHANGE_COUNT,
+    ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE,
+    PRICE, S_TIME, BEGIN_SN,
+    END_SN, VENDER, PRO_MODEL,
+    C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION
+    )
+    values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+    #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
+    #{orderId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
+    #{activityName,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR},
+    #{price,jdbcType=DECIMAL}, #{sTime,jdbcType=TIMESTAMP}, #{beginSn,jdbcType=VARCHAR},
+    #{endSn,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -108,6 +118,9 @@
       </if>
       <if test="subOrderId != null">
         SUB_ORDER_ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
       </if>
       <if test="activityFrontId != null">
         ACTIVITY_FRONT_ID,
@@ -121,8 +134,38 @@
       <if test="orderId != null">
         ORDER_ID,
       </if>
+      <if test="proName != null">
+        PRO_NAME,
+      </if>
+      <if test="changeCount != null">
+        CHANGE_COUNT,
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME,
+      </if>
+      <if test="activityWay != null">
+        ACTIVITY_WAY,
+      </if>
+      <if test="activityRule != null">
+        ACTIVITY_RULE,
+      </if>
+      <if test="price != null">
+        PRICE,
+      </if>
       <if test="sTime != null">
         S_TIME,
+      </if>
+      <if test="beginSn != null">
+        BEGIN_SN,
+      </if>
+      <if test="endSn != null">
+        END_SN,
+      </if>
+      <if test="vender != null">
+        VENDER,
+      </if>
+      <if test="proModel != null">
+        PRO_MODEL,
       </if>
       <if test="cTime != null">
         C_TIME,
@@ -142,24 +185,6 @@
       <if test="version != null">
         VERSION,
       </if>
-      <if test="changeCount != null">
-        CHANGE_COUNT,
-      </if>
-      <if test="beginSn != null">
-        BEGIN_SN,
-      </if>
-      <if test="endSn != null">
-        END_SN,
-      </if>
-      <if test="agentId != null">
-        AGENT_ID,
-      </if>
-      <if test="vender != null">
-        VENDER,
-      </if>
-      <if test="proModel != null">
-        PRO_MODEL,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -167,6 +192,9 @@
       </if>
       <if test="subOrderId != null">
         #{subOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
       </if>
       <if test="activityFrontId != null">
         #{activityFrontId,jdbcType=VARCHAR},
@@ -180,8 +208,38 @@
       <if test="orderId != null">
         #{orderId,jdbcType=VARCHAR},
       </if>
+      <if test="proName != null">
+        #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="changeCount != null">
+        #{changeCount,jdbcType=DECIMAL},
+      </if>
+      <if test="activityName != null">
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityWay != null">
+        #{activityWay,jdbcType=VARCHAR},
+      </if>
+      <if test="activityRule != null">
+        #{activityRule,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
       <if test="sTime != null">
         #{sTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="beginSn != null">
+        #{beginSn,jdbcType=VARCHAR},
+      </if>
+      <if test="endSn != null">
+        #{endSn,jdbcType=VARCHAR},
+      </if>
+      <if test="vender != null">
+        #{vender,jdbcType=VARCHAR},
+      </if>
+      <if test="proModel != null">
+        #{proModel,jdbcType=VARCHAR},
       </if>
       <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
@@ -201,24 +259,6 @@
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
       </if>
-      <if test="changeCount != null">
-        #{changeCount,jdbcType=DECIMAL},
-      </if>
-      <if test="beginSn != null">
-        #{beginSn,jdbcType=VARCHAR},
-      </if>
-      <if test="endSn != null">
-        #{endSn,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="vender != null">
-        #{vender,jdbcType=VARCHAR},
-      </if>
-      <if test="proModel != null">
-        #{proModel,jdbcType=VARCHAR},
-      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultType="java.lang.Long">
@@ -233,6 +273,9 @@
       <if test="subOrderId != null">
         SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
       </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
       <if test="activityFrontId != null">
         ACTIVITY_FRONT_ID = #{activityFrontId,jdbcType=VARCHAR},
       </if>
@@ -245,8 +288,38 @@
       <if test="orderId != null">
         ORDER_ID = #{orderId,jdbcType=VARCHAR},
       </if>
+      <if test="proName != null">
+        PRO_NAME = #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="changeCount != null">
+        CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityWay != null">
+        ACTIVITY_WAY = #{activityWay,jdbcType=VARCHAR},
+      </if>
+      <if test="activityRule != null">
+        ACTIVITY_RULE = #{activityRule,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null">
+        PRICE = #{price,jdbcType=DECIMAL},
+      </if>
       <if test="sTime != null">
         S_TIME = #{sTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="beginSn != null">
+        BEGIN_SN = #{beginSn,jdbcType=VARCHAR},
+      </if>
+      <if test="endSn != null">
+        END_SN = #{endSn,jdbcType=VARCHAR},
+      </if>
+      <if test="vender != null">
+        VENDER = #{vender,jdbcType=VARCHAR},
+      </if>
+      <if test="proModel != null">
+        PRO_MODEL = #{proModel,jdbcType=VARCHAR},
       </if>
       <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
@@ -266,47 +339,34 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
-      <if test="changeCount != null">
-        CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
-      </if>
-      <if test="beginSn != null">
-        BEGIN_SN = #{beginSn,jdbcType=VARCHAR},
-      </if>
-      <if test="endSn != null">
-        END_SN = #{endSn,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="vender != null">
-        VENDER = #{vender,jdbcType=VARCHAR},
-      </if>
-      <if test="proModel != null">
-        PRO_MODEL = #{proModel,jdbcType=VARCHAR},
-      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     update O_REFUND_PRICE_DIFF_DETAIL
     set SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
     ACTIVITY_FRONT_ID = #{activityFrontId,jdbcType=VARCHAR},
     ACTIVITY_REAL_ID = #{activityRealId,jdbcType=VARCHAR},
     REFUND_PRICE_DIFF_ID = #{refundPriceDiffId,jdbcType=VARCHAR},
     ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    PRO_NAME = #{proName,jdbcType=VARCHAR},
+    CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
+    ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+    ACTIVITY_WAY = #{activityWay,jdbcType=VARCHAR},
+    ACTIVITY_RULE = #{activityRule,jdbcType=VARCHAR},
+    PRICE = #{price,jdbcType=DECIMAL},
     S_TIME = #{sTime,jdbcType=TIMESTAMP},
+    BEGIN_SN = #{beginSn,jdbcType=VARCHAR},
+    END_SN = #{endSn,jdbcType=VARCHAR},
+    VENDER = #{vender,jdbcType=VARCHAR},
+    PRO_MODEL = #{proModel,jdbcType=VARCHAR},
     C_TIME = #{cTime,jdbcType=TIMESTAMP},
     U_TIME = #{uTime,jdbcType=TIMESTAMP},
     C_USER = #{cUser,jdbcType=VARCHAR},
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL},
-    CHANGE_COUNT = #{changeCount,jdbcType=DECIMAL},
-    BEGIN_SN = #{beginSn,jdbcType=VARCHAR},
-    END_SN = #{endSn,jdbcType=VARCHAR},
-    AGENT_ID = #{agentId,jdbcType=VARCHAR},
-    VENDER = #{vender,jdbcType=VARCHAR},
-    PRO_MODEL = #{proModel,jdbcType=VARCHAR}
+    VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
