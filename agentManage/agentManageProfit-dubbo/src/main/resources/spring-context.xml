@@ -30,6 +30,5 @@
     </aop:config>
     <!--<bean id="loginAuthFilter" class="com.ryx.common.filter.AuthFilter"></bean>-->
     <import resource="dubbo-provider.xml"/>
-    <import resource="dubbo-consumer.xml"/>
     <import resource="spring-redis.xml"/>
 </beans>
