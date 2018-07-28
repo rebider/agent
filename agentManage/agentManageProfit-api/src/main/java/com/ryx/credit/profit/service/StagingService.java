@@ -34,15 +34,29 @@ public interface StagingService {
 
 
     /**
-     * 获取扣款信息
+     * 获取扣款分期信息
      * @param id 不能为空
      * @return 扣款信息
      */
     ProfitStaging getStagingById(String id);
 
     /**
+     * 获取扣款分期信息
+     * @param sourceId 扣款id 不能为空
+     * @return 扣款信息
+     */
+    ProfitStaging getStagingBySourceId(String sourceId);
+
+    /**
      * 新增分期
      * @param profitStaging 分期对象
      */
     void addStaging(ProfitStaging profitStaging);
+
+    /**
+     * 流程结束修改业务数据
+     * @param insid 实例id
+     * @param status 状态
+     */
+    void completeTaskEnterActivity(String insid, String status);
 }

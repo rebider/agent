@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitSettleErrLs implements Serializable {
+    private static final long serialVersionUID = 5649240609380076449L;
     private String id;
 
     private String errCode;
@@ -11,6 +12,12 @@ public class ProfitSettleErrLs implements Serializable {
     private String tranLs;
 
     private String tranDate;
+
+
+    private String tranDateStart;
+
+
+    private String tranDateEnd;
 
     private String businessType;
 
@@ -451,5 +458,21 @@ public class ProfitSettleErrLs implements Serializable {
 
     public void setInstId(String instId) {
         this.instId = instId == null ? null : instId.trim();
+    }
+
+    public String getTranDateStart() {
+        return tranDateStart;
+    }
+
+    public void setTranDateStart(String tranDateStart) {
+        this.tranDateStart = tranDateStart;
+    }
+
+    public String getTranDateEnd() {
+        return tranDateEnd;
+    }
+
+    public void setTranDateEnd(String tranDateEnd) {
+        this.tranDateEnd = tranDateEnd;
     }
 }

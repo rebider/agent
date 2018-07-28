@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProfitSettleErrLsExample implements Serializable {
+    private static final long serialVersionUID = -1416172574072210214L;
     protected String orderByClause;
 
     protected boolean distinct;
