@@ -1,12 +1,15 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.impl.agent.AccountPaidItemServiceImpl;
@@ -44,6 +47,8 @@ public class CompensateServiceImpl implements CompensateService {
     private ORefundPriceDiffMapper refundPriceDiffMapper;
     @Autowired
     private ORefundPriceDiffDetailMapper refundPriceDiffDetailMapper;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
 
 
     @Override
@@ -153,7 +158,7 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String cUser){
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser){
 
         String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
         oRefundPriceDiff.setId(priceDiffId);
@@ -170,6 +175,25 @@ public class CompensateServiceImpl implements CompensateService {
         if(refundDiffInsert!=1){
             log.info("插入补退差价申请表异常");
             throw new ProcessException("系统异常");
+        }
+
+        //添加新的附件
+        if (refundPriceDiffFile != null) {
+            refundPriceDiffFile.forEach(fileId->{
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(fileId);
+                record.setSrcId(priceDiffId);
+                record.setcUser(cUser);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.ActivityEdit.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                int i = attachmentRelMapper.insertSelective(record);
+                if (1 != i) {
+                    log.info("活动变更附件关系失败");
+                    throw new ProcessException("系统异常");
+                }
+            });
         }
 
         refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
@@ -205,6 +229,8 @@ public class CompensateServiceImpl implements CompensateService {
             refundPriceDiffDetail.setcTime(nowDate);
             refundPriceDiffDetail.setuTime(nowDate);
             refundPriceDiffDetail.setsTime(nowDate);
+            refundPriceDiffDetail.setcUser(cUser);
+            refundPriceDiffDetail.setuUser(cUser);
             refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
             refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
             int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
