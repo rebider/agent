@@ -33,6 +33,7 @@ public enum DictGroup {
     BUS_SCOPE("业务范围"),
     //订单
     MODEL_TYPE("机具类型"),
+    MANUFACTURER("厂商"),
     PAYMENTSTATUS("分期计划状态"),
     PAYMENTTYPE("付款明细类型"),
     SETTLEMENT_TYPE("结算类型"),
