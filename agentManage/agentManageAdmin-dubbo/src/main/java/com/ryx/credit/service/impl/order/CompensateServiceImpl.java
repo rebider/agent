@@ -1,24 +1,26 @@
 package com.ryx.credit.service.impl.order;
 
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.order.OActivityMapper;
-import com.ryx.credit.dao.order.OLogisticsMapper;
-import com.ryx.credit.dao.order.OSubOrderActivityMapper;
-import com.ryx.credit.dao.order.OSubOrderMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.impl.agent.AccountPaidItemServiceImpl;
 import com.ryx.credit.service.order.CompensateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 补差价处理
@@ -36,6 +38,12 @@ public class CompensateServiceImpl implements CompensateService {
     private OSubOrderActivityMapper subOrderActivityMapper;
     @Autowired
     private OActivityMapper activityMapper;
+    @Autowired
+    private IdService idService;
+    @Autowired
+    private ORefundPriceDiffMapper refundPriceDiffMapper;
+    @Autowired
+    private ORefundPriceDiffDetailMapper refundPriceDiffDetailMapper;
 
 
     @Override
@@ -136,5 +144,75 @@ public class CompensateServiceImpl implements CompensateService {
         return sumPrice;
     }
 
+    /**
+     * save
+     * @param oRefundPriceDiff
+     * @param refundPriceDiffDetailList
+     * @param cUser
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList, String cUser){
 
+        String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
+        oRefundPriceDiff.setId(priceDiffId);
+        Date nowDate = new Date();
+        oRefundPriceDiff.setcTime(nowDate);
+        oRefundPriceDiff.setuTime(nowDate);
+        oRefundPriceDiff.setsTime(nowDate);
+        oRefundPriceDiff.setcUser(cUser);
+        oRefundPriceDiff.setuUser(cUser);
+        oRefundPriceDiff.setReviewStatus(AgStatus.Create.status);
+        oRefundPriceDiff.setStatus(Status.STATUS_1.status);
+        oRefundPriceDiff.setVersion(Status.STATUS_0.status);
+        int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
+        if(refundDiffInsert!=1){
+            log.info("插入补退差价申请表异常");
+            throw new ProcessException("系统异常");
+        }
+
+        refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
+            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+            OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
+            criteria.andSubOrderIdEqualTo(refundPriceDiffDetail.getSubOrderId());
+            criteria.andActivityIdEqualTo(refundPriceDiffDetail.getActivityFrontId());
+            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+            if(null==oSubOrderActivities){
+                log.info("查询oSubOrderActivities异常");
+                throw new ProcessException("系统异常");
+            }
+            if(oSubOrderActivities.size()!=1){
+                log.info("查询oSubOrderActivities.size()异常");
+                throw new ProcessException("系统异常");
+            }
+            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+            //变更后活动实体
+            OActivity oActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+            if(null==oActivity){
+                log.info("查询oActivity异常");
+                throw new ProcessException("系统异常");
+            }
+            refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_detail));
+            refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
+            refundPriceDiffDetail.setFrontPrice(oSubOrderActivity.getPrice());
+            refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
+            refundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
+            refundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
+            refundPriceDiffDetail.setPrice(oActivity.getPrice());
+            refundPriceDiffDetail.setVender(oActivity.getVender());
+            refundPriceDiffDetail.setProModel(oActivity.getProModel());
+            refundPriceDiffDetail.setcTime(nowDate);
+            refundPriceDiffDetail.setuTime(nowDate);
+            refundPriceDiffDetail.setsTime(nowDate);
+            refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
+            refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
+            int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
+            if(priceDiffDetailInsert!=1){
+                log.info("插入补退差价详情表异常");
+                throw new ProcessException("系统异常");
+            }
+        });
+        return AgentResult.ok();
+    }
 }

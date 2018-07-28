@@ -12,6 +12,7 @@ public enum AttachmentRelType {
     Business("业务"),
     Proceeds("收款"),
     Order("订单"),
+    ActivityEdit("活动变更附件"),
     Clear("结算附件");
 
     public String  msg;
