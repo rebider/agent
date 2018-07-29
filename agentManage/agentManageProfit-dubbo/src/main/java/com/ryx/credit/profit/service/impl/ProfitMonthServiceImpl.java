@@ -157,9 +157,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @param profitUnfreeze
      */
     @Override
-    public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId) throws ProcessException{
+    public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId, String workId) throws ProcessException{
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, "thaw", null, null, null);
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
         if (proceId == null) {
             LOG.error("月分润解冻审批流启动失败，代理商ID：{}", profitUnfreeze.getAgentId());
             profitUnfreeze.setUpdateTime(new Date());

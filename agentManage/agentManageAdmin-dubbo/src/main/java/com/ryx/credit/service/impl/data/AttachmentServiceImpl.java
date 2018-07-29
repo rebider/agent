@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.data;
 
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.service.data.AttachmentService;
 import com.ryx.credit.common.enumc.AttachmentRelType;
@@ -35,5 +36,13 @@ public class AttachmentServiceImpl implements AttachmentService {
         pageInfo.setRows(attachmentList);
         pageInfo.setTotal(attachmentMapper.getCount(map));
         return pageInfo;
+    }
+
+    @Override
+    public Attachment getAttachmentById(String id) {
+        if (StringUtils.isNotBlank(id)) {
+           return attachmentMapper.selectByPrimaryKey(id);
+        }
+        return null;
     }
 }

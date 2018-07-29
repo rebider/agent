@@ -10,4 +10,6 @@ import com.ryx.credit.pojo.admin.agent.AttachmentRel;
  */
 public interface AttachmentService {
     PageInfo selectAll(Page page, Attachment attachment,AttachmentRel attachmentRel);
+
+    Attachment getAttachmentById(String id);
 }

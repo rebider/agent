@@ -192,7 +192,7 @@ public class StagingServiceImpl implements StagingService {
         if (profitDeduction==null) {
             throw new StagingException("分期原始产品不存在");
         }
-        if (!"0".equals(profitDeduction.getStagingStatus())) {
+        if (!"0".equals(profitDeduction.getStagingStatus()) && !"4".equals(profitDeduction.getStagingStatus())) {
             throw new StagingException("已经存在分期");
         }
     }
