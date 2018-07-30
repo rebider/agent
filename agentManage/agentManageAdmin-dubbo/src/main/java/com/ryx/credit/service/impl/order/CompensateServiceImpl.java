@@ -3,19 +3,21 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.agent.BusActRelExample;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.impl.agent.AccountPaidItemServiceImpl;
 import com.ryx.credit.service.order.CompensateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ import java.util.*;
 @Service("compensateService")
 public class CompensateServiceImpl implements CompensateService {
 
-    private static Logger log = LoggerFactory.getLogger(AccountPaidItemServiceImpl.class);
+    private static Logger log = LoggerFactory.getLogger(CompensateServiceImpl.class);
     @Autowired
     private OLogisticsMapper logisticsMapper;
     @Autowired
@@ -318,6 +320,53 @@ public class CompensateServiceImpl implements CompensateService {
             throw new ProcessException("审批流启动失败:添加审批关系失败");
         }
 
+        return AgentResult.ok();
+    }
+
+
+    /**
+     * 处理任务
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
+        try {
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
+            if(!result.isOK()){
+                log.error(result.getMsg());
+                throw new ProcessException("工作流处理任务异常");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
+        }
+        return AgentResult.ok();
+    }
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus){
+
+        BusActRelExample example = new BusActRelExample();
+        example.or().andActivIdEqualTo(proIns).andActivStatusEqualTo(AgStatus.Approving.name());
+        List<BusActRel> list = busActRelMapper.selectByExample(example);
+        if (list.size() != 1) {
+            log.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
+            return null;
+        }
+        BusActRel rel = list.get(0);
+        ORefundPriceDiff oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(rel.getBusId());
+        if (null==oRefundPriceDiff) {
+            log.info("审批任务结束{}{}，ORefundPriceDiff为null", proIns, agStatus);
+            return null;
+        }
+        oRefundPriceDiff.setReviewStatus(agStatus);
+        oRefundPriceDiff.setuTime(new Date());
+        int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+        if(i!=1){
+            throw new ProcessException("更新退补差价数据申请失败");
+        }
         return AgentResult.ok();
     }
 }
