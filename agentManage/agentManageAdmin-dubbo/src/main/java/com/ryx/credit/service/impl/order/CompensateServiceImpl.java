@@ -3,6 +3,8 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
@@ -62,6 +64,23 @@ public class CompensateServiceImpl implements CompensateService {
     private ActivityService activityService;
     @Autowired
     private BusActRelMapper busActRelMapper;
+
+
+    @Override
+    public PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page){
+
+        ORefundPriceDiffExample example = new ORefundPriceDiffExample();
+        ORefundPriceDiffExample.Criteria criteria = example.createCriteria();
+
+        example.setPage(page);
+        List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(refundPriceDiffs);
+        long count = refundPriceDiffMapper.countByExample(example);
+        pageInfo.setTotal(new Long(count).intValue());
+        return pageInfo;
+    }
+
 
     @Override
     public OSubOrder getOrderMsgByExcel(List<Object> excelList){

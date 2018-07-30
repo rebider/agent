@@ -91,6 +91,7 @@ public class OrderServiceImpl implements OrderService {
         OOrderExample example = new OOrderExample();
         OOrderExample.Criteria criteria = example.createCriteria();
 
+        example.setPage(page);
         List<OOrder> oOrders = orderMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oOrders);

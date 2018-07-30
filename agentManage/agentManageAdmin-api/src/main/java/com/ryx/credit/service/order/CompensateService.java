@@ -1,6 +1,8 @@
 package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
@@ -14,6 +16,8 @@ import java.util.List;
  * Created by RYX on 2018/7/24.
  */
 public interface CompensateService {
+
+    PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page);
 
     OSubOrder getOrderMsgByExcel(List<Object> excelList);
 
