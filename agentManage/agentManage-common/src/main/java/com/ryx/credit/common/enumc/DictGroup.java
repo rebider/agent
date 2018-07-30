@@ -41,6 +41,7 @@ public enum DictGroup {
     ACT_ORDER("订单审批对应的启动流程"),
     ORDER_APR_MARKET("订单审批市场部参数"),
     ORDER_APR_BUSNISS("订单审批业务部参数"),
+    ACT_COMPENSATE("退补差价审批流名称"),
     TEMP_AGREE("协议模板"),
     ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型"),
