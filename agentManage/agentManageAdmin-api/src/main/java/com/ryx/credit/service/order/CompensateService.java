@@ -20,5 +20,7 @@ public interface CompensateService {
     BigDecimal calculatePriceDiff(String subOrderId,String oldActivityId,String activityId,BigDecimal proNum);
 
     AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
+
+    AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 }
 

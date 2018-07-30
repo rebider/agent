@@ -1,16 +1,19 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.impl.agent.AccountPaidItemServiceImpl;
 import com.ryx.credit.service.order.CompensateService;
@@ -49,7 +52,14 @@ public class CompensateServiceImpl implements CompensateService {
     private ORefundPriceDiffDetailMapper refundPriceDiffDetailMapper;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
-
+    @Autowired
+    private AgentEnterService agentEnterService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private BusActRelMapper busActRelMapper;
 
     @Override
     public OSubOrder getOrderMsgByExcel(List<Object> excelList){
@@ -239,6 +249,75 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("系统异常");
             }
         });
+        return AgentResult.ok(priceDiffId);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult startCompensateActiviy(String id, String cuser) throws Exception {
+
+        if (StringUtils.isBlank(id)) {
+            log.info("退补差价提交审批,订单ID为空{}:{}", id, cuser);
+            return AgentResult.fail("退补差价提交审批，订单ID为空");
+        }
+        if (StringUtils.isBlank(cuser)) {
+            log.info("退补差价提交审批,操作用户为空{}:{}", id, cuser);
+            return AgentResult.fail("退补差价审批中，操作用户为空");
+        }
+        //更新审批中
+        ORefundPriceDiff oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(id);
+        if (oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approving.name())) {
+            log.info("退补差价提交审批,禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("退补差价提交审批，禁止重复提交审批");
+        }
+
+        if (!oRefundPriceDiff.getStatus().equals(Status.STATUS_1.status)) {
+            log.info("退补差价提交审批,代理商信息已失效{}:{}", id, cuser);
+            return AgentResult.fail("退补差价信息已失效");
+        }
+
+        ORefundPriceDiff updateRefundPriceDiff = new ORefundPriceDiff();
+        updateRefundPriceDiff.setId(id);
+        updateRefundPriceDiff.setReviewStatus(AgStatus.Approving.status);
+        int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updateRefundPriceDiff);
+        if (1 != i) {
+            log.info("退补差价提交审批，更新订单基本信息失败{}:{}", id, cuser);
+            throw new ProcessException("退补差价提交审批，更新退补差价基本信息失败");
+        }
+
+        Map startPar = agentEnterService.startPar(cuser);
+        if (null == startPar) {
+            log.info("========用户{}{}启动部门参数为空", id, cuser);
+            throw new ProcessException("启动部门参数为空!");
+        }
+
+        //不同的业务类型找到不同的启动流程
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_COMPENSATE.name());
+        String workId = null;
+        for (Dict dict : actlist) {
+            workId = dict.getdItemvalue();
+        }
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        if (proce == null) {
+            log.info("退补差价提交审批，审批流启动失败{}:{}", id, cuser);
+            throw new ProcessException("审批流启动失败!");
+        }
+        //代理商业务视频关系
+        BusActRel record = new BusActRel();
+        record.setBusId(id);
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(cuser);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.ORDER.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            throw new ProcessException("审批流启动失败:添加审批关系失败");
+        }
+
         return AgentResult.ok();
     }
 }
