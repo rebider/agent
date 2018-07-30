@@ -7,6 +7,7 @@ import com.ryx.credit.profit.service.PosRewardTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -37,5 +38,22 @@ public class PosRewardTemplateServiceImpl implements PosRewardTemplateService{
     @Override
     public void updatePosRewardTemplate(PosRewardTemplate posRewardTemplate) {
         posRewardTemplateMapper.updateByPrimaryKeySelective(posRewardTemplate);
+    }
+
+    @Override
+    public BigDecimal computePosReward(BigDecimal tranTotal) {
+        if(tranTotal != null){
+            BigDecimal finalTranTotal = tranTotal.divide(new BigDecimal(10000));
+            List<PosRewardTemplate> posRewardTemplates = posRewardTemplateMapper.selectByExample(null);
+            for (PosRewardTemplate posRewardTemplate : posRewardTemplates) {
+                if(posRewardTemplate.getTranTotal().contains("~")) {
+                    String[] spl = posRewardTemplate.getTranTotal().trim().split("~");
+                    if (finalTranTotal.compareTo(new BigDecimal(spl[0])) >= 0 && finalTranTotal.compareTo(new BigDecimal(spl[1])) <= 0) {
+                        return posRewardTemplate.getProportion();
+                    }
+                }
+            }
+        }
+        return BigDecimal.ZERO;
     }
 }

@@ -41,6 +41,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }else if (StringUtils.isNotBlank(profitDeduction.getDeductionDateEnd())){
             criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDateEnd());
         }
+        if(StringUtils.isNotBlank(profitDeduction.getDeductionType())){
+            criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
