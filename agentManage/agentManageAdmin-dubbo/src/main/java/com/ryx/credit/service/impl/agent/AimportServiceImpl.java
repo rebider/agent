@@ -187,8 +187,8 @@ public class AimportServiceImpl implements AimportService {
                         agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
                         agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                     }
-                    
-                    
+
+
                 }
             }
 
@@ -590,18 +590,6 @@ public class AimportServiceImpl implements AimportService {
                             }
                         }
                     }
-
-
-                    //更新业务
-                    ImportAgentExample importAgentExample = new ImportAgentExample();
-                    importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name()).andDealstatusEqualTo(Status.STATUS_0.status).andDataidEqualTo(datum.getDataid());
-                    List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
-                    for (ImportAgent agentsBusiness : importAgentsBusiness) {
-                        agentsBusiness.setDealTime(datum.getDealTime());
-                        agentsBusiness.setDealstatus(Status.STATUS_2.status);
-                        importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
-                    }
-
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     payment.setDealstatus(Status.STATUS_2.status);//处理成功
                     payment.setDealmsg("成功");
@@ -616,7 +604,7 @@ public class AimportServiceImpl implements AimportService {
                     e.printStackTrace();
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     payment.setDealstatus(Status.STATUS_3.status);//处理成功
-                    payment.setDealmsg(e.getMessage());
+                    payment.setDealmsg(e.getLocalizedMessage());
                     payment.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(payment)){
                         logger.info("代理商导入业务{}失败",datum.getId());
@@ -625,7 +613,23 @@ public class AimportServiceImpl implements AimportService {
                         logger.info("代理商导入业务{}失败",datum.getId());
                     }
                 }
+
+
+
             }
+
+            //更新导入业务
+            //            ImportAgentExample importAgentExample = new ImportAgentExample();
+            //            importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name())
+            //                    .andDealstatusEqualTo(Status.STATUS_0.status)
+            //                    .andDataidEqualTo(uniqnum);
+            //            List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
+            //            for (ImportAgent agentsBusiness : importAgentsBusiness) {
+            //                agentsBusiness.setDealTime(new Date());
+            //                agentsBusiness.setDealstatus(Status.STATUS_2.status);
+            //                importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
+            //            }
+
             return ResultVO.success(null);
         } catch (Exception e) {
             logger.info("代理商导入业务失败{}",e.getMessage());
