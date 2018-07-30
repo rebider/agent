@@ -363,6 +363,12 @@ public class CompensateServiceImpl implements CompensateService {
         return AgentResult.ok();
     }
 
+    /**
+     * 完成处理
+     * @param proIns
+     * @param agStatus
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus){
@@ -387,5 +393,46 @@ public class CompensateServiceImpl implements CompensateService {
             throw new ProcessException("更新退补差价数据申请失败");
         }
         return AgentResult.ok();
+    }
+
+
+    /**
+     * 查看退补差价明细
+     * @param id
+     * @return
+     */
+    @Override
+    public ORefundPriceDiff queryRefDiffDetail(String id){
+        if(StringUtils.isBlank(id)){
+            return null;
+        }
+        ORefundPriceDiff oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(id);
+        if(null==oRefundPriceDiff){
+            return null;
+        }
+        oRefundPriceDiff.setApplyCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getApplyCompType()));
+        oRefundPriceDiff.setRelCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getRelCompType()));
+        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+        criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        oRefundPriceDiff.setRefundPriceDiffDetailList(oRefundPriceDiffDetails);
+        for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
+            oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
+            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+            OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
+            criteria1.andSubOrderIdEqualTo(oRefundPriceDiffDetail.getSubOrderId());
+            criteria1.andActivityIdEqualTo(oRefundPriceDiffDetail.getActivityFrontId());
+            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+            if(null==oSubOrderActivities){
+                return null;
+            }
+            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+            Dict dict1 = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oSubOrderActivity.getActivityWay());
+            oSubOrderActivity.setActivityWay(dict1.getdItemname());
+            oRefundPriceDiffDetail.setSubOrderActivity(oSubOrderActivity);
+        }
+        return oRefundPriceDiff;
     }
 }

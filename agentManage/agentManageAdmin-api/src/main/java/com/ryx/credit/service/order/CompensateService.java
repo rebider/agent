@@ -32,5 +32,7 @@ public interface CompensateService {
     AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
     AgentResult compressCompensateActivity(String proIns,BigDecimal agStatus);
+
+    ORefundPriceDiff queryRefDiffDetail(String id);
 }
 
