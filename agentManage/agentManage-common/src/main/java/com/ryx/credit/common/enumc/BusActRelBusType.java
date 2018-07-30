@@ -10,7 +10,8 @@ public enum BusActRelBusType {
     DC_Agent("代理商修改"),
     DC_Colinfo("代理商账户修改申请"),
     ORDER("订单审批"),
-    PkType("订单补款");
+    PkType("订单补款"),
+    COMPENSATE("退补差价审批");
     public String  msg;
 
     BusActRelBusType(String s){

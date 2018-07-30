@@ -311,7 +311,7 @@ public class CompensateServiceImpl implements CompensateService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(cuser);
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.ORDER.name());
+        record.setBusType(BusActRelBusType.COMPENSATE.name());
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);

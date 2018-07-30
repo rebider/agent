@@ -7,9 +7,11 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OOrderMapper;
+import com.ryx.credit.dao.order.ORefundPriceDiffMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.OOrder;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.service.agent.AgentQueryService;
 import org.slf4j.Logger;
@@ -44,6 +46,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private OSupplementMapper oSupplementMapper;
     @Autowired
     private OOrderMapper oOrderMapper;
+    @Autowired
+    private ORefundPriceDiffMapper refundPriceDiffMapper;
 
 
     @Override
@@ -137,6 +141,10 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.ORDER.name())){
                 OOrder order = oOrderMapper.selectByPrimaryKey(rel.getBusId());
                 return FastMap.fastSuccessMap().putKeyV("OOrder",order).putKeyV("rel",rel);
+            }
+            if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.COMPENSATE.name())){
+                ORefundPriceDiff refundrPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(rel.getBusId());
+                return FastMap.fastSuccessMap().putKeyV("refundrPriceDiff",refundrPriceDiff).putKeyV("rel",rel);
             }
         }
         return null;
