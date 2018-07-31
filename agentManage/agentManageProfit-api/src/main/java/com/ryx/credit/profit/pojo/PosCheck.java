@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class PosCheck {
+public class PosCheck implements Serializable {
     private String id;
 
     private String agentPid;
