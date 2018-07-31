@@ -61,7 +61,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * 2、调用明细接口并插入信息
      */
     @Override
-    public List<String> addList(List<List<Object>> data, String user, String startSn, String endSn, Integer begins, Integer finish) throws Exception {
+    public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
             if(objectList == null || objectList.size() == 0 || StringUtils.isBlank(objectList.get(0) + ""))break;
