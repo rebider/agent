@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -8,6 +9,7 @@ import com.ryx.credit.profit.exceptions.StagingException;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeductionExample;
 import com.ryx.credit.profit.service.ProfitDeductionService;
+import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +27,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Autowired
     private ProfitDeductionMapper profitDeductionMapper;
-
+    @Autowired
+    private IdService idService;
 
     @Override
     public PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page) {
@@ -77,6 +80,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Override
     public void insert(ProfitDeduction deduction) {
-
+        if(StringUtils.isBlank(deduction.getId())){
+            deduction.setId(idService.genId(TabId.P_DEDUCTION));
+        }
+        profitDeductionMapper.insertSelective(deduction);
     }
 }
