@@ -199,7 +199,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             throw new ProcessException("更新记录状态异常");
         }
         if (StringUtils.isEmpty(workId)) {
-            logger.info("========用户{}启动数据修改申请{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
+            logger.info("========用户{}启动补款审批{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
             throw new ProcessException("审批流启动失败字典中未配置部署流程!");
         }
         Map startPar = agentEnterService.startPar(userId);

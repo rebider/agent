@@ -9,8 +9,8 @@ package com.ryx.credit.common.enumc;
  */
 public enum PriceDiffType {
 
-    DETAIN_AMT("1","扣款"),
-    REPAIR_AMT("2","补款");
+    DETAIN_AMT("1","代理商打款"),
+    REPAIR_AMT("2","公司退款");
 
     public String code;
 
