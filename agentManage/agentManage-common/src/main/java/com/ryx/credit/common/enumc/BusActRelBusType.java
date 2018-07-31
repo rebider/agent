@@ -12,7 +12,8 @@ public enum BusActRelBusType {
     ORDER("订单审批"),
     STAGING("退单分期"),
     THAW("分润解冻申请"),
-    PkType("订单补款");
+    PkType("订单补款"),
+    TOOLS("机具扣款调整申请"),;
 
     public String  msg;
 
