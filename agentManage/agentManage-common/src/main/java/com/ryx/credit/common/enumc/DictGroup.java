@@ -45,7 +45,8 @@ public enum DictGroup {
     TEMP_AGREE("协议模板"),
     ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型"),
-    ACTIVITY_DIS_TYPE("活动优惠方式");
+    ACTIVITY_DIS_TYPE("活动优惠方式"),
+    C_TYPE("扣款款项资金类型");
 
     public String  msg;
 

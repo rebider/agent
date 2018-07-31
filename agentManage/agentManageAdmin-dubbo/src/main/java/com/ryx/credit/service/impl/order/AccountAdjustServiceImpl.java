@@ -1,21 +1,24 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.MapUtil;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
-import com.ryx.credit.pojo.admin.order.OAccountAdjustDetail;
-import com.ryx.credit.pojo.admin.order.OPaymentDetail;
-import com.ryx.credit.pojo.admin.order.ORefundAgent;
+import com.ryx.credit.dao.agent.DataHistoryMapper;
+import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.agent.DataHistory;
+import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IAccountAdjustService;
 import com.ryx.credit.service.order.IPaymentDetailService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: Zhang Lei
@@ -27,245 +30,313 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
     @Resource
     IPaymentDetailService paymentDetailService;
-
-
-    /**
-     * @Author: Zhang Lei
-     * @Description: 调账预算（生成草稿，不会真正进行欠款抵扣和生成退款记录）
-     * @Param adjustAmt 调账金额
-     * @Param adjustType 调账类型
-     * @Param isAdjustOrder 是否抵扣欠款(0-不抵扣  1-抵扣)
-     * @Param agentId 代理商ID
-     * @Param srcId 源ID（退货单ID、退差价ID）
-     * @Date: 15:47 2018/7/24
-     */
-    @Override
-    public Map<String, Object> adjustPreCalculate(BigDecimal adjustAmt, String adjustType, int isAdjustOrder, String agentId, String srcId) throws ProcessException {
-        return null;
-    }
-
+    @Autowired
+    OPaymentMapper paymentMapper;
+    @Autowired
+    OPaymentDetailMapper paymentDetailMapper;
+    @Resource
+    IdService idService;
+    @Autowired
+    DataHistoryMapper dataHistoryMapper;
+    @Autowired
+    ORefundAgentMapper refundAgentMapper;
+    @Autowired
+    OAccountAdjustMapper accountAdjustMapper;
+    @Autowired
+    OAccountAdjustDetailMapper accountAdjustDetailMapper;
 
     /**
      * @Author: Zhang Lei
-     * @Description: 调账（真正进行欠款抵扣和生成退款记录）
+     * @Description: 调账功能，退货退款和退差价时使用
+     * @Param isRealAdjust 是否真正调账（true-是，会更新数据库， false-否，只进行预算不更新数据库）
      * @Param adjustAmt 调账金额
      * @Param adjustType 调账类型
-     * @Param isAdjustOrder 是否抵扣欠款(0-不抵扣  1-抵扣)
+     * @Param isAdjustOrder 是否抵扣机具欠款(0-不抵扣  1-抵扣)
      * @Param agentId 代理商ID
      * @Param srcId 源ID（退货单ID、退差价ID）
+     * @Param srcType 源类型（THTK-退货退款  TCJ-退差价）
      * @Param userid 操作用户
      * @Date: 15:47 2018/7/24
      */
     @Override
-    public Map<String, Object> adjust(BigDecimal adjustAmt, String adjustType, int isAdjustOrder, String agentId, String userid, String srcId) throws ProcessException {
-        return null;
+    @Transactional
+    public Map<String, Object> adjust(boolean isRealAdjust, BigDecimal adjustAmt, String adjustType,
+                                      int isAdjustOrder, String agentId, String userid, String srcId, String srcType) throws ProcessException {
+
+        Map<String, Object> result = new HashMap<>();
+
+        //退款金额
+        BigDecimal leftAmt = adjustAmt;
+
+        //记录抵扣明细
+        List<Map<String, Object>> takeoutList = new ArrayList<>();
+
+        String batchcode_new = "";
+        String batchcode_old = "";
+
+        //需要抵扣欠款时，先抵扣代理商所有机具欠款（包含分润分期、线下分期），还剩余的金额走线下退款
+        if (isAdjustOrder != 0) {
+
+            //剩余金额大于0的时候循环抵扣机具欠款
+            while (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
+                //查询一条欠款
+                List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId);
+
+                //当没有欠款时结束循环
+                if (paymentDetails == null || paymentDetails.size() <= 0) {
+                    break;
+                }
+
+                //取第一条付款单处理
+                String paymentId = paymentDetails.get(0).getPaymentId();
+
+                //查询付款单和付款单明细
+                OPayment payment = paymentDetailService.getPaymentById(paymentId);
+
+                //退款可全部抵扣此订单欠款时，直接更新订单
+                if (payment.getOutstandingAmount().compareTo(leftAmt) <= 0) {
+                    List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
+                    for (OPaymentDetail paymentDetail : oPaymentDetails) {
+                        //一条抵扣记录
+                        Map<String, Object> oneTakeoutRecord = new HashMap<>();
+                        oneTakeoutRecord.put("orderId", paymentDetail.getOrderId());
+                        oneTakeoutRecord.put("paymentId", paymentId);
+                        oneTakeoutRecord.put("paymentDetailId", paymentDetail.getId());
+                        oneTakeoutRecord.put("batchCode", paymentDetail.getBatchCode());
+                        oneTakeoutRecord.put("paymentType", paymentDetail.getPaymentType());
+                        oneTakeoutRecord.put("payType", paymentDetail.getPayType());
+                        oneTakeoutRecord.put("payAmt", paymentDetail.getPayAmount());
+                        oneTakeoutRecord.put("planPayTime", paymentDetail.getPlanPayTime());
+                        oneTakeoutRecord.put("planNum", paymentDetail.getPlanNum());
+                        takeoutList.add(oneTakeoutRecord);
+                    }
+
+
+                    //更新订单状态全部明细为支付完成
+                    if (isRealAdjust) {
+                        updatePaymentComplete(paymentId, srcId, srcType);
+                    }
+
+                    leftAmt = leftAmt.subtract(payment.getOutstandingAmount());
+
+                } else {//退款不足以抵消订单欠款时，需要插入一条抵扣记录，并且更新付款计划
+
+                    List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
+
+                    //生成新的付款计划。先计算剩余代付金额和剩余期数
+
+                    //现在付款计划未还部分
+                    List<OPaymentDetail> planNows_df = paymentDetailService.getPaymentDetails(paymentId);
+                    //现在付款计划已付部分
+                    List<OPaymentDetail> planNows_complate = new ArrayList<>();
+
+                    //付款分期未还金额
+                    BigDecimal outAmt = BigDecimal.ZERO;
+                    //分期待付期数
+                    int outPlanNum = 0;
+                    //分期已付期数
+                    int complatePlanNum = 0;
+                    //代付分期起始时间
+                    Date startTime = null;
+
+                    for (OPaymentDetail detail : planNows_df) {
+                        if (detail.getPaymentType().equals(PaymentType.DKFQ.code) || detail.getPaymentType().equals(PaymentType.FRFQ.code)) {
+                            if (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
+                                outAmt = outAmt.add(detail.getPayAmount());
+                                outPlanNum++;
+                                if (startTime == null) {
+                                    startTime = detail.getPlanPayTime();
+                                }
+                            }
+                        } else {
+                            planNows_complate.add(detail);
+                            planNows_df.remove(detail);
+                            complatePlanNum++;
+                        }
+                    }
+                    //待还金额需要减去可抵扣金额
+                    outAmt = outAmt.subtract(leftAmt);
+                    result.put("planNows_df", planNows_df);
+                    result.put("planNows_complate", planNows_complate);
+                    result.put("takeoutList", takeoutList);
+
+                    //计算新付款计划
+                    List<Map> calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
+                    leftAmt = leftAmt.subtract(leftAmt);
+
+
+                    //更新订单部分金额支付完成
+                    if (isRealAdjust) {
+                        updatePaymentOutstandingAmt(paymentId, leftAmt);
+                    }
+
+                    //付款明细中插入退款抵扣记录
+                    Map<String, Object> oneTakeoutRecord = new HashMap<>();
+                    oneTakeoutRecord.put("orderId", payment.getOrderId());
+                    oneTakeoutRecord.put("paymentId", paymentId);
+                    oneTakeoutRecord.put("paymentDetailId", oPaymentDetails.get(0).getId());
+                    oneTakeoutRecord.put("batchCode", oPaymentDetails.get(0).getBatchCode());
+                    oneTakeoutRecord.put("paymentType", oPaymentDetails.get(0).getPaymentType());
+                    oneTakeoutRecord.put("payType", oPaymentDetails.get(0).getPayType());
+                    oneTakeoutRecord.put("payAmt", leftAmt);
+                    oneTakeoutRecord.put("srcId", srcId);
+                    oneTakeoutRecord.put("srcType", PamentSrcType.TUIKUAN_DIKOU.code);
+                    takeoutList.add(oneTakeoutRecord);
+
+                    OPaymentDetail newDeatil = new OPaymentDetail();
+                    newDeatil.setId(idService.genId(TabId.o_payment_detail));
+                    newDeatil.setPaymentId(paymentId);
+                    newDeatil.setPaymentType(oPaymentDetails.get(0).getPaymentType());
+                    newDeatil.setOrderId(oPaymentDetails.get(0).getOrderId());
+                    newDeatil.setPayType(oPaymentDetails.get(0).getPayType());
+                    newDeatil.setPayAmount(leftAmt);
+                    newDeatil.setRealPayAmount(leftAmt);
+                    newDeatil.setPayTime(new Date());
+                    newDeatil.setSrcId(srcId);
+                    newDeatil.setSrcType(srcType);
+                    newDeatil.setPaymentStatus(PaymentStatus.JQ.code);
+                    newDeatil.setcDate(new Date());
+                    newDeatil.setcUser(userid);
+
+                    if (isRealAdjust) {
+                        paymentDetailMapper.insertSelective(newDeatil);
+                    }
+
+                    //新付款计划入库付款明细
+                    List<OPaymentDetail> planNews = new ArrayList<>();
+                    batchcode_new = new Date().getTime()+"";
+                    batchcode_old = planNows_df.get(0).getBatchCode();
+                    for (Map map : calNews) {
+                        OPaymentDetail newDeatilPlan = new OPaymentDetail();
+                        newDeatilPlan.setId(idService.genId(TabId.o_payment_detail));
+                        newDeatilPlan.setPaymentId(paymentId);
+                        newDeatilPlan.setBatchCode(batchcode_new);
+                        newDeatilPlan.setPaymentType(planNows_df.get(0).getPaymentType());
+                        newDeatilPlan.setOrderId(planNows_df.get(0).getOrderId());
+                        newDeatilPlan.setPayType(planNows_df.get(0).getPayType());
+                        newDeatilPlan.setPayAmount(MapUtil.getBigDecimal(map, "item"));
+                        newDeatilPlan.setPaymentStatus(PaymentStatus.DF.code);
+                        newDeatilPlan.setPlanNum(new BigDecimal(complatePlanNum).add(MapUtil.getBigDecimal(map, "count")));
+                        newDeatilPlan.setPlanPayTime((Date) map.get("date"));
+                        newDeatilPlan.setcDate(new Date());
+                        newDeatilPlan.setcUser(userid);
+                        planNews.add(newDeatilPlan);
+
+                        //新付款计划入库
+                        if (isRealAdjust) {
+                            paymentDetailMapper.insertSelective(newDeatil);
+                        }
+
+                    }
+                    result.put("planNews", planNews);
+
+
+                    //付款明细中现在付款计划未还部分移入历史表
+                    if (isRealAdjust) {
+                        for (OPaymentDetail wh : planNows_df) {
+                            DataHistory dataHistory = new DataHistory();
+                            dataHistory.setId(idService.genId(TabId.data_history));
+                            dataHistory.setDataId(paymentId);
+                            dataHistory.setDataType(DataHistoryType.PAYMENT_DETAIL.code);
+                            dataHistory.setDataCotent(JSONObject.toJSONString(wh));
+                            dataHistory.setDataVersion(BigDecimal.ZERO);
+                            dataHistory.setcTime(new Date());
+                            dataHistory.setcUser(userid);
+                            dataHistory.setStatus(BigDecimal.ONE);
+                            dataHistoryMapper.insertSelective(dataHistory);
+                            OPaymentDetailExample example = new OPaymentDetailExample();
+                            example.or().andIdEqualTo(wh.getId());
+                            paymentDetailMapper.deleteByExample(example);
+                        }
+                    }
+
+                }
+
+            }
+        }
+
+
+        // 如果最终金额还有剩余，走线下退款
+        if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
+            ORefundAgent refundAgent = new ORefundAgent();
+            refundAgent.setRefundType(adjustType);
+            refundAgent.setSrcId(srcId);
+            refundAgent.setRefundAmount(leftAmt);
+            refundAgent.setAgentId(agentId);
+            refundAgent.setcUser(userid);
+            result.put("refund", refundAgent);
+            if (isRealAdjust) {
+                refundAgent.setId(idService.genId(TabId.o_refund_agent));
+                refundAgentMapper.insertSelective(refundAgent);
+            }
+        }
+
+        //生成调账记录
+        OAccountAdjust oAccountAdjust = new OAccountAdjust();
+        oAccountAdjust.setId(idService.genId(TabId.o_account_adjust));
+        oAccountAdjust.setAdjustType(adjustType);
+        oAccountAdjust.setSrcId(srcId);
+        oAccountAdjust.setAdjustAmount(adjustAmt);
+        oAccountAdjust.setIsAdjustOrder(new BigDecimal(isAdjustOrder));
+        oAccountAdjust.setAgentId(agentId);
+        oAccountAdjust.setcUser(userid);
+        oAccountAdjust.setcDate(new Date());
+        accountAdjustMapper.insertSelective(oAccountAdjust);
+
+        //生成调账抵扣明细
+        for (Map<String, Object> map : takeoutList) {
+            OAccountAdjustDetail oAccountAdjustDetail = new OAccountAdjustDetail();
+            oAccountAdjustDetail.setId(idService.genId(TabId.o_account_adjust_detail));
+            oAccountAdjustDetail.setAdjustId(oAccountAdjust.getId());
+            oAccountAdjustDetail.setAdjustType(adjustType);
+            oAccountAdjustDetail.setSrcId(srcId);
+            oAccountAdjustDetail.setTakeOutAmount(MapUtil.getBigDecimal(map, "payAmt"));
+            oAccountAdjustDetail.setOrderId(MapUtil.getString(map, "orderId"));
+            oAccountAdjustDetail.setPayType(MapUtil.getString(map, "payType"));
+            oAccountAdjustDetail.setPaymentDetailId(MapUtil.getString(map, "paymentDetailId"));
+            oAccountAdjustDetail.setBatchCodeNew(batchcode_new);
+            oAccountAdjustDetail.setBatchCodeOld(batchcode_old);
+            oAccountAdjustDetail.setAgentId(agentId);
+            oAccountAdjustDetail.setcUser(userid);
+            oAccountAdjustDetail.setcDate(new Date());
+            accountAdjustDetailMapper.insertSelective(oAccountAdjustDetail);
+        }
+
+        result.put("takeAmt", adjustAmt.subtract(leftAmt));
+        return result;
     }
 
 
     /**
      * @Author: Zhang Lei
-     * @Description: 调账计算方法
-     * @Date: 15:59 2018/7/24
+     * @Description: 更新订单全部付款记录为完成
+     * @Date: 11:22 2018/7/28
      */
-    public Map<String, Object> adjustCalculate(BigDecimal adjustAmt, String adjustType, int isAdjustOrder, String agentId, String srcId, String userid) {
-        Map<String, Object> result = new HashMap<>();
+    public void updatePaymentComplete(String paymentId, String srcId, String srcType) {
+        OPayment payment = paymentDetailService.getPaymentById(paymentId);
+        payment.setRealAmount(payment.getPayAmount());
+        payment.setOutstandingAmount(BigDecimal.ZERO);
+        payment.setPayCompletTime(new Date());
+        payment.setPayStatus(PayStatus.CLOSED.code);
+        payment.setPlanSucTime(new Date());
+        paymentMapper.updateByPrimaryKeySelective(payment);
 
-        //不需要抵扣欠款时，全部金额走线下退款，只生成退款记录
-        if (isAdjustOrder == Status.STATUS_0.status.intValue()) {
-            ORefundAgent refundAgent = new ORefundAgent();
-            refundAgent.setRefundType(adjustType);
-            refundAgent.setSrcId(srcId);
-            refundAgent.setRefundAmount(adjustAmt);
-            refundAgent.setAgentId(agentId);
-            refundAgent.setcUser(userid);
-            result.put("refund", refundAgent);
-            return result;
-        } else {
-            //需要抵扣欠款时，先抵扣代理商所有欠款，包含付款分期欠款、首付、或其他导入的欠款类型，还剩余的金额走线下退款
-
-            //a 查询代理商欠款
-            List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId);
-
-            //b 循环抵扣欠款
-            BigDecimal leftAmt = adjustAmt;
-            String calOrderId = "";                 //当前计算订单
-            BigDecimal planAmt = BigDecimal.ZERO;   //当前计算订单-分期待还总金额
-            int planCount = 0;                      //当前计算订单-待还总期数
-            Date planStatDate = null;               //当前计算订单-分期开始时间
-
-            for (OPaymentDetail paymentDetail : paymentDetails) {
-
-                //如果是机具订单欠款，计算剩余待还分期数和待还总额
-                if (paymentDetail.getPaymentType().equals(PamentIdType.ORDER_FKD.code)) {
-                    String nowOrderId = paymentDetail.getOrderId();
-
-                    //新的订单
-                    if (calOrderId.equals("")) {
-                        calOrderId = nowOrderId;
-                        planAmt = planAmt.add(paymentDetail.getPayAmount());
-                        planCount = 1;
-                        planStatDate = paymentDetail.getPlanPayTime();
-                    } else if (calOrderId.equals(nowOrderId)) {
-                        //还是当前计算订单，继续累加
-                        planAmt = planAmt.add(paymentDetail.getPayAmount());
-                        planCount++;
-                    } else if (!calOrderId.equals(nowOrderId)) {
-                        //到下一个订单
-
-                        //c 完成上面订单的计算
-                        if (leftAmt.compareTo(planAmt) < 0) {                       //订单欠款未全部抵扣
-
-                            OAccountAdjustDetail accountAdjustDetail = new OAccountAdjustDetail();
-                            break;
-                        } else {                                                 //订单欠款全部抵扣
-                            leftAmt = leftAmt.subtract(planAmt);
-                            //如果是正式调账，更新订单状态
-                            //记录调账明细
-                        }
-
-                        //d 开启下一个订单计算
-                        calOrderId = nowOrderId;
-                        planAmt = planAmt.add(paymentDetail.getPayAmount());
-                        planCount = 1;
-                        planStatDate = paymentDetail.getPlanPayTime();
-                    }
-
-
-                }
-
-            }
-
-
-            // 如果最终金额还有剩余，走线下退款
-
-        }
-
-return  null;
+        //更新明细
+        paymentDetailMapper.updatePaymentDetailByPaymentId(paymentId, srcId, srcType);
     }
 
-    /*public Map<String, Object> adjustCalculate(BigDecimal adjustAmt, String adjustType, int isAdjustOrder, String agentId, String srcId, String userid) {
-        Map<String, Object> result = new HashMap<>();
 
-        //不需要抵扣欠款时，全部金额走线下退款，只生成退款记录
-        if (isAdjustOrder == Status.STATUS_0.status.intValue()) {
-            ORefundAgent refundAgent = new ORefundAgent();
-            refundAgent.setRefundType(adjustType);
-            refundAgent.setSrcId(srcId);
-            refundAgent.setRefundAmount(adjustAmt);
-            refundAgent.setAgentId(agentId);
-            refundAgent.setcUser(userid);
-            result.put("refund", refundAgent);
-            return result;
-        } else {
-            //需要抵扣欠款时，先抵扣代理商所有欠款，包含付款分期欠款、首付、或其他导入的欠款类型，还剩余的金额走线下退款
-
-            //a 查询代理商欠款
-            List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId);
-
-            //b 循环抵扣欠款
-            BigDecimal leftAmt = adjustAmt;
-            String calOrderId = "";                 //当前计算订单
-            BigDecimal planAmt = BigDecimal.ZERO;   //当前计算订单-分期待还总金额
-            int planCount = 0;                      //当前计算订单-待还总期数
-            Date planStatDate = null;               //当前计算订单-分期开始时间
-
-            for (OPaymentDetail paymentDetail : paymentDetails) {
-
-                //如果是机具订单欠款，计算剩余待还分期数和待还总额
-                if (paymentDetail.getPaymentType().equals(PamentIdType.ORDER_FKD.code)) {
-                    String nowOrderId = paymentDetail.getOrderId();
-
-                    //新的订单
-                    if (calOrderId.equals("")) {
-                        calOrderId = nowOrderId;
-                        planAmt = planAmt.add(paymentDetail.getPayAmount());
-                        planCount = 1;
-                        planStatDate = paymentDetail.getPlanPayTime();
-                    } else if (calOrderId.equals(nowOrderId)) {
-                        //还是当前计算订单，继续累加
-                        planAmt = planAmt.add(paymentDetail.getPayAmount());
-                        planCount++;
-                    } else if (!calOrderId.equals(nowOrderId)) {
-                        //到下一个订单
-
-                        //c 完成上面订单的计算
-                        if (leftAmt.compareTo(planAmt) < 0) {                       //订单欠款未全部抵扣
-
-                            OAccountAdjustDetail accountAdjustDetail = new OAccountAdjustDetail();
-                            break;
-                        } else {                                                 //订单欠款全部抵扣
-                            leftAmt = leftAmt.subtract(planAmt);
-                            //如果是正式调账，更新订单状态
-                            //记录调账明细
-                        }
-
-                        //d 开启下一个订单计算
-                        calOrderId = nowOrderId;
-                        planAmt = planAmt.add(paymentDetail.getPayAmount());
-                        planCount = 1;
-                        planStatDate = paymentDetail.getPlanPayTime();
-                    }
-
-
-                }
-
-            }
-
-
-            // 如果最终金额还有剩余，走线下退款
-
-        }
-
-
-    }*/
-
-
-    public void takeoutOrder(Map<String, Object> result, BigDecimal planAmt, int planCount, Date planStatDate, String orderId, BigDecimal takeoutAmt, int isPreCalculate) {
-
-        //剩余未还
-        BigDecimal leftAmt = planAmt.subtract(takeoutAmt);
-        if(leftAmt.compareTo(BigDecimal.ZERO)>0){
-            //如果是正式调账,未抵扣欠款重新生成付款计划，更新订单付款计划
-            if(isPreCalculate==Status.STATUS_1.status.intValue()){
-                List<Map> SF2_data =  StageUtil.stageOrder(leftAmt,planCount,planStatDate,16);
-
-                //当前批次移入历史
-
-                //新批次付款计划入库
-                for (Map datum : SF2_data) {
-                    /*OPaymentDetail record =  new OPaymentDetail();
-                    record.setId(idService.genId(TabId.o_payment_detail));
-                    record.setBatchCode(d.getTime()+"");
-                    record.setPaymentId(oPayment.getId());
-                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                    record.setOrderId(oPayment.getOrderId());
-                    record.setPayType(PaymentType.DKFQ.code);
-                    record.setPayAmount((BigDecimal) datum.get("item"));
-                    record.setRealPayAmount(new BigDecimal(0));
-                    record.setPlanNum((BigDecimal) datum.get("count"));
-                    record.setAgentId(oPayment.getAgentId());
-                    record.setPaymentStatus(PaymentStatus.DS.code);
-                    record.setcUser(oPayment.getUserId());
-                    record.setcDate(d);
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setVersion(Status.STATUS_1.status);
-                    if(1!=oPaymentDetailMapper.insert(record)){
-                        throw new ProcessException("分期处理");
-                    }*/
-                }
-
-            }
-
-            //记录调账明细
-
-        }else {
-            //更新订单状态
-
-            //记录调账明细
-        }
-
-
-
+    /**
+     * @Author: Zhang Lei
+     * @Description: 更新订单部分金额支付完成
+     * @Date: 11:22 2018/7/28
+     */
+    public void updatePaymentOutstandingAmt(String paymentId, BigDecimal payAmt) {
+        OPayment payment = paymentDetailService.getPaymentById(paymentId);
+        payment.setRealAmount(payment.getRealAmount().add(payAmt));
+        payment.setOutstandingAmount(payment.getOutstandingAmount().subtract(payAmt));
+        payment.setPayStatus(PayStatus.PART_PAYMENT.code);
+        paymentMapper.updateByPrimaryKeySelective(payment);
     }
 
 

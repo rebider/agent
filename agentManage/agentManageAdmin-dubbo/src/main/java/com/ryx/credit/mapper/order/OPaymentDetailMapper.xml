@@ -336,4 +336,24 @@
     from O_PAYMENT_DETAIL
     where ID = #{id,jdbcType=VARCHAR} and STATUS=1
   </select>
+
+
+
+
+
+  <update id="updatePaymentDetailByPaymentId" parameterType="java.lang.String" >
+    update O_PAYMENT_DETAIL
+    set
+      PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
+      REAL_PAY_AMOUNT = PAY_AMOUNT,
+      PAY_TIME = sysdate,
+      SRC_ID = #{srcId,jdbcType=VARCHAR},
+      SRC_TYPE = #{srcType,jdbcType=VARCHAR},
+      PLAN_PAY_TIME = sysdate,
+      PAYMENT_STATUS = 4,
+      REMARK = '抵扣欠款'
+    where PAYMENT_ID = #{paymentId,jdbcType=VARCHAR}
+    and Payment_status in ('1','2','3')
+  </update>
+
 </mapper>
