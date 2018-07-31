@@ -50,4 +50,14 @@ public enum LogType {
         return "";
     }
 
+    public static String getContentByText(String value){
+        LogType[] logTypes = LogType.values();
+        for(LogType lo : logTypes){
+            if(lo.msg.equals(value)){
+                return lo.code;
+            }
+        }
+        return "";
+    }
+
 }
