@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OOrderExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OOrderMapper {
     int countByExample(OOrderExample example);
@@ -22,4 +23,8 @@ public interface OOrderMapper {
     int updateByPrimaryKeySelective(OOrder record);
 
     int updateByPrimaryKey(OOrder record);
+
+    List<Map<String,Object>> getOrderList(Map <String, Object> param);
+
+    Long getOrderCount(Map <String, Object> param);
 }
