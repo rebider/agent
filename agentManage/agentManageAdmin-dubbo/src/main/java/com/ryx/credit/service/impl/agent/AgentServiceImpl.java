@@ -280,7 +280,7 @@ public class AgentServiceImpl implements  AgentService {
      */
     @Override
     public void createBackUserbyAgent(String agentId){
-//        ThreadPool.putThreadPool(()->{
+        ThreadPool.putThreadPool(()->{
             try {
                 Agent agent = getAgentById(agentId);
                 UserVo userVo = new UserVo();
@@ -300,6 +300,6 @@ public class AgentServiceImpl implements  AgentService {
                logger.error("createBackUserbyAgent error {}",agentId,e);
             }
 
-//        });
+        });
     }
 }
