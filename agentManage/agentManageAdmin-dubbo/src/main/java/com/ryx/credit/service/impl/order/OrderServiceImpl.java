@@ -43,7 +43,6 @@ public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-
     @Autowired
     private OOrderMapper orderMapper;
     @Autowired
@@ -1247,4 +1246,21 @@ public class OrderServiceImpl implements OrderService {
         }
             return oPayments.get(0);
     }
+
+    /**
+     * 订单管理:
+     * 1、列表查询
+     * 2、导出订单信息
+     */
+    @Override
+    public PageInfo getOrderList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = orderMapper.getOrderCount(param);
+        List<Map<String, Object>> list = orderMapper.getOrderList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        System.out.println("查询/导出============================================" + JSONObject.toJSON(list));
+        return pageInfo;
+    }
+
+
 }
