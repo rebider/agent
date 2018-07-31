@@ -80,6 +80,8 @@ public class OrderServiceImpl implements OrderService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private BusActRelService busActRelService;
+    @Autowired
+    private OActivityMapper oActivityMapper;
 
 
     @Override
@@ -344,9 +346,6 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("下订单:{}", "商品价格数据错误");
                 throw new ProcessException("商品价格数据错误");
             }
-            if (oSubOrder.getProRelPrice() == null) {
-                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
-            }
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
                 throw new ProcessException("商品数量错误");
@@ -367,11 +366,52 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setStatus(Status.STATUS_1.status);
             oSubOrder.setVersion(Status.STATUS_0.status);
             oSubOrder.setAgentId(orderFormVo.getAgentId());
+
+            //商品参加的活动
+            String oActivity = oSubOrder.getActivity();
+
+            if(StringUtils.isNotBlank(oActivity)){
+                OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
+                if (activity!= null && activity.getPrice()!=null && activity.getPrice().compareTo(BigDecimal.ZERO)>0) {
+                    oSubOrder.setProRelPrice(activity.getPrice());
+                    OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
+                    oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
+                    oSubOrderActivity.setActivityId(activity.getId());
+                    oSubOrderActivity.setSubOrderId(oSubOrder.getId());
+                    oSubOrderActivity.setActivityName(activity.getActivityName());
+                    oSubOrderActivity.setRuleId(activity.getRuleId());
+                    oSubOrderActivity.setProId(oSubOrder.getProId());
+                    oSubOrderActivity.setProName(oSubOrder.getProName());
+                    oSubOrderActivity.setActivityRule(activity.getActivityRule());
+                    oSubOrderActivity.setActivityWay(activity.getActivityWay());
+                    oSubOrderActivity.setPrice(activity.getPrice());
+                    oSubOrderActivity.setProModel(activity.getProModel());
+                    oSubOrderActivity.setVender(activity.getVender());
+                    oSubOrderActivity.setPlatform(activity.getPlatform());
+                    oSubOrderActivity.setgTime(activity.getgTime());
+                    oSubOrderActivity.setcTime(d);
+                    oSubOrderActivity.setuTime(d);
+                    oSubOrderActivity.setcUser(userId);
+                    oSubOrderActivity.setuUser(userId);
+                    oSubOrderActivity.setVersion(Status.STATUS_0.status);
+                    if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
+                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动失败");
+                        throw new ProcessException("商品添加活动失败");
+                    }else{
+                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动成功");
+                    }
+                }else{
+                    oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+                }
+            }else{
+                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+            }
             //插入订单商品信息
             if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
                 logger.info("下订单:{}", "oSubOrder添加失败");
                 throw new ProcessException("oPayment添加失败");
             }
+            //计算订单金额
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
@@ -404,6 +444,7 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
                 throw new ProcessException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
             }
+            //收货地址商品
             for (OReceiptPro pro : pros) {
                 pro.setId(idService.genId(TabId.o_receipt_pro));
                 pro.setcTime(d);
