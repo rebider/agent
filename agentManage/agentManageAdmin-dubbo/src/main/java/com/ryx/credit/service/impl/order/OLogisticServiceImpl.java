@@ -23,6 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -67,6 +70,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * 1、导入物流信息
      * 2、调用明细接口并插入信息
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
         List<String> list = new ArrayList<>();
@@ -94,24 +98,25 @@ public class OLogisticServiceImpl implements OLogisticsService {
             begins = Integer.valueOf(String.valueOf(objectList.get(26)));   // 起始SN位数
             finish = Integer.valueOf(String.valueOf(objectList.get(27)));   // 结束SN位数
             ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
-            if(ResultVO.success(resultVO) != null) {
+            if(resultVO.isSuccess()) {
                 String id = "";
                 id = oLogistics.getReceiptPlanId();   // 排单编号
                 if (null == id) {
-                    continue;
+                    throw new ProcessException("排单id查询失败");
                 } else {
-                    ReceiptPlan receiptPlan;
-                    receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
+                    ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     if (receiptPlan != null) {
                         receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(8))));   // 发货数量
                         receiptPlan.setRealSendDate(Calendar.getInstance().getTime());   // 实际发货时间
                         receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));   // 排单状态为已发货
-                        receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                        int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                        if(i!=1){
+                            throw new ProcessException("更新排单数据失败");
+                        }
                         System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                     }
                 }
             }
-
         }
         return list;
     }
@@ -145,6 +150,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return list;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String uUser) {
         //1.起始SN序列号  2.结束SN序列号  3.开始截取的位数   4.结束截取的位数
