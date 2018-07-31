@@ -1,6 +1,8 @@
 package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.LogType;
+import com.ryx.credit.common.enumc.PlannerStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -9,19 +11,22 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OLogisticsMapper;
+import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.pojo.admin.order.OReceiptPro;
+import com.ryx.credit.pojo.admin.order.ReceiptPlan;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
+import com.ryx.credit.service.order.ReceiptPlanService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author Lihl
@@ -39,6 +44,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private OLogisticsDetailMapper oLogisticsDetailMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private ReceiptPlanMapper receiptPlanMapper;
 
     /**
      * 物流信息:
@@ -51,7 +58,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         List<Map<String, Object>> list = oLogisticsMapper.getOLogisticsList(param);
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
-        System.out.println("============================================" + JSONObject.toJSON(list));
+        System.out.println("查询/导出============================================" + JSONObject.toJSON(list));
         return pageInfo;
     }
 
@@ -67,17 +74,18 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if(objectList == null || objectList.size() == 0 || StringUtils.isBlank(objectList.get(0) + ""))break;
             OLogistics oLogistics = new OLogistics();
             oLogistics.setcUser(user);    // 创建人
-            oLogistics.setId(idService.genId(TabId.o_logistics));   // 物流ID序列号
-            oLogistics.setcTime(Calendar.getInstance().getTime());   // 创建时间
-            oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0)));   // 排单编号
-            oLogistics.setOrderId(String.valueOf(objectList.get(1)));   // 订单编号
-            oLogistics.setProId(String.valueOf(objectList.get(2)));   // 商品编号
-            oLogistics.setLogCom(String.valueOf(objectList.get(21)));   // 物流公司
-            oLogistics.setLogType(String.valueOf(objectList.get(22)));   // 物流类型
-            oLogistics.setwNumber(String.valueOf(objectList.get(23)));   // 物流单号
+            oLogistics.setLogType((LogType.Deliver.getValue()));            // 默认状态为发货物流
+            oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
+            oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
+            oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
+            oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
+            oLogistics.setProId(String.valueOf(objectList.get(2)));         // 商品编号
+            oLogistics.setLogCom(String.valueOf(objectList.get(21)));       // 物流公司
+            oLogistics.setLogType(String.valueOf(objectList.get(22)));      // 物流类型
+            oLogistics.setwNumber(String.valueOf(objectList.get(23)));      // 物流单号
             oLogistics.setSnBeginNum(String.valueOf(objectList.get(24)));   // 起始SN序列号
-            oLogistics.setSnEndNum(String.valueOf(objectList.get(25)));   // 结束SN序列号
-            System.out.println("物流信息============================================" + JSONObject.toJSON(oLogistics));
+            oLogistics.setSnEndNum(String.valueOf(objectList.get(25)));     // 结束SN序列号
+            System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
             if(1 != insertImportData(oLogistics)){
                 throw new ProcessException("插入失败");
             }
@@ -85,14 +93,31 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
             begins = Integer.valueOf(String.valueOf(objectList.get(26)));   // 起始SN位数
             finish = Integer.valueOf(String.valueOf(objectList.get(27)));   // 结束SN位数
-            insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
+            ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
+            if(ResultVO.success(resultVO) != null) {
+                String id = "";
+                id = oLogistics.getReceiptPlanId();   // 排单编号
+                if (null == id) {
+                    continue;
+                } else {
+                    ReceiptPlan receiptPlan;
+                    receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
+                    if (receiptPlan != null) {
+                        receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(8))));   // 发货数量
+                        receiptPlan.setRealSendDate(Calendar.getInstance().getTime());   // 实际发货时间
+                        receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));   // 排单状态为已发货
+                        receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                        System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
+                    }
+                }
+            }
+
         }
         return list;
     }
 
     @Override
     public int insertImportData(OLogistics oLogistics) {
-//        oLogistics.setId(idService.genId(TabId.o_logistics));
         return oLogisticsMapper.insertSelective(oLogistics);
     }
 
@@ -157,9 +182,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("添加失败");
                     throw new ProcessException("添加失败");
                 }
-
             }
         }
+
         return ResultVO.success(null);
     }
 
