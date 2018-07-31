@@ -369,6 +369,7 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setuTime(d);
             oSubOrder.setStatus(Status.STATUS_1.status);
             oSubOrder.setVersion(Status.STATUS_0.status);
+            oSubOrder.setAgentId(orderFormVo.getAgentId());
             //插入订单商品信息
             if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
                 logger.info("下订单:{}", "oSubOrder添加失败");
