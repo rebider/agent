@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.order.OPayment;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -36,7 +37,7 @@ public class AgentVo implements Serializable{
     private List<String> refundPriceDiffFile;
     private ORefundPriceDiff oRefundPriceDiff;
     //付款单
-    private OPayment oPayment;
+    private Map<String,String> oPayment;
 
     public Agent getAgent() {
         return agent;
@@ -159,11 +160,11 @@ public class AgentVo implements Serializable{
         this.orderAprDept = orderAprDept;
     }
 
-    public OPayment getoPayment() {
+    public Map<String, String> getoPayment() {
         return oPayment;
     }
 
-    public void setoPayment(OPayment oPayment) {
+    public void setoPayment(Map<String, String> oPayment) {
         this.oPayment = oPayment;
     }
 
