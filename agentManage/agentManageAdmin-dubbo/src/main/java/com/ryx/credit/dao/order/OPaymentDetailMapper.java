@@ -28,9 +28,8 @@ public interface OPaymentDetailMapper {
 
     OPaymentDetail selectById(String id);
 
-    //////////////////////////////////////////////////////////////////
-
     void updatePaymentDetailByPaymentId(@Param("paymentId") String paymentId,@Param("srcId") String srcId,@Param("srcType") String srcType);
+
     List<Map<String,Object>> selectShareMoney(@Param("map") Map<String, Object> map);
 
 }
