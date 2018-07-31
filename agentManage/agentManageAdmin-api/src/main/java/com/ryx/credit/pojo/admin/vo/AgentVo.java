@@ -2,10 +2,14 @@ package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
+import com.ryx.credit.pojo.admin.order.ODeductCapital;
+import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
+import com.ryx.credit.pojo.admin.order.OPayment;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -30,8 +34,12 @@ public class AgentVo implements Serializable{
 
     //订单审批下个审批部门参数
     private String orderAprDept;
-
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
+    private List<String> refundPriceDiffFile;
+    private ORefundPriceDiff oRefundPriceDiff;
+    private List<ODeductCapital> deductCapitalList;
+    //付款单
+    private Map<String,String> oPayment;
 
     public Agent getAgent() {
         return agent;
@@ -154,11 +162,43 @@ public class AgentVo implements Serializable{
         this.orderAprDept = orderAprDept;
     }
 
+    public Map<String, String> getoPayment() {
+        return oPayment;
+    }
+
+    public void setoPayment(Map<String, String> oPayment) {
+        this.oPayment = oPayment;
+    }
+
     public List<ORefundPriceDiffDetail> getRefundPriceDiffDetailList() {
         return refundPriceDiffDetailList;
     }
 
     public void setRefundPriceDiffDetailList(List<ORefundPriceDiffDetail> refundPriceDiffDetailList) {
         this.refundPriceDiffDetailList = refundPriceDiffDetailList;
+    }
+
+    public List<String> getRefundPriceDiffFile() {
+        return refundPriceDiffFile;
+    }
+
+    public void setRefundPriceDiffFile(List<String> refundPriceDiffFile) {
+        this.refundPriceDiffFile = refundPriceDiffFile;
+    }
+
+    public ORefundPriceDiff getoRefundPriceDiff() {
+        return oRefundPriceDiff;
+    }
+
+    public void setoRefundPriceDiff(ORefundPriceDiff oRefundPriceDiff) {
+        this.oRefundPriceDiff = oRefundPriceDiff;
+    }
+
+    public List<ODeductCapital> getDeductCapitalList() {
+        return deductCapitalList;
+    }
+
+    public void setDeductCapitalList(List<ODeductCapital> deductCapitalList) {
+        this.deductCapitalList = deductCapitalList;
     }
 }

@@ -2,6 +2,7 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.ReceiptPlan;
 import com.ryx.credit.pojo.admin.order.ReceiptPlanExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -26,4 +27,6 @@ public interface ReceiptPlanMapper {
     List<Map<String,Object>> getReceipPlanList(Map <String, Object> param);
 
     Long getReceipPlanCount(Map <String, Object> param);
+
+    List<Map<String,Object>> queryOrderReceiptPlanInfo(@Param("params") Map<String,String> params);
 }

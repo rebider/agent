@@ -22,7 +22,6 @@ public interface OLogisticsMapper {
 
     int updateByPrimaryKey(OLogistics record);
 
-    ////////////////////////////////////////////////////////////////////
 
     List<Map<String,Object>> getOLogisticsList(Map <String, Object> param);
 

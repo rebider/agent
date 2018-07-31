@@ -1277,6 +1277,146 @@ public class OSubOrderActivityExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andProIdIsNull() {
+            addCriterion("PRO_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdIsNotNull() {
+            addCriterion("PRO_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdEqualTo(String value) {
+            addCriterion("PRO_ID =", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdNotEqualTo(String value) {
+            addCriterion("PRO_ID <>", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdGreaterThan(String value) {
+            addCriterion("PRO_ID >", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdGreaterThanOrEqualTo(String value) {
+            addCriterion("PRO_ID >=", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdLessThan(String value) {
+            addCriterion("PRO_ID <", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdLessThanOrEqualTo(String value) {
+            addCriterion("PRO_ID <=", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdLike(String value) {
+            addCriterion("PRO_ID like", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdNotLike(String value) {
+            addCriterion("PRO_ID not like", value, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdIn(List<String> values) {
+            addCriterion("PRO_ID in", values, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdNotIn(List<String> values) {
+            addCriterion("PRO_ID not in", values, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdBetween(String value1, String value2) {
+            addCriterion("PRO_ID between", value1, value2, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProIdNotBetween(String value1, String value2) {
+            addCriterion("PRO_ID not between", value1, value2, "proId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameIsNull() {
+            addCriterion("PRO_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameIsNotNull() {
+            addCriterion("PRO_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameEqualTo(String value) {
+            addCriterion("PRO_NAME =", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotEqualTo(String value) {
+            addCriterion("PRO_NAME <>", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameGreaterThan(String value) {
+            addCriterion("PRO_NAME >", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameGreaterThanOrEqualTo(String value) {
+            addCriterion("PRO_NAME >=", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameLessThan(String value) {
+            addCriterion("PRO_NAME <", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameLessThanOrEqualTo(String value) {
+            addCriterion("PRO_NAME <=", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameLike(String value) {
+            addCriterion("PRO_NAME like", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotLike(String value) {
+            addCriterion("PRO_NAME not like", value, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameIn(List<String> values) {
+            addCriterion("PRO_NAME in", values, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotIn(List<String> values) {
+            addCriterion("PRO_NAME not in", values, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameBetween(String value1, String value2) {
+            addCriterion("PRO_NAME between", value1, value2, "proName");
+            return (Criteria) this;
+        }
+
+        public Criteria andProNameNotBetween(String value1, String value2) {
+            addCriterion("PRO_NAME not between", value1, value2, "proName");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -29,6 +29,8 @@ public class ORefundPriceDiffDetail implements Serializable{
 
     private String activityRule;
 
+    private BigDecimal frontPrice;
+
     private BigDecimal price;
 
     private Date sTime;
@@ -52,6 +54,8 @@ public class ORefundPriceDiffDetail implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private OSubOrderActivity subOrderActivity;
 
     public String getId() {
         return id;
@@ -149,6 +153,14 @@ public class ORefundPriceDiffDetail implements Serializable{
         this.activityRule = activityRule == null ? null : activityRule.trim();
     }
 
+    public BigDecimal getFrontPrice() {
+        return frontPrice;
+    }
+
+    public void setFrontPrice(BigDecimal frontPrice) {
+        this.frontPrice = frontPrice;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
@@ -243,5 +255,13 @@ public class ORefundPriceDiffDetail implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public OSubOrderActivity getSubOrderActivity() {
+        return subOrderActivity;
+    }
+
+    public void setSubOrderActivity(OSubOrderActivity subOrderActivity) {
+        this.subOrderActivity = subOrderActivity;
     }
 }

@@ -45,6 +45,8 @@ public class OSubOrder implements Serializable {
 
     private BigDecimal version;
 
+    private String agentId;
+
     private OSubOrderActivity subOrderActivity;
 
     private BigDecimal sumProPrice;
@@ -223,5 +225,13 @@ public class OSubOrder implements Serializable {
 
     public void setSumProPrice(BigDecimal sumProPrice) {
         this.sumProPrice = sumProPrice;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 }

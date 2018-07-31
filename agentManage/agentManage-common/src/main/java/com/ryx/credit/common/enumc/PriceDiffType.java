@@ -1,27 +1,22 @@
 package com.ryx.credit.common.enumc;
 
-
 /**
- * 数据历史类型
+ * 补差价类型
  * @version V1.0
  * @Description:
  * @author: Liudh
- * @date: 2018/4/17 18:11
+ * @date: 2018/7/28 18:11
  */
-public enum DataHistoryType {
+public enum PriceDiffType {
 
-    BASICS("basics","基础信息"),
-    BUSINESS("business","业务信息"),
-    CONTRACT("contract","合同信息"),
-    PAYMENT("payment","缴纳款项"),
-    GATHER("gather","收款账户"),
-    PAYMENT_DETAIL("paymentDetail","付款明细");
+    DETAIN_AMT("1","扣款"),
+    REPAIR_AMT("2","补款");
 
     public String code;
 
     public String msg;
 
-    DataHistoryType(String c, String m){
+    PriceDiffType(String c, String m){
         this.code=c;
         this.msg =m;
     }
@@ -47,8 +42,8 @@ public enum DataHistoryType {
      * @return
      */
     public static String getContentByValue(String value){
-        DataHistoryType[] fundType = DataHistoryType.values();
-        for(DataHistoryType cc : fundType){
+        PriceDiffType[] status = PriceDiffType.values();
+        for(PriceDiffType cc : status){
             if(cc.code.equals(value)){
                 return cc.msg;
             }

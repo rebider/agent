@@ -2,11 +2,13 @@ package com.ryx.credit.activity.task;
 
 import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.agent.DataChangeActivityService;
+import com.ryx.credit.service.order.CompensateService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -39,16 +41,16 @@ public class CompensationTaskExecutionListener implements TaskListener, Executio
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            CompensateService dataChange = (CompensateService) MySpringContextHandler.applicationContext.getBean("compensateService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
-                logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                AgentResult res = dataChange.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.name());
-                logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                AgentResult res = dataChange.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());

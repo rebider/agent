@@ -66,5 +66,10 @@ public interface OrderService {
      */
     public AgentResult approveFinish(String insid,String actname)throws Exception;
 
+    /**
+     * 查找订单id
+     */
+
+    public OPayment selectByOrderId(String orderId);
 
 }
