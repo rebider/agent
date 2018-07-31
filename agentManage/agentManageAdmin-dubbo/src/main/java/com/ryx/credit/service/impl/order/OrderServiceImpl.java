@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -82,6 +83,8 @@ public class OrderServiceImpl implements OrderService {
     private BusActRelService busActRelService;
     @Autowired
     private OActivityMapper oActivityMapper;
+    @Autowired
+    private ApaycompService apaycompService;
 
 
     @Override
@@ -91,6 +94,7 @@ public class OrderServiceImpl implements OrderService {
         OOrderExample.Criteria criteria = example.createCriteria();
 
         example.setPage(page);
+        example.setOrderByClause(" c_time desc ");
         List<OOrder> oOrders = orderMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oOrders);
@@ -120,7 +124,7 @@ public class OrderServiceImpl implements OrderService {
         OPayment oPayment = orderFormVo.getoPayment();
         //分期处理
         AgentResult oPayment_res = paymentPlan(oPayment);
-        return AgentResult.ok();
+        return AgentResult.ok(orderFormVo.getId());
     }
 
     /**
@@ -576,6 +580,11 @@ public class OrderServiceImpl implements OrderService {
 
         List<Attachment> attr = attachmentMapper.accessoryQuery(order.getId(), AttachmentRelType.Order.name());
         f.putKeyV("attrs", attr);
+
+        //收款公司
+        List<PayComp>  comp =  apaycompService.recCompList();
+        f.putKeyV("comp", comp);
+
         return AgentResult.ok(f);
     }
 
