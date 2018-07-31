@@ -74,4 +74,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             throw new StagingException("修改状态失败。");
         }
     }
+
+    @Override
+    public void insert(ProfitDeduction deduction) {
+
+    }
 }
