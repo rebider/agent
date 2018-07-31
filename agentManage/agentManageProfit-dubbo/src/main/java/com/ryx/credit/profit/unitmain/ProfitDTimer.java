@@ -1,12 +1,14 @@
 package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.service.IProfitDService;
+import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,8 @@ public class ProfitDTimer {
     protected Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
     private IProfitDService profitDService;
+    @Autowired
+    private IdService idService;
 
 
     public static void main(String agrs[]){
@@ -33,7 +37,7 @@ public class ProfitDTimer {
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                ("http://12.3.10.161:8003/qtfr/agentInterface/queryfrbyday.do",params);
+                (AppConfig.getProperty("profit.day"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             //logger.error("请求同步失败！");
@@ -58,7 +62,7 @@ public class ProfitDTimer {
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                ("http://12.3.10.161:8003/qtfr/agentInterface/queryfrbyday.do",params);
+                (AppConfig.getProperty("profit.day"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
@@ -78,7 +82,7 @@ public class ProfitDTimer {
     public void insertProfitD(List<HashMap> profitDays){
         for(HashMap map:profitDays){
             ProfitDay profitD = new ProfitDay();
-            profitD.setId(null);
+            profitD.setId(idService.genId(TabId.p_profit_adjust));
             profitD.setAgentId((String)map.get("AGENTID"));
             profitD.setAgentName((String)map.get("AGENTNAME"));
             profitD.setDailyMakeup((BigDecimal) map.get("DAILYMAKEUP"));

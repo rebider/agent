@@ -35,4 +35,6 @@ public interface AgentService {
 
     Agent findAgentByActivId(String activId);
 
+    void createBackUserbyAgent(String agentId);
+
 }

@@ -573,6 +573,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            //todo 生成后台用户
+            agentService.createBackUserbyAgent(agent.getId());
             agentNotifyService.asynNotifyPlatform();
         }
 
