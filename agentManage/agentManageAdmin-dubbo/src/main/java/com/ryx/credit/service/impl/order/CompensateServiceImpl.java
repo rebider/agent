@@ -372,32 +372,34 @@ public class CompensateServiceImpl implements CompensateService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
         try {
             if(agentVo.getApprovalResult().equals("pass")){
-                BigDecimal deductAmt = new BigDecimal(0);
-                String refundPriceDiffId = "";
-                if(agentVo.getDeductCapitalList()!=null)
-                for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
-                    oDeductCapital.setId(idService.genId(TabId.o_deduct_capital));
-                    Date nowDate = new Date();
-                    oDeductCapital.setcTime(nowDate);
-                    oDeductCapital.setcUtime(nowDate);
-                    oDeductCapital.setStatus(Status.STATUS_1.status);
-                    oDeductCapital.setVersion(Status.STATUS_0.status);
-                    deductAmt = deductAmt.add(oDeductCapital.getcAmount());
-                    int insert = deductCapitalMapper.insert(oDeductCapital);
-                    if(insert!=1){
-                        throw new ProcessException("工作流处理任务DeductCapita异常");
+                if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0){
+                    BigDecimal deductAmt = new BigDecimal(0);
+                    String refundPriceDiffId = "";
+                    if(agentVo.getDeductCapitalList()!=null)
+                    for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
+                        oDeductCapital.setId(idService.genId(TabId.o_deduct_capital));
+                        Date nowDate = new Date();
+                        oDeductCapital.setcTime(nowDate);
+                        oDeductCapital.setcUtime(nowDate);
+                        oDeductCapital.setStatus(Status.STATUS_1.status);
+                        oDeductCapital.setVersion(Status.STATUS_0.status);
+                        deductAmt = deductAmt.add(oDeductCapital.getcAmount());
+                        int insert = deductCapitalMapper.insert(oDeductCapital);
+                        if(insert!=1){
+                            throw new ProcessException("工作流处理任务DeductCapita异常");
+                        }
+                        refundPriceDiffId = oDeductCapital.getSourceId();
                     }
-                    refundPriceDiffId = oDeductCapital.getSourceId();
-                }
-                ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(refundPriceDiffId);
-                oRefundPriceDiff.setDeductAmt(deductAmt);
-                BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
-                String relCompAmtStr = String.valueOf(relCompAmt);
-                oRefundPriceDiff.setRelCompType(relCompAmtStr.contains("-")?PriceDiffType.REPAIR_AMT.getValue():PriceDiffType.DETAIN_AMT.getValue());
-                oRefundPriceDiff.setRelCompAmt(relCompAmt);
-                int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
-                if(i!=1){
-                    throw new ProcessException("工作流处理任务update异常");
+                    ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(refundPriceDiffId);
+                    oRefundPriceDiff.setDeductAmt(deductAmt);
+                    BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
+                    String relCompAmtStr = String.valueOf(relCompAmt);
+                    oRefundPriceDiff.setRelCompType(relCompAmtStr.contains("-")?PriceDiffType.DETAIN_AMT.getValue():PriceDiffType.REPAIR_AMT.getValue());
+                    oRefundPriceDiff.setRelCompAmt(new BigDecimal(relCompAmtStr));
+                    int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+                    if(i!=1){
+                        throw new ProcessException("工作流处理任务update异常");
+                    }
                 }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
@@ -469,18 +471,20 @@ public class CompensateServiceImpl implements CompensateService {
         for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
-            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-            OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
-            criteria1.andSubOrderIdEqualTo(oRefundPriceDiffDetail.getSubOrderId());
-            criteria1.andActivityIdEqualTo(oRefundPriceDiffDetail.getActivityFrontId());
-            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-            if(null==oSubOrderActivities){
-                return null;
+            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId())){
+                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
+                criteria1.andSubOrderIdEqualTo(oRefundPriceDiffDetail.getSubOrderId());
+                criteria1.andActivityIdEqualTo(oRefundPriceDiffDetail.getActivityFrontId());
+                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                if(null==oSubOrderActivities){
+                    return null;
+                }
+                OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+                Dict dict1 = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oSubOrderActivity.getActivityWay());
+                oSubOrderActivity.setActivityWay(dict1.getdItemname());
+                oRefundPriceDiffDetail.setSubOrderActivity(oSubOrderActivity);
             }
-            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-            Dict dict1 = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oSubOrderActivity.getActivityWay());
-            oSubOrderActivity.setActivityWay(dict1.getdItemname());
-            oRefundPriceDiffDetail.setSubOrderActivity(oSubOrderActivity);
         }
         return oRefundPriceDiff;
     }
