@@ -58,6 +58,20 @@ public class OPayment implements Serializable{
 
     private BigDecimal downPaymentCount;
 
+    @JSONField(
+            format = "yyyy-MM-dd"
+    )
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    @JsonDeserialize(
+            using = DateJsonDeserializer.class
+    )
+    @JsonSerialize(
+            using = DateJsonSerializer.class
+    )
     private Date downPaymentDate;
 
     private String collectCompany;
@@ -70,6 +84,20 @@ public class OPayment implements Serializable{
 
     private BigDecimal actualReceipt;
 
+    @JSONField(
+            format = "yyyy-MM-dd"
+    )
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    @JsonDeserialize(
+            using = DateJsonDeserializer.class
+    )
+    @JsonSerialize(
+            using = DateJsonSerializer.class
+    )
     private Date actualReceiptDate;
 
     public String getId() {
