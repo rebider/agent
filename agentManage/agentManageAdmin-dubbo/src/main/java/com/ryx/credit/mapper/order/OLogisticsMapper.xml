@@ -398,6 +398,31 @@
         </if>
     </sql>
 
+
+    <select id="getOrderAndLogisticsBySn" resultType="java.util.Map" parameterType="java.lang.String">
+    select
+    od.id as orderId,logi.id as logisticsId,logi.pro_id as proId,logi.pro_name as proName,logi.pro_type as proType,logi.pro_price as proPrice
+    ,logi.pro_MODEL as proModel,logi.Log_type as logType
+    from o_logistics_detail detail,O_LOGISTICS logi,O_order od
+    where detail.sn_num = #{SN,jdbcType=VARCHAR} and detail.status = '1' and od.agent_id=#{agentId,jdbcType=VARCHAR} and detail.logistics_id=logi.ID and logi.order_id = od.id
+  </select>
+
+    <select id="getOrderAndLogisticsBySns" resultType="java.util.Map" parameterType="java.lang.String">
+    select
+    od.id as orderId,logi.id as logisticsId,logi.pro_id as proId,logi.pro_name as proName,logi.pro_type as proType,logi.pro_price as proPrice
+    ,logi.pro_MODEL as proModel,logi.Log_type as logType,od.agent_id as agentId,logi.pro_com as proCom,detail.sn_num as sn,
+    logi.pro_MODEL as proModel,plan.Receipt_id as receiptId
+    from o_logistics_detail detail,O_LOGISTICS logi,O_order od,O_Receipt_plan plan
+    where
+    <![CDATA[detail.sn_num >= #{startSn,jdbcType=VARCHAR} and detail.sn_num <= #{endSn,jdbcType=VARCHAR}]]>
+    and detail.status = '1'
+    and detail.logistics_id=logi.ID
+    and logi.order_id = od.id
+    and logi.Log_type = '1'
+    and plan.id = logi.Receipt_plan_id
+    order by od.id asc , logi.pro_id asc, detail.sn_num asc
+  </select>
+
    <select id="queryLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
     select * from  o_logistics where
     id = (

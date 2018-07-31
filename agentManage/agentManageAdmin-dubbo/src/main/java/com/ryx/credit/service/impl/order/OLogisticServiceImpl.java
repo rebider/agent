@@ -112,7 +112,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         if (!startSn.equals(endSn)) {
             Map<String, Object> map2 = oLogisticsMapper.getOrderAndLogisticsBySn(endSn, agentId);
             if (map2 == null || map2.size() <= 0) {
-                throw new ProcessException("sn号" + endSn + "不在您的订单内");
+                throw new ProcessException("SN[" + endSn + "]不在您的发货订单中");
             }
         }
 

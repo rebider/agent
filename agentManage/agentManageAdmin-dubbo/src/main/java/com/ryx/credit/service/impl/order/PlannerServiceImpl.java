@@ -48,21 +48,21 @@ public class PlannerServiceImpl implements PlannerService {
 
 
     @Override
-    public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page){
+    public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page) {
 
-        Map<String,Object> reqMap = new HashMap<>();
-        reqMap.put("receiptStatus",OReceiptStatus.WAITING_LIST.code);
-        reqMap.put("receiptProStatus",OReceiptStatus.WAITING_LIST.code);
-        if(StringUtils.isNotBlank(receiptOrder.getOrderId())){
-            reqMap.put("orderId",receiptOrder.getOrderId());
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("receiptStatus", OReceiptStatus.WAITING_LIST.code);
+        reqMap.put("receiptProStatus", OReceiptStatus.WAITING_LIST.code);
+        if (StringUtils.isNotBlank(receiptOrder.getOrderId())) {
+            reqMap.put("orderId", receiptOrder.getOrderId());
         }
-        if(StringUtils.isNotBlank(receiptOrder.getReceiptNum())){
-            reqMap.put("receiptNum",receiptOrder.getReceiptNum());
+        if (StringUtils.isNotBlank(receiptOrder.getReceiptNum())) {
+            reqMap.put("receiptNum", receiptOrder.getReceiptNum());
         }
-        if(StringUtils.isNotBlank(receiptOrder.getAddrRealname())){
-            reqMap.put("addrRealname",receiptOrder.getAddrRealname());
+        if (StringUtils.isNotBlank(receiptOrder.getAddrRealname())) {
+            reqMap.put("addrRealname", receiptOrder.getAddrRealname());
         }
-        List<Map<String,Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap,page);
+        List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(plannerList);
         pageInfo.setTotal(receiptOrderMapper.queryPlannerCount(reqMap));
@@ -71,14 +71,15 @@ public class PlannerServiceImpl implements PlannerService {
 
     /**
      * 分配排单
+     *
      * @param receiptPlan
      * @param receiptProId
      * @return
      * @throws Exception
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult savePlanner(ReceiptPlan receiptPlan,String receiptProId) throws Exception{
+    public AgentResult savePlanner(ReceiptPlan receiptPlan, String receiptProId) throws Exception {
         AgentResult result = new AgentResult(500, "系统异常", "");
         try {
             String planId = idService.genId(TabId.o_receipt_plan);
@@ -92,17 +93,17 @@ public class PlannerServiceImpl implements PlannerService {
             int receiptInsert = receiptPlanMapper.insert(receiptPlan);
 
             OReceiptPro oReceiptPro = receiptProMapper.selectByPrimaryKey(receiptProId);
-            if(oReceiptPro==null){
+            if (oReceiptPro == null) {
                 throw new ProcessException("排单查询商品异常");
             }
             OReceiptPro receiptPro = new OReceiptPro();
             receiptPro.setId(receiptProId);
             receiptPro.setSendNum(oReceiptPro.getSendNum().add(receiptPlan.getPlanProNum()));
-            if(receiptPro.getSendNum().equals(oReceiptPro.getProNum())){
+            if (receiptPro.getSendNum().equals(oReceiptPro.getProNum())) {
                 receiptPro.setReceiptProStatus(String.valueOf(OReceiptStatus.DISPATCHED_ORDER.code));
             }
             int receiptProUpdate = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
-            if(receiptInsert!=1 || receiptProUpdate!=1){
+            if (receiptInsert != 1 || receiptProUpdate != 1) {
                 log.info("保存排单异常");
                 throw new ProcessException("保存排单异常");
             }
@@ -112,12 +113,12 @@ public class PlannerServiceImpl implements PlannerService {
             criteria.andReceiptIdEqualTo(receiptPlan.getReceiptId());
             criteria.andReceiptProStatusEqualTo(String.valueOf(OReceiptStatus.WAITING_LIST.code));
             List<OReceiptPro> oReceiptPros = receiptProMapper.selectByExample(oReceiptProExample);
-            if(oReceiptPros.size()==0){
+            if (oReceiptPros.size() == 0) {
                 OReceiptOrder receiptOrder = new OReceiptOrder();
                 receiptOrder.setId(receiptPlan.getReceiptId());
                 receiptOrder.setReceiptStatus(OReceiptStatus.DISPATCHED_ORDER.code);
                 int receiptOrdUpdate = receiptOrderMapper.updateByPrimaryKeySelective(receiptOrder);
-                if(receiptOrdUpdate!=1){
+                if (receiptOrdUpdate != 1) {
                     throw new ProcessException("保存排单异常");
                 }
             }
@@ -128,6 +129,18 @@ public class PlannerServiceImpl implements PlannerService {
             throw new ProcessException("保存排单异常");
         }
         return result;
+    }
+
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 查询订单/退货单的排单详细情况
+     * @Date: 15:58 2018/7/27
+     */
+    public List<Map<String, Object>> queryOrderReceiptPlanInfo(Map<String, String> params) throws ProcessException {
+        List<Map<String, Object>> list = null;
+        list = receiptPlanMapper.queryOrderReceiptPlanInfo(params);
+        return list;
     }
 
 }
