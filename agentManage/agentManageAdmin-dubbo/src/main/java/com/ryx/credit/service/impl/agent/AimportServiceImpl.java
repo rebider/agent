@@ -301,6 +301,8 @@ public class AimportServiceImpl implements AimportService {
                     }else{
                         ag.setcUser(userid);
                         Agent ag_db = agentService.insertAgent(ag, Arrays.asList());
+                        //todo 生成后台用户
+                        agentService.createBackUserbyAgent(ag_db.getId());
                         ImportAgent agent =  importAgentMapper.selectByPrimaryKey(datum.getId());
                         agent.setDealstatus(Status.STATUS_2.status);
                         agent.setDealTime(new Date());

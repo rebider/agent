@@ -283,6 +283,10 @@ public class AgentServiceImpl implements  AgentService {
         ThreadPool.putThreadPool(()->{
             try {
                 Agent agent = getAgentById(agentId);
+                UserVo userVoSelect = iUserService.selectByName(agent.getAgName());
+                if(userVoSelect!=null){
+                    return;
+                }
                 UserVo userVo = new UserVo();
                 String salt = com.ryx.credit.commons.utils.StringUtils.getUUId();
                 String pwd  = DigestUtils.hashByShiro("md5",redisService.hGet("config","pass") , salt, 1);
