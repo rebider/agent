@@ -57,6 +57,7 @@
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.bank.EtbSyscardinfoService" ref="etbSyscardinfoService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}"/>
     <!--订单系统-->
     <dubbo:service interface="com.ryx.credit.service.order.ProductService" ref="productService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.OrderService" ref="orderService"  timeout="1200000" registry="${zk.group}"/>
@@ -76,5 +77,6 @@
     <dubbo:service interface="com.ryx.credit.service.order.PlannerService" ref="plannerService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.ReceiptPlanService" ref="receiptPlanService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.PlatFormService" ref="platformService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService" timeout="1200000" registry="${zk.group}"/>
 
 </beans>

@@ -116,17 +116,17 @@
     <sequenceFlow id="sid-095EAB5B-EBAC-46F8-B332-A778BBF99133" name="业务部终审" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-5420F48A-05A3-4D8D-8BCD-5AF50CBEB28B">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finish'}]]></conditionExpression>
     </sequenceFlow>
+    <sequenceFlow id="sid-62638D2E-91ED-4BEB-9830-EE1F85271FDC" name="财务部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finance'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="sid-6DD0FF91-57AB-4CE5-BB46-B77E81033F2A" name="市场部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='market'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-4191C6FE-EA3F-4D79-AA11-D13E68354647" name="财务部审批" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finance'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-822E2811-0B4C-4729-9AA1-98F3B47B87FB" name="市场部终审" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-5420F48A-05A3-4D8D-8BCD-5AF50CBEB28B">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finish'}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="sid-62638D2E-91ED-4BEB-9830-EE1F85271FDC" name="财务部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finance'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_order">
@@ -229,8 +229,8 @@
         <omgdi:waypoint x="1594.8425978509017" y="324.0903689934393"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-095EAB5B-EBAC-46F8-B332-A778BBF99133" id="BPMNEdge_sid-095EAB5B-EBAC-46F8-B332-A778BBF99133">
-        <omgdi:waypoint x="1080.8622350800265" y="333.0707317643145"></omgdi:waypoint>
-        <omgdi:waypoint x="1168.5043334960938" y="403.7230529785156"></omgdi:waypoint>
+        <omgdi:waypoint x="1080.8970808240997" y="333.0358860202414"></omgdi:waypoint>
+        <omgdi:waypoint x="1163.3333740234375" y="399.0"></omgdi:waypoint>
         <omgdi:waypoint x="1609.5797119140625" y="403.7230529785156"></omgdi:waypoint>
         <omgdi:waypoint x="1608.9721822664628" y="338.08976926199523"></omgdi:waypoint>
       </bpmndi:BPMNEdge>

@@ -19,8 +19,8 @@ public final class HttpUtil {
 	public static String doPost(String url, Map<String, String> params) {
 		HttpClient httpClient = new HttpClient();
 		httpClient.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, "UTF-8");
-		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(15000);
-		httpClient.getHttpConnectionManager().getParams().setSoTimeout(15000);
+		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(60000);
+		httpClient.getHttpConnectionManager().getParams().setSoTimeout(60000);
 		PostMethod postMethod = new PostMethod(url);
 		try {
 			Iterator<Entry<String, String>> it = params.entrySet().iterator();

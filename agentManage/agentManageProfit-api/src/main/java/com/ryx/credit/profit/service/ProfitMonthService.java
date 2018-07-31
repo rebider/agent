@@ -76,11 +76,14 @@ public interface ProfitMonthService {
      */
     public ProfitUnfreeze insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
 
+
+    void editProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
+
     /**
      * 申请解冻，启动审批流
      * @param profitUnfreeze
      */
-    public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId) throws ProcessException;
+    public void apptlyProfitUnfreeze(ProfitUnfreeze profitUnfreeze, String userId, String workId) throws ProcessException;
 
     /**
      * @author zhaodw
@@ -98,4 +101,5 @@ public interface ProfitMonthService {
      * @date: 2018/7/28
      */
     void completeTaskEnterActivity(String insid, String status );
+
 }

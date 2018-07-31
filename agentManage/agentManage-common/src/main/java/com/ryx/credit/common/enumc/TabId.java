@@ -40,6 +40,7 @@ public enum TabId {
     P_STAGING_DETAIL("P_STAGING_DETAIL%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
     P_DEDUCTION("P_DEDUCTION%s%015d"),
+    P_SETTLE_ERR_LS("P_SETTLE_ERR_LS%s%015d"),
     p_profir_detail("PDE%s%015d"),
     p_profir_m("PRM%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
