@@ -386,4 +386,35 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
     </if>
   </sql>
+
+
+  <select id="queryOrderReceiptPlanInfo" parameterType="map" resultType="map">
+    <!--<include refid="OracleDialectPrefix" />-->
+    select
+    ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
+    ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
+    ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
+    ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id,
+    plan.ID  as plan_id, plan.PLAN_NUM,  plan.PRO_TYPE, plan.PRO_COM, plan.PLAN_PRO_NUM,
+    plan.SEND_PRO_NUM, plan.SEND_DATE, plan.REAL_SEND_DATE, plan.RETURN_ORDER_DETAIL_ID,
+    plan.C_DATE, plan.PLAN_ORDER_STATUS,plan.MODEL
+    from O_Receipt_order ro,o_Receipt_pro rp,O_Receipt_plan plan
+    where ro.id = rp.receipt_id
+    and ro.id = plan.Receipt_id
+    <if test="params.orderId != null and params.orderId!=''" >
+      and plan.order_id = #{params.orderId}
+    </if>
+    <if test="params.subOrderId != null and params.subOrderId!=''" >
+      and plan.Receipt_id = #{params.subOrderId}
+    </if>
+    <if test="params.returnId != null and params.returnId!=''" >
+      and plan.return_order_detail_id = #{params.returnId}
+    </if>
+    <if test="params.planOrderStatus != null and params.planOrderStatus!=''" >
+      and plan.plan_order_status = #{params.planOrderStatus}
+    </if>
+    <!--<include refid="OracleDialectSuffix" />-->
+  </select>
+
+
 </mapper>
