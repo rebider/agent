@@ -4,6 +4,8 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 
+import java.util.List;
+
 /**
  * 退单管理业务接口
  * @author zhaodw
@@ -20,4 +22,12 @@ public interface ProfitSettleErrLsService {
      * @return 返回退单分页列表
      */
     PageInfo getProfitSettleErrList(ProfitSettleErrLs settleErr, Page page);
+    
+    /*** 
+    * @Description:插入退单信息
+    * @Param:  profitSettleErrLs 退单信息
+    * @Author: zhaodw
+    * @Date: 2018/7/30 
+    */ 
+    void inset(ProfitSettleErrLs profitSettleErrLs);
 }

@@ -34,4 +34,12 @@ public interface ProfitDeductionService {
      * @param status 状态
      */
     void updateStagingStatusById(String id, String status);
+    
+    /*** 
+    * @Description: 新增扣款信息
+    * @Param:  扣款对象
+    * @Author: zhaodw
+    * @Date: 2018/7/30 
+    */ 
+    void insert(ProfitDeduction deduction);
 }

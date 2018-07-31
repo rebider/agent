@@ -46,4 +46,10 @@ public class ProfitSettleErrLsServiceImpl implements ProfitSettleErrLsService {
         return pageInfo;
     }
 
+    @Override
+    public void inset(ProfitSettleErrLs insert) {
+         profitSettleErrLsMapper.insert(insert);
+
+    }
+
 }

@@ -149,6 +149,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitUnfreeze;
     }
 
+    @Override
+    public void editProfitUnfreeze(ProfitUnfreeze profitUnfreeze) {
+        profitUnfreeze.setUpdateTime(new Date());
+        profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
+    }
 
 
     /**
@@ -212,18 +217,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     String profitStatus = "4";
                     String thawStatus = "1";
                     rel.setStatus(Status.STATUS_2.status);
-                    //拒绝
-                    if ("reject_end".equals(status)) {
-                        profitStatus = "3";
-                        thawStatus = "2";
-                        rel.setStatus(Status.STATUS_3.status);
-                    }
-                    LOG.info("1.更新分润状态为解冻失败");
+                    LOG.info("1.更新分润状态为未分润");
                     ProfitMonth profitMonth = new ProfitMonth();
                     profitMonth.setId(profitUnfreeze.getProfitId());
                     profitMonth.setStatus(profitStatus);
                     profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
-                    LOG.info("2.更新解冻审批对象解冻拒绝");
+                    LOG.info("2.更新解冻审批对象解冻成功");
                     profitUnfreeze.setUpdateTime(new Date());
                     profitUnfreeze.setFreezeStatus(thawStatus);
                     profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);

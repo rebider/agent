@@ -76,6 +76,9 @@ public interface ProfitMonthService {
      */
     public ProfitUnfreeze insertProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
 
+
+    void editProfitUnfreeze(ProfitUnfreeze profitUnfreeze);
+
     /**
      * 申请解冻，启动审批流
      * @param profitUnfreeze

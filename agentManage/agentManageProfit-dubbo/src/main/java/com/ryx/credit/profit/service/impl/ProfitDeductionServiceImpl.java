@@ -41,6 +41,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }else if (StringUtils.isNotBlank(profitDeduction.getDeductionDateEnd())){
             criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDateEnd());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getAgentId())){
+            criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
+        }
+        if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
+            criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
@@ -67,5 +73,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }else{
             throw new StagingException("修改状态失败。");
         }
+    }
+
+    @Override
+    public void insert(ProfitDeduction deduction) {
+        profitDeductionMapper.insert(deduction);
     }
 }
