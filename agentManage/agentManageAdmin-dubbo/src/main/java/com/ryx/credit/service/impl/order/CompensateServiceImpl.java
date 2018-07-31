@@ -64,6 +64,8 @@ public class CompensateServiceImpl implements CompensateService {
     private ActivityService activityService;
     @Autowired
     private BusActRelMapper busActRelMapper;
+    @Autowired
+    private ODeductCapitalMapper deductCapitalMapper;
 
 
     @Override
@@ -351,6 +353,35 @@ public class CompensateServiceImpl implements CompensateService {
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
         try {
+            if(agentVo.getApprovalResult().equals("pass")){
+                BigDecimal deductAmt = new BigDecimal(0);
+                String refundPriceDiffId = "";
+                if(agentVo.getDeductCapitalList()!=null)
+                for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
+                    oDeductCapital.setId(idService.genId(TabId.o_deduct_capital));
+                    Date nowDate = new Date();
+                    oDeductCapital.setcTime(nowDate);
+                    oDeductCapital.setcUtime(nowDate);
+                    oDeductCapital.setStatus(Status.STATUS_1.status);
+                    oDeductCapital.setVersion(Status.STATUS_0.status);
+                    deductAmt = deductAmt.add(oDeductCapital.getcAmount());
+                    int insert = deductCapitalMapper.insert(oDeductCapital);
+                    if(insert!=1){
+                        throw new ProcessException("工作流处理任务DeductCapita异常");
+                    }
+                    refundPriceDiffId = oDeductCapital.getSourceId();
+                }
+                ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(refundPriceDiffId);
+                oRefundPriceDiff.setDeductAmt(deductAmt);
+                BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
+                String relCompAmtStr = String.valueOf(relCompAmt);
+                oRefundPriceDiff.setRelCompType(relCompAmtStr.contains("-")?PriceDiffType.REPAIR_AMT.getValue():PriceDiffType.DETAIN_AMT.getValue());
+                oRefundPriceDiff.setRelCompAmt(relCompAmt);
+                int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+                if(i!=1){
+                    throw new ProcessException("工作流处理任务update异常");
+                }
+            }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 log.error(result.getMsg());
