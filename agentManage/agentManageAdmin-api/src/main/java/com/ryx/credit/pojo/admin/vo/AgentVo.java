@@ -2,12 +2,14 @@ package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
+import com.ryx.credit.pojo.admin.order.ODeductCapital;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OPayment;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -35,8 +37,9 @@ public class AgentVo implements Serializable{
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
     private List<String> refundPriceDiffFile;
     private ORefundPriceDiff oRefundPriceDiff;
+    private List<ODeductCapital> deductCapitalList;
     //付款单
-    private OPayment oPayment;
+    private Map<String,String> oPayment;
 
     public Agent getAgent() {
         return agent;
@@ -159,11 +162,11 @@ public class AgentVo implements Serializable{
         this.orderAprDept = orderAprDept;
     }
 
-    public OPayment getoPayment() {
+    public Map<String, String> getoPayment() {
         return oPayment;
     }
 
-    public void setoPayment(OPayment oPayment) {
+    public void setoPayment(Map<String, String> oPayment) {
         this.oPayment = oPayment;
     }
 
@@ -189,5 +192,13 @@ public class AgentVo implements Serializable{
 
     public void setoRefundPriceDiff(ORefundPriceDiff oRefundPriceDiff) {
         this.oRefundPriceDiff = oRefundPriceDiff;
+    }
+
+    public List<ODeductCapital> getDeductCapitalList() {
+        return deductCapitalList;
+    }
+
+    public void setDeductCapitalList(List<ODeductCapital> deductCapitalList) {
+        this.deductCapitalList = deductCapitalList;
     }
 }

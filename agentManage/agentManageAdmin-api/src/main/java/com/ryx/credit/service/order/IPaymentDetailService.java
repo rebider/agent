@@ -4,7 +4,9 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Zhang Lei
@@ -19,6 +21,11 @@ public interface IPaymentDetailService {
      * @Date: 16:52 2018/7/24
      */
     List<OPaymentDetail> getCanTakeoutPaymentsByAgentId(String agentId) throws ProcessException;
+
+    /**
+     * 提供分润接口
+     */
+    List<Map<String, Object>> getShareMoney(String method, String agentId, String time) throws ParseException;
 
     /**
      * @Author: Zhang Lei

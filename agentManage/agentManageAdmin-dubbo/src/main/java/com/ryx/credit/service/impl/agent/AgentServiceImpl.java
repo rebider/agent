@@ -5,15 +5,20 @@ import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.commons.utils.DigestUtils;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.IdService;
@@ -50,6 +55,10 @@ public class AgentServiceImpl implements  AgentService {
     private DepartmentService departmentService;
     @Autowired
     private BusActRelMapper busActRelMapper;
+    @Autowired
+    private RedisService redisService;
+    @Autowired
+    private IUserService iUserService;
 
     /**
      * 查询代理商信息
@@ -263,5 +272,38 @@ public class AgentServiceImpl implements  AgentService {
             agent.setAgDocDistrict( departmentService.getById(agent.getAgDocDistrict()).getName());
         }
         return agent;
+    }
+
+    /**
+     * 生成后台用户
+     * @param agentId
+     */
+    @Override
+    public void createBackUserbyAgent(String agentId){
+        ThreadPool.putThreadPool(()->{
+            try {
+                Agent agent = getAgentById(agentId);
+                UserVo userVoSelect = iUserService.selectByName(agent.getAgName());
+                if(userVoSelect!=null){
+                    return;
+                }
+                UserVo userVo = new UserVo();
+                String salt = com.ryx.credit.commons.utils.StringUtils.getUUId();
+                String pwd  = DigestUtils.hashByShiro("md5",redisService.hGet("config","pass") , salt, 1);
+                userVo.setSalt(salt);
+                userVo.setPassword(pwd);
+                userVo.setLoginName(agent.getAgLegalMobile());
+                userVo.setName(agent.getAgName());
+                userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config","org")));
+                userVo.setRoleIds(redisService.hGet("config","role"));
+                userVo.setUserType(1);
+                iUserService.insertByVo(userVo);
+                userVo = iUserService.selectByName(userVo.getName());
+                redisService.setValue(String.valueOf(userVo.getId()),agent.getId(),Long.valueOf(Integer.MAX_VALUE));
+            } catch (Exception e) {
+                logger.error("createBackUserbyAgent error {}",agentId,e);
+            }
+
+        });
     }
 }

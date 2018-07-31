@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtils;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -563,13 +560,20 @@ public class OrderServiceImpl implements OrderService {
 
         //检查是否有审批中的代理商新
         BusActRelExample example = new BusActRelExample();
-        example.or().andBusIdEqualTo(cuser).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
+        example.or().andBusIdEqualTo(id)
+                .andBusTypeEqualTo(BusActRelBusType.ORDER.name())
+                .andActivStatusEqualTo(AgStatus.Approving.name())
+                .andStatusEqualTo(Status.STATUS_1.status);
         if (busActRelMapper.selectByExample(example).size() > 0) {
             logger.info("订单提交审批,禁止重复提交审批{}:{}", id, cuser);
             return AgentResult.fail("订单提交审批，禁止重复提交审批");
         }
         OOrder order = orderMapper.selectByPrimaryKey(id);
         if (order.getReviewStatus().equals(AgStatus.Approving.name())) {
+            logger.info("订单提交审批,禁止重复提交审批{}:{}", id, cuser);
+            return AgentResult.fail("订单提交审批，禁止重复提交审批");
+        }
+        if (order.getReviewStatus().equals(AgStatus.Approved.name())) {
             logger.info("订单提交审批,禁止重复提交审批{}:{}", id, cuser);
             return AgentResult.fail("订单提交审批，禁止重复提交审批");
         }
@@ -636,14 +640,7 @@ public class OrderServiceImpl implements OrderService {
         try {
             //处理审批数据
             logger.info("订单提交审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
-            //如果有业务数据就保存
-            if (null != agentVo.getoPayment()) {
-                OPayment oPayment = new OPayment();
-                BeanUtils.copyProperties(agentVo.getoPayment(), oPayment);
-                if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                    logger.info("付款单数据储存失败");
-                }
-            }
+
             //完成任务
             AgentResult result = new AgentResult(500, "系统异常", "");
             Map<String, Object> reqMap = new HashMap<>();
@@ -664,17 +661,74 @@ public class OrderServiceImpl implements OrderService {
 
             //完成任务
             Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+
+
+            //如果有业务数据就保存
+            if (null != agentVo.getoPayment()) {
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("id"))){
+                    //付款单
+                    OPayment db =  oPaymentMapper.selectByPrimaryKey(agentVo.getoPayment().get("id"));
+                    OPayment oPayment = new OPayment();
+                    oPayment.setId(db.getId());
+                    oPayment.setVersion(db.getVersion());
+                    //抵扣金额
+                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionAmount"))){
+                        //抵扣类型
+                        if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
+                            oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
+                        }else{
+                            oPayment.setDeductionType("BAOZHENGJIN");
+                        }
+                        oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
+                    }
+
+                    //收款时间
+                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))){
+                        //收款金额
+                        if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
+                            oPayment.setActualReceipt(new BigDecimal(agentVo.getoPayment().get("actualReceipt")));
+                        }else{
+                            throw new ProcessException("实收金额不能为空");
+                        }
+                        //收款公司
+                        if(StringUtils.isNotBlank(agentVo.getoPayment().get("collectCompany"))){
+                            oPayment.setCollectCompany(agentVo.getoPayment().get("collectCompany"));
+                        }else{
+                            throw new ProcessException("收款公司不能为空");
+                        }
+                        oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
+                    }
+                    //结算价
+                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("settlementPrice"))){
+                        oPayment.setSettlementPrice(new BigDecimal(agentVo.getoPayment().get("settlementPrice")));
+                        //分润模板
+                        if(StringUtils.isNotBlank(agentVo.getoPayment().get("shareTemplet"))){
+                            oPayment.setShareTemplet(agentVo.getoPayment().get("shareTemplet"));
+                        }
+                        //是否开具发票
+                        if(StringUtils.isNotBlank(agentVo.getoPayment().get("isCloInvoice"))){
+                            oPayment.setIsCloInvoice(new BigDecimal(agentVo.getoPayment().get("isCloInvoice")));
+                        }
+                    }
+                    //担保代理商
+                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("guaranteeAgent"))){
+                        oPayment.setGuaranteeAgent(agentVo.getoPayment().get("guaranteeAgent"));
+                    }
+
+                    if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                        logger.info("付款单数据储存失败");
+                        throw new ProcessException("付款单数据储存失败");
+                    }
+                }
+            }
+            if (resultMap == null) {
+                throw new ProcessException("catch工作流处理任务异常!");
+            }
             Boolean rs = (Boolean) resultMap.get("rs");
             String msg = String.valueOf(resultMap.get("msg"));
-            if (resultMap == null) {
-                return result;
-            }
-
             if (!rs) {
-                result.setMsg(msg);
-                return result;
+                throw new ProcessException("catch工作流处理任务异常!");
             }
-
             return AgentResult.ok(null);
         } catch (ProcessException e) {
             e.printStackTrace();
@@ -683,7 +737,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     //订单审批通过
-    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRES_NEW)
     @Override
     public AgentResult approveFinish(String insid, String actname) throws Exception {
         logger.info("代理商订单审批完成:{},{}", insid, actname);
@@ -693,6 +747,10 @@ public class OrderServiceImpl implements OrderService {
         if (actname.equals("finish_end")) {
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
+            if(order.getReviewStatus().compareTo(AgStatus.Approved.status)==0){
+                logger.info("代理商订单审批完成已审批过:{}", order.getId());
+                return AgentResult.ok();
+            }
             OPaymentExample example = new OPaymentExample();
             example.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OPayment> payments = oPaymentMapper.selectByExample(example);
@@ -812,7 +870,7 @@ public class OrderServiceImpl implements OrderService {
                         //添加首付明细
                         OPaymentDetail record_SF1 = new OPaymentDetail();
                         record_SF1.setId(idService.genId(TabId.o_payment_detail));
-                        record_SF1.setBatchCode(d.getTime() + "");
+                        record_SF1.setBatchCode(d.getTime().getTime() + "");
                         record_SF1.setPaymentId(oPayment.getId());
                         record_SF1.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_SF1.setOrderId(oPayment.getOrderId());
@@ -864,7 +922,7 @@ public class OrderServiceImpl implements OrderService {
                         //添加首付明细
                         OPaymentDetail record_SF2 = new OPaymentDetail();
                         record_SF2.setId(idService.genId(TabId.o_payment_detail));
-                        record_SF2.setBatchCode(d.getTime() + "");
+                        record_SF2.setBatchCode(d.getTime().getTime()+ "");
                         record_SF2.setPaymentId(oPayment.getId());
                         record_SF2.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_SF2.setOrderId(oPayment.getOrderId());
@@ -915,7 +973,7 @@ public class OrderServiceImpl implements OrderService {
                         //添加首付明细
                         OPaymentDetail record_QT = new OPaymentDetail();
                         record_QT.setId(idService.genId(TabId.o_payment_detail));
-                        record_QT.setBatchCode(d.getTime() + "");
+                        record_QT.setBatchCode(d.getTime().getTime() + "");
                         record_QT.setPaymentId(oPayment.getId());
                         record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
                         record_QT.setOrderId(oPayment.getOrderId());
@@ -949,8 +1007,6 @@ public class OrderServiceImpl implements OrderService {
             }
 
         } else if (actname.equals("reject_end")) {
-
-
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
             OPaymentExample example = new OPaymentExample();
