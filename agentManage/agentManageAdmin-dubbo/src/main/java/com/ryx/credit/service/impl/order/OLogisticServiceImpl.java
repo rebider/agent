@@ -7,15 +7,16 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OLogisticsMapper;
+import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
-import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -24,12 +25,12 @@ import java.util.Map;
 
 /**
  * @Author Lihl
- * @Date 2018/07/21
+ * @Date 2018/07/23
  * 排单管理：物流信息
  */
 @Service("oLogisticService")
 public class OLogisticServiceImpl implements OLogisticsService {
-    private static org.slf4j.Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
     @Autowired
@@ -54,6 +55,46 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return pageInfo;
     }
 
+    /**
+     * 物流信息：
+     * 1、导入物流信息
+     * 2、调用明细接口并插入信息
+     */
+    @Override
+    public List<String> addList(List<List<Object>> data, String user, String startSn, String endSn, Integer begins, Integer finish) throws Exception {
+        List<String> list = new ArrayList<>();
+        for (List<Object> objectList : data) {
+            if(objectList == null || objectList.size() == 0 || StringUtils.isBlank(objectList.get(0) + ""))break;
+            OLogistics oLogistics = new OLogistics();
+            oLogistics.setcUser(user);    // 创建人
+            oLogistics.setId(idService.genId(TabId.o_logistics));   // 物流ID序列号
+            oLogistics.setcTime(Calendar.getInstance().getTime());   // 创建时间
+            oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0)));   // 排单编号
+            oLogistics.setOrderId(String.valueOf(objectList.get(1)));   // 订单编号
+            oLogistics.setProId(String.valueOf(objectList.get(2)));   // 商品编号
+            oLogistics.setLogCom(String.valueOf(objectList.get(21)));   // 物流公司
+            oLogistics.setLogType(String.valueOf(objectList.get(22)));   // 物流类型
+            oLogistics.setwNumber(String.valueOf(objectList.get(23)));   // 物流单号
+            oLogistics.setSnBeginNum(String.valueOf(objectList.get(24)));   // 起始SN序列号
+            oLogistics.setSnEndNum(String.valueOf(objectList.get(25)));   // 结束SN序列号
+            System.out.println("物流信息============================================" + JSONObject.toJSON(oLogistics));
+            if(1 != insertImportData(oLogistics)){
+                throw new ProcessException("插入失败");
+            }
+            list.add(oLogistics.getId());
+
+            begins = Integer.valueOf(String.valueOf(objectList.get(26)));   // 起始SN位数
+            finish = Integer.valueOf(String.valueOf(objectList.get(27)));   // 结束SN位数
+            insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
+        }
+        return list;
+    }
+
+    @Override
+    public int insertImportData(OLogistics oLogistics) {
+//        oLogistics.setId(idService.genId(TabId.o_logistics));
+        return oLogisticsMapper.insertSelective(oLogistics);
+    }
 
     /**
      * @Author: Zhang Lei
@@ -76,10 +117,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
 
         List<Map<String, Object>> list = oLogisticsMapper.getOrderAndLogisticsBySns(startSn, endSn, agentId);
-
         return list;
     }
-
 
     @Override
     public ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String uUser) {
@@ -121,10 +160,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
             }
         }
-
         return ResultVO.success(null);
     }
-
 
     public static List<String> idList(String startSn, String endSn, Integer begins, Integer finish) {
         //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
@@ -144,4 +181,5 @@ public class OLogisticServiceImpl implements OLogisticsService {
         }
         return list;
     }
+
 }
