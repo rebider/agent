@@ -1,18 +1,20 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.PaymentStatus;
-import com.ryx.credit.common.enumc.PaymentType;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.order.OPaymentDetailExample;
 import com.ryx.credit.service.order.IPaymentDetailService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @Author: Zhang Lei
@@ -21,13 +23,14 @@ import java.util.List;
  */
 @Service("paymentDetailService")
 public class PaymentDetailServiceImpl implements IPaymentDetailService {
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger(PaymentDetailServiceImpl.class);
 
     @Autowired
     OPaymentDetailMapper oPaymentDetailMapper;
 
     /**
      * @Author: Zhang Lei
-     * @Description: 查询代理商可抵扣欠款,先根据欠款类型排序，欠款类型相同的根据订单号排序
+     * @Description: 查询代理商可抵扣欠款, 先根据欠款类型排序，欠款类型相同的根据订单号排序
      * @Date: 17:01 2018/7/24
      */
     @Override
@@ -50,5 +53,59 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         example.setOrderByClause("order_id asc");
         example.setOrderByClause("plan_pay_time asc");
         return oPaymentDetailMapper.selectByExample(example);
+    }
+
+    @Override
+    public List<Map<String, Object>> getShareMoney(String method, String agentId, String time) throws ParseException {
+        List<Map<String, Object>> maps = null;
+        if (StringUtils.isBlank(method)) {
+            logger.info("分润查询:{}", "获取方式为空");
+            throw new ProcessException("获取方式为空");
+        }
+        if (method.equals(GetMethod.AGENTORDER.code)) {
+            //代理商订单分期--需要agentId 和 time
+            if (StringUtils.isBlank(agentId)) {
+                logger.info("分润查询:{}", "代理商id为空");
+                throw new ProcessException("代理商id为空");
+            }
+            if (StringUtils.isBlank(time)) {
+                logger.info("分润查询:{}", "时间为空");
+                throw new ProcessException("时间为空");
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("agentId", agentId);
+            map.put("time", time);
+            maps= oPaymentDetailMapper.selectShareMoney(map);
+        }
+        if (method.equals(GetMethod.AGENTDATE.code)) {
+            //所有当月分期---只需要时间
+            if (StringUtils.isBlank(time)) {
+                logger.info("分润查询:{}", "时间为空");
+                throw new ProcessException("时间为空");
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("time", time);
+            maps= oPaymentDetailMapper.selectShareMoney(map);
+        }
+        return maps;
+    }
+
+    private List<OPaymentDetail> selectAll(String agentId, String time) throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date parse = simpleDateFormat.parse(time);
+
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+        if (StringUtils.isNotBlank(agentId))
+            criteria.andAgentIdEqualTo(agentId);
+        criteria.andCDateEqualTo(parse);//时间查询如何使用这个实例
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andPaymentStatusEqualTo(PaymentStatus.DF.code);
+        criteria.andPayTypeEqualTo(PaymentType.FRFQ.code);//有个分润分期和打款分期的
+        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        if (null == oPaymentDetails && oPaymentDetails.size() < 0) {
+            return Arrays.asList();
+        }
+        return oPaymentDetails;
     }
 }
