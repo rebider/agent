@@ -1,5 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.agent.Attachment;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -41,6 +43,8 @@ public class ORefundPriceDiff implements Serializable{
     private BigDecimal version;
 
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
+
+    private List<Attachment> attachmentList;
 
     public String getId() {
         return id;
@@ -184,5 +188,13 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setRefundPriceDiffDetailList(List<ORefundPriceDiffDetail> refundPriceDiffDetailList) {
         this.refundPriceDiffDetailList = refundPriceDiffDetailList;
+    }
+
+    public List<Attachment> getAttachmentList() {
+        return attachmentList;
+    }
+
+    public void setAttachmentList(List<Attachment> attachmentList) {
+        this.attachmentList = attachmentList;
     }
 }
