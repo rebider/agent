@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -42,7 +43,6 @@ import java.util.*;
 public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
-
 
     @Autowired
     private OOrderMapper orderMapper;
@@ -80,6 +80,10 @@ public class OrderServiceImpl implements OrderService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private BusActRelService busActRelService;
+    @Autowired
+    private OActivityMapper oActivityMapper;
+    @Autowired
+    private ApaycompService apaycompService;
 
 
     @Override
@@ -89,6 +93,7 @@ public class OrderServiceImpl implements OrderService {
         OOrderExample.Criteria criteria = example.createCriteria();
 
         example.setPage(page);
+        example.setOrderByClause(" c_time desc ");
         List<OOrder> oOrders = orderMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oOrders);
@@ -118,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
         OPayment oPayment = orderFormVo.getoPayment();
         //分期处理
         AgentResult oPayment_res = paymentPlan(oPayment);
-        return AgentResult.ok();
+        return AgentResult.ok(orderFormVo.getId());
     }
 
     /**
@@ -344,9 +349,6 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("下订单:{}", "商品价格数据错误");
                 throw new ProcessException("商品价格数据错误");
             }
-            if (oSubOrder.getProRelPrice() == null) {
-                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
-            }
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
                 throw new ProcessException("商品数量错误");
@@ -367,11 +369,52 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setStatus(Status.STATUS_1.status);
             oSubOrder.setVersion(Status.STATUS_0.status);
             oSubOrder.setAgentId(orderFormVo.getAgentId());
+
+            //商品参加的活动
+            String oActivity = oSubOrder.getActivity();
+
+            if(StringUtils.isNotBlank(oActivity)){
+                OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
+                if (activity!= null && activity.getPrice()!=null && activity.getPrice().compareTo(BigDecimal.ZERO)>0) {
+                    oSubOrder.setProRelPrice(activity.getPrice());
+                    OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
+                    oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
+                    oSubOrderActivity.setActivityId(activity.getId());
+                    oSubOrderActivity.setSubOrderId(oSubOrder.getId());
+                    oSubOrderActivity.setActivityName(activity.getActivityName());
+                    oSubOrderActivity.setRuleId(activity.getRuleId());
+                    oSubOrderActivity.setProId(oSubOrder.getProId());
+                    oSubOrderActivity.setProName(oSubOrder.getProName());
+                    oSubOrderActivity.setActivityRule(activity.getActivityRule());
+                    oSubOrderActivity.setActivityWay(activity.getActivityWay());
+                    oSubOrderActivity.setPrice(activity.getPrice());
+                    oSubOrderActivity.setProModel(activity.getProModel());
+                    oSubOrderActivity.setVender(activity.getVender());
+                    oSubOrderActivity.setPlatform(activity.getPlatform());
+                    oSubOrderActivity.setgTime(activity.getgTime());
+                    oSubOrderActivity.setcTime(d);
+                    oSubOrderActivity.setuTime(d);
+                    oSubOrderActivity.setcUser(userId);
+                    oSubOrderActivity.setuUser(userId);
+                    oSubOrderActivity.setVersion(Status.STATUS_0.status);
+                    if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
+                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动失败");
+                        throw new ProcessException("商品添加活动失败");
+                    }else{
+                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动成功");
+                    }
+                }else{
+                    oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+                }
+            }else{
+                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+            }
             //插入订单商品信息
             if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
                 logger.info("下订单:{}", "oSubOrder添加失败");
                 throw new ProcessException("oPayment添加失败");
             }
+            //计算订单金额
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
@@ -404,6 +447,7 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
                 throw new ProcessException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
             }
+            //收货地址商品
             for (OReceiptPro pro : pros) {
                 pro.setId(idService.genId(TabId.o_receipt_pro));
                 pro.setcTime(d);
@@ -535,6 +579,11 @@ public class OrderServiceImpl implements OrderService {
 
         List<Attachment> attr = attachmentMapper.accessoryQuery(order.getId(), AttachmentRelType.Order.name());
         f.putKeyV("attrs", attr);
+
+        //收款公司
+        List<PayComp>  comp =  apaycompService.recCompList();
+        f.putKeyV("comp", comp);
+
         return AgentResult.ok(f);
     }
 
@@ -1206,4 +1255,21 @@ public class OrderServiceImpl implements OrderService {
         }
             return oPayments.get(0);
     }
+
+    /**
+     * 订单管理:
+     * 1、列表查询
+     * 2、导出订单信息
+     */
+    @Override
+    public PageInfo getOrderList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = orderMapper.getOrderCount(param);
+        List<Map<String, Object>> list = orderMapper.getOrderList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        System.out.println("查询/导出============================================" + JSONObject.toJSON(list));
+        return pageInfo;
+    }
+
+
 }

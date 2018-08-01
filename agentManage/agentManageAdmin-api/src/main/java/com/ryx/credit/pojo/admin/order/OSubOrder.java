@@ -1,10 +1,12 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.vo.OSubOrderExtends;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OSubOrder implements Serializable {
+public class OSubOrder extends OSubOrderExtends implements Serializable {
     private String id;
 
     private String orderId;

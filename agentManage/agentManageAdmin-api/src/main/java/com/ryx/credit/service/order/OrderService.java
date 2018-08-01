@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -7,6 +8,9 @@ import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -69,7 +73,11 @@ public interface OrderService {
     /**
      * 查找订单id
      */
-
     public OPayment selectByOrderId(String orderId);
+
+    /**
+     * 导出订单信息
+     */
+    PageInfo getOrderList(Map<String, Object> param, PageInfo pageInfo);
 
 }

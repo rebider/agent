@@ -78,14 +78,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if(objectList == null || objectList.size() == 0 || StringUtils.isBlank(objectList.get(0) + ""))break;
             OLogistics oLogistics = new OLogistics();
             oLogistics.setcUser(user);    // 创建人
-            oLogistics.setLogType((LogType.Deliver.getValue()));            // 默认状态为发货物流
+            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认类型为发货物流
             oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
+            oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
             oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
             oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
             oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
             oLogistics.setProId(String.valueOf(objectList.get(2)));         // 商品编号
             oLogistics.setLogCom(String.valueOf(objectList.get(21)));       // 物流公司
-            oLogistics.setLogType(String.valueOf(objectList.get(22)));      // 物流类型
+//            oLogistics.setLogType(String.valueOf(objectList.get(22)));      // 物流类型
             oLogistics.setwNumber(String.valueOf(objectList.get(23)));      // 物流单号
             oLogistics.setSnBeginNum(String.valueOf(objectList.get(24)));   // 起始SN序列号
             oLogistics.setSnEndNum(String.valueOf(objectList.get(25)));     // 结束SN序列号
