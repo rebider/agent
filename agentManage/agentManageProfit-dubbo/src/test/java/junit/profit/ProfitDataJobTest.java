@@ -4,9 +4,7 @@ package junit.profit;/**
  * @Description:
  */
 
-import com.ryx.credit.profit.jobs.ProfitDataJob;
 import com.ryx.credit.profit.jobs.RefundJob;
-import com.ryx.credit.profit.service.StagingService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,12 +22,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class RefundJobTest {
+public class ProfitDataJobTest {
 
-    private Logger logger = LoggerFactory.getLogger(RefundJobTest.class);
+    private Logger logger = LoggerFactory.getLogger(ProfitDataJobTest.class);
 
     @Autowired
-    private ProfitDataJob profitDataJob;
+    private RefundJob refundJob;
 
     /*** 
     * @Description: 测试任务处理
@@ -40,6 +38,6 @@ public class RefundJobTest {
     */
     @Test
     public void testDeal() {
-        profitDataJob.deal();
+        refundJob.deal();
     }
 }

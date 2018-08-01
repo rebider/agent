@@ -36,7 +36,7 @@ public class StagingServiceTest {
         staging.setSumAmt(new BigDecimal("10000"));
         staging.setStagCount(new BigDecimal("2"));
         staging.setUserId("524");
-        stagingServiceImpl.addStaging(staging);
+        stagingServiceImpl.addStaging(staging,"");
     }
     
 

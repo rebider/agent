@@ -113,7 +113,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                     agentSumAmtMap.put(list.get(1).toString(), agentSumAmtMap.get(list.get(1).toString()).add(new BigDecimal(list.get(3).toString())));
                 }else{
                     agentSumAmtMap.put(list.get(1).toString(), new BigDecimal(list.get(3).toString()));
-                    deductionIdMap.put(list.get(1).toString(),idService.genIdInTran(TabId.P_STAGING_DETAIL) );
+                    deductionIdMap.put(list.get(1).toString(),idService.genIdInTran(TabId.P_DEDUCTION) );
                     agentNameMap.put(list.get(1).toString(),list.get(0).toString());
                 }
                 insertDetail( deductionIdMap.get(list.get(1).toString()), new BigDecimal(list.get(3).toString()), (String)list.get(2));

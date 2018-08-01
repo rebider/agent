@@ -23,6 +23,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -149,29 +150,20 @@ public class StagingServiceImpl implements StagingService {
     }
 
     @Override
-    public void addStaging(ProfitStaging profitStaging) {
+    public void addStaging(ProfitStaging profitStaging, String workId) {
         LOG.info("新建分期");
-        try {
-            validate(profitStaging);
-            ProfitDeduction deduction = new ProfitDeduction();
-            deduction.setId(profitStaging.getSourceId());
-            deduction.setStagingStatus(DeductionStatus.REVIEWING.getStatus());
-            profitDeductionServiceImpl.updateProfitDeduction(deduction);
-            profitStaging.setId(idService.genId(TabId.P_STAGING));
-            profitStagingMapper.insert(profitStaging);
-            startActivity(profitStaging);
-            // 增加扣款分期状态为分期审核中
-            LOG.info("生成分期明细");
-            splitStaging(profitStaging);
-        }catch (StagingException e){
-            LOG.error(e.getMessage());
-            e.printStackTrace();
-            throw new StagingException(e.getMessage());
-        }catch (Exception e){
-            LOG.error("新建分期失败。");
-            e.printStackTrace();
-            throw new StagingException("新建分期失败");
-        }
+        validate(profitStaging);
+        ProfitDeduction deduction = new ProfitDeduction();
+        deduction.setId(profitStaging.getSourceId());
+        deduction.setStagingStatus(DeductionStatus.REVIEWING.getStatus());
+        profitDeductionServiceImpl.updateProfitDeduction(deduction);
+        profitStaging.setId(idService.genId(TabId.P_STAGING));
+        profitStagingMapper.insert(profitStaging);
+        startActivity(profitStaging, workId);
+        // 增加扣款分期状态为分期审核中
+        LOG.info("生成分期明细");
+        splitStaging(profitStaging);
+
     }
 
     /**
@@ -204,9 +196,9 @@ public class StagingServiceImpl implements StagingService {
      *启动审批流
      * @param  profitStaging 分期对象
      */
-    private void startActivity(ProfitStaging profitStaging) {
+    private void startActivity(ProfitStaging profitStaging, String workId) {
             //启动审批
-            String proceId = activityService.createDeloyFlow(null, "refundByStages", null, null, null);
+            String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
             if (proceId == null) {
                 LOG.error("审批流启动失败{}");
                 throw new ProcessException("审批流启动失败!");
@@ -227,8 +219,7 @@ public class StagingServiceImpl implements StagingService {
                 ProfitStaging staging = getStagingById(rel.getBusId());
                 if (staging !=null) {
                     rel.setStatus(Status.STATUS_2.status);
-                    ProfitDeduction deduction = new ProfitDeduction();
-                    deduction.setId(staging.getSourceId());
+                    ProfitDeduction deduction = profitDeductionServiceImpl.getProfitDeductionById(staging.getSourceId());
                     deduction.setStagingStatus(DeductionStatus.PASS.getStatus());
                     //拒绝
                     if ("reject_end".equals(status)) {
@@ -250,6 +241,7 @@ public class StagingServiceImpl implements StagingService {
         } catch (Exception e) {
             e.printStackTrace();
             LOG.info("任务执行完成处理业务逻辑报错。");
+            throw new ProcessException("任务执行完成处理业务逻辑报错!");
         }
 
     }

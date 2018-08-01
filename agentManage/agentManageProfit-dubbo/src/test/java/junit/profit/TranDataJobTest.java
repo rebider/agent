@@ -4,8 +4,7 @@ package junit.profit;/**
  * @Description:
  */
 
-import com.ryx.credit.profit.jobs.CheckTranJob;
-import com.ryx.credit.profit.jobs.RefundJob;
+import com.ryx.credit.profit.jobs.TranDataJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,12 +22,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class CheckTranJobTest {
+public class TranDataJobTest {
 
-    private Logger logger = LoggerFactory.getLogger(CheckTranJobTest.class);
+    private Logger logger = LoggerFactory.getLogger(TranDataJobTest.class);
 
     @Autowired
-    private CheckTranJob checkTranJob;
+    private TranDataJob tranDataJob;
 
     /*** 
     * @Description: 测试任务处理
@@ -39,6 +38,6 @@ public class CheckTranJobTest {
     */
     @Test
     public void testDeal() {
-        checkTranJob.deal();
+        tranDataJob.deal();
     }
 }
