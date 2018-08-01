@@ -100,7 +100,7 @@ public class PlannerServiceImpl implements PlannerService {
             receiptPro.setId(receiptProId);
             receiptPro.setSendNum(oReceiptPro.getSendNum().add(receiptPlan.getPlanProNum()));
             if (receiptPro.getSendNum().equals(oReceiptPro.getProNum())) {
-                receiptPro.setReceiptProStatus(String.valueOf(OReceiptStatus.DISPATCHED_ORDER.code));
+                receiptPro.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
             }
             int receiptProUpdate = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
             if (receiptInsert != 1 || receiptProUpdate != 1) {
@@ -111,7 +111,7 @@ public class PlannerServiceImpl implements PlannerService {
             OReceiptProExample oReceiptProExample = new OReceiptProExample();
             OReceiptProExample.Criteria criteria = oReceiptProExample.createCriteria();
             criteria.andReceiptIdEqualTo(receiptPlan.getReceiptId());
-            criteria.andReceiptProStatusEqualTo(String.valueOf(OReceiptStatus.WAITING_LIST.code));
+            criteria.andReceiptProStatusEqualTo(OReceiptStatus.WAITING_LIST.code);
             List<OReceiptPro> oReceiptPros = receiptProMapper.selectByExample(oReceiptProExample);
             if (oReceiptPros.size() == 0) {
                 OReceiptOrder receiptOrder = new OReceiptOrder();

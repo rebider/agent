@@ -133,14 +133,15 @@ public class ProductServiceImpl implements ProductService {
             OProductExample oProductExample = new OProductExample();
             OProductExample.Criteria criteria = oProductExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andIdNotEqualTo(product.getId());
             List<OProduct> oProducts = productMapper.selectByExample(oProductExample);
             if (null == oProducts && oProducts.size()<0) {
                 return null;
             }
             for (OProduct oProduct : oProducts) {
                 if (product.getProName().equals(oProduct.getProName()) && product.getProType().equals(oProduct.getProType()) && product.getProCom().equals(oProduct.getProCom()) && product.getProModel().equals(oProduct.getProModel())) {
-                    logger.info("商品修改:{}", "商品未作任何修改！");
-                    return AgentResult.fail("商品未作任何修改！");
+                    logger.info("商品修改:{}", "商品不可修改重复的选项");
+                    return AgentResult.fail("商品不可修改重复的选项");
                 }
             }
         }

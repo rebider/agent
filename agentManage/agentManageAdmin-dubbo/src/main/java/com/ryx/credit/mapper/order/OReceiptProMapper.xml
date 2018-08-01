@@ -16,7 +16,7 @@
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="RECEIPT_PRO_STATUS" jdbcType="VARCHAR" property="receiptProStatus" />
+    <result column="RECEIPT_PRO_STATUS" jdbcType="DECIMAL" property="receiptProStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -90,7 +90,7 @@
     #{proId,jdbcType=VARCHAR}, #{proCode,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR},
     #{proNum,jdbcType=DECIMAL}, #{sendNum,jdbcType=DECIMAL}, #{cUser,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{uUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{receiptProStatus,jdbcType=VARCHAR}
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{receiptProStatus,jdbcType=DECIMAL}
     )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReceiptPro">
@@ -186,7 +186,7 @@
         #{version,jdbcType=DECIMAL},
       </if>
       <if test="receiptProStatus != null">
-        #{receiptProStatus,jdbcType=VARCHAR},
+        #{receiptProStatus,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -239,7 +239,7 @@
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
       <if test="receiptProStatus != null">
-        RECEIPT_PRO_STATUS = #{receiptProStatus,jdbcType=VARCHAR},
+        RECEIPT_PRO_STATUS = #{receiptProStatus,jdbcType=DECIMAL},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -259,7 +259,7 @@
     U_TIME = #{uTime,jdbcType=TIMESTAMP},
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
-    RECEIPT_PRO_STATUS = #{receiptProStatus,jdbcType=VARCHAR}
+    RECEIPT_PRO_STATUS = #{receiptProStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

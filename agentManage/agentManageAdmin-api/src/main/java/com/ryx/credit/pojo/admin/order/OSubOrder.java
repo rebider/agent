@@ -53,6 +53,10 @@ public class OSubOrder extends OSubOrderExtends implements Serializable {
 
     private BigDecimal sumProPrice;
 
+    private String snBegin;
+
+    private String snEnd;
+
     public String getId() {
         return id;
     }
@@ -235,5 +239,21 @@ public class OSubOrder extends OSubOrderExtends implements Serializable {
 
     public void setAgentId(String agentId) {
         this.agentId = agentId;
+    }
+
+    public String getSnBegin() {
+        return snBegin;
+    }
+
+    public void setSnBegin(String snBegin) {
+        this.snBegin = snBegin;
+    }
+
+    public String getSnEnd() {
+        return snEnd;
+    }
+
+    public void setSnEnd(String snEnd) {
+        this.snEnd = snEnd;
     }
 }
