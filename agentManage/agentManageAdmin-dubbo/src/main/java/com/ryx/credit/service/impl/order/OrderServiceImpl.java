@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -20,10 +21,13 @@ import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.AgentQueryService;
+import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
+import com.sun.org.apache.xerces.internal.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -43,7 +49,6 @@ public class OrderServiceImpl implements OrderService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-
     @Autowired
     private OOrderMapper orderMapper;
     @Autowired
@@ -52,8 +57,6 @@ public class OrderServiceImpl implements OrderService {
     private OSubOrderMapper oSubOrderMapper;
     @Autowired
     private OSubOrderActivityMapper oSubOrderActivityMapper;
-    @Autowired
-    private OReceiptProMapper oReceiptProMapper;
     @Autowired
     private OPaymentMapper oPaymentMapper;
     @Autowired
@@ -66,6 +69,8 @@ public class OrderServiceImpl implements OrderService {
     private OAddressMapper oAddressMapper;
     @Autowired
     private OReceiptOrderMapper oReceiptOrderMapper;
+    @Autowired
+    private OReceiptProMapper oReceiptProMapper;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
@@ -80,6 +85,12 @@ public class OrderServiceImpl implements OrderService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private BusActRelService busActRelService;
+    @Autowired
+    private OActivityMapper oActivityMapper;
+    @Autowired
+    private ApaycompService apaycompService;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
 
     @Override
@@ -89,11 +100,28 @@ public class OrderServiceImpl implements OrderService {
         OOrderExample.Criteria criteria = example.createCriteria();
 
         example.setPage(page);
+        example.setOrderByClause(" c_time desc ");
         List<OOrder> oOrders = orderMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oOrders);
         pageInfo.setTotal(orderMapper.countByExample(example));
         return pageInfo;
+    }
+
+
+    @Override
+    public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus,List<BigDecimal> orderStatus) {
+        OOrderExample example = new OOrderExample();
+        example.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andAgentIdEqualTo(agentId)
+                .andReviewStatusEqualTo(approveStatus)
+                .andOrderStatusIn(orderStatus);
+        List<OOrder> orders = orderMapper.selectByExample(example);
+        List<String>  ids =  orders.stream().map(OOrder::getId).collect(Collectors.toList());
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdIn(ids);
+        return oPaymentMapper.selectByExample(oPaymentExample);
     }
 
     /**
@@ -111,6 +139,9 @@ public class OrderServiceImpl implements OrderService {
         if (StringUtils.isBlank(orderFormVo.getOrderPlatform())) {
             return AgentResult.fail("请选择平台");
         }
+        if (orderFormVo.getoSubOrder()==null || orderFormVo.getoSubOrder().size()==0) {
+            return AgentResult.fail("请选择商品");
+        }
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = setOrderFormValue(orderFormVo, userId);
@@ -118,7 +149,7 @@ public class OrderServiceImpl implements OrderService {
         OPayment oPayment = orderFormVo.getoPayment();
         //分期处理
         AgentResult oPayment_res = paymentPlan(oPayment);
-        return AgentResult.ok();
+        return AgentResult.ok(orderFormVo.getId());
     }
 
     /**
@@ -344,9 +375,6 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("下订单:{}", "商品价格数据错误");
                 throw new ProcessException("商品价格数据错误");
             }
-            if (oSubOrder.getProRelPrice() == null) {
-                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
-            }
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
                 throw new ProcessException("商品数量错误");
@@ -367,11 +395,52 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setStatus(Status.STATUS_1.status);
             oSubOrder.setVersion(Status.STATUS_0.status);
             oSubOrder.setAgentId(orderFormVo.getAgentId());
+
+            //商品参加的活动
+            String oActivity = oSubOrder.getActivity();
+
+            if(StringUtils.isNotBlank(oActivity)){
+                OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
+                if (activity!= null && activity.getPrice()!=null && activity.getPrice().compareTo(BigDecimal.ZERO)>0) {
+                    oSubOrder.setProRelPrice(activity.getPrice());
+                    OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
+                    oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
+                    oSubOrderActivity.setActivityId(activity.getId());
+                    oSubOrderActivity.setSubOrderId(oSubOrder.getId());
+                    oSubOrderActivity.setActivityName(activity.getActivityName());
+                    oSubOrderActivity.setRuleId(activity.getRuleId());
+                    oSubOrderActivity.setProId(oSubOrder.getProId());
+                    oSubOrderActivity.setProName(oSubOrder.getProName());
+                    oSubOrderActivity.setActivityRule(activity.getActivityRule());
+                    oSubOrderActivity.setActivityWay(activity.getActivityWay());
+                    oSubOrderActivity.setPrice(activity.getPrice());
+                    oSubOrderActivity.setProModel(activity.getProModel());
+                    oSubOrderActivity.setVender(activity.getVender());
+                    oSubOrderActivity.setPlatform(activity.getPlatform());
+                    oSubOrderActivity.setgTime(activity.getgTime());
+                    oSubOrderActivity.setcTime(d);
+                    oSubOrderActivity.setuTime(d);
+                    oSubOrderActivity.setcUser(userId);
+                    oSubOrderActivity.setuUser(userId);
+                    oSubOrderActivity.setVersion(Status.STATUS_0.status);
+                    if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
+                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动失败");
+                        throw new ProcessException("商品添加活动失败");
+                    }else{
+                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动成功");
+                    }
+                }else{
+                    oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+                }
+            }else{
+                oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+            }
             //插入订单商品信息
             if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
                 logger.info("下订单:{}", "oSubOrder添加失败");
                 throw new ProcessException("oPayment添加失败");
             }
+            //计算订单金额
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
@@ -404,6 +473,7 @@ public class OrderServiceImpl implements OrderService {
                 logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
                 throw new ProcessException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
             }
+            //收货地址商品
             for (OReceiptPro pro : pros) {
                 pro.setId(idService.genId(TabId.o_receipt_pro));
                 pro.setcTime(d);
@@ -419,7 +489,7 @@ public class OrderServiceImpl implements OrderService {
                 pro.setuUser(userId);
                 pro.setStatus(Status.STATUS_1.status);
                 pro.setVersion(Status.STATUS_0.status);
-                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code.toString());
+                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
                 //插入收货地址明细
                 if (1 != oReceiptProMapper.insertSelective(pro)) {
                     logger.info("下订单:{}", "oReceiptPro添加失败");
@@ -533,8 +603,14 @@ public class OrderServiceImpl implements OrderService {
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
+        //订单附件
         List<Attachment> attr = attachmentMapper.accessoryQuery(order.getId(), AttachmentRelType.Order.name());
         f.putKeyV("attrs", attr);
+
+        //收款公司
+        List<PayComp>  comp =  apaycompService.recCompList();
+        f.putKeyV("comp", comp);
+
         return AgentResult.ok(f);
     }
 
@@ -1006,6 +1082,37 @@ public class OrderServiceImpl implements OrderService {
                 throw new ProcessException("订单更新异常");
             }
 
+            //  发货单状态修改
+            OReceiptOrderExample oReceiptOrderExample = getoReceiptOrderExample();
+            oReceiptOrderExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrderIdEqualTo(order.getId())
+                    .andReceiptStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
+            List<OReceiptOrder> oReceiptOrderList = oReceiptOrderMapper.selectByExample(oReceiptOrderExample);
+            for (OReceiptOrder oReceiptOrder : oReceiptOrderList) {
+                oReceiptOrder.setReceiptStatus(OReceiptStatus.WAITING_LIST.code);
+                oReceiptOrder.setuTime(d.getTime());
+                if(1!=oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder)){
+                    logger.error("更新收货单异常{}",order.getId());
+                    throw new ProcessException("更新收货单异常");
+                }
+            }
+
+            //  发货单商品状态修改
+            OReceiptProExample oReceiptProExample = new OReceiptProExample();
+            oReceiptProExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrderidEqualTo(order.getId())
+                    .andReceiptProStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
+            List<OReceiptPro>  pros =  oReceiptProMapper.selectByExample(oReceiptProExample);
+            for (OReceiptPro pro : pros) {
+                //  发货单商品状态修改 更新成待排单
+                pro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
+                pro.setuTime(d.getTime());
+                if(1!=oReceiptProMapper.updateByPrimaryKeySelective(pro)){
+                    logger.error("更新收货单商品异常{}",order.getId());
+                    throw new ProcessException("更新收货单商品异常");
+                }
+            }
+
         } else if (actname.equals("reject_end")) {
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
@@ -1194,6 +1301,10 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok();
     }
 
+    private OReceiptOrderExample getoReceiptOrderExample() {
+        return new OReceiptOrderExample();
+    }
+
     @Override
     public OPayment selectByOrderId(String orderId) {
         OPaymentExample oPaymentExample = new OPaymentExample();
@@ -1205,5 +1316,61 @@ public class OrderServiceImpl implements OrderService {
             return null;
         }
             return oPayments.get(0);
+    }
+
+    /**
+     * 订单管理:
+     * 1、列表查询
+     * 2、导出订单信息
+     */
+    @Override
+    public PageInfo getOrderList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = orderMapper.getOrderCount(param);
+        List<Map<String, Object>> list = orderMapper.getOrderList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        System.out.println("查询/导出============================================" + JSONObject.toJSON(list));
+        return pageInfo;
+    }
+
+
+    /**
+     * 查询用户的交款信息
+     * @param agentId
+     * @param type
+     * @return
+     */
+    @Override
+    public AgentResult queryAgentCapital(String agentId, String type) {
+        FastMap f = FastMap.fastSuccessMap();
+        List<Capital>  listc =  agentQueryService.capitalQuery(agentId,type);
+        if(listc.size()==0){
+            f.putKeyV("all",0);
+            f.putKeyV("can",0);
+        }else{
+            //总资金
+            BigDecimal all = new BigDecimal(0);
+            for (Capital capital : listc) {
+                all = all.add(capital.getcAmount());
+            }
+            f.putKeyV("all",all);
+            //可用资金 审批中的订单
+            List<OPayment>  pamentS  =  queryApprovePayment(agentId,AgStatus.Approving.status,Arrays.asList(OrderStatus.CREATE.status));
+            BigDecimal cannot = new BigDecimal(0);
+            for (OPayment pament : pamentS) {
+              if(StringUtils.isNotBlank(pament.getDeductionType())
+                      && pament.getDeductionType().equals(type)
+                      && pament.getDeductionAmount()!=null
+                      &&  pament.getDeductionAmount().compareTo(BigDecimal.ZERO)>0)  {
+                  cannot = cannot.add(pament.getDeductionAmount());
+              }
+            }
+            if(all.compareTo(cannot)>=0) {
+                f.putKeyV("can", all.subtract(cannot));
+            }else{
+                f.putKeyV("can", 0);
+            }
+        }
+        return AgentResult.ok(f);
     }
 }

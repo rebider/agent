@@ -343,4 +343,44 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="getOrderList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT O.O_APYTIME,O_NUM,O.O_AMO,A.AG_NAME,A.AG_UNIQ_NUM,
+    R.EXPRESS_REMARK,R.ADDR_REALNAME,R.ADDR_MOBILE,R.ADDR_DETAIL,
+    S.PRO_NAME,S.MODEL,S.PRO_NUM,S.PRO_PRICE
+    FROM O_ORDER O
+    LEFT JOIN O_RECEIPT_ORDER R ON O.ID = R.ORDER_ID
+    LEFT JOIN A_AGENT A ON A.ID = O.AGENT_ID
+    LEFT JOIN O_RECEIPT_PRO P ON R.ORDER_ID = P.ID
+    LEFT JOIN O_SUB_ORDER S ON O.ID = S.ORDER_ID
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getOrderCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM O_ORDER O
+    LEFT JOIN O_RECEIPT_ORDER R ON O.ID = R.ORDER_ID
+    LEFT JOIN A_AGENT A ON A.ID = O.AGENT_ID
+    LEFT JOIN O_RECEIPT_PRO P ON R.ORDER_ID = P.ID
+    LEFT JOIN O_SUB_ORDER S ON O.ID = S.ORDER_ID
+  </select>
+
+  <sql id='SORTING'>
+    ORDER BY O.O_APYTIME DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
 </mapper>

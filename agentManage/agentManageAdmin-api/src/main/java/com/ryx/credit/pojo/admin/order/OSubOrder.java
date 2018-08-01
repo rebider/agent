@@ -1,10 +1,12 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.vo.OSubOrderExtends;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OSubOrder implements Serializable {
+public class OSubOrder extends OSubOrderExtends implements Serializable {
     private String id;
 
     private String orderId;
@@ -50,6 +52,10 @@ public class OSubOrder implements Serializable {
     private OSubOrderActivity subOrderActivity;
 
     private BigDecimal sumProPrice;
+
+    private String snBegin;
+
+    private String snEnd;
 
     public String getId() {
         return id;
@@ -233,5 +239,21 @@ public class OSubOrder implements Serializable {
 
     public void setAgentId(String agentId) {
         this.agentId = agentId;
+    }
+
+    public String getSnBegin() {
+        return snBegin;
+    }
+
+    public void setSnBegin(String snBegin) {
+        this.snBegin = snBegin;
+    }
+
+    public String getSnEnd() {
+        return snEnd;
+    }
+
+    public void setSnEnd(String snEnd) {
+        this.snEnd = snEnd;
     }
 }

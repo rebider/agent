@@ -45,6 +45,16 @@ public class OActivity implements Serializable{
 
     private BigDecimal gTime;
 
+    private String venderName;
+
+    public String getVenderName() {
+        return venderName;
+    }
+
+    public void setVenderName(String venderName) {
+        this.venderName = venderName;
+    }
+
     public String getId() {
         return id;
     }

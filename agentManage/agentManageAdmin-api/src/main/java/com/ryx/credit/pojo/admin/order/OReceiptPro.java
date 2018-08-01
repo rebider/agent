@@ -33,7 +33,7 @@ public class OReceiptPro implements Serializable{
 
     private BigDecimal version;
 
-    private String receiptProStatus;
+    private BigDecimal receiptProStatus;
 
     public String getId() {
         return id;
@@ -147,11 +147,11 @@ public class OReceiptPro implements Serializable{
         this.version = version;
     }
 
-    public String getReceiptProStatus() {
+    public BigDecimal getReceiptProStatus() {
         return receiptProStatus;
     }
 
-    public void setReceiptProStatus(String receiptProStatus) {
-        this.receiptProStatus = receiptProStatus == null ? null : receiptProStatus.trim();
+    public void setReceiptProStatus(BigDecimal receiptProStatus) {
+        this.receiptProStatus = receiptProStatus;
     }
 }

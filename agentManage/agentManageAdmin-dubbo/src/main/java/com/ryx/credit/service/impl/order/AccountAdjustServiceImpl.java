@@ -170,38 +170,6 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         updatePaymentOutstandingAmt(paymentId, leftAmt);
                     }
 
-                    //付款明细中插入退款抵扣记录
-                    Map<String, Object> oneTakeoutRecord = new HashMap<>();
-                    oneTakeoutRecord.put("orderId", payment.getOrderId());
-                    oneTakeoutRecord.put("paymentId", paymentId);
-                    oneTakeoutRecord.put("paymentDetailId", oPaymentDetails.get(0).getId());
-                    oneTakeoutRecord.put("batchCode", oPaymentDetails.get(0).getBatchCode());
-                    oneTakeoutRecord.put("paymentType", oPaymentDetails.get(0).getPaymentType());
-                    oneTakeoutRecord.put("payType", oPaymentDetails.get(0).getPayType());
-                    oneTakeoutRecord.put("payAmt", leftAmt);
-                    oneTakeoutRecord.put("srcId", srcId);
-                    oneTakeoutRecord.put("srcType", PamentSrcType.TUIKUAN_DIKOU.code);
-                    takeoutList.add(oneTakeoutRecord);
-
-                    OPaymentDetail newDeatil = new OPaymentDetail();
-                    newDeatil.setId(idService.genId(TabId.o_payment_detail));
-                    newDeatil.setPaymentId(paymentId);
-                    newDeatil.setPaymentType(oPaymentDetails.get(0).getPaymentType());
-                    newDeatil.setOrderId(oPaymentDetails.get(0).getOrderId());
-                    newDeatil.setPayType(oPaymentDetails.get(0).getPayType());
-                    newDeatil.setPayAmount(leftAmt);
-                    newDeatil.setRealPayAmount(leftAmt);
-                    newDeatil.setPayTime(new Date());
-                    newDeatil.setSrcId(srcId);
-                    newDeatil.setSrcType(srcType);
-                    newDeatil.setPaymentStatus(PaymentStatus.JQ.code);
-                    newDeatil.setcDate(new Date());
-                    newDeatil.setcUser(userid);
-
-                    if (isRealAdjust) {
-                        paymentDetailMapper.insertSelective(newDeatil);
-                    }
-
                     //新付款计划入库付款明细
                     List<OPaymentDetail> planNews = new ArrayList<>();
                     batchcode_new = new Date().getTime()+"";
@@ -220,11 +188,12 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         newDeatilPlan.setPlanPayTime((Date) map.get("date"));
                         newDeatilPlan.setcDate(new Date());
                         newDeatilPlan.setcUser(userid);
+                        newDeatilPlan.setAgentId(agentId);
                         planNews.add(newDeatilPlan);
 
                         //新付款计划入库
                         if (isRealAdjust) {
-                            paymentDetailMapper.insertSelective(newDeatil);
+                            paymentDetailMapper.insertSelective(newDeatilPlan);
                         }
 
                     }
@@ -250,6 +219,39 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         }
                     }
 
+                    //付款明细中插入退款抵扣记录
+                    Map<String, Object> oneTakeoutRecord = new HashMap<>();
+                    oneTakeoutRecord.put("orderId", payment.getOrderId());
+                    oneTakeoutRecord.put("paymentId", paymentId);
+                    oneTakeoutRecord.put("paymentDetailId", oPaymentDetails.get(0).getId());
+                    oneTakeoutRecord.put("batchCode", oPaymentDetails.get(0).getBatchCode());
+                    oneTakeoutRecord.put("paymentType", oPaymentDetails.get(0).getPaymentType());
+                    oneTakeoutRecord.put("payType", oPaymentDetails.get(0).getPayType());
+                    oneTakeoutRecord.put("payAmt", leftAmt);
+                    oneTakeoutRecord.put("srcId", srcId);
+                    oneTakeoutRecord.put("srcType", PamentSrcType.TUIKUAN_DIKOU.code);
+                    takeoutList.add(oneTakeoutRecord);
+
+                    OPaymentDetail newDeatil = new OPaymentDetail();
+                    newDeatil.setId(idService.genId(TabId.o_payment_detail));
+                    newDeatil.setPaymentId(paymentId);
+                    newDeatil.setPaymentType(oPaymentDetails.get(0).getPaymentType());
+                    newDeatil.setOrderId(oPaymentDetails.get(0).getOrderId());
+                    newDeatil.setPayType(oPaymentDetails.get(0).getPayType());
+                    newDeatil.setPayAmount(leftAmt);
+                    newDeatil.setRealPayAmount(leftAmt);
+                    newDeatil.setPayTime(new Date());
+                    newDeatil.setAgentId(agentId);
+                    newDeatil.setSrcId(srcId);
+                    newDeatil.setSrcType(srcType);
+                    newDeatil.setPaymentStatus(PaymentStatus.JQ.code);
+                    newDeatil.setcDate(new Date());
+                    newDeatil.setcUser(userid);
+
+                    if (isRealAdjust) {
+                        paymentDetailMapper.insertSelective(newDeatil);
+                    }
+
                 }
 
             }
@@ -271,35 +273,37 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             }
         }
 
-        //生成调账记录
-        OAccountAdjust oAccountAdjust = new OAccountAdjust();
-        oAccountAdjust.setId(idService.genId(TabId.o_account_adjust));
-        oAccountAdjust.setAdjustType(adjustType);
-        oAccountAdjust.setSrcId(srcId);
-        oAccountAdjust.setAdjustAmount(adjustAmt);
-        oAccountAdjust.setIsAdjustOrder(new BigDecimal(isAdjustOrder));
-        oAccountAdjust.setAgentId(agentId);
-        oAccountAdjust.setcUser(userid);
-        oAccountAdjust.setcDate(new Date());
-        accountAdjustMapper.insertSelective(oAccountAdjust);
+        if (isRealAdjust) {
+            //生成调账记录
+            OAccountAdjust oAccountAdjust = new OAccountAdjust();
+            oAccountAdjust.setId(idService.genId(TabId.o_account_adjust));
+            oAccountAdjust.setAdjustType(adjustType);
+            oAccountAdjust.setSrcId(srcId);
+            oAccountAdjust.setAdjustAmount(adjustAmt);
+            oAccountAdjust.setIsAdjustOrder(new BigDecimal(isAdjustOrder));
+            oAccountAdjust.setAgentId(agentId);
+            oAccountAdjust.setcUser(userid);
+            oAccountAdjust.setcDate(new Date());
+            accountAdjustMapper.insertSelective(oAccountAdjust);
 
-        //生成调账抵扣明细
-        for (Map<String, Object> map : takeoutList) {
-            OAccountAdjustDetail oAccountAdjustDetail = new OAccountAdjustDetail();
-            oAccountAdjustDetail.setId(idService.genId(TabId.o_account_adjust_detail));
-            oAccountAdjustDetail.setAdjustId(oAccountAdjust.getId());
-            oAccountAdjustDetail.setAdjustType(adjustType);
-            oAccountAdjustDetail.setSrcId(srcId);
-            oAccountAdjustDetail.setTakeOutAmount(MapUtil.getBigDecimal(map, "payAmt"));
-            oAccountAdjustDetail.setOrderId(MapUtil.getString(map, "orderId"));
-            oAccountAdjustDetail.setPayType(MapUtil.getString(map, "payType"));
-            oAccountAdjustDetail.setPaymentDetailId(MapUtil.getString(map, "paymentDetailId"));
-            oAccountAdjustDetail.setBatchCodeNew(batchcode_new);
-            oAccountAdjustDetail.setBatchCodeOld(batchcode_old);
-            oAccountAdjustDetail.setAgentId(agentId);
-            oAccountAdjustDetail.setcUser(userid);
-            oAccountAdjustDetail.setcDate(new Date());
-            accountAdjustDetailMapper.insertSelective(oAccountAdjustDetail);
+            //生成调账抵扣明细
+            for (Map<String, Object> map : takeoutList) {
+                OAccountAdjustDetail oAccountAdjustDetail = new OAccountAdjustDetail();
+                oAccountAdjustDetail.setId(idService.genId(TabId.o_account_adjust_detail));
+                oAccountAdjustDetail.setAdjustId(oAccountAdjust.getId());
+                oAccountAdjustDetail.setAdjustType(adjustType);
+                oAccountAdjustDetail.setSrcId(srcId);
+                oAccountAdjustDetail.setTakeOutAmount(MapUtil.getBigDecimal(map, "payAmt"));
+                oAccountAdjustDetail.setOrderId(MapUtil.getString(map, "orderId"));
+                oAccountAdjustDetail.setPayType(MapUtil.getString(map, "payType"));
+                oAccountAdjustDetail.setPaymentDetailId(MapUtil.getString(map, "paymentDetailId"));
+                oAccountAdjustDetail.setBatchCodeNew(batchcode_new);
+                oAccountAdjustDetail.setBatchCodeOld(batchcode_old);
+                oAccountAdjustDetail.setAgentId(agentId);
+                oAccountAdjustDetail.setcUser(userid);
+                oAccountAdjustDetail.setcDate(new Date());
+                accountAdjustDetailMapper.insertSelective(oAccountAdjustDetail);
+            }
         }
 
         result.put("takeAmt", adjustAmt.subtract(leftAmt));
