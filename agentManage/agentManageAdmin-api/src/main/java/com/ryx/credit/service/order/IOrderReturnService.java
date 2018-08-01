@@ -15,7 +15,7 @@ public interface IOrderReturnService {
 
     PageInfo orderList(OReturnOrder returnOrder, PageInfo page);
 
-    Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson) throws ProcessException;
+    Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson,String userid) throws ProcessException;
 
     Map<String, Object> view(String returnId) throws ProcessException;
 
