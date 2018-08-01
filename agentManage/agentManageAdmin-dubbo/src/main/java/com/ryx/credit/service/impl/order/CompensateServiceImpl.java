@@ -5,15 +5,12 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.agent.BusActRelExample;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
@@ -66,6 +63,8 @@ public class CompensateServiceImpl implements CompensateService {
     private BusActRelMapper busActRelMapper;
     @Autowired
     private ODeductCapitalMapper deductCapitalMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
 
     @Override
@@ -75,6 +74,7 @@ public class CompensateServiceImpl implements CompensateService {
         ORefundPriceDiffExample.Criteria criteria = example.createCriteria();
 
         example.setPage(page);
+        example.setOrderByClause("c_time desc");
         List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(refundPriceDiffs);
@@ -211,6 +211,8 @@ public class CompensateServiceImpl implements CompensateService {
         String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
         oRefundPriceDiff.setId(priceDiffId);
         Date nowDate = new Date();
+        oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
+        oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getRelCompAmt());
         oRefundPriceDiff.setcTime(nowDate);
         oRefundPriceDiff.setuTime(nowDate);
         oRefundPriceDiff.setsTime(nowDate);
@@ -461,6 +463,10 @@ public class CompensateServiceImpl implements CompensateService {
         if(null==oRefundPriceDiff){
             return null;
         }
+        //查询关联附件
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(oRefundPriceDiff.getId(), AttachmentRelType.ActivityEdit.name());
+        oRefundPriceDiff.setAttachmentList(attachments);
+
         oRefundPriceDiff.setApplyCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getApplyCompType()));
         oRefundPriceDiff.setRelCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getRelCompType()));
         ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
