@@ -127,6 +127,8 @@ public class CompensateServiceImpl implements CompensateService {
         }
         OSubOrder oSubOrder = oSubOrders.get(0);
         oSubOrder.setProNum(new BigDecimal(count));
+        oSubOrder.setSnBegin(snBegin);
+        oSubOrder.setSnEnd(snEnd);
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         OSubOrderActivityExample.Criteria criteria2 = oSubOrderActivityExample.createCriteria();
         criteria2.andSubOrderIdEqualTo(oSubOrder.getId());

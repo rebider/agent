@@ -1068,62 +1068,52 @@ public class OReceiptProExample {
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusEqualTo(String value) {
+        public Criteria andReceiptProStatusEqualTo(BigDecimal value) {
             addCriterion("RECEIPT_PRO_STATUS =", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusNotEqualTo(String value) {
+        public Criteria andReceiptProStatusNotEqualTo(BigDecimal value) {
             addCriterion("RECEIPT_PRO_STATUS <>", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusGreaterThan(String value) {
+        public Criteria andReceiptProStatusGreaterThan(BigDecimal value) {
             addCriterion("RECEIPT_PRO_STATUS >", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusGreaterThanOrEqualTo(String value) {
+        public Criteria andReceiptProStatusGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("RECEIPT_PRO_STATUS >=", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusLessThan(String value) {
+        public Criteria andReceiptProStatusLessThan(BigDecimal value) {
             addCriterion("RECEIPT_PRO_STATUS <", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusLessThanOrEqualTo(String value) {
+        public Criteria andReceiptProStatusLessThanOrEqualTo(BigDecimal value) {
             addCriterion("RECEIPT_PRO_STATUS <=", value, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusLike(String value) {
-            addCriterion("RECEIPT_PRO_STATUS like", value, "receiptProStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andReceiptProStatusNotLike(String value) {
-            addCriterion("RECEIPT_PRO_STATUS not like", value, "receiptProStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andReceiptProStatusIn(List<String> values) {
+        public Criteria andReceiptProStatusIn(List<BigDecimal> values) {
             addCriterion("RECEIPT_PRO_STATUS in", values, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusNotIn(List<String> values) {
+        public Criteria andReceiptProStatusNotIn(List<BigDecimal> values) {
             addCriterion("RECEIPT_PRO_STATUS not in", values, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusBetween(String value1, String value2) {
+        public Criteria andReceiptProStatusBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("RECEIPT_PRO_STATUS between", value1, value2, "receiptProStatus");
             return (Criteria) this;
         }
 
-        public Criteria andReceiptProStatusNotBetween(String value1, String value2) {
+        public Criteria andReceiptProStatusNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("RECEIPT_PRO_STATUS not between", value1, value2, "receiptProStatus");
             return (Criteria) this;
         }

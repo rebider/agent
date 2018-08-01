@@ -463,7 +463,7 @@ public class OrderServiceImpl implements OrderService {
                 pro.setuUser(userId);
                 pro.setStatus(Status.STATUS_1.status);
                 pro.setVersion(Status.STATUS_0.status);
-                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code.toString());
+                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
                 //插入收货地址明细
                 if (1 != oReceiptProMapper.insertSelective(pro)) {
                     logger.info("下订单:{}", "oReceiptPro添加失败");
