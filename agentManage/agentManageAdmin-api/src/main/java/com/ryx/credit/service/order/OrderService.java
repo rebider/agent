@@ -9,6 +9,7 @@ import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,15 @@ import java.util.Map;
 public interface OrderService {
 
     PageInfo orderList(OOrder product, Page page);
+
+
+    /**
+     * 根据审批状态来查询付款单信息
+     * @param agentId
+     * @param approveStatus
+     * @return
+     */
+    public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus,List<BigDecimal> orderStatus);
 
 
     /**
@@ -79,5 +89,15 @@ public interface OrderService {
      * 导出订单信息
      */
     PageInfo getOrderList(Map<String, Object> param, PageInfo pageInfo);
+
+    /**
+     * 查询用户缴款相关信息
+     * @param agentId
+     * @param type
+     * @return
+     */
+    public AgentResult queryAgentCapital(String agentId,String type);
+
+
 
 }

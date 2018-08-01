@@ -3,7 +3,6 @@
 <mapper namespace="com.ryx.credit.dao.order.ORefundPriceDiffMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
     <result column="APPLY_COMP_TYPE" jdbcType="VARCHAR" property="applyCompType" />
     <result column="APPLY_COMP_AMT" jdbcType="DECIMAL" property="applyCompAmt" />
     <result column="REL_COMP_TYPE" jdbcType="VARCHAR" property="relCompType" />
@@ -50,9 +49,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ORDER_ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, REFUND_TYPE, 
-    REVIEW_STATUS, S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER, U_USER, 
-    STATUS, VERSION
+    ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, REFUND_TYPE, REVIEW_STATUS,
+    S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -71,7 +69,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_REFUND_PRICE_DIFF
     where ID = #{id,jdbcType=VARCHAR}
@@ -83,27 +81,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
-    insert into O_REFUND_PRICE_DIFF (ID, ORDER_ID, APPLY_COMP_TYPE, 
-      APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, 
-      REFUND_TYPE, REVIEW_STATUS, S_TIME, 
-      APPLY_REMARK, DEDUCT_AMT, C_TIME, 
-      U_TIME, C_USER, U_USER, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{applyCompType,jdbcType=VARCHAR}, 
-      #{applyCompAmt,jdbcType=DECIMAL}, #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, 
-      #{refundType,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL}, #{sTime,jdbcType=TIMESTAMP}, 
-      #{applyRemark,jdbcType=VARCHAR}, #{deductAmt,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into O_REFUND_PRICE_DIFF (ID, APPLY_COMP_TYPE, APPLY_COMP_AMT,
+    REL_COMP_TYPE, REL_COMP_AMT, REFUND_TYPE,
+    REVIEW_STATUS, S_TIME, APPLY_REMARK,
+    DEDUCT_AMT, C_TIME, U_TIME,
+    C_USER, U_USER, STATUS,
+    VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{applyCompType,jdbcType=VARCHAR}, #{applyCompAmt,jdbcType=DECIMAL},
+    #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, #{refundType,jdbcType=VARCHAR},
+    #{reviewStatus,jdbcType=DECIMAL}, #{sTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR},
+    #{deductAmt,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     insert into O_REFUND_PRICE_DIFF
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         ID,
-      </if>
-      <if test="orderId != null">
-        ORDER_ID,
       </if>
       <if test="applyCompType != null">
         APPLY_COMP_TYPE,
@@ -154,9 +149,6 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="orderId != null">
-        #{orderId,jdbcType=VARCHAR},
       </if>
       <if test="applyCompType != null">
         #{applyCompType,jdbcType=VARCHAR},
@@ -214,9 +206,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     update O_REFUND_PRICE_DIFF
     <set>
-      <if test="orderId != null">
-        ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      </if>
       <if test="applyCompType != null">
         APPLY_COMP_TYPE = #{applyCompType,jdbcType=VARCHAR},
       </if>
@@ -267,8 +256,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     update O_REFUND_PRICE_DIFF
-    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      APPLY_COMP_TYPE = #{applyCompType,jdbcType=VARCHAR},
+    set APPLY_COMP_TYPE = #{applyCompType,jdbcType=VARCHAR},
       APPLY_COMP_AMT = #{applyCompAmt,jdbcType=DECIMAL},
       REL_COMP_TYPE = #{relCompType,jdbcType=VARCHAR},
       REL_COMP_AMT = #{relCompAmt,jdbcType=DECIMAL},
@@ -287,7 +275,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

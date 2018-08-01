@@ -19,6 +19,8 @@ public class ORefundPriceDiffDetail implements Serializable{
 
     private String orderId;
 
+    private String proId;
+
     private String proName;
 
     private BigDecimal changeCount;
@@ -263,5 +265,13 @@ public class ORefundPriceDiffDetail implements Serializable{
 
     public void setSubOrderActivity(OSubOrderActivity subOrderActivity) {
         this.subOrderActivity = subOrderActivity;
+    }
+
+    public String getProId() {
+        return proId;
+    }
+
+    public void setProId(String proId) {
+        this.proId = proId;
     }
 }

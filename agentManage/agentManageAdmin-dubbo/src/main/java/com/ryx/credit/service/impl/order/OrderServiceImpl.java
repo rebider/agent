@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -20,11 +21,13 @@ import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
+import com.sun.org.apache.xerces.internal.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -53,8 +58,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
-    private OReceiptProMapper oReceiptProMapper;
-    @Autowired
     private OPaymentMapper oPaymentMapper;
     @Autowired
     private OPaymentDetailMapper oPaymentDetailMapper;
@@ -66,6 +69,8 @@ public class OrderServiceImpl implements OrderService {
     private OAddressMapper oAddressMapper;
     @Autowired
     private OReceiptOrderMapper oReceiptOrderMapper;
+    @Autowired
+    private OReceiptProMapper oReceiptProMapper;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
@@ -84,6 +89,8 @@ public class OrderServiceImpl implements OrderService {
     private OActivityMapper oActivityMapper;
     @Autowired
     private ApaycompService apaycompService;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
 
     @Override
@@ -101,6 +108,22 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
+
+    @Override
+    public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus,List<BigDecimal> orderStatus) {
+        OOrderExample example = new OOrderExample();
+        example.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andAgentIdEqualTo(agentId)
+                .andReviewStatusEqualTo(approveStatus)
+                .andOrderStatusIn(orderStatus);
+        List<OOrder> orders = orderMapper.selectByExample(example);
+        List<String>  ids =  orders.stream().map(OOrder::getId).collect(Collectors.toList());
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdIn(ids);
+        return oPaymentMapper.selectByExample(oPaymentExample);
+    }
+
     /**
      * 订单构建
      *
@@ -115,6 +138,9 @@ public class OrderServiceImpl implements OrderService {
         }
         if (StringUtils.isBlank(orderFormVo.getOrderPlatform())) {
             return AgentResult.fail("请选择平台");
+        }
+        if (orderFormVo.getoSubOrder()==null || orderFormVo.getoSubOrder().size()==0) {
+            return AgentResult.fail("请选择商品");
         }
         orderFormVo.setUserId(userId);
         //保存订单数据
@@ -577,6 +603,7 @@ public class OrderServiceImpl implements OrderService {
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
+        //订单附件
         List<Attachment> attr = attachmentMapper.accessoryQuery(order.getId(), AttachmentRelType.Order.name());
         f.putKeyV("attrs", attr);
 
@@ -1055,6 +1082,37 @@ public class OrderServiceImpl implements OrderService {
                 throw new ProcessException("订单更新异常");
             }
 
+            //  发货单状态修改
+            OReceiptOrderExample oReceiptOrderExample = getoReceiptOrderExample();
+            oReceiptOrderExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrderIdEqualTo(order.getId())
+                    .andReceiptStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
+            List<OReceiptOrder> oReceiptOrderList = oReceiptOrderMapper.selectByExample(oReceiptOrderExample);
+            for (OReceiptOrder oReceiptOrder : oReceiptOrderList) {
+                oReceiptOrder.setReceiptStatus(OReceiptStatus.WAITING_LIST.code);
+                oReceiptOrder.setuTime(d.getTime());
+                if(1!=oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder)){
+                    logger.error("更新收货单异常{}",order.getId());
+                    throw new ProcessException("更新收货单异常");
+                }
+            }
+
+            //  发货单商品状态修改
+            OReceiptProExample oReceiptProExample = new OReceiptProExample();
+            oReceiptProExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrderidEqualTo(order.getId())
+                    .andReceiptProStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
+            List<OReceiptPro>  pros =  oReceiptProMapper.selectByExample(oReceiptProExample);
+            for (OReceiptPro pro : pros) {
+                //  发货单商品状态修改 更新成待排单
+                pro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
+                pro.setuTime(d.getTime());
+                if(1!=oReceiptProMapper.updateByPrimaryKeySelective(pro)){
+                    logger.error("更新收货单商品异常{}",order.getId());
+                    throw new ProcessException("更新收货单商品异常");
+                }
+            }
+
         } else if (actname.equals("reject_end")) {
             //订单信息
             OOrder order = orderMapper.selectByPrimaryKey(rel.getBusId());
@@ -1243,6 +1301,10 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok();
     }
 
+    private OReceiptOrderExample getoReceiptOrderExample() {
+        return new OReceiptOrderExample();
+    }
+
     @Override
     public OPayment selectByOrderId(String orderId) {
         OPaymentExample oPaymentExample = new OPaymentExample();
@@ -1272,4 +1334,43 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    /**
+     * 查询用户的交款信息
+     * @param agentId
+     * @param type
+     * @return
+     */
+    @Override
+    public AgentResult queryAgentCapital(String agentId, String type) {
+        FastMap f = FastMap.fastSuccessMap();
+        List<Capital>  listc =  agentQueryService.capitalQuery(agentId,type);
+        if(listc.size()==0){
+            f.putKeyV("all",0);
+            f.putKeyV("can",0);
+        }else{
+            //总资金
+            BigDecimal all = new BigDecimal(0);
+            for (Capital capital : listc) {
+                all = all.add(capital.getcAmount());
+            }
+            f.putKeyV("all",all);
+            //可用资金 审批中的订单
+            List<OPayment>  pamentS  =  queryApprovePayment(agentId,AgStatus.Approving.status,Arrays.asList(OrderStatus.CREATE.status));
+            BigDecimal cannot = new BigDecimal(0);
+            for (OPayment pament : pamentS) {
+              if(StringUtils.isNotBlank(pament.getDeductionType())
+                      && pament.getDeductionType().equals(type)
+                      && pament.getDeductionAmount()!=null
+                      &&  pament.getDeductionAmount().compareTo(BigDecimal.ZERO)>0)  {
+                  cannot = cannot.add(pament.getDeductionAmount());
+              }
+            }
+            if(all.compareTo(cannot)>=0) {
+                f.putKeyV("can", all.subtract(cannot));
+            }else{
+                f.putKeyV("can", 0);
+            }
+        }
+        return AgentResult.ok(f);
+    }
 }

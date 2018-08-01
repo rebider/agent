@@ -24,6 +24,14 @@ public interface AgentQueryService {
     public List<Capital> paymentQuery(String id);
 
     /**
+     * 缴款查询
+     * @param agentId
+     * @param type
+     * @return
+     */
+    public List<Capital> capitalQuery(String agentId,String type);
+
+    /**
      * 查询合同信息
      */
     public List<AgentContract> compactQuery(String id);

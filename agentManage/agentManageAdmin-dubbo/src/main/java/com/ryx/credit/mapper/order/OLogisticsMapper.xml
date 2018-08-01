@@ -424,7 +424,9 @@
   </select>
 
    <select id="queryLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
-    select * from  o_logistics where
+    select
+       <include refid="Base_Column_List"/>
+    from  o_logistics where
     id = (
       select
         logistics_id
@@ -435,6 +437,7 @@
       and status = #{status}
       group by logistics_id
     )
+    and order_id = #{orderId}
    </select>
 
 </mapper>
