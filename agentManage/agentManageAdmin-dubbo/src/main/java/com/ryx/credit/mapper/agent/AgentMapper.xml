@@ -488,6 +488,9 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             <if test='null!= agent.agName and agent.agName !="" '>
                 AND agent.AG_NAME LIKE #{agent.agName}||'%'
             </if>
+            <if test='null!= agent.agStatus and agent.agStatus !="" '>
+                AND agent.AG_STATUS =#{agent.agStatus}
+            </if>
             <if test='null!= agent.agDocPro and agent.agDocPro !="" '>
                 AND agent.AG_DOC_PRO = #{agent.agDocPro}
             </if>
@@ -495,8 +498,6 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
                 AND agent.AG_DOC_DISTRICT = #{agent.agDocDistrict}
             </if>
         </where>
-
-
         order by agent.c_utime desc
     </select>
     <resultMap id="AgentoutVo" type="com.ryx.credit.pojo.admin.vo.AgentoutVo">
