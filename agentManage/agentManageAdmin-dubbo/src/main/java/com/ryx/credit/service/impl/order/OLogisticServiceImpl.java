@@ -77,26 +77,33 @@ public class OLogisticServiceImpl implements OLogisticsService {
         for (List<Object> objectList : data) {
             if(objectList == null || objectList.size() == 0 || StringUtils.isBlank(objectList.get(0) + ""))break;
             OLogistics oLogistics = new OLogistics();
-            oLogistics.setcUser(user);    // 创建人
-            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为发货物流
+            oLogistics.setcUser(user);                                      // 创建人
+            oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
+            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
             oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
             oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
             oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
             oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
             oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
             oLogistics.setProId(String.valueOf(objectList.get(3)));         // 商品ID
-            oLogistics.setLogCom(String.valueOf(objectList.get(22)));       // 物流公司
-            oLogistics.setwNumber(String.valueOf(objectList.get(24)));      // 物流单号
-            oLogistics.setSnBeginNum(String.valueOf(objectList.get(25)));   // 起始SN序列号
-            oLogistics.setSnEndNum(String.valueOf(objectList.get(26)));     // 结束SN序列号
+            oLogistics.setProName(String.valueOf(objectList.get(4)));       // 商品名称
+            oLogistics.setProType(String.valueOf(objectList.get(5)));       // 商品类型
+            oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
+            oLogistics.setProCom(String.valueOf(objectList.get(7)));        // 厂家
+            oLogistics.setProModel(String.valueOf(objectList.get(9)));      // 机型
+            oLogistics.setLogCom(String.valueOf(objectList.get(24)));       // 物流公司
+            oLogistics.setwNumber(String.valueOf(objectList.get(26)));      // 物流单号
+            oLogistics.setSnBeginNum(String.valueOf(objectList.get(27)));   // 起始SN序列号
+            oLogistics.setSnEndNum(String.valueOf(objectList.get(28)));     // 结束SN序列号
+            oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));   // 发货数量
             System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
             if(1 != insertImportData(oLogistics)){
                 throw new ProcessException("插入失败");
             }
             list.add(oLogistics.getId());
 
-            begins = Integer.valueOf(String.valueOf(objectList.get(27)));   // 起始SN位数
-            finish = Integer.valueOf(String.valueOf(objectList.get(28)));   // 结束SN位数
+            begins = Integer.valueOf(String.valueOf(objectList.get(29)));   // 起始SN位数
+            finish = Integer.valueOf(String.valueOf(objectList.get(30)));   // 结束SN位数
             ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
             if(resultVO.isSuccess()) {
                 String id = "";
@@ -106,9 +113,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 } else {
                     ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     if (receiptPlan != null) {
-                        receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(9))));   // 发货数量
-                        receiptPlan.setRealSendDate(Calendar.getInstance().getTime());   // 实际发货时间
-                        receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));   // 排单状态为已发货
+                        receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(21))));          // 发货数量
+                        receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
+                        receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
                         int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
                         if(i != 1){
                             throw new ProcessException("更新排单数据失败");
