@@ -71,6 +71,7 @@ public interface OrderService {
      */
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
+    public AgentResult approvalTaskBussiData(AgentVo agentVo, String userId) throws Exception;
 
     /**
      * 订单审批
