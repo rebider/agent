@@ -37,7 +37,7 @@ public enum TabId {
     o_logistics("LG%s%014d"),//发货物流
     o_receipt_plan("ORP%s%015d"),
 
-    P_STAGING_DETAIL("P_STAGING_DETAIL%s%015d"),
+    P_STAGING_DETAIL("PSD%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
     P_DEDUCTION("P_DEDUCTION%s%015d"),
     P_SETTLE_ERR_LS("P_SETTLE_ERR_LS%s%015d"),
