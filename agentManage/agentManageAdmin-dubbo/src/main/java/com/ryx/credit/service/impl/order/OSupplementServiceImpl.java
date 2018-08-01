@@ -85,7 +85,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         return selectOSupplement(id);
     }
 
-    public OSupplement  selectOSupplement(String id){
+    public OSupplement selectOSupplement(String id) {
         OSupplementExample oSupplementExample = new OSupplementExample();
         OSupplementExample.Criteria criteria = oSupplementExample.createCriteria();
         criteria.andIdEqualTo(id);
@@ -161,12 +161,12 @@ public class OSupplementServiceImpl implements OSupplementService {
         criteria.andIdEqualTo(oSupplement.getSrcId());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-        if (oPaymentDetails.size()!=1){
+        if (oPaymentDetails.size() != 1) {
             return null;
         }
         OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
         BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
-        if (!paymentStatus.equals(PaymentStatus.DF.code)){
+        if (!paymentStatus.equals(PaymentStatus.DF.code)) {
             logger.info("订单还未生效{}:{}", id, userId);
             throw new ProcessException("订单还未生效");
         }
@@ -199,7 +199,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             throw new ProcessException("更新记录状态异常");
         }
         if (StringUtils.isEmpty(workId)) {
-            logger.info("========用户{}启动数据修改申请{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
+            logger.info("========用户{}启动补款审批{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
             throw new ProcessException("审批流启动失败字典中未配置部署流程!");
         }
         Map startPar = agentEnterService.startPar(userId);
@@ -247,7 +247,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
         OPaymentDetail oPaymentDetail = details.get(0);
         oPaymentDetail.setPayType(PaymentType.getPaymentTypeValue(oPaymentDetail.getPayType()));
-        if (StringUtils.isNotBlank(oPaymentDetail.getSrcType())){
+        if (StringUtils.isNotBlank(oPaymentDetail.getSrcType())) {
             oPaymentDetail.setSrcType(PamentSrcType.getSrcTypeValue(oPaymentDetail.getSrcType()));
         }
         return oPaymentDetail;
@@ -340,8 +340,9 @@ public class OSupplementServiceImpl implements OSupplementService {
         BusActRelExample.Criteria criteria = busActRelExample.createCriteria();
         criteria.andActivIdEqualTo(id);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andActivStatusEqualTo(AgStatus.Approving.name());
         List<BusActRel> busActRels = busActRelMapper.selectByExample(busActRelExample);
-        if (busActRels.size() != 1) {
+        if (1 != busActRels.size()) {
             return null;
         }
         return busActRels.get(0);

@@ -102,4 +102,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         return result;
     }
 
+    @Override
+    public List<OActivity> allActivity(){
+        OActivityExample example = new OActivityExample();
+        OActivityExample.Criteria criteria = example.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OActivity> activitys = activityMapper.selectByExample(example);
+        return activitys;
+    }
 }

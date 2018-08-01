@@ -13,8 +13,8 @@ public enum BusActRelBusType {
     STAGING("退单分期"),
     THAW("分润解冻申请"),
     PkType("订单补款"),
-    TOOLS("机具扣款调整申请"),;
-
+    TOOLS("机具扣款调整申请"),
+    COMPENSATE("退补差价审批");
     public String  msg;
 
     BusActRelBusType(String s){

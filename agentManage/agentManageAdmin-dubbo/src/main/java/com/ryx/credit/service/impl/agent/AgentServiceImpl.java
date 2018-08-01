@@ -301,7 +301,7 @@ public class AgentServiceImpl implements  AgentService {
                 userVo = iUserService.selectByName(userVo.getName());
                 redisService.setValue(String.valueOf(userVo.getId()),agent.getId(),Long.valueOf(Integer.MAX_VALUE));
             } catch (Exception e) {
-               logger.error("createBackUserbyAgent error {}",agentId,e);
+                logger.error("createBackUserbyAgent error {}",agentId,e);
             }
 
         });

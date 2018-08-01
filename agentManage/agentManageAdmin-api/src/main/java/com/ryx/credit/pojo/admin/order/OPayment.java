@@ -30,6 +30,10 @@ public class OPayment implements Serializable{
 
     private BigDecimal outstandingAmount;
 
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
     private Date payCompletTime;
 
     private BigDecimal payStatus;
@@ -54,10 +58,20 @@ public class OPayment implements Serializable{
 
     private BigDecimal downPaymentCount;
 
-    @JSONField(format="yyyy-MM-dd")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @JsonDeserialize(using = DateJsonDeserializer.class)
-    @JsonSerialize(using = DateJsonSerializer.class)
+    @JSONField(
+            format = "yyyy-MM-dd"
+    )
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    @JsonDeserialize(
+            using = DateJsonDeserializer.class
+    )
+    @JsonSerialize(
+            using = DateJsonSerializer.class
+    )
     private Date downPaymentDate;
 
     private String collectCompany;
@@ -67,6 +81,24 @@ public class OPayment implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private BigDecimal actualReceipt;
+
+    @JSONField(
+            format = "yyyy-MM-dd"
+    )
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    @JsonDeserialize(
+            using = DateJsonDeserializer.class
+    )
+    @JsonSerialize(
+            using = DateJsonSerializer.class
+    )
+    private Date actualReceiptDate;
 
     public String getId() {
         return id;
@@ -274,5 +306,21 @@ public class OPayment implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getActualReceipt() {
+        return actualReceipt;
+    }
+
+    public void setActualReceipt(BigDecimal actualReceipt) {
+        this.actualReceipt = actualReceipt;
+    }
+
+    public Date getActualReceiptDate() {
+        return actualReceiptDate;
+    }
+
+    public void setActualReceiptDate(Date actualReceiptDate) {
+        this.actualReceiptDate = actualReceiptDate;
     }
 }

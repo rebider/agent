@@ -2,12 +2,13 @@ package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OPaymentExample {
+public class OPaymentExample implements Serializable {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -1805,6 +1806,126 @@ public class OPaymentExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptIsNull() {
+            addCriterion("ACTUAL_RECEIPT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptIsNotNull() {
+            addCriterion("ACTUAL_RECEIPT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT =", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptNotEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT <>", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptGreaterThan(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT >", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT >=", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptLessThan(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT <", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT <=", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptIn(List<BigDecimal> values) {
+            addCriterion("ACTUAL_RECEIPT in", values, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptNotIn(List<BigDecimal> values) {
+            addCriterion("ACTUAL_RECEIPT not in", values, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTUAL_RECEIPT between", value1, value2, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTUAL_RECEIPT not between", value1, value2, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateIsNull() {
+            addCriterion("ACTUAL_RECEIPT_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateIsNotNull() {
+            addCriterion("ACTUAL_RECEIPT_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE =", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateNotEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE <>", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateGreaterThan(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE >", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateGreaterThanOrEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE >=", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateLessThan(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE <", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateLessThanOrEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE <=", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateIn(List<Date> values) {
+            addCriterion("ACTUAL_RECEIPT_DATE in", values, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateNotIn(List<Date> values) {
+            addCriterion("ACTUAL_RECEIPT_DATE not in", values, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateBetween(Date value1, Date value2) {
+            addCriterion("ACTUAL_RECEIPT_DATE between", value1, value2, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateNotBetween(Date value1, Date value2) {
+            addCriterion("ACTUAL_RECEIPT_DATE not between", value1, value2, "actualReceiptDate");
             return (Criteria) this;
         }
     }

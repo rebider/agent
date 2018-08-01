@@ -1,13 +1,14 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.agent.Attachment;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class ORefundPriceDiff implements Serializable{
     private String id;
-
-    private String orderId;
 
     private String applyCompType;
 
@@ -39,20 +40,18 @@ public class ORefundPriceDiff implements Serializable{
 
     private BigDecimal version;
 
+    private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
+
+    private List<Attachment> attachmentList;
+
+    private List<ODeductCapital>  deductCapitalList;
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
     }
 
     public String getApplyCompType() {
@@ -173,5 +172,29 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public List<ORefundPriceDiffDetail> getRefundPriceDiffDetailList() {
+        return refundPriceDiffDetailList;
+    }
+
+    public void setRefundPriceDiffDetailList(List<ORefundPriceDiffDetail> refundPriceDiffDetailList) {
+        this.refundPriceDiffDetailList = refundPriceDiffDetailList;
+    }
+
+    public List<Attachment> getAttachmentList() {
+        return attachmentList;
+    }
+
+    public void setAttachmentList(List<Attachment> attachmentList) {
+        this.attachmentList = attachmentList;
+    }
+
+    public List<ODeductCapital> getDeductCapitalList() {
+        return deductCapitalList;
+    }
+
+    public void setDeductCapitalList(List<ODeductCapital> deductCapitalList) {
+        this.deductCapitalList = deductCapitalList;
     }
 }
