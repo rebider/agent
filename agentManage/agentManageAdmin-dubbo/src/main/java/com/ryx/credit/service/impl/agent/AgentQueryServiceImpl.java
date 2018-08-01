@@ -80,6 +80,13 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     }
 
     @Override
+    public List<Capital> capitalQuery(String agentId, String type) {
+        CapitalExample example = new CapitalExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andCAgentIdEqualTo(agentId).andCTypeEqualTo(type).andCIsinEqualTo(Status.STATUS_0.status);
+        return capitalMapper.selectByExample(example);
+    }
+
+    @Override
     public List<AgentContract> compactQuery(String id) {
         List<AgentContract> agentContracts = agentContractMapper.compactQuery(id);
         if (null != agentContracts && agentContracts.size() > 0) {
