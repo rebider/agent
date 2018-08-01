@@ -66,7 +66,6 @@ public class CompensateServiceImpl implements CompensateService {
     @Autowired
     private AttachmentMapper attachmentMapper;
 
-
     @Override
     public PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page){
 
@@ -451,7 +450,6 @@ public class CompensateServiceImpl implements CompensateService {
         return AgentResult.ok();
     }
 
-
     /**
      * 查看退补差价明细
      * @param id
@@ -469,6 +467,12 @@ public class CompensateServiceImpl implements CompensateService {
         //查询关联附件
         List<Attachment> attachments = attachmentMapper.accessoryQuery(oRefundPriceDiff.getId(), AttachmentRelType.ActivityEdit.name());
         oRefundPriceDiff.setAttachmentList(attachments);
+        //查询扣除款项
+        ODeductCapitalExample oDeductCapitalExample = new ODeductCapitalExample();
+        ODeductCapitalExample.Criteria criteria2 = oDeductCapitalExample.createCriteria();
+        criteria2.andSourceIdEqualTo(oRefundPriceDiff.getId());
+        List<ODeductCapital> oDeductCapitals = deductCapitalMapper.selectByExample(oDeductCapitalExample);
+        oRefundPriceDiff.setDeductCapitalList(oDeductCapitals);
 
         oRefundPriceDiff.setApplyCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getApplyCompType()));
         oRefundPriceDiff.setRelCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getRelCompType()));
