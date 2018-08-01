@@ -90,4 +90,14 @@ public interface OrderService {
      */
     PageInfo getOrderList(Map<String, Object> param, PageInfo pageInfo);
 
+    /**
+     * 查询用户缴款相关信息
+     * @param agentId
+     * @param type
+     * @return
+     */
+    public AgentResult queryAgentCapital(String agentId,String type);
+
+
+
 }

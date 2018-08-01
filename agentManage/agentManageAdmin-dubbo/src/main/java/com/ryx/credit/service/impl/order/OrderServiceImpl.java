@@ -139,6 +139,9 @@ public class OrderServiceImpl implements OrderService {
         if (StringUtils.isBlank(orderFormVo.getOrderPlatform())) {
             return AgentResult.fail("请选择平台");
         }
+        if (orderFormVo.getoSubOrder()==null || orderFormVo.getoSubOrder().size()==0) {
+            return AgentResult.fail("请选择商品");
+        }
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = setOrderFormValue(orderFormVo, userId);
@@ -607,9 +610,6 @@ public class OrderServiceImpl implements OrderService {
         //收款公司
         List<PayComp>  comp =  apaycompService.recCompList();
         f.putKeyV("comp", comp);
-
-
-        agentQueryService.capitalQuery(order.getAgentId(),AgCapitalType.FUWUFEI.name());
 
         return AgentResult.ok(f);
     }
@@ -1082,7 +1082,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new ProcessException("订单更新异常");
             }
 
-            // TODO 发货单状态修改
+            //  发货单状态修改
             OReceiptOrderExample oReceiptOrderExample = getoReceiptOrderExample();
             oReceiptOrderExample.or().andStatusEqualTo(Status.STATUS_1.status)
                     .andOrderIdEqualTo(order.getId())
@@ -1092,15 +1092,25 @@ public class OrderServiceImpl implements OrderService {
                 oReceiptOrder.setReceiptStatus(OReceiptStatus.WAITING_LIST.code);
                 oReceiptOrder.setuTime(d.getTime());
                 if(1!=oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder)){
-                    throw new ProcessException("更新排单异常");
+                    logger.error("更新收货单异常{}",order.getId());
+                    throw new ProcessException("更新收货单异常");
                 }
             }
-            // TODO 发货单商品状态修改
+
+            //  发货单商品状态修改
             OReceiptProExample oReceiptProExample = new OReceiptProExample();
-            oReceiptProExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderidEqualTo(order.getId());
+            oReceiptProExample.or().andStatusEqualTo(Status.STATUS_1.status)
+                    .andOrderidEqualTo(order.getId())
+                    .andReceiptProStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
             List<OReceiptPro>  pros =  oReceiptProMapper.selectByExample(oReceiptProExample);
             for (OReceiptPro pro : pros) {
-                // TODO 发货单商品状态修改 更新成待排单
+                //  发货单商品状态修改 更新成待排单
+                pro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
+                pro.setuTime(d.getTime());
+                if(1!=oReceiptProMapper.updateByPrimaryKeySelective(pro)){
+                    logger.error("更新收货单商品异常{}",order.getId());
+                    throw new ProcessException("更新收货单商品异常");
+                }
             }
 
         } else if (actname.equals("reject_end")) {
@@ -1324,4 +1334,43 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    /**
+     * 查询用户的交款信息
+     * @param agentId
+     * @param type
+     * @return
+     */
+    @Override
+    public AgentResult queryAgentCapital(String agentId, String type) {
+        FastMap f = FastMap.fastSuccessMap();
+        List<Capital>  listc =  agentQueryService.capitalQuery(agentId,type);
+        if(listc.size()==0){
+            f.putKeyV("all",0);
+            f.putKeyV("can",0);
+        }else{
+            //总资金
+            BigDecimal all = new BigDecimal(0);
+            for (Capital capital : listc) {
+                all = all.add(capital.getcAmount());
+            }
+            f.putKeyV("all",all);
+            //可用资金 审批中的订单
+            List<OPayment>  pamentS  =  queryApprovePayment(agentId,AgStatus.Approving.status,Arrays.asList(OrderStatus.CREATE.status));
+            BigDecimal cannot = new BigDecimal(0);
+            for (OPayment pament : pamentS) {
+              if(StringUtils.isNotBlank(pament.getDeductionType())
+                      && pament.getDeductionType().equals(type)
+                      && pament.getDeductionAmount()!=null
+                      &&  pament.getDeductionAmount().compareTo(BigDecimal.ZERO)>0)  {
+                  cannot = cannot.add(pament.getDeductionAmount());
+              }
+            }
+            if(all.compareTo(cannot)>=0) {
+                f.putKeyV("can", all.subtract(cannot));
+            }else{
+                f.putKeyV("can", 0);
+            }
+        }
+        return AgentResult.ok(f);
+    }
 }
