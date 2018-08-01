@@ -125,8 +125,10 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
                     //生成新的付款计划。先计算剩余代付金额和剩余期数
 
+
+                    List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId);
                     //现在付款计划未还部分
-                    List<OPaymentDetail> planNows_df = paymentDetailService.getPaymentDetails(paymentId);
+                    List<OPaymentDetail> planNows_df  = new ArrayList<>();
                     //现在付款计划已付部分
                     List<OPaymentDetail> planNows_complate = new ArrayList<>();
 
@@ -139,7 +141,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     //代付分期起始时间
                     Date startTime = null;
 
-                    for (OPaymentDetail detail : planNows_df) {
+                    for (OPaymentDetail detail : planNows) {
                         if (detail.getPaymentType().equals(PaymentType.DKFQ.code) || detail.getPaymentType().equals(PaymentType.FRFQ.code)) {
                             if (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
                                 outAmt = outAmt.add(detail.getPayAmount());
@@ -147,10 +149,10 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                 if (startTime == null) {
                                     startTime = detail.getPlanPayTime();
                                 }
+                                planNows_df.add(detail);
                             }
                         } else {
                             planNows_complate.add(detail);
-                            planNows_df.remove(detail);
                             complatePlanNum++;
                         }
                     }
