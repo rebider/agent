@@ -10,8 +10,6 @@ import java.util.List;
 public class ORefundPriceDiff implements Serializable{
     private String id;
 
-    private String orderId;
-
     private String applyCompType;
 
     private BigDecimal applyCompAmt;
@@ -52,14 +50,6 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
     }
 
     public String getApplyCompType() {

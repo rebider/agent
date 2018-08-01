@@ -99,6 +99,7 @@ public class CompensateServiceImpl implements CompensateService {
         reqParam.put("snBegin",snBegin);
         reqParam.put("snEnd",snEnd);
         reqParam.put("status",Status.STATUS_1.status);
+        reqParam.put("orderId",orderNum);
         List<Map<String,Object>> oLogistics = logisticsMapper.queryLogisticsList(reqParam);
         if(oLogistics==null){
             log.info("数据有误异常返回01");
@@ -214,7 +215,7 @@ public class CompensateServiceImpl implements CompensateService {
         oRefundPriceDiff.setId(priceDiffId);
         Date nowDate = new Date();
         oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
-        oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getRelCompAmt());
+        oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
         oRefundPriceDiff.setcTime(nowDate);
         oRefundPriceDiff.setuTime(nowDate);
         oRefundPriceDiff.setsTime(nowDate);
