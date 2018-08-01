@@ -30,7 +30,7 @@ public class AgentVo implements Serializable{
     private String approvalOpinion;
     private String approvalResult;
     private String taskId;
-
+    private String flag;
 
     //订单审批下个审批部门参数
     private String orderAprDept;
@@ -200,5 +200,13 @@ public class AgentVo implements Serializable{
 
     public void setDeductCapitalList(List<ODeductCapital> deductCapitalList) {
         this.deductCapitalList = deductCapitalList;
+    }
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
     }
 }
