@@ -8,8 +8,8 @@ package com.ryx.credit.profit.enums;
  * @date 2018/7/2516:08
  */
 public enum DeductionType {
-    //退单，未审核，审核中，通过，不通过
-    SETTLE_ERR("01");
+    //退单，机具,其他
+    SETTLE_ERR("01"),MACHINE("02"),OTHER("03");
 
     private String type;
     DeductionType(String type) {

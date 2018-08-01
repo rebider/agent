@@ -4,6 +4,8 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 
+import java.util.List;
+
 /**
  * @author zhaodw
  * @Title: ProfitDeductionService
@@ -29,11 +31,10 @@ public interface ProfitDeductionService {
     ProfitDeduction getProfitDeductionById(String id);
 
     /**
-     * 修改扣款分期状态
-     * @param id  扣款id
-     * @param status 状态
+     * 修改扣款信息
+     * @param  deduction 扣款信息
      */
-    void updateStagingStatusById(String id, String status);
+    void updateProfitDeduction(ProfitDeduction deduction);
     
     /*** 
     * @Description: 新增扣款信息
@@ -42,4 +43,12 @@ public interface ProfitDeductionService {
     * @Date: 2018/7/30 
     */ 
     void insert(ProfitDeduction deduction);
+
+    /*** 
+    * @Description: 批量新增其他扣款
+    * @Param:  datas 扣款信息
+    * @Author: zhaodw
+    * @Date: 2018/7/31 
+    */ 
+    void batchInsertOtherDeduction(List<List<Object>> datas);
 }

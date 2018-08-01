@@ -153,7 +153,10 @@ public class StagingServiceImpl implements StagingService {
         LOG.info("新建分期");
         try {
             validate(profitStaging);
-            profitDeductionServiceImpl.updateStagingStatusById(profitStaging.getSourceId(), DeductionStatus.UNREVIEWED.getStatus());
+            ProfitDeduction deduction = new ProfitDeduction();
+            deduction.setId(profitStaging.getSourceId());
+            deduction.setStagingStatus(DeductionStatus.REVIEWING.getStatus());
+            profitDeductionServiceImpl.updateProfitDeduction(deduction);
             profitStaging.setId(idService.genId(TabId.P_STAGING));
             profitStagingMapper.insert(profitStaging);
             startActivity(profitStaging);
@@ -223,19 +226,23 @@ public class StagingServiceImpl implements StagingService {
             if (rel != null) {
                 ProfitStaging staging = getStagingById(rel.getBusId());
                 if (staging !=null) {
-                    String deductionStatus = DeductionStatus.PASS.getStatus();
                     rel.setStatus(Status.STATUS_2.status);
+                    ProfitDeduction deduction = new ProfitDeduction();
+                    deduction.setId(staging.getSourceId());
+                    deduction.setStagingStatus(DeductionStatus.PASS.getStatus());
                     //拒绝
                     if ("reject_end".equals(status)) {
                         LOG.info("1.更新扣款分期状态为审核不通过");
-                        deductionStatus = DeductionStatus.UN_PASS.getStatus();
+                        deduction.setStagingStatus(DeductionStatus.UN_PASS.getStatus());
                         rel.setStatus(Status.STATUS_3.status);
                         LOG.info("2.删除分期");
                         deleteStaging(staging.getId());
                         LOG.info("3.删除分期明细");
                         deleteStagDetail(staging.getId());
+                    }else{
+                        deduction.setMustDeductionAmt(deduction.getMustDeductionAmt().subtract(staging.getStagAmt()));
                     }
-                    profitDeductionServiceImpl.updateStagingStatusById(staging.getSourceId(), deductionStatus);
+                    profitDeductionServiceImpl.updateProfitDeduction(deduction);
                     LOG.info("更新审批流与业务对象");
                     taskApprovalService.updateABusActRel(rel);
                 }
@@ -245,6 +252,11 @@ public class StagingServiceImpl implements StagingService {
             LOG.info("任务执行完成处理业务逻辑报错。");
         }
 
+    }
+
+    @Override
+    public void insetStagingDetail(ProfitStagingDetail stagingDetail) {
+        profitStagingDetailMapper.insert(stagingDetail);
     }
 
     /**

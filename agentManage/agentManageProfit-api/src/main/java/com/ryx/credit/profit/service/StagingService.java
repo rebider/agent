@@ -59,4 +59,12 @@ public interface StagingService {
      * @param status 状态
      */
     void completeTaskEnterActivity(String insid, String status);
+
+    /*** 
+    * @Description: 新增分期明细
+    * @Param:  stagingDetail 分期明细
+    * @Author: zhaodw
+    * @Date: 2018/7/31 
+    */ 
+    void insetStagingDetail(ProfitStagingDetail stagingDetail);
 }
