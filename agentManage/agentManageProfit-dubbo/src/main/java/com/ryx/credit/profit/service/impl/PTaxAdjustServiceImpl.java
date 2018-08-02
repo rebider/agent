@@ -1,15 +1,18 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PTaxAdjustMapper;
 import com.ryx.credit.profit.pojo.PTaxAdjust;
 import com.ryx.credit.profit.pojo.PTaxAdjustExample;
 import com.ryx.credit.profit.service.IPTaxAdjustService;
-import com.ryx.credit.profit.service.IPTaxAdjustService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import com.ryx.credit.service.dict.IdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +29,12 @@ import java.util.List;
  */
 @Service("iPTaxAdjustService")
 public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
-    protected Logger logger = LogManager.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(PTaxAdjustServiceImpl.class);
     @Autowired
     private PTaxAdjustMapper adjustMapper;
 
-
+    @Autowired
+    private IdService idService;
 
     /**
      * 处理分页用到的信息
@@ -56,6 +60,27 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         pageInfo.setRows(profitD);
         pageInfo.setTotal((int)adjustMapper.countByExample(example));
         return pageInfo;
+    }
+
+    @Override
+    public ResultVO posTaxEnterIn(PTaxAdjust record) throws ProcessException {
+        record.setId(idService.genId(TabId.p_profit_adjust));
+        adjustMapper.insertSelective(record);
+        return ResultVO.success(record);
+    }
+
+    @Override
+    public ResultVO startTaxEnterActivity(String agentPid, String userId) throws ProcessException {
+        if (StringUtils.isBlank(agentPid)) {
+            logger.info("代理商ID为空{}:{}", agentPid, userId);
+            return ResultVO.fail("代理商审批中，代理商ID为空");
+        }
+        if (StringUtils.isBlank(userId)) {
+            logger.info("操作用户为空{}:{}", agentPid, userId);
+            return ResultVO.fail("代理商审批中，操作用户为空");
+        }
+
+        return null;
     }
 
     private PTaxAdjustExample adjustEqualsTo(PTaxAdjust adjust) {
@@ -112,4 +137,6 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     public int updateByPrimaryKey(PTaxAdjust record) {
         return adjustMapper.updateByPrimaryKey(record);
     }
+
+
 }
