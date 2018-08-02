@@ -47,7 +47,7 @@ public enum DictGroup {
     TOOLS("机具押金扣款调整"),
     TOOLS_APR_BUSNISS("扣款调整审批业务部参数"),
     TOOLS_APR_MARKET("扣款调整审批市场部参数"),
-    TOOLS_APR_OFFICE("扣款调整审批总经办参数"),
+    TOOLS_APR_BOSS("扣款调整审批总经办参数"),
     TOOLS_APR_EXPAND("扣款调整审批客户拓展部门参数"),
     ;
 
