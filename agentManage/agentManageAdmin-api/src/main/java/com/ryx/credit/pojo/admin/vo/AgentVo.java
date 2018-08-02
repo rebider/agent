@@ -37,6 +37,7 @@ public class AgentVo implements Serializable{
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
     private List<String> refundPriceDiffFile;
     private ORefundPriceDiff oRefundPriceDiff;
+    private ORefundPriceDiffVo oRefundPriceDiffVo;
     private List<ODeductCapital> deductCapitalList;
     //付款单
     private Map<String,String> oPayment;
@@ -208,5 +209,13 @@ public class AgentVo implements Serializable{
 
     public void setFlag(String flag) {
         this.flag = flag;
+    }
+
+    public ORefundPriceDiffVo getoRefundPriceDiffVo() {
+        return oRefundPriceDiffVo;
+    }
+
+    public void setoRefundPriceDiffVo(ORefundPriceDiffVo oRefundPriceDiffVo) {
+        this.oRefundPriceDiffVo = oRefundPriceDiffVo;
     }
 }

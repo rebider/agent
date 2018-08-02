@@ -9,10 +9,7 @@ import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AttachmentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
@@ -52,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OOrderMapper orderMapper;
+    @Autowired
+    private CapitalMapper capitalMapper;
     @Autowired
     private AgentMapper agentMapper;
     @Autowired
@@ -95,6 +94,10 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderService orderService;
 
+    @Override
+    public OOrder getById(String orderId){
+        return orderMapper.selectByPrimaryKey(orderId);
+    }
 
     @Override
     public PageInfo orderList(OOrder product, Page page) {
@@ -603,7 +606,10 @@ public class OrderServiceImpl implements OrderService {
         f.putKeyV("oPayment", oPayment);
 
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        oPaymentDetailExample.or().andStatusEqualTo(Status.STATUS_1.status).andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(order.getId());
+        oPaymentDetailExample.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(order.getId());
+        oPaymentDetailExample.setOrderByClause(" plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
@@ -1035,37 +1041,39 @@ public class OrderServiceImpl implements OrderService {
                     oPayment.setRealAmount(oPayment.getDownPayment());//已付款 首付金额
                     oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
 
-                    //分期数据
-                    List<Map> SF1_data = StageUtil.stageOrder(
-                            oPayment.getOutstandingAmount(),
-                            oPayment.getDownPaymentCount().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                    if(oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO)>0) {
+                        //分期数据
+                        List<Map> SF1_data = StageUtil.stageOrder(
+                                oPayment.getOutstandingAmount(),
+                                oPayment.getDownPaymentCount().intValue(),
+                                oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
 
-                    //明细处理
-                    for (Map datum : SF1_data) {
-                        OPaymentDetail record = new OPaymentDetail();
-                        record.setId(idService.genId(TabId.o_payment_detail));
-                        record.setBatchCode(d.getTime().getTime() + "");
-                        record.setPaymentId(oPayment.getId());
-                        record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                        record.setOrderId(oPayment.getOrderId());
-                        record.setPayType(PaymentType.FRFQ.code);
-                        record.setPayAmount((BigDecimal) datum.get("item"));
-                        record.setRealPayAmount(new BigDecimal(0));
-                        record.setPlanPayTime((Date) datum.get("date"));
-                        record.setPlanNum((BigDecimal) datum.get("count"));
-                        record.setAgentId(oPayment.getAgentId());
-                        record.setPaymentStatus(PaymentStatus.DF.code);
-                        record.setcUser(oPayment.getUserId());
-                        record.setcDate(d.getTime());
-                        record.setStatus(Status.STATUS_1.status);
-                        record.setVersion(Status.STATUS_1.status);
+                        //明细处理
+                        for (Map datum : SF1_data) {
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(d.getTime().getTime() + "");
+                            record.setPaymentId(oPayment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(oPayment.getOrderId());
+                            record.setPayType(PaymentType.FRFQ.code);
+                            record.setPayAmount((BigDecimal) datum.get("item"));
+                            record.setRealPayAmount(new BigDecimal(0));
+                            record.setPlanPayTime((Date) datum.get("date"));
+                            record.setPlanNum((BigDecimal) datum.get("count"));
+                            record.setAgentId(oPayment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DF.code);
+                            record.setcUser(oPayment.getUserId());
+                            record.setcDate(d.getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
 
-                        if (1 != oPaymentDetailMapper.insert(record)) {
-                            logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
-                            throw new ProcessException("分期处理");
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
+                                throw new ProcessException("分期处理");
+                            }
+                            logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
                         }
-                        logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
                     }
                     //首付款添加明细
                     if (oPayment.getDownPayment() != null && oPayment.getDownPayment().compareTo(BigDecimal.ZERO) > 0) {
@@ -1100,39 +1108,41 @@ public class OrderServiceImpl implements OrderService {
                     oPayment.setRealAmount(oPayment.getDownPayment());//已付款
                     oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getDownPayment()));//待付
 
-                    //分期数据
-                    List<Map> SF2_data = StageUtil.stageOrder(
-                            oPayment.getOutstandingAmount(),
-                            oPayment.getDownPaymentCount().intValue(),
-                            oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
+                    if(oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO)>0) {
+                        //分期数据
+                        List<Map> SF2_data = StageUtil.stageOrder(
+                                oPayment.getOutstandingAmount(),
+                                oPayment.getDownPaymentCount().intValue(),
+                                oPayment.getDownPaymentDate(), temp.get(Calendar.DAY_OF_MONTH));
 
-                    //明细处理
-                    for (Map datum : SF2_data) {
-                        OPaymentDetail record = new OPaymentDetail();
-                        record.setId(idService.genId(TabId.o_payment_detail));
-                        record.setBatchCode(d.getTime().getTime() + "");
-                        record.setPaymentId(oPayment.getId());
-                        record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                        record.setOrderId(oPayment.getOrderId());
-                        record.setPayType(PaymentType.DKFQ.code);
-                        record.setPayAmount((BigDecimal) datum.get("item"));
-                        record.setRealPayAmount(new BigDecimal(0));
-                        record.setPlanPayTime((Date) datum.get("date"));
-                        record.setPlanNum((BigDecimal) datum.get("count"));
-                        record.setAgentId(oPayment.getAgentId());
-                        record.setPaymentStatus(PaymentStatus.DF.code);
-                        record.setcUser(oPayment.getUserId());
-                        record.setcDate(d.getTime());
-                        record.setStatus(Status.STATUS_1.status);
-                        record.setVersion(Status.STATUS_1.status);
+                        //明细处理
+                        for (Map datum : SF2_data) {
+                            OPaymentDetail record = new OPaymentDetail();
+                            record.setId(idService.genId(TabId.o_payment_detail));
+                            record.setBatchCode(d.getTime().getTime() + "");
+                            record.setPaymentId(oPayment.getId());
+                            record.setPaymentType(PamentIdType.ORDER_FKD.code);
+                            record.setOrderId(oPayment.getOrderId());
+                            record.setPayType(PaymentType.DKFQ.code);
+                            record.setPayAmount((BigDecimal) datum.get("item"));
+                            record.setRealPayAmount(new BigDecimal(0));
+                            record.setPlanPayTime((Date) datum.get("date"));
+                            record.setPlanNum((BigDecimal) datum.get("count"));
+                            record.setAgentId(oPayment.getAgentId());
+                            record.setPaymentStatus(PaymentStatus.DF.code);
+                            record.setcUser(oPayment.getUserId());
+                            record.setcDate(d.getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setVersion(Status.STATUS_1.status);
 
-                        if (1 != oPaymentDetailMapper.insert(record)) {
-                            logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
-                            throw new ProcessException("分期处理");
+                            if (1 != oPaymentDetailMapper.insert(record)) {
+                                logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
+                                throw new ProcessException("分期处理");
+                            }
+                            logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
                         }
-                        logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
-                    }
 
+                    }
                     if (oPayment.getDownPayment() != null && oPayment.getDownPayment().compareTo(BigDecimal.ZERO) > 0) {
                         //添加首付明细
                         OPaymentDetail record_SF2 = new OPaymentDetail();
@@ -1171,6 +1181,7 @@ public class OrderServiceImpl implements OrderService {
                     if (oPayment.getDeductionAmount() == null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) <= 0) {
                         oPayment.setDeductionAmount(BigDecimal.ZERO);
                     }
+
                     oPayment.setPayStatus(PayStatus.PART_PAYMENT.code);
                     oPayment.setRealAmount(oPayment.getDownPayment().add(oPayment.getDeductionAmount()));//已付款
                     oPayment.setOutstandingAmount(oPayment.getPayAmount().subtract(oPayment.getRealAmount()));//待付
@@ -1236,30 +1247,15 @@ public class OrderServiceImpl implements OrderService {
                     }
 
                     if (oPayment.getDeductionAmount() != null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
-                        //添加抵扣明细
-
                         //抵扣操作
-
-                        //添加抵扣明细
-                        OPaymentDetail record_QT = new OPaymentDetail();
-                        record_QT.setId(idService.genId(TabId.o_payment_detail));
-                        record_QT.setBatchCode(d.getTime().getTime() + "");
-                        record_QT.setPaymentId(oPayment.getId());
-                        record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
-                        record_QT.setOrderId(oPayment.getOrderId());
-                        record_QT.setPayType(oPayment.getDeductionType());
-                        record_QT.setPayAmount(oPayment.getDeductionAmount());
-                        record_QT.setRealPayAmount(oPayment.getDeductionAmount());
-                        record_QT.setPlanPayTime(d.getTime());
-                        record_QT.setPlanNum(Status.STATUS_0.status);
-                        record_QT.setAgentId(oPayment.getAgentId());
-                        record_QT.setPaymentStatus(PaymentStatus.JQ.code);
-                        record_QT.setcUser(oPayment.getUserId());
-                        record_QT.setcDate(d.getTime());
-                        record_QT.setStatus(Status.STATUS_1.status);
-                        record_QT.setVersion(Status.STATUS_1.status);
-                        if (1 != oPaymentDetailMapper.insert(record_QT)) {
-                            throw new ProcessException("首付错误");
+                        AgentResult dealOrderDeductionRes =  dealOrderDeduction(oPayment);
+                        if(dealOrderDeductionRes.isOK()){
+                            List<OPaymentDetail> details =  (List<OPaymentDetail>)dealOrderDeductionRes.getData();
+                            for (OPaymentDetail detail : details) {
+                                if(1!=oPaymentDetailMapper.insertSelective(detail)){
+                                    throw new ProcessException("抵扣操作失败");
+                                }
+                            }
                         }
                         logger.info("代理商订单审批完成处理明细完成数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     }
@@ -1495,8 +1491,15 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok();
     }
 
+    /**
+     * 处理订单抵扣
+     * @param payment 付款单
+     * @return
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult dealOrderDeduction(OPayment payment) {
+
         if(StringUtils.isBlank(payment.getDeductionType()))return AgentResult.ok();
         //可扣款的缴款项
         List<Capital>  listc =  agentQueryService.capitalQuery(payment.getAgentId(),payment.getDeductionType());
@@ -1504,25 +1507,189 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal deductionAmount =  payment.getDeductionAmount();
 
         BigDecimal for_deal = deductionAmount;
-        for (Capital capital : listc) {
-              //相等直接处理
-             if(capital.getcAmount().compareTo(deductionAmount)==0){
 
-                 capital.setcAmount(capital.getcAmount().subtract(deductionAmount));
-                 capital.setcInAmount(deductionAmount);
-                 capital.setcIsin(Status.STATUS_1.status);
+        List<OPaymentDetail> OPaymentDetail = new ArrayList<>();
 
-             }else if(capital.getcAmount().compareTo(deductionAmount)>0){
+        if(listc.size()>0){
 
-             }else if(capital.getcAmount().compareTo(deductionAmount)<0){
+            Capital capital = listc.get(0);
 
-             }
+            //相等直接处理
+            if(capital.getcAmount().compareTo(deductionAmount)==0){
+
+                //扣除缴款项
+                capital.setcAmount(capital.getcAmount().subtract(deductionAmount));
+                capital.setcInAmount(deductionAmount);
+                capital.setcIsin(Status.STATUS_1.status);
+                capital.setcBusStatus(Status.STATUS_1.status);//已扣款，已拆分，已冻结等
+
+                if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                    throw new ProcessException("更新缴款项失败");
+                }
+
+                //添加抵扣明细
+                OPaymentDetail record_QT = new OPaymentDetail();
+                record_QT.setId(idService.genId(TabId.o_payment_detail));
+                record_QT.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
+                record_QT.setPaymentId(payment.getId());
+                record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                record_QT.setOrderId(payment.getOrderId());
+                record_QT.setPayType(payment.getDeductionType());
+                record_QT.setPayAmount(payment.getDeductionAmount());
+                record_QT.setRealPayAmount(payment.getDeductionAmount());
+                record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                record_QT.setPlanNum(Status.STATUS_0.status);
+                record_QT.setAgentId(payment.getAgentId());
+                record_QT.setSrcId(capital.getId());
+                record_QT.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                record_QT.setcUser(payment.getUserId());
+                record_QT.setcDate(Calendar.getInstance().getTime());
+                record_QT.setStatus(Status.STATUS_1.status);
+                record_QT.setVersion(Status.STATUS_1.status);
+
+                OPaymentDetail.add(record_QT);
+                return AgentResult.ok(OPaymentDetail);
+
+            }else if(capital.getcAmount().compareTo(deductionAmount)>0){
+
+                //扣除缴款项
+                capital.setcAmount(capital.getcAmount().subtract(deductionAmount));
+                capital.setcInAmount(deductionAmount);
+                capital.setcIsin(Status.STATUS_0.status);
+                capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
+
+                if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                    throw new ProcessException("更新缴款项失败");
+                }
+                //添加抵扣明细
+                OPaymentDetail record_QT = new OPaymentDetail();
+                record_QT.setId(idService.genId(TabId.o_payment_detail));
+                record_QT.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
+                record_QT.setPaymentId(payment.getId());
+                record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                record_QT.setOrderId(payment.getOrderId());
+                record_QT.setPayType(payment.getDeductionType());
+                record_QT.setPayAmount(payment.getDeductionAmount());
+                record_QT.setRealPayAmount(payment.getDeductionAmount());
+                record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                record_QT.setPlanNum(Status.STATUS_0.status);
+                record_QT.setAgentId(payment.getAgentId());
+                record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                record_QT.setSrcId(capital.getId());
+                record_QT.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                record_QT.setcUser(payment.getUserId());
+                record_QT.setcDate(Calendar.getInstance().getTime());
+                record_QT.setStatus(Status.STATUS_1.status);
+                record_QT.setVersion(Status.STATUS_1.status);
+                OPaymentDetail.add(record_QT);
+                return AgentResult.ok(OPaymentDetail);
+
+            }else if(capital.getcAmount().compareTo(for_deal)<0){
+
+                for (Capital capitalItem : listc) {
+
+                    if(capital.getcAmount().compareTo(for_deal)>0){
+                        //扣除缴款项
+                        capital.setcAmount(capital.getcAmount().subtract(for_deal));
+                        capital.setcInAmount(for_deal);
+                        capital.setcIsin(Status.STATUS_0.status);
+                        capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
+                        if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                            throw new ProcessException("更新缴款项失败");
+                        }
+                        //添加抵扣明细
+                        OPaymentDetail record_QT = new OPaymentDetail();
+                        record_QT.setId(idService.genId(TabId.o_payment_detail));
+                        record_QT.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
+                        record_QT.setPaymentId(payment.getId());
+                        record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_QT.setOrderId(payment.getOrderId());
+                        record_QT.setPayType(payment.getDeductionType());
+                        record_QT.setPayAmount(for_deal);
+                        record_QT.setRealPayAmount(for_deal);
+                        record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                        record_QT.setPlanNum(Status.STATUS_0.status);
+                        record_QT.setAgentId(payment.getAgentId());
+                        record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_QT.setSrcId(capital.getId());
+                        record_QT.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                        record_QT.setcUser(payment.getUserId());
+                        record_QT.setcDate(Calendar.getInstance().getTime());
+                        record_QT.setStatus(Status.STATUS_1.status);
+                        record_QT.setVersion(Status.STATUS_1.status);
+                        OPaymentDetail.add(record_QT);
+                        for_deal = new BigDecimal(0);
+                        break;
+                    }else if(capital.getcAmount().compareTo(for_deal)==0){
+                        //扣除缴款项
+                        capital.setcAmount(capital.getcAmount().subtract(for_deal));
+                        capital.setcInAmount(for_deal);
+                        capital.setcIsin(Status.STATUS_0.status);
+                        capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
+                        if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                            throw new ProcessException("更新缴款项失败");
+                        }
+                        //添加抵扣明细
+                        OPaymentDetail record_QT = new OPaymentDetail();
+                        record_QT.setId(idService.genId(TabId.o_payment_detail));
+                        record_QT.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
+                        record_QT.setPaymentId(payment.getId());
+                        record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_QT.setOrderId(payment.getOrderId());
+                        record_QT.setPayType(payment.getDeductionType());
+                        record_QT.setPayAmount(for_deal);
+                        record_QT.setRealPayAmount(for_deal);
+                        record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                        record_QT.setPlanNum(Status.STATUS_0.status);
+                        record_QT.setAgentId(payment.getAgentId());
+                        record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_QT.setSrcId(capital.getId());
+                        record_QT.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                        record_QT.setcUser(payment.getUserId());
+                        record_QT.setcDate(Calendar.getInstance().getTime());
+                        record_QT.setStatus(Status.STATUS_1.status);
+                        record_QT.setVersion(Status.STATUS_1.status);
+                        OPaymentDetail.add(record_QT);
+                        for_deal = new BigDecimal(0);
+                        break;
+                    }else if(capital.getcAmount().compareTo(for_deal) < 0){
+                        BigDecimal camount = capital.getcAmount();
+                        //扣除缴款项
+                        capital.setcInAmount(camount);
+                        capital.setcAmount(new BigDecimal(0));
+                        capital.setcIsin(Status.STATUS_1.status);
+                        capital.setcBusStatus(Status.STATUS_1.status);//已扣款，已拆分，已冻结 部分扣款等
+                        if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                            throw new ProcessException("更新缴款项失败");
+                        }
+                        //添加抵扣明细
+                        OPaymentDetail record_QT = new OPaymentDetail();
+                        record_QT.setId(idService.genId(TabId.o_payment_detail));
+                        record_QT.setBatchCode(Calendar.getInstance().getTime().getTime() + "");
+                        record_QT.setPaymentId(payment.getId());
+                        record_QT.setPaymentType(PamentIdType.ORDER_FKD.code);
+                        record_QT.setOrderId(payment.getOrderId());
+                        record_QT.setPayType(payment.getDeductionType());
+                        record_QT.setPayAmount(camount);
+                        record_QT.setRealPayAmount(camount);
+                        record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                        record_QT.setPlanNum(Status.STATUS_0.status);
+                        record_QT.setAgentId(payment.getAgentId());
+                        record_QT.setPaymentStatus(PaymentStatus.JQ.code);
+                        record_QT.setSrcId(capital.getId());
+                        record_QT.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                        record_QT.setcUser(payment.getUserId());
+                        record_QT.setcDate(Calendar.getInstance().getTime());
+                        record_QT.setStatus(Status.STATUS_1.status);
+                        record_QT.setVersion(Status.STATUS_1.status);
+                        OPaymentDetail.add(record_QT);
+                        for_deal = for_deal.subtract(camount);
+                    }
+                }
+            }
         }
-
-
-
-
-        return null;
+        return AgentResult.ok(OPaymentDetail);
     }
 
     private OReceiptOrderExample getoReceiptOrderExample() {
