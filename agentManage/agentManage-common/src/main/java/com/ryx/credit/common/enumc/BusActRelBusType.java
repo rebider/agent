@@ -14,7 +14,11 @@ public enum BusActRelBusType {
     OTHER_DEDUCTION_STAGING("其他扣款退单分期"),
     THAW("分润解冻申请"),
     PkType("订单补款"),
-    TOOLS("机具扣款调整申请"),;
+    TOOLS("机具扣款调整申请"),
+    POSTAX("税点调整申请"),
+    POSCHECK("POS考核奖励申请"),
+    POSREWARD("POS奖励申请"),
+    ;
 
     public String  msg;
 

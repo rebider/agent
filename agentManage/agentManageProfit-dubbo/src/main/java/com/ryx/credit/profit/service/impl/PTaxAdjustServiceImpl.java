@@ -1,21 +1,28 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.PTaxAdjustMapper;
+import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.PTaxAdjust;
 import com.ryx.credit.profit.pojo.PTaxAdjustExample;
+import com.ryx.credit.profit.pojo.ProfitStagingDetailExample;
 import com.ryx.credit.profit.service.IPTaxAdjustService;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -36,6 +43,10 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Autowired
     private IdService idService;
 
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private TaskApprovalService taskApprovalService;
     /**
      * 处理分页用到的信息
      *
@@ -63,9 +74,35 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     }
 
     @Override
-    public ResultVO posTaxEnterIn(PTaxAdjust record) throws ProcessException {
-        record.setId(idService.genId(TabId.p_profit_adjust));
-        adjustMapper.insertSelective(record);
+    public PTaxAdjust selectByAgentPid(String agentPid) {
+        return adjustMapper.selectByAgentPid(agentPid);
+    }
+
+    @Override
+    public ResultVO posTaxEnterIn(PTaxAdjust tax) throws ProcessException {
+        tax.setId(idService.genId(TabId.p_profit_adjust));
+        adjustMapper.insertSelective(tax);
+
+        //启动审批流
+        String proceId = activityService.createDeloyFlow(null, "taxPoint", null, null, null);
+        if (proceId == null) {
+            logger.error("税点调整审批流启动失败，代理商ID：{}", tax.getAgentPid());
+            throw new ProcessException("税点调整审批流启动失败!");
+        }
+        BusActRel record = new BusActRel();
+        record.setBusId(tax.getId());
+        record.setActivId(proceId);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(tax.getUserId());
+        record.setBusType(BusActRelBusType.TOOLS.name());
+        try {
+            taskApprovalService.addABusActRel(record);
+            logger.info("税点调整申请审批流启动成功");
+        } catch (Exception e) {
+            e.getStackTrace();
+            logger.error("税点调整申请审批流启动失败{}");
+            throw new ProcessException("税点调整申请审批流启动失败!:{}",e.getMessage());
+        }
         return ResultVO.success(record);
     }
 
