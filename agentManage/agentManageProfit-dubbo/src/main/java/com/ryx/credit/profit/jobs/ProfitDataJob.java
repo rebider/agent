@@ -43,12 +43,16 @@ public class ProfitDataJob {
 
 //    @Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
-        String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        String settleMonth = "201806";//LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
         if (agentResult != null && agentResult.getData() != null) {
             JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
-            addQr(json);//新增二维码
-            addPos(json);//新增pos
+            if (json != null) {
+                addQr(json, settleMonth);//新增二维码
+                addPos(json, settleMonth);//新增pos
+            }else{
+                LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
+            }
         }
     }
     /***
@@ -57,9 +61,9 @@ public class ProfitDataJob {
     * @Author: zhaodw
     * @Date: 2018/8/1
     */
-    private void addQr(JSONObject json) {
+    private void addQr(JSONObject json, String settleMonth) {
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
-        profitOrganTranMonth.setProfitDate(json.getString("SETTLE_MONTH"));
+        profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("03");
@@ -76,9 +80,9 @@ public class ProfitDataJob {
      * @Author: zhaodw
      * @Date: 2018/8/1
      */
-    private void addPos(JSONObject json) {
+    private void addPos(JSONObject json, String settleMonth) {
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
-        profitOrganTranMonth.setProfitDate(json.getString("SETTLE_MONTH"));
+        profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("01");
