@@ -329,7 +329,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         //检查是否有审批中的代理商新
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(returnId)
-                .andBusTypeEqualTo(BusActRelBusType.ORDER_RETURN.name())
+                .andBusTypeEqualTo(BusActRelBusType.refund.name())
                 .andActivStatusEqualTo(AgStatus.Approving.name())
                 .andStatusEqualTo(Status.STATUS_1.status);
         if (busActRelMapper.selectByExample(example).size() > 0) {
@@ -338,7 +338,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         //更新退货单状态
-        returnOrder.setRetSchedule(AgStatus.Approving.status);
+        returnOrder.setRetSchedule(new BigDecimal(RetSchedule.SPZ.code));
         returnOrder.setuTime(new Date());
         if (1 != returnOrderMapper.updateByPrimaryKeySelective(returnOrder)) {
             log.info("退货提交审批失败,禁止重复提交审批{}:{}", returnId, agentId);
@@ -368,9 +368,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setBusId(returnId);
         record.setActivId(proce);
         record.setcTime(Calendar.getInstance().getTime());
-        record.setcUser(agentId);
+        record.setcUser(userid);
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.ORDER_RETURN.name());
+        record.setBusType(BusActRelBusType.refund.name());
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
