@@ -383,9 +383,8 @@ public class CompensateServiceImpl implements CompensateService {
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
         try {
             if(agentVo.getApprovalResult().equals("pass")){
+                BigDecimal deductAmt = new BigDecimal(0);
                 if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0){
-                    BigDecimal deductAmt = new BigDecimal(0);
-                    String refundPriceDiffId = "";
                     if(agentVo.getDeductCapitalList()!=null)
                     for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
                         oDeductCapital.setId(idService.genId(TabId.o_deduct_capital));
@@ -399,28 +398,26 @@ public class CompensateServiceImpl implements CompensateService {
                         if(insert!=1){
                             throw new ProcessException("工作流处理任务DeductCapita异常");
                         }
-                        refundPriceDiffId = oDeductCapital.getSourceId();
-                    }
-                    ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(refundPriceDiffId);
-                    oRefundPriceDiff.setDeductAmt(deductAmt);
-                    BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
-                    String relCompAmtStr = String.valueOf(relCompAmt);
-                    oRefundPriceDiff.setRelCompType(relCompAmtStr.contains("-")?PriceDiffType.DETAIN_AMT.getValue():PriceDiffType.REPAIR_AMT.getValue());
-                    oRefundPriceDiff.setRelCompAmt(new BigDecimal(relCompAmtStr));
-                    int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
-                    if(i!=1){
-                        throw new ProcessException("工作流处理任务update异常");
                     }
                 }
-                //财务审批
-                ORefundPriceDiffVo oRefundPriceDiffVo = agentVo.getoRefundPriceDiffVo();
-                if(null!=oRefundPriceDiffVo){
-                    if(StringUtils.isBlank(agentVo.getAgentBusId())){
-                        throw new ProcessException("退补差价业务id为空异常");
-                    }
-                    AgentResult agentResult = compensateService.updateFinaceTask(oRefundPriceDiffVo, agentVo.getAgentBusId());
-                    if(!agentResult.isOK())
-                    throw new ProcessException("退补差价财务审批数据更新异常");
+                ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+                ORefundPriceDiffVo updatePriceDiff = new ORefundPriceDiffVo();
+                updatePriceDiff.setId(oRefundPriceDiff.getId());
+                if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0) {
+                    updatePriceDiff.setDeductAmt(deductAmt);
+                    BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
+                    String relCompAmtStr = String.valueOf(relCompAmt);
+                    updatePriceDiff.setRelCompType(relCompAmtStr.contains("-") ? PriceDiffType.DETAIN_AMT.getValue() : PriceDiffType.REPAIR_AMT.getValue());
+                    updatePriceDiff.setRelCompAmt(relCompAmtStr.contains("-") ? new BigDecimal(relCompAmtStr.substring(1)) : new BigDecimal(relCompAmtStr));
+                }
+                if(StringUtils.isNotBlank(updatePriceDiff.getGatherTimeStr())){
+                    updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(updatePriceDiff.getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
+                    updatePriceDiff.setGatherAmt(oRefundPriceDiff.getGatherAmt());
+                }
+                updatePriceDiff.setuTime(new Date());
+                int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
+                if(i!=1){
+                    throw new ProcessException("工作流处理任务update异常");
                 }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
@@ -435,24 +432,24 @@ public class CompensateServiceImpl implements CompensateService {
         return AgentResult.ok();
     }
 
-    /**
-     * 退补差价财务处理
-     * @param oRefundPriceDiffVo
-     * @param agentBusId
-     * @return
-     */
-    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
-    @Override
-    public AgentResult updateFinaceTask(ORefundPriceDiffVo oRefundPriceDiffVo,String agentBusId){
-        oRefundPriceDiffVo.setId(agentBusId);
-        oRefundPriceDiffVo.setGatherTime(DateUtil.getDateFromStr(oRefundPriceDiffVo.getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
-        oRefundPriceDiffVo.setuTime(new Date());
-        int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiffVo);
-        if(i!=1){
-            return AgentResult.fail("更新异常");
-        }
-        return AgentResult.ok();
-    }
+//    /**
+//     * 退补差价财务处理
+//     * @param oRefundPriceDiffVo
+//     * @param agentBusId
+//     * @return
+//     */
+//    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+//    @Override
+//    public AgentResult updateFinaceTask(ORefundPriceDiffVo oRefundPriceDiffVo,String agentBusId){
+//        oRefundPriceDiffVo.setId(agentBusId);
+//        oRefundPriceDiffVo.setGatherTime(DateUtil.getDateFromStr(oRefundPriceDiffVo.getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
+//        oRefundPriceDiffVo.setuTime(new Date());
+//        int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiffVo);
+//        if(i!=1){
+//            return AgentResult.fail("更新异常");
+//        }
+//        return AgentResult.ok();
+//    }
 
     /**
      * 完成处理

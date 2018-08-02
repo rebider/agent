@@ -36,6 +36,5 @@ public interface CompensateService {
 
     ORefundPriceDiff queryRefDiffDetail(String id);
 
-    AgentResult updateFinaceTask(ORefundPriceDiffVo oRefundPriceDiffVo, String agentBusId);
 }
 
