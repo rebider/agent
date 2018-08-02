@@ -41,7 +41,7 @@ public class ProfitDataJob {
     @Autowired
     private IdService idService;
 
-//    @Scheduled(cron = "0 0 0 10 * ?")
+//    @Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);

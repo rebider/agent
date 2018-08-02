@@ -11,6 +11,7 @@ public enum BusActRelBusType {
     DC_Colinfo("代理商账户修改申请"),
     ORDER("订单审批"),
     STAGING("退单分期"),
+    OTHER_DEDUCTION_STAGING("其他扣款退单分期"),
     THAW("分润解冻申请"),
     PkType("订单补款"),
     ORDER_RETURN("退货审批"),

@@ -6,11 +6,17 @@ package com.ryx.credit.profit.service.impl;/**
 
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
+import com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample;
+import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
+import com.ryx.credit.profit.pojo.ProfitSettleErrLsExample;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 月交易实现
@@ -36,6 +42,22 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Override
     public PageInfo getProfitOrganTranMonthList(ProfitOrganTranMonth profitOrganTranMonth, Page page) {
-        return null;
+        ProfitOrganTranMonthExample example = new ProfitOrganTranMonthExample();
+        example.setPage(page);
+        ProfitOrganTranMonthExample.Criteria criteria = example.createCriteria();
+        // 月份按开始到结束查询
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate()))
+        {
+            criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDate());
+        }
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProductType()))
+        {
+            criteria.andProductTypeEqualTo(profitOrganTranMonth.getProductType());
+        }
+        List<ProfitOrganTranMonth> settleErrs = profitOrganTranMonthMapper.selectByExample(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(settleErrs);
+        pageInfo.setTotal(profitOrganTranMonthMapper.countByExample(example));
+        return pageInfo;
     }
 }
