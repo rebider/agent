@@ -474,8 +474,8 @@ public class CompensateServiceImpl implements CompensateService {
         List<ODeductCapital> oDeductCapitals = deductCapitalMapper.selectByExample(oDeductCapitalExample);
         oRefundPriceDiff.setDeductCapitalList(oDeductCapitals);
 
-        oRefundPriceDiff.setApplyCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getApplyCompType()));
-        oRefundPriceDiff.setRelCompType(PriceDiffType.getContentByValue(oRefundPriceDiff.getRelCompType()));
+        oRefundPriceDiff.setApplyCompName(PriceDiffType.getContentByValue(oRefundPriceDiff.getApplyCompType()));
+        oRefundPriceDiff.setRelCompName(PriceDiffType.getContentByValue(oRefundPriceDiff.getRelCompType()));
         ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
         ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
         criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
