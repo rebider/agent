@@ -3,8 +3,8 @@ package com.ryx.credit.activity.task;
 import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.ActIdUserService;
-import com.ryx.credit.service.agent.DataChangeActivityService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -37,7 +37,7 @@ public class ToolsInstallmentTaskExecutionListener implements TaskListener, Exec
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            ToolsDeductService toolsDeductService = (ToolsDeductService) MySpringContextHandler.applicationContext.getBean("toolsDeductService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
@@ -46,6 +46,7 @@ public class ToolsInstallmentTaskExecutionListener implements TaskListener, Exec
             if ("finish_end".equals(activityName)) {
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
+            toolsDeductService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), activityName);
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         }

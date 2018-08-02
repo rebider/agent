@@ -49,9 +49,10 @@ public interface StagingService {
 
     /**
      * 新增分期
+     *
      * @param profitStaging 分期对象
      */
-    void addStaging(ProfitStaging profitStaging);
+    void addStaging(ProfitStaging profitStaging, String workId);
 
     /**
      * 流程结束修改业务数据
@@ -59,4 +60,12 @@ public interface StagingService {
      * @param status 状态
      */
     void completeTaskEnterActivity(String insid, String status);
+
+    /*** 
+    * @Description: 新增分期明细
+    * @Param:  stagingDetail 分期明细
+    * @Author: zhaodw
+    * @Date: 2018/7/31 
+    */ 
+    void insetStagingDetail(ProfitStagingDetail stagingDetail);
 }

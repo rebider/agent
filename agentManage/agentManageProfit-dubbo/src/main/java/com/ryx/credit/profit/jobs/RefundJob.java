@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -57,28 +58,23 @@ public class RefundJob {
 
 
 //    @Scheduled(cron = "0 0/2 * * * ?")
+    @Transactional
     public void deal() {
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
-        Map<String, String> deductionMap = new HashMap<>(10);
+        Map<String, String> deductionIdMap = new HashMap<>(10);
         LOG.info("每月定时获取退单数据。");
        JSONObject result = getRefundList();
        if (result.containsKey("info") ) {
            JSONArray array = result.getJSONArray("info");
            try {
                LOG.info("对数据汇总并生成退单明细。");
-               List<ProfitSettleErrLs> settleErrLsList = insertSettleErrLs(array, orgMap);
+               insertSettleErrLs(array, orgMap, deductionIdMap);
                LOG.info("对数据汇总并生成扣款信息。");
                if (orgMap.size() > 0) {
                   Set<String> keys = orgMap.keySet();
                   for (String key : keys) {
-                      ProfitDeduction profitDeduction = getProfitDeduction(key, orgMap.get(key));
-                      deductionMap.put(key, profitDeduction.getId());
-                      profitDeductionService.insert(profitDeduction);
+                      insertProfitDeduction(key, orgMap.get(key), deductionIdMap.get(key));
                   }
-                   settleErrLsList.forEach(profitSettleErrLs ->{
-                       profitSettleErrLs.setSourceId(deductionMap.get(profitSettleErrLs.getInstId()));
-                       profitSettleErrLsService.inset(profitSettleErrLs);
-                   });
                }
            }catch (Exception e) {
                e.printStackTrace();
@@ -93,11 +89,11 @@ public class RefundJob {
     * @Description: 获取扣款信息对象
     * @Param:  agentId 机构id
     * @Param:  addsum 新增扣款金额
-    * @return: 扣款信息对象
+    * @Param:  id 主键
     * @Author: zhaodw
     * @Date: 2018/7/30
     */
-    private ProfitDeduction getProfitDeduction(String agentId, BigDecimal addAmt) {
+    private void insertProfitDeduction(String agentId, BigDecimal addAmt, String id) {
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         deduction.setAgentId(agentId);
@@ -105,16 +101,14 @@ public class RefundJob {
         if (pageInfo.getRows() != null && pageInfo.getRows().size()==1) {
             deduction = (ProfitDeduction) pageInfo.getRows().get(0);
         }else{
-            deduction.setId(idService.genId(TabId.P_DEDUCTION));
+            deduction.setId(id);
             deduction.setStagingStatus(DeductionStatus.UNREVIEWED.getStatus());
-//            deduction.setAgentName();
-//            deduction.setAgentPid();
             deduction.setDeductionDesc(DEDUCTION_DESC);
         }
         deduction.setAddDeductionAmt(addAmt);
         deduction.setSumDeductionAmt(deduction.getSumDeductionAmt().add(addAmt));
         deduction.setMustDeductionAmt(deduction.getSumDeductionAmt());
-        return deduction;
+        profitDeductionService.insert(deduction);
     }
 
     /*** 
@@ -124,14 +118,13 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/7/30 
     */ 
-    private List<ProfitSettleErrLs> insertSettleErrLs(JSONArray array,  Map<String, BigDecimal> orgMap) {
-       List<ProfitSettleErrLs> errLsList = array.parallelStream().
+    private void insertSettleErrLs(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
+       array.stream().
                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) && ((JSONObject)json).getBigDecimal("balanceAmt").intValue() < 0)
-               .map(json->{
-             return json2Object((JSONObject)json, orgMap);
+               .forEach(json->{
+                   insertSettleErr((JSONObject)json, orgMap, deductionIdMap);
             }
-        ).collect(Collectors.toList());
-        return errLsList;
+        );
     }
 
     /*** 
@@ -142,7 +135,7 @@ public class RefundJob {
     * @Author: zhaodw 
     * @Date: 2018/7/30 
     */ 
-    private ProfitSettleErrLs json2Object( JSONObject jsonObject, Map<String, BigDecimal> orgMap) {
+    private void insertSettleErr( JSONObject jsonObject, Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
         ProfitSettleErrLs settleErrLs = new ProfitSettleErrLs();
         settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
         settleErrLs.setHostLs(jsonObject.getString("hostLs"));
@@ -164,9 +157,11 @@ public class RefundJob {
                 orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("balanceAmt")));
             }else {
                 orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("balanceAmt"));
+                deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
             }
         }
-        return settleErrLs;
+        settleErrLs.setSourceId(deductionIdMap.get(jsonObject.getString("instId")));
+        profitSettleErrLsService.inset(settleErrLs);
     }
 
     /*** 

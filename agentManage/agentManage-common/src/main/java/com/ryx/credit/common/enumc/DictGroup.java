@@ -43,7 +43,13 @@ public enum DictGroup {
     TEMP_AGREE("协议模板"),
     ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型"),
-    ACTIVITY_DIS_TYPE("活动优惠方式");
+    ACTIVITY_DIS_TYPE("活动优惠方式"),
+    TOOLS("机具押金扣款调整"),
+    TOOLS_APR_BUSNISS("扣款调整审批业务部参数"),
+    TOOLS_APR_MARKET("扣款调整审批市场部参数"),
+    TOOLS_APR_OFFICE("扣款调整审批总经办参数"),
+    TOOLS_APR_EXPAND("扣款调整审批客户拓展部门参数"),
+    ;
 
     public String  msg;
 
