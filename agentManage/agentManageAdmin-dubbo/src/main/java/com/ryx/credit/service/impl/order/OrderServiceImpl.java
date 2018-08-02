@@ -623,7 +623,7 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
                 .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(order.getId());
-        oPaymentDetailExample.setOrderByClause(" plan_pay_time asc ");
+        oPaymentDetailExample.setOrderByClause(" plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
@@ -1777,5 +1777,28 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return AgentResult.ok(f);
+    }
+
+
+    /**
+     * 查询订单付款
+     * @param orderId
+     * @return
+     */
+    @Override
+    public AgentResult queryOrderForOSupplementPaymentdetail(String orderId,String agentId) {
+        OOrder order = orderMapper.selectByPrimaryKey(orderId);
+        OPaymentDetailExample example = new OPaymentDetailExample();
+        example.or().andOrderIdEqualTo(orderId)
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPaymentStatusEqualTo(PaymentStatus.DF.code)
+                .andAgentIdEqualTo(agentId);
+        example.setOrderByClause(" plan_pay_time asc ");
+        List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectByExample(example);
+        if(paymentDetails.size()>0){
+            return AgentResult.ok(FastMap.fastSuccessMap().putKeyV("order",order).putKeyV("paymentDetails",paymentDetails.get(0)));
+        }else{
+            return AgentResult.fail("没有需要补款的欠款");
+        }
     }
 }
