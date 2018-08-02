@@ -2,20 +2,24 @@ package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.RetSchedule;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.MapUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.ODeductCapitalMapper;
 import com.ryx.credit.dao.order.OReturnOrderDetailMapper;
 import com.ryx.credit.dao.order.OReturnOrderMapper;
 import com.ryx.credit.dao.order.OReturnOrderRelMapper;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.agent.BusActRelExample;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.PlannerService;
@@ -25,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.order.OReturnOrder;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -52,6 +58,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     ODeductCapitalMapper deductCapitalMapper;
     @Resource
     PlannerService plannerService;
+    @Autowired
+    private BusActRelMapper busActRelMapper;
+    @Autowired
+    private AgentEnterService agentEnterService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private ActivityService activityService;
+
 
     /**
      * @Author: Zhang Lei
@@ -225,7 +240,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     @Override
     @Transactional
-    public Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson) throws ProcessException {
+    public Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson,String userid) throws ProcessException {
 
         List<Map> list = null;
         try {
@@ -306,6 +321,60 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.error("生成退货关系失败", e);
                 throw new ProcessException("生成退货关系失败");
             }
+        }
+
+
+        //启动退货审批流程==========================================================
+
+        //检查是否有审批中的代理商新
+        BusActRelExample example = new BusActRelExample();
+        example.or().andBusIdEqualTo(returnId)
+                .andBusTypeEqualTo(BusActRelBusType.ORDER_RETURN.name())
+                .andActivStatusEqualTo(AgStatus.Approving.name())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        if (busActRelMapper.selectByExample(example).size() > 0) {
+            log.info("退货提交审批失败,禁止重复提交审批{}:{}", returnId, agentId);
+            throw new ProcessException("退货提交审批失败，禁止重复提交审批");
+        }
+
+        //更新退货单状态
+        returnOrder.setRetSchedule(AgStatus.Approving.status);
+        returnOrder.setuTime(new Date());
+        if (1 != returnOrderMapper.updateByPrimaryKeySelective(returnOrder)) {
+            log.info("退货提交审批失败,禁止重复提交审批{}:{}", returnId, agentId);
+            throw new ProcessException("退货提交审批失败，更新退货单失败");
+        }
+        Map startPar = agentEnterService.startPar(userid);
+        if (null == startPar) {
+            log.info("========用户{}{}启动部门参数为空", returnId, agentId);
+            throw new ProcessException("启动部门参数为空!");
+        }
+
+        //不同的业务类型找到不同的启动流程
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER_RETURN.name());
+        String workId = null;
+        for (Dict dict : actlist) {
+            workId = dict.getdItemvalue();
+        }
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        if (proce == null) {
+            log.info("退货提交审批，审批流启动失败{}:{}", returnId, agentId);
+            throw new ProcessException("退货审批流启动失败!");
+        }
+
+        //添加审批关系
+        BusActRel record = new BusActRel();
+        record.setBusId(returnId);
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(agentId);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.ORDER_RETURN.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
+            throw new ProcessException("退货审批流启动失败:添加审批关系失败");
         }
 
         return null;

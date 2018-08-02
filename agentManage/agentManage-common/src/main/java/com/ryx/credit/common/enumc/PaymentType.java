@@ -11,9 +11,7 @@ public enum PaymentType {
     SF("SF","首付"),
     FRFQ("FRFQ","分润分期"),
     DKFQ("DKFQ","打款分期"),
-    DK("DK","打款"),
-    YJ("YJ","押金"),
-    BZJ("BZJ","保证金");
+    DK("DK","打款");
 
     public String code;
 
