@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author yangmx
@@ -52,6 +49,15 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     @Autowired
     private TaskApprovalService taskApprovalService;
 
+    /**
+     * 扣款总额=本月新增+上月未口足，
+     * 调整金额=本月应扣，
+     * 实际扣款数=本月实扣，
+     * 未扣足=本月应扣-本月实扣
+     * @param profitDeduction
+     * @param userId
+     * @throws ProcessException
+     */
     @Override
     public void applyAdjustment(ProfitDeduction profitDeduction, String userId) throws ProcessException {
 
@@ -60,9 +66,9 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         profitStagingDetail.setId(idService.genId(TabId.P_STAGING_DETAIL));
         profitStagingDetail.setCurrentStagCount(1);
         profitStagingDetail.setDeductionDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")));
-        BigDecimal actualDeductionAmt = profitDeduction.getMustDeductionAmt().subtract(profitDeduction.getActualDeductionAmt());
-        profitStagingDetail.setMustAmt(actualDeductionAmt);
-        profitStagingDetail.setRealAmt(actualDeductionAmt);
+        BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
+        profitStagingDetail.setMustAmt(mustDeductionAmt);
+        profitStagingDetail.setRealAmt(BigDecimal.ZERO);
         profitStagingDetail.setRemark(profitDeduction.getRemark());
         profitStagingDetail.setSourceId(profitDeduction.getSourceId());
         profitStagingDetail.setStagId(profitDeduction.getId());
@@ -96,7 +102,6 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             throw new ProcessException("机具扣款调整申请审批流启动失败!:{}",e.getMessage());
         }
         profitDeduction.setStagingStatus(DeductionStatus.REVIEWING.getStatus());
-        profitDeduction.setActualDeductionAmt(profitDeduction.getMustDeductionAmt());
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
     }
 
@@ -112,8 +117,6 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(profitStagingDetail.getStagId());
                     LOG.info("1.更新机具扣款申请状态为申请通过");
                     LOG.info("审批通过，未申请前本月实扣：{},申请扣款数：{}",profitDeduction.getActualDeductionAmt(),profitStagingDetail.getRealAmt());
-                    BigDecimal actualDeductionAmt = profitDeduction.getMustDeductionAmt().subtract(profitStagingDetail.getRealAmt());
-                    profitDeduction.setActualDeductionAmt(actualDeductionAmt);
                     profitDeduction.setStagingStatus(DeductionStatus.PASS.getStatus());
                     profitDeduction.setRemark(profitStagingDetail.getRemark());
                     profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
@@ -162,5 +165,16 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             return result;
         }
         return AgentResult.ok(resultMap);
+    }
+
+    @Override
+    public List<ProfitStagingDetail> getProfitStagingDetailByStagId(String stagId) {
+        if(StringUtils.isNotBlank(stagId)){
+            ProfitStagingDetailExample profitStagingDetailExample = new ProfitStagingDetailExample();
+            ProfitStagingDetailExample.Criteria criteria = profitStagingDetailExample.createCriteria();
+            criteria.andStagIdEqualTo(stagId);
+            return profitStagingDetailMapper.selectByExample(profitStagingDetailExample);
+        }
+        return null;
     }
 }
