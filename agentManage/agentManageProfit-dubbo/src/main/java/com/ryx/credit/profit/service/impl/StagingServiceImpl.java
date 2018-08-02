@@ -265,9 +265,9 @@ public class StagingServiceImpl implements StagingService {
         record.setcUser(profitStaging.getUserId());
         record.setStatus(Status.STATUS_1.status);
         if("otherDeduct".equals(workId)) {
-            record.setBusType(BusActRelBusType.STAGING.name());
+            record.setBusType(BusActRelBusType.OTHER_DEDUCTION.name());
         }else{
-            record.setBusType(BusActRelBusType.OTHER_DEDUCTION_STAGING.name());
+            record.setBusType(BusActRelBusType.STAGING.name());
         }
         record.setActivStatus(AgStatus.Approving.name());
         try {
