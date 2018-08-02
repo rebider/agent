@@ -6,6 +6,8 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 
+import java.util.List;
+
 /**
  * @author yangmx
  * @desc 机具扣款调整实现
@@ -39,4 +41,11 @@ public interface ToolsDeductService {
      * @throws ProcessException
      */
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
+
+    /**
+     * 根据扣款ID 查询对应的明细信息
+     * @param stagId
+     * @return
+     */
+    public List<ProfitStagingDetail> getProfitStagingDetailByStagId(String stagId);
 }

@@ -65,6 +65,14 @@
     from P_TAX_ADJUST
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectByAgentPid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_TAX_ADJUST
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='0'
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample">
     delete from P_TAX_ADJUST
     <if test="_parameter != null">

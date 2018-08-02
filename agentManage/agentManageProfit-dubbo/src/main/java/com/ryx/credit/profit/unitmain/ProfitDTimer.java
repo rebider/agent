@@ -36,8 +36,10 @@ public class ProfitDTimer {
         map.put("pageNumber","1");
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
+        /*String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("profit.day"),params);*/
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.day"),params);
+                ("http://12.3.10.161:8003/qtfr/agentInterface/queryfrbyday.do",params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             //logger.error("请求同步失败！");
