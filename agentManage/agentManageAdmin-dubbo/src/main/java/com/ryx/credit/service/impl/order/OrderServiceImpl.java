@@ -1236,7 +1236,11 @@ public class OrderServiceImpl implements OrderService {
                     }
 
                     if (oPayment.getDeductionAmount() != null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
-                        //添加首付明细
+                        //添加抵扣明细
+
+                        //抵扣操作
+
+                        //添加抵扣明细
                         OPaymentDetail record_QT = new OPaymentDetail();
                         record_QT.setId(idService.genId(TabId.o_payment_detail));
                         record_QT.setBatchCode(d.getTime().getTime() + "");
@@ -1489,6 +1493,36 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult dealOrderDeduction(OPayment payment) {
+        if(StringUtils.isBlank(payment.getDeductionType()))return AgentResult.ok();
+        //可扣款的缴款项
+        List<Capital>  listc =  agentQueryService.capitalQuery(payment.getAgentId(),payment.getDeductionType());
+        //需要的扣款金额
+        BigDecimal deductionAmount =  payment.getDeductionAmount();
+
+        BigDecimal for_deal = deductionAmount;
+        for (Capital capital : listc) {
+              //相等直接处理
+             if(capital.getcAmount().compareTo(deductionAmount)==0){
+
+                 capital.setcAmount(capital.getcAmount().subtract(deductionAmount));
+                 capital.setcInAmount(deductionAmount);
+                 capital.setcIsin(Status.STATUS_1.status);
+
+             }else if(capital.getcAmount().compareTo(deductionAmount)>0){
+
+             }else if(capital.getcAmount().compareTo(deductionAmount)<0){
+
+             }
+        }
+
+
+
+
+        return null;
     }
 
     private OReceiptOrderExample getoReceiptOrderExample() {
