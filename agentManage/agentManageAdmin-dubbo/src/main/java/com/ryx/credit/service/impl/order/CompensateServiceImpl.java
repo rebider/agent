@@ -405,6 +405,7 @@ public class CompensateServiceImpl implements CompensateService {
                         throw new ProcessException("工作流处理任务update异常");
                     }
                 }
+
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
