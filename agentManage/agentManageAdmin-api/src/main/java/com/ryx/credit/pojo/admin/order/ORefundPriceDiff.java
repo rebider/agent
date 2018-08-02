@@ -18,7 +18,11 @@ public class ORefundPriceDiff implements Serializable{
 
     private BigDecimal relCompAmt;
 
-    private String refundType;
+    private BigDecimal machOweAmt;
+
+    private Date gatherTime;
+
+    private BigDecimal gatherAmt;
 
     private BigDecimal reviewStatus;
 
@@ -84,14 +88,6 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setRelCompAmt(BigDecimal relCompAmt) {
         this.relCompAmt = relCompAmt;
-    }
-
-    public String getRefundType() {
-        return refundType;
-    }
-
-    public void setRefundType(String refundType) {
-        this.refundType = refundType == null ? null : refundType.trim();
     }
 
     public BigDecimal getReviewStatus() {
@@ -196,5 +192,29 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setDeductCapitalList(List<ODeductCapital> deductCapitalList) {
         this.deductCapitalList = deductCapitalList;
+    }
+
+    public BigDecimal getMachOweAmt() {
+        return machOweAmt;
+    }
+
+    public void setMachOweAmt(BigDecimal machOweAmt) {
+        this.machOweAmt = machOweAmt;
+    }
+
+    public Date getGatherTime() {
+        return gatherTime;
+    }
+
+    public void setGatherTime(Date gatherTime) {
+        this.gatherTime = gatherTime;
+    }
+
+    public BigDecimal getGatherAmt() {
+        return gatherAmt;
+    }
+
+    public void setGatherAmt(BigDecimal gatherAmt) {
+        this.gatherAmt = gatherAmt;
     }
 }

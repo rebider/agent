@@ -19,6 +19,19 @@ import java.util.Map;
  */
 public interface OrderService {
 
+    /**
+     * 根据ID查询订单信息
+     * @param orderId
+     * @return
+     */
+    public OOrder getById(String orderId);
+
+    /**
+     * 获取订单列表
+     * @param product
+     * @param page
+     * @return
+     */
     PageInfo orderList(OOrder product, Page page);
 
 
