@@ -1,6 +1,7 @@
 package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 
@@ -40,4 +41,9 @@ public interface IPaymentDetailService {
      * @Date: 9:31 2018/7/28
      */
     List<OPaymentDetail> getPaymentDetails(String paymentId, String... paymentStatus) throws ProcessException;
+
+    /**
+     * 更新状态
+     */
+    ResultVO uploadStatus(List<OPaymentDetail> list);
 }
