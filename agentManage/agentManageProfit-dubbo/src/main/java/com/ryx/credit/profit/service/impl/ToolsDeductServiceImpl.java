@@ -96,6 +96,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             throw new ProcessException("机具扣款调整申请审批流启动失败!:{}",e.getMessage());
         }
         profitDeduction.setStagingStatus(DeductionStatus.REVIEWING.getStatus());
+        profitDeduction.setActualDeductionAmt(profitDeduction.getMustDeductionAmt());
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
     }
 
@@ -111,7 +112,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(profitStagingDetail.getStagId());
                     LOG.info("1.更新机具扣款申请状态为申请通过");
                     LOG.info("审批通过，未申请前本月实扣：{},申请扣款数：{}",profitDeduction.getActualDeductionAmt(),profitStagingDetail.getRealAmt());
-                    BigDecimal actualDeductionAmt = profitDeduction.getActualDeductionAmt().subtract(profitStagingDetail.getRealAmt());
+                    BigDecimal actualDeductionAmt = profitDeduction.getMustDeductionAmt().subtract(profitStagingDetail.getRealAmt());
                     profitDeduction.setActualDeductionAmt(actualDeductionAmt);
                     profitDeduction.setStagingStatus(DeductionStatus.PASS.getStatus());
                     profitDeduction.setRemark(profitStagingDetail.getRemark());
@@ -140,12 +141,10 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         LOG.info("审批对象：{}", JSONObject.toJSON(agentVo));
         AgentResult result = new AgentResult(500, "系统异常", "");
         Map<String, Object> reqMap = new HashMap<>();
-        if(agentVo.getOrderAprDept().equals("north")){
-            reqMap.put("part", agentVo.getOrderAprDept());
-        } else {
-            reqMap.put("rs", agentVo.getApprovalResult());
+        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", agentVo.getOrderAprDept());
         }
+        reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
         reqMap.put("approvalPerson", userId);
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
