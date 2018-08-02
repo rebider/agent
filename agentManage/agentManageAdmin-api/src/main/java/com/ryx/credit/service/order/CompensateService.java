@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OSubOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.ORefundPriceDiffVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,5 +35,7 @@ public interface CompensateService {
     AgentResult compressCompensateActivity(String proIns,BigDecimal agStatus);
 
     ORefundPriceDiff queryRefDiffDetail(String id);
+
+    AgentResult updateFinaceTask(ORefundPriceDiffVo oRefundPriceDiffVo, String agentBusId);
 }
 
