@@ -1,11 +1,15 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
@@ -26,6 +30,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author yangmx
@@ -126,5 +133,35 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             return profitStagingDetailMapper.selectByPrimaryKey(id);
         }
         return null;
+    }
+
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
+        LOG.info("审批对象：{}", JSONObject.toJSON(agentVo));
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        Map<String, Object> reqMap = new HashMap<>();
+        if(agentVo.getOrderAprDept().equals("north")){
+            reqMap.put("part", agentVo.getOrderAprDept());
+        } else {
+            reqMap.put("rs", agentVo.getApprovalResult());
+            reqMap.put("dept", agentVo.getOrderAprDept());
+        }
+        reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
+        reqMap.put("approvalPerson", userId);
+        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+        reqMap.put("taskId", agentVo.getTaskId());
+
+        LOG.info("创建下一审批流对象：{}", reqMap.toString());
+        Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+        Boolean rs = (Boolean) resultMap.get("rs");
+        String msg = String.valueOf(resultMap.get("msg"));
+        if (resultMap == null) {
+            return result;
+        }
+        if (!rs) {
+            result.setMsg(msg);
+            return result;
+        }
+        return AgentResult.ok(resultMap);
     }
 }
