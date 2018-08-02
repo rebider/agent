@@ -7,7 +7,9 @@
     <result column="APPLY_COMP_AMT" jdbcType="DECIMAL" property="applyCompAmt" />
     <result column="REL_COMP_TYPE" jdbcType="VARCHAR" property="relCompType" />
     <result column="REL_COMP_AMT" jdbcType="DECIMAL" property="relCompAmt" />
-    <result column="REFUND_TYPE" jdbcType="VARCHAR" property="refundType" />
+    <result column="MACH_OWE_AMT" jdbcType="DECIMAL" property="machOweAmt" />
+    <result column="GATHER_TIME" jdbcType="TIMESTAMP" property="gatherTime" />
+    <result column="GATHER_AMT" jdbcType="DECIMAL" property="gatherAmt" />
     <result column="REVIEW_STATUS" jdbcType="DECIMAL" property="reviewStatus" />
     <result column="S_TIME" jdbcType="TIMESTAMP" property="sTime" />
     <result column="APPLY_REMARK" jdbcType="VARCHAR" property="applyRemark" />
@@ -49,8 +51,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, REFUND_TYPE, REVIEW_STATUS,
-    S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+    ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, MACH_OWE_AMT, GATHER_TIME,
+    GATHER_AMT, REVIEW_STATUS, S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -82,17 +85,19 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     insert into O_REFUND_PRICE_DIFF (ID, APPLY_COMP_TYPE, APPLY_COMP_AMT,
-    REL_COMP_TYPE, REL_COMP_AMT, REFUND_TYPE,
-    REVIEW_STATUS, S_TIME, APPLY_REMARK,
-    DEDUCT_AMT, C_TIME, U_TIME,
-    C_USER, U_USER, STATUS,
-    VERSION)
+    REL_COMP_TYPE, REL_COMP_AMT, MACH_OWE_AMT,
+    GATHER_TIME, GATHER_AMT, REVIEW_STATUS,
+    S_TIME, APPLY_REMARK, DEDUCT_AMT,
+    C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION
+    )
     values (#{id,jdbcType=VARCHAR}, #{applyCompType,jdbcType=VARCHAR}, #{applyCompAmt,jdbcType=DECIMAL},
-    #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, #{refundType,jdbcType=VARCHAR},
-    #{reviewStatus,jdbcType=DECIMAL}, #{sTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR},
-    #{deductAmt,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
-    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL})
+    #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, #{machOweAmt,jdbcType=DECIMAL},
+    #{gatherTime,jdbcType=TIMESTAMP}, #{gatherAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
+    #{sTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{deductAmt,jdbcType=DECIMAL},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     insert into O_REFUND_PRICE_DIFF
@@ -112,8 +117,14 @@
       <if test="relCompAmt != null">
         REL_COMP_AMT,
       </if>
-      <if test="refundType != null">
-        REFUND_TYPE,
+      <if test="machOweAmt != null">
+        MACH_OWE_AMT,
+      </if>
+      <if test="gatherTime != null">
+        GATHER_TIME,
+      </if>
+      <if test="gatherAmt != null">
+        GATHER_AMT,
       </if>
       <if test="reviewStatus != null">
         REVIEW_STATUS,
@@ -162,8 +173,14 @@
       <if test="relCompAmt != null">
         #{relCompAmt,jdbcType=DECIMAL},
       </if>
-      <if test="refundType != null">
-        #{refundType,jdbcType=VARCHAR},
+      <if test="machOweAmt != null">
+        #{machOweAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="gatherTime != null">
+        #{gatherTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gatherAmt != null">
+        #{gatherAmt,jdbcType=DECIMAL},
       </if>
       <if test="reviewStatus != null">
         #{reviewStatus,jdbcType=DECIMAL},
@@ -218,8 +235,14 @@
       <if test="relCompAmt != null">
         REL_COMP_AMT = #{relCompAmt,jdbcType=DECIMAL},
       </if>
-      <if test="refundType != null">
-        REFUND_TYPE = #{refundType,jdbcType=VARCHAR},
+      <if test="machOweAmt != null">
+        MACH_OWE_AMT = #{machOweAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="gatherTime != null">
+        GATHER_TIME = #{gatherTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gatherAmt != null">
+        GATHER_AMT = #{gatherAmt,jdbcType=DECIMAL},
       </if>
       <if test="reviewStatus != null">
         REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
@@ -257,20 +280,22 @@
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     update O_REFUND_PRICE_DIFF
     set APPLY_COMP_TYPE = #{applyCompType,jdbcType=VARCHAR},
-      APPLY_COMP_AMT = #{applyCompAmt,jdbcType=DECIMAL},
-      REL_COMP_TYPE = #{relCompType,jdbcType=VARCHAR},
-      REL_COMP_AMT = #{relCompAmt,jdbcType=DECIMAL},
-      REFUND_TYPE = #{refundType,jdbcType=VARCHAR},
-      REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
-      S_TIME = #{sTime,jdbcType=TIMESTAMP},
-      APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
-      DEDUCT_AMT = #{deductAmt,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    APPLY_COMP_AMT = #{applyCompAmt,jdbcType=DECIMAL},
+    REL_COMP_TYPE = #{relCompType,jdbcType=VARCHAR},
+    REL_COMP_AMT = #{relCompAmt,jdbcType=DECIMAL},
+    MACH_OWE_AMT = #{machOweAmt,jdbcType=DECIMAL},
+    GATHER_TIME = #{gatherTime,jdbcType=TIMESTAMP},
+    GATHER_AMT = #{gatherAmt,jdbcType=DECIMAL},
+    REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
+    S_TIME = #{sTime,jdbcType=TIMESTAMP},
+    APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
+    DEDUCT_AMT = #{deductAmt,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
