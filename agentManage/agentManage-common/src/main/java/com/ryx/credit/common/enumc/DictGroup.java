@@ -47,12 +47,12 @@ public enum DictGroup {
     AGREE_TYPE("协议类型"),
     ACTIVITY_DIS_TYPE("活动优惠方式"),
     C_TYPE("扣款款项资金类型"),
+    ACT_ORDER_RETURN("退货审批流名称"),
     TOOLS("机具押金扣款调整"),
     TOOLS_APR_BUSNISS("扣款调整审批业务部参数"),
     TOOLS_APR_MARKET("扣款调整审批市场部参数"),
     TOOLS_APR_OFFICE("扣款调整审批总经办参数"),
     TOOLS_APR_EXPAND("扣款调整审批客户拓展部门参数");
-    ;
 
     public String  msg;
 

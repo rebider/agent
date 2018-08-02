@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
@@ -12,6 +13,9 @@ import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -31,6 +35,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     OPaymentDetailMapper oPaymentDetailMapper;
     @Autowired
     OPaymentMapper paymentMapper;
+    @Autowired
+    OPaymentMapper oPaymentMapper;
 
     /**
      * @Author: Zhang Lei
@@ -91,6 +97,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         return oPaymentDetailMapper.selectByExample(example);
     }
 
+
     @Override
     public List<Map<String, Object>> getShareMoney(String method, String agentId, String time) throws ParseException {
         List<Map<String, Object>> maps = null;
@@ -111,9 +118,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             HashMap<String, Object> map = new HashMap<>();
             map.put("agentId", agentId);
             map.put("time", time);
-            maps= oPaymentDetailMapper.selectShareMoney(map);
-        }
-        if (method.equals(GetMethod.AGENTDATE.code)) {
+            maps = oPaymentDetailMapper.selectShareMoney(map);
+        } else if (method.equals(GetMethod.AGENTDATE.code)) {
             //所有当月分期---只需要时间
             if (StringUtils.isBlank(time)) {
                 logger.info("分润查询:{}", "时间为空");
@@ -121,27 +127,60 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             }
             HashMap<String, Object> map = new HashMap<>();
             map.put("time", time);
-            maps= oPaymentDetailMapper.selectShareMoney(map);
+            maps = oPaymentDetailMapper.selectShareMoney(map);
         }
         return maps;
     }
 
-    private List<OPaymentDetail> selectAll(String agentId, String time) throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date parse = simpleDateFormat.parse(time);
-
-        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
-        if (StringUtils.isNotBlank(agentId))
-            criteria.andAgentIdEqualTo(agentId);
-        criteria.andCDateEqualTo(parse);//时间查询如何使用这个实例
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        criteria.andPaymentStatusEqualTo(PaymentStatus.DF.code);
-        criteria.andPayTypeEqualTo(PaymentType.FRFQ.code);//有个分润分期和打款分期的
-        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-        if (null == oPaymentDetails && oPaymentDetails.size() < 0) {
-            return Arrays.asList();
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO uploadStatus(List<OPaymentDetail> list) {
+        if (null == list && list.size() < 0) {
+            logger.info("更新数据:{}", "更新数据为空");
+            throw new ProcessException("更新数据为空");
         }
-        return oPaymentDetails;
+        for (OPaymentDetail oPaymentDetail : list) {
+            OPaymentDetail detail = new OPaymentDetail();
+            detail.setRealPayAmount(oPaymentDetail.getPayAmount());
+            detail.setPayTime(Calendar.getInstance().getTime());
+            detail.setPaymentStatus(PaymentStatus.JQ.code);
+            detail.setSrcId(oPaymentDetail.getSrcId());
+            detail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
+            detail.setId(oPaymentDetail.getId());
+            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
+                logger.info("更新数据:{}", "付款明细更新数据失败");
+                return ResultVO.fail("付款明细更新数据失败");
+            }
+            OPayment oPayment = new OPayment();
+            //已付款金额
+            oPayment.setRealAmount(oPaymentDetail.getRealPayAmount());
+            //待付款金额
+            oPayment.setOutstandingAmount(oPaymentDetail.getRealPayAmount());
+            //赋值一个id
+            oPayment.setId(oPaymentDetail.getOrderId());
+            if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                logger.info("更新数据:{}", "付款单更新数据失败");
+                return ResultVO.fail("付款单更新数据失败");
+            }
+            //查询当前订单是否还有未结清的订单
+            OPaymentDetailExample detailExample = new OPaymentDetailExample();
+            OPaymentDetailExample.Criteria criteria = detailExample.createCriteria();
+            criteria.andOrderIdEqualTo(oPaymentDetail.getOrderId());
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andPaymentStatusNotEqualTo(PaymentStatus.JQ.code);
+            List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(detailExample);
+            if (null == oPaymentDetails && oPaymentDetails.size() < 0) {
+                //说明没有未结清的订单
+                OPayment payment = new OPayment();
+                payment.setId(oPaymentDetail.getOrderId());
+                payment.setPayStatus(PaymentStatus.JQ.code);
+                payment.setPayCompletTime(Calendar.getInstance().getTime());
+                if (1 != paymentMapper.updateByPrimaryKeySelective(payment)) {
+                    logger.info("更新数据:{}", "付款明细更新数据失败");
+                    return ResultVO.fail("付款明细更新数据失败");
+                }
+            }
+        }
+        return ResultVO.success("");
     }
 }

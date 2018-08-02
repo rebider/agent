@@ -297,6 +297,7 @@ public class AgentServiceImpl implements  AgentService {
                 userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config","org")));
                 userVo.setRoleIds(redisService.hGet("config","role"));
                 userVo.setUserType(1);
+                userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
                 userVo = iUserService.selectByName(userVo.getName());
                 redisService.setValue(String.valueOf(userVo.getId()),agent.getId(),Long.valueOf(Integer.MAX_VALUE));
