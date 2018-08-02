@@ -42,6 +42,8 @@ public interface IPTaxAdjustService {
 
     PageInfo PTaxAdjustList(PTaxAdjust record, Page page);
 
+    PTaxAdjust selectByAgentPid(String agentPid);
+
     /**
      * 新增税点调整
      * @param record
