@@ -12,9 +12,13 @@ public class ORefundPriceDiff implements Serializable{
 
     private String applyCompType;
 
+    private String applyCompName;
+
     private BigDecimal applyCompAmt;
 
     private String relCompType;
+
+    private String relCompName;
 
     private BigDecimal relCompAmt;
 
@@ -216,5 +220,21 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setGatherAmt(BigDecimal gatherAmt) {
         this.gatherAmt = gatherAmt;
+    }
+
+    public String getApplyCompName() {
+        return applyCompName;
+    }
+
+    public void setApplyCompName(String applyCompName) {
+        this.applyCompName = applyCompName;
+    }
+
+    public String getRelCompName() {
+        return relCompName;
+    }
+
+    public void setRelCompName(String relCompName) {
+        this.relCompName = relCompName;
     }
 }
