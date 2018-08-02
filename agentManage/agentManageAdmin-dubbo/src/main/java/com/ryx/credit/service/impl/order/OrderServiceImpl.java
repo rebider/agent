@@ -114,6 +114,20 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
+    /**
+     * 分页查询
+     * @param par
+     * @param page
+     * @return
+     */
+    @Override
+    public PageInfo orderList(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        par.put("page",page);
+        pageInfo.setTotal(orderMapper.queryOrderListViewCount(par)) ;
+        pageInfo.setRows(orderMapper.queryOrderListView(par));
+        return pageInfo;
+    }
 
     @Override
     public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus,List<BigDecimal> orderStatus) {

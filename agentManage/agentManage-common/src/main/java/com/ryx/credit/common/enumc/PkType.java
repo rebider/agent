@@ -4,8 +4,7 @@ package com.ryx.credit.common.enumc;
  * 补款类型
  */
 public enum PkType {
-    OfflineMoney("1","线下打款分期补款"),
-    FenRunOverdue("2","分润逾期扣款补款");
+    FQBK("1","分期补款");
 
     public String code;
 
