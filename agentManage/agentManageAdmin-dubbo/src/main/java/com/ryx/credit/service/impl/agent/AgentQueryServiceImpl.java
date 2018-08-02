@@ -86,6 +86,9 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 .andCAgentIdEqualTo(agentId)
                 .andCTypeEqualTo(type)
                 .andCIsinEqualTo(Status.STATUS_0.status);
+
+        example.setOrderByClause(" c_amount desc ");
+
         return capitalMapper.selectByExample(example);
     }
 
