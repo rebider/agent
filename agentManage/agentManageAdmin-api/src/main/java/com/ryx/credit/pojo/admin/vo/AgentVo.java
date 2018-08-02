@@ -31,6 +31,7 @@ public class AgentVo implements Serializable{
     private String approvalResult;
     private String taskId;
     private String flag;
+    private String agentBusId;
 
     //订单审批下个审批部门参数
     private String orderAprDept;
@@ -217,5 +218,13 @@ public class AgentVo implements Serializable{
 
     public void setoRefundPriceDiffVo(ORefundPriceDiffVo oRefundPriceDiffVo) {
         this.oRefundPriceDiffVo = oRefundPriceDiffVo;
+    }
+
+    public String getAgentBusId() {
+        return agentBusId;
+    }
+
+    public void setAgentBusId(String agentBusId) {
+        this.agentBusId = agentBusId;
     }
 }
