@@ -122,4 +122,6 @@ public interface OrderService {
 
 
 
+    public AgentResult queryOrderForOSupplementPaymentdetail(String orderId,String agentId);
+
 }
