@@ -203,7 +203,7 @@ public class StagingServiceImpl implements StagingService {
                 LOG.error("审批流启动失败{}");
                 throw new ProcessException("审批流启动失败!");
             }
-            addABusActRel(profitStaging,proceId);
+            addABusActRel(profitStaging,proceId,workId);
 
     }
 
@@ -255,15 +255,20 @@ public class StagingServiceImpl implements StagingService {
      * 审批流与业务关联对象
      * @param profitStaging 分期对象
      * @param proce 审批实例
+     * @param workId 模板id
      */
-    private void addABusActRel(ProfitStaging profitStaging, String proce) {
+    private void addABusActRel(ProfitStaging profitStaging, String proce, String workId) {
         BusActRel record = new BusActRel();
         record.setBusId(profitStaging.getId());
         record.setActivId(proce);
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(profitStaging.getUserId());
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.STAGING.name());
+        if("otherDeduct".equals(workId)) {
+            record.setBusType(BusActRelBusType.STAGING.name());
+        }else{
+            record.setBusType(BusActRelBusType.OTHER_DEDUCTION_STAGING.name());
+        }
         record.setActivStatus(AgStatus.Approving.name());
         try {
             taskApprovalService.addABusActRel(record);

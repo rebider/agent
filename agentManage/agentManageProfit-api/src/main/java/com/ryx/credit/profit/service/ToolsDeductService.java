@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 
@@ -28,4 +30,13 @@ public interface ToolsDeductService {
      * 查询机具扣款申请明细
      */
     public ProfitStagingDetail getProfitStagingDetail(String id);
+
+    /**
+     * 处理审批任务
+     * @param agentVo
+     * @param userId
+     * @return
+     * @throws ProcessException
+     */
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 }

@@ -57,7 +57,7 @@ public class RefundJob {
 
 
 
-//    @Scheduled(cron = "0 0/2 * * * ?")
+//    @Scheduled(cron = "0 0 12 * * ?")
     @Transactional
     public void deal() {
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
@@ -152,11 +152,13 @@ public class RefundJob {
         settleErrLs.setErrDate(jsonObject.getString("errDate"));
         settleErrLs.setNettingStatus(jsonObject.getString("nettingStatus"));
         settleErrLs.setErrDesc(jsonObject.getString("errDesc"));
+        settleErrLs.setRealDeductAmt(jsonObject.getBigDecimal("shouldDeductAmt"));// 应扣分润
+        settleErrLs.setMakeAmt(jsonObject.getBigDecimal("shouldMakeAmt"));//应补分润
         synchronized (object) {
             if (orgMap.containsKey(jsonObject.getString("instId"))) {
-                orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("balanceAmt")));
+                orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt")));
             }else {
-                orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("balanceAmt"));
+                orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt"));
                 deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
             }
         }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * 交易总量获取
@@ -36,19 +37,55 @@ public class TranDataJob {
     @Autowired
     private ProfitOrganTranMonthService profitOrganTranMonthService;
 
-    //   @Scheduled(cron = "0 30 0 10 * ?")
+    //   @Scheduled(cron = "0 30 12 10 * ?")
     public void deal() {
         String settleMonth = "201806";//LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         JSONObject json = getTranData(settleMonth);
         if (json != null && json.containsKey("info")) {
-            BigDecimal posSumAmt = json.getJSONObject("info").getBigDecimal("zydlPosAmt");
+
+//            BigDecimal zydlPosAmt = json.getJSONObject("info").getBigDecimal("zydlPosAmt");// 自营代理pos总金额
+            BigDecimal zydlPosAmt = json.getJSONObject("info").getBigDecimal("zydlPosAmt");// 自营代理pos总金额
+            BigDecimal zyPosAmt = json.getJSONObject("info").getBigDecimal("zyPosAmt");//自营交易总金额
+            BigDecimal hyxJwAmt = json.getJSONObject("info").getBigDecimal("hyxJwAmt");//汇银讯境外卡交易总金额
+            BigDecimal orgJwAmt = json.getJSONObject("info").getBigDecimal("orgJwAmt");//代理商境外卡交易总金额
+            BigDecimal tranAmt = zydlPosAmt.subtract(zyPosAmt).subtract(hyxJwAmt).subtract(orgJwAmt);
             ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
             profitOrganTranMonth.setProfitDate(settleMonth);
             PageInfo pageInfo = profitOrganTranMonthService.getProfitOrganTranMonthList(profitOrganTranMonth, null);
+            if(pageInfo != null && pageInfo.getTotal() > 0) {
+                List<ProfitOrganTranMonth> profitOrganTranMonths = pageInfo.getRows();
+                profitOrganTranMonths.forEach(
+                        organTranMonth->{
+                           if ("01".equals(organTranMonth.getProductType())) {
+                               organTranMonth = (ProfitOrganTranMonth) pageInfo.getRows().get(0);
+                               organTranMonth.setTranAmt(tranAmt);
+                               organTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+                               organTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
+                               profitOrganTranMonthService.update(organTranMonth);
+                           }else if ("02".equals(organTranMonth.getProductType())) {
+                               organTranMonth = (ProfitOrganTranMonth) pageInfo.getRows().get(0);
+                               organTranMonth.setTranAmt(tranAmt);
+                               organTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
+                               organTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
+                               profitOrganTranMonthService.update(organTranMonth);
+                           }else{
+
+                           }
+                        }
+                );
+
+            }
         }
 
     }
 
+    /*** 
+    * @Description: 获取POS交易数据
+    * @Param:  settleMonth 分润月份
+    * @return:  数据json对象
+    * @Author: zhaodw 
+    * @Date: 2018/8/2 
+    */ 
     private JSONObject getTranData(String settleMonth) {
         JSONObject json = new JSONObject();
         json.put("tranType","22");
