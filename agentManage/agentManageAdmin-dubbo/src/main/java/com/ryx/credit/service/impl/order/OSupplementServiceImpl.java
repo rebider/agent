@@ -108,11 +108,17 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款添加:{}", "操作用户不能为空");
             throw new ProcessException("操作用户不能为空");
         }
+        if (StringUtils.isEmpty(oSupplement.getPkType())) {
+            logger.info("补款添加:{}", "类型不能为空");
+            throw new ProcessException("类型不能为空");
+        }
+        if (StringUtils.isEmpty(oSupplement.getSrcId())) {
+            logger.info("补款添加:{}", "源数据不能为空");
+            throw new ProcessException("源数据不能为空");
+        }
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
-        oSupplement.setPkType("1");
-        oSupplement.setSrcId("OPD2018072300000000000069");
         oSupplement.setReviewStatus(AgStatus.Create.status);//审批状态
         oSupplement.setSchstatus(SchStatus.ONE.getValue());//补款状态
         oSupplement.setStatus(Status.STATUS_1.status);
@@ -155,23 +161,26 @@ public class OSupplementServiceImpl implements OSupplementService {
             throw new ProcessException("补款审批中，操作用户为空");
         }
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
-        //获取资源id
-        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
-        criteria.andIdEqualTo(oSupplement.getSrcId());
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-        if (oPaymentDetails.size() != 1) {
-            return null;
-        }
-        OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
-        BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
-        if (!paymentStatus.equals(PaymentStatus.DF.code)) {
-            logger.info("订单还未生效{}:{}", id, userId);
-            throw new ProcessException("订单还未生效");
-        }
 
-        if (oSupplement.getPkType().equals(PkType.OfflineMoney.code) || oSupplement.getPkType().equals(PkType.FenRunOverdue.code)) {
+
+
+        if (oSupplement.getPkType().equals(PkType.FQBK.code)) {
+            //获取资源id
+            OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+            OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+            criteria.andIdEqualTo(oSupplement.getSrcId());
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+            if (oPaymentDetails.size() != 1) {
+                return ResultVO.fail("明细为空");
+            }
+            OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
+            BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
+            if (!paymentStatus.equals(PaymentStatus.DF.code)) {
+                logger.info("订单还未生效{}:{}", id, userId);
+                throw new ProcessException("订单还未生效");
+            }
+
             //只有是待付款状态才可以启动流程   并修改状态为付款中
             oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
             if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
@@ -294,9 +303,8 @@ public class OSupplementServiceImpl implements OSupplementService {
                 throw new ProcessException("补款状态修改失败");
             }
             OSupplement supplement = selectOSupplement(oSupplement.getId());
-            if (supplement.getPkType().equals(PkType.OfflineMoney.code) || supplement.getPkType().equals(PkType.FenRunOverdue.code)) {
-                OPaymentDetail oPaymentDetail = new OPaymentDetail();
-                oPaymentDetail.setId(supplement.getSrcId());
+            if (supplement.getPkType().equals(PkType.FQBK.code)) {
+                OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
@@ -317,9 +325,8 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
             //修改订单明细付款状态
             OSupplement supplement = selectOSupplement(oSupplement.getId());
-            if (supplement.getPkType().equals(PkType.OfflineMoney.code) || supplement.getPkType().equals(PkType.FenRunOverdue.code)) {
-                OPaymentDetail oPaymentDetail = new OPaymentDetail();
-                oPaymentDetail.setId(supplement.getSrcId());
+            if (supplement.getPkType().equals(PkType.FQBK.code)) {
+                OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
