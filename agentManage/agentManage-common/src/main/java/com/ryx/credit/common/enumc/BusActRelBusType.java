@@ -16,7 +16,10 @@ public enum BusActRelBusType {
     PkType("订单补款"),
     ORDER_RETURN("退货审批"),
     TOOLS("机具扣款调整申请"),
-    COMPENSATE("退补差价审批");
+    COMPENSATE("退补差价审批"),
+    POSTAX("税点调整申请"),
+    POSCHECK("POS考核奖励申请"),
+    POSREWARD("POS奖励申请");;
     public String  msg;
 
     BusActRelBusType(String s){
