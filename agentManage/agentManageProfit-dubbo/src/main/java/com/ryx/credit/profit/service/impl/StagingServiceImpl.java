@@ -251,6 +251,16 @@ public class StagingServiceImpl implements StagingService {
         profitStagingDetailMapper.insert(stagingDetail);
     }
 
+    @Override
+    public void editStaging(ProfitStaging profitStaging) {
+        profitStagingMapper.updateByPrimaryKeySelective(profitStaging);
+        // 删除原始分期明细信息
+        deleteStagDetail(profitStaging.getId());
+        //新增分析明细
+        splitStaging(profitStaging);
+
+    }
+
     /**
      * 审批流与业务关联对象
      * @param profitStaging 分期对象
