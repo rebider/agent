@@ -82,6 +82,12 @@ public interface OrderService {
     public AgentResult approveFinish(String insid,String actname)throws Exception;
 
     /**
+     * 处理订单抵扣类型扣款并返回明细
+     * @param payment 付款单
+     * @return
+     */
+    public AgentResult dealOrderDeduction(OPayment payment);
+    /**
      * 查找订单id
      */
     public OPayment selectByOrderId(String orderId);

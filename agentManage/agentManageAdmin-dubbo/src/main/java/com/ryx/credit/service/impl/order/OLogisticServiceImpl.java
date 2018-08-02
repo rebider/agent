@@ -79,7 +79,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             OLogistics oLogistics = new OLogistics();
             oLogistics.setcUser(user);                                      // 创建人
             oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
-            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+//            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
             oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
             oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
             oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
@@ -91,11 +91,29 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
             oLogistics.setProCom(String.valueOf(objectList.get(7)));        // 厂家
             oLogistics.setProModel(String.valueOf(objectList.get(9)));      // 机型
-            oLogistics.setLogCom(String.valueOf(objectList.get(24)));       // 物流公司
-            oLogistics.setwNumber(String.valueOf(objectList.get(26)));      // 物流单号
-            oLogistics.setSnBeginNum(String.valueOf(objectList.get(27)));   // 起始SN序列号
-            oLogistics.setSnEndNum(String.valueOf(objectList.get(28)));     // 结束SN序列号
             oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));   // 发货数量
+
+            String logCom = String.valueOf(objectList.get(24));
+            if(null != logCom){
+                oLogistics.setLogType(logCom);
+            }
+            String logType = LogType.Deliver.getValue();
+            if(null != logType){
+                oLogistics.setLogCom(logType);
+            }
+            String wNumber = String.valueOf(objectList.get(26));
+            if(null != wNumber){
+                oLogistics.setwNumber(wNumber);
+            }
+            String snBeginNum = String.valueOf(objectList.get(27));
+            if(null != snBeginNum){
+                oLogistics.setSnBeginNum(snBeginNum);
+            }
+            String snEndNum = String.valueOf(objectList.get(28));
+            if(null != snEndNum){
+                oLogistics.setSnEndNum(snEndNum);
+            }
+
             System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
             if(1 != insertImportData(oLogistics)){
                 throw new ProcessException("插入失败");
