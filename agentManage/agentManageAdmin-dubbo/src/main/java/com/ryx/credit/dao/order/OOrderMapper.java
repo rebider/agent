@@ -27,4 +27,8 @@ public interface OOrderMapper {
     List<Map<String,Object>> getOrderList(Map <String, Object> param);
 
     Long getOrderCount(Map <String, Object> param);
+
+    List<Map<String,Object>> queryOrderListView(Map <String, Object> param);
+
+    int queryOrderListViewCount(Map <String, Object> param);
 }

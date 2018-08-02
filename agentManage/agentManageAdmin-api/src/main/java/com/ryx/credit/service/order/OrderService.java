@@ -34,6 +34,8 @@ public interface OrderService {
      */
     PageInfo orderList(OOrder product, Page page);
 
+    PageInfo orderList(Map par, Page page);
+
 
     /**
      * 根据审批状态来查询付款单信息
