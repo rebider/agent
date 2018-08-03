@@ -8,13 +8,14 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OPayment;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
  */
-public class AgentVo implements Serializable{
+public class AgentVo implements Serializable {
 
     private Agent agent;
     private List<CapitalVo> capitalVoList;
@@ -32,16 +33,28 @@ public class AgentVo implements Serializable{
     private String taskId;
     private String flag;
     private String agentBusId;
+    private BigDecimal realPayAmount;
+    private String supplementId;
 
     //订单审批下个审批部门参数
     private String orderAprDept;
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
     private List<String> refundPriceDiffFile;
+    private List<String> refundPriceDiffFinanceFile;
     private ORefundPriceDiff oRefundPriceDiff;
     private ORefundPriceDiffVo oRefundPriceDiffVo;
     private List<ODeductCapital> deductCapitalList;
     //付款单
-    private Map<String,String> oPayment;
+    private Map<String, String> oPayment;
+
+    //退货ID
+    private String returnId;
+    //退货排单计划
+    private String plans;
+    //工作流节点ID
+    private String sid;
+    //退货打款截图
+    private String[] attachments;
 
     public Agent getAgent() {
         return agent;
@@ -226,5 +239,60 @@ public class AgentVo implements Serializable{
 
     public void setAgentBusId(String agentBusId) {
         this.agentBusId = agentBusId;
+    }
+
+    public String getPlans() {
+        return plans;
+    }
+
+    public void setPlans(String plans) {
+        this.plans = plans;
+    }
+
+    public String getSid() {
+        return sid;
+    }
+
+    public void setSid(String sid) {
+        this.sid = sid;
+    }
+
+    public String[] getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String[] attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getReturnId() {
+        return returnId;
+    }
+
+    public void setReturnId(String returnId) {
+        this.returnId = returnId;
+    }
+
+    public List<String> getRefundPriceDiffFinanceFile() {
+        return refundPriceDiffFinanceFile;
+    }
+
+    public void setRefundPriceDiffFinanceFile(List<String> refundPriceDiffFinanceFile) {
+        this.refundPriceDiffFinanceFile = refundPriceDiffFinanceFile;
+    }
+    public String getSupplementId() {
+        return supplementId;
+    }
+
+    public void setSupplementId(String supplementId) {
+        this.supplementId = supplementId;
+    }
+
+    public BigDecimal getRealPayAmount() {
+        return realPayAmount;
+    }
+
+    public void setRealPayAmount(BigDecimal realPayAmount) {
+        this.realPayAmount = realPayAmount;
     }
 }

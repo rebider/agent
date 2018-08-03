@@ -127,4 +127,25 @@ public class RegionServiceImpl implements RegionService {
         example.setOrderByClause(" r_sort desc ");
         return regionMapper.selectByExample(example);
     }
+
+    /**
+     * 多个地区
+     * @param codes
+     * @return
+     */
+    @Override
+    public String getRegionsName(String codes){
+        String name  = "";
+        String[] split = codes.split(",");
+        for(int i=0;i<split.length;i++){
+            String code = split[i];
+            Region region =  queryByCode(code);
+            if(i>=1){
+                name = name+",";
+            }
+            name = name + region.getrName();
+        }
+        return name;
+    }
+
 }

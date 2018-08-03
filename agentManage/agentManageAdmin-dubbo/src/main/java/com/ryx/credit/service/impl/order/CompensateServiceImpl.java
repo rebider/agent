@@ -20,6 +20,7 @@ import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
+import com.ryx.credit.service.order.IAccountAdjustService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,19 @@ public class CompensateServiceImpl implements CompensateService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private CompensateService compensateService;
+    @Autowired
+    private IAccountAdjustService accountAdjustService;
+
+
+    @Override
+    public ORefundPriceDiff selectByPrimaryKey(String id){
+        if(StringUtils.isBlank(id)){
+            return null;
+        }
+        ORefundPriceDiff oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(id);
+        return oRefundPriceDiff;
+    }
+
 
     @Override
     public PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page){
@@ -400,6 +414,26 @@ public class CompensateServiceImpl implements CompensateService {
                         }
                     }
                 }
+                //添加新的附件
+                if (agentVo.getRefundPriceDiffFinanceFile()!= null) {
+                    agentVo.getRefundPriceDiffFinanceFile().forEach(fileId->{
+                        AttachmentRel record = new AttachmentRel();
+                        record.setAttId(fileId);
+                        record.setSrcId(agentVo.getAgentBusId());
+                        record.setcUser(userId);
+                        record.setcTime(Calendar.getInstance().getTime());
+                        record.setStatus(Status.STATUS_1.status);
+                        record.setBusType(AttachmentRelType.ActivityFinanceEdit.name());
+                        record.setId(idService.genId(TabId.a_attachment_rel));
+                        int i = attachmentRelMapper.insertSelective(record);
+                        if (1 != i) {
+                            log.info("活动变更财务审批附件关系失败");
+                            throw new ProcessException("系统异常");
+                        }
+                    });
+                    BigDecimal subtract = agentVo.getoRefundPriceDiff().getRelCompAmt().subtract(agentVo.getoRefundPriceDiff().getMachOweAmt());
+                    agentVo.getoRefundPriceDiff().setRelCompAmt(subtract);
+                }
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
                 if(!agentResult.isOK()){
                     throw new ProcessException("更新退补差价主表异常");
@@ -434,10 +468,12 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setRelCompType(relCompAmtStr.contains("-") ? PriceDiffType.DETAIN_AMT.getValue() : PriceDiffType.REPAIR_AMT.getValue());
             updatePriceDiff.setRelCompAmt(relCompAmtStr.contains("-") ? new BigDecimal(relCompAmtStr.substring(1)) : new BigDecimal(relCompAmtStr));
         }
-        if(StringUtils.isNotBlank(updatePriceDiff.getGatherTimeStr())){
-            updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(updatePriceDiff.getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
-            updatePriceDiff.setGatherAmt(oRefundPriceDiff.getGatherAmt());
+        if(null!=agentVo.getoRefundPriceDiffVo())
+        if(StringUtils.isNotBlank(agentVo.getoRefundPriceDiffVo().getGatherTimeStr())){
+            updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(agentVo.getoRefundPriceDiffVo().getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
+            updatePriceDiff.setGatherAmt(agentVo.getoRefundPriceDiffVo().getGatherAmt());
         }
+
         updatePriceDiff.setuTime(new Date());
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
         if(i!=1){

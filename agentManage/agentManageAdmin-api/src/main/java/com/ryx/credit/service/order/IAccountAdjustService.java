@@ -28,4 +28,12 @@ public interface IAccountAdjustService {
      */
     Map<String, Object> adjust(boolean isRealAdjust, BigDecimal adjustAmt, String adjustType,
                                int isAdjustOrder, String agentId, String userid, String srcId, String srcType) throws ProcessException;
+
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 查询调账记录和明细
+     * @Date: 18:03 2018/8/3
+     */
+    Map<String, Object> getAccountAdjustDetail(String srcId, String srcType, String userid, String agentId);
 }
