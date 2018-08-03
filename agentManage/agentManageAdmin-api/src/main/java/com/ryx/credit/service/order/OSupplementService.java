@@ -68,4 +68,9 @@ public interface OSupplementService {
      */
 
     public  ResultVO selectBySrcId(OsupplementVo osupplementVo);
+
+    /**
+     * 更新实际付款金额
+     */
+    public ResultVO updateAmount(AgentVo agentVo);
 }

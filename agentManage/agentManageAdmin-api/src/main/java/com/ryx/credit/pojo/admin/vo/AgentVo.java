@@ -8,13 +8,14 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OPayment;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
  */
-public class AgentVo implements Serializable{
+public class AgentVo implements Serializable {
 
     private Agent agent;
     private List<CapitalVo> capitalVoList;
@@ -32,6 +33,24 @@ public class AgentVo implements Serializable{
     private String taskId;
     private String flag;
     private String agentBusId;
+    private BigDecimal realPayAmount;
+    private String supplementId;
+
+    public String getSupplementId() {
+        return supplementId;
+    }
+
+    public void setSupplementId(String supplementId) {
+        this.supplementId = supplementId;
+    }
+
+    public BigDecimal getRealPayAmount() {
+        return realPayAmount;
+    }
+
+    public void setRealPayAmount(BigDecimal realPayAmount) {
+        this.realPayAmount = realPayAmount;
+    }
 
     //订单审批下个审批部门参数
     private String orderAprDept;
@@ -41,7 +60,7 @@ public class AgentVo implements Serializable{
     private ORefundPriceDiffVo oRefundPriceDiffVo;
     private List<ODeductCapital> deductCapitalList;
     //付款单
-    private Map<String,String> oPayment;
+    private Map<String, String> oPayment;
 
     //退货ID
     private String returnId;

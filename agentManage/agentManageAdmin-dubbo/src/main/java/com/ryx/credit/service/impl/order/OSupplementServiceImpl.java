@@ -360,7 +360,7 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Override
     public ResultVO selectBySrcId(OsupplementVo osupplementVo) {
-        ResultVO res=new ResultVO();
+        ResultVO res = new ResultVO();
         if (null == osupplementVo.getSupplement()) {
             logger.info("补款信息为空{}:", osupplementVo.getSupplement());
             return res.fail("失败");
@@ -396,5 +396,20 @@ public class OSupplementServiceImpl implements OSupplementService {
             return null;
         }
         return busActRels.get(0);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public ResultVO updateAmount(AgentVo agentVo) {
+        if (StringUtils.isNotBlank(agentVo.getSupplementId()) && null != agentVo.getRealPayAmount()) {
+            OSupplement oSupplement = new OSupplement();
+            oSupplement.setId(agentVo.getSupplementId());
+            oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
+            if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
+                logger.info("实际金额保存失败");
+                throw new ProcessException("实际金额保存失败");
+            }
+        }
+        return ResultVO.success("");
     }
 }
