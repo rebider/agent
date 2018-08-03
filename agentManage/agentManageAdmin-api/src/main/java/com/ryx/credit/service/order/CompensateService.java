@@ -18,6 +18,8 @@ import java.util.List;
  */
 public interface CompensateService {
 
+    ORefundPriceDiff selectByPrimaryKey(String id);
+
     PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page);
 
     OSubOrder getOrderMsgByExcel(List<Object> excelList);

@@ -37,6 +37,7 @@ public class AgentVo implements Serializable{
     private String orderAprDept;
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
     private List<String> refundPriceDiffFile;
+    private List<String> refundPriceDiffFinanceFile;
     private ORefundPriceDiff oRefundPriceDiff;
     private ORefundPriceDiffVo oRefundPriceDiffVo;
     private List<ODeductCapital> deductCapitalList;
@@ -226,5 +227,13 @@ public class AgentVo implements Serializable{
 
     public void setAgentBusId(String agentBusId) {
         this.agentBusId = agentBusId;
+    }
+
+    public List<String> getRefundPriceDiffFinanceFile() {
+        return refundPriceDiffFinanceFile;
+    }
+
+    public void setRefundPriceDiffFinanceFile(List<String> refundPriceDiffFinanceFile) {
+        this.refundPriceDiffFinanceFile = refundPriceDiffFinanceFile;
     }
 }
