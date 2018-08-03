@@ -25,6 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -59,7 +62,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
      * @throws ProcessException
      */
     @Override
-    public void applyAdjustment(ProfitDeduction profitDeduction, String userId) throws ProcessException {
+    public void applyAdjustment(ProfitDeduction profitDeduction, String userId, String workId) throws ProcessException {
 
         LocalDate date = LocalDate.now();
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
@@ -76,7 +79,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         profitStagingDetailMapper.insertSelective(profitStagingDetail);
 
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, "toolsInstallment", null, null, null);
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
         if (proceId == null) {
             ProfitStagingDetailExample profitStagingDetailExample = new ProfitStagingDetailExample();
             profitStagingDetailExample.createCriteria().andIdEqualTo(profitStagingDetail.getId());
@@ -176,5 +179,23 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             return profitStagingDetailMapper.selectByExample(profitStagingDetailExample);
         }
         return null;
+    }
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public void editToolDeduct(ProfitDeduction profitDeduction, String detailId) throws Exception{
+        try {
+            profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
+            ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
+            profitStagingDetail.setId(detailId);
+            profitStagingDetail.setStagId(profitDeduction.getId());
+            BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
+            profitStagingDetail.setMustAmt(mustDeductionAmt);
+            profitStagingDetail.setRemark(profitDeduction.getRemark());
+            profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception();
+        }
     }
 }

@@ -19,7 +19,7 @@ public interface ToolsDeductService {
      * @param profitDeduction
      * @param userId
      */
-    public void applyAdjustment(ProfitDeduction profitDeduction, String userId) throws ProcessException;
+    public void applyAdjustment(ProfitDeduction profitDeduction, String userId, String workId) throws ProcessException;
 
     /**
      * 审批流回调方法
@@ -48,4 +48,11 @@ public interface ToolsDeductService {
      * @return
      */
     public List<ProfitStagingDetail> getProfitStagingDetailByStagId(String stagId);
+
+
+    /**
+     * 审批退回，修改申请信息
+     * @param profitDeduction
+     */
+    public void editToolDeduct(ProfitDeduction profitDeduction, String detailId)throws Exception;
 }
