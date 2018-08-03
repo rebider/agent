@@ -36,22 +36,6 @@ public class AgentVo implements Serializable {
     private BigDecimal realPayAmount;
     private String supplementId;
 
-    public String getSupplementId() {
-        return supplementId;
-    }
-
-    public void setSupplementId(String supplementId) {
-        this.supplementId = supplementId;
-    }
-
-    public BigDecimal getRealPayAmount() {
-        return realPayAmount;
-    }
-
-    public void setRealPayAmount(BigDecimal realPayAmount) {
-        this.realPayAmount = realPayAmount;
-    }
-
     //订单审批下个审批部门参数
     private String orderAprDept;
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
@@ -295,5 +279,20 @@ public class AgentVo implements Serializable {
 
     public void setRefundPriceDiffFinanceFile(List<String> refundPriceDiffFinanceFile) {
         this.refundPriceDiffFinanceFile = refundPriceDiffFinanceFile;
+    }
+    public String getSupplementId() {
+        return supplementId;
+    }
+
+    public void setSupplementId(String supplementId) {
+        this.supplementId = supplementId;
+    }
+
+    public BigDecimal getRealPayAmount() {
+        return realPayAmount;
+    }
+
+    public void setRealPayAmount(BigDecimal realPayAmount) {
+        this.realPayAmount = realPayAmount;
     }
 }
