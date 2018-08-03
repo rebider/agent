@@ -378,6 +378,7 @@
             <trim prefixOverrides="and">
                 <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
                 <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
+                <if test="returnId != null and returnId != ''">AND R.return_order_detail_id = #{returnId}</if>
             </trim>
         </where>
     </sql>

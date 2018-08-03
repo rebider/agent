@@ -43,6 +43,15 @@ public class AgentVo implements Serializable{
     //付款单
     private Map<String,String> oPayment;
 
+    //退货ID
+    private String returnId;
+    //退货排单计划
+    private String plans;
+    //工作流节点ID
+    private String sid;
+    //退货打款截图
+    private String[] attachments;
+
     public Agent getAgent() {
         return agent;
     }
@@ -226,5 +235,37 @@ public class AgentVo implements Serializable{
 
     public void setAgentBusId(String agentBusId) {
         this.agentBusId = agentBusId;
+    }
+
+    public String getPlans() {
+        return plans;
+    }
+
+    public void setPlans(String plans) {
+        this.plans = plans;
+    }
+
+    public String getSid() {
+        return sid;
+    }
+
+    public void setSid(String sid) {
+        this.sid = sid;
+    }
+
+    public String[] getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(String[] attachments) {
+        this.attachments = attachments;
+    }
+
+    public String getReturnId() {
+        return returnId;
+    }
+
+    public void setReturnId(String returnId) {
+        this.returnId = returnId;
     }
 }
