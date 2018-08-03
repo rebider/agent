@@ -45,5 +45,5 @@ public interface IPaymentDetailService {
     /**
      * 更新状态
      */
-    ResultVO uploadStatus(List<OPaymentDetail> list);
+    ResultVO uploadStatus(List<Map<String, Object>> maps );
 }
