@@ -14,11 +14,9 @@ import com.ryx.credit.dao.order.OLogisticsMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
-import com.ryx.credit.pojo.admin.order.OReceiptPro;
 import com.ryx.credit.pojo.admin.order.ReceiptPlan;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
-import com.ryx.credit.service.order.ReceiptPlanService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,91 +63,81 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return pageInfo;
     }
 
+    @Override
+    public int insertImportData(OLogistics oLogistics) {
+        return oLogisticsMapper.insertSelective(oLogistics);
+    }
+
     /**
      * 物流信息：
      * 1、导入物流信息
-     * 2、调用明细接口并插入信息
+     * 2、调用明细接口
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
         List<String> list = new ArrayList<>();
-        for (List<Object> objectList : data) {
-            if(objectList == null || objectList.size() == 0 || StringUtils.isBlank(objectList.get(0) + ""))break;
-            OLogistics oLogistics = new OLogistics();
-            oLogistics.setcUser(user);                                      // 创建人
-            oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
-//            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
-            oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
-            oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
-            oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
-            oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
-            oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
-            oLogistics.setProId(String.valueOf(objectList.get(3)));         // 商品ID
-            oLogistics.setProName(String.valueOf(objectList.get(4)));       // 商品名称
-            oLogistics.setProType(String.valueOf(objectList.get(5)));       // 商品类型
-            oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
-            oLogistics.setProCom(String.valueOf(objectList.get(7)));        // 厂家
-            oLogistics.setProModel(String.valueOf(objectList.get(9)));      // 机型
-            oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));   // 发货数量
+            for (List<Object> objectList : data) {
+                OLogistics oLogistics = new OLogistics();
+                oLogistics.setcUser(user);                                      // 创建人
+                oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
+                oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+                oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
+                oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
+                oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
 
-            String logCom = String.valueOf(objectList.get(24));
-            if(null != logCom){
-                oLogistics.setLogType(logCom);
-            }
-            String logType = LogType.Deliver.getValue();
-            if(null != logType){
-                oLogistics.setLogCom(logType);
-            }
-            String wNumber = String.valueOf(objectList.get(26));
-            if(null != wNumber){
-                oLogistics.setwNumber(wNumber);
-            }
-            String snBeginNum = String.valueOf(objectList.get(27));
-            if(null != snBeginNum){
-                oLogistics.setSnBeginNum(snBeginNum);
-            }
-            String snEndNum = String.valueOf(objectList.get(28));
-            if(null != snEndNum){
-                oLogistics.setSnEndNum(snEndNum);
-            }
+                oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
+                oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
+                oLogistics.setProId(String.valueOf(objectList.get(3)));         // 商品ID
+                oLogistics.setProName(String.valueOf(objectList.get(4)));       // 商品名称
+                oLogistics.setProType(String.valueOf(objectList.get(5)));       // 商品类型
+                oLogistics.setProCom(String.valueOf(objectList.get(7)));        // 厂家
+                oLogistics.setProModel(String.valueOf(objectList.get(9)));      // 机型
 
-            System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
-            if(1 != insertImportData(oLogistics)){
-                throw new ProcessException("插入失败");
-            }
-            list.add(oLogistics.getId());
+                try {
+                    oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
+                    oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
+                    oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司
+                    oLogistics.setwNumber(null != objectList.get(26) ? String.valueOf(objectList.get(26)) : "");      // 物流单号
+                    oLogistics.setSnBeginNum(null != objectList.get(27) ? String.valueOf(objectList.get(27)) : "");   // 起始SN序列号
+                    oLogistics.setSnEndNum(null != objectList.get(28) ? String.valueOf(objectList.get(28)) : "");     // 结束SN序列号
+                } catch (Exception e) {
+                    throw new ProcessException("Excel参数错误！");
+                }
+                System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
+                if (1 != insertImportData(oLogistics)) {
+                    throw new ProcessException("插入失败！");
+                }
+                list.add(oLogistics.getId());
 
-            begins = Integer.valueOf(String.valueOf(objectList.get(29)));   // 起始SN位数
-            finish = Integer.valueOf(String.valueOf(objectList.get(30)));   // 结束SN位数
-            ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
-            if(resultVO.isSuccess()) {
-                String id = "";
-                id = oLogistics.getReceiptPlanId();   // 排单编号
-                if (null == id) {
-                    throw new ProcessException("排单ID查询失败");
-                } else {
-                    ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
-                    if (receiptPlan != null) {
-                        receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(21))));          // 发货数量
-                        receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
-                        receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
-                        int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
-                        if(i != 1){
-                            throw new ProcessException("更新排单数据失败");
+                // 调用明细接口
+                begins = Integer.valueOf(String.valueOf(objectList.get(29)));   // 起始SN位数
+                finish = Integer.valueOf(String.valueOf(objectList.get(30)));   // 结束SN位数
+                ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
+                if (resultVO.isSuccess()) {
+                    String id = "";
+                    id = oLogistics.getReceiptPlanId();   // 排单编号
+                    if (null == id) {
+                        throw new ProcessException("排单ID查询失败！");
+                    } else {
+                        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
+                        if (receiptPlan != null) {
+                            receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(21))));          // 发货数量
+                            receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
+                            receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
+                            int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
+                            if (i != 1) {
+                                throw new ProcessException("更新排单数据失败！");
+                            }
+                            System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                         }
-                        System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                     }
                 }
             }
-        }
+
         return list;
     }
 
-    @Override
-    public int insertImportData(OLogistics oLogistics) {
-        return oLogisticsMapper.insertSelective(oLogistics);
-    }
 
     /**
      * @Author: Zhang Lei
@@ -175,6 +163,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return list;
     }
 
+    /**
+     * 插入物流明细
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String uUser) {

@@ -68,4 +68,12 @@ public interface StagingService {
     * @Date: 2018/7/31 
     */ 
     void insetStagingDetail(ProfitStagingDetail stagingDetail);
+
+    /*** 
+    * @Description: 编辑分期
+    * @Param:  profitStaging 分期对象
+    * @Author: zhaodw
+    * @Date: 2018/8/2 
+    */ 
+     void editStaging(ProfitStaging profitStaging);
 }

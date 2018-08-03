@@ -2,9 +2,10 @@ package com.ryx.credit.profit.pojo;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class ProfitDeduction implements Serializable {
-    private static final long serialVersionUID = 3158600493041170535L;
+    private static final long serialVersionUID = 3601559210970366148L;
     private String id;
 
     private String parentAgentPid;
@@ -46,6 +47,10 @@ public class ProfitDeduction implements Serializable {
     private BigDecimal upperNotDeductionAmt;
 
     private String stagingStatus;
+
+    private String userId;
+
+    private Date createDateTime;
 
     public String getId() {
         return id;
@@ -197,6 +202,22 @@ public class ProfitDeduction implements Serializable {
 
     public void setStagingStatus(String stagingStatus) {
         this.stagingStatus = stagingStatus == null ? null : stagingStatus.trim();
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId == null ? null : userId.trim();
+    }
+
+    public Date getCreateDateTime() {
+        return createDateTime;
+    }
+
+    public void setCreateDateTime(Date createDateTime) {
+        this.createDateTime = createDateTime;
     }
 
     public String getDeductionDateStart() {

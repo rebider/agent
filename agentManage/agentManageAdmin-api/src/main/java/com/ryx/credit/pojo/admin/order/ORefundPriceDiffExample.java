@@ -468,73 +468,183 @@ public class ORefundPriceDiffExample {
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeIsNull() {
-            addCriterion("REFUND_TYPE is null");
+        public Criteria andMachOweAmtIsNull() {
+            addCriterion("MACH_OWE_AMT is null");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeIsNotNull() {
-            addCriterion("REFUND_TYPE is not null");
+        public Criteria andMachOweAmtIsNotNull() {
+            addCriterion("MACH_OWE_AMT is not null");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeEqualTo(String value) {
-            addCriterion("REFUND_TYPE =", value, "refundType");
+        public Criteria andMachOweAmtEqualTo(BigDecimal value) {
+            addCriterion("MACH_OWE_AMT =", value, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeNotEqualTo(String value) {
-            addCriterion("REFUND_TYPE <>", value, "refundType");
+        public Criteria andMachOweAmtNotEqualTo(BigDecimal value) {
+            addCriterion("MACH_OWE_AMT <>", value, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeGreaterThan(String value) {
-            addCriterion("REFUND_TYPE >", value, "refundType");
+        public Criteria andMachOweAmtGreaterThan(BigDecimal value) {
+            addCriterion("MACH_OWE_AMT >", value, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeGreaterThanOrEqualTo(String value) {
-            addCriterion("REFUND_TYPE >=", value, "refundType");
+        public Criteria andMachOweAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("MACH_OWE_AMT >=", value, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeLessThan(String value) {
-            addCriterion("REFUND_TYPE <", value, "refundType");
+        public Criteria andMachOweAmtLessThan(BigDecimal value) {
+            addCriterion("MACH_OWE_AMT <", value, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeLessThanOrEqualTo(String value) {
-            addCriterion("REFUND_TYPE <=", value, "refundType");
+        public Criteria andMachOweAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("MACH_OWE_AMT <=", value, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeLike(String value) {
-            addCriterion("REFUND_TYPE like", value, "refundType");
+        public Criteria andMachOweAmtIn(List<BigDecimal> values) {
+            addCriterion("MACH_OWE_AMT in", values, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeNotLike(String value) {
-            addCriterion("REFUND_TYPE not like", value, "refundType");
+        public Criteria andMachOweAmtNotIn(List<BigDecimal> values) {
+            addCriterion("MACH_OWE_AMT not in", values, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeIn(List<String> values) {
-            addCriterion("REFUND_TYPE in", values, "refundType");
+        public Criteria andMachOweAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MACH_OWE_AMT between", value1, value2, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeNotIn(List<String> values) {
-            addCriterion("REFUND_TYPE not in", values, "refundType");
+        public Criteria andMachOweAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MACH_OWE_AMT not between", value1, value2, "machOweAmt");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeBetween(String value1, String value2) {
-            addCriterion("REFUND_TYPE between", value1, value2, "refundType");
+        public Criteria andGatherTimeIsNull() {
+            addCriterion("GATHER_TIME is null");
             return (Criteria) this;
         }
 
-        public Criteria andRefundTypeNotBetween(String value1, String value2) {
-            addCriterion("REFUND_TYPE not between", value1, value2, "refundType");
+        public Criteria andGatherTimeIsNotNull() {
+            addCriterion("GATHER_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeEqualTo(Date value) {
+            addCriterion("GATHER_TIME =", value, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeNotEqualTo(Date value) {
+            addCriterion("GATHER_TIME <>", value, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeGreaterThan(Date value) {
+            addCriterion("GATHER_TIME >", value, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("GATHER_TIME >=", value, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeLessThan(Date value) {
+            addCriterion("GATHER_TIME <", value, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeLessThanOrEqualTo(Date value) {
+            addCriterion("GATHER_TIME <=", value, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeIn(List<Date> values) {
+            addCriterion("GATHER_TIME in", values, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeNotIn(List<Date> values) {
+            addCriterion("GATHER_TIME not in", values, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeBetween(Date value1, Date value2) {
+            addCriterion("GATHER_TIME between", value1, value2, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherTimeNotBetween(Date value1, Date value2) {
+            addCriterion("GATHER_TIME not between", value1, value2, "gatherTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtIsNull() {
+            addCriterion("GATHER_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtIsNotNull() {
+            addCriterion("GATHER_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtEqualTo(BigDecimal value) {
+            addCriterion("GATHER_AMT =", value, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtNotEqualTo(BigDecimal value) {
+            addCriterion("GATHER_AMT <>", value, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtGreaterThan(BigDecimal value) {
+            addCriterion("GATHER_AMT >", value, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("GATHER_AMT >=", value, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtLessThan(BigDecimal value) {
+            addCriterion("GATHER_AMT <", value, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("GATHER_AMT <=", value, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtIn(List<BigDecimal> values) {
+            addCriterion("GATHER_AMT in", values, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtNotIn(List<BigDecimal> values) {
+            addCriterion("GATHER_AMT not in", values, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("GATHER_AMT between", value1, value2, "gatherAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andGatherAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("GATHER_AMT not between", value1, value2, "gatherAmt");
             return (Criteria) this;
         }
 

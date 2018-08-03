@@ -8,6 +8,7 @@ public enum PamentSrcType {
 
     PamentSrcType_XXBK("XXBK", "线下补款"),
     TUIKUAN_DIKOU("TUIKUAN_DIKOU", "退货退款抵扣"),
+    CAPITAL_DIKOU("CAPITAL_DIKOU", "缴款抵扣"),
     TUICHAJIA_DIKOU("TUICHAJIA_DIKOU", "退差价抵扣"),
     FENRUN_DIKOU("FENRUN_DIKOU","分润抵扣");
 

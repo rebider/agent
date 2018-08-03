@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zhaodw
@@ -103,57 +100,32 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public void batchInsertOtherDeduction(List<List<Object>> deductionist) {
+    public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
         if(deductionist != null && deductionist.size() > 0 ) {
-            Map<String, String> deductionIdMap = new HashMap<>();
-            Map<String, String> agentNameMap = new HashMap<>();
-            Map<String, BigDecimal> agentSumAmtMap = new HashMap<>();
             deductionist.stream().filter(list->list.get(1) != null && list.get(3) != null).forEach(list->{
-                if (deductionIdMap.containsKey(list.get(1))) {
-                    agentSumAmtMap.put(list.get(1).toString(), agentSumAmtMap.get(list.get(1).toString()).add(new BigDecimal(list.get(3).toString())));
-                }else{
-                    agentSumAmtMap.put(list.get(1).toString(), new BigDecimal(list.get(3).toString()));
-                    deductionIdMap.put(list.get(1).toString(),idService.genIdInTran(TabId.P_DEDUCTION) );
-                    agentNameMap.put(list.get(1).toString(),list.get(0).toString());
-                }
-                insertDetail( deductionIdMap.get(list.get(1).toString()), new BigDecimal(list.get(3).toString()), (String)list.get(2));
+                insertDeduction(list, userId);
             });
 
-            Set<String> keys = agentSumAmtMap.keySet();
-            for (String key : keys) {
-                ProfitDeduction deduction = new ProfitDeduction();
-                deduction.setDeductionType(DeductionType.OTHER.getType());
-                deduction.setAddDeductionAmt(agentSumAmtMap.get(key));
-                deduction.setSumDeductionAmt(agentSumAmtMap.get(key));
-                deduction.setMustDeductionAmt(agentSumAmtMap.get(key));
-                deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
-                deduction.setId(deductionIdMap.get(key));
-                deduction.setAgentId(key);
-                deduction.setAgentName(agentNameMap.get(key));
-                deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
-                this.insert(deduction);
-                deduction = null;
-            }
+
         }
     }
 
-    /*** 
-    * @Description: 添加明细
-    * @Param:  sourceId 原始对象id
-    * @Param:  mustAmt 应扣
-    * @Param:  remark 扣款类型
-    * @Author: zhaodw
-    * @Date: 2018/7/31 
-    */ 
-    private void insertDetail(String sourceId, BigDecimal mustAmt, String remark) {
-        ImportDeductionDetail detail = new ImportDeductionDetail();
-        detail.setId(idService.genId(TabId.P_IMPORT_DEDUCTION_DETAIL));
-        detail.setSourceId(sourceId);
-        detail.setMustAmt(mustAmt);
-        detail.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
-        detail.setRemark(remark);
-        importDeductionDetailServiceImpl.insetImportDeductionDetail(detail);
-        detail = null;
+    private void insertDeduction(List list, String userId) {
+        BigDecimal amt = list.get(3)==null?BigDecimal.ZERO:new BigDecimal(list.get(3).toString());
+        ProfitDeduction deduction = new ProfitDeduction();
+        deduction.setDeductionType(DeductionType.OTHER.getType());
+        deduction.setAddDeductionAmt(amt);
+        deduction.setSumDeductionAmt(amt);
+        deduction.setMustDeductionAmt(amt);
+        deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+        deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) );
+        deduction.setAgentId(list.get(1).toString());
+        deduction.setAgentName(list.get(0).toString());
+        deduction.setRemark(list.get(2).toString());
+        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
+        deduction.setCreateDateTime(new Date());
+        deduction.setUserId(userId);
+        this.insert(deduction);
     }
 
 }

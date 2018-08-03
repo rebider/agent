@@ -31,12 +31,14 @@ public class AgentVo implements Serializable{
     private String approvalResult;
     private String taskId;
     private String flag;
+    private String agentBusId;
 
     //订单审批下个审批部门参数
     private String orderAprDept;
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
     private List<String> refundPriceDiffFile;
     private ORefundPriceDiff oRefundPriceDiff;
+    private ORefundPriceDiffVo oRefundPriceDiffVo;
     private List<ODeductCapital> deductCapitalList;
     //付款单
     private Map<String,String> oPayment;
@@ -208,5 +210,21 @@ public class AgentVo implements Serializable{
 
     public void setFlag(String flag) {
         this.flag = flag;
+    }
+
+    public ORefundPriceDiffVo getoRefundPriceDiffVo() {
+        return oRefundPriceDiffVo;
+    }
+
+    public void setoRefundPriceDiffVo(ORefundPriceDiffVo oRefundPriceDiffVo) {
+        this.oRefundPriceDiffVo = oRefundPriceDiffVo;
+    }
+
+    public String getAgentBusId() {
+        return agentBusId;
+    }
+
+    public void setAgentBusId(String agentBusId) {
+        this.agentBusId = agentBusId;
     }
 }

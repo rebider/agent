@@ -41,7 +41,6 @@ public class TranDataJob {
     @Autowired
     private ProfitOrganTranMonthService profitOrganTranMonthService;
 
-    //   @Scheduled(cron = "0 30 12 10 * ?")
     public void deal() {
         String settleMonth = "201806";//LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         JSONObject json = getTranData(settleMonth);
