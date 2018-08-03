@@ -55,6 +55,16 @@ public interface OrderService {
 
 
     /**
+     * 更新订单
+     * @param orderFormVo
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public AgentResult updateOrder(OrderFormVo orderFormVo, String userId) throws Exception;
+
+
+    /**
      * 付款单下单处理
      * @param oPayment
      * @return
@@ -101,7 +111,7 @@ public interface OrderService {
      * @param payment 付款单
      * @return
      */
-    public AgentResult dealOrderDeduction(OPayment payment);
+    public AgentResult dealOrderDeduction(OPayment payment)throws Exception;
     /**
      * 查找订单id
      */
