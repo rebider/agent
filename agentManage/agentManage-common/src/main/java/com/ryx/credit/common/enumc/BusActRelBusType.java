@@ -19,7 +19,7 @@ public enum BusActRelBusType {
     COMPENSATE("退补差价审批"),
     POSTAX("税点调整申请"),
     POSCHECK("POS考核奖励申请"),
-    POSREWARD("POS奖励申请");;
+    POSREWARD("POS奖励申请");
     public String  msg;
 
     BusActRelBusType(String s){

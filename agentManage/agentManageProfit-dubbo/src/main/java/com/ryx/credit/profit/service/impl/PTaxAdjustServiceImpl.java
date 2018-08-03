@@ -1,18 +1,21 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PTaxAdjustMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
-import com.ryx.credit.profit.pojo.PTaxAdjust;
-import com.ryx.credit.profit.pojo.PTaxAdjustExample;
-import com.ryx.credit.profit.pojo.ProfitStagingDetailExample;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IPTaxAdjustService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -22,8 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * PTaxAdjustServiceImpl
@@ -39,7 +43,6 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     private Logger logger = LoggerFactory.getLogger(PTaxAdjustServiceImpl.class);
     @Autowired
     private PTaxAdjustMapper adjustMapper;
-
     @Autowired
     private IdService idService;
 
@@ -94,7 +97,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         record.setActivId(proceId);
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(tax.getUserId());
-        record.setBusType(BusActRelBusType.TOOLS.name());
+        record.setBusType(BusActRelBusType.POSTAX.name());
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("税点调整申请审批流启动成功");
@@ -107,17 +110,55 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     }
 
     @Override
-    public ResultVO startTaxEnterActivity(String agentPid, String userId) throws ProcessException {
-        if (StringUtils.isBlank(agentPid)) {
-            logger.info("代理商ID为空{}:{}", agentPid, userId);
-            return ResultVO.fail("代理商审批中，代理商ID为空");
+    public void completeTaskEnterActivity(String insid, String status) {
+        LocalDate date = LocalDate.now();
+        BusActRel busActRel = new BusActRel();
+        busActRel.setActivId(insid);
+        try {
+            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            if (rel != null) {
+                PTaxAdjust taxAdjust = adjustMapper.selectByPrimaryKey(insid);
+                logger.info("1.更新税点调整申请状态为通过，有效");
+                logger.info("审批通过，原税点：{},现税点：{}",taxAdjust.getTaxOld(),taxAdjust.getTaxIng());
+                taxAdjust.setTaxStatus("1");
+                taxAdjust.setValidDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")));
+                adjustMapper.updateByPrimaryKeySelective(taxAdjust);
+                logger.info("2更新审批流与业务对象");
+                rel.setStatus(Status.STATUS_2.status);
+                taskApprovalService.updateABusActRel(rel);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("税点调整审批流回调异常，activId：{}", insid);
         }
-        if (StringUtils.isBlank(userId)) {
-            logger.info("操作用户为空{}:{}", agentPid, userId);
-            return ResultVO.fail("代理商审批中，操作用户为空");
-        }
+    }
 
-        return null;
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
+        logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", agentVo.getOrderAprDept());
+        }
+        reqMap.put("rs", agentVo.getApprovalResult());
+        reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
+        reqMap.put("approvalPerson", userId);
+        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+        reqMap.put("taskId", agentVo.getTaskId());
+
+        logger.info("创建下一审批流对象：{}", reqMap.toString());
+        Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+        Boolean rs = (Boolean) resultMap.get("rs");
+        String msg = String.valueOf(resultMap.get("msg"));
+        if (resultMap == null) {
+            return result;
+        }
+        if (!rs) {
+            result.setMsg(msg);
+            return result;
+        }
+        return AgentResult.ok(resultMap);
     }
 
     private PTaxAdjustExample adjustEqualsTo(PTaxAdjust adjust) {
