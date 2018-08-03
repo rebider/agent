@@ -253,12 +253,15 @@ public class StagingServiceImpl implements StagingService {
 
     @Override
     public void editStaging(ProfitStaging profitStaging) {
-        profitStagingMapper.updateByPrimaryKeySelective(profitStaging);
-        // 删除原始分期明细信息
-        deleteStagDetail(profitStaging.getId());
-        //新增分析明细
-        splitStaging(profitStaging);
-
+        if (StringUtils.isNotBlank(profitStaging.getId())) {
+            profitStagingMapper.updateByPrimaryKeySelective(profitStaging);
+            // 删除原始分期明细信息
+            deleteStagDetail(profitStaging.getId());
+            //新增分析明细
+            splitStaging(profitStaging);
+        }else {
+            throw new StagingException("修改失败。");
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ import com.ryx.credit.common.util.Page;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ProfitDeductionExample {
@@ -1404,6 +1405,136 @@ public class ProfitDeductionExample {
 
         public Criteria andStagingStatusNotBetween(String value1, String value2) {
             addCriterion("STAGING_STATUS not between", value1, value2, "stagingStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdIsNull() {
+            addCriterion("USER_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdIsNotNull() {
+            addCriterion("USER_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdEqualTo(String value) {
+            addCriterion("USER_ID =", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdNotEqualTo(String value) {
+            addCriterion("USER_ID <>", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdGreaterThan(String value) {
+            addCriterion("USER_ID >", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdGreaterThanOrEqualTo(String value) {
+            addCriterion("USER_ID >=", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdLessThan(String value) {
+            addCriterion("USER_ID <", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdLessThanOrEqualTo(String value) {
+            addCriterion("USER_ID <=", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdLike(String value) {
+            addCriterion("USER_ID like", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdNotLike(String value) {
+            addCriterion("USER_ID not like", value, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdIn(List<String> values) {
+            addCriterion("USER_ID in", values, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdNotIn(List<String> values) {
+            addCriterion("USER_ID not in", values, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdBetween(String value1, String value2) {
+            addCriterion("USER_ID between", value1, value2, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andUserIdNotBetween(String value1, String value2) {
+            addCriterion("USER_ID not between", value1, value2, "userId");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeIsNull() {
+            addCriterion("CREATE_DATE_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeIsNotNull() {
+            addCriterion("CREATE_DATE_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeEqualTo(Date value) {
+            addCriterion("CREATE_DATE_TIME =", value, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeNotEqualTo(Date value) {
+            addCriterion("CREATE_DATE_TIME <>", value, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeGreaterThan(Date value) {
+            addCriterion("CREATE_DATE_TIME >", value, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("CREATE_DATE_TIME >=", value, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeLessThan(Date value) {
+            addCriterion("CREATE_DATE_TIME <", value, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeLessThanOrEqualTo(Date value) {
+            addCriterion("CREATE_DATE_TIME <=", value, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeIn(List<Date> values) {
+            addCriterion("CREATE_DATE_TIME in", values, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeNotIn(List<Date> values) {
+            addCriterion("CREATE_DATE_TIME not in", values, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeBetween(Date value1, Date value2) {
+            addCriterion("CREATE_DATE_TIME between", value1, value2, "createDateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateDateTimeNotBetween(Date value1, Date value2) {
+            addCriterion("CREATE_DATE_TIME not between", value1, value2, "createDateTime");
             return (Criteria) this;
         }
     }

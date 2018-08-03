@@ -50,5 +50,5 @@ public interface ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/7/31 
     */ 
-    void batchInsertOtherDeduction(List<List<Object>> datas);
+    void batchInsertOtherDeduction(List<List<Object>> datas , String userId);
 }

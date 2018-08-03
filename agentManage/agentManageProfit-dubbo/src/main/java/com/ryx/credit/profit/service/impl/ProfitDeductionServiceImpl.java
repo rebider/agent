@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author zhaodw
@@ -103,17 +100,17 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public void batchInsertOtherDeduction(List<List<Object>> deductionist) {
+    public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
         if(deductionist != null && deductionist.size() > 0 ) {
             deductionist.stream().filter(list->list.get(1) != null && list.get(3) != null).forEach(list->{
-                insertDeduction(list);
+                insertDeduction(list, userId);
             });
 
 
         }
     }
 
-    private void insertDeduction(List list) {
+    private void insertDeduction(List list, String userId) {
         BigDecimal amt = list.get(3)==null?BigDecimal.ZERO:new BigDecimal(list.get(3).toString());
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.OTHER.getType());
@@ -126,6 +123,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setAgentName(list.get(0).toString());
         deduction.setRemark(list.get(2).toString());
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
+        deduction.setCreateDateTime(new Date());
+        deduction.setUserId(userId);
         this.insert(deduction);
     }
 
