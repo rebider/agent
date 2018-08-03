@@ -11,6 +11,7 @@ package com.ryx.credit.common.enumc;
 public enum PlatformType {
 
     POS("POS","POS"),
+    ZPOS("ZPOS","ZPOS"),
     MPOS("MPOS","手刷");
 
     public String code;

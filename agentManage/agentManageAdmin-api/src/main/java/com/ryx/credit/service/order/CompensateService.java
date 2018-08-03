@@ -36,5 +36,6 @@ public interface CompensateService {
 
     ORefundPriceDiff queryRefDiffDetail(String id);
 
+    AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt);
 }
 
