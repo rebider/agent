@@ -120,19 +120,19 @@ public class OSupplementServiceImpl implements OSupplementService {
         OSupplement oSupplement = osupplementVo.getSupplement();
         if (oSupplement == null) {
             logger.info("补款添加:{}", "补款添加信息为空");
-            throw new ProcessException("补款信息为空");
+            return ResultVO.fail("补款添加信息为空");
         }
         if (StringUtils.isEmpty(oSupplement.getcUser())) {
             logger.info("补款添加:{}", "操作用户不能为空");
-            throw new ProcessException("操作用户不能为空");
+            return ResultVO.fail("操作用户不能为空");
         }
         if (StringUtils.isEmpty(oSupplement.getPkType())) {
             logger.info("补款添加:{}", "类型不能为空");
-            throw new ProcessException("类型不能为空");
+            return ResultVO.fail("类型不能为空");
         }
         if (StringUtils.isEmpty(oSupplement.getSrcId())) {
             logger.info("补款添加:{}", "源数据不能为空");
-            throw new ProcessException("源数据不能为空");
+            return ResultVO.fail("源数据不能为空");
         }
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
@@ -356,6 +356,32 @@ public class OSupplementServiceImpl implements OSupplementService {
             }
         }
         return ResultVO.success(null);
+    }
+
+    @Override
+    public ResultVO selectBySrcId(OsupplementVo osupplementVo) {
+        ResultVO res=new ResultVO();
+        if (null == osupplementVo.getSupplement()) {
+            logger.info("补款信息为空{}:", osupplementVo.getSupplement());
+            return res.fail("失败");
+        }
+        OSupplement supplement = osupplementVo.getSupplement();
+        String oPaymentDetailId = supplement.getSrcId();
+        OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+        OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+        criteria.andIdEqualTo(oPaymentDetailId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+        if (1 != oPaymentDetails.size()) {
+            return res.fail("失败");
+        }
+        OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
+        if (null != oPaymentDetail.getPaymentStatus()) {
+            if (oPaymentDetail.getPaymentStatus().equals(PaymentStatus.DF.code)) {
+                return res.success("");
+            }
+        }
+        return res;
     }
 
 
