@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
@@ -50,6 +51,8 @@ public class OSupplementServiceImpl implements OSupplementService {
     private AgentEnterService agentEnterService;
     @Autowired
     private ActivityService activityService;
+    @Autowired
+    private AgentMapper agentMapper;
 
     @Override
     public PageInfo selectAll(Page page, OSupplement oSupplement, String time) {
@@ -73,6 +76,21 @@ public class OSupplementServiceImpl implements OSupplementService {
             maps.put("PAY_METHOD", PayMethod.getPayMethod(String.valueOf(maps.get("PAY_METHOD"))));//付款方式
             maps.put("REVIEW_STATUS", AgStatus.getMsg((BigDecimal) (maps.get("REVIEW_STATUS"))));//审核状态
             maps.put("SCHSTATUS", SchStatus.getMsg((BigDecimal) maps.get("SCHSTATUS")));//补款状态
+            AgentExample agentExample = new AgentExample();
+            AgentExample.Criteria agent = agentExample.createCriteria();
+            agent.andStatusEqualTo(Status.STATUS_1.status);
+
+            String agent_id = String.valueOf(maps.get("AGENT_ID"));
+            if (StringUtils.isNotBlank(agent_id) && !"null".equals(agent_id)) {
+                agent.andIdEqualTo(agent_id);
+                List<Agent> agentList = agentMapper.selectByExample(agentExample);
+                if (1 != agentList.size()) {
+                    return null;
+                }
+                Agent agen = agentList.get(0);
+                if (StringUtils.isNotBlank(agen.getAgName()))
+                    maps.put("AGENT_ID", agen.getAgName());//代理商名称
+            }
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(supplementList);
@@ -161,7 +179,6 @@ public class OSupplementServiceImpl implements OSupplementService {
             throw new ProcessException("补款审批中，操作用户为空");
         }
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
-
 
 
         if (oSupplement.getPkType().equals(PkType.FQBK.code)) {
