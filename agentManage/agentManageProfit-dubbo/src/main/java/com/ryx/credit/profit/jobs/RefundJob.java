@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
@@ -14,6 +15,7 @@ import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitSettleErrLsService;
 import com.ryx.credit.profit.service.StagingService;
+import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,9 @@ public class RefundJob {
     @Autowired
     private IdService idService;
 
+    @Autowired
+    private BusinessPlatformService businessPlatformService;
+
 
 
 
@@ -73,7 +78,7 @@ public class RefundJob {
                if (orgMap.size() > 0) {
                   Set<String> keys = orgMap.keySet();
                   for (String key : keys) {
-                      insertProfitDeduction(key, orgMap.get(key), deductionIdMap.get(key));
+                      insertProfitDeduction(key, orgMap.get(key), deductionIdMap);
                   }
                }
            }catch (Exception e) {
@@ -93,15 +98,16 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/7/30
     */
-    private void insertProfitDeduction(String agentId, BigDecimal addAmt, String id) {
+    private void insertProfitDeduction(String agentId, BigDecimal addAmt, Map<String, String> deductionIdMap) {
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
-        deduction.setAgentId(agentId);
+        deduction.setAgentId(deductionIdMap.get(agentId+"-agentId"));
+        deduction.setAgentPid(agentId);
         PageInfo pageInfo = profitDeductionService.getProfitDeductionList(deduction, null);
         if (pageInfo.getRows() != null && pageInfo.getRows().size()==1) {
             deduction = (ProfitDeduction) pageInfo.getRows().get(0);
         }else{
-            deduction.setId(id);
+            deduction.setId(deductionIdMap.get(agentId));
             deduction.setStagingStatus(DeductionStatus.UNREVIEWED.getStatus());
             deduction.setDeductionDesc(DEDUCTION_DESC);
         }
@@ -120,7 +126,9 @@ public class RefundJob {
     */ 
     private void insertSettleErrLs(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
        array.stream().
-               filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) && ((JSONObject)json).getBigDecimal("balanceAmt").intValue() < 0)
+               filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
+                       (((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()> 0 ||
+                       ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0))
                .forEach(json->{
                    insertSettleErr((JSONObject)json, orgMap, deductionIdMap);
             }
@@ -160,6 +168,15 @@ public class RefundJob {
             }else {
                 orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt"));
                 deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
+                // 获取代理商平台id
+                AgentBusInfo agentBusInfo = new AgentBusInfo();
+                PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, null,null);
+                if (pageInfo != null && pageInfo.getTotal() > 0) {
+                    Map<String, Object> map  = (Map<String, Object>) pageInfo.getRows().get(0);
+                    if (map != null) {
+                        deductionIdMap.put(jsonObject.getString("instId")+"-agentId", String.valueOf(map.get("AGENT_ID")));
+                    }
+                }
             }
         }
         settleErrLs.setSourceId(deductionIdMap.get(jsonObject.getString("instId")));
