@@ -421,6 +421,7 @@
     and logi.order_id = od.id
     and logi.Log_type = '1'
     and plan.id = logi.Receipt_plan_id
+    and od.agent_id = #{agentId,jdbcType=VARCHAR}
     order by od.id asc , logi.pro_id asc, detail.sn_num asc
   </select>
 
@@ -440,5 +441,14 @@
     )
     and order_id = #{orderId}
    </select>
+
+
+    <update id="updateSnStatus">
+    update o_logistics_detail
+     set STATUS = #{status,jdbcType=DECIMAL}
+    where logistics_id in
+    (select distinct id from o_logistics where order_id =#{orderId,jdbcType=VARCHAR})
+    and  <![CDATA[sn_num >= #{startSn,jdbcType=VARCHAR} and sn_num <= #{endSn,jdbcType=VARCHAR}]]>
+  </update>
 
 </mapper>

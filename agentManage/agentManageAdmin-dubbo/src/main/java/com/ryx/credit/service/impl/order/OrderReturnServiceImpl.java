@@ -23,6 +23,7 @@ import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
+import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -71,6 +72,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private ActivityService activityService;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
+    @Resource
+    OLogisticsService oLogisticsService;
 
 
     /**
@@ -278,6 +281,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
         for (Map<String, Object> map : list) {
 
+            String orderId = (String) map.get("orderId");
+            String startSn = (String) map.get("startSn");
+            String endSn = (String) map.get("endSn");
+
             //生成退货明细
             OReturnOrderDetail returnOrderDetail = null;
             try {
@@ -285,7 +292,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setId(idService.genId(TabId.o_return_order_detail));
                 returnOrderDetail.setReturnId(returnId);
                 returnOrderDetail.setAgentId(agentId);
-                returnOrderDetail.setOrderId((String) map.get("orderId"));
+                returnOrderDetail.setOrderId(orderId);
                 returnOrderDetail.setSubOrderId((String) map.get("receiptId"));
                 returnOrderDetail.setProId((String) map.get("proId"));
                 returnOrderDetail.setProName((String) map.get("proName"));
@@ -306,6 +313,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.error("生成退货明细失败", e);
                 throw new ProcessException("生成退货明细失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
             }
+
+            //更新物流明细表SN状态
+            try {
+                oLogisticsService.updateSnStatus(orderId,startSn,endSn,SnStatus.THZ.code);
+            } catch (Exception e) {
+                log.error("更新SN状态失败", e);
+                throw new ProcessException("更新SN状态失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
+            }
+
 
             String setstr = returnOrderDetail.getOrderId() + "_" + returnOrderDetail.getSubOrderId() + "_" + returnOrderDetail.getReturnId();
             relSet.add(setstr);
