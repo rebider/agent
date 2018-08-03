@@ -85,9 +85,6 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-8A9B5BDA-1703-4DBE-B24F-E6D7035FF30B" sourceRef="sid-E6B44B4D-0A3D-4E00-9F03-C73C14BB9F9D" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F"></sequenceFlow>
-    <sequenceFlow id="sid-8041F0C5-0F6B-49B5-9A17-3745278B1E36" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='north'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-D10B85BA-0E8F-4E86-A8E0-DE87E30153A4" name="完成" sourceRef="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD" targetRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
     </sequenceFlow>
@@ -101,9 +98,14 @@
         <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.BusinessTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="sid-C8DAF639-3E95-47AA-949B-605EF850689E" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-C72289F3-BD87-4C7E-A967-519D54B2CE7E"></sequenceFlow>
     <sequenceFlow id="sid-DF330366-46BD-4F75-B435-FA5CB57203ED" sourceRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F"></sequenceFlow>
     <sequenceFlow id="sid-36BA9F55-5BE0-4A1F-88F7-5D64D1CA7F2A" sourceRef="sid-C72289F3-BD87-4C7E-A967-519D54B2CE7E" targetRef="sid-C0823C1F-4FED-4748-BDB4-E8A2880C944F"></sequenceFlow>
+    <sequenceFlow id="sid-8041F0C5-0F6B-49B5-9A17-3745278B1E36" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='north'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-C8DAF639-3E95-47AA-949B-605EF850689E" sourceRef="sid-6DA8FE70-61D0-470B-AD34-16A06B2A5CB3" targetRef="sid-C72289F3-BD87-4C7E-A967-519D54B2CE7E">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='beijing'}]]></conditionExpression>
+    </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_business">
     <bpmndi:BPMNPlane bpmnElement="business" id="BPMNPlane_business">
