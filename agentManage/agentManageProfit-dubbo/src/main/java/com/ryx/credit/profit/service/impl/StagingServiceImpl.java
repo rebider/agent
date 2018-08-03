@@ -274,7 +274,7 @@ public class StagingServiceImpl implements StagingService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(profitStaging.getUserId());
         record.setStatus(Status.STATUS_1.status);
-        if("otherDeduct".equals(workId)) {
+        if("otherDeductAgent".equals(workId) || "otherDeductCity".equals(workId)) {
             record.setBusType(BusActRelBusType.OTHER_DEDUCTION.name());
         }else{
             record.setBusType(BusActRelBusType.STAGING.name());
