@@ -434,9 +434,10 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setRelCompType(relCompAmtStr.contains("-") ? PriceDiffType.DETAIN_AMT.getValue() : PriceDiffType.REPAIR_AMT.getValue());
             updatePriceDiff.setRelCompAmt(relCompAmtStr.contains("-") ? new BigDecimal(relCompAmtStr.substring(1)) : new BigDecimal(relCompAmtStr));
         }
-        if(StringUtils.isNotBlank(updatePriceDiff.getGatherTimeStr())){
-            updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(updatePriceDiff.getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
-            updatePriceDiff.setGatherAmt(oRefundPriceDiff.getGatherAmt());
+        if(null!=agentVo.getoRefundPriceDiffVo())
+        if(StringUtils.isNotBlank(agentVo.getoRefundPriceDiffVo().getGatherTimeStr())){
+            updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(agentVo.getoRefundPriceDiffVo().getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
+            updatePriceDiff.setGatherAmt(agentVo.getoRefundPriceDiffVo().getGatherAmt());
         }
         updatePriceDiff.setuTime(new Date());
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
