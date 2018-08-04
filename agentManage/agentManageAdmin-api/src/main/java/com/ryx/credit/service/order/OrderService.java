@@ -63,6 +63,13 @@ public interface OrderService {
      */
     public AgentResult updateOrder(OrderFormVo orderFormVo, String userId) throws Exception;
 
+    /**
+     * 根据付款单属相初始化参数
+     * @param payment
+     * @return
+     */
+    public OPayment initPayment(OPayment payment);
+
 
     /**
      * 付款单下单处理
