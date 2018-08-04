@@ -148,4 +148,21 @@ public class RegionServiceImpl implements RegionService {
         return name;
     }
 
+
+    /**
+     * 根据code判断是否是“市"
+     * @param code
+     * @return
+     */
+    @Override
+    public Boolean isCity(String code) {
+        RegionExample example = new RegionExample();
+        example.or().andRCodeEqualTo(code);
+        List<Region> list = regionMapper.selectByExample(example);
+        Region region = list.get(0);
+        if(region.gettType().equals(2)){
+            return true;
+        }
+        return false;
+    }
 }
