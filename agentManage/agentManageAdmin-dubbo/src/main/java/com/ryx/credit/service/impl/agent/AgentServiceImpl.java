@@ -15,9 +15,11 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.service.ICuserAgentService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +62,8 @@ public class AgentServiceImpl implements  AgentService {
     private RedisService redisService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private ICuserAgentService iCuserAgentService;
 
     /**
      * 查询代理商信息
@@ -280,7 +285,7 @@ public class AgentServiceImpl implements  AgentService {
      */
     @Override
     public void createBackUserbyAgent(String agentId){
-        ThreadPool.putThreadPool(()->{
+//        ThreadPool.putThreadPool(()->{
             try {
                 Agent agent = getAgentById(agentId);
                 UserVo userVoSelect = iUserService.selectByName(agent.getAgName());
@@ -300,11 +305,18 @@ public class AgentServiceImpl implements  AgentService {
                 userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
                 userVo = iUserService.selectByName(userVo.getName());
+                CuserAgent cuserAgent = new CuserAgent();
+                cuserAgent.setAgentid(agent.getId());
+                cuserAgent.setUserid(userVo.getId().toString());
+                cuserAgent.setcTime(new Date());
+                cuserAgent.setStatus(BigDecimal.ONE);
+                cuserAgent.setUserType(BigDecimal.ONE.toString());
+                iCuserAgentService.insert(cuserAgent);
                 redisService.setValue(String.valueOf(userVo.getId()),agent.getId(),Long.valueOf(Integer.MAX_VALUE));
             } catch (Exception e) {
                 logger.error("createBackUserbyAgent error {}",agentId,e);
             }
 
-        });
+//        });
     }
 }

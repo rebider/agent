@@ -21,6 +21,7 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
     <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -52,9 +53,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ACTIVITY_ID, SUB_ORDER_ID, ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, ACTIVITY_WAY,
-    PRICE, PRO_MODEL, VENDER, PLATFORM, G_TIME, C_TIME, U_TIME, C_USER, U_USER, VERSION,
-    PRO_ID, PRO_NAME
+    ID, ACTIVITY_ID, SUB_ORDER_ID, ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, ACTIVITY_WAY, 
+    PRICE, PRO_MODEL, VENDER, PLATFORM, G_TIME, C_TIME, U_TIME, C_USER, U_USER, VERSION, 
+    PRO_ID, PRO_NAME, STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -73,7 +74,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
     from O_SUB_ORDER_ACTIVITY
     where ID = #{id,jdbcType=VARCHAR}
@@ -85,20 +86,20 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
-    insert into O_SUB_ORDER_ACTIVITY (ID, ACTIVITY_ID, SUB_ORDER_ID,
-    ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE,
-    ACTIVITY_WAY, PRICE, PRO_MODEL,
-    VENDER, PLATFORM, G_TIME,
-    C_TIME, U_TIME, C_USER,
-    U_USER, VERSION, PRO_ID,
-    PRO_NAME)
-    values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR},
-    #{activityName,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR},
-    #{activityWay,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR},
-    #{vender,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
-    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{proId,jdbcType=VARCHAR},
-    #{proName,jdbcType=VARCHAR})
+    insert into O_SUB_ORDER_ACTIVITY (ID, ACTIVITY_ID, SUB_ORDER_ID, 
+      ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, 
+      ACTIVITY_WAY, PRICE, PRO_MODEL, 
+      VENDER, PLATFORM, G_TIME, 
+      C_TIME, U_TIME, C_USER, 
+      U_USER, VERSION, PRO_ID, 
+      PRO_NAME, STATUS)
+    values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, 
+      #{activityName,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR}, 
+      #{activityWay,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR}, 
+      #{vender,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL}, 
+      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
+      #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{proId,jdbcType=VARCHAR}, 
+      #{proName,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
     insert into O_SUB_ORDER_ACTIVITY
@@ -160,6 +161,9 @@
       <if test="proName != null">
         PRO_NAME,
       </if>
+      <if test="status != null">
+        STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -218,6 +222,9 @@
       </if>
       <if test="proName != null">
         #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -284,6 +291,9 @@
       <if test="proName != null">
         PRO_NAME = #{proName,jdbcType=VARCHAR},
       </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -306,12 +316,13 @@
       U_USER = #{uUser,jdbcType=VARCHAR},
       VERSION = #{version,jdbcType=DECIMAL},
       PRO_ID = #{proId,jdbcType=VARCHAR},
-      PRO_NAME = #{proName,jdbcType=VARCHAR}
+      PRO_NAME = #{proName,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
+      select * from ( select row_.*, rownum rownum_ from ( 
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

@@ -63,4 +63,14 @@ public interface OSupplementService {
      */
     public ResultVO updateByActivId(String id,String activityName);
 
+    /**
+     * 查询是否为待付款状态
+     */
+
+    public  ResultVO selectBySrcId(OsupplementVo osupplementVo);
+
+    /**
+     * 更新实际付款金额
+     */
+    public ResultVO updateAmount(AgentVo agentVo);
 }
