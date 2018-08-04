@@ -62,7 +62,7 @@ public interface ToolsDeductService {
      * 批量新增机具扣款分期数据
      * @param maps
      */
-    public List<Map<String, Object>> batchInsertDeduct(List<Map<String, Object>> maps, String deductionDate);
+    public List<Map<String, Object>> batchInsertDeduct(List<Map<String, Object>> maps, String deductionDate) throws ProcessException;;
 
     /**
      * 扣款分期调整后，本月信息补全

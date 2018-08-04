@@ -56,10 +56,11 @@ public class ToolsDeductJob {
                     //补全本月扣款信息（上月未扣足金额）
                     toolsDeductService.deductCompletionInfo(detailList);
                     //通知结果
-//                    iPaymentDetailService.uploadStatus(successList);
+                    iPaymentDetailService.uploadStatus(successList);
                 }
             }
-        } catch (ParseException e) {
+        } catch (Exception e){
+            LOG.error("初始化机具扣款数据失败");
             e.printStackTrace();
         }
     }
