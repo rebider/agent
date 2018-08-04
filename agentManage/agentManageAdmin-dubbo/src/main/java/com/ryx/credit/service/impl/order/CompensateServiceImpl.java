@@ -431,8 +431,15 @@ public class CompensateServiceImpl implements CompensateService {
                             throw new ProcessException("系统异常");
                         }
                     });
-                    BigDecimal subtract = agentVo.getoRefundPriceDiff().getRelCompAmt().subtract(agentVo.getoRefundPriceDiff().getMachOweAmt());
-                    agentVo.getoRefundPriceDiff().setRelCompAmt(subtract);
+                }
+                if(agentVo.getFlag().equals("1")){
+                    ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+                    BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+                    String subtractStr = String.valueOf(subtract);
+                    if(subtractStr.contains("-")){
+                        agentVo.getoRefundPriceDiffVo().setMachOweAmt(oRefundPriceDiff.getRelCompAmt());
+                    }
+                    agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
                 }
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
                 if(!agentResult.isOK()){
@@ -473,7 +480,10 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(agentVo.getoRefundPriceDiffVo().getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
             updatePriceDiff.setGatherAmt(agentVo.getoRefundPriceDiffVo().getGatherAmt());
         }
-
+        if(agentVo.getFlag().equals("1")){
+            updatePriceDiff.setRelCompAmt(agentVo.getoRefundPriceDiffVo().getRelCompAmt());
+            updatePriceDiff.setMachOweAmt(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+        }
         updatePriceDiff.setuTime(new Date());
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
         if(i!=1){
