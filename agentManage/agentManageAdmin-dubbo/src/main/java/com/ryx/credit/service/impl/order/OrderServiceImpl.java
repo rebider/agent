@@ -363,6 +363,37 @@ public class OrderServiceImpl implements OrderService {
 
     }
 
+
+    @Override
+    public OPayment initPayment(OPayment payment) {
+        switch (payment.getPayMethod()){
+            case "SF1"://首付+分润分期
+                return payment;
+            case "SF2"://首付+打款分期
+                return payment;
+            case "FKFQ"://打款分期
+                payment.setDownPayment(BigDecimal.ZERO);
+                payment.setActualReceipt(BigDecimal.ZERO);
+                return payment;
+            case "FRFQ"://分润分期
+                payment.setDownPayment(BigDecimal.ZERO);
+                payment.setActualReceipt(BigDecimal.ZERO);
+                return payment;
+            case "XXDK"://线下打款
+                payment.setDownPayment(BigDecimal.ZERO);
+                payment.setDownPaymentDate(null);
+                payment.setDownPaymentCount(BigDecimal.ZERO);
+                return payment;
+            case "QT"://其他
+                payment.setDownPayment(BigDecimal.ZERO);
+                payment.setDownPaymentDate(null);
+                payment.setDownPaymentCount(BigDecimal.ZERO);
+                payment.setActualReceipt(BigDecimal.ZERO);
+                return payment;
+        }
+        return payment;
+    }
+
     /**
      * 订单form表单填充并入库
      *
@@ -488,6 +519,66 @@ public class OrderServiceImpl implements OrderService {
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
+        //收货地址
+        List<OReceiptOrderVo> OReceiptOrderVos = orderFormVo.getoReceiptOrderList();
+        for (OReceiptOrderVo oReceiptOrderVo : OReceiptOrderVos) {
+            oReceiptOrderVo.setId(idService.genId(TabId.o_receipt_order));
+            oReceiptOrderVo.setOrderId(orderFormVo.getId());
+            oReceiptOrderVo.setReceiptNum(oReceiptOrderVo.getId());
+            OAddress address = oAddressMapper.selectByPrimaryKey(oReceiptOrderVo.getAddressId());
+            oReceiptOrderVo.setAddrRealname(address.getAddrRealname());
+            oReceiptOrderVo.setAddrMobile(address.getAddrMobile());
+            oReceiptOrderVo.setAddrProvince(address.getAddrProvince());
+            oReceiptOrderVo.setAddrCity(address.getAddrCity());
+            oReceiptOrderVo.setAddrDistrict(address.getAddrDistrict());
+            oReceiptOrderVo.setAddrDetail(address.getAddrDetail());
+            oReceiptOrderVo.setRemark(address.getRemark());
+            oReceiptOrderVo.setZipCode(address.getZipCode());
+            oReceiptOrderVo.setcTime(d);
+            oReceiptOrderVo.setuTime(d);
+            oReceiptOrderVo.setReceiptStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+            oReceiptOrderVo.setuUser(userId);
+            oReceiptOrderVo.setcUser(userId);
+            oReceiptOrderVo.setStatus(Status.STATUS_1.status);
+            oReceiptOrderVo.setVersion(Status.STATUS_0.status);
+            oReceiptOrderVo.setAgentId(orderFormVo.getAgentId());
+            BigDecimal b = new BigDecimal(0);
+            List<OReceiptPro> pros = oReceiptOrderVo.getoReceiptPros();
+            if (pros.size() == 0) {
+                logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
+                throw new MessageException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
+            }
+            //收货地址商品
+            for (OReceiptPro pro : pros) {
+                pro.setId(idService.genId(TabId.o_receipt_pro));
+                pro.setcTime(d);
+                pro.setOrderid(orderFormVo.getId());
+                pro.setReceiptId(oReceiptOrderVo.getId());
+                String proid = pro.getProId();
+                OProduct product = oProductMapper.selectByPrimaryKey(proid);
+                pro.setProCode(product.getProCode());
+                pro.setProName(product.getProName());
+                pro.setSendNum(new BigDecimal(0));
+                pro.setcUser(userId);
+                pro.setuTime(d);
+                pro.setuUser(userId);
+                pro.setStatus(Status.STATUS_1.status);
+                pro.setVersion(Status.STATUS_0.status);
+                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+                //插入收货地址明细
+                if (1 != oReceiptProMapper.insertSelective(pro)) {
+                    logger.info("下订单:{}", "oReceiptPro添加失败");
+                    throw new MessageException("oPayment添加失败");
+                }
+                b = b.add(pro.getProNum());
+            }
+            oReceiptOrderVo.setProNum(b);
+            //插入收货地址
+            if (1 != oReceiptOrderMapper.insertSelective(oReceiptOrderVo)) {
+                logger.info("下订单:{}", "oReceiptOrderVo添加失败");
+                throw new MessageException("oReceiptOrderVo添加失败");
+            }
+        }
         List<Attachment> attr = orderFormVo.getAttachments();
         for (Attachment attachment : attr) {
             if (org.apache.commons.lang.StringUtils.isEmpty(attachment.getId())) continue;
@@ -518,6 +609,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("订单添加失败");
         }
         //插入付款单
+        oPayment = initPayment(oPayment);
         if (1 != oPaymentMapper.insertSelective(oPayment)) {
             throw new MessageException("oPayment添加失败");
         }
@@ -539,7 +631,7 @@ public class OrderServiceImpl implements OrderService {
         order_db.setOrderPlatform(orderFormVo.getOrderPlatform());
         order_db.setoAmo(orderFormVo.getoAmo());
         order_db.setPaymentMethod(orderFormVo.getPaymentMethod());
-
+        order_db.setRemark(orderFormVo.getRemark());
         //支付方式
         OPayment oPayment = orderFormVo.getoPayment();
 
@@ -548,13 +640,13 @@ public class OrderServiceImpl implements OrderService {
         oPayment_db.setAgentId(orderFormVo.getAgentId());
         oPayment_db.setPayMethod(order_db.getPaymentMethod());
         oPayment_db.setGuaranteeAgent(oPayment.getGuaranteeAgent());
+        oPayment_db.setSettlementPrice(oPayment.getSettlementPrice());
         oPayment_db.setDownPayment(oPayment.getDownPayment());
         oPayment_db.setDownPaymentCount(oPayment.getDownPaymentCount());
         oPayment_db.setDownPaymentDate(oPayment.getDownPaymentDate());
         oPayment_db.setActualReceipt(oPayment.getActualReceipt());
         oPayment_db.setCollectCompany(oPayment.getCollectCompany());
-
-
+        oPayment_db.setRemark(oPayment.getRemark());
         if(StringUtils.isBlank(orderFormVo.getPaymentMethod())){
             logger.info("下订单:{}", "商品价格数据错误");
             throw new MessageException("付款方式不能为空");
@@ -756,6 +848,7 @@ public class OrderServiceImpl implements OrderService {
         if (1 != orderMapper.updateByPrimaryKeySelective(order_db)) {
             throw new MessageException("订单添加失败");
         }
+        oPayment_db = initPayment(oPayment_db);
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
             throw new MessageException("oPayment添加失败");
@@ -766,7 +859,6 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 加载订单数据
-     *
      * @param id
      * @return
      */
