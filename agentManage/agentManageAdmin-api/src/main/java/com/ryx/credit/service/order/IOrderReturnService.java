@@ -1,9 +1,12 @@
 package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -24,4 +27,8 @@ public interface IOrderReturnService {
     Map<String, Object> bizAudit(String returnId, String plans, String remark, String userid, String auditResult) throws ProcessException;
 
     Map<String, Object> cwAudit(String returnId, String remark, String userid, String auditResult, String[] attachments) throws ProcessException;
+
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
+
+    void doPlan(String returnId, BigDecimal takeAmt, String userid);
 }

@@ -1,9 +1,10 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
@@ -168,6 +169,27 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok(orderFormVo.getId());
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult updateOrder(OrderFormVo orderFormVo, String userId) throws Exception {
+        if (StringUtils.isBlank(orderFormVo.getAgentId())) {
+            return AgentResult.fail("请选择代理商");
+        }
+        if (StringUtils.isBlank(orderFormVo.getOrderPlatform())) {
+            return AgentResult.fail("请选择平台");
+        }
+        if (orderFormVo.getoSubOrder()==null || orderFormVo.getoSubOrder().size()==0) {
+            return AgentResult.fail("请选择商品");
+        }
+        if (StringUtils.isBlank(orderFormVo.getId())) {
+            return AgentResult.fail("订单ID不能为空");
+        }
+        orderFormVo.setUserId(userId);
+        //保存订单数据
+        orderFormVo = updateOrderFormValue(orderFormVo, userId);
+        return AgentResult.ok(orderFormVo.getId());
+    }
+
     /**
      * 分期处理
      *
@@ -217,7 +239,7 @@ public class OrderServiceImpl implements OrderService {
                     record.setStatus(Status.STATUS_1.status);
                     record.setVersion(Status.STATUS_1.status);
                     if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new ProcessException("分期处理");
+                        throw new MessageException("分期处理");
                     }
                 }
                 break;
@@ -254,7 +276,7 @@ public class OrderServiceImpl implements OrderService {
                     record.setStatus(Status.STATUS_1.status);
                     record.setVersion(Status.STATUS_1.status);
                     if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new ProcessException("分期处理");
+                        throw new MessageException("分期处理");
                     }
                 }
                 break;
@@ -291,7 +313,7 @@ public class OrderServiceImpl implements OrderService {
                     record.setStatus(Status.STATUS_1.status);
                     record.setVersion(Status.STATUS_1.status);
                     if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new ProcessException("分期处理");
+                        throw new MessageException("分期处理");
                     }
                 }
                 break;
@@ -328,7 +350,7 @@ public class OrderServiceImpl implements OrderService {
                     record.setStatus(Status.STATUS_1.status);
                     record.setVersion(Status.STATUS_1.status);
                     if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new ProcessException("分期处理");
+                        throw new MessageException("分期处理");
                     }
                 }
                 break;
@@ -348,7 +370,7 @@ public class OrderServiceImpl implements OrderService {
      * @param userId
      * @return
      */
-    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo, String userId) {
+    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo, String userId)throws Exception {
         logger.info("下订单:{}{}",userId, orderFormVo.getAgentId());
         //订单基础数据
         Date d = Calendar.getInstance().getTime();
@@ -379,7 +401,7 @@ public class OrderServiceImpl implements OrderService {
 
         if(StringUtils.isBlank(orderFormVo.getPaymentMethod())){
             logger.info("下订单:{}", "商品价格数据错误");
-            throw new ProcessException("付款方式不能为空");
+            throw new MessageException("付款方式不能为空");
         }
 
         //订单总金额
@@ -394,11 +416,11 @@ public class OrderServiceImpl implements OrderService {
             OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
             if (oSubOrder.getProPrice() == null || oSubOrder.getProPrice().compareTo(product.getProPrice()) != 0) {
                 logger.info("下订单:{}", "商品价格数据错误");
-                throw new ProcessException("商品价格数据错误");
+                throw new MessageException("商品价格数据错误");
             }
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
-                throw new ProcessException("商品数量错误");
+                throw new MessageException("商品数量错误");
             }
             oSubOrder.setOrderId(orderFormVo.getId());
             oSubOrder.setProCode(product.getProCode());
@@ -443,10 +465,11 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setuTime(d);
                     oSubOrderActivity.setcUser(userId);
                     oSubOrderActivity.setuUser(userId);
+                    oSubOrderActivity.setStatus(Status.STATUS_1.status);
                     oSubOrderActivity.setVersion(Status.STATUS_0.status);
                     if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
                         logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动失败");
-                        throw new ProcessException("商品添加活动失败");
+                        throw new MessageException("商品添加活动失败");
                     }else{
                         logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动成功");
                     }
@@ -459,71 +482,11 @@ public class OrderServiceImpl implements OrderService {
             //插入订单商品信息
             if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
                 logger.info("下订单:{}", "oSubOrder添加失败");
-                throw new ProcessException("oPayment添加失败");
+                throw new MessageException("oPayment添加失败");
             }
             //计算订单金额
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
-        }
-        //收货地址
-        List<OReceiptOrderVo> OReceiptOrderVos = orderFormVo.getoReceiptOrderList();
-        for (OReceiptOrderVo oReceiptOrderVo : OReceiptOrderVos) {
-            oReceiptOrderVo.setId(idService.genId(TabId.o_receipt_order));
-            oReceiptOrderVo.setOrderId(orderFormVo.getId());
-            oReceiptOrderVo.setReceiptNum(oReceiptOrderVo.getId());
-            OAddress address = oAddressMapper.selectByPrimaryKey(oReceiptOrderVo.getAddressId());
-            oReceiptOrderVo.setAddrRealname(address.getAddrRealname());
-            oReceiptOrderVo.setAddrMobile(address.getAddrMobile());
-            oReceiptOrderVo.setAddrProvince(address.getAddrProvince());
-            oReceiptOrderVo.setAddrCity(address.getAddrCity());
-            oReceiptOrderVo.setAddrDistrict(address.getAddrDistrict());
-            oReceiptOrderVo.setAddrDetail(address.getAddrDetail());
-            oReceiptOrderVo.setRemark(address.getRemark());
-            oReceiptOrderVo.setZipCode(address.getZipCode());
-            oReceiptOrderVo.setcTime(d);
-            oReceiptOrderVo.setuTime(d);
-            oReceiptOrderVo.setReceiptStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
-            oReceiptOrderVo.setuUser(userId);
-            oReceiptOrderVo.setcUser(userId);
-            oReceiptOrderVo.setStatus(Status.STATUS_1.status);
-            oReceiptOrderVo.setVersion(Status.STATUS_0.status);
-            oReceiptOrderVo.setAgentId(orderFormVo.getAgentId());
-            BigDecimal b = new BigDecimal(0);
-            List<OReceiptPro> pros = oReceiptOrderVo.getoReceiptPros();
-            if (pros.size() == 0) {
-                logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
-                throw new ProcessException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
-            }
-            //收货地址商品
-            for (OReceiptPro pro : pros) {
-                pro.setId(idService.genId(TabId.o_receipt_pro));
-                pro.setcTime(d);
-                pro.setOrderid(orderFormVo.getId());
-                pro.setReceiptId(oReceiptOrderVo.getId());
-                String proid = pro.getProId();
-                OProduct product = oProductMapper.selectByPrimaryKey(proid);
-                pro.setProCode(product.getProCode());
-                pro.setProName(product.getProName());
-                pro.setSendNum(new BigDecimal(0));
-                pro.setcUser(userId);
-                pro.setuTime(d);
-                pro.setuUser(userId);
-                pro.setStatus(Status.STATUS_1.status);
-                pro.setVersion(Status.STATUS_0.status);
-                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
-                //插入收货地址明细
-                if (1 != oReceiptProMapper.insertSelective(pro)) {
-                    logger.info("下订单:{}", "oReceiptPro添加失败");
-                    throw new ProcessException("oPayment添加失败");
-                }
-                b = b.add(pro.getProNum());
-            }
-            oReceiptOrderVo.setProNum(b);
-            //插入收货地址
-            if (1 != oReceiptOrderMapper.insertSelective(oReceiptOrderVo)) {
-                logger.info("下订单:{}", "oReceiptOrderVo添加失败");
-                throw new ProcessException("oReceiptOrderVo添加失败");
-            }
         }
         List<Attachment> attr = orderFormVo.getAttachments();
         for (Attachment attachment : attr) {
@@ -538,7 +501,7 @@ public class OrderServiceImpl implements OrderService {
             record.setId(idService.genId(TabId.a_attachment_rel));
             if (1 != attachmentRelMapper.insertSelective(record)) {
                 logger.info("下订单:{}", "附件添加失败");
-                throw new ProcessException("下订单附件添加失败");
+                throw new MessageException("下订单附件添加失败");
             }
         }
 
@@ -552,11 +515,250 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
         //插入订单
         if (1 != orderMapper.insertSelective(orderFormVo)) {
-            throw new ProcessException("订单添加失败");
+            throw new MessageException("订单添加失败");
         }
         //插入付款单
         if (1 != oPaymentMapper.insertSelective(oPayment)) {
-            throw new ProcessException("oPayment添加失败");
+            throw new MessageException("oPayment添加失败");
+        }
+        return orderFormVo;
+    }
+
+
+    private OrderFormVo updateOrderFormValue(OrderFormVo orderFormVo, String userId)throws Exception {
+
+        logger.info("下订单:{}{}",userId, orderFormVo.getAgentId());
+
+        //订单基础数据
+        OOrder order_db = orderMapper.selectByPrimaryKey(orderFormVo.getId());
+        Date d = Calendar.getInstance().getTime();
+        order_db.setPayAmo(orderFormVo.getoAmo());
+        order_db.setuUser(userId);
+        order_db.setuTime(d);
+        order_db.setAgentId(orderFormVo.getAgentId());
+        order_db.setOrderPlatform(orderFormVo.getOrderPlatform());
+        order_db.setoAmo(orderFormVo.getoAmo());
+        order_db.setPaymentMethod(orderFormVo.getPaymentMethod());
+
+        //支付方式
+        OPayment oPayment = orderFormVo.getoPayment();
+
+        OPayment oPayment_db = oPaymentMapper.selectByPrimaryKey(oPayment.getId());
+        oPayment_db.setOrderId(orderFormVo.getId());
+        oPayment_db.setAgentId(orderFormVo.getAgentId());
+        oPayment_db.setPayMethod(order_db.getPaymentMethod());
+        oPayment_db.setGuaranteeAgent(oPayment.getGuaranteeAgent());
+        oPayment_db.setDownPayment(oPayment.getDownPayment());
+        oPayment_db.setDownPaymentCount(oPayment.getDownPaymentCount());
+        oPayment_db.setDownPaymentDate(oPayment.getDownPaymentDate());
+        oPayment_db.setActualReceipt(oPayment.getActualReceipt());
+        oPayment_db.setCollectCompany(oPayment.getCollectCompany());
+
+
+        if(StringUtils.isBlank(orderFormVo.getPaymentMethod())){
+            logger.info("下订单:{}", "商品价格数据错误");
+            throw new MessageException("付款方式不能为空");
+        }
+
+        //订单总金额
+        BigDecimal forPayAmount = new BigDecimal(0);
+        //订单应付金额
+        BigDecimal forRealPayAmount = new BigDecimal(0);
+
+
+        //子订单接口 计算整个订单数据
+        List<OSubOrder> OSubOrders = orderFormVo.getoSubOrder();
+
+        //删除订购单信息
+        OSubOrderExample example = new OSubOrderExample();
+        example.or().andOrderIdEqualTo(order_db.getId()).andStatusEqualTo(Status.STATUS_1.status);
+        List<OSubOrder> fordele_subOrders = oSubOrderMapper.selectByExample(example);
+        for (OSubOrder fordele_subOrder : fordele_subOrders) {
+            fordele_subOrder.setStatus(Status.STATUS_0.status);
+            fordele_subOrder.setuUser(userId);
+            if(1!=oSubOrderMapper.updateByPrimaryKeySelective(fordele_subOrder)){
+                logger.info("下订单:{}{}", "删除订购单失败",fordele_subOrder.getId());
+                throw new MessageException("删除订购单失败");
+            }
+        }
+
+        //更新商品
+        for (OSubOrder oSubOrder : OSubOrders) {
+
+            OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
+
+            if (oSubOrder.getProPrice() == null || oSubOrder.getProPrice().compareTo(product.getProPrice()) != 0) {
+                logger.info("下订单:{}", "商品价格数据错误");
+                throw new MessageException("商品价格数据错误");
+            }
+
+            if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
+                logger.info("下订单:{}", "商品数量错误");
+                throw new MessageException("商品数量错误");
+            }
+
+            //商品参加的活动
+            String oActivity = oSubOrder.getActivity();
+            //商品活动对象
+            OSubOrderActivity oSubOrderActivity =null;
+            //订购单不为空，删除之前参与的活动
+            if(StringUtils.isNotBlank(oSubOrder.getId())){
+                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrderActivity>  OSubOrderActivitys =  oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                for (OSubOrderActivity subOrderActivity : OSubOrderActivitys) {
+                    subOrderActivity.setStatus(Status.STATUS_0.status);
+                    subOrderActivity.setuUser(userId);
+                    if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(subOrderActivity)){
+                        logger.info("下订单:{}{}", "删除活动有误",subOrderActivity.getId());
+                        throw new MessageException("删除活动有误");
+                    }
+                }
+            }
+
+            //参与活动
+            if(StringUtils.isNotBlank(oActivity)){
+                //查询活动
+                OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
+                //活动存在
+                if (activity!= null && activity.getPrice()!=null && activity.getPrice().compareTo(BigDecimal.ZERO)>0) {
+                    //设置商品实际单价
+                    oSubOrder.setProRelPrice(activity.getPrice());
+                    //缓存活动信息
+                    oSubOrderActivity = new OSubOrderActivity();
+                    oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
+                    oSubOrderActivity.setActivityId(activity.getId());
+                    oSubOrderActivity.setSubOrderId(oSubOrder.getId());
+                    oSubOrderActivity.setActivityName(activity.getActivityName());
+                    oSubOrderActivity.setRuleId(activity.getRuleId());
+                    oSubOrderActivity.setProId(oSubOrder.getProId());
+                    oSubOrderActivity.setProName(oSubOrder.getProName());
+                    oSubOrderActivity.setActivityRule(activity.getActivityRule());
+                    oSubOrderActivity.setActivityWay(activity.getActivityWay());
+                    oSubOrderActivity.setPrice(activity.getPrice());
+                    oSubOrderActivity.setProModel(activity.getProModel());
+                    oSubOrderActivity.setVender(activity.getVender());
+                    oSubOrderActivity.setPlatform(activity.getPlatform());
+                    oSubOrderActivity.setgTime(activity.getgTime());
+                    oSubOrderActivity.setcTime(d);
+                    oSubOrderActivity.setuTime(d);
+                    oSubOrderActivity.setcUser(userId);
+                    oSubOrderActivity.setuUser(userId);
+                    oSubOrderActivity.setVersion(Status.STATUS_0.status);
+                    oSubOrderActivity.setStatus(Status.STATUS_1.status);
+                }else{
+                    //设置商品实际单价
+                    oSubOrder.setProRelPrice(product.getProPrice());
+                }
+            }else{
+                //设置商品实际单价
+                oSubOrder.setProRelPrice(product.getProPrice());
+            }
+
+            //添加订购单
+            oSubOrder.setOrderId(order_db.getId());
+            oSubOrder.setProCode(product.getProCode());
+            oSubOrder.setProName(product.getProName());
+            oSubOrder.setProType(product.getProType());
+            oSubOrder.setProPrice(product.getProPrice());
+            oSubOrder.setSendNum(Status.STATUS_0.status);
+            oSubOrder.setIsDeposit(product.getIsDeposit());
+            oSubOrder.setDeposit(product.getDeposit());
+            oSubOrder.setModel(product.getProModel());
+            oSubOrder.setcTime(d);
+            oSubOrder.setcUser(userId);
+            oSubOrder.setuUser(userId);
+            oSubOrder.setuTime(d);
+            oSubOrder.setStatus(Status.STATUS_1.status);
+            oSubOrder.setVersion(Status.STATUS_0.status);
+            oSubOrder.setAgentId(order_db.getAgentId());
+            oSubOrder.setId(idService.genId(TabId.o_sub_order));
+
+            OSubOrderExample oSubOrderExamplesureExist =  new OSubOrderExample();
+            oSubOrderExamplesureExist.or()
+                    .andOrderIdEqualTo(oSubOrder.getOrderId())
+                    .andProIdEqualTo(oSubOrder.getProId())
+                    .andStatusEqualTo(Status.STATUS_1.status);
+
+            List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderExamplesureExist);
+            if(oSubOrderList.size()>0){
+                logger.info("下订单:{}{}", oSubOrder.getOrderId(),"订单商品重复");
+                throw new MessageException("订单商品重复");
+            }
+            //插入订单商品信息
+            if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
+                logger.info("下订单:{}", "oSubOrder添加失败");
+                throw new MessageException("oPayment添加失败");
+            }
+            //更新商品参与活动
+            if(oSubOrderActivity!=null) {
+                oSubOrderActivity.setSubOrderId(oSubOrder.getId());
+                if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
+                    logger.info("下订单:{}{}", oSubOrderActivity.getActivityName(), "商品添加活动失败");
+                    throw new MessageException("商品添加活动失败");
+                } else {
+                    logger.info("下订单:{}{}{}",order_db.getId(), oSubOrderActivity.getActivityName(), "商品添加活动成功");
+                }
+            }
+            //计算订单金额
+            forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
+            forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
+
+        }
+        //附件
+        List<Attachment> attr = orderFormVo.getAttachments();
+        //删除附件
+        AttachmentRelExample deleAttr = new AttachmentRelExample();
+        deleAttr.or()
+                .andBusTypeEqualTo(AttachmentRelType.Order.name())
+                .andSrcIdEqualTo(orderFormVo.getId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        List<AttachmentRel>  attachmentRels = attachmentRelMapper.selectByExample(deleAttr);
+        if(attachmentRels.size()>0){
+            for (AttachmentRel attachmentRelItem : attachmentRels) {
+                attachmentRelItem.setStatus(Status.STATUS_0.status);
+                if(attachmentRelMapper.updateByPrimaryKeySelective(attachmentRelItem)!=1){
+                    logger.info("下订单:{},{},{}",order_db.getId(), "删除附件失败",userId);
+                    throw new MessageException("删除附件失败");
+                }
+                logger.info("下订单:{},{},{}",order_db.getId(), "删除附件成功",userId);
+            }
+        }
+
+        //添加新附件
+        for (Attachment attachment : attr) {
+            if (org.apache.commons.lang.StringUtils.isEmpty(attachment.getId())) continue;
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(attachment.getId());
+                record.setSrcId(orderFormVo.getId());
+                record.setcUser(userId);
+                record.setcTime(d);
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.Order.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                if (1 != attachmentRelMapper.insertSelective(record)) {
+                    logger.info("下订单:{},{}",order_db.getId(), "附件添加失败");
+                    throw new MessageException("附件添加失败");
+                }
+        }
+
+        //需要手动计算付款金额
+        oPayment_db.setPayAmount(forRealPayAmount);//应付金额
+        oPayment_db.setOutstandingAmount(forRealPayAmount);//待付金额
+        oPayment_db.setRealAmount(new BigDecimal(0));//已付金额
+
+        //需要手动计算付款金额
+        order_db.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
+        order_db.setoAmo(forPayAmount);//订单总金额
+        order_db.setPayAmo(forRealPayAmount);//订单应付金额
+
+        //插入订单
+        if (1 != orderMapper.updateByPrimaryKeySelective(order_db)) {
+            throw new MessageException("订单添加失败");
+        }
+        //插入付款单
+        if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
+            throw new MessageException("oPayment添加失败");
         }
         return orderFormVo;
     }
@@ -583,6 +785,7 @@ public class OrderServiceImpl implements OrderService {
         osubOrderExample.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(osubOrderExample);
         f.putKeyV("oSubOrders", oSubOrders);
+        f.putKeyV("oSubOrdersJson", JSONArray.toJSONString(oSubOrders));
 
         //商品活动信息
         if (oSubOrders.size() > 0) {
@@ -595,6 +798,7 @@ public class OrderServiceImpl implements OrderService {
                 oSubOrderActivityExample.or().andSubOrderIdIn(ids);
                 List<OSubOrderActivity> sSubOrderActivitys = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
                 f.putKeyV("sSubOrderActivitys", sSubOrderActivitys);
+                f.putKeyV("sSubOrderActivitysJson", JSONArray.toJSONString(sSubOrderActivitys));
             }
         }
         //配货信息
@@ -623,7 +827,7 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
                 .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(order.getId());
-        oPaymentDetailExample.setOrderByClause(" plan_pay_time asc ");
+        oPaymentDetailExample.setOrderByClause(" plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
@@ -689,12 +893,12 @@ public class OrderServiceImpl implements OrderService {
         order.setoApytime(new Date());
         if (1 != orderMapper.updateByPrimaryKeySelective(order)) {
             logger.info("订单提交审批，更新订单基本信息失败{}:{}", id, cuser);
-            throw new ProcessException("订单提交审批，更新订单基本信息失败");
+            throw new MessageException("订单提交审批，更新订单基本信息失败");
         }
         Map startPar = agentEnterService.startPar(cuser);
         if (null == startPar) {
             logger.info("========用户{}{}启动部门参数为空", id, cuser);
-            throw new ProcessException("启动部门参数为空!");
+            throw new MessageException("启动部门参数为空!");
         }
 
         //不同的业务类型找到不同的启动流程
@@ -707,7 +911,7 @@ public class OrderServiceImpl implements OrderService {
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {
             logger.info("订单提交审批，审批流启动失败{}:{}", id, cuser);
-            throw new ProcessException("审批流启动失败!");
+            throw new MessageException("审批流启动失败!");
         }
 
         //代理商业务视频关系
@@ -721,7 +925,7 @@ public class OrderServiceImpl implements OrderService {
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
-            throw new ProcessException("审批流启动失败:添加审批关系失败");
+            throw new MessageException("审批流启动失败:添加审批关系失败");
         }
         return AgentResult.ok();
     }
@@ -764,17 +968,17 @@ public class OrderServiceImpl implements OrderService {
             //完成任务
             Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
             if (resultMap == null) {
-                throw new ProcessException("catch工作流处理任务异常!");
+                throw new MessageException("catch工作流处理任务异常!");
             }
             Boolean rs = (Boolean) resultMap.get("rs");
             String msg = String.valueOf(resultMap.get("msg"));
             if (!rs) {
-                throw new ProcessException("catch工作流处理任务异常!");
+                throw new MessageException("catch工作流处理任务异常!");
             }
             return AgentResult.ok(null);
-        } catch (ProcessException e) {
+        } catch (MessageException e) {
             e.printStackTrace();
-            throw new ProcessException("catch工作流处理任务异常!");
+            throw new MessageException("catch工作流处理任务异常!");
         }
     }
 
@@ -836,13 +1040,13 @@ public class OrderServiceImpl implements OrderService {
                     if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
                         oPayment.setActualReceipt(new BigDecimal(agentVo.getoPayment().get("actualReceipt")));
                     }else{
-                        throw new ProcessException("实收金额不能为空");
+                        throw new MessageException("实收金额不能为空");
                     }
                     //收款公司
                     if(StringUtils.isNotBlank(agentVo.getoPayment().get("collectCompany"))){
                         oPayment.setCollectCompany(agentVo.getoPayment().get("collectCompany"));
                     }else{
-                        throw new ProcessException("收款公司不能为空");
+                        throw new MessageException("收款公司不能为空");
                     }
                     oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
                 }
@@ -874,7 +1078,7 @@ public class OrderServiceImpl implements OrderService {
                             FastMap f =   (FastMap)agentResult.getData();
                             BigDecimal can = new BigDecimal(f.get("can")+"");
                             if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
-                                throw new ProcessException("收款公司不能为空");
+                                throw new MessageException("收款公司不能为空");
                             }
                             oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
                         }
@@ -883,7 +1087,7 @@ public class OrderServiceImpl implements OrderService {
 
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单数据储存失败");
-                    throw new ProcessException("付款单数据储存失败");
+                    throw new MessageException("付款单数据储存失败");
                 }
             }
         }
@@ -913,7 +1117,7 @@ public class OrderServiceImpl implements OrderService {
             List<OPayment> payments = oPaymentMapper.selectByExample(example);
             if (payments.size() != 1) {
                 logger.info("代理商订单审批完成:付款单未找到:{}", order.getId());
-                throw new ProcessException("付款单未找到");
+                throw new MessageException("付款单未找到");
             }
             OPayment oPayment = payments.get(0);
             //更新订单状态 审批状态，结算状态 订单生效时间
@@ -967,7 +1171,7 @@ public class OrderServiceImpl implements OrderService {
 
                         if (1 != oPaymentDetailMapper.insert(record)) {
                             logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
-                            throw new ProcessException("分期处理");
+                            throw new MessageException("分期处理");
                         }
 
                         logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
@@ -1010,7 +1214,7 @@ public class OrderServiceImpl implements OrderService {
 
                         if (1 != oPaymentDetailMapper.insert(record)) {
                             logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
-                            throw new ProcessException("分期处理");
+                            throw new MessageException("分期处理");
                         }
 
                         logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
@@ -1043,7 +1247,7 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setStatus(Status.STATUS_1.status);
                         record_XXDK.setVersion(Status.STATUS_1.status);
                         if (1 != oPaymentDetailMapper.insert(record_XXDK)) {
-                            throw new ProcessException("打款明细错误");
+                            throw new MessageException("打款明细错误");
                         }
                         logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     }
@@ -1084,7 +1288,7 @@ public class OrderServiceImpl implements OrderService {
 
                             if (1 != oPaymentDetailMapper.insert(record)) {
                                 logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
-                                throw new ProcessException("分期处理");
+                                throw new MessageException("分期处理");
                             }
                             logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
                         }
@@ -1110,7 +1314,7 @@ public class OrderServiceImpl implements OrderService {
                         record_SF1.setStatus(Status.STATUS_1.status);
                         record_SF1.setVersion(Status.STATUS_1.status);
                         if (1 != oPaymentDetailMapper.insert(record_SF1)) {
-                            throw new ProcessException("首付错误");
+                            throw new MessageException("首付错误");
                         }
                         logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     }
@@ -1151,7 +1355,7 @@ public class OrderServiceImpl implements OrderService {
 
                             if (1 != oPaymentDetailMapper.insert(record)) {
                                 logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
-                                throw new ProcessException("分期处理");
+                                throw new MessageException("分期处理");
                             }
                             logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), record.getId());
                         }
@@ -1177,7 +1381,7 @@ public class OrderServiceImpl implements OrderService {
                         record_SF2.setStatus(Status.STATUS_1.status);
                         record_SF2.setVersion(Status.STATUS_1.status);
                         if (1 != oPaymentDetailMapper.insert(record_SF2)) {
-                            throw new ProcessException("首付错误");
+                            throw new MessageException("首付错误");
                         }
                         logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     }
@@ -1188,7 +1392,7 @@ public class OrderServiceImpl implements OrderService {
                     //首付金额判断
                     if (oPayment.getDownPayment() == null || oPayment.getDownPayment().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成QT首付不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new ProcessException("首付数据错误");
+                        throw new MessageException("首付数据错误");
                     }
 
                     //抵扣金额判断
@@ -1230,7 +1434,7 @@ public class OrderServiceImpl implements OrderService {
 
                         if (1 != oPaymentDetailMapper.insert(record)) {
                             logger.info("代理商订单审批完成:明细生成失败:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
-                            throw new ProcessException("分期处理");
+                            throw new MessageException("分期处理");
                         }
                         logger.info("代理商订单审批完成:明细生成:订单ID:{},付款单ID:{},付款方式:{}，明细ID:{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(),record.getId());
                     }
@@ -1255,7 +1459,7 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setStatus(Status.STATUS_1.status);
                         record_QT.setVersion(Status.STATUS_1.status);
                         if (1 != oPaymentDetailMapper.insert(record_QT)) {
-                            throw new ProcessException("首付错误");
+                            throw new MessageException("首付错误");
                         }
                         logger.info("代理商订单审批完成处理明细完成首付数据成功{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                     }
@@ -1267,7 +1471,7 @@ public class OrderServiceImpl implements OrderService {
                             List<OPaymentDetail> details =  (List<OPaymentDetail>)dealOrderDeductionRes.getData();
                             for (OPaymentDetail detail : details) {
                                 if(1!=oPaymentDetailMapper.insertSelective(detail)){
-                                    throw new ProcessException("抵扣操作失败");
+                                    throw new MessageException("抵扣操作失败");
                                 }
                             }
                         }
@@ -1279,11 +1483,11 @@ public class OrderServiceImpl implements OrderService {
 
             //订单更新
             if (1 != orderMapper.updateByPrimaryKeySelective(order)) {
-                throw new ProcessException("订单更新异常");
+                throw new MessageException("订单更新异常");
             }
             //付款单处理
             if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                throw new ProcessException("订单更新异常");
+                throw new MessageException("订单更新异常");
             }
 
             //  发货单状态修改
@@ -1297,7 +1501,7 @@ public class OrderServiceImpl implements OrderService {
                 oReceiptOrder.setuTime(d.getTime());
                 if(1!=oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder)){
                     logger.error("更新收货单异常{}",order.getId());
-                    throw new ProcessException("更新收货单异常");
+                    throw new MessageException("更新收货单异常");
                 }
             }
 
@@ -1313,7 +1517,7 @@ public class OrderServiceImpl implements OrderService {
                 pro.setuTime(d.getTime());
                 if(1!=oReceiptProMapper.updateByPrimaryKeySelective(pro)){
                     logger.error("更新收货单商品异常{}",order.getId());
-                    throw new ProcessException("更新收货单商品异常");
+                    throw new MessageException("更新收货单商品异常");
                 }
             }
 
@@ -1323,7 +1527,7 @@ public class OrderServiceImpl implements OrderService {
             OPaymentExample example = new OPaymentExample();
             example.or().andOrderIdEqualTo(order.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OPayment> payments = oPaymentMapper.selectByExample(example);
-            if (payments.size() != 1) throw new ProcessException("支付单信息错误");
+            if (payments.size() != 1) throw new MessageException("支付单信息错误");
             OPayment oPayment = payments.get(0);
             //更新订单状态 审批状态，结算状态 订单生效时间
             order.setOrderStatus(OrderStatus.UNENABLE.status);
@@ -1348,7 +1552,7 @@ public class OrderServiceImpl implements OrderService {
                         detail.setStatus(Status.STATUS_0.status);
                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
                             logger.error("代理商订单审批完成处理明细{}:{},{},{},{}", order.getId(), detail.getId(), detail.getBatchCode(), detail.getPayAmount(), detail.getPaymentStatus());
-                            throw new ProcessException("明细处理异常");
+                            throw new MessageException("明细处理异常");
                         } else {
                             logger.info("代理商订单审批完成处理明细{}:{},{},{},{}", order.getId(), detail.getId(), detail.getBatchCode(), detail.getPayAmount(), detail.getPaymentStatus());
                         }
@@ -1372,7 +1576,7 @@ public class OrderServiceImpl implements OrderService {
                     for (OPaymentDetail detail : oPaymentDetailExample_FRFQ_details) {
                         detail.setStatus(Status.STATUS_0.status);
                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
-                            throw new ProcessException("明细处理异常");
+                            throw new MessageException("明细处理异常");
                         } else {
                             logger.info("代理商订单审批完成处理明细{}:{},{},{},{}", order.getId(), detail.getId(), detail.getBatchCode(), detail.getPayAmount(), detail.getPaymentStatus());
                         }
@@ -1396,7 +1600,7 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("代理商订单审批完成处理明细完成{}:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), "线下付款禁止付款明细");
                         detail.setStatus(Status.STATUS_0.status);
                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
-                            throw new ProcessException("明细处理异常");
+                            throw new MessageException("明细处理异常");
                         } else {
                             logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
                                     order.getId(),
@@ -1424,7 +1628,7 @@ public class OrderServiceImpl implements OrderService {
                         detail.setStatus(Status.STATUS_0.status);
                         logger.info("代理商订单审批完成处理明细完成{}:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), "线下付款禁止付款明细");
                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
-                            throw new ProcessException("明细处理异常");
+                            throw new MessageException("明细处理异常");
                         } else {
                             logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
                                     order.getId(),
@@ -1452,7 +1656,7 @@ public class OrderServiceImpl implements OrderService {
                         detail.setStatus(Status.STATUS_0.status);
                         logger.info("代理商订单审批完成处理明细完成{}:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), "线下付款禁止付款明细");
                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
-                            throw new ProcessException("明细处理异常");
+                            throw new MessageException("明细处理异常");
                         } else {
                             logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
                                     order.getId(),
@@ -1479,7 +1683,7 @@ public class OrderServiceImpl implements OrderService {
                         detail.setStatus(Status.STATUS_0.status);
                         logger.info("代理商订单审批完成处理明细完成{}:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod(), "线下付款禁止付款明细");
                         if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
-                            throw new ProcessException("明细处理异常");
+                            throw new MessageException("明细处理异常");
                         } else {
                             logger.info("代理商订单审批完成处理明细{}:{},{},{},{}",
                                     order.getId(),
@@ -1495,11 +1699,11 @@ public class OrderServiceImpl implements OrderService {
 
             //订单更新
             if (1 != orderMapper.updateByPrimaryKeySelective(order)) {
-                throw new ProcessException("订单更新异常");
+                throw new MessageException("订单更新异常");
             }
             //付款单处理
             if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
-                throw new ProcessException("订单更新异常");
+                throw new MessageException("订单更新异常");
             }
         }
         return AgentResult.ok();
@@ -1512,7 +1716,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
-    public AgentResult dealOrderDeduction(OPayment payment) {
+    public AgentResult dealOrderDeduction(OPayment payment)throws Exception {
 
         if(StringUtils.isBlank(payment.getDeductionType()))return AgentResult.ok();
         //可扣款的缴款项
@@ -1538,7 +1742,7 @@ public class OrderServiceImpl implements OrderService {
                 capital.setcBusStatus(Status.STATUS_1.status);//已扣款，已拆分，已冻结等
 
                 if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
-                    throw new ProcessException("更新缴款项失败");
+                    throw new MessageException("更新缴款项失败");
                 }
 
                 //添加抵扣明细
@@ -1574,7 +1778,7 @@ public class OrderServiceImpl implements OrderService {
                 capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
 
                 if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
-                    throw new ProcessException("更新缴款项失败");
+                    throw new MessageException("更新缴款项失败");
                 }
                 //添加抵扣明细
                 OPaymentDetail record_QT = new OPaymentDetail();
@@ -1610,7 +1814,7 @@ public class OrderServiceImpl implements OrderService {
                         capital.setcIsin(Status.STATUS_0.status);
                         capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
                         if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
-                            throw new ProcessException("更新缴款项失败");
+                            throw new MessageException("更新缴款项失败");
                         }
                         //添加抵扣明细
                         OPaymentDetail record_QT = new OPaymentDetail();
@@ -1642,7 +1846,7 @@ public class OrderServiceImpl implements OrderService {
                         capital.setcIsin(Status.STATUS_0.status);
                         capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
                         if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
-                            throw new ProcessException("更新缴款项失败");
+                            throw new MessageException("更新缴款项失败");
                         }
                         //添加抵扣明细
                         OPaymentDetail record_QT = new OPaymentDetail();
@@ -1675,7 +1879,7 @@ public class OrderServiceImpl implements OrderService {
                         capital.setcIsin(Status.STATUS_1.status);
                         capital.setcBusStatus(Status.STATUS_1.status);//已扣款，已拆分，已冻结 部分扣款等
                         if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
-                            throw new ProcessException("更新缴款项失败");
+                            throw new MessageException("更新缴款项失败");
                         }
                         //添加抵扣明细
                         OPaymentDetail record_QT = new OPaymentDetail();
@@ -1777,5 +1981,28 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return AgentResult.ok(f);
+    }
+
+
+    /**
+     * 查询订单付款
+     * @param orderId
+     * @return
+     */
+    @Override
+    public AgentResult queryOrderForOSupplementPaymentdetail(String orderId,String agentId) {
+        OOrder order = orderMapper.selectByPrimaryKey(orderId);
+        OPaymentDetailExample example = new OPaymentDetailExample();
+        example.or().andOrderIdEqualTo(orderId)
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPaymentStatusEqualTo(PaymentStatus.DF.code)
+                .andAgentIdEqualTo(agentId);
+        example.setOrderByClause(" plan_pay_time asc ");
+        List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectByExample(example);
+        if(paymentDetails.size()>0){
+            return AgentResult.ok(FastMap.fastSuccessMap().putKeyV("order",order).putKeyV("paymentDetails",paymentDetails.get(0)));
+        }else{
+            return AgentResult.fail("没有需要补款的欠款");
+        }
     }
 }

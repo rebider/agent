@@ -5,6 +5,8 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 
 import com.ryx.credit.pojo.admin.order.OLogistics;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -25,4 +27,5 @@ public interface OLogisticsService {
 
     public int insertImportData(OLogistics oLogistics);
 
+    void updateSnStatus(String orderId, String startSn, String endSn, BigDecimal code)throws Exception;
 }

@@ -7,14 +7,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
-/**
- * @author yangmx
- * @desc
- */
+
 public class PayCompServiceImplTest extends BaseSpringTest {
     @Autowired
     private PayCompService payCompService;
@@ -56,23 +51,12 @@ public class PayCompServiceImplTest extends BaseSpringTest {
 
     @Test
     public void update() {
-        List<OPaymentDetail> oPaymentList = new ArrayList<OPaymentDetail>();
-        OPaymentDetail oPaymentDetail = new OPaymentDetail();
-        //id,订单id，srcId,实际付款进行
-        oPaymentDetail.setId("OPD2018073100000000000148");
-        oPaymentDetail.setOrderId("OPA2018073100000000000076");
-        oPaymentDetail.setSrcId("111");
-        oPaymentDetail.setRealPayAmount(new BigDecimal(123));
-
-        OPaymentDetail oPaymentDetail1 = new OPaymentDetail();
-        //id,订单id，srcId,实际付款进行
-        oPaymentDetail1.setId("OPD2018073100000000000149");
-        oPaymentDetail1.setOrderId("OPA2018073100000000000076");
-        oPaymentDetail1.setSrcId("222");
-        oPaymentDetail1.setRealPayAmount(new BigDecimal(500));
-        oPaymentList.add(oPaymentDetail1);
-        oPaymentList.add(oPaymentDetail);
-        ResultVO resultVO = paymentDetailService.uploadStatus(oPaymentList);
+        Map map = new HashMap<String, String>();
+        map.put("detailId", "OPD2018073100000000000154");
+        map.put("srcId", "OPA2018072500000000000055");
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        list.add(map);
+        ResultVO resultVO = paymentDetailService.uploadStatus(list);
         System.out.println(resultVO);
     }
 
