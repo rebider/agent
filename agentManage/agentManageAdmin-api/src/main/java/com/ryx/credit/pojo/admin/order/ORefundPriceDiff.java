@@ -54,6 +54,8 @@ public class ORefundPriceDiff implements Serializable{
 
     private List<ODeductCapital>  deductCapitalList;
 
+    private List<Attachment> attachmentFianceList;
+
     public String getId() {
         return id;
     }
@@ -236,5 +238,13 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setRelCompName(String relCompName) {
         this.relCompName = relCompName;
+    }
+
+    public List<Attachment> getAttachmentFianceList() {
+        return attachmentFianceList;
+    }
+
+    public void setAttachmentFianceList(List<Attachment> attachmentFianceList) {
+        this.attachmentFianceList = attachmentFianceList;
     }
 }
