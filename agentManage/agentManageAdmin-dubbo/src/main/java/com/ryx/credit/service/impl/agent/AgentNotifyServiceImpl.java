@@ -12,8 +12,10 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.bank.BankRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.dict.RegionService;
 import com.ryx.credit.util.*;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.*;
@@ -65,6 +67,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private ImportAgentMapper importAgentMapper;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private RegionService regionService;
+    @Autowired
+    private BankRegionService bankRegionService;
 
     @Override
     public void asynNotifyPlatform(){
@@ -135,6 +141,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             return;
         }
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        //业务id不为空不通知业务平台
+        if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+            log.info("业务平台不为空不通知 busNum:{}",agentBusInfo.getBusNum());
+            return;
+        }
         if(agentBusInfo==null){
             log.info("notifyPlatform记录不存在:{}",busId);
             if(impId!=null){
@@ -149,6 +160,22 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
         }
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+
+        String[] split = agentBusInfo.getBusRegion().split(",");
+        List<String> busiAreasList = new ArrayList<>();
+        for (int i = 0 ; i < split.length ; i++ ){
+            String busRegion = split[i];
+            if(regionService.isCity(busRegion)){
+                busiAreasList.add(bankRegionService.findRegionByCityId(busRegion).get(0));
+            }else{
+                List<String> regionByProvinceId = bankRegionService.findRegionByProvinceId(busRegion);
+                for (String provinceId : regionByProvinceId) {
+                    busiAreasList.add(provinceId);
+                }
+            }
+        }
+        String[] busiAreas = busiAreasList.toArray(new String[]{});
+        agentNotifyVo.setBusiAreas(busiAreas);
 //        if(agentBusInfo.getBusRegion()!=null){
 //            List<String> regionList = getParent(agentBusInfo.getBusRegion());
 //            if(regionList!=null){
@@ -318,6 +345,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("uniqueId",agentNotifyVo.getUniqueId());
             data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             data.put("orgName",agentNotifyVo.getOrgName());
+            data.put("busiAreas",agentNotifyVo.getBusiAreas());
 //            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
 //                data.put("province",agentNotifyVo.getProvince());
 //            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
