@@ -20,7 +20,7 @@ public interface CompensateService {
 
     ORefundPriceDiff selectByPrimaryKey(String id);
 
-    PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page);
+    PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page);
 
     OSubOrder getOrderMsgByExcel(List<Object> excelList);
 
