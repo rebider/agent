@@ -85,11 +85,19 @@ public class CompensateServiceImpl implements CompensateService {
 
 
     @Override
-    public PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page){
+    public PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page){
 
         ORefundPriceDiffExample example = new ORefundPriceDiffExample();
         ORefundPriceDiffExample.Criteria criteria = example.createCriteria();
-
+        if(StringUtils.isNotBlank(refundPriceDiff.getApplyBeginTime())){
+            criteria.andSTimeGreaterThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyBeginTime(),DateUtil.DATE_FORMAT_1));
+        }
+        if(StringUtils.isNotBlank(refundPriceDiff.getApplyEndTime())){
+            criteria.andSTimeLessThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyEndTime(),DateUtil.DATE_FORMAT_1));
+        }
+        if(null!=refundPriceDiff.getReviewStatus()){
+            criteria.andReviewStatusEqualTo(refundPriceDiff.getReviewStatus());
+        }
         example.setPage(page);
         example.setOrderByClause("c_time desc");
         List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
@@ -431,8 +439,15 @@ public class CompensateServiceImpl implements CompensateService {
                             throw new ProcessException("系统异常");
                         }
                     });
-                    BigDecimal subtract = agentVo.getoRefundPriceDiff().getRelCompAmt().subtract(agentVo.getoRefundPriceDiff().getMachOweAmt());
-                    agentVo.getoRefundPriceDiff().setRelCompAmt(subtract);
+                }
+                if(agentVo.getFlag().equals("1")){
+                    ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+                    BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+                    String subtractStr = String.valueOf(subtract);
+                    if(subtractStr.contains("-")){
+                        agentVo.getoRefundPriceDiffVo().setMachOweAmt(oRefundPriceDiff.getRelCompAmt());
+                    }
+                    agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
                 }
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
                 if(!agentResult.isOK()){
@@ -473,7 +488,10 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(agentVo.getoRefundPriceDiffVo().getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
             updatePriceDiff.setGatherAmt(agentVo.getoRefundPriceDiffVo().getGatherAmt());
         }
-
+        if(agentVo.getFlag().equals("1")){
+            updatePriceDiff.setRelCompAmt(agentVo.getoRefundPriceDiffVo().getRelCompAmt());
+            updatePriceDiff.setMachOweAmt(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+        }
         updatePriceDiff.setuTime(new Date());
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
         if(i!=1){
@@ -531,6 +549,9 @@ public class CompensateServiceImpl implements CompensateService {
         //查询关联附件
         List<Attachment> attachments = attachmentMapper.accessoryQuery(oRefundPriceDiff.getId(), AttachmentRelType.ActivityEdit.name());
         oRefundPriceDiff.setAttachmentList(attachments);
+        //查询财务打款关联附件
+        List<Attachment> attachmentFianceList = attachmentMapper.accessoryQuery(oRefundPriceDiff.getId(), AttachmentRelType.ActivityFinanceEdit.name());
+        oRefundPriceDiff.setAttachmentFianceList(attachmentFianceList);
         //查询扣除款项
         ODeductCapitalExample oDeductCapitalExample = new ODeductCapitalExample();
         ODeductCapitalExample.Criteria criteria2 = oDeductCapitalExample.createCriteria();
