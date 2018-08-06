@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
  * @date 2018/7/2911:33
  */
 @Service("refundJob")
+@Transactional
 public class RefundJob {
     private static final Logger LOG = Logger.getLogger(RefundJob.class);
     private static final  String URL =  AppConfig.getProperty("refund_url");
@@ -170,6 +171,7 @@ public class RefundJob {
                 deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
                 // 获取代理商平台id
                 AgentBusInfo agentBusInfo = new AgentBusInfo();
+                agentBusInfo.setBusNum(jsonObject.getString("instId"));
                 PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, null,null);
                 if (pageInfo != null && pageInfo.getTotal() > 0) {
                     Map<String, Object> map  = (Map<String, Object>) pageInfo.getRows().get(0);
