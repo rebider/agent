@@ -1,11 +1,22 @@
-package com.ryx.credit.profit.dao;
+package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.profit.pojo.PProfitFactor;
 import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.pojo.ProfitSupplyExample;
+
 import java.util.List;
 import java.util.Map;
 
-public interface ProfitSupplyMapper {
+/**
+ * @Author Wangy
+ * @Date 2018/08/02
+ * 分润管理：补款管理
+ */
+public interface ProfitSupplyService {
+
+    PageInfo getProfitSupplyList(Map<String, Object> param, PageInfo pageInfo);
+
     int countByExample(ProfitSupplyExample example);
 
     int deleteByExample(ProfitSupplyExample example);
@@ -24,7 +35,5 @@ public interface ProfitSupplyMapper {
 
     int updateByPrimaryKey(ProfitSupply record);
 
-    Long getProfitSupplyCount(Map<String, Object> param);
-
-    List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
+    List<String> importSupplyList(List<List<Object>> data) throws Exception;
 }
