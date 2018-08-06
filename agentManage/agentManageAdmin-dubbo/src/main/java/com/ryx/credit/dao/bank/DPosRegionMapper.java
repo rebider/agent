@@ -16,9 +16,5 @@ public interface DPosRegionMapper {
 
     List<DPosRegion> selectByExample(DPosRegionExample example);
 
-    DPosRegion selectByPrimaryKey(String code);
-
-    int updateByPrimaryKeySelective(DPosRegion record);
-
-    int updateByPrimaryKey(DPosRegion record);
+    List<DPosRegion> findRegionByProvinceName(String provinceName);
 }
