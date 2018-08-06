@@ -139,8 +139,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     BigDecimal outAmt = BigDecimal.ZERO;
                     //分期待付期数
                     int outPlanNum = 0;
-                    //分期已付期数
-                    int complatePlanNum = 0;
+                    //重算起始分期期数
+                    BigDecimal startPlanNum = BigDecimal.ONE;
                     //代付分期起始时间
                     Date startTime = null;
 
@@ -152,12 +152,12 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                 outPlanNum++;
                                 if (startTime == null) {
                                     startTime = detail.getPlanPayTime();
+                                    startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
                                 }
                             }
                             planNows_df.add(detail);
                         } else {
                             planNows_complate.add(detail);
-                            complatePlanNum++;
                         }
                     }
 
@@ -196,7 +196,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                             newDeatilPlan.setPayType(planNows_df.get(0).getPayType());
                             newDeatilPlan.setPayAmount(MapUtil.getBigDecimal(map, "item"));
                             newDeatilPlan.setPaymentStatus(PaymentStatus.DF.code);
-                            newDeatilPlan.setPlanNum(new BigDecimal(complatePlanNum).add(MapUtil.getBigDecimal(map, "count")));
+                            newDeatilPlan.setPlanNum(startPlanNum.add(MapUtil.getBigDecimal(map, "count")));
                             newDeatilPlan.setPlanPayTime((Date) map.get("date"));
                             newDeatilPlan.setcDate(new Date());
                             newDeatilPlan.setcUser(userid);
