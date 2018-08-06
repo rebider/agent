@@ -35,7 +35,7 @@ public class PosRegionServiceImpl implements PosRegionService {
         if(null==region){
             return null;
         }
-        List<DPosRegion> bankRegions = posRegionMapper.findRegionByProvinceName(region.getrName());
+        List<DPosRegion> bankRegions = posRegionMapper.findRegionByProvinceName(region.getrName()+"%");
         List<String> resultList = new ArrayList<>();
         bankRegions.forEach(row->{
             resultList.add(row.getCode());
