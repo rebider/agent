@@ -23,6 +23,7 @@ public class AgentNotifyVo {
     private String agHeadMobile;
     private Agent baseMessage;
     private AgentBusInfo busMessage;
+    private String[] busiAreas;
 
     public String getUniqueId() {
         return uniqueId;
@@ -118,5 +119,13 @@ public class AgentNotifyVo {
 
     public void setBusMessage(AgentBusInfo busMessage) {
         this.busMessage = busMessage;
+    }
+
+    public String[] getBusiAreas() {
+        return busiAreas;
+    }
+
+    public void setBusiAreas(String[] busiAreas) {
+        this.busiAreas = busiAreas;
     }
 }

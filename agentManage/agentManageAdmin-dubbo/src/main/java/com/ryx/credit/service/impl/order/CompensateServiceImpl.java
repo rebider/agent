@@ -85,11 +85,19 @@ public class CompensateServiceImpl implements CompensateService {
 
 
     @Override
-    public PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page){
+    public PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page){
 
         ORefundPriceDiffExample example = new ORefundPriceDiffExample();
         ORefundPriceDiffExample.Criteria criteria = example.createCriteria();
-
+        if(StringUtils.isNotBlank(refundPriceDiff.getApplyBeginTime())){
+            criteria.andSTimeGreaterThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyBeginTime(),DateUtil.DATE_FORMAT_1));
+        }
+        if(StringUtils.isNotBlank(refundPriceDiff.getApplyEndTime())){
+            criteria.andSTimeLessThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyEndTime(),DateUtil.DATE_FORMAT_1));
+        }
+        if(null!=refundPriceDiff.getReviewStatus()){
+            criteria.andReviewStatusEqualTo(refundPriceDiff.getReviewStatus());
+        }
         example.setPage(page);
         example.setOrderByClause("c_time desc");
         List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
@@ -102,29 +110,40 @@ public class CompensateServiceImpl implements CompensateService {
 
 
     @Override
-    public OSubOrder getOrderMsgByExcel(List<Object> excelList){
-        String agentName =  String.valueOf(excelList.get(0));
-        String proCom =  String.valueOf(excelList.get(1));
-        String model =  String.valueOf(excelList.get(2));
-        String snBegin =  String.valueOf(excelList.get(3));
-        String snEnd =  String.valueOf(excelList.get(4));
-        String count =  String.valueOf(excelList.get(5));
-        String subOrderNum =  String.valueOf(excelList.get(6));
-        String orderNum =  String.valueOf(excelList.get(7));
-
+    public OSubOrder getOrderMsgByExcel(List<Object> excelList)throws ProcessException{
+        String agentName = "";
+        String proCom = "";
+        String proModel = "";
+        String snBegin = "";
+        String snEnd = "";
+        String count = "";
+        String orderNum = "";
+        try {
+            agentName =  String.valueOf(excelList.get(0));
+            proCom =  String.valueOf(excelList.get(1));
+            proModel =  String.valueOf(excelList.get(2));
+            snBegin =  String.valueOf(excelList.get(3));
+            snEnd =  String.valueOf(excelList.get(4));
+            count =  String.valueOf(excelList.get(5));
+            orderNum =  String.valueOf(excelList.get(6));
+        } catch (Exception e) {
+            throw new ProcessException("导入解析文件异常");
+        }
         Map<String, Object> reqParam = new HashMap<>();
         reqParam.put("snBegin",snBegin);
         reqParam.put("snEnd",snEnd);
         reqParam.put("status",Status.STATUS_1.status);
         reqParam.put("orderId",orderNum);
+        reqParam.put("proCom",proCom);
+        reqParam.put("proModel",proModel);
         List<Map<String,Object>> oLogistics = logisticsMapper.queryLogisticsList(reqParam);
         if(oLogistics==null){
             log.info("数据有误异常返回01");
-            return null;
+            throw new ProcessException("商品数据异常");
         }
         if(oLogistics.size()==0 || oLogistics.size()!=1){
             log.info("数据有误异常返回02");
-            return null;
+            throw new ProcessException("未找到该商品");
         }
         Map<String, Object> logisticMap = oLogistics.get(0);
         String proId = String.valueOf(logisticMap.get("PRO_ID"));
@@ -137,11 +156,11 @@ public class CompensateServiceImpl implements CompensateService {
         List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
         if(oSubOrders==null){
             log.info("数据有误异常返回03");
-            return null;
+            throw new ProcessException("商品数据异常");
         }
         if(oSubOrders.size()==0 || oLogistics.size()!=1){
             log.info("数据有误异常返回04");
-            return null;
+            throw new ProcessException("未找到该商品");
         }
         OSubOrder oSubOrder = oSubOrders.get(0);
         oSubOrder.setProNum(new BigDecimal(count));
@@ -151,8 +170,21 @@ public class CompensateServiceImpl implements CompensateService {
         OSubOrderActivityExample.Criteria criteria2 = oSubOrderActivityExample.createCriteria();
         criteria2.andSubOrderIdEqualTo(oSubOrder.getId());
         List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-        if(null!=oSubOrderActivities && oSubOrderActivities.size()==1){
-            oSubOrder.setSubOrderActivity(oSubOrderActivities.get(0));
+        if(null!=oSubOrderActivities){
+            log.info("数据有误异常返回05");
+            throw new ProcessException("商品活动内部服务器异常");
+        }
+        if(oSubOrderActivities.size()==1){
+            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+            BigDecimal gTime = oSubOrderActivity.getgTime();
+            gTime.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
+            long activityCtime = oSubOrderActivity.getcTime().getTime();
+            long nowTime = new Date().getTime();
+            if((new BigDecimal(nowTime-activityCtime)).compareTo(gTime)==1){
+                log.info("商品活动超出保价时间");
+                throw new ProcessException("商品活动超出保价时间");
+            }
+            oSubOrder.setSubOrderActivity(oSubOrderActivity);
         }
         return oSubOrder;
     }
@@ -431,8 +463,15 @@ public class CompensateServiceImpl implements CompensateService {
                             throw new ProcessException("系统异常");
                         }
                     });
-                    BigDecimal subtract = agentVo.getoRefundPriceDiff().getRelCompAmt().subtract(agentVo.getoRefundPriceDiff().getMachOweAmt());
-                    agentVo.getoRefundPriceDiff().setRelCompAmt(subtract);
+                }
+                if(agentVo.getFlag().equals("1")){
+                    ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+                    BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+                    String subtractStr = String.valueOf(subtract);
+                    if(subtractStr.contains("-")){
+                        agentVo.getoRefundPriceDiffVo().setMachOweAmt(oRefundPriceDiff.getRelCompAmt());
+                    }
+                    agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
                 }
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
                 if(!agentResult.isOK()){
@@ -473,7 +512,10 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(agentVo.getoRefundPriceDiffVo().getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
             updatePriceDiff.setGatherAmt(agentVo.getoRefundPriceDiffVo().getGatherAmt());
         }
-
+        if(agentVo.getFlag().equals("1")){
+            updatePriceDiff.setRelCompAmt(agentVo.getoRefundPriceDiffVo().getRelCompAmt());
+            updatePriceDiff.setMachOweAmt(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+        }
         updatePriceDiff.setuTime(new Date());
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
         if(i!=1){
@@ -531,6 +573,9 @@ public class CompensateServiceImpl implements CompensateService {
         //查询关联附件
         List<Attachment> attachments = attachmentMapper.accessoryQuery(oRefundPriceDiff.getId(), AttachmentRelType.ActivityEdit.name());
         oRefundPriceDiff.setAttachmentList(attachments);
+        //查询财务打款关联附件
+        List<Attachment> attachmentFianceList = attachmentMapper.accessoryQuery(oRefundPriceDiff.getId(), AttachmentRelType.ActivityFinanceEdit.name());
+        oRefundPriceDiff.setAttachmentFianceList(attachmentFianceList);
         //查询扣除款项
         ODeductCapitalExample oDeductCapitalExample = new ODeductCapitalExample();
         ODeductCapitalExample.Criteria criteria2 = oDeductCapitalExample.createCriteria();
@@ -565,4 +610,5 @@ public class CompensateServiceImpl implements CompensateService {
         }
         return oRefundPriceDiff;
     }
+
 }

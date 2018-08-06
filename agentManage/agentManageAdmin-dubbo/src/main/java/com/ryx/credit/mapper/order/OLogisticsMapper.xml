@@ -440,6 +440,8 @@
       group by logistics_id
     )
     and order_id = #{orderId}
+    and pro_com = #{proCom}
+    and pro_model = #{proModel}
    </select>
 
 

@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -20,9 +21,9 @@ public interface CompensateService {
 
     ORefundPriceDiff selectByPrimaryKey(String id);
 
-    PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page);
+    PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page);
 
-    OSubOrder getOrderMsgByExcel(List<Object> excelList);
+    OSubOrder getOrderMsgByExcel(List<Object> excelList)throws ProcessException;
 
     BigDecimal calculateTotalPrice(String activityId, BigDecimal count);
 

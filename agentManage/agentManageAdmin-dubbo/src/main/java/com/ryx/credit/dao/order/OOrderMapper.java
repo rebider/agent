@@ -3,6 +3,7 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OOrderExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -31,4 +32,8 @@ public interface OOrderMapper {
     List<Map<String,Object>> queryOrderListView(Map <String, Object> param);
 
     int queryOrderListViewCount(Map <String, Object> param);
+
+    List<Map<String,Object>> queryOrderSubOrderProduct(@Param("orderId") String orderId,@Param("agentId") String agentId);
+
+    List<Map<String,Object>> queryHavePeiHuoProduct(@Param("orderId") String orderId,@Param("agentId") String agentId);
 }

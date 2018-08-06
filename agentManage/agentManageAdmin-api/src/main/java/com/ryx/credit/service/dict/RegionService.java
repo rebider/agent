@@ -22,4 +22,6 @@ public interface RegionService {
     List<Region> queryRegion(Region region);
 
     String getRegionsName(String codes);
+
+    Boolean isCity(String code);
 }

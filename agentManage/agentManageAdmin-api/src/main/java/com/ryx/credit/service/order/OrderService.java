@@ -63,6 +63,13 @@ public interface OrderService {
      */
     public AgentResult updateOrder(OrderFormVo orderFormVo, String userId) throws Exception;
 
+    /**
+     * 根据付款单属相初始化参数
+     * @param payment
+     * @return
+     */
+    public OPayment initPayment(OPayment payment);
+
 
     /**
      * 付款单下单处理
@@ -131,7 +138,28 @@ public interface OrderService {
     public AgentResult queryAgentCapital(String agentId,String type);
 
 
-
+    /**
+     * 查询订单的补款信息
+     * @param orderId
+     * @param agentId
+     * @return
+     */
     public AgentResult queryOrderForOSupplementPaymentdetail(String orderId,String agentId);
+
+    /**
+     * 待配货商品
+     * @param agentId
+     * @param orderId
+     * @return
+     */
+    public List<Map<String,Object>> querySubOrderInfoList(String agentId,String orderId);
+
+    /**
+     * 已配货商品
+     * @param agentId
+     * @param orderId
+     * @return
+     */
+    public List<Map<String,Object>> queryHavePeiHuoProduct(String agentId,String orderId);
 
 }
