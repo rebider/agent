@@ -10,9 +10,8 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample;
-import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
-import com.ryx.credit.profit.pojo.ProfitSettleErrLsExample;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +25,8 @@ import java.util.List;
  */
 @Service("profitOrganTranMonthServiceImpl")
 public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthService {
+
+    private static final Logger LOGGER = Logger.getLogger(ProfitOrganTranMonthServiceImpl.class);
 
     @Autowired
     private ProfitOrganTranMonthMapper profitOrganTranMonthMapper;
@@ -59,5 +60,24 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         pageInfo.setRows(settleErrs);
         pageInfo.setTotal(profitOrganTranMonthMapper.countByExample(example));
         return pageInfo;
+    }
+
+    @Override
+    public void delete(ProfitOrganTranMonth profitOrganTranMonth) {
+        ProfitOrganTranMonthExample example = new ProfitOrganTranMonthExample();
+        ProfitOrganTranMonthExample.Criteria criteria = example.createCriteria();
+        // 月份按开始到结束查询
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate()))
+        {
+            criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDate());
+            if (StringUtils.isNotBlank(profitOrganTranMonth.getProductType()))
+            {
+                criteria.andProductTypeEqualTo(profitOrganTranMonth.getProductType());
+            }
+        } else {
+            LOGGER.error("删除失败");
+            throw new RuntimeException("删除失败。。");
+        }
+        profitOrganTranMonthMapper.deleteByExample(example);
     }
 }

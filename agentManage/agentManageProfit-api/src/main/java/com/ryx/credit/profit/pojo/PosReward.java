@@ -22,6 +22,16 @@ public class PosReward implements Serializable {
 
     private String applyStatus;
 
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId == null ? null : userId.trim();
+    }
+
     public String getId() {
         return id;
     }
