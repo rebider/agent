@@ -145,22 +145,25 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     Date startTime = null;
 
                     for (OPaymentDetail detail : planNows) {
-                        if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) {
-                            if (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
-                                outAmt = outAmt.add(detail.getPayAmount());
+                        //if ((detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) && (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code))) {
+                        if (!detail.getPaymentStatus().equals(PaymentStatus.JQ.code)) {
+                            outAmt = outAmt.add(detail.getPayAmount());
+                            if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)){
                                 outPlanNum++;
                                 if (startTime == null) {
                                     startTime = detail.getPlanPayTime();
                                 }
-                                planNows_df.add(detail);
                             }
+                            planNows_df.add(detail);
                         } else {
                             planNows_complate.add(detail);
                             complatePlanNum++;
                         }
                     }
+
                     //待还金额需要减去可抵扣金额
                     outAmt = outAmt.subtract(leftAmt);
+                    result.put("planNows", planNows);
                     result.put("planNows_df", planNows_df);
                     result.put("planNows_complate", planNows_complate);
                     result.put("takeoutList", takeoutList);
