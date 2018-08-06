@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhaodw
@@ -51,4 +52,20 @@ public interface ProfitDeductionService {
     * @Date: 2018/7/31 
     */ 
     void batchInsertOtherDeduction(List<List<Object>> datas , String userId);
+
+    /**
+     * 根据扣款类型、扣款日期、查询总数
+     * @param deductType
+     * @param deductDate
+     * @return
+     */
+    public int getProfitDeductionCount(String deductType, String deductDate);
+
+    /**
+     * 获取本月调整的扣款明细
+     * @param deductDate
+     * @return
+     */
+    public List<Map<String, Object>> getDeductDetail(String deductDate);
+
 }

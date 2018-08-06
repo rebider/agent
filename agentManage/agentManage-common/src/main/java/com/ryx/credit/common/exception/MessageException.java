@@ -1,21 +1,20 @@
 package com.ryx.credit.common.exception;
 
 /**
- * Created by cx on 2018/5/22.
+ * Created by RYX on 2018/8/3.
  */
-public class ProcessException extends RuntimeException {
-
+public class MessageException  extends Exception {
     private String code = "1000";
 
     private String msg = "失败";
 
-    public ProcessException(String code,String message){
-       super(message);
+    public MessageException(String code,String message){
+        super(message);
         this.code = code;
         this.msg = message;
     }
 
-    public ProcessException(String message){
+    public MessageException(String message){
         super(message);
         this.msg = message;
     }

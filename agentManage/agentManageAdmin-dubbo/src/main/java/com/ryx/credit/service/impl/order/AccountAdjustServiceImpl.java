@@ -11,6 +11,7 @@ import com.ryx.credit.pojo.admin.agent.DataHistory;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IAccountAdjustService;
+import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
     OAccountAdjustMapper accountAdjustMapper;
     @Autowired
     OAccountAdjustDetailMapper accountAdjustDetailMapper;
+    @Resource
+    IOrderReturnService orderReturnService;
 
     /**
      * @Author: Zhang Lei
@@ -128,7 +131,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
                     List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId);
                     //现在付款计划未还部分
-                    List<OPaymentDetail> planNows_df  = new ArrayList<>();
+                    List<OPaymentDetail> planNows_df = new ArrayList<>();
                     //现在付款计划已付部分
                     List<OPaymentDetail> planNows_complate = new ArrayList<>();
 
@@ -142,7 +145,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     Date startTime = null;
 
                     for (OPaymentDetail detail : planNows) {
-                        if (detail.getPaymentType().equals(PaymentType.DKFQ.code) || detail.getPaymentType().equals(PaymentType.FRFQ.code)) {
+                        if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) {
                             if (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
                                 outAmt = outAmt.add(detail.getPayAmount());
                                 outPlanNum++;
@@ -163,8 +166,10 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     result.put("takeoutList", takeoutList);
 
                     //计算新付款计划
-                    List<Map> calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
-                    leftAmt = leftAmt.subtract(leftAmt);
+                    List<Map> calNews = new ArrayList<>();
+                    if (outPlanNum > 0) {
+                        calNews = StageUtil.stageOrder(outAmt, outPlanNum, startTime, 16);
+                    }
 
 
                     //更新订单部分金额支付完成
@@ -174,31 +179,35 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
                     //新付款计划入库付款明细
                     List<OPaymentDetail> planNews = new ArrayList<>();
-                    batchcode_new = new Date().getTime()+"";
-                    batchcode_old = planNows_df.get(0).getBatchCode();
-                    for (Map map : calNews) {
-                        OPaymentDetail newDeatilPlan = new OPaymentDetail();
-                        newDeatilPlan.setId(idService.genId(TabId.o_payment_detail));
-                        newDeatilPlan.setPaymentId(paymentId);
-                        newDeatilPlan.setBatchCode(batchcode_new);
-                        newDeatilPlan.setPaymentType(planNows_df.get(0).getPaymentType());
-                        newDeatilPlan.setOrderId(planNows_df.get(0).getOrderId());
-                        newDeatilPlan.setPayType(planNows_df.get(0).getPayType());
-                        newDeatilPlan.setPayAmount(MapUtil.getBigDecimal(map, "item"));
-                        newDeatilPlan.setPaymentStatus(PaymentStatus.DF.code);
-                        newDeatilPlan.setPlanNum(new BigDecimal(complatePlanNum).add(MapUtil.getBigDecimal(map, "count")));
-                        newDeatilPlan.setPlanPayTime((Date) map.get("date"));
-                        newDeatilPlan.setcDate(new Date());
-                        newDeatilPlan.setcUser(userid);
-                        newDeatilPlan.setAgentId(agentId);
-                        planNews.add(newDeatilPlan);
+                    batchcode_new = new Date().getTime() + "";
 
-                        //新付款计划入库
-                        if (isRealAdjust) {
-                            paymentDetailMapper.insertSelective(newDeatilPlan);
+                    if (planNows_df != null && planNows_df.size() > 0) {
+                        batchcode_old = planNows_df.get(0).getBatchCode();
+                        for (Map map : calNews) {
+                            OPaymentDetail newDeatilPlan = new OPaymentDetail();
+                            newDeatilPlan.setId(idService.genId(TabId.o_payment_detail));
+                            newDeatilPlan.setPaymentId(paymentId);
+                            newDeatilPlan.setBatchCode(batchcode_new);
+                            newDeatilPlan.setPaymentType(planNows_df.get(0).getPaymentType());
+                            newDeatilPlan.setOrderId(planNows_df.get(0).getOrderId());
+                            newDeatilPlan.setPayType(planNows_df.get(0).getPayType());
+                            newDeatilPlan.setPayAmount(MapUtil.getBigDecimal(map, "item"));
+                            newDeatilPlan.setPaymentStatus(PaymentStatus.DF.code);
+                            newDeatilPlan.setPlanNum(new BigDecimal(complatePlanNum).add(MapUtil.getBigDecimal(map, "count")));
+                            newDeatilPlan.setPlanPayTime((Date) map.get("date"));
+                            newDeatilPlan.setcDate(new Date());
+                            newDeatilPlan.setcUser(userid);
+                            newDeatilPlan.setAgentId(agentId);
+                            planNews.add(newDeatilPlan);
+
+                            //新付款计划入库
+                            if (isRealAdjust) {
+                                paymentDetailMapper.insertSelective(newDeatilPlan);
+                            }
+
                         }
-
                     }
+
                     result.put("planNews", planNews);
 
 
@@ -254,6 +263,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         paymentDetailMapper.insertSelective(newDeatil);
                     }
 
+                    leftAmt = leftAmt.subtract(leftAmt);
+
                 }
 
             }
@@ -308,8 +319,41 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             }
         }
 
-        result.put("takeAmt", adjustAmt.subtract(leftAmt));
+        //抵扣欠款金额
+        BigDecimal takeAmt = adjustAmt.subtract(leftAmt);
+
+        //更新退货表
+        if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {
+            orderReturnService.doPlan(srcId, takeAmt, userid);
+        }
+
+        result.put("takeAmt", takeAmt);
         return result;
+    }
+
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 查询调账记录和明细
+     * @Date: 18:03 2018/8/3
+     */
+    @Override
+    public Map<String, Object> getAccountAdjustDetail(String srcId, String adjustType, String userid, String agentId) {
+        Map<String, Object> map = new HashMap<>();
+        OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
+        oAccountAdjustExample.or().andSrcIdEqualTo(srcId).andAdjustTypeEqualTo(adjustType);
+        List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
+        if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {
+            return null;
+        } else {
+            map.put("adjust", oAccountAdjusts.get(0));
+            OAccountAdjustDetailExample example = new OAccountAdjustDetailExample();
+            example.or().andSrcIdEqualTo(srcId).andAdjustTypeEqualTo(adjustType);
+            List<OAccountAdjustDetail> details = accountAdjustDetailMapper.selectByExample(example);
+            map.put("details", details);
+        }
+
+        return map;
     }
 
 

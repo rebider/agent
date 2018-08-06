@@ -18,7 +18,9 @@ import java.util.List;
  */
 public interface CompensateService {
 
-    PageInfo compensateList(ORefundPriceDiff refundPriceDiff, Page page);
+    ORefundPriceDiff selectByPrimaryKey(String id);
+
+    PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page);
 
     OSubOrder getOrderMsgByExcel(List<Object> excelList);
 
@@ -36,6 +38,6 @@ public interface CompensateService {
 
     ORefundPriceDiff queryRefDiffDetail(String id);
 
-    AgentResult updateFinaceTask(ORefundPriceDiffVo oRefundPriceDiffVo, String agentBusId);
+    AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt);
 }
 
