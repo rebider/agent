@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
@@ -170,14 +171,14 @@ public class CompensateServiceImpl implements CompensateService {
         OSubOrderActivityExample.Criteria criteria2 = oSubOrderActivityExample.createCriteria();
         criteria2.andSubOrderIdEqualTo(oSubOrder.getId());
         List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-        if(null!=oSubOrderActivities){
+        if(null==oSubOrderActivities){
             log.info("数据有误异常返回05");
             throw new ProcessException("商品活动内部服务器异常");
         }
         if(oSubOrderActivities.size()==1){
             OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
             BigDecimal gTime = oSubOrderActivity.getgTime();
-            gTime.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
+            gTime = gTime.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
             long activityCtime = oSubOrderActivity.getcTime().getTime();
             long nowTime = new Date().getTime();
             if((new BigDecimal(nowTime-activityCtime)).compareTo(gTime)==1){
@@ -387,7 +388,7 @@ public class CompensateServiceImpl implements CompensateService {
         Map startPar = agentEnterService.startPar(cuser);
         if (null == startPar) {
             log.info("========用户{}{}启动部门参数为空", id, cuser);
-            throw new ProcessException("启动部门参数为空!");
+            throw new MessageException("启动部门参数为空!");
         }
 
         //不同的业务类型找到不同的启动流程
