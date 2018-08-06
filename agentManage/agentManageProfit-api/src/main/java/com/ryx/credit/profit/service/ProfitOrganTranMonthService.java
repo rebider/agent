@@ -40,4 +40,12 @@ public interface ProfitOrganTranMonthService {
     * @Date: 2018/8/1 
     */ 
     PageInfo getProfitOrganTranMonthList(ProfitOrganTranMonth profitOrganTranMonth, Page page);
+    
+    /*** 
+    * @Description: 根据分润月份删除对应交易数据
+    * @Param:  profitOrganTranMonth 交易数据信息
+    * @Author: zhaodw
+    * @Date: 2018/8/2 
+    */ 
+    void delete(ProfitOrganTranMonth profitOrganTranMonth);
 }

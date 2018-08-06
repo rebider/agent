@@ -27,10 +27,13 @@
     <dubbo:service interface="com.ryx.credit.profit.service.IPTaxAdjustService" ref="iPTaxAdjustService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ImportDeductionDetailService" ref="importDeductionDetailServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ToolsDeductService" ref="toolsDeductService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ProfitFactorService" ref="profitFactorService"  timeout="1200000" registry="${zk.group}"/>
+    <!--<dubbo:service interface="com.ryx.credit.profit.service.ProfitSupplyService" ref="profitSupplyService"  timeout="1200000" registry="${zk.group}"/>-->
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.TaskApprovalService" id="taskApprovalService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.profit.IPosProfitDataService" id="iPosProfitDataService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.IPaymentDetailService" id="iPaymentDetailService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
 </beans>

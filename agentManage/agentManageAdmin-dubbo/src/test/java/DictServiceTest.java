@@ -9,16 +9,12 @@ import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 
-import com.ryx.credit.service.impl.agent.AimportServiceImpl;
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.aspectj.AspectJAsyncConfiguration;
 
 import java.util.List;
-import java.util.Map;
 
 
 /**

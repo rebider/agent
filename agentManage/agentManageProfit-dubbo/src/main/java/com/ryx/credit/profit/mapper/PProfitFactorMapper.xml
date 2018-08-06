@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PProfitFactorMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PProfitFactor">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="FACTOR_MONTH" jdbcType="VARCHAR" property="factorMonth" />
+    <result column="TATOL_AMT" jdbcType="DECIMAL" property="tatolAmt" />
+    <result column="BUCKLE_AMT" jdbcType="DECIMAL" property="buckleAmt" />
+    <result column="SURPLUS_AMT" jdbcType="DECIMAL" property="surplusAmt" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="FACTOR_DATE" jdbcType="TIMESTAMP" property="factorDate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, AGENT_PID, AGENT_NAME, FACTOR_MONTH, TATOL_AMT, BUCKLE_AMT, SURPLUS_AMT, 
+    REMARK, FACTOR_DATE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PProfitFactorExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_PROFIT_FACTOR
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_PROFIT_FACTOR
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PProfitFactorExample">
+    delete from P_PROFIT_FACTOR
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
+    insert into P_PROFIT_FACTOR (ID, AGENT_ID, AGENT_PID, 
+      AGENT_NAME, FACTOR_MONTH, TATOL_AMT, 
+      BUCKLE_AMT, SURPLUS_AMT, REMARK, 
+      FACTOR_DATE)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{factorMonth,jdbcType=VARCHAR}, #{tatolAmt,jdbcType=DECIMAL}, 
+      #{buckleAmt,jdbcType=DECIMAL}, #{surplusAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
+      #{factorDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
+    insert into P_PROFIT_FACTOR
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="factorMonth != null">
+        FACTOR_MONTH,
+      </if>
+      <if test="tatolAmt != null">
+        TATOL_AMT,
+      </if>
+      <if test="buckleAmt != null">
+        BUCKLE_AMT,
+      </if>
+      <if test="surplusAmt != null">
+        SURPLUS_AMT,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="factorDate != null">
+        FACTOR_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="factorMonth != null">
+        #{factorMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="tatolAmt != null">
+        #{tatolAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="buckleAmt != null">
+        #{buckleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="surplusAmt != null">
+        #{surplusAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="factorDate != null">
+        #{factorDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PProfitFactorExample" resultType="java.lang.Long">
+    select count(*) from P_PROFIT_FACTOR
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
+    update P_PROFIT_FACTOR
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="factorMonth != null">
+        FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="tatolAmt != null">
+        TATOL_AMT = #{tatolAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="buckleAmt != null">
+        BUCKLE_AMT = #{buckleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="surplusAmt != null">
+        SURPLUS_AMT = #{surplusAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="factorDate != null">
+        FACTOR_DATE = #{factorDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
+    update P_PROFIT_FACTOR
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR},
+      TATOL_AMT = #{tatolAmt,jdbcType=DECIMAL},
+      BUCKLE_AMT = #{buckleAmt,jdbcType=DECIMAL},
+      SURPLUS_AMT = #{surplusAmt,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      FACTOR_DATE = #{factorDate,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <select id="selectByData" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_FACTOR
+    WHERE FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
+    AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="getProfitFactorList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT ID,AGENT_ID,AGENT_PID,AGENT_NAME,FACTOR_MONTH,
+    TATOL_AMT,BUCKLE_AMT,SURPLUS_AMT,REMARK,FACTOR_DATE
+    FROM P_PROFIT_FACTOR
+    <include refid="BASE_WHERE_SQL"></include>
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getProfitFactorCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM P_PROFIT_FACTOR
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      <trim prefixOverrides="and">
+        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID}</if>
+      </trim>
+    </where>
+  </sql>
+
+  <sql id='SORTING'>
+    ORDER BY FACTOR_DATE DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
+</mapper>
