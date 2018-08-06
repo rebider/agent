@@ -44,9 +44,9 @@ public class ToolsInstallmentTaskExecutionListener implements TaskListener, Exec
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
+                toolsDeductService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
-            toolsDeductService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), activityName);
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         }

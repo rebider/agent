@@ -65,6 +65,9 @@
     from P_PROFIT_ADJUST
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+
+
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitAdjustExample">
     delete from P_PROFIT_ADJUST
     <if test="_parameter != null">
