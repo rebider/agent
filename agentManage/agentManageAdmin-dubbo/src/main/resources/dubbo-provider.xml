@@ -80,5 +80,6 @@
     <dubbo:service interface="com.ryx.credit.service.order.ReceiptPlanService" ref="receiptPlanService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.PlatFormService" ref="platformService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService" timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.IPaymentDetailService" ref="paymentDetailService" timeout="1200000" registry="${zk.group}"/>
 
 </beans>

@@ -251,6 +251,19 @@ public class StagingServiceImpl implements StagingService {
         profitStagingDetailMapper.insert(stagingDetail);
     }
 
+    @Override
+    public void editStaging(ProfitStaging profitStaging) {
+        if (StringUtils.isNotBlank(profitStaging.getId())) {
+            profitStagingMapper.updateByPrimaryKeySelective(profitStaging);
+            // 删除原始分期明细信息
+            deleteStagDetail(profitStaging.getId());
+            //新增分析明细
+            splitStaging(profitStaging);
+        }else {
+            throw new StagingException("修改失败。");
+        }
+    }
+
     /**
      * 审批流与业务关联对象
      * @param profitStaging 分期对象
@@ -264,10 +277,10 @@ public class StagingServiceImpl implements StagingService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(profitStaging.getUserId());
         record.setStatus(Status.STATUS_1.status);
-        if("otherDeduct".equals(workId)) {
-            record.setBusType(BusActRelBusType.STAGING.name());
+        if("otherDeductAgent".equals(workId) || "otherDeductCity".equals(workId)) {
+            record.setBusType(BusActRelBusType.OTHER_DEDUCTION.name());
         }else{
-            record.setBusType(BusActRelBusType.OTHER_DEDUCTION_STAGING.name());
+            record.setBusType(BusActRelBusType.STAGING.name());
         }
         record.setActivStatus(AgStatus.Approving.name());
         try {

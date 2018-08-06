@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.bank.BankRegionService;
+import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.dict.RegionService;
@@ -70,7 +71,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     @Autowired
     private RegionService regionService;
     @Autowired
-    private BankRegionService bankRegionService;
+    private PosRegionService posRegionService;
 
     @Override
     public void asynNotifyPlatform(){
@@ -166,9 +167,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         for (int i = 0 ; i < split.length ; i++ ){
             String busRegion = split[i];
             if(regionService.isCity(busRegion)){
-                busiAreasList.add(bankRegionService.findRegionByCityId(busRegion).get(0));
+                busiAreasList.add(posRegionService.findRegionByCityId(busRegion).get(0));
             }else{
-                List<String> regionByProvinceId = bankRegionService.findRegionByProvinceId(busRegion);
+                List<String> regionByProvinceId = posRegionService.findRegionByProvinceId(busRegion);
                 for (String provinceId : regionByProvinceId) {
                     busiAreasList.add(provinceId);
                 }
