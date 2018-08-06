@@ -1,10 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.LogType;
-import com.ryx.credit.common.enumc.PlannerStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
@@ -13,10 +10,12 @@ import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OLogisticsMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailExample;
 import com.ryx.credit.pojo.admin.order.ReceiptPlan;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.slf4j.Logger;
@@ -49,6 +48,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private IdService idService;
     @Autowired
     private ReceiptPlanMapper receiptPlanMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     /**
      * 物流信息:
@@ -138,9 +139,18 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
             oLogistics.setProId(String.valueOf(objectList.get(3)));         // 商品ID
             oLogistics.setProName(String.valueOf(objectList.get(4)));       // 商品名称
-            oLogistics.setProType(String.valueOf(objectList.get(5)));       // 商品类型
-            oLogistics.setProCom(String.valueOf(objectList.get(7)));        // 厂家
-            oLogistics.setProModel(String.valueOf(objectList.get(9)));      // 机型
+            if (StringUtils.isNotBlank(String.valueOf(objectList.get(5)))) {
+                Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(), String.valueOf(objectList.get(5)));
+                if (null != dictByName && !dictByName.getdItemname().equals(""))
+                    oLogistics.setProType(dictByName.getdItemvalue());      // 商品类型
+            }
+            if (StringUtils.isNotBlank(String.valueOf(objectList.get(9)))) {
+                Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(objectList.get(9)));
+                if (null != dictByName && !dictByName.getdItemname().equals(""))
+                    oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
+            }
+
+            oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
             try {
                 oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
                 oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
