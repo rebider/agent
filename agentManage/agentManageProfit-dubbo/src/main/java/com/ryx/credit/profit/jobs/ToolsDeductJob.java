@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import sun.tools.jar.Main;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -56,7 +57,11 @@ public class ToolsDeductJob {
                     //补全本月扣款信息（上月未扣足金额）
                     toolsDeductService.deductCompletionInfo(detailList);
                     //通知结果
-                    iPaymentDetailService.uploadStatus(successList);
+                    try {
+                        iPaymentDetailService.uploadStatus(successList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (Exception e){
@@ -65,9 +70,14 @@ public class ToolsDeductJob {
         }
     }
 
-
-    public void computeToolsDeduct(){
-
+    /**
+     * 平台编号
+     * @param paltformNo
+     * @param AgentProfitAmt
+     * @param paraentAgentProfitAmt
+     * @param deductDate
+     */
+    public void computeToolsDeduct(String AgentId, String paltformNo,BigDecimal AgentProfitAmt,BigDecimal paraentAgentProfitAmt, String deductDate){
 
     }
 }
