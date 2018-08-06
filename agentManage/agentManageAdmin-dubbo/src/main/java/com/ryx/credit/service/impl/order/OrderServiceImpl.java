@@ -95,11 +95,22 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderService orderService;
 
+    /**
+     * 根据ID查询订单
+     * @param orderId
+     * @return
+     */
     @Override
     public OOrder getById(String orderId){
         return orderMapper.selectByPrimaryKey(orderId);
     }
 
+    /**
+     * 分页查询订单列表
+     * @param product
+     * @param page
+     * @return
+     */
     @Override
     public PageInfo orderList(OOrder product, Page page) {
 
@@ -116,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 分页查询
+     * 分页查询订单列表
      * @param par
      * @param page
      * @return
@@ -130,6 +141,14 @@ public class OrderServiceImpl implements OrderService {
         return pageInfo;
     }
 
+
+    /**
+     * 查询给定条件的订单的payment
+     * @param agentId
+     * @param approveStatus
+     * @param orderStatus
+     * @return
+     */
     @Override
     public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus,List<BigDecimal> orderStatus) {
         OOrderExample example = new OOrderExample();
@@ -364,6 +383,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    /**
+     * 根据支付类型初始化付款单参数
+     * @param payment
+     * @return
+     */
     @Override
     public OPayment initPayment(OPayment payment) {
         switch (payment.getPayMethod()){
@@ -2118,7 +2142,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     /**
-     * 查询用户的交款信息
+     * 根据给定的类型查询用户的缴款项金额和可用余额
      * @param agentId
      * @param type
      * @return
@@ -2178,5 +2202,17 @@ public class OrderServiceImpl implements OrderService {
         }else{
             return AgentResult.fail("没有需要补款的欠款");
         }
+    }
+
+
+    @Override
+    public List<Map<String,Object>> querySubOrderInfoList(String agentId, String orderId) {
+        return orderMapper.queryOrderSubOrderProduct(orderId,agentId);
+    }
+
+
+    @Override
+    public List<Map<String,Object>> queryHavePeiHuoProduct(String agentId, String orderId) {
+        return orderMapper.queryHavePeiHuoProduct(orderId,agentId);
     }
 }
