@@ -4,6 +4,7 @@ package junit.profit;/**
  * @Description:
  */
 
+import com.ryx.credit.profit.jobs.ProfitDataJob;
 import com.ryx.credit.profit.jobs.RefundJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +28,7 @@ public class ProfitDataJobTest {
     private Logger logger = LoggerFactory.getLogger(ProfitDataJobTest.class);
 
     @Autowired
-    private RefundJob refundJob;
+    private ProfitDataJob profitDataJob;
 
     /*** 
     * @Description: 测试任务处理
@@ -38,6 +39,6 @@ public class ProfitDataJobTest {
     */
     @Test
     public void testDeal() {
-        refundJob.deal();
+        profitDataJob.deal();
     }
 }
