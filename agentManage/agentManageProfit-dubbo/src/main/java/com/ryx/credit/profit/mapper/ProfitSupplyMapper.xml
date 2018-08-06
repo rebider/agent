@@ -67,6 +67,14 @@
     from P_PROFIT_SUPPLY
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectByAgentMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_SUPPLY
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
     delete from P_PROFIT_SUPPLY
     <if test="_parameter != null" >
@@ -200,6 +208,47 @@
   <sql id="OracleDialectSuffix" >
     <if test="page != null" >
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="getProfitSupplyList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_SUPPLY
+    <include refid="BASE_WHERE_SQL"></include>
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getProfitSupplyCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM P_PROFIT_SUPPLY
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      <trim prefixOverrides="and">
+        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID}</if>
+      </trim>
+    </where>
+  </sql>
+
+  <sql id='SORTING'>
+    ORDER BY SUPPLY_DATE DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
     </if>
   </sql>
 </mapper>
