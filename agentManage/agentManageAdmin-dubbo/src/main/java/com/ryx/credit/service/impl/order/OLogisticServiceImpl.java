@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.LogType;
 import com.ryx.credit.common.enumc.PlannerStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -14,6 +15,7 @@ import com.ryx.credit.dao.order.OLogisticsMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.pojo.admin.order.OLogistics;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetailExample;
 import com.ryx.credit.pojo.admin.order.ReceiptPlan;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
@@ -79,6 +81,51 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
+            if (StringUtils.isBlank(String.valueOf(objectList.get(23)))) {
+                logger.info("排单编号为空");
+                throw new MessageException("排单编号为空");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(23)))) {
+                logger.info("订单编号为空");
+                throw new MessageException("订单编号为空");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(23)))) {
+                logger.info("商品编号为空");
+                throw new MessageException("商品编号为空");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(23)))) {
+                logger.info("商品ID为空");
+                throw new MessageException("商品ID为空");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(23)))) {
+                logger.info("请填写发货数量");
+                throw new MessageException("请填写发货数量");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(26)))) {
+                logger.info("请填写起始SN序列号");
+                throw new MessageException("请填写起始SN序列号");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(27)))) {
+                logger.info("请填写结束SN序列号");
+                throw new MessageException("请填写结束SN序列号");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(28)))) {
+                logger.info("请填写起始SN位数");
+                throw new MessageException("请填写起始SN位数");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(29)))) {
+                logger.info("请填写结束SN位数");
+                throw new MessageException("请填写结束SN位数");
+            }
+            String snBeginNum = String.valueOf(String.valueOf(objectList.get(26)));   // 起始SN序列号
+            String snEndNum = String.valueOf(String.valueOf(objectList.get(27)));   // 结束SN序列号
+            begins = Integer.valueOf(String.valueOf(objectList.get(28)));   // 起始SN位数
+            finish = Integer.valueOf(String.valueOf(objectList.get(29)));   // 结束SN位数
+            List<String> stringList = idList(snBeginNum, snEndNum, begins, finish);
+            if (Integer.valueOf(String.valueOf(objectList.get(23))) != stringList.size()) {
+                logger.info("请仔细核对发货数量");
+                throw new MessageException("请仔细核对发货数量");
+            }
             OLogistics oLogistics = new OLogistics();
             oLogistics.setcUser(user);                                      // 创建人
             oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
@@ -94,32 +141,45 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setProType(String.valueOf(objectList.get(5)));       // 商品类型
             oLogistics.setProCom(String.valueOf(objectList.get(7)));        // 厂家
             oLogistics.setProModel(String.valueOf(objectList.get(9)));      // 机型
-
             try {
                 oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
                 oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
                 oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司
-                oLogistics.setwNumber(null != objectList.get(26) ? String.valueOf(objectList.get(26)) : "");      // 物流单号
-                oLogistics.setSnBeginNum(null != objectList.get(27) ? String.valueOf(objectList.get(27)) : "");   // 起始SN序列号
-                oLogistics.setSnEndNum(null != objectList.get(28) ? String.valueOf(objectList.get(28)) : "");     // 结束SN序列号
+                oLogistics.setwNumber(null != objectList.get(25) ? String.valueOf(objectList.get(25)) : "");      // 物流单号
+                oLogistics.setSnBeginNum(null != objectList.get(26) ? String.valueOf(objectList.get(26)) : "");   // 起始SN序列号
+                oLogistics.setSnEndNum(null != objectList.get(27) ? String.valueOf(objectList.get(27)) : "");     // 结束SN序列号
             } catch (Exception e) {
                 throw new ProcessException("Excel参数错误！");
             }
             System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
             if (1 != insertImportData(oLogistics)) {
-                throw new ProcessException("插入失败！");
+                throw new MessageException("插入失败！");
             }
             list.add(oLogistics.getId());
 
+            //调用明细接口之前需要先去数据库进行查询是否已有数据
+            List<String> idList = idList(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish);
+            if (null != idList && idList.size() > 0) {
+                for (String snNum : idList) {
+                    OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                    OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria.andSnNumEqualTo(snNum);
+                    List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                    if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
+                        //说明已经存在数据
+                        logger.info("此物流已经存在,正在发货中!!!");
+                        throw new MessageException("此物流已经存在,正在发货中!!!");
+                    }
+                }
+            }
             // 调用明细接口
-            begins = Integer.valueOf(String.valueOf(objectList.get(29)));   // 起始SN位数
-            finish = Integer.valueOf(String.valueOf(objectList.get(30)));   // 结束SN位数
             ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, user);
             if (resultVO.isSuccess()) {
                 String id = "";
                 id = oLogistics.getReceiptPlanId();   // 排单编号
                 if (null == id) {
-                    throw new ProcessException("排单ID查询失败！");
+                    throw new MessageException("排单ID查询失败！");
                 } else {
                     ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     if (receiptPlan != null) {
@@ -128,7 +188,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
                         int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
                         if (i != 1) {
-                            throw new ProcessException("更新排单数据失败！");
+                            throw new MessageException("更新排单数据失败！");
                         }
                         System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                     }
