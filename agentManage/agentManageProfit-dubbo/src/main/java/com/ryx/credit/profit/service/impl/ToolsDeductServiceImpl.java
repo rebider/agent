@@ -218,7 +218,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 if(map.get("ID") != null && map.get("ORDER_ID") != null ){
                     try {
                         ProfitDeduction profitDeduction = new ProfitDeduction();
-                        profitDeduction.setId(map.get("ID") == null ? "" : map.get("ID").toString());
+                        profitDeduction.setId(map.get("ID").toString());
                         profitDeduction.setParentAgentId(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
                         profitDeduction.setParentAgentPid(map.get("ORDER_PLATFORM") == null ? "" : map.get("ORDER_PLATFORM").toString());
                         profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
@@ -231,7 +231,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         profitDeduction.setMustDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
                         profitDeduction.setActualDeductionAmt(BigDecimal.ZERO);
                         profitDeduction.setNotDeductionAmt(BigDecimal.ZERO);
-                        profitDeduction.setSourceId(map.get("ORDER_ID") == null ? "" : map.get("ORDER_ID").toString());
+                        profitDeduction.setSourceId(map.get("ORDER_ID").toString());
                         profitDeduction.setUpperNotDeductionAmt(BigDecimal.ZERO);
                         profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
                         profitDeduction.setCreateDateTime(new Date());
@@ -262,7 +262,10 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     criteria.andDeductionDateEqualTo(map.get("DEDUCTION_DATE").toString());
                     criteria.andSourceIdEqualTo(map.get("SOURCE_ID").toString());
                     List<ProfitDeduction> list = profitDeductionMapper.selectByExample(profitDeductionExample);
-                    if(list != null && !list.isEmpty()){
+                    if(list == null || list.isEmpty()){
+                        LOG.error("本月已经不存在分期订单，将之前调整的扣款金额，新增到本月还款，流水号：{}",map.get("SOURCE_ID"));
+
+                    } else {
                         try {
                             ProfitDeduction profitDeduction = list.get(0);
                             //计算补全信息

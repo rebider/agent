@@ -65,4 +65,9 @@ public class ToolsDeductJob {
         }
     }
 
+
+    public void computeToolsDeduct(){
+
+
+    }
 }
