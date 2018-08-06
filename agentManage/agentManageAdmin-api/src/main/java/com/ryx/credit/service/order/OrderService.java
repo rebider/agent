@@ -138,7 +138,28 @@ public interface OrderService {
     public AgentResult queryAgentCapital(String agentId,String type);
 
 
-
+    /**
+     * 查询订单的补款信息
+     * @param orderId
+     * @param agentId
+     * @return
+     */
     public AgentResult queryOrderForOSupplementPaymentdetail(String orderId,String agentId);
+
+    /**
+     * 待配货商品
+     * @param agentId
+     * @param orderId
+     * @return
+     */
+    public List<Map<String,Object>> querySubOrderInfoList(String agentId,String orderId);
+
+    /**
+     * 已配货商品
+     * @param agentId
+     * @param orderId
+     * @return
+     */
+    public List<Map<String,Object>> queryHavePeiHuoProduct(String agentId,String orderId);
 
 }

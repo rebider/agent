@@ -117,8 +117,7 @@ public class CompensateServiceImpl implements CompensateService {
         String snBegin =  String.valueOf(excelList.get(3));
         String snEnd =  String.valueOf(excelList.get(4));
         String count =  String.valueOf(excelList.get(5));
-        String subOrderNum =  String.valueOf(excelList.get(6));
-        String orderNum =  String.valueOf(excelList.get(7));
+        String orderNum =  String.valueOf(excelList.get(6));
 
         Map<String, Object> reqParam = new HashMap<>();
         reqParam.put("snBegin",snBegin);
