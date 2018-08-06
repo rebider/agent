@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.CuserAgentKey;
 import com.ryx.credit.service.ICuserAgentService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
  * @see CuserAgentServiceImpl
  * To change this template use File | Settings | File Templates.
  */
-
+@Service("ICuserAgentService")
 public class CuserAgentServiceImpl implements ICuserAgentService {
     @Autowired
     private CuserAgentMapper cuserAgentMapper;

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OSubOrderActivity implements Serializable {
+public class OSubOrderActivity implements Serializable{
     private String id;
 
     private String activityId;
@@ -42,6 +42,8 @@ public class OSubOrderActivity implements Serializable {
     private String proId;
 
     private String proName;
+
+    private BigDecimal status;
 
     public String getId() {
         return id;
@@ -193,5 +195,13 @@ public class OSubOrderActivity implements Serializable {
 
     public void setProName(String proName) {
         this.proName = proName == null ? null : proName.trim();
+    }
+
+    public BigDecimal getStatus() {
+        return status;
+    }
+
+    public void setStatus(BigDecimal status) {
+        this.status = status;
     }
 }

@@ -722,7 +722,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                        agentoutVo.setBusPlatform( platForm.getPlatformName());
                 }
                 if(null!=agentoutVo.getBusRegion()){
-                    String regionName = regionService.getRegionName(agentoutVo.getBusRegion());
+                    String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
                     agentoutVo.setBusRegion(regionName);
                 }
                 if (null!=agentoutVo.getBusScope()){

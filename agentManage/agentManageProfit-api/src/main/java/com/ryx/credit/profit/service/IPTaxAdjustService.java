@@ -1,9 +1,11 @@
 package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.PTaxAdjust;
 import com.ryx.credit.profit.pojo.PTaxAdjustExample;
 import com.ryx.credit.profit.pojo.ProfitDay;
@@ -45,17 +47,13 @@ public interface IPTaxAdjustService {
     PTaxAdjust selectByAgentPid(String agentPid);
 
     /**
-     * 新增税点调整
+     * 新增并启动一个税点调整审批
      * @param record
      * @return
      */
-    public ResultVO posTaxEnterIn(PTaxAdjust record)throws ProcessException;
-    /**
-     * 启动一个税点调整审批
-     * @param agentPid
-     * @param userId
-     * @return
-     * @throws ProcessException
-     */
-    public ResultVO startTaxEnterActivity(String agentPid,String userId)throws ProcessException;
+    ResultVO posTaxEnterIn(PTaxAdjust record)throws ProcessException;
+
+    void completeTaskEnterActivity(String insid, String status);
+
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 }

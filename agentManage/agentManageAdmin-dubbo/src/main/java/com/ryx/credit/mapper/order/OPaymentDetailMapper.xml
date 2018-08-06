@@ -367,7 +367,7 @@
             and detail.AGENT_ID = #{map.agentId}
         </if>
         <if test="map.time != null and map.time != '' ">
-            and to_char(detail.C_DATE,'YYYY-MM-dd')=#{map.time}
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
         </if>
         ORDER BY detail.C_DATE DESC
     </select>

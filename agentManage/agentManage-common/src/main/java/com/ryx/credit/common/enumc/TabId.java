@@ -56,7 +56,12 @@ public enum TabId {
     P_PROFIT_DETAIL("PDE%s%015d"),
     P_PROFIT_M("PRM%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
-    p_profit_adjust("PPA%s%015d");
+    p_profit_adjust("PPA%s%015d"),
+    p_profit_factor("PF%s%015d"),
+    p_tax_adjust("PTA%s%015d"),
+    p_pos_reward("PPR%s%015d"),
+    p_pos_check("PPC%s%015d"),
+    p_profit_supply("PPS%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;

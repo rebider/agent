@@ -15,10 +15,11 @@ public interface RegionService {
 
     List<Tree> selectAllRegion(String pCode);
 
-    public Region queryByCode(String code);
+    Region queryByCode(String code);
 
-    public String getRegionName(String code);
+    String getRegionName(String code);
 
+    List<Region> queryRegion(Region region);
 
-    public List<Region> queryRegion(Region region);
+    String getRegionsName(String codes);
 }

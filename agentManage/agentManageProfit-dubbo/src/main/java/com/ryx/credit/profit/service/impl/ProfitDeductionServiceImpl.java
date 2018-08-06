@@ -128,4 +128,19 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         this.insert(deduction);
     }
 
+
+    @Override
+    public int getProfitDeductionCount(String deductType, String deductDate) {
+        ProfitDeductionExample example = new ProfitDeductionExample();
+        ProfitDeductionExample.Criteria criteria = example.createCriteria();
+        criteria.andDeductionTypeEqualTo(deductType);
+        criteria.andDeductionDateEqualTo(deductDate);
+        return profitDeductionMapper.countByExample(example);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDeductDetail(String deductDate) {
+        return profitDeductionMapper.getDeductDetail(deductDate);
+    }
+
 }
