@@ -193,4 +193,11 @@ public class AddressServiceImpl implements AddressService {
     public OAddress queryById(String id) {
         return oAddressMapper.selectByPrimaryKey(id);
     }
+
+    @Override
+    public List<String> addList(List<List<Object>> list, String userid) throws Exception {
+
+
+        return null;
+    }
 }
