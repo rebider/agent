@@ -544,63 +544,65 @@ public class OrderServiceImpl implements OrderService {
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
         //收货地址
-        List<OReceiptOrderVo> OReceiptOrderVos = orderFormVo.getoReceiptOrderList();
-        for (OReceiptOrderVo oReceiptOrderVo : OReceiptOrderVos) {
-            oReceiptOrderVo.setId(idService.genId(TabId.o_receipt_order));
-            oReceiptOrderVo.setOrderId(orderFormVo.getId());
-            oReceiptOrderVo.setReceiptNum(oReceiptOrderVo.getId());
-            OAddress address = oAddressMapper.selectByPrimaryKey(oReceiptOrderVo.getAddressId());
-            oReceiptOrderVo.setAddrRealname(address.getAddrRealname());
-            oReceiptOrderVo.setAddrMobile(address.getAddrMobile());
-            oReceiptOrderVo.setAddrProvince(address.getAddrProvince());
-            oReceiptOrderVo.setAddrCity(address.getAddrCity());
-            oReceiptOrderVo.setAddrDistrict(address.getAddrDistrict());
-            oReceiptOrderVo.setAddrDetail(address.getAddrDetail());
-            oReceiptOrderVo.setRemark(address.getRemark());
-            oReceiptOrderVo.setZipCode(address.getZipCode());
-            oReceiptOrderVo.setcTime(d);
-            oReceiptOrderVo.setuTime(d);
-            oReceiptOrderVo.setReceiptStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
-            oReceiptOrderVo.setuUser(userId);
-            oReceiptOrderVo.setcUser(userId);
-            oReceiptOrderVo.setStatus(Status.STATUS_1.status);
-            oReceiptOrderVo.setVersion(Status.STATUS_0.status);
-            oReceiptOrderVo.setAgentId(orderFormVo.getAgentId());
-            BigDecimal b = new BigDecimal(0);
-            List<OReceiptPro> pros = oReceiptOrderVo.getoReceiptPros();
-            if (pros.size() == 0) {
-                logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
-                throw new MessageException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
-            }
-            //收货地址商品
-            for (OReceiptPro pro : pros) {
-                pro.setId(idService.genId(TabId.o_receipt_pro));
-                pro.setcTime(d);
-                pro.setOrderid(orderFormVo.getId());
-                pro.setReceiptId(oReceiptOrderVo.getId());
-                String proid = pro.getProId();
-                OProduct product = oProductMapper.selectByPrimaryKey(proid);
-                pro.setProCode(product.getProCode());
-                pro.setProName(product.getProName());
-                pro.setSendNum(new BigDecimal(0));
-                pro.setcUser(userId);
-                pro.setuTime(d);
-                pro.setuUser(userId);
-                pro.setStatus(Status.STATUS_1.status);
-                pro.setVersion(Status.STATUS_0.status);
-                pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
-                //插入收货地址明细
-                if (1 != oReceiptProMapper.insertSelective(pro)) {
-                    logger.info("下订单:{}", "oReceiptPro添加失败");
-                    throw new MessageException("oPayment添加失败");
+        if(orderFormVo.getoReceiptOrderList()!=null) {
+            List<OReceiptOrderVo> OReceiptOrderVos = orderFormVo.getoReceiptOrderList();
+            for (OReceiptOrderVo oReceiptOrderVo : OReceiptOrderVos) {
+                oReceiptOrderVo.setId(idService.genId(TabId.o_receipt_order));
+                oReceiptOrderVo.setOrderId(orderFormVo.getId());
+                oReceiptOrderVo.setReceiptNum(oReceiptOrderVo.getId());
+                OAddress address = oAddressMapper.selectByPrimaryKey(oReceiptOrderVo.getAddressId());
+                oReceiptOrderVo.setAddrRealname(address.getAddrRealname());
+                oReceiptOrderVo.setAddrMobile(address.getAddrMobile());
+                oReceiptOrderVo.setAddrProvince(address.getAddrProvince());
+                oReceiptOrderVo.setAddrCity(address.getAddrCity());
+                oReceiptOrderVo.setAddrDistrict(address.getAddrDistrict());
+                oReceiptOrderVo.setAddrDetail(address.getAddrDetail());
+                oReceiptOrderVo.setRemark(address.getRemark());
+                oReceiptOrderVo.setZipCode(address.getZipCode());
+                oReceiptOrderVo.setcTime(d);
+                oReceiptOrderVo.setuTime(d);
+                oReceiptOrderVo.setReceiptStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+                oReceiptOrderVo.setuUser(userId);
+                oReceiptOrderVo.setcUser(userId);
+                oReceiptOrderVo.setStatus(Status.STATUS_1.status);
+                oReceiptOrderVo.setVersion(Status.STATUS_0.status);
+                oReceiptOrderVo.setAgentId(orderFormVo.getAgentId());
+                BigDecimal b = new BigDecimal(0);
+                List<OReceiptPro> pros = oReceiptOrderVo.getoReceiptPros();
+                if (pros.size() == 0) {
+                    logger.info("下订单:{}", "请为收货地址[" + address.getRemark() + "]配置上商品明细");
+                    throw new MessageException("请为收货地址[" + address.getRemark() + "]配置上商品明细");
                 }
-                b = b.add(pro.getProNum());
-            }
-            oReceiptOrderVo.setProNum(b);
-            //插入收货地址
-            if (1 != oReceiptOrderMapper.insertSelective(oReceiptOrderVo)) {
-                logger.info("下订单:{}", "oReceiptOrderVo添加失败");
-                throw new MessageException("oReceiptOrderVo添加失败");
+                //收货地址商品
+                for (OReceiptPro pro : pros) {
+                    pro.setId(idService.genId(TabId.o_receipt_pro));
+                    pro.setcTime(d);
+                    pro.setOrderid(orderFormVo.getId());
+                    pro.setReceiptId(oReceiptOrderVo.getId());
+                    String proid = pro.getProId();
+                    OProduct product = oProductMapper.selectByPrimaryKey(proid);
+                    pro.setProCode(product.getProCode());
+                    pro.setProName(product.getProName());
+                    pro.setSendNum(new BigDecimal(0));
+                    pro.setcUser(userId);
+                    pro.setuTime(d);
+                    pro.setuUser(userId);
+                    pro.setStatus(Status.STATUS_1.status);
+                    pro.setVersion(Status.STATUS_0.status);
+                    pro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+                    //插入收货地址明细
+                    if (1 != oReceiptProMapper.insertSelective(pro)) {
+                        logger.info("下订单:{}", "oReceiptPro添加失败");
+                        throw new MessageException("oPayment添加失败");
+                    }
+                    b = b.add(pro.getProNum());
+                }
+                oReceiptOrderVo.setProNum(b);
+                //插入收货地址
+                if (1 != oReceiptOrderMapper.insertSelective(oReceiptOrderVo)) {
+                    logger.info("下订单:{}", "oReceiptOrderVo添加失败");
+                    throw new MessageException("oReceiptOrderVo添加失败");
+                }
             }
         }
         List<Attachment> attr = orderFormVo.getAttachments();
@@ -2205,14 +2207,277 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    /**
+     * 查询订单的订购单信息
+     * @param agentId
+     * @param orderId
+     * @return
+     */
     @Override
     public List<Map<String,Object>> querySubOrderInfoList(String agentId, String orderId) {
         return orderMapper.queryOrderSubOrderProduct(orderId,agentId);
     }
 
 
+    /**
+     * 查询已派单信息
+     * @param agentId
+     * @param orderId
+     * @return
+     */
+
     @Override
     public List<Map<String,Object>> queryHavePeiHuoProduct(String agentId, String orderId) {
         return orderMapper.queryHavePeiHuoProduct(orderId,agentId);
+    }
+
+
+    /**
+     * 配货操作
+     * @param oReceiptOrder
+     * @param oReceiptPro
+     * @param sendNum
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult subOrderPeiHuo(OReceiptOrder oReceiptOrder, OReceiptPro oReceiptPro,int sendNum) throws Exception {
+
+        if(StringUtils.isBlank(oReceiptOrder.getOrderId())
+                || StringUtils.isBlank(oReceiptOrder.getAddressId())
+                || StringUtils.isBlank(oReceiptOrder.getAgentId())
+                || StringUtils.isBlank(oReceiptPro.getProId())
+                || StringUtils.isBlank(oReceiptOrder.getuUser())
+                || sendNum<=0){
+
+                return AgentResult.fail("参数错误");
+        }
+
+        OOrder order = orderMapper.selectByPrimaryKey(oReceiptOrder.getOrderId());
+        if(AgStatus.Approved.status.compareTo(order.getReviewStatus())!=0){
+            return AgentResult.fail("审批未通过");
+        }
+        Calendar d = Calendar.getInstance();
+        String userid = oReceiptOrder.getuUser();
+
+        logger.info("订单配货:{},{},{},{},{}",
+                oReceiptOrder.getOrderId(),
+                oReceiptOrder.getAddressId(),
+                oReceiptPro.getProId(),
+                sendNum,
+                oReceiptOrder.getcUser());
+
+        //查询收货地址是否已经存在收货单中
+        OReceiptOrderExample oReceiptOrderQuery = new OReceiptOrderExample();
+        oReceiptOrderQuery.or()
+                .andOrderIdEqualTo(oReceiptOrder.getOrderId())
+                .andAddressIdEqualTo(oReceiptOrder.getAddressId())
+                .andAgentIdEqualTo(oReceiptOrder.getAgentId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+
+        //地址信息
+        OAddress address = oAddressMapper.selectByPrimaryKey(oReceiptOrder.getAddressId());
+
+        //订货单记录是否存在
+        List<OReceiptOrder> OReceiptOrderList = oReceiptOrderMapper.selectByExample(oReceiptOrderQuery);
+        OReceiptOrder receiptOrder_option = null;
+        if(OReceiptOrderList.size()>0){
+            receiptOrder_option = OReceiptOrderList.get(0);
+        }else{
+            //不存在则新增
+            OReceiptOrder receiptOrder_db = new OReceiptOrder();
+            receiptOrder_db.setId(idService.genId(TabId.o_receipt_order));
+            receiptOrder_db.setOrderId(oReceiptOrder.getOrderId());
+            receiptOrder_db.setReceiptNum(receiptOrder_db.getId());
+            receiptOrder_db.setAddressId(address.getId());
+            receiptOrder_db.setAddrRealname(address.getAddrRealname());
+            receiptOrder_db.setAddrMobile(address.getAddrMobile());
+            receiptOrder_db.setAddrProvince(address.getAddrProvince());
+            receiptOrder_db.setAddrCity(address.getAddrCity());
+            receiptOrder_db.setAddrDistrict(address.getAddrDistrict());
+            receiptOrder_db.setAddrDetail(address.getAddrDetail());
+            receiptOrder_db.setRemark(address.getRemark());
+            receiptOrder_db.setZipCode(address.getZipCode());
+            receiptOrder_db.setcTime(d.getTime());
+            receiptOrder_db.setuTime(d.getTime());
+            receiptOrder_db.setReceiptStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+            receiptOrder_db.setuUser(userid);
+            receiptOrder_db.setcUser(userid);
+            receiptOrder_db.setStatus(Status.STATUS_1.status);
+            receiptOrder_db.setVersion(Status.STATUS_0.status);
+            receiptOrder_db.setAgentId(oReceiptOrder.getAgentId());
+
+            if(1!=oReceiptOrderMapper.insertSelective(receiptOrder_db)){
+                throw new MessageException("收货单添加失败");
+            }
+            receiptOrder_option = receiptOrder_db;
+        }
+
+        //商品信息
+        OSubOrderExample oSubOrderQuery = new OSubOrderExample();
+        oSubOrderQuery.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andOrderIdEqualTo(receiptOrder_option.getOrderId())
+                .andProIdEqualTo(oReceiptPro.getProId());
+        List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderQuery);
+        if(oSubOrderList.size()==0)throw new MessageException("订购单信息未找到");
+        OSubOrder oSubOrder = oSubOrderList.get(0);
+
+        //检查已配货的商品数量
+        OReceiptProExample oReceiptProQuery = new OReceiptProExample();
+        oReceiptProQuery.or()
+                .andOrderidEqualTo(receiptOrder_option.getOrderId())
+                .andProIdEqualTo(oSubOrder.getProId())
+                .andStatusEqualTo(Status.STATUS_1.status);
+        //计算已配货的商品数量
+        List<OReceiptPro> OReceiptProListHaveIn =  oReceiptProMapper.selectByExample(oReceiptProQuery);
+        BigDecimal have_peihuo_count = new BigDecimal(0);
+        for (OReceiptPro receiptPro : OReceiptProListHaveIn) {
+            have_peihuo_count = have_peihuo_count.add(receiptPro.getProNum());
+        }
+        if(have_peihuo_count.add(new BigDecimal(sendNum)).compareTo(oSubOrder.getProNum())>0){
+            throw  new MessageException("配货商品数量已超出订单商品数量");
+        }
+
+        //添加配货单商品
+        oReceiptPro.setId(idService.genId(TabId.o_receipt_pro));
+        oReceiptPro.setOrderid(receiptOrder_option.getOrderId());
+        oReceiptPro.setReceiptId(receiptOrder_option.getId());
+        oReceiptPro.setProId(oSubOrder.getProId());
+        oReceiptPro.setProCode(oSubOrder.getProCode());
+        oReceiptPro.setProName(oSubOrder.getProName());
+        //传递配单的商品数量
+        oReceiptPro.setProNum(new BigDecimal(sendNum));
+        oReceiptPro.setSendNum(Status.STATUS_0.status);
+        oReceiptPro.setcUser(userid);
+        oReceiptPro.setcTime(d.getTime());
+        oReceiptPro.setuUser(userid);
+        oReceiptPro.setuTime(d.getTime());
+        oReceiptPro.setStatus(Status.STATUS_1.status);
+        oReceiptPro.setVersion(Status.STATUS_0.status);
+        oReceiptPro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
+        if(1!=oReceiptProMapper.insertSelective(oReceiptPro)){
+            throw new MessageException("收货单商品添加失败");
+        }
+        //数据库配货地址同步
+        AgentResult  sysn = sysnReceiptOrderPorNum(oReceiptPro.getReceiptId());
+        return sysn;
+    }
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult subOrderPeiHuoUpdate(OReceiptPro oReceiptPro) throws Exception {
+
+        logger.info("用户{}修改{}",oReceiptPro.getuUser(),JSONObject.toJSONString(oReceiptPro));
+
+        //数据库配货地址商品
+        OReceiptPro oReceiptPro_db = oReceiptProMapper.selectByPrimaryKey(oReceiptPro.getId());
+        oReceiptPro_db.setuUser(oReceiptPro.getuUser());
+        oReceiptPro_db.setuTime(Calendar.getInstance().getTime());
+
+        //检查订单状态
+        OOrder order = orderMapper.selectByPrimaryKey(oReceiptPro_db.getOrderid());
+        if(AgStatus.Approved.status.compareTo(order.getReviewStatus())!=0){
+            return AgentResult.fail("审批未通过");
+        }
+
+
+        if(oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code)==0) {
+            logger.info("用户{}修改{},{},更新发货商品失败请重试",oReceiptPro.getuUser(),oReceiptPro.getId(),oReceiptPro.getProNum());
+            return AgentResult.fail("发货商品已排单禁止修改");
+        }
+
+        if(null !=oReceiptPro.getProNum()) {
+            oReceiptPro_db.setProNum(oReceiptPro.getProNum());
+            if (oReceiptPro_db.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
+                oReceiptPro_db.setStatus(Status.STATUS_0.status);
+            }
+        }
+
+        if(null !=oReceiptPro.getReceiptProStatus()) {
+            oReceiptPro_db.setReceiptProStatus(oReceiptPro.getReceiptProStatus());
+        }
+
+        if(1!=oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro_db)){
+            logger.info("用户{}修改{},{},更新发货商品失败请重试",oReceiptPro.getuUser(),oReceiptPro.getId(),oReceiptPro.getProNum());
+            throw new MessageException("更新发货商品失败请重试");
+        }
+
+        //数据库配货地址同步
+        AgentResult  sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
+        return sysn;
+    }
+
+
+
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult subOrderPeiHuoUpdateStatus(String orderId,String agentId) throws Exception {
+        OOrder order =  orderMapper.selectByPrimaryKey(orderId);
+        if(!order.getAgentId().equals(agentId)){
+            logger.info("配货信息修改失败，订单代理商和参数代理商不匹配");
+            AgentResult.fail("信息错误");
+        }
+        OReceiptProExample example = new OReceiptProExample();
+        example.or().andOrderidEqualTo(orderId).andStatusEqualTo(Status.STATUS_1.status).andReceiptProStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
+        List<OReceiptPro> oReceiptProList =   oReceiptProMapper.selectByExample(example);
+        for (OReceiptPro oReceiptPro : oReceiptProList) {
+            oReceiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
+            oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
+        }
+        return AgentResult.ok();
+    }
+
+    /**
+     * 同步发货单数量
+     * @param receiptOrder
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult sysnReceiptOrderPorNum(String receiptOrder) throws Exception {
+        //数据库配货地址
+        OReceiptOrder oReceiptOrder_db = oReceiptOrderMapper.selectByPrimaryKey(receiptOrder);
+
+        //检查订单状态
+        OOrder order = orderMapper.selectByPrimaryKey(oReceiptOrder_db.getOrderId());
+        if(AgStatus.Approved.status.compareTo(order.getReviewStatus())!=0){
+            return AgentResult.fail("审批未通过");
+        }
+
+        OReceiptProExample oReceiptProQuery = new OReceiptProExample();
+        oReceiptProQuery.or().andReceiptIdEqualTo(receiptOrder).andStatusEqualTo(Status.STATUS_1.status);
+        List<OReceiptPro>  oReceiptProList =  oReceiptProMapper.selectByExample(oReceiptProQuery);
+        BigDecimal allCount = BigDecimal.ZERO;
+
+        if(oReceiptProList.size()>0) {
+            for (OReceiptPro oReceiptPro : oReceiptProList) {
+                if (oReceiptPro.getProNum() == null || oReceiptPro.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
+                    oReceiptPro.setStatus(Status.STATUS_0.status);
+                    if (1 != oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro)) {
+                        throw new MessageException("更新发货商品失败请重试");
+                    }
+                }
+                allCount = allCount.add(oReceiptPro.getProNum());
+            }
+
+            if (allCount.compareTo(BigDecimal.ZERO) <= 0) {
+                oReceiptOrder_db.setProNum(BigDecimal.ZERO);
+                oReceiptOrder_db.setStatus(Status.STATUS_0.status);
+            } else {
+                oReceiptOrder_db.setProNum(allCount);
+            }
+        }else{
+            oReceiptOrder_db.setProNum(BigDecimal.ZERO);
+            oReceiptOrder_db.setStatus(Status.STATUS_0.status);
+        }
+        if(1!=oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder_db)){
+            throw new MessageException("更新发货订单失败请重试");
+
+        }
+        return AgentResult.ok();
     }
 }

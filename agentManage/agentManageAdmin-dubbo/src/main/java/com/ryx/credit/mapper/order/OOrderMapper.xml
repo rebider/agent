@@ -412,7 +412,7 @@
             (
               nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
               -
-              nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1),0)
+              nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
             )as dpd,
             c.platform_name
         from o_order o
@@ -463,6 +463,7 @@
         o_sub_order.pro_num,
         o_sub_order.pro_rel_price,
         o_sub_order.send_num,
+        o_sub_order.agent_id,
         nvl(
           (
             select sum(o_receipt_pro.pro_num)
@@ -490,6 +491,9 @@
       O_Receipt_order.Addr_Province,
       O_Receipt_order.Addr_City,
       O_Receipt_order.Addr_District,
+      dr_pro.r_name as Addr_Province_string,
+      dr_cit.r_name as Addr_City_string,
+      dr_di.r_name as Addr_District_string,
       O_Receipt_order.Addr_Detail,
       O_Receipt_order.Remark,
       O_Receipt_order.Zip_Code,
@@ -500,12 +504,15 @@
       o_receipt_pro.id as receipt_pro_id,
       o_receipt_pro.pro_code,
       o_receipt_pro.pro_name,
-      o_receipt_pro.pro_num,
+      o_receipt_pro.pro_num as pro_num_count,
       o_receipt_pro.receipt_pro_status
     from O_Receipt_order
     left join o_receipt_pro on O_Receipt_order.Id = o_receipt_pro.receipt_id and o_receipt_pro.status=1
+    left join d_region dr_pro on dr_pro.r_code = O_Receipt_order.Addr_Province
+    left join d_region dr_cit on dr_cit.r_code = O_Receipt_order.Addr_City
+    left join d_region dr_di on dr_di.r_code = O_Receipt_order.Addr_District
     where O_Receipt_order.Status=1 and O_Receipt_order.Order_Id=#{orderId}  and O_Receipt_order.Agent_Id = #{agentId}
-    order by  O_Receipt_order.Order_Id asc
+    order by O_Receipt_order.Address_Id asc, o_receipt_pro.c_time desc
   </select>
 
 

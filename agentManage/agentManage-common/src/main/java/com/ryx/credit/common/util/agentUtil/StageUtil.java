@@ -11,12 +11,13 @@ import java.util.*;
 public class StageUtil {
 
     public static List<Map> stageOrder(BigDecimal amount, int count, Date date, int day){
-        BigDecimal item =  amount.divide(new BigDecimal(count),0,BigDecimal.ROUND_HALF_UP);
+        BigDecimal item =  amount.divide(new BigDecimal(count),8,BigDecimal.ROUND_HALF_UP);
+        item = item.setScale(2,BigDecimal.ROUND_HALF_UP);
         BigDecimal temp = new BigDecimal(0);
         for (int i=1;i<= count;i++){
             temp = temp.add(item);
         }
-        if(temp.compareTo(amount) < 0){
+        if(temp.compareTo(amount) != 0){
             temp = amount.subtract(temp);
         }else{
             temp = new BigDecimal(0);

@@ -74,15 +74,15 @@ public class AppConfig extends Thread {
 
     public void run() {
         while (!appConfig.getProperty("ServerStop").equals("0")) {
-            try {
-                sleep(300000);//隔5分钟重读配置文件
-            } catch (Exception ex1) {
-                logger.fatal(ex1);
-            }
-            loadConfig();
+        try {
+            sleep(300000);//隔5分钟重读配置文件
+        } catch (Exception ex1) {
+            logger.fatal(ex1);
         }
-        logger.debug("AppConfig thread is exiting...");
+        loadConfig();
     }
+        logger.debug("AppConfig thread is exiting...");
+}
 
 
     public static String getProperty(String propName) {
