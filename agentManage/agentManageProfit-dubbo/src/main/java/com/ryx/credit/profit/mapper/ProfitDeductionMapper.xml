@@ -346,12 +346,15 @@
   </sql>
 
   <select id="getDeductDetail" parameterType="java.lang.String" resultType="java.util.Map">
-    SELECT S.SOURCE_ID, S.DEDUCTION_DATE, S.MUST_AMT,D.NOT_DEDUCTION_AMT
-    FROM P_DEDUCTION D INNER JOIN P_STAGING_DETAIL S  ON D.ID = S.STAG_ID
-     AND D.SOURCE_ID = S.SOURCE_ID
+     SELECT S.STAG_ID,S.SOURCE_ID, S.DEDUCTION_DATE, S.MUST_AMT, D.NOT_DEDUCTION_AMT
+    FROM P_STAGING_DETAIL S
+    LEFT JOIN P_DEDUCTION D
+      ON S.STAG_ID = D.ID
+     AND S.SOURCE_ID = D.SOURCE_ID
      AND D.DEDUCTION_TYPE = '02'
-     AND S.DEDUCTION_DATE = #{deductDate}
+     AND D.STAGING_STATUS IN ('3', '5')
+   WHERE S.REMARK = '机具扣款分期调整下月还款计划'
      AND S.STATUS = '0'
-     AND D.STAGING_STATUS in('3','5')
+     AND S.DEDUCTION_DATE = #{deductDate}
   </select>
 </mapper>
