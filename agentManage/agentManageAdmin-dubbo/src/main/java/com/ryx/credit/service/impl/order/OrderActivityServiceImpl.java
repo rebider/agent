@@ -33,6 +33,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     public PageInfo activityList(OActivity activity, Page page){
         OActivityExample example = new OActivityExample();
         OActivityExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(activity.getActivityName())) {
+            criteria.andActivityNameEqualTo(activity.getActivityName());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setPage(page);
         List<OActivity> activitys = activityMapper.selectByExample(example);
