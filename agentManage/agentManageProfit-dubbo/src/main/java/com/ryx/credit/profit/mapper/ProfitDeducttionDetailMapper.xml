@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitDeducttionDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitDeducttionDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PARENT_AGENT_PID" jdbcType="VARCHAR" property="parentAgentPid" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="DEDUCTION_DATE" jdbcType="VARCHAR" property="deductionDate" />
+    <result column="DEDUCTION_TYPE" jdbcType="CHAR" property="deductionType" />
+    <result column="DEDUCTION_DESC" jdbcType="VARCHAR" property="deductionDesc" />
+    <result column="MUST_DEDUCTION_AMT" jdbcType="DECIMAL" property="mustDeductionAmt" />
+    <result column="DEDUCTION_AMT" jdbcType="DECIMAL" property="deductionAmt" />
+    <result column="NOT_DEDUCTION_AMT" jdbcType="DECIMAL" property="notDeductionAmt" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+    <result column="CREATE_DATE_TIME" jdbcType="TIMESTAMP" property="createDateTime" />
+    <result column="DEDUCTION_ID" jdbcType="VARCHAR" property="deductionId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME, 
+    DEDUCTION_DATE, DEDUCTION_TYPE, DEDUCTION_DESC, MUST_DEDUCTION_AMT, DEDUCTION_AMT, 
+    NOT_DEDUCTION_AMT, REMARK, USER_ID, CREATE_DATE_TIME, DEDUCTION_ID
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_DEDUCTION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_DEDUCTION_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetailExample">
+    delete from P_DEDUCTION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetail">
+    insert into P_DEDUCTION_DETAIL (ID, PARENT_AGENT_PID, PARENT_AGENT_ID, 
+      PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, 
+      AGENT_NAME, DEDUCTION_DATE, DEDUCTION_TYPE, 
+      DEDUCTION_DESC, MUST_DEDUCTION_AMT, DEDUCTION_AMT, 
+      NOT_DEDUCTION_AMT, REMARK, USER_ID, 
+      CREATE_DATE_TIME, DEDUCTION_ID)
+    values (#{id,jdbcType=VARCHAR}, #{parentAgentPid,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
+      #{parentAgentName,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{deductionDate,jdbcType=VARCHAR}, #{deductionType,jdbcType=CHAR}, 
+      #{deductionDesc,jdbcType=VARCHAR}, #{mustDeductionAmt,jdbcType=DECIMAL}, #{deductionAmt,jdbcType=DECIMAL}, 
+      #{notDeductionAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
+      #{createDateTime,jdbcType=TIMESTAMP}, #{deductionId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetail">
+    insert into P_DEDUCTION_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="parentAgentPid != null">
+        PARENT_AGENT_PID,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="deductionDate != null">
+        DEDUCTION_DATE,
+      </if>
+      <if test="deductionType != null">
+        DEDUCTION_TYPE,
+      </if>
+      <if test="deductionDesc != null">
+        DEDUCTION_DESC,
+      </if>
+      <if test="mustDeductionAmt != null">
+        MUST_DEDUCTION_AMT,
+      </if>
+      <if test="deductionAmt != null">
+        DEDUCTION_AMT,
+      </if>
+      <if test="notDeductionAmt != null">
+        NOT_DEDUCTION_AMT,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="userId != null">
+        USER_ID,
+      </if>
+      <if test="createDateTime != null">
+        CREATE_DATE_TIME,
+      </if>
+      <if test="deductionId != null">
+        DEDUCTION_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentPid != null">
+        #{parentAgentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionDate != null">
+        #{deductionDate,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionType != null">
+        #{deductionType,jdbcType=CHAR},
+      </if>
+      <if test="deductionDesc != null">
+        #{deductionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="mustDeductionAmt != null">
+        #{mustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionAmt != null">
+        #{deductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="notDeductionAmt != null">
+        #{notDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDateTime != null">
+        #{createDateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deductionId != null">
+        #{deductionId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetailExample" resultType="java.lang.Long">
+    select count(*) from P_DEDUCTION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetail">
+    update P_DEDUCTION_DETAIL
+    <set>
+      <if test="parentAgentPid != null">
+        PARENT_AGENT_PID = #{parentAgentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionDate != null">
+        DEDUCTION_DATE = #{deductionDate,jdbcType=VARCHAR},
+      </if>
+      <if test="deductionType != null">
+        DEDUCTION_TYPE = #{deductionType,jdbcType=CHAR},
+      </if>
+      <if test="deductionDesc != null">
+        DEDUCTION_DESC = #{deductionDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="mustDeductionAmt != null">
+        MUST_DEDUCTION_AMT = #{mustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionAmt != null">
+        DEDUCTION_AMT = #{deductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="notDeductionAmt != null">
+        NOT_DEDUCTION_AMT = #{notDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null">
+        USER_ID = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="createDateTime != null">
+        CREATE_DATE_TIME = #{createDateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deductionId != null">
+        DEDUCTION_ID = #{deductionId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetail">
+    update P_DEDUCTION_DETAIL
+    set PARENT_AGENT_PID = #{parentAgentPid,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      DEDUCTION_DATE = #{deductionDate,jdbcType=VARCHAR},
+      DEDUCTION_TYPE = #{deductionType,jdbcType=CHAR},
+      DEDUCTION_DESC = #{deductionDesc,jdbcType=VARCHAR},
+      MUST_DEDUCTION_AMT = #{mustDeductionAmt,jdbcType=DECIMAL},
+      DEDUCTION_AMT = #{deductionAmt,jdbcType=DECIMAL},
+      NOT_DEDUCTION_AMT = #{notDeductionAmt,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      USER_ID = #{userId,jdbcType=VARCHAR},
+      CREATE_DATE_TIME = #{createDateTime,jdbcType=TIMESTAMP},
+      DEDUCTION_ID = #{deductionId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
