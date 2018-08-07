@@ -71,9 +71,6 @@ public class CompensateServiceImpl implements CompensateService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private CompensateService compensateService;
-    @Autowired
-    private IAccountAdjustService accountAdjustService;
-
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -135,7 +132,8 @@ public class CompensateServiceImpl implements CompensateService {
         reqParam.put("snEnd",snEnd);
         reqParam.put("status",Status.STATUS_1.status);
         reqParam.put("orderId",orderNum);
-        reqParam.put("proCom",proCom);
+        Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
+        reqParam.put("proCom",dictByName.getdItemvalue());
         reqParam.put("proModel",proModel);
         List<Map<String,Object>> oLogistics = logisticsMapper.queryLogisticsList(reqParam);
         if(oLogistics==null){
