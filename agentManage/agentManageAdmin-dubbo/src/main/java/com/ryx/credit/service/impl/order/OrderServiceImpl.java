@@ -1126,11 +1126,11 @@ public class OrderServiceImpl implements OrderService {
                     }
                     if(oPayment.getDownPaymentCount()==null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                       throw new MessageException("分期数据为错误");
+                       throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<=0){
+                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                        throw new MessageException("分期日期错误");
                     }
 
                     //待付 订单待付减去抵扣
@@ -1219,12 +1219,12 @@ public class OrderServiceImpl implements OrderService {
                         throw new MessageException("待付金额不能为空");
                     }
                     if(oPayment.getDownPaymentCount()==null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
-                        logger.info("代理商订单审批完成:分期数据为错误:{},{}", order.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                        logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                        throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<=0){
-                        logger.info("代理商订单审批完成:分期数据为错误:{},{}", order.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<0){
+                        logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                        throw new MessageException("分期日期错误");
                     }
 
                     //待付 订单待付减去抵扣
@@ -1405,11 +1405,11 @@ public class OrderServiceImpl implements OrderService {
                     }
                     if(oPayment.getDownPaymentCount()==null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                        throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<=0){
+                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                        throw new MessageException("分期日期错误");
                     }
                     if(oPayment.getActualReceipt()==null || oPayment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
                         logger.info("代理商订单审批完成:实际收款金额不能为空:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
@@ -1519,11 +1519,11 @@ public class OrderServiceImpl implements OrderService {
                     }
                     if(oPayment.getDownPaymentCount()==null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                        throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<=0){
+                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                        throw new MessageException("分期数据为错误");
+                        throw new MessageException("分期日期错误");
                     }
                     if(oPayment.getActualReceipt()==null || oPayment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
                         logger.info("代理商订单审批完成:实际收款金额不能为空:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
