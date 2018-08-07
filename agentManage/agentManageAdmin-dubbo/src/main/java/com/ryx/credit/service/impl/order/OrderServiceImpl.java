@@ -209,178 +209,7 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok(orderFormVo.getId());
     }
 
-    /**
-     * 分期处理
-     *
-     * @param oPayment
-     * @return
-     */
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-    @Override
-    public AgentResult paymentPlan(OPayment oPayment) throws Exception {
-        Date d = Calendar.getInstance().getTime();
-        BigDecimal allPay = oPayment.getPayAmount();//总金额
-        BigDecimal down = oPayment.getDownPayment();//首付
-        BigDecimal paymentCount = oPayment.getDownPaymentCount();//分期
-        Date downPaymentDate = oPayment.getDownPaymentDate();//起始日期
-        switch (oPayment.getPayMethod()) {
-            case "SF1"://首付+分润分期
-                if (down == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (paymentCount == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate.compareTo(new Date()) < 0) {
-                    return AgentResult.fail("分期日期错误");
-                }
-                List<Map> SF1_data = StageUtil.stageOrder(allPay.subtract(down), paymentCount.intValue(), downPaymentDate, 16);
-                //明细处理
-                for (Map datum : SF1_data) {
-                    OPaymentDetail record = new OPaymentDetail();
-                    record.setId(idService.genId(TabId.o_payment_detail));
-                    record.setBatchCode(d.getTime() + "");
-                    record.setPaymentId(oPayment.getId());
-                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                    record.setOrderId(oPayment.getOrderId());
-                    record.setPayType(PaymentType.FRFQ.code);
-                    record.setPayAmount((BigDecimal) datum.get("item"));
-                    record.setRealPayAmount(new BigDecimal(0));
-                    record.setPlanPayTime((Date) datum.get("date"));
-                    record.setPlanNum((BigDecimal) datum.get("count"));
-                    record.setAgentId(oPayment.getAgentId());
-                    record.setPaymentStatus(PaymentStatus.DS.code);
-                    record.setcUser(oPayment.getUserId());
-                    record.setcDate(d);
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setVersion(Status.STATUS_1.status);
-                    if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new MessageException("分期处理");
-                    }
-                }
-                break;
-            case "SF2": //首付+打款分期
-                if (down == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (paymentCount == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate.compareTo(new Date()) < 0) {
-                    return AgentResult.fail("分期日期错误");
-                }
-                List<Map> SF2_data = StageUtil.stageOrder(allPay.subtract(down), paymentCount.intValue(), downPaymentDate, 16);
-                //明细处理
-                for (Map datum : SF2_data) {
-                    OPaymentDetail record = new OPaymentDetail();
-                    record.setId(idService.genId(TabId.o_payment_detail));
-                    record.setBatchCode(d.getTime() + "");
-                    record.setPaymentId(oPayment.getId());
-                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                    record.setOrderId(oPayment.getOrderId());
-                    record.setPayType(PaymentType.DKFQ.code);
-                    record.setPayAmount((BigDecimal) datum.get("item"));
-                    record.setRealPayAmount(new BigDecimal(0));
-                    record.setPlanNum((BigDecimal) datum.get("count"));
-                    record.setAgentId(oPayment.getAgentId());
-                    record.setPaymentStatus(PaymentStatus.DS.code);
-                    record.setcUser(oPayment.getUserId());
-                    record.setcDate(d);
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setVersion(Status.STATUS_1.status);
-                    if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new MessageException("分期处理");
-                    }
-                }
-                break;
-            case "FKFQ"://付款分期
-                if (down == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (paymentCount == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate.compareTo(new Date()) < 0) {
-                    return AgentResult.fail("分期日期错误");
-                }
-                List<Map> FKFQ_data = StageUtil.stageOrder(allPay, paymentCount.intValue(), downPaymentDate, 16);
-                //明细处理
-                for (Map datum : FKFQ_data) {
-                    OPaymentDetail record = new OPaymentDetail();
-                    record.setId(idService.genId(TabId.o_payment_detail));
-                    record.setBatchCode(d.getTime() + "");
-                    record.setPaymentId(oPayment.getId());
-                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                    record.setOrderId(oPayment.getOrderId());
-                    record.setPayType(PaymentType.DKFQ.code);
-                    record.setPayAmount((BigDecimal) datum.get("item"));
-                    record.setRealPayAmount(new BigDecimal(0));
-                    record.setPlanNum((BigDecimal) datum.get("count"));
-                    record.setAgentId(oPayment.getAgentId());
-                    record.setPaymentStatus(PaymentStatus.DS.code);
-                    record.setcUser(oPayment.getUserId());
-                    record.setcDate(d);
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setVersion(Status.STATUS_1.status);
-                    if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new MessageException("分期处理");
-                    }
-                }
-                break;
-            case "FRFQ"://分润分期
-                if (down == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (paymentCount == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate == null) {
-                    return AgentResult.fail("分期数据错误");
-                }
-                if (downPaymentDate.compareTo(new Date()) < 0) {
-                    return AgentResult.fail("分期日期错误");
-                }
-                List<Map> FRFQ_data = StageUtil.stageOrder(allPay, paymentCount.intValue(), downPaymentDate, 16);
-                //明细处理
-                for (Map datum : FRFQ_data) {
-                    OPaymentDetail record = new OPaymentDetail();
-                    record.setId(idService.genId(TabId.o_payment_detail));
-                    record.setBatchCode(d.getTime() + "");
-                    record.setPaymentId(oPayment.getId());
-                    record.setPaymentType(PamentIdType.ORDER_FKD.code);
-                    record.setOrderId(oPayment.getOrderId());
-                    record.setPayType(PaymentType.FRFQ.code);
-                    record.setPayAmount((BigDecimal) datum.get("item"));
-                    record.setRealPayAmount(new BigDecimal(0));
-                    record.setPlanNum((BigDecimal) datum.get("count"));
-                    record.setAgentId(oPayment.getAgentId());
-                    record.setPaymentStatus(PaymentStatus.DS.code);
-                    record.setcUser(oPayment.getUserId());
-                    record.setcDate(d);
-                    record.setStatus(Status.STATUS_1.status);
-                    record.setVersion(Status.STATUS_1.status);
-                    if (1 != oPaymentDetailMapper.insert(record)) {
-                        throw new MessageException("分期处理");
-                    }
-                }
-                break;
-            case "XXDK"://线下打款
-                break;
-            case "QT"://其他
-                break;
-        }
-        return AgentResult.ok();
 
-    }
 
 
     /**
@@ -582,6 +411,7 @@ public class OrderServiceImpl implements OrderService {
             }
             //计算订单金额
             forPayAmount = forPayAmount.add(oSubOrder.getProPrice().multiply(oSubOrder.getProNum()));
+            //优惠后金额
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
         //收货地址
@@ -672,7 +502,7 @@ public class OrderServiceImpl implements OrderService {
         oPayment.setRealAmount(new BigDecimal(0));//已付金额
         //需要手动计算付款金额
         orderFormVo.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
-        orderFormVo.setoAmo(forRealPayAmount);//订单总金额
+        orderFormVo.setoAmo(forPayAmount);//订单总金额
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
         //插入订单
         if (1 != orderMapper.insertSelective(orderFormVo)) {

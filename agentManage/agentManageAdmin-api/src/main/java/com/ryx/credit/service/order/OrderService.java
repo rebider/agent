@@ -71,12 +71,6 @@ public interface OrderService {
     public OPayment initPayment(OPayment payment) throws MessageException;
 
 
-    /**
-     * 付款单下单处理
-     * @param oPayment
-     * @return
-     */
-    public AgentResult paymentPlan(OPayment oPayment)throws Exception;
 
 
     /**
