@@ -225,10 +225,10 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("请填写首付金额");
                 }
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("请填分期时间");
+                    throw new MessageException("分期时间有误");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
-                    throw new MessageException("请填分期期数");
+                    throw new MessageException("分期期数有误");
                 }
                 if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("请填实际打款金额");
@@ -239,10 +239,10 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("请填写首付金额");
                 }
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("请填分期时间");
+                    throw new MessageException("分期时间有误");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
-                    throw new MessageException("请填分期期数");
+                    throw new MessageException("分期期数有误");
                 }
                 if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("请填实际打款金额");
@@ -250,20 +250,20 @@ public class OrderServiceImpl implements OrderService {
                 return payment;
             case "FKFQ"://打款分期
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("请填分期时间");
+                    throw new MessageException("分期时间有误");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
-                    throw new MessageException("请填分期期数");
+                    throw new MessageException("分期期数有误");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "FRFQ"://分润分期
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("请填分期时间");
+                    throw new MessageException("分期时间有误");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
-                    throw new MessageException("请填分期期数");
+                    throw new MessageException("分期期数有误");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setActualReceipt(BigDecimal.ZERO);
