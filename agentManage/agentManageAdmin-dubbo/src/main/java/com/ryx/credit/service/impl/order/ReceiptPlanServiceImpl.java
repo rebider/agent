@@ -55,7 +55,11 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
         List<Map<String, Object>> list = receiptPlanMapper.getReceipPlanList(param);
         for (Map<String, Object> maps : list) {
             Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(), String.valueOf(maps.get("PRO_TYPE")));
+            if(dictByValue!=null)
             maps.put("PRO_TYPE",dictByValue.getdItemname());
+            Dict proCom = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(maps.get("PRO_COM")));
+            if(proCom!=null)
+            maps.put("PRO_COM",proCom.getdItemname());
         }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
