@@ -8,10 +8,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.order.ODeductCapitalMapper;
-import com.ryx.credit.dao.order.OReturnOrderDetailMapper;
-import com.ryx.credit.dao.order.OReturnOrderMapper;
-import com.ryx.credit.dao.order.OReturnOrderRelMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AttachmentRel;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.agent.BusActRelExample;
@@ -26,6 +23,7 @@ import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.authz.annotation.Logical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +72,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private AttachmentRelMapper attachmentRelMapper;
     @Resource
     OLogisticsService oLogisticsService;
-
+    @Autowired
+    ReceiptPlanMapper receiptPlanMapper;
+    @Autowired
+    OLogisticsMapper logisticsMapper;
 
     /**
      * @Author: Zhang Lei
@@ -165,6 +166,35 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         returnOrder.setCutAmo(returnOrder.getCutAmo().add(new BigDecimal(amt)));
         returnOrder.setReturnAmo(returnOrder.getReturnAmo().subtract(new BigDecimal(amt)));
         returnOrder.setuTime(new Date());
+        returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+
+        map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
+        map.put("returnAmo", returnOrder.getReturnAmo());
+        map.put("cutAmo", returnOrder.getCutAmo());
+        map.put("cutId", deductCapital.getId());
+
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> delCut(String returnId, String cutId, String userid) throws ProcessException {
+
+        Map<String, Object> map = new HashMap<>();
+
+        ODeductCapitalExample example = new ODeductCapitalExample();
+        example.or().andIdEqualTo(cutId).andSourceIdEqualTo(returnId);
+        List<ODeductCapital> oDeductCapitals = deductCapitalMapper.selectByExample(example);
+        if (oDeductCapitals == null && oDeductCapitals.size() <= 0) {
+            throw new ProcessException("未找到此扣款款项");
+        }
+        ODeductCapital oDeductCapital = oDeductCapitals.get(0);
+        deductCapitalMapper.deleteByExample(example);
+
+        OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+        returnOrder.setCutAmo(returnOrder.getCutAmo().subtract(oDeductCapital.getcAmount()));
+        returnOrder.setReturnAmo(returnOrder.getReturnAmo().add(oDeductCapital.getcAmount()));
+        returnOrder.setuTime(new Date());
+        returnOrder.setcUser(userid);
         returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
 
         map.put("goodsReturnAmo", returnOrder.getGoodsReturnAmo());
@@ -316,7 +346,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //更新物流明细表SN状态
             try {
-                oLogisticsService.updateSnStatus(orderId,startSn,endSn,SnStatus.THZ.code);
+                oLogisticsService.updateSnStatus(orderId, startSn, endSn, SnStatus.THZ.code);
             } catch (Exception e) {
                 log.error("更新SN状态失败", e);
                 throw new ProcessException("更新SN状态失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
@@ -437,6 +467,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
             }
 
+
+            //代理商审批时判断是否上传物流信息
+            if (sid.equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")) {
+                ReceiptPlanExample example = new ReceiptPlanExample();
+                example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
+                List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
+                for (ReceiptPlan receiptPlan : receiptPlans) {
+                    String receiptPlanId = receiptPlan.getId();
+                    OLogisticsExample example1 = new OLogisticsExample();
+                    example1.or().andReceiptPlanIdEqualTo(receiptPlanId);
+                    List<OLogistics> oLogistics = logisticsMapper.selectByExample(example1);
+                    if (oLogistics == null || oLogistics.size() <= 0) {
+                        throw new ProcessException("排单编号为"+receiptPlanId+"的排单未导入退货物流信息");
+                    }
+                }
+            }
+
             //完成任务
             AgentResult result = new AgentResult(500, "系统异常", "");
             Map<String, Object> reqMap = new HashMap<>();
@@ -467,7 +514,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             return AgentResult.ok(null);
         } catch (ProcessException e) {
             e.printStackTrace();
-            throw new ProcessException("catch工作流处理任务异常!");
+            throw new ProcessException(e.getMessage());
         }
     }
 
@@ -538,17 +585,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 执行扣款计划后更新退货单和退货明细
      * @Date: 19:13 2018/8/3
      */
-    public void doPlan(String returnId, BigDecimal takeAmt,String userid) {
+    public void doPlan(String returnId, BigDecimal takeAmt, String userid) {
         try {
 
             OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
             BigDecimal returnAmo = oReturnOrder.getReturnAmo();
-            returnAmo = returnAmo.subtract(takeAmt);
-            oReturnOrder.setReturnAmo(returnAmo);
 
-            if(returnAmo.compareTo(BigDecimal.ZERO)>0){
+            if ((returnAmo.subtract(takeAmt)).compareTo(BigDecimal.ZERO) > 0) {
                 oReturnOrder.setRetSchedule(new BigDecimal(RetSchedule.TKZ.code));
-            }else {
+            } else {
                 oReturnOrder.setRetSchedule(new BigDecimal(RetSchedule.WC.code));
             }
 
