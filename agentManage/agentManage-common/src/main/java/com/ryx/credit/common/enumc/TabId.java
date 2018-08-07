@@ -37,7 +37,7 @@ public enum TabId {
     o_logistics("LG%s%014d"),//发货物流
     o_logistics_detail("LD%s%014d"),
     o_Refund_price_diff("ORPD%s%015d"),
-    o_Refund_price_diff_detail("ORPDD%s%015d"),
+    o_Refund_price_diff_d("ORPDD%s%015d"),
     o_return_order("RO%s%015d"),
     o_return_order_detail("ROD%s%014d"),
     o_return_order_rel("ROR%s%014d"),

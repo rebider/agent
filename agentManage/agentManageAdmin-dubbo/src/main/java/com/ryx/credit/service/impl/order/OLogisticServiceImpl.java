@@ -134,7 +134,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
             oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
             oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
-
+            oLogistics.setIsdeall(Status.STATUS_1.status);
             oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
             oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
             oLogistics.setProId(String.valueOf(objectList.get(3)));         // 商品ID
@@ -144,14 +144,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 if (null != dictByName && !dictByName.getdItemname().equals(""))
                     oLogistics.setProType(dictByName.getdItemvalue());      // 商品类型
             }
-            if (StringUtils.isNotBlank(String.valueOf(objectList.get(9)))) {
-                Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(objectList.get(9)));
-                if (null != dictByName && !dictByName.getdItemname().equals(""))
-                    oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
+            if (StringUtils.isBlank(String.valueOf(objectList.get(9)))) {
+                logger.info("未匹配到厂家:{}", String.valueOf(objectList.get(9)));
+                throw new MessageException("未匹配到厂家");
             }
-
-            oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
+            Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(objectList.get(9)));
+            if (null != dictByName && !dictByName.getdItemname().equals(""))
+                oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
             try {
+
+                oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
                 oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
                 oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
                 oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司
@@ -159,7 +161,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setSnBeginNum(null != objectList.get(26) ? String.valueOf(objectList.get(26)) : "");   // 起始SN序列号
                 oLogistics.setSnEndNum(null != objectList.get(27) ? String.valueOf(objectList.get(27)) : "");     // 结束SN序列号
             } catch (Exception e) {
-                throw new ProcessException("Excel参数错误！");
+                throw new MessageException("Excel参数错误！");
             }
             System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
             if (1 != insertImportData(oLogistics)) {

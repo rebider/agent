@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
@@ -70,9 +71,6 @@ public class CompensateServiceImpl implements CompensateService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private CompensateService compensateService;
-    @Autowired
-    private IAccountAdjustService accountAdjustService;
-
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -134,7 +132,8 @@ public class CompensateServiceImpl implements CompensateService {
         reqParam.put("snEnd",snEnd);
         reqParam.put("status",Status.STATUS_1.status);
         reqParam.put("orderId",orderNum);
-        reqParam.put("proCom",proCom);
+        Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
+        reqParam.put("proCom",dictByName.getdItemvalue());
         reqParam.put("proModel",proModel);
         List<Map<String,Object>> oLogistics = logisticsMapper.queryLogisticsList(reqParam);
         if(oLogistics==null){
@@ -170,14 +169,14 @@ public class CompensateServiceImpl implements CompensateService {
         OSubOrderActivityExample.Criteria criteria2 = oSubOrderActivityExample.createCriteria();
         criteria2.andSubOrderIdEqualTo(oSubOrder.getId());
         List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-        if(null!=oSubOrderActivities){
+        if(null==oSubOrderActivities){
             log.info("数据有误异常返回05");
             throw new ProcessException("商品活动内部服务器异常");
         }
         if(oSubOrderActivities.size()==1){
             OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
             BigDecimal gTime = oSubOrderActivity.getgTime();
-            gTime.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
+            gTime = gTime.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
             long activityCtime = oSubOrderActivity.getcTime().getTime();
             long nowTime = new Date().getTime();
             if((new BigDecimal(nowTime-activityCtime)).compareTo(gTime)==1){
@@ -216,8 +215,6 @@ public class CompensateServiceImpl implements CompensateService {
                 return null;
             }
             OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-            OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oSubOrderActivity.getSubOrderId());
-
             BigDecimal oldPrice = oSubOrderActivity.getPrice().multiply(proNum);
             BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
             resultPrice = oldPrice.subtract(newPrice);
@@ -325,7 +322,7 @@ public class CompensateServiceImpl implements CompensateService {
                 log.info("查询oActivity异常");
                 throw new ProcessException("系统异常");
             }
-            refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_detail));
+            refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
             refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
             refundPriceDiffDetail.setFrontPrice(oSubOrderActivity!=null?oSubOrderActivity.getPrice():new BigDecimal(0));
             refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
@@ -387,7 +384,7 @@ public class CompensateServiceImpl implements CompensateService {
         Map startPar = agentEnterService.startPar(cuser);
         if (null == startPar) {
             log.info("========用户{}{}启动部门参数为空", id, cuser);
-            throw new ProcessException("启动部门参数为空!");
+            throw new MessageException("启动部门参数为空!");
         }
 
         //不同的业务类型找到不同的启动流程
@@ -611,4 +608,72 @@ public class CompensateServiceImpl implements CompensateService {
         return oRefundPriceDiff;
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser) {
+
+        if(null==refundPriceDiffDetailList){
+            throw new ProcessException("退补差价明细数据为空");
+        }
+        if(null==oRefundPriceDiff){
+            throw new ProcessException("退补差价金额数据为空");
+        }
+        refundPriceDiffDetailList.forEach(row->{
+            //查询最新活动
+            OActivity oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+            ORefundPriceDiffDetail oRefundPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(row.getId());
+            oRefundPriceDiffDetail.setActivityRealId(row.getActivityRealId());
+            oRefundPriceDiffDetail.setActivityName(oActivity.getActivityName());
+            oRefundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
+            oRefundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
+            oRefundPriceDiffDetail.setPrice(oActivity.getPrice());
+            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
+            if(i!=1){
+                throw new ProcessException("修改退补差价数据失败");
+            }
+        });
+        if(null==oRefundPriceDiff.getId()){
+            throw new ProcessException("退补差价数据id为空");
+        }
+        int k = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+        if(k!=1){
+            throw new ProcessException("更新退补差价数据失败");
+        }
+        //附件修改
+        if(null!=refundPriceDiffFile){
+            AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+            AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+            criteria.andSrcIdEqualTo(oRefundPriceDiff.getId());
+            criteria.andBusTypeEqualTo(AttachmentRelType.ActivityEdit.name());
+            List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+            attachmentRels.forEach(row->{
+                row.setStatus(Status.STATUS_0.status);
+                int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                if (1 != i) {
+                    log.info("删除活动变更附件关系失败");
+                    throw new ProcessException("删除附件失败");
+                }
+            });
+
+            refundPriceDiffFile.forEach(row->{
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(row);
+                record.setSrcId(oRefundPriceDiff.getId());
+                record.setcUser(cUser);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.ActivityEdit.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                int i = attachmentRelMapper.insertSelective(record);
+                if (1 != i) {
+                    log.info("活动变更附件关系失败");
+                    throw new ProcessException("系统异常");
+                }
+            });
+        }
+
+
+        return AgentResult.ok();
+    }
 }

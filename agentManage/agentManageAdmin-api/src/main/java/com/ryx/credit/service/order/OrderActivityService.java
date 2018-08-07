@@ -24,4 +24,6 @@ public interface OrderActivityService {
     AgentResult deleteById(String id);
 
     List<OActivity> allActivity();
+
+    List<OActivity> productActivity(String product,String angetId);
 }

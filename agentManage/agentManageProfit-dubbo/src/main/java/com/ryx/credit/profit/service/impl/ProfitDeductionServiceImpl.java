@@ -143,4 +143,27 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return profitDeductionMapper.getDeductDetail(deductDate);
     }
 
+    @Override
+    public List<ProfitDeduction> getProfitDeduction(ProfitDeduction profitDeduction) {
+        ProfitDeductionExample example = new ProfitDeductionExample();
+        ProfitDeductionExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(profitDeduction.getAgentId())){
+            criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
+        }
+        if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
+            criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+        }
+        if (StringUtils.isNotBlank(profitDeduction.getDeductionDate())){
+            criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
+        }
+        if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
+            criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
+        }
+        List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
+        if(profitDeductions != null && !profitDeductions.isEmpty()){
+            return profitDeductions;
+        }
+        return null;
+    }
+
 }
