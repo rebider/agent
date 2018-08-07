@@ -13,5 +13,7 @@ public interface IdService {
 
     public String genIdInTran(TabId tablename);
 
+    public String genOrderId(TabId tablename,Integer userid);
+
 
 }

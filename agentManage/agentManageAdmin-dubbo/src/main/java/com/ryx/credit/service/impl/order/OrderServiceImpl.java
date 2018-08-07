@@ -430,7 +430,7 @@ public class OrderServiceImpl implements OrderService {
         //订单基础数据
         Date d = Calendar.getInstance().getTime();
         orderFormVo.setId(idService.genId(TabId.o_order));
-        orderFormVo.setoNum(orderFormVo.getId());
+        orderFormVo.setoNum(idService.genOrderId(TabId.o_order,Integer.valueOf(userId)));
         orderFormVo.setoApytime(orderFormVo.getcTime());
         orderFormVo.setUserId(userId);
         orderFormVo.setPayAmo(orderFormVo.getoAmo());
