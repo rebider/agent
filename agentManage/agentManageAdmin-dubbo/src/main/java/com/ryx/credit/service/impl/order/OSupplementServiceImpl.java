@@ -1,7 +1,8 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
-import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -11,6 +12,7 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
+import com.ryx.credit.dao.order.OPaymentMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
@@ -53,6 +55,8 @@ public class OSupplementServiceImpl implements OSupplementService {
     private ActivityService activityService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private OPaymentMapper oPaymentMapper;
 
     @Override
     public PageInfo selectAll(Page page, OSupplement oSupplement, String time) {
@@ -116,7 +120,7 @@ public class OSupplementServiceImpl implements OSupplementService {
     }
 
     @Override
-    public ResultVO supplementSave(OsupplementVo osupplementVo) {
+    public ResultVO supplementSave(OsupplementVo osupplementVo) throws Exception {
         OSupplement oSupplement = osupplementVo.getSupplement();
         if (oSupplement == null) {
             logger.info("补款添加:{}", "补款添加信息为空");
@@ -157,7 +161,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     record.setId(idService.genId(TabId.a_attachment_rel));
                     if (1 != attachmentRelMapper.insertSelective(record)) {
                         logger.info("补款添加:{}", "上传打款截图失败");
-                        throw new ProcessException("上传打款截图失败");
+                        throw new MessageException("上传打款截图失败");
                     }
                 }
             }
@@ -168,15 +172,15 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO startSuppActivity(String id, String userId) throws ProcessException {
+    public ResultVO startSuppActivity(String id, String userId)throws Exception{
         logger.info("========用户{}启动补款审核{}", userId, id);
         if (StringUtils.isBlank(id)) {
             logger.info("补款审批,补款ID为空{}:{}", id, userId);
-            throw new ProcessException("补款审批中，补款ID为空");
+            throw new MessageException("补款审批中，补款ID为空");
         }
         if (StringUtils.isBlank(userId)) {
             logger.info("补款审批,操作用户为空{}:{}", id, userId);
-            throw new ProcessException("补款审批中，操作用户为空");
+            throw new MessageException("补款审批中，操作用户为空");
         }
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
 
@@ -195,14 +199,14 @@ public class OSupplementServiceImpl implements OSupplementService {
             BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
             if (!paymentStatus.equals(PaymentStatus.DF.code)) {
                 logger.info("订单还未生效{}:{}", id, userId);
-                throw new ProcessException("订单还未生效");
+                throw new MessageException("订单还未生效");
             }
 
             //只有是待付款状态才可以启动流程   并修改状态为付款中
             oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
             if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                 logger.info("订单付款状态修改失败{}:", oPaymentDetail.getId());
-                throw new ProcessException("订单付款状态修改失败");
+                throw new MessageException("订单付款状态修改失败");
             }
 
         }
@@ -211,7 +215,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         example.or().andBusIdEqualTo(id).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         if (busActRelMapper.selectByExample(example).size() > 0) {
             logger.info("补款审批,禁止重复提交审批{}:{}", id, userId);
-            throw new ProcessException("补款审批中，禁止重复提交审批");
+            throw new MessageException("补款审批中，禁止重复提交审批");
         }
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_RETURN_FINANCE.name());
         String workId = null;
@@ -222,22 +226,22 @@ public class OSupplementServiceImpl implements OSupplementService {
 
         if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
             logger.info("补款审批，启动审批异常，更新记录状态{}:{}", oSupplement.getId(), userId);
-            throw new ProcessException("更新记录状态异常");
+            throw new MessageException("更新记录状态异常");
         }
         if (StringUtils.isEmpty(workId)) {
             logger.info("========用户{}启动补款审批{}{}", id, userId, "审批流启动失败字典中未配置部署流程");
-            throw new ProcessException("审批流启动失败字典中未配置部署流程!");
+            throw new MessageException("审批流启动失败字典中未配置部署流程!");
         }
         Map startPar = agentEnterService.startPar(userId);
         if (null == startPar) {
             logger.info("========用户{}启动补款审批{}{}启动部门参数为空", id, userId, "审批流启动失败字典中未配置部署流程");
-            throw new ProcessException("启动部门参数为空!");
+            throw new MessageException("启动部门参数为空!");
         }
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {
             logger.info("========用户{}启动补款审批申请{}{}", id, userId, "补款审批，审批流启动失败");
             logger.info("补款审批，审批流启动失败{}:{}", id, userId);
-            throw new ProcessException("审批流启动失败!");
+            throw new MessageException("审批流启动失败!");
         }
         //补款业务流程关系
         BusActRel record = new BusActRel();
@@ -250,7 +254,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("补款审批审批，启动审批异常，添加审批关系失败{}:{}", oSupplement.getId(), proce);
-            throw new ProcessException("添加审批关系失败");
+            throw new MessageException("添加审批关系失败");
 
         }
         return ResultVO.success(null);
@@ -286,18 +290,18 @@ public class OSupplementServiceImpl implements OSupplementService {
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {
                 logger.error(result.getMsg());
-                throw new ProcessException("工作流处理任务异常");
+                throw new MessageException("工作流处理任务异常");
             }
-        } catch (ProcessException e) {
+        } catch (MessageException e) {
             e.printStackTrace();
-            throw new ProcessException("catch工作流处理任务异常!");
+            throw new MessageException("catch工作流处理任务异常!");
         }
         return AgentResult.ok();
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateByActivId(String id, String activityName) {
+    public ResultVO updateByActivId(String id, String activityName) throws MessageException {
         BusActRel busActRel = selectByActivId(id);
         OSupplement oSupplement = new OSupplement();
         String srcId = "";
@@ -311,13 +315,13 @@ public class OSupplementServiceImpl implements OSupplementService {
             busActRel.setActivStatus(AgStatus.Refuse.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}:", busActRel.getActivId());
-                throw new ProcessException("业务流程状态修改失败");
+                throw new MessageException("业务流程状态修改失败");
             }
             oSupplement.setSchstatus(SchStatus.FOUR.getValue());
             oSupplement.setReviewStatus(AgStatus.Refuse.status);
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("补款状态修改失败{}:", busActRel.getActivId());
-                throw new ProcessException("补款状态修改失败");
+                throw new MessageException("补款状态修改失败");
             }
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
@@ -325,33 +329,51 @@ public class OSupplementServiceImpl implements OSupplementService {
                 oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
-                    throw new ProcessException("订单付款状态修改失败");
+                    throw new MessageException("订单付款状态修改失败");
                 }
             }
         } else if ("finish_end".equals(activityName)) {//审批同意
             busActRel.setActivStatus(AgStatus.Approved.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}", busActRel.getActivId());
-                throw new ProcessException("业务流程状态修改失败");
+                throw new MessageException("业务流程状态修改失败");
             }
             oSupplement.setSchstatus(SchStatus.THREE.getValue());
             oSupplement.setReviewStatus(AgStatus.Approved.status);
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("补款状态修改失败{}:", busActRel.getActivId());
-                throw new ProcessException("补款状态修改失败");
+                throw new MessageException("补款状态修改失败");
             }
             //修改订单明细付款状态
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                oPaymentDetail.setRealPayAmount(supplement.getRealPayAmount());
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
                 oPaymentDetail.setSrcType(PamentSrcType.PamentSrcType_XXBK.code);
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
-                    throw new ProcessException("订单付款状态修改失败");
+                    throw new MessageException("订单付款状态修改失败");
+                }
+                //更新付款单的已付款和未付款
+                OPaymentExample oPaymentExample = new OPaymentExample();
+                OPaymentExample.Criteria criteria = oPaymentExample.createCriteria();
+                criteria.andIdEqualTo(oPaymentDetail.getPaymentId());
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
+                if (1 != oPayments.size()) {
+                    logger.info("无此数据");
+                    throw new MessageException("无此数据!!!");
+                }
+                OPayment oPayment = oPayments.get(0);
+                oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
+                oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
+                if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+                    logger.info("付款单修改失败");
+                    throw new MessageException("付款单修改失败");
                 }
             }
         }
@@ -400,14 +422,14 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAmount(AgentVo agentVo) {
+    public ResultVO updateAmount(AgentVo agentVo) throws MessageException {
         if (StringUtils.isNotBlank(agentVo.getSupplementId()) && null != agentVo.getRealPayAmount()) {
             OSupplement oSupplement = new OSupplement();
             oSupplement.setId(agentVo.getSupplementId());
             oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("实际金额保存失败");
-                throw new ProcessException("实际金额保存失败");
+                throw new MessageException("实际金额保存失败");
             }
         }
         return ResultVO.success("");

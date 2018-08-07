@@ -134,7 +134,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
             oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
             oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
-
+            oLogistics.setIsdeall(Status.STATUS_1.status);
             oLogistics.setReceiptPlanId(String.valueOf(objectList.get(0))); // 排单编号
             oLogistics.setOrderId(String.valueOf(objectList.get(1)));       // 订单编号
             oLogistics.setProId(String.valueOf(objectList.get(3)));         // 商品ID
@@ -149,9 +149,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 if (null != dictByName && !dictByName.getdItemname().equals(""))
                     oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
             }
-
-            oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
             try {
+
+                oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
                 oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
                 oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
                 oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司
