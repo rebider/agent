@@ -215,8 +215,6 @@ public class CompensateServiceImpl implements CompensateService {
                 return null;
             }
             OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-            OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oSubOrderActivity.getSubOrderId());
-
             BigDecimal oldPrice = oSubOrderActivity.getPrice().multiply(proNum);
             BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
             resultPrice = oldPrice.subtract(newPrice);
@@ -615,7 +613,12 @@ public class CompensateServiceImpl implements CompensateService {
     @Override
     public AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser) {
 
-        System.out.println(refundPriceDiffDetailList);
+        if(null==refundPriceDiffDetailList){
+            throw new ProcessException("退补差价明细数据为空");
+        }
+        if(null==oRefundPriceDiff){
+            throw new ProcessException("退补差价金额数据为空");
+        }
         refundPriceDiffDetailList.forEach(row->{
             //查询最新活动
             OActivity oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
@@ -630,6 +633,46 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("修改退补差价数据失败");
             }
         });
+        if(null==oRefundPriceDiff.getId()){
+            throw new ProcessException("退补差价数据id为空");
+        }
+        int k = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+        if(k!=1){
+            throw new ProcessException("更新退补差价数据失败");
+        }
+        //附件修改
+        if(null!=refundPriceDiffFile){
+            AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+            AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+            criteria.andSrcIdEqualTo(oRefundPriceDiff.getId());
+            criteria.andBusTypeEqualTo(AttachmentRelType.ActivityEdit.name());
+            List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+            attachmentRels.forEach(row->{
+                row.setStatus(Status.STATUS_0.status);
+                int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                if (1 != i) {
+                    log.info("删除活动变更附件关系失败");
+                    throw new ProcessException("删除附件失败");
+                }
+            });
+
+            refundPriceDiffFile.forEach(row->{
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(row);
+                record.setSrcId(oRefundPriceDiff.getId());
+                record.setcUser(cUser);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.ActivityEdit.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                int i = attachmentRelMapper.insertSelective(record);
+                if (1 != i) {
+                    log.info("活动变更附件关系失败");
+                    throw new ProcessException("系统异常");
+                }
+            });
+        }
+
 
         return AgentResult.ok();
     }
