@@ -73,7 +73,7 @@ public interface ProfitDeductionService {
     /***
     * @Description:扣款计算
     * @Param: profitAmt 分润金额
-    * @Param: deductionType 扣款类型 1 退单扣款 3 其他扣款
+    * @Param: deductionType 扣款类型 01 退单扣款 03 其他扣款
     * @Param: agentId 机构id
     * @return: 应扣余额 扣足返回0 其他返回 未扣足
     * @Author: zhaodw

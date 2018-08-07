@@ -169,8 +169,20 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Override
     public BigDecimal deductionAmt(BigDecimal profitAmt, String deductionType, String agentId) throws DeductionException {
-//        if ()
+        // 其它扣款
+        if ("03".equals(deductionType)) {
+
+        }
+        // 退单扣款
+        else  if ("01".equals(deductionType)) {
+
+        }
         return BigDecimal.ZERO;
     }
 
+    private  void deductionOther(BigDecimal profitAmt, String agentId) {
+        // 获取代理商历史未扣足
+        // 获取代理商本月新增
+        // 获取代理商本月分期
+    }
 }

@@ -64,8 +64,8 @@ public class TranDataJob {
                         zyssAmt = tranData.getBigDecimal("zyssAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyssAmt");;// 自营代理手刷总金额
                         BigDecimal zydlPosAmt = tranData.getBigDecimal("zydlPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zydlPosAmt");;// 自营代理pos总金额
                         BigDecimal zyPosAmt = tranData.getBigDecimal("zyPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyPosAmt");//自营交易总金额
-                        BigDecimal hyxJwAmt = tranData.getBigDecimal("hyxJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("hyxJwAmt");//汇银讯境外卡交易总金额
-                        BigDecimal orgJwAmt = tranData.getBigDecimal("orgJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("orgJwAmt");//代理商境外卡交易总金额
+                        BigDecimal hyxJwAmt = tranData.getBigDecimal("hyxPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("hyxPosJwAmt");//汇银讯境外卡交易总金额
+                        BigDecimal orgJwAmt = tranData.getBigDecimal("dlPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("dlPosJwAmt");//代理商境外卡交易总金额
                         tranAmt = zydlPosAmt.subtract(zyPosAmt).subtract(hyxJwAmt).subtract(orgJwAmt);
                     }
                     insertOrUpdate(json, settleMonth, tranAmt, zyssAmt);//新增二维码
