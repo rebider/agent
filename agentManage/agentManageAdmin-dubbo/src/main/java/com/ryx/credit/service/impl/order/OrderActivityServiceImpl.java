@@ -7,8 +7,10 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OActivityMapper;
+import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
+import com.ryx.credit.pojo.admin.order.OProduct;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private OActivityMapper activityMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private OProductMapper oProductMapper;
 
 
     @Override
@@ -110,6 +114,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         OActivityExample example = new OActivityExample();
         OActivityExample.Criteria criteria = example.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<OActivity> activitys = activityMapper.selectByExample(example);
+        return activitys;
+    }
+
+    @Override
+    public List<OActivity> productActivity(String product,String angetId) {
+        //TODO 检查代理商销售额
+        OProduct productObj = oProductMapper.selectByPrimaryKey(product);
+        OActivityExample example = new OActivityExample();
+        example.or().andProductIdEqualTo(productObj.getId()).andBeginTimeLessThanOrEqualTo(new Date()).andEndTimeGreaterThanOrEqualTo(new Date());
         List<OActivity> activitys = activityMapper.selectByExample(example);
         return activitys;
     }
