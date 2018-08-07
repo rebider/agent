@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.dict;
 
-import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.DictMapper;

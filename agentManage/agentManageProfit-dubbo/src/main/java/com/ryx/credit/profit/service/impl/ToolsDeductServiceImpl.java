@@ -74,7 +74,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
         profitStagingDetail.setMustAmt(mustDeductionAmt);
         profitStagingDetail.setRealAmt(BigDecimal.ZERO);
-        profitStagingDetail.setRemark(profitDeduction.getRemark());
+        profitStagingDetail.setRemark("机具扣款分期调整下月还款计划");
         profitStagingDetail.setSourceId(profitDeduction.getSourceId());
         profitStagingDetail.setStagId(profitDeduction.getId());
         profitStagingDetail.setStatus(StagingDetailStatus.N.getStatus());
@@ -124,7 +124,6 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     LOG.info("1.更新机具扣款申请状态为申请通过");
                     LOG.info("审批通过，未申请前本月实扣：{},申请扣款数：{}",profitDeduction.getActualDeductionAmt(),profitStagingDetail.getRealAmt());
                     profitDeduction.setStagingStatus(DeductionStatus.PASS.getStatus());
-                    profitDeduction.setRemark(profitStagingDetail.getRemark());
                     profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
                     LOG.info("2更新审批流与业务对象");
                     rel.setStatus(Status.STATUS_2.status);
@@ -194,7 +193,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             profitStagingDetail.setStagId(profitDeduction.getId());
             BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
             profitStagingDetail.setMustAmt(mustDeductionAmt);
-            profitStagingDetail.setRemark(profitDeduction.getRemark());
+            profitStagingDetail.setRemark("机具扣款分期调整下月还款计划");
             profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
         } catch (Exception e) {
             e.printStackTrace();
@@ -264,11 +263,26 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     List<ProfitDeduction> list = profitDeductionMapper.selectByExample(profitDeductionExample);
                     if(list == null || list.isEmpty()){
                         LOG.error("本月已经不存在分期订单，将之前调整的扣款金额，新增到本月还款，流水号：{}",map.get("SOURCE_ID"));
-
+                        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(map.get("STAG_ID").toString());
+                        BigDecimal upperNotDeductionAmt = new BigDecimal(map.get("MUST_AMT").toString())
+                                .add(map.get("NOT_DEDUCTION_AMT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                        profitDeduction.setId(idService.genId(TabId.P_DEDUCTION));
+                        profitDeduction.setSourceId(map.get("SOURCE_ID").toString());
+                        profitDeduction.setDeductionDate(map.get("DEDUCTION_DATE").toString());
+                        profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+                        profitDeduction.setSumDeductionAmt(upperNotDeductionAmt);
+                        profitDeduction.setAddDeductionAmt(new BigDecimal(map.get("MUST_AMT").toString()));
+                        profitDeduction.setMustDeductionAmt(upperNotDeductionAmt);
+                        profitDeduction.setActualDeductionAmt(BigDecimal.ZERO);
+                        profitDeduction.setNotDeductionAmt(BigDecimal.ZERO);
+                        profitDeduction.setUpperNotDeductionAmt(map.get("NOT_DEDUCTION_AMT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                        profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+                        profitDeduction.setCreateDateTime(new Date());
+                        profitDeductionMapper.insertSelective(profitDeduction);
                     } else {
                         try {
-                            ProfitDeduction profitDeduction = list.get(0);
                             //计算补全信息
+                            ProfitDeduction profitDeduction = list.get(0);
                             BigDecimal upperNotDeductionAmt = new BigDecimal(map.get("MUST_AMT").toString())
                                     .add(map.get("NOT_DEDUCTION_AMT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
                             profitDeduction.setUpperNotDeductionAmt(upperNotDeductionAmt);
