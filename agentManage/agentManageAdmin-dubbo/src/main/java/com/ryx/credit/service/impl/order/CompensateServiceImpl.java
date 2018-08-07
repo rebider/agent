@@ -324,7 +324,7 @@ public class CompensateServiceImpl implements CompensateService {
                 log.info("查询oActivity异常");
                 throw new ProcessException("系统异常");
             }
-            refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_detail));
+            refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
             refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
             refundPriceDiffDetail.setFrontPrice(oSubOrderActivity!=null?oSubOrderActivity.getPrice():new BigDecimal(0));
             refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
@@ -610,4 +610,27 @@ public class CompensateServiceImpl implements CompensateService {
         return oRefundPriceDiff;
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser) {
+
+        System.out.println(refundPriceDiffDetailList);
+        refundPriceDiffDetailList.forEach(row->{
+            //查询最新活动
+            OActivity oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+            ORefundPriceDiffDetail oRefundPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(row.getId());
+            oRefundPriceDiffDetail.setActivityRealId(row.getActivityRealId());
+            oRefundPriceDiffDetail.setActivityName(oActivity.getActivityName());
+            oRefundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
+            oRefundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
+            oRefundPriceDiffDetail.setPrice(oActivity.getPrice());
+            int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
+            if(i!=1){
+                throw new ProcessException("修改退补差价数据失败");
+            }
+        });
+
+        return AgentResult.ok();
+    }
 }

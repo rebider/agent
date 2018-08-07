@@ -144,11 +144,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 if (null != dictByName && !dictByName.getdItemname().equals(""))
                     oLogistics.setProType(dictByName.getdItemvalue());      // 商品类型
             }
-            if (StringUtils.isNotBlank(String.valueOf(objectList.get(9)))) {
-                Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(objectList.get(9)));
-                if (null != dictByName && !dictByName.getdItemname().equals(""))
-                    oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
+            if (StringUtils.isBlank(String.valueOf(objectList.get(9)))) {
+                logger.info("未匹配到厂家:{}", String.valueOf(objectList.get(9)));
+                throw new MessageException("未匹配到厂家");
             }
+            Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(objectList.get(9)));
+            if (null != dictByName && !dictByName.getdItemname().equals(""))
+                oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
             try {
 
                 oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
@@ -159,7 +161,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setSnBeginNum(null != objectList.get(26) ? String.valueOf(objectList.get(26)) : "");   // 起始SN序列号
                 oLogistics.setSnEndNum(null != objectList.get(27) ? String.valueOf(objectList.get(27)) : "");     // 结束SN序列号
             } catch (Exception e) {
-                throw new ProcessException("Excel参数错误！");
+                throw new MessageException("Excel参数错误！");
             }
             System.out.println("导入物流数据============================================" + JSONObject.toJSON(oLogistics));
             if (1 != insertImportData(oLogistics)) {
