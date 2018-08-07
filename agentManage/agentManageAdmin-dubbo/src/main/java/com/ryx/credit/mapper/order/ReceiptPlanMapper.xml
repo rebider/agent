@@ -357,22 +357,20 @@
       LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
       LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
       LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
-      LEFT JOIN O_RECEIPT_PRO P ON R.pro_ID = P.id
+      LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
     <include refid="BASE_WHERE_SQL"></include>
   </select>
 
   <sql id="BASE_WHERE_SQL">
     <where>
-      <trim prefixOverrides="and">
-        <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
-        <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
-        <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS}</if>
-        <if test="PRO_COM != null and PRO_COM != ''">AND R.PRO_COM = #{PRO_COM}</if>
-        <if test="C_DATE_START != null and C_DATE_START != ''">R.C_DATE >= TO_DATE(#{C_DATE},'yyyy-MM-dd') </if>
-        <if test="C_DATE_END != null and C_DATE_END != ''">R.C_DATE &lt;= TO_DATE(#{C_DATE},'yyyy-MM-dd')</if>
-        <if test="returnId != null and returnId!=''" >
-          and R.return_order_detail_id = #{returnId}
-        </if>
+      <trim prefixOverrides="AND">
+        <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM,jdbcType=VARCHAR}</if>
+        <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID,jdbcType=VARCHAR}</if>
+        <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS,jdbcType=DECIMAL}</if>
+        <if test="PRO_COM != null and PRO_COM != ''">AND R.PRO_COM = #{PRO_COM,jdbcType=VARCHAR}</if>
+        <if test="C_DATE_START != null and C_DATE_START != ''">AND R.C_DATE &gt;= TO_DATE(#{C_DATE_START,jdbcType=TIMESTAMP},'yyyy-MM-dd')</if>
+        <if test="C_DATE_END != null and C_DATE_END != ''">AND R.C_DATE &lt;= TO_DATE(#{C_DATE_END,jdbcType=TIMESTAMP},'yyyy-MM-dd')</if>
+        <if test="returnId != null and returnId!=''" >and R.return_order_detail_id = #{returnId}</if>
       </trim>
     </where>
   </sql>
@@ -382,14 +380,13 @@
   </sql>
 
   <sql id="PAGING_START">
-    <if test="begin != null  and end != null and end >0">
+    <if test='begin != null and end!=""'>
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
     </if>
   </sql>
-
   <sql id="PAGING_END">
-    <if test="begin != null  and end != null and end >0">
-      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    <if test='begin != null and end!=""'>
+      ) A WHERE ROWNUM &lt;= #{end} ) B WHERE RN > #{begin}
     </if>
   </sql>
 

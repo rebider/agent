@@ -106,6 +106,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(profitDetailMonth.getProfitId())){
             criteria.andProfitIdEqualTo(profitDetailMonth.getProfitId());
         }
+
+        if(StringUtils.isNotBlank(profitDetailMonth.getProfitDate())){
+            criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDate());
+        }
         return profitDetailMonthExample;
     }
 
@@ -127,6 +131,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public void updateProfitMonth(ProfitMonth profitMonth) {
         if(profitMonth != null){
             profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+        }
+    }
+
+    @Override
+    public void insertProfitMonth(ProfitMonth profitMonth) {
+        if(profitMonth != null){
+            profitMonthMapper.insert(profitMonth);
         }
     }
 

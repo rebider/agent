@@ -7,6 +7,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
+import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.exceptions.StagingException;
 import com.ryx.credit.profit.pojo.ImportDeductionDetail;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
@@ -102,7 +103,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
         if(deductionist != null && deductionist.size() > 0 ) {
-            deductionist.stream().filter(list->list.get(1) != null && list.get(3) != null).forEach(list->{
+            deductionist.stream().filter(list->list.get(0) != null && list.get(4) != null).forEach(list->{
                 insertDeduction(list, userId);
             });
 
@@ -111,7 +112,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     private void insertDeduction(List list, String userId) {
-        BigDecimal amt = list.get(3)==null?BigDecimal.ZERO:new BigDecimal(list.get(3).toString());
+        BigDecimal amt = list.get(4)==null?BigDecimal.ZERO:new BigDecimal(list.get(4).toString());
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.OTHER.getType());
         deduction.setAddDeductionAmt(amt);
@@ -119,9 +120,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setMustDeductionAmt(amt);
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) );
-        deduction.setAgentId(list.get(1).toString());
-        deduction.setAgentName(list.get(0).toString());
-        deduction.setRemark(list.get(2).toString());
+        deduction.setAgentId(list.get(0).toString());
+        deduction.setAgentName(list.get(2).toString());
+        deduction.setRemark(list.get(3).toString());
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
         deduction.setCreateDateTime(new Date());
         deduction.setUserId(userId);
@@ -165,5 +166,4 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         return null;
     }
-
 }

@@ -58,6 +58,13 @@ public interface ProfitMonthService {
     public void updateProfitMonth(ProfitMonth profitMonth);
 
     /**
+     * 新增月分润数据
+     * @author zhaodw
+     * @param profitMonth
+     */
+    void insertProfitMonth(ProfitMonth profitMonth);
+
+    /**
      *查找
      * @param id
      * @return

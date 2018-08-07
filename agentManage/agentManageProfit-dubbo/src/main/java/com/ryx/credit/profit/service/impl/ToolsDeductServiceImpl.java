@@ -301,4 +301,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             LOG.info("本月没有调整机具分期的订单");
         }
     }
+
+    @Override
+    public void updateProfitStagingDetail(ProfitStagingDetail profitStagingDetail) {
+        if(profitStagingDetail != null){
+            profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
+        }
+    }
 }
