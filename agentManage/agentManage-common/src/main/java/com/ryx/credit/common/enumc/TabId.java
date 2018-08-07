@@ -47,7 +47,7 @@ public enum TabId {
     o_receipt_plan("ORP%s%015d"),
     o_account_adjust_detail("AJD%s%014d"),
     P_ORGAN_TRAN_MONTH("P_ORGAN_TRAN_MONTH%s%015d"),
-    P_IMPORT_DEDUCTION_DETAIL("P_IMPORT_DEDUCTION_DETAIL%s%015d"),
+    P_IMPORT_DEDUCTION_DETAIL("PIDD_SEQID%s%015d"),
     P_STAGING_DETAIL("PSD%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
     P_ORGAN_TRAN_MONTH_DETAIL("POTMD%s%015d"),

@@ -63,32 +63,39 @@ public class ProfitDataJob {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+settleMonth);
         LOG.info("获取分润数据");
-        AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
-        if (agentResult != null && agentResult.getData() != null) {
-            JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
-            if (json != null) {
-                if (json.containsKey("pftData")) {
-                    JSONArray array = json.getJSONArray("pftData");
-                    if (array != null && array.size() > 0 ) {
-                        array.stream().forEach(object->{
-                            JSONObject profitData = (JSONObject) object;
-                            Map<String, Object> agentMap = getAgentId(profitData.getString("ORG_ID"));
-                            if (agentMap != null) {
-                                LOG.info("新增月分润数据");
-                                String profitId =  insertProfitMonth(agentMap,profitData, settleMonth);
-                                LOG.info("新增月分润明细数据");
-                                insertProfitMonthDetail(agentMap,profitData, settleMonth, profitId );
-                                LOG.info("新增月分润交易明细数据");
-                                insertOrganTranDetail(agentMap,profitData, settleMonth, profitId );
-                                profitId = null;
-                            }
-                        });
+        try {
+            AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
+            if (agentResult != null && agentResult.getData() != null) {
+                JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
+                if (json != null && json.size() > 0) {
+                    if (json.containsKey("pftData")) {
+                        JSONArray array = json.getJSONArray("pftData");
+                        if (array != null && array.size() > 0 ) {
+                            array.stream().limit(10).forEach(object->{
+                                JSONObject profitData = (JSONObject) object;
+                                Map<String, Object> agentMap = getAgentId(profitData.getString("ORG_ID"));
+                                if (agentMap != null) {
+                                    LOG.info("新增月分润数据");
+                                    String profitId =  insertProfitMonth(agentMap,profitData, settleMonth);
+                                    LOG.info("新增月分润明细数据");
+                                    insertProfitMonthDetail(agentMap,profitData, settleMonth, profitId );
+                                    LOG.info("新增月分润交易明细数据");
+                                    insertOrganTranDetail(agentMap,profitData, settleMonth, profitId );
+                                    profitId = null;
+                                }
+                            });
+                        }
                     }
+                }else{
+                    LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
                 }
-            }else{
-                LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
             }
+        }catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("分润数据处理失败");
+            throw new RuntimeException("分润数据处理失败");
         }
+
     }
 
     /***
@@ -113,8 +120,8 @@ public class ProfitDataJob {
         profitMonth.setStatus("4");
         profitMonth.setProfitDate(settleMonth);
         profitMonth.setTransProfitPos(posTranProFitAmt.add(posPayProFitAmt));
-//        profitMonth.setTransSupplyProfitPos();
-        profitMonth.setPayProfit(profitMonth.getTransProfitPos().add(profitMonth.getTransSupplyProfitPos()==null?BigDecimal.ZERO:profitMonth.getTransSupplyProfitPos()));
+        profitMonth.setTransSupplyProfitPos(profitData.getBigDecimal("PFT_DIFF_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_DIFF_AMT"));
+        profitMonth.setPayProfit(profitMonth.getTransProfitPos().add(profitMonth.getTransSupplyProfitPos()));
         profitMonthServiceImpl.insertProfitMonth(profitMonth);
 
         return  profitMonth.getId();

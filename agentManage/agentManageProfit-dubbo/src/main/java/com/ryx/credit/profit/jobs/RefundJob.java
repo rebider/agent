@@ -7,13 +7,16 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
+import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitSettleErrLsService;
+import com.ryx.credit.profit.service.ProfitSupplyService;
 import com.ryx.credit.profit.service.StagingService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
@@ -39,12 +42,14 @@ import java.util.stream.Collectors;
  * @date 2018/7/2911:33
  */
 @Service("refundJob")
-@Transactional
+@Transactional(rollbackFor=RuntimeException.class)
 public class RefundJob {
     private static final Logger LOG = Logger.getLogger(RefundJob.class);
     private static final  String URL =  AppConfig.getProperty("refund_url");
 
     private static  final  String DEDUCTION_DESC = "退单扣款";
+
+    private static  final  String SUPPLY_DESC = "退单补款";
 
     private final Object object = new Object();
 
@@ -60,35 +65,114 @@ public class RefundJob {
     @Autowired
     private BusinessPlatformService businessPlatformService;
 
+    @Autowired
+    private ProfitSupplyService profitSupplyServiceImpl;
+
 
 
 
 //    @Scheduled(cron = "0 0 12 * * ?")
     @Transactional
     public void deal() {
+        // 上月的开始及结束日期
+        LocalDate date = LocalDate.now().plusMonths(-1);
+        String chargebackEnd = date.with(TemporalAdjusters.lastDayOfMonth()).format(DateTimeFormatter.BASIC_ISO_DATE);
+        String chargebackStart = date.with(TemporalAdjusters.firstDayOfMonth()).format(DateTimeFormatter.BASIC_ISO_DATE);
+        JSONObject param = new JSONObject();
+        param.put("chargebackStart", chargebackStart);
+        param.put("chargebackEnd", chargebackEnd);
+        // 退单应扣分润
+        getDeductionListAndDeal(param);
+
+        // 退单应补分润
+        getSupplyListAndDeal(param);
+    }
+
+    /***
+     * @Description: 获取退单应补分润并做处理
+     * @Param:  param 查询条件
+     * @Author: zhaodw
+     * @Date: 2018/8/7
+     */
+    private void getSupplyListAndDeal(JSONObject param) {
+        param.put("flag","2");
+        JSONObject result = getRefundList(param);
+        if (result.containsKey("info") ) {
+            JSONArray array = result.getJSONArray("info");
+            LOG.info("生成补款信息。");
+            insertSupplyList(array);
+        }
+    }
+
+    private void insertSupplyList(JSONArray array) {
+        array.stream().
+                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
+                                ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0)
+                .forEach(json->{
+                            insertSupply((JSONObject) json);
+                        }
+                );
+    }
+
+    /***
+    * @Description: 新增补款信息
+    * @Param:  jsonObject 应补分润
+    * @Author: zhaodw
+    * @Date: 2018/8/7
+    */
+    private void insertSupply(JSONObject jsonObject) {
+        Map<String,Object> agentMap = getAgentId(jsonObject.getString(jsonObject.getString("instId")));
+        String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        ProfitSupply profitSupply = new ProfitSupply();
+        profitSupply.setId(idService.genId(TabId.p_profit_supply));
+        profitSupply.setSupplyType(SUPPLY_DESC);
+        profitSupply.setRemerk(SUPPLY_DESC);
+        profitSupply.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
+        profitSupply.setAgentPid(jsonObject.getString("instId"));
+        profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));
+        profitSupply.setSupplyDate(supplyDate);
+        profitSupplyServiceImpl.insert(profitSupply);
+    }
+
+    /***
+    * @Description: 获取退单应扣分润并做处理
+    * @Param:  param 查询条件
+    * @Author: zhaodw
+    * @Date: 2018/8/7
+    */
+    private void getDeductionListAndDeal(JSONObject param) {
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
         Map<String, String> deductionIdMap = new HashMap<>(10);
-        LOG.info("每月定时获取退单数据。");
-       JSONObject result = getRefundList();
-       if (result.containsKey("info") ) {
-           JSONArray array = result.getJSONArray("info");
-           try {
-               LOG.info("对数据汇总并生成退单明细。");
-               insertSettleErrLs(array, orgMap, deductionIdMap);
-               LOG.info("对数据汇总并生成扣款信息。");
-               if (orgMap.size() > 0) {
-                  Set<String> keys = orgMap.keySet();
-                  for (String key : keys) {
-                      insertProfitDeduction(key, orgMap.get(key), deductionIdMap);
-                  }
-               }
-           }catch (Exception e) {
-               e.printStackTrace();
-               LOG.info("退单数据处理失败");
-           }
+        LOG.info("每月定时获取退单应扣数据。");
+        param.put("flag","1");
+        JSONObject result = getRefundList(param);
+        if (result.containsKey("info") ) {
+            JSONArray array = result.getJSONArray("info");
+            LOG.info("对数据汇总并生成退单明细。");
+            insertSettleErrList(array, orgMap, deductionIdMap);
+            LOG.info("对数据汇总并生成扣款信息。");
+            if (orgMap.size() > 0) {
+                Set<String> keys = orgMap.keySet();
+                for (String key : keys) {
+                    insertProfitDeduction(key, orgMap.get(key), deductionIdMap);
+                }
+            }
+        }
+    }
 
-
-       }
+    /***
+     * @Description:  获取退单应扣分润列表
+     * @return:  返回的退单应扣分润列表
+     * @Author: zhaodw
+     * @Date: 2018/7/29
+     */
+    private JSONObject getRefundList(JSONObject param) {
+        String result = HttpClientUtil.doPostJson(URL, param.toJSONString());
+        if (StringUtils.isNotBlank(result)) {
+            return  JSONObject.parseObject(result);
+        }
+        return null;
     }
 
     /***
@@ -125,11 +209,10 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/7/30 
     */ 
-    private void insertSettleErrLs(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
+    private void insertSettleErrList(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
        array.stream().
                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
-                       (((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()> 0 ||
-                       ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0))
+                       ((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()< 0  )
                .forEach(json->{
                    insertSettleErr((JSONObject)json, orgMap, deductionIdMap);
             }
@@ -151,7 +234,8 @@ public class RefundJob {
         settleErrLs.setChargebackDate(jsonObject.getString("chargebackDate"));
         settleErrLs.setTranDate(jsonObject.getString("tranDate"));
         settleErrLs.setMerchId(jsonObject.getString("merchId"));
-        settleErrLs.setId(jsonObject.getString("instId"));
+        settleErrLs.setMerchName(jsonObject.getString("merchName"));
+        settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
         settleErrLs.setTranAmt(jsonObject.getBigDecimal("tranAmt"));
         settleErrLs.setNetAmt(jsonObject.getBigDecimal("netAmt"));
         settleErrLs.setOffsetBalanceAmt(jsonObject.getBigDecimal("offsetBalanceAmt"));
@@ -161,8 +245,8 @@ public class RefundJob {
         settleErrLs.setErrDate(jsonObject.getString("errDate"));
         settleErrLs.setNettingStatus(jsonObject.getString("nettingStatus"));
         settleErrLs.setErrDesc(jsonObject.getString("errDesc"));
-        settleErrLs.setRealDeductAmt(jsonObject.getBigDecimal("shouldDeductAmt"));// 应扣分润
-        settleErrLs.setMakeAmt(jsonObject.getBigDecimal("shouldMakeAmt"));//应补分润
+        settleErrLs.setMustDeductionAmt(jsonObject.getBigDecimal("shouldDeductAmt"));// 应扣分润
+        settleErrLs.setMustSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));//应补分润
         synchronized (object) {
             if (orgMap.containsKey(jsonObject.getString("instId"))) {
                 orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt")));
@@ -184,27 +268,21 @@ public class RefundJob {
         settleErrLs.setSourceId(deductionIdMap.get(jsonObject.getString("instId")));
         profitSettleErrLsService.inset(settleErrLs);
     }
-
-    /*** 
-    * @Description:  获取退单列表
-    * @return:  返回的退单列表
-    * @Author: zhaodw 
-    * @Date: 2018/7/29 
-    */ 
-    private JSONObject getRefundList() {
-        // 上月的开始及结束日期
-        LocalDate date = LocalDate.now().plusMonths(-1);
-        String chargebackEnd = date.with(TemporalAdjusters.lastDayOfMonth()).format(DateTimeFormatter.BASIC_ISO_DATE);
-        String chargebackStart = date.with(TemporalAdjusters.firstDayOfMonth()).format(DateTimeFormatter.BASIC_ISO_DATE);
-
-        JSONObject param = new JSONObject();
-        param.put("chargebackStart", chargebackStart);
-        param.put("chargebackEnd", chargebackEnd);
-        String result = HttpClientUtil.doPostJson(URL, param.toJSONString());
-        if (StringUtils.isNotBlank(result)) {
-            return  JSONObject.parseObject(result);
+    /***
+     * @Description: 获取代理商信息
+     * @Param:  orgId 代理商id
+     * @return:  代理商系统代理商唯一id
+     * @Author: zhaodw
+     * @Date: 2018/8/3
+     */
+    private Map<String, Object> getAgentId(String orgId) {
+        // 获取代理商平台id
+        AgentBusInfo agentBusInfo = new AgentBusInfo();
+        agentBusInfo.setBusNum(orgId);
+        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null);
+        if (pageInfo != null && pageInfo.getTotal() > 0) {
+            return (Map<String, Object>) pageInfo.getRows().get(0);
         }
-        return null;
+        return  null;
     }
-
 }
