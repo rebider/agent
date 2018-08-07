@@ -6,7 +6,10 @@ import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
+import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 import com.ryx.credit.profit.service.ProfitDeductionService;
+import com.ryx.credit.profit.service.ProfitDeducttionDetailService;
 import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
@@ -14,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import sun.tools.jar.Main;
 
 import java.math.BigDecimal;
@@ -37,6 +43,8 @@ public class ToolsDeductJob {
     private ToolsDeductService toolsDeductService;
     @Autowired
     private ProfitDeductionService profitDeductionService;
+    @Autowired
+    private ProfitDeducttionDetailService profitDeducttionDetailService;
 
 //    @Scheduled(cron = "0 0/20/40 10 20 * ?")
     public void execut(){
@@ -82,9 +90,9 @@ public class ToolsDeductJob {
      * @param paltformNo 平台编号
      * @param deductDate 扣款月份
      * @param agentProfitAmt 代理商分润金额
-     * @param parentAgentProfitAmt 担保代理商分润金额
+//     * @param parentAgentProfitAmt 担保代理商分润金额
      */
-    public void computeToolsDeduct(String agentId, String paltformNo, String deductDate, BigDecimal agentProfitAmt, BigDecimal parentAgentProfitAmt){
+    public void computeToolsDeduct(String agentId, String paltformNo, String deductDate, BigDecimal agentProfitAmt, BigDecimal parentAgentProfitAmt) throws Exception {
         LOG.info("机具分润扣款：agentId：{}，paltformNo：{}，deductDate：{}，agentProfitAmt：{}，parentAgentProfitAmt：{}",
                 agentId, paltformNo, deductDate, agentProfitAmt, parentAgentProfitAmt);
         if(StringUtils.isBlank(agentId) || StringUtils.isBlank(paltformNo) || StringUtils.isBlank(deductDate)
@@ -97,16 +105,22 @@ public class ToolsDeductJob {
         profitDeduction.setDeductionDate(deductDate);
         profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
         List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
+        //应扣总额
+        BigDecimal mustDeductionAmtSum = BigDecimal.ZERO;
+        //实扣总额
+        BigDecimal actualDeductionAmtSum = BigDecimal.ZERO;
         if(list != null && !list.isEmpty()){
             for (ProfitDeduction profitDeductionList:  list) {
                 LOG.info("机具分润扣款：代理商编号：{}，机具类型：{}，代理商分润：{}，担保代理商分润：{}",
                         agentId, paltformNo, agentProfitAmt.toString(), parentAgentProfitAmt.toString());
                 LOG.info("扣款信息：代理商编号：{}，扣款总额：{}，应扣：{}",profitDeductionList.getAgentId(),profitDeductionList.getSumDeductionAmt(),profitDeductionList.getMustDeductionAmt());
+                mustDeductionAmtSum = mustDeductionAmtSum.add(profitDeductionList.getMustDeductionAmt());
                 if(agentProfitAmt.compareTo(profitDeductionList.getMustDeductionAmt()) >= 0 ){
                     agentProfitAmt = agentProfitAmt.subtract(profitDeductionList.getMustDeductionAmt());
                     profitDeductionList.setActualDeductionAmt(profitDeductionList.getMustDeductionAmt());
                     profitDeductionList.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-                    profitDeductionService.updateProfitDeduction(profitDeductionList);
+                    this.updateDeductionInfo(profitDeductionList);
+                    actualDeductionAmtSum = actualDeductionAmtSum.add(profitDeductionList.getMustDeductionAmt());
                 } else {
                     //未扣足部分
                     BigDecimal notDeductionAmt = profitDeductionList.getMustDeductionAmt().subtract(agentProfitAmt);
@@ -116,6 +130,7 @@ public class ToolsDeductJob {
                     if(parentAgentProfitAmt.compareTo(notDeductionAmt) >= 0){
                         parentAgentProfitAmt = parentAgentProfitAmt.subtract(notDeductionAmt);
                         profitDeductionList.setActualDeductionAmt(profitDeductionList.getMustDeductionAmt());
+                        actualDeductionAmtSum = actualDeductionAmtSum.add(profitDeductionList.getMustDeductionAmt());
                     } else {
                         //担保代理商月分润不足
                         BigDecimal parentProfitNotDeductionAmt = notDeductionAmt.subtract(parentAgentProfitAmt);
@@ -124,12 +139,43 @@ public class ToolsDeductJob {
                         profitDeductionList.setNotDeductionAmt(parentProfitNotDeductionAmt);
                         BigDecimal actualDeductionAmt = profitDeductionList.getMustDeductionAmt().subtract(parentProfitNotDeductionAmt);
                         profitDeductionList.setActualDeductionAmt(actualDeductionAmt);
+                        actualDeductionAmtSum = actualDeductionAmtSum.add(actualDeductionAmt);
                     }
                     profitDeductionList.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-                    profitDeductionService.updateProfitDeduction(profitDeductionList);
+                    this.updateDeductionInfo(profitDeductionList);
                 }
             }
         }
         LOG.info("机具扣款结束。代理商剩余分润：{}，担保代理商剩余分润：{}", agentProfitAmt, parentAgentProfitAmt);
+        LOG.info("机具扣款结束。代理商本月应扣总额：{}，代理商本月实扣总额：{}", mustDeductionAmtSum, actualDeductionAmtSum);
+    }
+
+    /**
+     * 1、更新分期明细表状态为已扣款
+     * 2、更新扣款表状态与实扣金额
+     * 3、新增扣款明细
+     * @param profitDeductionList
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    private void updateDeductionInfo(ProfitDeduction profitDeductionList) throws Exception {
+        try {
+            ProfitDeducttionDetail detailList = profitDeducttionDetailService.getProfitDeducttionDetail(profitDeductionList);
+            if(detailList == null ){
+                profitDeducttionDetailService.insertDeducttionDetail(profitDeductionList);
+            }
+            profitDeductionService.updateProfitDeduction(profitDeductionList);
+            if(profitDeductionList.getMustDeductionAmt().compareTo(profitDeductionList.getActualDeductionAmt()) == 0){
+                List<ProfitStagingDetail> list = toolsDeductService.getProfitStagingDetailByStagId(profitDeductionList.getId());
+                if(list != null && !list.isEmpty()){
+                    ProfitStagingDetail profitStagingDetail1 = list.get(0);
+                    profitStagingDetail1.setStatus(StagingDetailStatus.Y.getStatus());
+                    toolsDeductService.updateProfitStagingDetail(profitStagingDetail1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("机具扣款更新失败。");
+        }
     }
 }

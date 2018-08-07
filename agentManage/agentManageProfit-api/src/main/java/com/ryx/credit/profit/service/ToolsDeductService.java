@@ -69,4 +69,9 @@ public interface ToolsDeductService {
      * @param detailList
      */
     public void deductCompletionInfo(List<Map<String, Object>> detailList);
+
+    /**
+     * 更新分期明细表明细状态
+     */
+    public void updateProfitStagingDetail(ProfitStagingDetail profitStagingDetail);
 }

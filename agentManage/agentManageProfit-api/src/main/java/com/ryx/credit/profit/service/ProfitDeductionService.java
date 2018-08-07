@@ -70,16 +70,6 @@ public interface ProfitDeductionService {
      */
     public List<Map<String, Object>> getDeductDetail(String deductDate);
 
-    /***
-    * @Description:扣款计算
-    * @Param: profitAmt 分润金额
-    * @Param: deductionType 扣款类型 1 退单扣款 3 其他扣款
-    * @Param: agentId 机构id
-    * @return: 应扣余额 扣足返回0 其他返回 未扣足
-    * @Author: zhaodw
-    * @Date: 2018/8/7
-    */
-    BigDecimal deductionAmt(BigDecimal profitAmt, String deductionType, String agentId) throws DeductionException;
     /**
      * 查询一条扣款信息
      * @param profitDeduction

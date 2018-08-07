@@ -166,11 +166,4 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         return null;
     }
-
-    @Override
-    public BigDecimal deductionAmt(BigDecimal profitAmt, String deductionType, String agentId) throws DeductionException {
-//        if ()
-        return BigDecimal.ZERO;
-    }
-
 }
