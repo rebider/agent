@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -67,7 +68,7 @@ public interface OrderService {
      * @param payment
      * @return
      */
-    public OPayment initPayment(OPayment payment);
+    public OPayment initPayment(OPayment payment) throws MessageException;
 
 
     /**
