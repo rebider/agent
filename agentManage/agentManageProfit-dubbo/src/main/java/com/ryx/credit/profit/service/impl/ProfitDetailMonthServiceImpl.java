@@ -33,7 +33,7 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
     @Override
     public void insert(ProfitDetailMonth profitDetailMonth) {
         if(profitDetailMonth.getId() == null) {
-            profitDetailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL));
+            profitDetailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
         }
         profitDetailMonthMapper.insert(profitDetailMonth);
     }

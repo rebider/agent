@@ -7,6 +7,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
+import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.exceptions.StagingException;
 import com.ryx.credit.profit.pojo.ImportDeductionDetail;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
@@ -141,6 +142,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public List<Map<String, Object>> getDeductDetail(String deductDate) {
         return profitDeductionMapper.getDeductDetail(deductDate);
+    }
+
+    @Override
+    public BigDecimal deductionAmt(BigDecimal profitAmt, String deductionType, String agentId) throws DeductionException {
+//        if ()
+        return BigDecimal.ZERO;
     }
 
 }
