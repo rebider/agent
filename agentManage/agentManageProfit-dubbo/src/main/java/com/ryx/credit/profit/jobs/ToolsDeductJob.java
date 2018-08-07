@@ -2,6 +2,7 @@ package com.ryx.credit.profit.jobs;
 
 import com.ryx.credit.common.enumc.GetMethod;
 import com.ryx.credit.profit.enums.DeductionType;
+import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -72,12 +73,23 @@ public class ToolsDeductJob {
 
     /**
      * 平台编号
-     * @param paltformNo
-     * @param AgentProfitAmt
-     * @param paraentAgentProfitAmt
-     * @param deductDate
+     * @param AgentId 代理商编号
+     * @param paltformNo 平台编号
+     * @param deductDate 扣款月份
+     * @param agentProfitAmt 代理商分润金额
+     * @param parentAgentProfitAmt 担保代理商分润金额
      */
-    public void computeToolsDeduct(String AgentId, String paltformNo,BigDecimal AgentProfitAmt,BigDecimal paraentAgentProfitAmt, String deductDate){
+    public void computeToolsDeduct(String AgentId, String paltformNo, String deductDate, BigDecimal agentProfitAmt, BigDecimal parentAgentProfitAmt){
+        ProfitDeduction profitDeduction = new ProfitDeduction();
+        profitDeduction.setAgentId(AgentId);
+        profitDeduction.setAgentPid(paltformNo);
+        profitDeduction.setDeductionDate(deductDate);
+        profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+        List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
+        for (ProfitDeduction profitDeductionList:  list) {
+            agentProfitAmt.subtract(profitDeductionList.getMustDeductionAmt());
+        }
+
 
     }
 }
