@@ -50,8 +50,8 @@ public interface ProfitDeductionService {
     * @Param:  datas 扣款信息
     * @Author: zhaodw
     * @Date: 2018/7/31 
-    */ 
-    void batchInsertOtherDeduction(List<List<Object>> datas , String userId);
+    */
+    public void batchInsertOtherDeduction(List<List<Object>> datas , String userId);
 
     /**
      * 根据扣款类型、扣款日期、查询总数
@@ -68,4 +68,10 @@ public interface ProfitDeductionService {
      */
     public List<Map<String, Object>> getDeductDetail(String deductDate);
 
+    /**
+     * 查询一条扣款信息
+     * @param profitDeduction
+     * @return
+     */
+    public List<ProfitDeduction> getProfitDeduction(ProfitDeduction profitDeduction);
 }

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.jobs;
 
 import com.ryx.credit.common.enumc.GetMethod;
 import com.ryx.credit.profit.enums.DeductionType;
+import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import sun.tools.jar.Main;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -56,7 +58,11 @@ public class ToolsDeductJob {
                     //补全本月扣款信息（上月未扣足金额）
                     toolsDeductService.deductCompletionInfo(detailList);
                     //通知结果
-                    iPaymentDetailService.uploadStatus(successList);
+                    try {
+                        iPaymentDetailService.uploadStatus(successList);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (Exception e){
@@ -65,8 +71,24 @@ public class ToolsDeductJob {
         }
     }
 
-
-    public void computeToolsDeduct(){
+    /**
+     * 平台编号
+     * @param AgentId 代理商编号
+     * @param paltformNo 平台编号
+     * @param deductDate 扣款月份
+     * @param agentProfitAmt 代理商分润金额
+     * @param parentAgentProfitAmt 担保代理商分润金额
+     */
+    public void computeToolsDeduct(String AgentId, String paltformNo, String deductDate, BigDecimal agentProfitAmt, BigDecimal parentAgentProfitAmt){
+        ProfitDeduction profitDeduction = new ProfitDeduction();
+        profitDeduction.setAgentId(AgentId);
+        profitDeduction.setAgentPid(paltformNo);
+        profitDeduction.setDeductionDate(deductDate);
+        profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+        List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
+        for (ProfitDeduction profitDeductionList:  list) {
+            agentProfitAmt.subtract(profitDeductionList.getMustDeductionAmt());
+        }
 
 
     }

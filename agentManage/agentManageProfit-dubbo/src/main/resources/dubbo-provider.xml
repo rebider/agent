@@ -21,6 +21,7 @@
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitDeductionService" ref="profitDeductionServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.StagingService" ref="stagingServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitSettleErrLsService" ref="profitSettleErrLsServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.PosRewardTemplateService" ref="posRewardTemplateService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:service interface="com.ryx.credit.profit.service.IPosRewardService" ref="iPosRewardService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.IPosCheckService" ref="iPosCheckService"  timeout="1200000" registry="${zk.group}"/>
@@ -28,7 +29,8 @@
     <dubbo:service interface="com.ryx.credit.profit.service.ImportDeductionDetailService" ref="importDeductionDetailServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ToolsDeductService" ref="toolsDeductService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitFactorService" ref="profitFactorService"  timeout="1200000" registry="${zk.group}"/>
-    <!--<dubbo:service interface="com.ryx.credit.profit.service.ProfitSupplyService" ref="profitSupplyService"  timeout="1200000" registry="${zk.group}"/>-->
+    <dubbo:service interface="com.ryx.credit.profit.service.ProfitSupplyService" ref="profitSupplyService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.IProfitDirectService" ref="profitDirectService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.dict.IdService" id="idService"  timeout="1200000" registry="${zk.group}" check="false"/>
