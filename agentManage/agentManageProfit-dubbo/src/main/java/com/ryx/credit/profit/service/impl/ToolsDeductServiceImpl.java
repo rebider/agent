@@ -308,4 +308,12 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getNotDeductDetail(String beforeDeductDate, String deductDate, String type) {
+        if(StringUtils.isBlank(beforeDeductDate)|| StringUtils.isBlank(deductDate)){
+            return null;
+        }
+        return profitDeductionMapper.getNotDeductDetail(beforeDeductDate, deductDate, type);
+    }
 }

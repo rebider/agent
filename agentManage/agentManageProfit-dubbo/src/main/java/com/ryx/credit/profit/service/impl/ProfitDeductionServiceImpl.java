@@ -160,6 +160,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
             criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
+            criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         if(profitDeductions != null && !profitDeductions.isEmpty()){
             return profitDeductions;
