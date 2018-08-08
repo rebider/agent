@@ -253,7 +253,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String uUser) {
+    public ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String uUser) throws MessageException {
         //1.起始SN序列号  2.结束SN序列号  3.开始截取的位数   4.结束截取的位数
         if (StringUtils.isBlank(startSn)) {
             logger.info("起始SN序列号为空{}:", startSn);
@@ -295,14 +295,22 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return ResultVO.success(null);
     }
 
-    public static List<String> idList(String startSn, String endSn, Integer begins, Integer finish) {
+    public static List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
         //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
         int begin = begins - 1;
         ArrayList<String> list = new ArrayList<>();
         String start = startSn;
         String end = endSn;
+        if (startSn.length() != begins || endSn.length() != finish) {
+            logger.info("请输入正确的起始和结束SN号位数");
+            throw new MessageException("请输入正确的起始和结束SN号位数");
+        }
         String sSub = start.substring(begin, finish);
         String eSub = end.substring(begin, finish);
+        if ("".equals(eSub) || "".equals(sSub)) {
+            logger.info("请输入正确的起始和结束SN号位数");
+            throw new MessageException("请输入正确的起始和结束SN号位数");
+        }
         int num = Integer.parseInt(sSub);
         int w = finish - begin;
         for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
