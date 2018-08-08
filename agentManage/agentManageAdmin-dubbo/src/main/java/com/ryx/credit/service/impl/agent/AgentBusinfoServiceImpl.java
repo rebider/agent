@@ -67,16 +67,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusType()) ||
-        			null == agentBusInfo.getBusSentDirectly() ||
-        			null == agentBusInfo.getBusDirectCashback() ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContactMobile()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
-        			null == agentBusInfo.getCloReceipt() ||
-        			StringUtils.isEmpty(agentBusInfo.getcUser())
+        			StringUtils.isEmpty(agentBusInfo.getBusType())
+//					||
+//        			null == agentBusInfo.getBusSentDirectly() ||
+//        			null == agentBusInfo.getBusDirectCashback() ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContactMobile()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
+//        			null == agentBusInfo.getCloReceipt() ||
+//        			StringUtils.isEmpty(agentBusInfo.getcUser())
         			){
                 throw new ProcessException("业务数据不完整");
         	}

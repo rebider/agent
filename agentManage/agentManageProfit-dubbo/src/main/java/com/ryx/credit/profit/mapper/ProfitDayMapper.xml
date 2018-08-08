@@ -180,6 +180,12 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+
+  <select id="getProfitFactorCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT SUM(RHB_PROFIT)
+    FROM P_PROFIT_D
+  </select>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay" >
     update P_PROFIT_D
     <set >

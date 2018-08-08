@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.jobs;
 
 import com.ryx.credit.common.enumc.GetMethod;
+import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.service.ProfitDeductionService;
@@ -9,14 +10,10 @@ import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import sun.tools.jar.Main;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,34 +34,34 @@ public class ToolsDeductJob {
 
 //    @Scheduled(cron = "0 0/20/40 10 20 * ?")
     public void execut(){
-//        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String deductDate = "2018-09";
+        //String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String deductDate = "2018-08";
+        //String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
+        String beforeDeductDate = "2018-07";
         try {
-
-            //判断当月数据是否已经初始化
             int count = profitDeductionService.getProfitDeductionCount(DeductionType.MACHINE.getType(), deductDate);
             LOG.info("当月已初始化机具扣款分期数据：{} 条", count);
-            //调用接口查询分期数据
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             if(list!= null && !list.isEmpty()){
                 LOG.info("接口获取机具扣款分期数据：{} 条", list.size());
-                if(list.size() - count > 5){
-                    //批量插入机具扣款分期数据
+                if(list.size() > count && count == 0 ){
                     List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
                     LOG.info("机具扣款分期入库成功：{} 条", successList.size());
-                    //查询上月存在分期调整的数据，
-                    List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
-                    LOG.info("上月调整成功的机具扣款：{} 条", detailList.size());
-                    //补全本月扣款信息（上月未扣足金额）
-                    toolsDeductService.deductCompletionInfo(detailList);
-                    //通知结果
                     try {
+                        //通知结果
                         iPaymentDetailService.uploadStatus(successList);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             }
+            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
+            if(detailList != null && !detailList.isEmpty()){
+                LOG.info("上月存在调整成功的机具扣款：{} 条，调整金额补充到本月扣款", detailList.size());
+                toolsDeductService.deductCompletionInfo(detailList);
+            }
+            this.initNormalDeductDetail(beforeDeductDate, deductDate);
+            this.initNotDeductDetailList(beforeDeductDate, deductDate);
         } catch (Exception e){
             LOG.error("初始化机具扣款数据失败");
             e.printStackTrace();
@@ -72,24 +69,62 @@ public class ToolsDeductJob {
     }
 
     /**
-     * 平台编号
-     * @param AgentId 代理商编号
-     * @param paltformNo 平台编号
-     * @param deductDate 扣款月份
-     * @param agentProfitAmt 代理商分润金额
-     * @param parentAgentProfitAmt 担保代理商分润金额
+     * 上个月未扣足订单，且没有调整扣款金额，下月还有还款计划的订单，将未扣足金额调整到下期还款计划中
+     * @param beforeDeductDate
+     * @param deductDate
      */
-    public void computeToolsDeduct(String AgentId, String paltformNo, String deductDate, BigDecimal agentProfitAmt, BigDecimal parentAgentProfitAmt){
-        ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentId(AgentId);
-        profitDeduction.setAgentPid(paltformNo);
-        profitDeduction.setDeductionDate(deductDate);
-        profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
-        List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
-        for (ProfitDeduction profitDeductionList:  list) {
-            agentProfitAmt.subtract(profitDeductionList.getMustDeductionAmt());
+    private void initNormalDeductDetail(String beforeDeductDate, String deductDate) {
+        List<Map<String, Object>> normalDeductDetailList = toolsDeductService.getNotDeductDetail(beforeDeductDate, deductDate, "1");
+        if(normalDeductDetailList != null && !normalDeductDetailList.isEmpty()){
+            LOG.info("上个月未扣足订单，且没有调整扣款金额，下月还有还款计划的订单，将未扣足金额调整到下期还款计划中：{}条", normalDeductDetailList.size());
+            normalDeductDetailList.forEach(map -> {
+                ProfitDeduction profitDeduction = new ProfitDeduction();
+                profitDeduction.setSourceId(map.get("SOURCE_ID").toString());
+                profitDeduction.setAgentId(map.get("AGENT_ID").toString());
+                profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+                profitDeduction.setDeductionDate(deductDate);
+                List<ProfitDeduction> stagesProfitDeduction = profitDeductionService.getProfitDeduction(profitDeduction);
+                if(stagesProfitDeduction != null && !stagesProfitDeduction.isEmpty()){
+                    ProfitDeduction updateProfitDeduction = stagesProfitDeduction.get(0);
+                    BigDecimal sumAmt = updateProfitDeduction.getSumDeductionAmt().add(new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                    updateProfitDeduction.setSumDeductionAmt(sumAmt);
+                    updateProfitDeduction.setMustDeductionAmt(sumAmt);
+                    updateProfitDeduction.setUpperNotDeductionAmt(new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                    profitDeductionService.updateProfitDeduction(updateProfitDeduction);
+                }
+            });
         }
+    }
 
-
+    /**
+     * 上月未扣足订单，且没有调整扣款金额，也没有后续分期计划，自动转换为下月扣款计划
+     * @param beforeDeductDate
+     * @param deductDate
+     */
+    private void initNotDeductDetailList(String beforeDeductDate, String deductDate) {
+        List<Map<String, Object>> notDeductDetailList = toolsDeductService.getNotDeductDetail(beforeDeductDate, deductDate, "2");
+        if(notDeductDetailList != null && !notDeductDetailList.isEmpty()){
+            LOG.info("上月未扣足订单，且没有调整扣款金额，也没有后续分期计划，自动转换为下月扣款计划：{}条", notDeductDetailList.size());
+            notDeductDetailList.forEach(map -> {
+                ProfitDeduction profitDeduction = new ProfitDeduction();
+                profitDeduction.setDeductionDate(deductDate);
+                profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+                profitDeduction.setActualDeductionAmt(BigDecimal.ZERO);
+                profitDeduction.setNotDeductionAmt(BigDecimal.ZERO);
+                profitDeduction.setSourceId(map.get("SOURCE_ID").toString());
+                profitDeduction.setUpperNotDeductionAmt(new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+                profitDeduction.setCreateDateTime(new Date());
+                profitDeduction.setParentAgentId(map.get("PARENT_AGENT_ID") == null ? "" : map.get("PARENT_AGENT_ID").toString());
+                profitDeduction.setParentAgentPid(map.get("PARENT_AGENT_PID") == null ? "" : map.get("PARENT_AGENT_PID").toString());
+                profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
+                profitDeduction.setAgentPid(map.get("AGENT_PID") == null ? "" : map.get("AGENT_PID").toString());
+                profitDeduction.setAgentName(map.get("AGENT_NAME") == null ? "" : map.get("AGENT_NAME").toString());
+                profitDeduction.setSumDeductionAmt(new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                profitDeduction.setAddDeductionAmt(BigDecimal.ZERO);
+                profitDeduction.setMustDeductionAmt(new BigDecimal(map.get("NOT_DEDUCTION_AMT").toString()));
+                profitDeductionService.insert(profitDeduction);
+            });
+        }
     }
 }

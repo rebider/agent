@@ -50,17 +50,21 @@ public enum TabId {
     P_IMPORT_DEDUCTION_DETAIL("P_IMPORT_DEDUCTION_DETAIL%s%015d"),
     P_STAGING_DETAIL("PSD%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
+    P_ORGAN_TRAN_MONTH_DETAIL("POTMD%s%015d"),
     P_DEDUCTION("P_DEDUCTION%s%015d"),
     P_SETTLE_ERR_LS("P_SETTLE_ERR_LS%s%015d"),
-    p_profir_detail("PDE%s%015d"),
-    p_profir_m("PRM%s%015d"),
+    P_PROFIT_DETAIL("PDE%s%015d"),
+    P_PROFIT_DETAIL_M("P_PROFIT_DETAIL_M%s%015d"),
+    P_PROFIT_D("PDAY%s%015d"),
+    P_PROFIT_M("PRM%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
     p_profit_adjust("PPA%s%015d"),
     p_profit_factor("PF%s%015d"),
     p_tax_adjust("PTA%s%015d"),
     p_pos_reward("PPR%s%015d"),
     p_pos_check("PPC%s%015d"),
-    p_profit_supply("PPS%s%015d");
+    p_profit_supply("PPS%s%015d"),
+    P_DEDUCTION_DETAIL("PDD%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;
