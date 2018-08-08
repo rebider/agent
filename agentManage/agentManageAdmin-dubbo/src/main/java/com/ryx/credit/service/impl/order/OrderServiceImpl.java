@@ -210,7 +210,50 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
+    @Override
+    public AgentResult checkDownPaymentDate(Date date) {
 
+        Calendar c = Calendar.getInstance();
+        //当前日
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        //三个月后
+        c.add(Calendar.MONTH,3);
+        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR,c.getActualMinimum(Calendar.HOUR));
+        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
+        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
+        Date threeMDay =  c.getTime();
+
+        //用户选择
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR,c.getActualMinimum(Calendar.HOUR));
+        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
+        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
+        Date selDay =  c.getTime();
+
+        c.setTime(new Date());
+        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR,c.getActualMinimum(Calendar.HOUR));
+        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
+        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
+        Date current  =  c.getTime();
+
+        if(threeMDay.compareTo(selDay)>0){
+            return AgentResult.fail("分期日超出三个月");
+        }
+
+        if(day>5){
+            if(current.compareTo(selDay)==0){
+                return AgentResult.fail("5号以后只能选择下月开始分期");
+            }
+        }
+        return AgentResult.ok();
+    }
 
     /**
      * 根据支付类型初始化付款单参数
@@ -233,6 +276,10 @@ public class OrderServiceImpl implements OrderService {
                 if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("请填实际打款金额");
                 }
+                AgentResult SF1_checkDownPaymentDateres  = checkDownPaymentDate(payment.getDownPaymentDate());
+                if(!SF1_checkDownPaymentDateres.isOK()){
+                    throw new MessageException(SF1_checkDownPaymentDateres.getMsg());
+                }
                 return payment;
             case "SF2"://首付+打款分期
                 if(payment.getDownPayment()==null||payment.getDownPayment().compareTo(BigDecimal.ZERO)==0){
@@ -246,6 +293,10 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("请填实际打款金额");
+                }
+                AgentResult SF2_checkDownPaymentDateres  = checkDownPaymentDate(payment.getDownPaymentDate());
+                if(!SF2_checkDownPaymentDateres.isOK()){
+                    throw new MessageException(SF2_checkDownPaymentDateres.getMsg());
                 }
                 return payment;
             case "FKFQ"://打款分期

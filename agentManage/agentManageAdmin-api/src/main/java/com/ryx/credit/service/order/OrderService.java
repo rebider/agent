@@ -10,6 +10,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,7 @@ public interface OrderService {
     public OPayment initPayment(OPayment payment) throws MessageException;
 
 
+    public AgentResult checkDownPaymentDate(Date date);
 
 
     /**
