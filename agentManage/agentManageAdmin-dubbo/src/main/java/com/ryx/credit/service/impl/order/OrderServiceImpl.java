@@ -887,17 +887,26 @@ public class OrderServiceImpl implements OrderService {
             logger.info("订单提交审批，更新订单基本信息失败{}:{}", id, cuser);
             throw new MessageException("订单提交审批，更新订单基本信息失败");
         }
+        //流程中的部门参数
         Map startPar = agentEnterService.startPar(cuser);
         if (null == startPar) {
             logger.info("========用户{}{}启动部门参数为空", id, cuser);
             throw new MessageException("启动部门参数为空!");
         }
-
+        Object party = startPar.get("party");
         //不同的业务类型找到不同的启动流程
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_ORDER.name());
         String workId = null;
         for (Dict dict : actlist) {
-            workId = dict.getdItemvalue();
+            //根据不同的部门信息启动不同的流程
+            if(party.equals(dict.getdItemvalue())) {
+                workId = dict.getdItemname();
+            }
+        }
+        //订单启动流程
+        if(StringUtils.isBlank(workId)){
+            logger.info("========用户{}{}订单启动流程未找到", cuser, workId);
+            throw new MessageException("订单启动流程未找到!");
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
