@@ -329,7 +329,10 @@
     and rpd.begin_sn = #{map.beginSn}
     and rpd.end_sn = #{map.endSn}
     and order_id = #{map.orderId}
-    and review_status in ('1','2')
+    and review_status in
+    <foreach item="item" index="index" open="(" separator="," close=")" collection="map.reviewStatus">
+      #{item}
+    </foreach>
   </select>
 
 </mapper>
