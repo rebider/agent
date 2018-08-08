@@ -55,6 +55,7 @@ public enum TabId {
     P_SETTLE_ERR_LS("P_SETTLE_ERR_LS%s%015d"),
     P_PROFIT_DETAIL("PDE%s%015d"),
     P_PROFIT_DETAIL_M("P_PROFIT_DETAIL_M%s%015d"),
+    P_PROFIT_D("PDAY%s%015d"),
     P_PROFIT_M("PRM%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
     p_profit_adjust("PPA%s%015d"),
