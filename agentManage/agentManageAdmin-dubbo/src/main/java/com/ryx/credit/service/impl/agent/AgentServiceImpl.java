@@ -312,7 +312,7 @@ public class AgentServiceImpl implements  AgentService {
                 cuserAgent.setStatus(BigDecimal.ONE);
                 cuserAgent.setUserType(BigDecimal.ONE.toString());
                 iCuserAgentService.insert(cuserAgent);
-                redisService.setValue(String.valueOf(userVo.getId()),agent.getId(),Long.valueOf(Integer.MAX_VALUE));
+                redisService.hSet("agent",String.valueOf(userVo.getId()),agent.getId());
             } catch (Exception e) {
                 logger.error("createBackUserbyAgent error {}",agentId,e);
             }
