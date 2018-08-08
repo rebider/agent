@@ -128,8 +128,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 List<ProfitStagingDetail> list = toolsDeductService.getProfitStagingDetailByStagId(profitDeductionList.getId());
                 if (list != null && !list.isEmpty()) {
                     ProfitStagingDetail profitStagingDetail1 = list.get(0);
-                    profitStagingDetail1.setStatus(StagingDetailStatus.Y.getStatus());
-                    toolsDeductService.updateProfitStagingDetail(profitStagingDetail1);
+                    if(profitStagingDetail1.getDeductionDate().equals(profitDeductionList.getDeductionDate())){
+                        profitStagingDetail1.setStatus(StagingDetailStatus.Y.getStatus());
+                        toolsDeductService.updateProfitStagingDetail(profitStagingDetail1);
+                    }
                 }
             }
         } catch (Exception e) {

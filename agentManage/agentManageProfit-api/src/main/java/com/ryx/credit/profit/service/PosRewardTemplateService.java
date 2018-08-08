@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.PosRewardTemplate;
 
@@ -15,7 +16,7 @@ public interface PosRewardTemplateService {
      * 查询通用模板列表
      * @return
      */
-    public PageInfo getPosRewardTemplateList();
+    public PageInfo getPosRewardTemplateList(Page page);
 
     /**
      * 查询一条模板数据
@@ -36,4 +37,10 @@ public interface PosRewardTemplateService {
      * @return POS奖励比例
      */
     public BigDecimal computePosReward(BigDecimal tranTotal);
+
+    /**
+     * 新增POS奖励通用模板
+     * @param posRewardTemplate
+     */
+    public void insertPosRewardTemplate(PosRewardTemplate posRewardTemplate);
 }
