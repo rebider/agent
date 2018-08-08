@@ -160,17 +160,16 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             if (1 != oPaymentDetails.size())
                 throw new ProcessException("没有查找到相关数据");
             OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
-            OPaymentDetail detail = new OPaymentDetail();
-            detail.setRealPayAmount(oPaymentDetail.getPayAmount());
-            detail.setPayTime(Calendar.getInstance().getTime());
-            detail.setPaymentStatus(PaymentStatus.JQ.code);
-            detail.setSrcId(srcId);
-            detail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
-            detail.setId(oPaymentDetail.getId());
-            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(detail)) {
+            oPaymentDetail.setRealPayAmount(oPaymentDetail.getPayAmount());
+            oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
+            oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+            oPaymentDetail.setSrcId(srcId);
+            oPaymentDetail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
+            if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                 logger.info("付款明细更新数据失败");
                 throw new ProcessException("付款明细更新数据失败");
             }
+
             OPaymentExample oPaymentExample = new OPaymentExample();
             OPaymentExample.Criteria criteri = oPaymentExample.createCriteria();
             criteri.andStatusEqualTo(Status.STATUS_1.status);
@@ -179,33 +178,28 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             if (1 != oPayments.size())
                 throw new ProcessException("没有查找到相关数据");
             OPayment oPaymentss = oPayments.get(0);
-            OPayment oPayment = new OPayment();
+            if (oPaymentss.getRealAmount() == null) {
+                oPaymentss.setRealAmount(BigDecimal.ZERO);
+            }
             //已付款金额
-            oPayment.setRealAmount(oPaymentss.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
+            oPaymentss.setRealAmount(oPaymentss.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
             //待付款金额
-                oPayment.setOutstandingAmount(oPaymentss.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
-            oPayment.setId(oPaymentDetail.getPaymentId());
-            if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
+            oPaymentss.setOutstandingAmount(oPaymentss.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
+            if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPaymentss)) {
                 logger.info("付款单更新数据失败");
                 throw new ProcessException("付款单更新数据失败");
             }
-            //更新订单的状态
-            OOrder oOrder = new OOrder();
-            oOrder.setId(oPaymentss.getOrderId());
-            oOrder.setClearStatus(ClearStatus.CLEARED.status);
-            if (1 != oOrderMapper.updateByPrimaryKeySelective(oOrder)) {
-                logger.info("订单更新数据失败");
-                throw new ProcessException("订单更新数据失败");
-            }
+
             //查询当前订单是否还有未结清的订单
             OPaymentDetailExample detailExample = new OPaymentDetailExample();
             OPaymentDetailExample.Criteria riteria = detailExample.createCriteria();
             riteria.andPaymentIdEqualTo(oPaymentDetail.getPaymentId());
             riteria.andStatusEqualTo(Status.STATUS_1.status);
-            riteria.andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.YQ.code, PaymentStatus.FKING.code));
+            riteria.andPaymentStatusIn(Arrays.asList(PaymentStatus.DF.code, PaymentStatus.BF.code, PaymentStatus.YQ.code, PaymentStatus.FKING.code));
             List<OPaymentDetail> oPaymentDetai = oPaymentDetailMapper.selectByExample(detailExample);
 
-            if (null == oPaymentDetai && oPaymentDetai.size() == 0 && oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO) == 0) {
+            if (null == oPaymentDetai && oPaymentDetai.size() == 0 && oPaymentss.getOutstandingAmount().compareTo(BigDecimal.ZERO) == 0) {
+
                 //说明没有未结清的订单
                 OPayment payment = new OPayment();
                 payment.setId(oPaymentDetail.getPaymentId());
@@ -214,6 +208,15 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 if (1 != paymentMapper.updateByPrimaryKeySelective(payment)) {
                     logger.info("付款明细更新数据失败");
                     throw new ProcessException("付款明细更新数据失败");
+                }
+
+                //更新订单的状态
+                OOrder oOrder = new OOrder();
+                oOrder.setId(oPaymentss.getOrderId());
+                oOrder.setClearStatus(ClearStatus.CLEARED.status);
+                if (1 != oOrderMapper.updateByPrimaryKeySelective(oOrder)) {
+                    logger.info("订单更新数据失败");
+                    throw new ProcessException("订单更新数据失败");
                 }
             }
         }
