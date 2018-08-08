@@ -8,6 +8,8 @@ import java.util.Map;
 public interface PProfitFactorMapper {
     long countByExample(PProfitFactorExample example);
 
+    long getSumFactor(PProfitFactor record);
+
     int deleteByExample(PProfitFactorExample example);
 
     int insert(PProfitFactor record);
