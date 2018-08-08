@@ -301,4 +301,19 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             LOG.info("本月没有调整机具分期的订单");
         }
     }
+
+    @Override
+    public void updateProfitStagingDetail(ProfitStagingDetail profitStagingDetail) {
+        if(profitStagingDetail != null){
+            profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getNotDeductDetail(String beforeDeductDate, String deductDate, String type) {
+        if(StringUtils.isBlank(beforeDeductDate)|| StringUtils.isBlank(deductDate)){
+            return null;
+        }
+        return profitDeductionMapper.getNotDeductDetail(beforeDeductDate, deductDate, type);
+    }
 }

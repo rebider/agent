@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -106,6 +107,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(profitDetailMonth.getProfitId())){
             criteria.andProfitIdEqualTo(profitDetailMonth.getProfitId());
         }
+
+        if(StringUtils.isNotBlank(profitDetailMonth.getProfitDate())){
+            criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDate());
+        }
         return profitDetailMonthExample;
     }
 
@@ -127,6 +132,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public void updateProfitMonth(ProfitMonth profitMonth) {
         if(profitMonth != null){
             profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+        }
+    }
+
+    @Override
+    public void insertProfitMonth(ProfitMonth profitMonth) {
+        if(profitMonth != null){
+            profitMonthMapper.insert(profitMonth);
         }
     }
 
@@ -234,5 +246,21 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public BigDecimal getAgentProfit(String agentId, String profitDate) {
+        if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
+            ProfitMonthExample profitMonthExample = new ProfitMonthExample();
+            ProfitMonthExample.Criteria criteria = profitMonthExample.createCriteria();
+            criteria.andAgentIdEqualTo(agentId);
+            criteria.andProfitDateEqualTo(profitDate);
+            List<ProfitMonth> list = profitMonthMapper.selectByExample(profitMonthExample);
+            if(list != null && !list.isEmpty()){
+                ProfitMonth profitMonth= list.get(0);
+                return profitMonth.getPayProfit();
+            }
+        }
+        return BigDecimal.ZERO;
     }
 }

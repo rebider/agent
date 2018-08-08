@@ -6,6 +6,7 @@ import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitMonth;
 import com.ryx.credit.profit.pojo.ProfitUnfreeze;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -58,6 +59,13 @@ public interface ProfitMonthService {
     public void updateProfitMonth(ProfitMonth profitMonth);
 
     /**
+     * 新增月分润数据
+     * @author zhaodw
+     * @param profitMonth
+     */
+    void insertProfitMonth(ProfitMonth profitMonth);
+
+    /**
      *查找
      * @param id
      * @return
@@ -102,4 +110,11 @@ public interface ProfitMonthService {
      */
     void completeTaskEnterActivity(String insid, String status );
 
+    /**
+     * 获取代理商分润
+     * @param agentId
+     * @param profitDate
+     * @return
+     */
+    public BigDecimal getAgentProfit(String agentId, String profitDate);
 }
