@@ -119,6 +119,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         return oSupplements.get(0);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO supplementSave(OsupplementVo osupplementVo) throws Exception {
         OSupplement oSupplement = osupplementVo.getSupplement();
@@ -172,7 +173,7 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO startSuppActivity(String id, String userId)throws Exception{
+    public ResultVO startSuppActivity(String id, String userId) throws Exception {
         logger.info("========用户{}启动补款审核{}", userId, id);
         if (StringUtils.isBlank(id)) {
             logger.info("补款审批,补款ID为空{}:{}", id, userId);
