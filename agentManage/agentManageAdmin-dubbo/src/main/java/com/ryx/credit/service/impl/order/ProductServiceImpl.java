@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -15,6 +16,9 @@ import com.ryx.credit.service.order.ProductService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,7 +73,6 @@ public class ProductServiceImpl implements ProductService {
         return pageInfo;
     }
 
-
     @Override
     public AgentResult saveProduct(OProduct product) {
         AgentResult result = new AgentResult(500, "系统异常", "");
@@ -77,6 +80,17 @@ public class ProductServiceImpl implements ProductService {
             logger.info("商品添加:{}", "商品添加信息编号为空");
             throw new ProcessException("商品编号为空");
         }
+        //去查找商品编号是否已经存在
+        OProductExample oProductExam = new OProductExample();
+        OProductExample.Criteria criter = oProductExam.createCriteria();
+        criter.andStatusEqualTo(Status.STATUS_1.status);
+        criter.andProCodeEqualTo(product.getProCode());
+        List<OProduct> products = productMapper.selectByExample(oProductExam);
+        if (null != products && products.size() > 0) {
+            logger.info("商品添加:{}", "商品添加信息编号已存在");
+            return AgentResult.fail("商品编号已存在");
+        }
+
         if (StringUtils.isBlank(product.getProName())) {
             logger.info("商品添加:{}", "商品添加信息名称为空");
             throw new ProcessException("商品名称为空");
@@ -95,7 +109,7 @@ public class ProductServiceImpl implements ProductService {
             OProductExample.Criteria criteria = oProductExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
             List<OProduct> oProducts = productMapper.selectByExample(oProductExample);
-            if (null == oProducts && oProducts.size()<0) {
+            if (null == oProducts && oProducts.size() < 0) {
                 return null;
             }
             for (OProduct oProduct : oProducts) {
@@ -128,16 +142,19 @@ public class ProductServiceImpl implements ProductService {
         if (StringUtils.isBlank(product.getId())) {
             return result;
         }
+        if (StringUtils.isNotBlank(product.getProCode())) {
+            List<OProduct> oProducts = selectById(product);
+            for (OProduct oProduct : oProducts) {
+                String proCode = oProduct.getProCode();
+                if (product.getProCode().equals(proCode)) {
+                    logger.info("商品修改:{}", "商品编号不可重复");
+                    return AgentResult.fail("商品编号不可重复");
+                }
+            }
+        }
         if (StringUtils.isNotBlank(product.getProName()) && StringUtils.isNotBlank(product.getProType()) && StringUtils.isNotBlank(product.getProCom()) && StringUtils.isNotBlank(product.getProModel())) {
             //进行判断商品名称,机具类型,厂商，型号是否一致
-            OProductExample oProductExample = new OProductExample();
-            OProductExample.Criteria criteria = oProductExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andIdNotEqualTo(product.getId());
-            List<OProduct> oProducts = productMapper.selectByExample(oProductExample);
-            if (null == oProducts && oProducts.size()<0) {
-                return null;
-            }
+            List<OProduct> oProducts = selectById(product);
             for (OProduct oProduct : oProducts) {
                 if (product.getProName().equals(oProduct.getProName()) && product.getProType().equals(oProduct.getProType()) && product.getProCom().equals(oProduct.getProCom()) && product.getProModel().equals(oProduct.getProModel())) {
                     logger.info("商品修改:{}", "商品不可修改重复的选项");
@@ -195,8 +212,20 @@ public class ProductServiceImpl implements ProductService {
         OProductExample example = new OProductExample();
         OProductExample.Criteria criteria = example.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andProStatusEqualTo(Status.STATUS_1.status);
         List<OProduct> oProducts = productMapper.selectByExample(example);
         return oProducts;
     }
 
+    private List<OProduct> selectById(OProduct product) {
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andIdNotEqualTo(product.getId());
+        List<OProduct> oProducts = productMapper.selectByExample(oProductExample);
+        if (null == oProducts && oProducts.size() < 0) {
+            return null;
+        }
+        return oProducts;
+    }
 }

@@ -1,91 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.order.ReceiptPlanMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.ReceiptPlan">
-    <id column="ID" jdbcType="VARCHAR" property="id" />
-    <result column="PLAN_NUM" jdbcType="VARCHAR" property="planNum" />
-    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
-    <result column="RECEIPT_ID" jdbcType="VARCHAR" property="receiptId" />
-    <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
-    <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
-    <result column="PRO_TYPE" jdbcType="VARCHAR" property="proType" />
-    <result column="PRO_COM" jdbcType="VARCHAR" property="proCom" />
-    <result column="PLAN_PRO_NUM" jdbcType="DECIMAL" property="planProNum" />
-    <result column="SEND_PRO_NUM" jdbcType="DECIMAL" property="sendProNum" />
-    <result column="SEND_DATE" jdbcType="TIMESTAMP" property="sendDate" />
-    <result column="REAL_SEND_DATE" jdbcType="TIMESTAMP" property="realSendDate" />
-    <result column="RETURN_ORDER_DETAIL_ID" jdbcType="VARCHAR" property="returnOrderDetailId" />
-    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
-    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
-    <result column="C_DATE" jdbcType="TIMESTAMP" property="cDate" />
-    <result column="PLAN_ORDER_STATUS" jdbcType="DECIMAL" property="planOrderStatus" />
-    <result column="STATUS" jdbcType="DECIMAL" property="status" />
-    <result column="VERSION" jdbcType="DECIMAL" property="version" />
-    <result column="MODEL" jdbcType="VARCHAR" property="model" />
-  </resultMap>
-  <sql id="Example_Where_Clause">
-    <where>
-      <foreach collection="oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.ReceiptPlan">
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="PLAN_NUM" jdbcType="VARCHAR" property="planNum" />
+        <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+        <result column="RECEIPT_ID" jdbcType="VARCHAR" property="receiptId" />
+        <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
+        <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
+        <result column="PRO_TYPE" jdbcType="VARCHAR" property="proType" />
+        <result column="PRO_COM" jdbcType="VARCHAR" property="proCom" />
+        <result column="PLAN_PRO_NUM" jdbcType="DECIMAL" property="planProNum" />
+        <result column="SEND_PRO_NUM" jdbcType="DECIMAL" property="sendProNum" />
+        <result column="SEND_DATE" jdbcType="TIMESTAMP" property="sendDate" />
+        <result column="REAL_SEND_DATE" jdbcType="TIMESTAMP" property="realSendDate" />
+        <result column="RETURN_ORDER_DETAIL_ID" jdbcType="VARCHAR" property="returnOrderDetailId" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+        <result column="C_DATE" jdbcType="TIMESTAMP" property="cDate" />
+        <result column="PLAN_ORDER_STATUS" jdbcType="DECIMAL" property="planOrderStatus" />
+        <result column="STATUS" jdbcType="DECIMAL" property="status" />
+        <result column="VERSION" jdbcType="DECIMAL" property="version" />
+        <result column="MODEL" jdbcType="VARCHAR" property="model" />
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
             </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
-  <sql id="Base_Column_List">
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
     ID, PLAN_NUM, ORDER_ID, RECEIPT_ID, USER_ID, PRO_ID, PRO_TYPE, PRO_COM, PLAN_PRO_NUM, 
     SEND_PRO_NUM, SEND_DATE, REAL_SEND_DATE, RETURN_ORDER_DETAIL_ID, REMARK, C_USER, 
     C_DATE, PLAN_ORDER_STATUS, STATUS, VERSION, MODEL
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from O_RECEIPT_PLAN
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from O_RECEIPT_PLAN
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample">
-    delete from O_RECEIPT_PLAN
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample" resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix" />
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List" />
+        from O_RECEIPT_PLAN
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+        <include refid="OracleDialectSuffix" />
+    </select>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from O_RECEIPT_PLAN
+        where ID = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample">
+        delete from O_RECEIPT_PLAN
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
     insert into O_RECEIPT_PLAN (ID, PLAN_NUM, ORDER_ID, 
       RECEIPT_ID, USER_ID, PRO_ID, 
       PRO_TYPE, PRO_COM, PLAN_PRO_NUM, 
@@ -101,203 +101,203 @@
       #{cDate,jdbcType=TIMESTAMP}, #{planOrderStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, 
       #{version,jdbcType=DECIMAL}, #{model,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
-    insert into O_RECEIPT_PLAN
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        ID,
-      </if>
-      <if test="planNum != null">
-        PLAN_NUM,
-      </if>
-      <if test="orderId != null">
-        ORDER_ID,
-      </if>
-      <if test="receiptId != null">
-        RECEIPT_ID,
-      </if>
-      <if test="userId != null">
-        USER_ID,
-      </if>
-      <if test="proId != null">
-        PRO_ID,
-      </if>
-      <if test="proType != null">
-        PRO_TYPE,
-      </if>
-      <if test="proCom != null">
-        PRO_COM,
-      </if>
-      <if test="planProNum != null">
-        PLAN_PRO_NUM,
-      </if>
-      <if test="sendProNum != null">
-        SEND_PRO_NUM,
-      </if>
-      <if test="sendDate != null">
-        SEND_DATE,
-      </if>
-      <if test="realSendDate != null">
-        REAL_SEND_DATE,
-      </if>
-      <if test="returnOrderDetailId != null">
-        RETURN_ORDER_DETAIL_ID,
-      </if>
-      <if test="remark != null">
-        REMARK,
-      </if>
-      <if test="cUser != null">
-        C_USER,
-      </if>
-      <if test="cDate != null">
-        C_DATE,
-      </if>
-      <if test="planOrderStatus != null">
-        PLAN_ORDER_STATUS,
-      </if>
-      <if test="status != null">
-        STATUS,
-      </if>
-      <if test="version != null">
-        VERSION,
-      </if>
-      <if test="model != null">
-        MODEL,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="planNum != null">
-        #{planNum,jdbcType=VARCHAR},
-      </if>
-      <if test="orderId != null">
-        #{orderId,jdbcType=VARCHAR},
-      </if>
-      <if test="receiptId != null">
-        #{receiptId,jdbcType=VARCHAR},
-      </if>
-      <if test="userId != null">
-        #{userId,jdbcType=VARCHAR},
-      </if>
-      <if test="proId != null">
-        #{proId,jdbcType=VARCHAR},
-      </if>
-      <if test="proType != null">
-        #{proType,jdbcType=VARCHAR},
-      </if>
-      <if test="proCom != null">
-        #{proCom,jdbcType=VARCHAR},
-      </if>
-      <if test="planProNum != null">
-        #{planProNum,jdbcType=DECIMAL},
-      </if>
-      <if test="sendProNum != null">
-        #{sendProNum,jdbcType=DECIMAL},
-      </if>
-      <if test="sendDate != null">
-        #{sendDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="realSendDate != null">
-        #{realSendDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="returnOrderDetailId != null">
-        #{returnOrderDetailId,jdbcType=VARCHAR},
-      </if>
-      <if test="remark != null">
-        #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="cUser != null">
-        #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="cDate != null">
-        #{cDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="planOrderStatus != null">
-        #{planOrderStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="model != null">
-        #{model,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample" resultType="java.lang.Long">
-    select count(*) from O_RECEIPT_PLAN
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
-    update O_RECEIPT_PLAN
-    <set>
-      <if test="planNum != null">
-        PLAN_NUM = #{planNum,jdbcType=VARCHAR},
-      </if>
-      <if test="orderId != null">
-        ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      </if>
-      <if test="receiptId != null">
-        RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
-      </if>
-      <if test="userId != null">
-        USER_ID = #{userId,jdbcType=VARCHAR},
-      </if>
-      <if test="proId != null">
-        PRO_ID = #{proId,jdbcType=VARCHAR},
-      </if>
-      <if test="proType != null">
-        PRO_TYPE = #{proType,jdbcType=VARCHAR},
-      </if>
-      <if test="proCom != null">
-        PRO_COM = #{proCom,jdbcType=VARCHAR},
-      </if>
-      <if test="planProNum != null">
-        PLAN_PRO_NUM = #{planProNum,jdbcType=DECIMAL},
-      </if>
-      <if test="sendProNum != null">
-        SEND_PRO_NUM = #{sendProNum,jdbcType=DECIMAL},
-      </if>
-      <if test="sendDate != null">
-        SEND_DATE = #{sendDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="realSendDate != null">
-        REAL_SEND_DATE = #{realSendDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="returnOrderDetailId != null">
-        RETURN_ORDER_DETAIL_ID = #{returnOrderDetailId,jdbcType=VARCHAR},
-      </if>
-      <if test="remark != null">
-        REMARK = #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="cUser != null">
-        C_USER = #{cUser,jdbcType=VARCHAR},
-      </if>
-      <if test="cDate != null">
-        C_DATE = #{cDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="planOrderStatus != null">
-        PLAN_ORDER_STATUS = #{planOrderStatus,jdbcType=DECIMAL},
-      </if>
-      <if test="status != null">
-        STATUS = #{status,jdbcType=DECIMAL},
-      </if>
-      <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
-      </if>
-      <if test="model != null">
-        MODEL = #{model,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
+    <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
+        insert into O_RECEIPT_PLAN
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                ID,
+            </if>
+            <if test="planNum != null">
+                PLAN_NUM,
+            </if>
+            <if test="orderId != null">
+                ORDER_ID,
+            </if>
+            <if test="receiptId != null">
+                RECEIPT_ID,
+            </if>
+            <if test="userId != null">
+                USER_ID,
+            </if>
+            <if test="proId != null">
+                PRO_ID,
+            </if>
+            <if test="proType != null">
+                PRO_TYPE,
+            </if>
+            <if test="proCom != null">
+                PRO_COM,
+            </if>
+            <if test="planProNum != null">
+                PLAN_PRO_NUM,
+            </if>
+            <if test="sendProNum != null">
+                SEND_PRO_NUM,
+            </if>
+            <if test="sendDate != null">
+                SEND_DATE,
+            </if>
+            <if test="realSendDate != null">
+                REAL_SEND_DATE,
+            </if>
+            <if test="returnOrderDetailId != null">
+                RETURN_ORDER_DETAIL_ID,
+            </if>
+            <if test="remark != null">
+                REMARK,
+            </if>
+            <if test="cUser != null">
+                C_USER,
+            </if>
+            <if test="cDate != null">
+                C_DATE,
+            </if>
+            <if test="planOrderStatus != null">
+                PLAN_ORDER_STATUS,
+            </if>
+            <if test="status != null">
+                STATUS,
+            </if>
+            <if test="version != null">
+                VERSION,
+            </if>
+            <if test="model != null">
+                MODEL,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="planNum != null">
+                #{planNum,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="receiptId != null">
+                #{receiptId,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="proId != null">
+                #{proId,jdbcType=VARCHAR},
+            </if>
+            <if test="proType != null">
+                #{proType,jdbcType=VARCHAR},
+            </if>
+            <if test="proCom != null">
+                #{proCom,jdbcType=VARCHAR},
+            </if>
+            <if test="planProNum != null">
+                #{planProNum,jdbcType=DECIMAL},
+            </if>
+            <if test="sendProNum != null">
+                #{sendProNum,jdbcType=DECIMAL},
+            </if>
+            <if test="sendDate != null">
+                #{sendDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="realSendDate != null">
+                #{realSendDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="returnOrderDetailId != null">
+                #{returnOrderDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="cUser != null">
+                #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="cDate != null">
+                #{cDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="planOrderStatus != null">
+                #{planOrderStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="model != null">
+                #{model,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlanExample" resultType="java.lang.Long">
+        select count(*) from O_RECEIPT_PLAN
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause" />
+        </if>
+    </select>
+    <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
+        update O_RECEIPT_PLAN
+        <set>
+            <if test="planNum != null">
+                PLAN_NUM = #{planNum,jdbcType=VARCHAR},
+            </if>
+            <if test="orderId != null">
+                ORDER_ID = #{orderId,jdbcType=VARCHAR},
+            </if>
+            <if test="receiptId != null">
+                RECEIPT_ID = #{receiptId,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null">
+                USER_ID = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="proId != null">
+                PRO_ID = #{proId,jdbcType=VARCHAR},
+            </if>
+            <if test="proType != null">
+                PRO_TYPE = #{proType,jdbcType=VARCHAR},
+            </if>
+            <if test="proCom != null">
+                PRO_COM = #{proCom,jdbcType=VARCHAR},
+            </if>
+            <if test="planProNum != null">
+                PLAN_PRO_NUM = #{planProNum,jdbcType=DECIMAL},
+            </if>
+            <if test="sendProNum != null">
+                SEND_PRO_NUM = #{sendProNum,jdbcType=DECIMAL},
+            </if>
+            <if test="sendDate != null">
+                SEND_DATE = #{sendDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="realSendDate != null">
+                REAL_SEND_DATE = #{realSendDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="returnOrderDetailId != null">
+                RETURN_ORDER_DETAIL_ID = #{returnOrderDetailId,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="cUser != null">
+                C_USER = #{cUser,jdbcType=VARCHAR},
+            </if>
+            <if test="cDate != null">
+                C_DATE = #{cDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="planOrderStatus != null">
+                PLAN_ORDER_STATUS = #{planOrderStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="status != null">
+                STATUS = #{status,jdbcType=DECIMAL},
+            </if>
+            <if test="version != null">
+                VERSION = #{version,jdbcType=DECIMAL},
+            </if>
+            <if test="model != null">
+                MODEL = #{model,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ReceiptPlan">
     update O_RECEIPT_PLAN
     set PLAN_NUM = #{planNum,jdbcType=VARCHAR},
       ORDER_ID = #{orderId,jdbcType=VARCHAR},
@@ -320,104 +320,104 @@
       MODEL = #{model,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <sql id="OracleDialectPrefix">
-    <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix">
-    <if test="page != null">
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
 
-  <select id="getReceipPlanList" parameterType="java.util.Map" resultType="java.util.Map">
-    <include refid="PAGING_START" />
-    SELECT R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,R.PRO_COM,
-    R.PLAN_PRO_NUM,R.SEND_PRO_NUM,R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
-    O.ADDR_REALNAME,O.ADDR_MOBILE,O.ADDR_PROVINCE,O.ADDR_CITY,O.ADDR_DISTRICT,O.ADDR_DETAIL,
-    O.REMARK,O.ZIP_CODE,O.EXPRESS_REMARK,R.C_DATE,S.PRO_PRICE,S.PRO_TYPE,
-    O.RECEIPT_STATUS,D.R_NAME as NAME,C.R_NAME as CITY,E.R_NAME as DISTRICT
-    FROM O_RECEIPT_PLAN R
-    LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID
-    LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
-    LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
-    LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
-    LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
-    LEFT JOIN O_SUB_ORDER S ON O.ORDER_ID = S.ORDER_ID
-    <include refid="BASE_WHERE_SQL"></include>
-    <include refid="SORTING"></include>
-    <include refid="PAGING_END" />
-  </select>
+    <select id="getReceipPlanList" parameterType="java.util.Map" resultType="java.util.Map">
+        <include refid="PAGING_START" />
+        SELECT R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,R.PRO_COM,
+        R.PLAN_PRO_NUM,R.SEND_PRO_NUM,R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
+        O.ADDR_REALNAME,O.ADDR_MOBILE,O.ADDR_PROVINCE,O.ADDR_CITY,O.ADDR_DISTRICT,O.ADDR_DETAIL,
+        O.REMARK,O.ZIP_CODE,O.EXPRESS_REMARK,R.C_DATE,S.PRO_PRICE,S.PRO_TYPE,
+        O.RECEIPT_STATUS,D.R_NAME as NAME,C.R_NAME as CITY,E.R_NAME as DISTRICT
+        FROM O_RECEIPT_PLAN R
+        LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID
+        LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
+        LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
+        LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
+        LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
+        LEFT JOIN O_SUB_ORDER S ON O.ORDER_ID = S.ORDER_ID
+        <include refid="BASE_WHERE_SQL"></include>
+        <include refid="SORTING"></include>
+        <include refid="PAGING_END" />
+    </select>
 
-  <select id="getReceipPlanCount" parameterType="java.util.Map" resultType="java.lang.Long">
-    SELECT COUNT(1)
-      FROM O_RECEIPT_PLAN R
-      LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID
-      LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
-      LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
-      LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
-      LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
-    <include refid="BASE_WHERE_SQL"></include>
-  </select>
+    <select id="getReceipPlanCount" parameterType="java.util.Map" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM O_RECEIPT_PLAN R
+        LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID
+        LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
+        LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
+        LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
+        LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
+        <include refid="BASE_WHERE_SQL"></include>
+    </select>
 
-  <sql id="BASE_WHERE_SQL">
-    <where>
-      <trim prefixOverrides="AND">
-        <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM,jdbcType=VARCHAR}</if>
-        <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID,jdbcType=VARCHAR}</if>
-        <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS,jdbcType=DECIMAL}</if>
-        <if test="PRO_COM != null and PRO_COM != ''">AND R.PRO_COM = #{PRO_COM,jdbcType=VARCHAR}</if>
-        <if test="C_DATE_START != null and C_DATE_START != ''">AND R.C_DATE &gt;= TO_DATE(#{C_DATE_START,jdbcType=TIMESTAMP},'yyyy-MM-dd')</if>
-        <if test="C_DATE_END != null and C_DATE_END != ''">AND R.C_DATE &lt;= TO_DATE(#{C_DATE_END,jdbcType=TIMESTAMP},'yyyy-MM-dd')</if>
-        <if test="returnId != null and returnId!=''" >and R.return_order_detail_id = #{returnId}</if>
-      </trim>
-    </where>
-  </sql>
+    <sql id="BASE_WHERE_SQL">
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM,jdbcType=VARCHAR}</if>
+                <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID,jdbcType=VARCHAR}</if>
+                <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS,jdbcType=DECIMAL}</if>
+                <if test="PRO_COM != null and PRO_COM != ''">AND R.PRO_COM = #{PRO_COM,jdbcType=VARCHAR}</if>
+                <if test="C_DATE_START != null and C_DATE_START != ''">AND R.C_DATE &gt;= TO_DATE(#{C_DATE_START,jdbcType=TIMESTAMP},'yyyy-MM-dd')</if>
+                <if test="C_DATE_END != null and C_DATE_END != ''">AND R.C_DATE &lt;= TO_DATE(#{C_DATE_END,jdbcType=TIMESTAMP},'yyyy-MM-dd')</if>
+                <if test="returnId != null and returnId!=''" >and R.return_order_detail_id = #{returnId}</if>
+            </trim>
+        </where>
+    </sql>
 
-  <sql id='SORTING'>
-    ORDER BY R.C_DATE DESC
-  </sql>
+    <sql id='SORTING'>
+        ORDER BY R.C_DATE DESC
+    </sql>
 
-  <sql id="PAGING_START">
-    <if test='begin != null and end!=""'>
-      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
-    </if>
-  </sql>
-  <sql id="PAGING_END">
-    <if test='begin != null and end!=""'>
-      ) A WHERE ROWNUM &lt;= #{end} ) B WHERE RN > #{begin}
-    </if>
-  </sql>
+    <sql id="PAGING_START">
+        <if test='begin != null and end!=""'>
+            SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+        </if>
+    </sql>
+    <sql id="PAGING_END">
+        <if test='begin != null and end!=""'>
+            ) A WHERE ROWNUM &lt;= #{end} ) B WHERE RN > #{begin}
+        </if>
+    </sql>
 
 
-  <select id="queryOrderReceiptPlanInfo" parameterType="map" resultType="map">
-    <!--<include refid="OracleDialectPrefix" />-->
-    select
-    ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
-    ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
-    ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
-    ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id,
-    plan.ID  as plan_id, plan.PLAN_NUM,  plan.PRO_TYPE, plan.PRO_COM, plan.PLAN_PRO_NUM,
-    plan.SEND_PRO_NUM, plan.SEND_DATE, plan.REAL_SEND_DATE, plan.RETURN_ORDER_DETAIL_ID,
-    plan.C_DATE, plan.PLAN_ORDER_STATUS,plan.MODEL
-    from O_Receipt_order ro,o_Receipt_pro rp,O_Receipt_plan plan
-    where ro.id = rp.receipt_id
-    and ro.id = plan.Receipt_id
-    <if test="params.orderId != null and params.orderId!=''" >
-      and plan.order_id = #{params.orderId}
-    </if>
-    <if test="params.subOrderId != null and params.subOrderId!=''" >
-      and plan.Receipt_id = #{params.subOrderId}
-    </if>
-    <if test="params.returnId != null and params.returnId!=''" >
-      and plan.return_order_detail_id = #{params.returnId}
-    </if>
-    <if test="params.planOrderStatus != null and params.planOrderStatus!=''" >
-      and plan.plan_order_status = #{params.planOrderStatus}
-    </if>
-    <!--<include refid="OracleDialectSuffix" />-->
-  </select>
+    <select id="queryOrderReceiptPlanInfo" parameterType="map" resultType="map">
+        <!--<include refid="OracleDialectPrefix" />-->
+        select
+        ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
+        ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
+        ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
+        ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id,
+        plan.ID  as plan_id, plan.PLAN_NUM,  plan.PRO_TYPE, plan.PRO_COM, plan.PLAN_PRO_NUM,
+        plan.SEND_PRO_NUM, plan.SEND_DATE, plan.REAL_SEND_DATE, plan.RETURN_ORDER_DETAIL_ID,
+        plan.C_DATE, plan.PLAN_ORDER_STATUS,plan.MODEL
+        from O_Receipt_order ro,o_Receipt_pro rp,O_Receipt_plan plan
+        where ro.id = rp.receipt_id
+        and ro.id = plan.Receipt_id
+        <if test="params.orderId != null and params.orderId!=''" >
+            and plan.order_id = #{params.orderId}
+        </if>
+        <if test="params.subOrderId != null and params.subOrderId!=''" >
+            and plan.Receipt_id = #{params.subOrderId}
+        </if>
+        <if test="params.returnId != null and params.returnId!=''" >
+            and plan.return_order_detail_id = #{params.returnId}
+        </if>
+        <if test="params.planOrderStatus != null and params.planOrderStatus!=''" >
+            and plan.plan_order_status = #{params.planOrderStatus}
+        </if>
+        <!--<include refid="OracleDialectSuffix" />-->
+    </select>
 
 
 </mapper>

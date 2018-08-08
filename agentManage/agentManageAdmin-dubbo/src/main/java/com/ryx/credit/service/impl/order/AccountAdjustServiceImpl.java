@@ -139,28 +139,31 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     BigDecimal outAmt = BigDecimal.ZERO;
                     //分期待付期数
                     int outPlanNum = 0;
-                    //分期已付期数
-                    int complatePlanNum = 0;
+                    //重算起始分期期数
+                    BigDecimal startPlanNum = BigDecimal.ONE;
                     //代付分期起始时间
                     Date startTime = null;
 
                     for (OPaymentDetail detail : planNows) {
-                        if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) {
-                            if (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code)) {
-                                outAmt = outAmt.add(detail.getPayAmount());
+                        //if ((detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) && (detail.getPaymentStatus().equals(PaymentStatus.DF.code) || detail.getPaymentStatus().equals(PaymentStatus.YQ.code))) {
+                        if (!detail.getPaymentStatus().equals(PaymentStatus.JQ.code)) {
+                            outAmt = outAmt.add(detail.getPayAmount());
+                            if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)){
                                 outPlanNum++;
                                 if (startTime == null) {
                                     startTime = detail.getPlanPayTime();
+                                    startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
                                 }
-                                planNows_df.add(detail);
                             }
+                            planNows_df.add(detail);
                         } else {
                             planNows_complate.add(detail);
-                            complatePlanNum++;
                         }
                     }
+
                     //待还金额需要减去可抵扣金额
                     outAmt = outAmt.subtract(leftAmt);
+                    result.put("planNows", planNows);
                     result.put("planNows_df", planNows_df);
                     result.put("planNows_complate", planNows_complate);
                     result.put("takeoutList", takeoutList);
@@ -193,7 +196,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                             newDeatilPlan.setPayType(planNows_df.get(0).getPayType());
                             newDeatilPlan.setPayAmount(MapUtil.getBigDecimal(map, "item"));
                             newDeatilPlan.setPaymentStatus(PaymentStatus.DF.code);
-                            newDeatilPlan.setPlanNum(new BigDecimal(complatePlanNum).add(MapUtil.getBigDecimal(map, "count")));
+                            newDeatilPlan.setPlanNum(startPlanNum.add(MapUtil.getBigDecimal(map, "count")));
                             newDeatilPlan.setPlanPayTime((Date) map.get("date"));
                             newDeatilPlan.setcDate(new Date());
                             newDeatilPlan.setcUser(userid);

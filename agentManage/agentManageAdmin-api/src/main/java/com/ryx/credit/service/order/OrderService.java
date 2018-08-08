@@ -1,11 +1,11 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.pojo.admin.order.OOrder;
-import com.ryx.credit.pojo.admin.order.OPayment;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 
@@ -68,15 +68,9 @@ public interface OrderService {
      * @param payment
      * @return
      */
-    public OPayment initPayment(OPayment payment);
+    public OPayment initPayment(OPayment payment) throws MessageException;
 
 
-    /**
-     * 付款单下单处理
-     * @param oPayment
-     * @return
-     */
-    public AgentResult paymentPlan(OPayment oPayment)throws Exception;
 
 
     /**
@@ -161,5 +155,43 @@ public interface OrderService {
      * @return
      */
     public List<Map<String,Object>> queryHavePeiHuoProduct(String agentId,String orderId);
+
+
+    /**
+     * 订单商品配货
+     * @param oReceiptOrder
+     * @param oReceiptPro
+     * @return
+     * @throws Exception
+     */
+    public AgentResult subOrderPeiHuo(OReceiptOrder oReceiptOrder, OReceiptPro oReceiptPro,int sendNum)throws Exception;
+
+    /**
+     * 修改配货明细
+     * @param oReceiptPro
+     * @return
+     * @throws Exception
+     */
+    public AgentResult subOrderPeiHuoUpdate(OReceiptPro oReceiptPro)throws Exception;
+
+
+    /**
+     * 更新配货及配货明细为待排单状态
+     * @param orderId
+     * @return
+     * @throws Exception
+     */
+    public AgentResult subOrderPeiHuoUpdateStatus(String orderId,String agentId)throws Exception;
+
+
+    /**
+     * 同步发货订单数据
+     * @param receiptOrder
+     * @return
+     * @throws Exception
+     */
+    public AgentResult sysnReceiptOrderPorNum(String receiptOrder)throws Exception;
+
+
 
 }

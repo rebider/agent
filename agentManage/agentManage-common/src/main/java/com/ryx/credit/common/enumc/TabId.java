@@ -37,7 +37,7 @@ public enum TabId {
     o_logistics("LG%s%014d"),//发货物流
     o_logistics_detail("LD%s%014d"),
     o_Refund_price_diff("ORPD%s%015d"),
-    o_Refund_price_diff_detail("ORPDD%s%015d"),
+    o_Refund_price_diff_d("ORPDD%s%015d"),
     o_return_order("RO%s%015d"),
     o_return_order_detail("ROD%s%014d"),
     o_return_order_rel("ROR%s%014d"),
@@ -51,7 +51,7 @@ public enum TabId {
     P_STAGING_DETAIL("PSD%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
     P_ORGAN_TRAN_MONTH_DETAIL("POTMD%s%015d"),
-    P_DEDUCTION("P_DEDUCTION%s%015d"),
+    P_DEDUCTION("P_DEDUCT%s%015d"),
     P_SETTLE_ERR_LS("P_SETTLE_ERR_LS%s%015d"),
     P_PROFIT_DETAIL("PDE%s%015d"),
     P_PROFIT_DETAIL_M("P_PROFIT_DETAIL_M%s%015d"),

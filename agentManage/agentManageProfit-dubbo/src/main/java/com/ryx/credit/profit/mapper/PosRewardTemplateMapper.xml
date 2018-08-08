@@ -10,6 +10,7 @@
     <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
     <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="OPER_USER" jdbcType="VARCHAR" property="operUser" />
+    <result column="ACTIVITY_VALID" jdbcType="VARCHAR" property="activityValid" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -40,38 +41,9 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Update_By_Example_Where_Clause">
-    <where>
-      <foreach collection="example.oredCriteria" item="criteria" separator="or">
-        <if test="criteria.valid">
-          <trim prefix="(" prefixOverrides="and" suffix=")">
-            <foreach collection="criteria.criteria" item="criterion">
-              <choose>
-                <when test="criterion.noValue">
-                  and ${criterion.condition}
-                </when>
-                <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
-                </when>
-                <when test="criterion.betweenValue">
-                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
-                </when>
-                <when test="criterion.listValue">
-                  and ${criterion.condition}
-                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
-                    #{listItem}
-                  </foreach>
-                </when>
-              </choose>
-            </foreach>
-          </trim>
-        </if>
-      </foreach>
-    </where>
-  </sql>
   <sql id="Base_Column_List">
     ID, TRAN_CONTRAST_MONTH, TRAN_TOTAL, CREDIT_TRAN_CONTRAST_MONTH, PROPORTION, CREATE_TIME, 
-    UPDATE_TIME, OPER_USER
+    UPDATE_TIME, OPER_USER, ACTIVITY_VALID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplateExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,10 +67,6 @@
     from P_REWARD_TEMPLATE
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from P_REWARD_TEMPLATE
-    where ID = #{id,jdbcType=VARCHAR}
-  </delete>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplateExample">
     delete from P_REWARD_TEMPLATE
     <if test="_parameter != null">
@@ -108,10 +76,12 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
     insert into P_REWARD_TEMPLATE (ID, TRAN_CONTRAST_MONTH, TRAN_TOTAL, 
       CREDIT_TRAN_CONTRAST_MONTH, PROPORTION, CREATE_TIME, 
-      UPDATE_TIME, OPER_USER)
+      UPDATE_TIME, OPER_USER, ACTIVITY_VALID
+      )
     values (#{id,jdbcType=VARCHAR}, #{tranContrastMonth,jdbcType=VARCHAR}, #{tranTotal,jdbcType=VARCHAR}, 
       #{creditTranContrastMonth,jdbcType=VARCHAR}, #{proportion,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{operUser,jdbcType=VARCHAR})
+      #{updateTime,jdbcType=TIMESTAMP}, #{operUser,jdbcType=VARCHAR}, #{activityValid,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
     insert into P_REWARD_TEMPLATE
@@ -140,6 +110,9 @@
       <if test="operUser != null">
         OPER_USER,
       </if>
+      <if test="activityValid != null">
+        ACTIVITY_VALID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -166,6 +139,9 @@
       <if test="operUser != null">
         #{operUser,jdbcType=VARCHAR},
       </if>
+      <if test="activityValid != null">
+        #{activityValid,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplateExample" resultType="java.lang.Long">
@@ -174,52 +150,6 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByExampleSelective" parameterType="map">
-    update P_REWARD_TEMPLATE
-    <set>
-      <if test="record.id != null">
-        ID = #{record.id,jdbcType=VARCHAR},
-      </if>
-      <if test="record.tranContrastMonth != null">
-        TRAN_CONTRAST_MONTH = #{record.tranContrastMonth,jdbcType=VARCHAR},
-      </if>
-      <if test="record.tranTotal != null">
-        TRAN_TOTAL = #{record.tranTotal,jdbcType=VARCHAR},
-      </if>
-      <if test="record.creditTranContrastMonth != null">
-        CREDIT_TRAN_CONTRAST_MONTH = #{record.creditTranContrastMonth,jdbcType=VARCHAR},
-      </if>
-      <if test="record.proportion != null">
-        PROPORTION = #{record.proportion,jdbcType=DECIMAL},
-      </if>
-      <if test="record.createTime != null">
-        CREATE_TIME = #{record.createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.updateTime != null">
-        UPDATE_TIME = #{record.updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="record.operUser != null">
-        OPER_USER = #{record.operUser,jdbcType=VARCHAR},
-      </if>
-    </set>
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExample" parameterType="map">
-    update P_REWARD_TEMPLATE
-    set ID = #{record.id,jdbcType=VARCHAR},
-      TRAN_CONTRAST_MONTH = #{record.tranContrastMonth,jdbcType=VARCHAR},
-      TRAN_TOTAL = #{record.tranTotal,jdbcType=VARCHAR},
-      CREDIT_TRAN_CONTRAST_MONTH = #{record.creditTranContrastMonth,jdbcType=VARCHAR},
-      PROPORTION = #{record.proportion,jdbcType=DECIMAL},
-      CREATE_TIME = #{record.createTime,jdbcType=TIMESTAMP},
-      UPDATE_TIME = #{record.updateTime,jdbcType=TIMESTAMP},
-      OPER_USER = #{record.operUser,jdbcType=VARCHAR}
-    <if test="_parameter != null">
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
     update P_REWARD_TEMPLATE
     <set>
@@ -244,6 +174,9 @@
       <if test="operUser != null">
         OPER_USER = #{operUser,jdbcType=VARCHAR},
       </if>
+      <if test="activityValid != null">
+        ACTIVITY_VALID = #{activityValid,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -255,7 +188,8 @@
       PROPORTION = #{proportion,jdbcType=DECIMAL},
       CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
       UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
-      OPER_USER = #{operUser,jdbcType=VARCHAR}
+      OPER_USER = #{operUser,jdbcType=VARCHAR},
+      ACTIVITY_VALID = #{activityValid,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

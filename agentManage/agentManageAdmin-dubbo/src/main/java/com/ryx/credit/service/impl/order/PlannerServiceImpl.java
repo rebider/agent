@@ -51,7 +51,7 @@ public class PlannerServiceImpl implements PlannerService {
     public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page) {
 
         Map<String, Object> reqMap = new HashMap<>();
-        reqMap.put("receiptStatus", OReceiptStatus.WAITING_LIST.code);
+//        reqMap.put("receiptStatus", OReceiptStatus.WAITING_LIST.code);
         reqMap.put("receiptProStatus", OReceiptStatus.WAITING_LIST.code);
         if (StringUtils.isNotBlank(receiptOrder.getOrderId())) {
             reqMap.put("orderId", receiptOrder.getOrderId());

@@ -29,23 +29,23 @@ public class DictOptionsServiceImpl implements DictOptionsService {
 
     @Override
     public List<Dict> dictList(String group, String artifact) {
-        DictExample example  = new DictExample();
+        DictExample example = new DictExample();
         example.or().andDGroupEqualTo(group)
                 .andDArtifactEqualTo(artifact)
                 .andDStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause(" D_sort desc");
-        return  dictMapper.selectByExample(example);
+        return dictMapper.selectByExample(example);
     }
 
     @Override
-    public Dict findDictByValue(String group, String artifact,String itemValue) {
+    public Dict findDictByValue(String group, String artifact, String itemValue) {
         DictExample example = new DictExample();
         DictExample.Criteria criteria = example.createCriteria();
         criteria.andDGroupEqualTo(group);
         criteria.andDItemvalueEqualTo(itemValue);
         criteria.andDArtifactEqualTo(artifact);
         List<Dict> dicts = dictMapper.selectByExample(example);
-        if(null==dicts || dicts.size()!=1){
+        if (null == dicts || dicts.size() != 1) {
             return null;
         }
         return dicts.get(0);
@@ -81,11 +81,11 @@ public class DictOptionsServiceImpl implements DictOptionsService {
     }
 
     @Override
-    public boolean insertDict(Dict dict, @Param("tableName")String tableName) {
-        if(StringUtils.isEmpty(dict.getdGroup()))dict.setdGroup(dictMapper.sqlId(tableName)+"");
-        if(1 == dictMapper.insertDict(dict)) {
+    public boolean insertDict(Dict dict, @Param("tableName") String tableName) {
+        if (StringUtils.isEmpty(dict.getdGroup())) dict.setdGroup(dictMapper.sqlId(tableName) + "");
+        if (1 == dictMapper.insertDict(dict)) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -94,6 +94,20 @@ public class DictOptionsServiceImpl implements DictOptionsService {
     public int updateByPrimaryKeySelective(Dict record) {
         record.setdStatus(new BigDecimal(String.valueOf(Status.STATUS_0.status)));
         return dictMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public Dict findDictByName(String group, String artifact, String itemName) {
+        DictExample example = new DictExample();
+        DictExample.Criteria criteria = example.createCriteria();
+        criteria.andDGroupEqualTo(group);
+        criteria.andDItemnameEqualTo(itemName);
+        criteria.andDArtifactEqualTo(artifact);
+        List<Dict> dicts = dictMapper.selectByExample(example);
+        if (null == dicts || dicts.size() != 1) {
+            return null;
+        }
+        return dicts.get(0);
     }
 
 }

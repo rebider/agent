@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.bank.BankRegionService;
+import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.dict.RegionService;
@@ -70,7 +71,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     @Autowired
     private RegionService regionService;
     @Autowired
-    private BankRegionService bankRegionService;
+    private PosRegionService posRegionService;
 
     @Override
     public void asynNotifyPlatform(){
@@ -90,6 +91,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 criteria.andDatatypeIn(dataType);
                 criteria.andDealstatusEqualTo(Status.STATUS_0.status);
                 List<ImportAgent> importAgents = importAgentMapper.selectByExample(example);
+                log.info("接收入网查询列表开始:size：{}",importAgents.size());
                 for (ImportAgent importAgent : importAgents) {
                     if(importAgent.getDatatype().equals(AgImportType.NETINAPP.getValue())){
                         AgentBusInfoExample AgBusExample = new AgentBusInfoExample();
@@ -136,6 +138,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public void notifyPlatform(String busId,String impId)throws Exception{
+        log.info("接收入网请求开始: 业务id：{},类型:{}",busId,impId);
         if(StringUtils.isBlank(busId)){
             log.info("notifyPlatform业务ID为空");
             return;
@@ -166,14 +169,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         for (int i = 0 ; i < split.length ; i++ ){
             String busRegion = split[i];
             if(regionService.isCity(busRegion)){
-                busiAreasList.add(bankRegionService.findRegionByCityId(busRegion).get(0));
+                busiAreasList.add(posRegionService.findRegionByCityId(busRegion).get(0));
             }else{
-                List<String> regionByProvinceId = bankRegionService.findRegionByProvinceId(busRegion);
+                List<String> regionByProvinceId = posRegionService.findRegionByProvinceId(busRegion);
                 for (String provinceId : regionByProvinceId) {
                     busiAreasList.add(provinceId);
                 }
             }
         }
+        log.info("接收入网获取地区,业务id：{},类型:{}",busId,impId);
         String[] busiAreas = busiAreasList.toArray(new String[]{});
         agentNotifyVo.setBusiAreas(busiAreas);
 //        if(agentBusInfo.getBusRegion()!=null){
@@ -231,6 +235,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                     result = httpRequestForMPOS(agentNotifyVo);
                 }
+                log.info("接收入网,业务id：{},返回结果:{}",busId,result);
                 record.setNotifyJson(String.valueOf(result.getData()));
             } catch (Exception e) {
                 log.info("通知pos手刷http请求异常:{}",e.getMessage());
@@ -248,6 +253,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 czResult = agentPlatFormSynMapper.insert(record);
             }
             if(czResult==1 && null!=result && !"".equals(result) && result.isOK()){
+                log.info("接收入网更新入网状态开始,业务id：{},返回结果:{}",busId);
                 //更新入网状态
                 Agent updateAgent = new Agent();
                 updateAgent.setId(agent.getId());
@@ -257,6 +263,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateAgent.setcIncomTime(nowDate);
                 updateAgent.setcUtime(nowDate);
                 int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
+                log.info("接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
                 //更新业务编号
                 AgentBusInfo updateBusInfo = new AgentBusInfo();
                 JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
@@ -264,6 +271,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateBusInfo.setId(agentBusInfo.getId());
                 updateBusInfo.setBusNum(jsonObject.getString("orgId"));
                 int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
+                log.info("接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
                 if(upResult1!=1 || upResult2!=1){
                     if(i==5){
                         if(impId!=null) {
@@ -273,7 +281,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     throw new Exception("更新入网状态/业务编号异常");
                 }
                 if(impId!=null){
-                    updateImportAgent(impId,Status.STATUS_2.status,"处理成功");
+                    int clRes = updateImportAgent(impId, Status.STATUS_2.status, "处理成功");
+                    log.info("接收入网更新入网状态,业务id：{},clRes:{}",clRes);
                 }
                 break;
             }

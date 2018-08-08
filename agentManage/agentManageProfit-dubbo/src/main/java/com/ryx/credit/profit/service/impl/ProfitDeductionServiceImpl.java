@@ -67,6 +67,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
+            criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
