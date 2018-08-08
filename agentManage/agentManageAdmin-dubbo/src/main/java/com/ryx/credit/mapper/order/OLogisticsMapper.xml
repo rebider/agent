@@ -384,7 +384,7 @@
     </sql>
 
     <sql id='SORTING'>
-        ORDER BY R.SEND_DATE DESC
+        ORDER BY R.REAL_SEND_DATE DESC
     </sql>
 
     <sql id="PAGING_START">
