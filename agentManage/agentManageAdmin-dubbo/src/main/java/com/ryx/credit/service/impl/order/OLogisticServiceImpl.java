@@ -301,7 +301,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         ArrayList<String> list = new ArrayList<>();
         String start = startSn;
         String end = endSn;
-        if (startSn.length() != begins || endSn.length() != finish) {
+        if (startSn.length() < begins || endSn.length() <finish) {
             logger.info("请输入正确的起始和结束SN号位数");
             throw new MessageException("请输入正确的起始和结束SN号位数");
         }
