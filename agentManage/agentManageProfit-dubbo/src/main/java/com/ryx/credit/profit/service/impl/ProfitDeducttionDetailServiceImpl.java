@@ -1,0 +1,65 @@
+package com.ryx.credit.profit.service.impl;
+
+import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.profit.dao.ProfitDeducttionDetailMapper;
+import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetailExample;
+import com.ryx.credit.profit.service.ProfitDeducttionDetailService;
+import com.ryx.credit.service.dict.IdService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * @author yangmx
+ * @desc
+ */
+@Service("profitDeducttionDetailService")
+public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetailService {
+
+    @Autowired
+    private ProfitDeducttionDetailMapper profitDeducttionDetailMapper;
+    @Autowired
+    private IdService idService;
+
+    @Override
+    public ProfitDeducttionDetail getProfitDeducttionDetail(ProfitDeduction profitDeduction) {
+        ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
+        ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
+        if(profitDeduction != null){
+            if(StringUtils.isNotBlank(profitDeduction.getId())){
+                criteria.andDeductionIdEqualTo(profitDeduction.getId());
+                List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+                return list != null && !list.isEmpty() ? list.get(0) : null;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void insertDeducttionDetail(ProfitDeduction profitDeduction) throws Exception{
+        ProfitDeducttionDetail profitDeducttionDetail = new ProfitDeducttionDetail();
+        profitDeducttionDetail.setAgentId(profitDeduction.getAgentId());
+        profitDeducttionDetail.setAgentName(profitDeduction.getAgentName());
+        profitDeducttionDetail.setAgentPid(profitDeduction.getAgentPid());
+        profitDeducttionDetail.setCreateDateTime(new Date());
+        profitDeducttionDetail.setDeductionDate(profitDeduction.getDeductionDate());
+        profitDeducttionDetail.setDeductionDesc(profitDeduction.getDeductionDesc());
+        profitDeducttionDetail.setDeductionId(profitDeduction.getId());
+        profitDeducttionDetail.setDeductionType(profitDeduction.getDeductionType());
+        profitDeducttionDetail.setId(idService.genId(TabId.P_DEDUCTION_DETAIL));
+        profitDeducttionDetail.setDeductionAmt(profitDeduction.getActualDeductionAmt());
+        profitDeducttionDetail.setMustDeductionAmt(profitDeduction.getMustDeductionAmt());
+        profitDeducttionDetail.setNotDeductionAmt(profitDeduction.getNotDeductionAmt());
+        profitDeducttionDetail.setParentAgentName(profitDeduction.getParentAgentName());
+        profitDeducttionDetail.setParentAgentId(profitDeduction.getParentAgentId());
+        profitDeducttionDetail.setParentAgentPid(profitDeduction.getParentAgentPid());
+        profitDeducttionDetail.setRemark(profitDeduction.getRemark());
+        profitDeducttionDetail.setUserId(profitDeduction.getUserId());
+        profitDeducttionDetailMapper.insertSelective(profitDeducttionDetail);
+    }
+}

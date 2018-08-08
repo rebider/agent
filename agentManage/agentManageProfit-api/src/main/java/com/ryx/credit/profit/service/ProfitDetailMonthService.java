@@ -5,6 +5,9 @@ package com.ryx.credit.profit.service;/**
  */
 
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
+import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
+
+import java.util.List;
 
 /**
  * 月度分润明细业务接口
@@ -30,4 +33,20 @@ public interface ProfitDetailMonthService {
      * @Date: 2018/8/6
      */
     void update(ProfitDetailMonth profitDetailMonth);
+
+    int countByExample(ProfitDetailMonthExample example);
+
+    int deleteByExample(ProfitDetailMonthExample example);
+
+    int insertSelective(ProfitDetailMonth record);
+
+    List<ProfitDetailMonth> selectByExample(ProfitDetailMonthExample example);
+
+    ProfitDetailMonth selectByPrimaryKey(String id);
+
+    ProfitDetailMonth selectByPIdAndMonth(ProfitDetailMonth record);
+
+    int updateByPrimaryKeySelective(ProfitDetailMonth record);
+
+    int updateByPrimaryKey(ProfitDetailMonth record);
 }

@@ -17,8 +17,11 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
-public class ProfitDTimer {
-    protected Logger logger = LogManager.getLogger(this.getClass());
+/**
+ * 手刷日结分润数据同步、定时
+ */
+public class ProfitDayMposDataJob {
+    Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
     private IProfitDService profitDService;
     @Autowired
@@ -36,10 +39,8 @@ public class ProfitDTimer {
         map.put("pageNumber","1");
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
-        /*String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.day"),params);*/
         String res = HttpClientUtil.doPostJson
-                ("http://12.3.10.161:8003/qtfr/agentInterface/queryfrbyday.do",params);
+                (AppConfig.getProperty("profit.day"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             //logger.error("请求同步失败！");
@@ -84,16 +85,19 @@ public class ProfitDTimer {
     public void insertProfitD(List<HashMap> profitDays){
         for(HashMap map:profitDays){
             ProfitDay profitD = new ProfitDay();
-            profitD.setId(idService.genId(TabId.p_profit_adjust));
+            profitD.setId(idService.genId(TabId.P_PROFIT_D));
             profitD.setAgentId((String)map.get("AGENTID"));
             profitD.setAgentName((String)map.get("AGENTNAME"));
-            profitD.setDailyMakeup((BigDecimal) map.get("DAILYMAKEUP"));
             profitD.setRemitDate((String)map.get("REMITDATE"));
             profitD.setTransDate((String)map.get("TRANSDATE"));
             profitD.setAgentPid((String)map.get("AGENTPID"));
-            profitD.setRhbProfit((BigDecimal) map.get("RHBPROFIT"));
-            profitD.setZfProfit((BigDecimal) map.get("ZFPROFIT"));
             profitD.setTotalProfit((BigDecimal) map.get("TOTALPROFIT"));
+            profitD.setFrozenMoney((BigDecimal) map.get("FROZENMONEY "));
+            profitD.setSuccessMoney((BigDecimal) map.get("SUCCESSMONEY "));
+            profitD.setFailMoney((BigDecimal) map.get("FAILMONEY "));
+            profitD.setRedoMoney((BigDecimal) map.get("REDOMONEY "));
+            profitD.setReturnMoney((BigDecimal) map.get("RETURNMONEY "));
+            profitD.setRealMoney((BigDecimal) map.get("REALMONEY "));
             profitDService.insert(profitD);
         }
     }

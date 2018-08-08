@@ -26,5 +26,7 @@ public interface ProfitSupplyMapper {
 
     Long getProfitSupplyCount(Map<String, Object> param);
 
+    Long getTotalByMonthAndPid(ProfitSupply record);
+
     List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
 }

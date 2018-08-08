@@ -55,6 +55,7 @@ public enum TabId {
     P_SETTLE_ERR_LS("P_SETTLE_ERR_LS%s%015d"),
     P_PROFIT_DETAIL("PDE%s%015d"),
     P_PROFIT_DETAIL_M("P_PROFIT_DETAIL_M%s%015d"),
+    P_PROFIT_D("PDAY%s%015d"),
     P_PROFIT_M("PRM%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
     p_profit_adjust("PPA%s%015d"),
@@ -62,7 +63,8 @@ public enum TabId {
     p_tax_adjust("PTA%s%015d"),
     p_pos_reward("PPR%s%015d"),
     p_pos_check("PPC%s%015d"),
-    p_profit_supply("PPS%s%015d");
+    p_profit_supply("PPS%s%015d"),
+    P_DEDUCTION_DETAIL("PDD%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;

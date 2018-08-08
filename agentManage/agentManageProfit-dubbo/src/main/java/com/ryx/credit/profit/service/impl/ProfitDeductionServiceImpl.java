@@ -160,6 +160,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
             criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
+            criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         if(profitDeductions != null && !profitDeductions.isEmpty()){
             return profitDeductions;
@@ -181,15 +184,15 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return BigDecimal.ZERO;
     }
 
-    /*** 
+    /***
     * @Description: 其他扣款处理
     * @Param:  profitAmt 分润金额
     * @Param:  agentId 机构id
     * @Param:  deductionDate 分润月份
     * @return:
-    * @Author: zhaodw 
-    * @Date: 2018/8/8 
-    */ 
+    * @Author: zhaodw
+    * @Date: 2018/8/8
+    */
     private  BigDecimal deductionOther(BigDecimal profitAmt, String agentId, String deductionDate) {
         // 获取代理商所有其它扣款信息
         ProfitDeduction profitDeduction = new ProfitDeduction();
@@ -224,16 +227,16 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         return result;
     }
-    
+
     /***
     * @Description: 含分期的扣款处理
     * @Param:  profitAmt 当前分润
     * @Param:  resultAmt 扣款结果
     * @Param:  profitDeductionTemp 扣款对象
     * @return:
-    * @Author: zhaodw 
-    * @Date: 2018/8/8 
-    */ 
+    * @Author: zhaodw
+    * @Date: 2018/8/8
+    */
     private void stagingDeal(BigDecimal profitAmt,BigDecimal resultAmt, ProfitDeduction profitDeductionTemp) {
         // 扣足
         profitDeductionTemp.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
@@ -313,12 +316,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
     }
 
-    /*** 
+    /***
     * @Description: 一般扣款处理
     * @Param:  resultAmt 扣减后金额
     * @Author: zhaodw
-    * @Date: 2018/8/8 
-    */ 
+    * @Date: 2018/8/8
+    */
     private void generalDeal(BigDecimal profitAmt,BigDecimal resultAmt, ProfitDeduction profitDeductionTemp) {
         // 扣足
         profitDeductionTemp.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
