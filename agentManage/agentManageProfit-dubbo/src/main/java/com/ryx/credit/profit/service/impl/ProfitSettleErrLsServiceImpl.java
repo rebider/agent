@@ -39,6 +39,10 @@ public class ProfitSettleErrLsServiceImpl implements ProfitSettleErrLsService {
         }else if (StringUtils.isNotBlank(settleErr.getTranDateEnd())){
             criteria.andTranDateEqualTo(settleErr.getTranDateEnd());
         }
+
+        if (StringUtils.isNotBlank(settleErr.getSourceId())) {
+            criteria.andSourceIdEqualTo(settleErr.getSourceId());
+        }
         List<ProfitSettleErrLs> settleErrs = profitSettleErrLsMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(settleErrs);

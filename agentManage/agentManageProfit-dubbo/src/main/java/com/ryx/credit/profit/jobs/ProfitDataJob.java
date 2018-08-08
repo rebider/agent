@@ -30,7 +30,7 @@ import java.util.Map;
  * @author zhaodw
  * @Title: CheckTranJob
  * @ProjectName agentManage
- * @Description: huoq
+ * @Description: 分润数据处理
  * @date 2018/7/2911:34
  */
 @Service("profitDataJob")
@@ -110,7 +110,7 @@ public class ProfitDataJob {
         // pos交易分润额
         BigDecimal posTranProFitAmt = profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT");
         // pos付款分润额
-        BigDecimal posPayProFitAmt = profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT");
+        BigDecimal posPayProFitAmt = profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT");
 
         ProfitMonth profitMonth = new ProfitMonth();
 
@@ -140,9 +140,9 @@ public class ProfitDataJob {
         OrganTranMonthDetail organTranMonthDetail = new OrganTranMonthDetail();
         organTranMonthDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
         organTranMonthDetail.setAgentName((String)agentMap.get("AG_NAME"));
-        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
+        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("PFT_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_03_AMT"));
         organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
-        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
+        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT"));
         organTranMonthDetail.setProfitId(profitId);
         organTranMonthDetailService.insert(organTranMonthDetail);
         organTranMonthDetail = null;
@@ -164,12 +164,13 @@ public class ProfitDataJob {
         profitDetailMonthTemp.setProfitDate(settleMonth);
         profitDetailMonthTemp.setAgentName((String)agentMap.get("AG_NAME"));
         profitDetailMonthTemp.setTranAmt(profitData.getBigDecimal("TRAN_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_01_AMT"));
-        profitDetailMonthTemp.setPayAmt(profitData.getBigDecimal("TRAN_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_01_AMT"));
+        profitDetailMonthTemp.setPayAmt(profitData.getBigDecimal("TRAN_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_02_AMT"));
         profitDetailMonthTemp.setTranProfitScale(profitData.getString("PFT_01_RATE"));
         profitDetailMonthTemp.setPayProfitScale(profitData.getString("PFT_02_RATE"));
         profitDetailMonthTemp.setTranProfitAmt(profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT"));
         profitDetailMonthTemp.setPayProfitAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
         profitDetailMonthTemp.setProfitId(profitId);
+        profitDetailMonthTemp.setPosZqSupplyProfitAmt(profitData.getBigDecimal("PFT_DIFF_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_DIFF_AMT"));
         profitDetailMonthServiceImpl.insert(profitDetailMonthTemp);
         profitDetailMonthTemp = null;
     }

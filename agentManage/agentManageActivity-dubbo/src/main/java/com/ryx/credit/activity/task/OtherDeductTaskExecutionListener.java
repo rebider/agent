@@ -37,6 +37,10 @@ public class OtherDeductTaskExecutionListener implements TaskListener, Execution
             logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
+            String remark = null;
+            if (delegateExecution.getVariableInstances() !=null && delegateExecution.getVariableInstances().get("approvalOpinion") !=null){
+                remark = delegateExecution.getVariableInstances().get("approvalOpinion").getTextValue();
+            }
             //数据变更服务类
             StagingService stagingServiceImpl = (StagingService)MySpringContextHandler.applicationContext.getBean("stagingServiceImpl");
             //审批拒绝
@@ -48,7 +52,7 @@ public class OtherDeductTaskExecutionListener implements TaskListener, Execution
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
             logger.info("根据流程结果完善数据状态");
-            stagingServiceImpl.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(),activityName);
+            stagingServiceImpl.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(),activityName, remark);
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         }

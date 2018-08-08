@@ -75,12 +75,7 @@ public class RefundJob {
     @Transactional
     public void deal() {
         // 上月的开始及结束日期
-        LocalDate date = LocalDate.now().plusMonths(-1);
-        String chargebackEnd = date.with(TemporalAdjusters.lastDayOfMonth()).format(DateTimeFormatter.BASIC_ISO_DATE);
-        String chargebackStart = date.with(TemporalAdjusters.firstDayOfMonth()).format(DateTimeFormatter.BASIC_ISO_DATE);
         JSONObject param = new JSONObject();
-        param.put("chargebackStart", chargebackStart);
-        param.put("chargebackEnd", chargebackEnd);
         // 退单应扣分润
         getDeductionListAndDeal(param);
 

@@ -59,7 +59,7 @@ public interface StagingService {
      * @param insid 实例id
      * @param status 状态
      */
-    void completeTaskEnterActivity(String insid, String status);
+    void completeTaskEnterActivity(String insid, String status, String remark);
 
     /*** 
     * @Description: 新增分期明细
@@ -68,6 +68,14 @@ public interface StagingService {
     * @Date: 2018/7/31 
     */ 
     void insetStagingDetail(ProfitStagingDetail stagingDetail);
+
+    /*** 
+    * @Description:  编辑分期明细
+    * @Param:   stagingDetail 分期明细
+    * @Author: zhaodw
+    * @Date: 2018/8/8 
+    */ 
+    void editStagingDetail(ProfitStagingDetail stagingDetail);
 
     /*** 
     * @Description: 编辑分期
