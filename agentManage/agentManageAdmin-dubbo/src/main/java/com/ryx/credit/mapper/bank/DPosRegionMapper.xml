@@ -137,7 +137,7 @@
     from D_POS_REGION where parent_code =
     (
       select code from D_POS_REGION
-      where name like #{provinceName}
+      where name like #{provinceName} and CODE_LEVEL = '2'
     )
   </select>
 </mapper>
