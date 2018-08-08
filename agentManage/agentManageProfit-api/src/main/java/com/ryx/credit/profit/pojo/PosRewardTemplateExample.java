@@ -667,6 +667,76 @@ public class PosRewardTemplateExample {
             addCriterion("OPER_USER not between", value1, value2, "operUser");
             return (Criteria) this;
         }
+
+        public Criteria andActivityValidIsNull() {
+            addCriterion("ACTIVITY_VALID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidIsNotNull() {
+            addCriterion("ACTIVITY_VALID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID =", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID <>", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidGreaterThan(String value) {
+            addCriterion("ACTIVITY_VALID >", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidGreaterThanOrEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID >=", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidLessThan(String value) {
+            addCriterion("ACTIVITY_VALID <", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidLessThanOrEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID <=", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidLike(String value) {
+            addCriterion("ACTIVITY_VALID like", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotLike(String value) {
+            addCriterion("ACTIVITY_VALID not like", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidIn(List<String> values) {
+            addCriterion("ACTIVITY_VALID in", values, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotIn(List<String> values) {
+            addCriterion("ACTIVITY_VALID not in", values, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidBetween(String value1, String value2) {
+            addCriterion("ACTIVITY_VALID between", value1, value2, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotBetween(String value1, String value2) {
+            addCriterion("ACTIVITY_VALID not between", value1, value2, "activityValid");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
