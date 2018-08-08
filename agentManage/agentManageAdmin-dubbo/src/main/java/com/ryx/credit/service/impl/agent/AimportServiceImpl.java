@@ -525,33 +525,33 @@ public class AimportServiceImpl implements AimportService {
 
                         AgentBusInfo busItem = parseBusFromJson(busRelArray.getJSONObject(i),platForms,bustype,payCompList);
                         if(busItem==null)continue;
-//                        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-//                        agentBusInfoExample.or()
-//                                .andAgentIdEqualTo(busItem.getAgentId())
-//                                .andBusPlatformEqualTo(busItem.getBusPlatform())
-//                                .andStatusEqualTo(Status.STATUS_1.status);
-//                        List<AgentBusInfo> agentBusInfoExamplelist = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-//
-//                        if(agentBusInfoExamplelist.size()>0) {
-//                            logger.info("业务已存在{}{}",busItem.getBusPlatform(),busItem.getAgentId());
-//                            AgentBusInfo db_agentBusInfo = agentBusInfoExamplelist.get(0);
-//                            db_agentBusInfo.setBusRegion(busItem.getBusRegion());
-//                            db_agentBusInfo.setBusSentDirectly(busItem.getBusSentDirectly());
-//                            db_agentBusInfo.setBusDirectCashback(busItem.getBusDirectCashback());
-//                            db_agentBusInfo.setBusIndeAss(busItem.getBusIndeAss());
-//                            db_agentBusInfo.setBusContact(busItem.getBusContact());
-//                            db_agentBusInfo.setBusContactMobile(busItem.getBusContactMobile());
-//                            db_agentBusInfo.setBusContactEmail(busItem.getBusContactEmail());
-//                            db_agentBusInfo.setBusContactPerson(busItem.getBusContactPerson());
-//                            db_agentBusInfo.setBusRiskEmail(busItem.getBusRiskEmail());
-//                            db_agentBusInfo.setCloTaxPoint(busItem.getCloTaxPoint());
-//                            db_agentBusInfo.setCloInvoice(busItem.getCloInvoice());
-//                            db_agentBusInfo.setCloReceipt(busItem.getCloReceipt());
-//                            db_agentBusInfo.setCloPayCompany(busItem.getCloPayCompany());
-//                            db_agentBusInfo.setAgZbh(busItem.getAgZbh());
-//                            agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
-//                            break;
-//                        }
+                        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                        agentBusInfoExample.or()
+                                .andAgentIdEqualTo(busItem.getAgentId())
+                                .andBusPlatformEqualTo(busItem.getBusPlatform())
+                                .andStatusEqualTo(Status.STATUS_1.status);
+                        List<AgentBusInfo> agentBusInfoExamplelist = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+
+                        if(agentBusInfoExamplelist.size()>0) {
+                            logger.info("业务已存在{}{}",busItem.getBusPlatform(),busItem.getAgentId());
+                            AgentBusInfo db_agentBusInfo = agentBusInfoExamplelist.get(0);
+                            db_agentBusInfo.setBusRegion(busItem.getBusRegion());
+                            db_agentBusInfo.setBusSentDirectly(busItem.getBusSentDirectly());
+                            db_agentBusInfo.setBusDirectCashback(busItem.getBusDirectCashback());
+                            db_agentBusInfo.setBusIndeAss(busItem.getBusIndeAss());
+                            db_agentBusInfo.setBusContact(busItem.getBusContact());
+                            db_agentBusInfo.setBusContactMobile(busItem.getBusContactMobile());
+                            db_agentBusInfo.setBusContactEmail(busItem.getBusContactEmail());
+                            db_agentBusInfo.setBusContactPerson(busItem.getBusContactPerson());
+                            db_agentBusInfo.setBusRiskEmail(busItem.getBusRiskEmail());
+                            db_agentBusInfo.setCloTaxPoint(busItem.getCloTaxPoint());
+                            db_agentBusInfo.setCloInvoice(busItem.getCloInvoice());
+                            db_agentBusInfo.setCloReceipt(busItem.getCloReceipt());
+                            db_agentBusInfo.setCloPayCompany(busItem.getCloPayCompany());
+                            db_agentBusInfo.setAgZbh(busItem.getAgZbh());
+                            agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
+                            break;
+                        }
 
                          busItem.setcUser(userid);
                          busItem =  agentBusinfoService.agentBusInfoInsert(busItem);
