@@ -6,16 +6,19 @@ import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.commons.utils.DigestUtils;
+import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CuserAgent;
+import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
@@ -64,6 +67,8 @@ public class AgentServiceImpl implements  AgentService {
     private IUserService iUserService;
     @Autowired
     private ICuserAgentService iCuserAgentService;
+    @Autowired
+    private CuserAgentMapper cuserAgentMapper;
 
     /**
      * 查询代理商信息
@@ -183,6 +188,30 @@ public class AgentServiceImpl implements  AgentService {
         return agentMapper.selectByPrimaryKey(id);
     }
 
+    @Override
+    public List<CuserAgent>  queryByUserId(String userId) {
+        CuserAgentExample example  = new CuserAgentExample();
+        example.or().andUseridEqualTo(userId).andStatusEqualTo(Status.STATUS_1.status);
+        return   cuserAgentMapper.selectByExample(example);
+    }
+
+    @Override
+    public Agent queryAgentByUserId(String userId) {
+        List<CuserAgent>   cas =  queryByUserId(userId);
+        for (CuserAgent ca : cas) {
+            if(StringUtils.isNotEmpty(ca.getAgentid())) {
+                Agent agent = agentMapper.selectByPrimaryKey(ca.getAgentid());
+                if(agent!=null)return agent;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public AgentResult isAgent(String userId) {
+        Agent agent  = queryAgentByUserId(userId);
+        return agent==null?AgentResult.fail():AgentResult.ok(agent);
+    }
 
     @Override
     public int updateAgent(Agent agent) {
