@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * 地区树实现类
+ *
  * @version V1.0
  * @Description:
  * @author: Liudh
@@ -36,7 +37,7 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public List<Tree> selectAllRegion(String pCode) {
-        if(StringUtils.isBlank(pCode)){
+        if (StringUtils.isBlank(pCode)) {
             pCode = "0";
         }
         List<Region> regionsList = regionMapper.findByPcode(pCode);
@@ -46,19 +47,19 @@ public class RegionServiceImpl implements RegionService {
         }
         String treeJson = JsonUtil.objectToJson(rootTree);
         try {
-            redisService.setNx(REGIONS_KEY+ ":" +pCode,treeJson);
+            redisService.setNx(REGIONS_KEY + ":" + pCode, treeJson);
         } catch (Exception e) {
             log.info("redis异常");
         }
         return rootTree;
     }
 
-    private Tree regionToTree(Region region){
+    private Tree regionToTree(Region region) {
         Tree tree = new Tree();
-        tree.setId(Long.valueOf(region.getrCode())+"");
-        tree.setPid(Long.valueOf(region.getpCode())+"");
+        tree.setId(Long.valueOf(region.getrCode()) + "");
+        tree.setPid(Long.valueOf(region.getpCode()) + "");
         tree.setText(region.getrName());
-        tree.setState(regionMapper.findCountByPcode(region.getrCode())==0?1:0);
+        tree.setState(regionMapper.findCountByPcode(region.getrCode()) == 0 ? 1 : 0);
         tree.settType(region.gettType());
         return tree;
     }
@@ -97,18 +98,18 @@ public class RegionServiceImpl implements RegionService {
         RegionExample example = new RegionExample();
         example.or().andRCodeEqualTo(code);
         List<Region> list = regionMapper.selectByExample(example);
-        return list.size()>0?list.get(0):null;
+        return list.size() > 0 ? list.get(0) : null;
     }
 
 
     @Override
     public String getRegionName(String code) {
-        String name  = "";
-        Region r =  queryByCode(code);
-        if(r!=null){
+        String name = "";
+        Region r = queryByCode(code);
+        if (r != null) {
             name = r.getrName();
-            if(org.apache.commons.lang.StringUtils.isNotEmpty(r.getpCode()) && !"0".equals(r.getpCode())){
-                name = getRegionName(r.getpCode())+"-"+name;
+            if (org.apache.commons.lang.StringUtils.isNotEmpty(r.getpCode()) && !"0".equals(r.getpCode())) {
+                name = getRegionName(r.getpCode()) + "-" + name;
             }
         }
         return name;
@@ -116,34 +117,37 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public List<Region> queryRegion(Region region) {
-        if(region==null)return new ArrayList<>();
+        if (region == null) return new ArrayList<>();
         RegionExample example = new RegionExample();
-        RegionExample.Criteria c=  example.or().andStatusEqualTo(Status.STATUS_1.status);
-        if(region.gettType()!=null)c.andTTypeEqualTo(region.gettType());
-        if(region.getId()!=null)c.andIdEqualTo(region.getId());
-        if(region.getrName()!=null)c.andRNameEqualTo(region.getrName());
-        if(region.getrCode()!=null)c.andRCodeEqualTo(region.getrCode());
-        if(region.getpCode()!=null)c.andPCodeEqualTo(region.getpCode());
+        RegionExample.Criteria c = example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if (region.gettType() != null) c.andTTypeEqualTo(region.gettType());
+        if (region.getId() != null) c.andIdEqualTo(region.getId());
+        if (region.getrName() != null) c.andRNameEqualTo(region.getrName());
+        if (region.getrCode() != null) c.andRCodeEqualTo(region.getrCode());
+        if (region.getpCode() != null) c.andPCodeEqualTo(region.getpCode());
         example.setOrderByClause(" r_sort desc ");
         return regionMapper.selectByExample(example);
     }
 
     /**
      * 多个地区
+     *
      * @param codes
      * @return
      */
     @Override
-    public String getRegionsName(String codes){
-        String name  = "";
+    public String getRegionsName(String codes) {
+        String name = "";
         String[] split = codes.split(",");
-        for(int i=0;i<split.length;i++){
+        for (int i = 0; i < split.length; i++) {
             String code = split[i];
-            Region region =  queryByCode(code);
-            if(i>=1){
-                name = name+",";
+            Region region = queryByCode(code);
+            if (null != region) {
+                if (i >= 1) {
+                    name = name + ",";
+                }
+                name = name + region.getrName();
             }
-            name = name + region.getrName();
         }
         return name;
     }
@@ -151,6 +155,7 @@ public class RegionServiceImpl implements RegionService {
 
     /**
      * 根据code判断是否是“市"
+     *
      * @param code
      * @return
      */
@@ -160,7 +165,7 @@ public class RegionServiceImpl implements RegionService {
         example.or().andRCodeEqualTo(code);
         List<Region> list = regionMapper.selectByExample(example);
         Region region = list.get(0);
-        if(region.gettType().equals(2)){
+        if (region.gettType().equals(2)) {
             return true;
         }
         return false;
