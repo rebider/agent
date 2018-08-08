@@ -22,6 +22,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
 import com.ryx.credit.service.order.IAccountAdjustService;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,7 +126,23 @@ public class CompensateServiceImpl implements CompensateService {
             count =  String.valueOf(excelList.get(5));
             orderNum =  String.valueOf(excelList.get(6));
         } catch (Exception e) {
-            throw new ProcessException("导入解析文件异常");
+            throw new ProcessException("导入解析文件失败");
+        }
+
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("beginSn",snBegin);
+        reqMap.put("endSn",snEnd);
+        reqMap.put("orderId",orderNum);
+        ArrayList<Object> reviewStatusList = new ArrayList<>();
+        reviewStatusList.add(AgStatus.Create.getValue());
+        reviewStatusList.add(AgStatus.Approving.getValue());
+        reqMap.put("reviewStatus",reviewStatusList);
+        List<Map<String, Object>> resultMap = refundPriceDiffMapper.selectBySnAndOrderId(reqMap);
+        if (resultMap == null) {
+            throw new ProcessException("查询文件失败");
+        }
+        if (resultMap.size()>=1) {
+            throw new ProcessException("记录审批中请勿重复提交");
         }
         Map<String, Object> reqParam = new HashMap<>();
         reqParam.put("snBegin",snBegin);
