@@ -426,6 +426,7 @@
                 o.user_id=#{userId}
                 <if test="1==1"> and  o.status = 1 </if>
                 <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+                <if test="id!=null and id!=''"> and  o.id = #{id} </if>
                 <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
                 <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
                 <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
@@ -473,6 +474,7 @@
                   <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
                   <if test="1==1"> and  o.status = 1 </if>
                   <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+                  <if test="id!=null and id!=''"> and  o.id = #{id} </if>
                   <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
                   <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
                   <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
@@ -496,6 +498,7 @@
         o.user_id=#{userId}
         <if test="1==1"> and  o.status = 1 </if>
         <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+        <if test="id!=null and id!=''"> and  o.id = #{id} </if>
         <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
         <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
         <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
@@ -514,6 +517,7 @@
         <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
         <if test="1==1"> and  o.status = 1 </if>
         <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+        <if test="id!=null and id!=''"> and  o.id = #{id} </if>
         <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
         <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
         <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
