@@ -64,18 +64,18 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         if(StringUtils.isEmpty(ac.getAgentId())){
             throw new ProcessException("代理商ID不能为空");
         }
-        if(StringUtils.isEmpty(ac.getCloBank())){
-            throw new ProcessException("收款开户行不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getCloRealname())){
-            throw new ProcessException("收款账户名不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getCloBankAccount())){
-            throw new ProcessException("收款账号不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getCloType())){
-            throw new ProcessException("收款账户类型不能为空");
-        }
+//        if(StringUtils.isEmpty(ac.getCloBank())){
+//            throw new ProcessException("收款开户行不能为空");
+//        }
+//        if(StringUtils.isEmpty(ac.getCloRealname())){
+//            throw new ProcessException("收款账户名不能为空");
+//        }
+//        if(StringUtils.isEmpty(ac.getCloBankAccount())){
+//            throw new ProcessException("收款账号不能为空");
+//        }
+//        if(StringUtils.isEmpty(ac.getCloType())){
+//            throw new ProcessException("收款账户类型不能为空");
+//        }
         Date d = Calendar.getInstance().getTime();
         ac.setcTime(d);
         ac.setcUtime(d);

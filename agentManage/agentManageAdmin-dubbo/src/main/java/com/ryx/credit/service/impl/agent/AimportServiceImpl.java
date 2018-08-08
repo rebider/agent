@@ -187,8 +187,8 @@ public class AimportServiceImpl implements AimportService {
                         agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
                         agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                     }
-                    
-                    
+
+
                 }
             }
 
@@ -592,18 +592,6 @@ public class AimportServiceImpl implements AimportService {
                             }
                         }
                     }
-
-
-                    //更新业务
-                    ImportAgentExample importAgentExample = new ImportAgentExample();
-                    importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name()).andDealstatusEqualTo(Status.STATUS_0.status).andDataidEqualTo(datum.getDataid());
-                    List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
-                    for (ImportAgent agentsBusiness : importAgentsBusiness) {
-                        agentsBusiness.setDealTime(datum.getDealTime());
-                        agentsBusiness.setDealstatus(Status.STATUS_2.status);
-                        importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
-                    }
-
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     payment.setDealstatus(Status.STATUS_2.status);//处理成功
                     payment.setDealmsg("成功");
@@ -618,7 +606,7 @@ public class AimportServiceImpl implements AimportService {
                     e.printStackTrace();
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     payment.setDealstatus(Status.STATUS_3.status);//处理成功
-                    payment.setDealmsg(e.getMessage());
+                    payment.setDealmsg(e.getLocalizedMessage());
                     payment.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(payment)){
                         logger.info("代理商导入业务{}失败",datum.getId());
@@ -627,7 +615,23 @@ public class AimportServiceImpl implements AimportService {
                         logger.info("代理商导入业务{}失败",datum.getId());
                     }
                 }
+
+
+
             }
+
+            //更新导入业务
+            //            ImportAgentExample importAgentExample = new ImportAgentExample();
+            //            importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name())
+            //                    .andDealstatusEqualTo(Status.STATUS_0.status)
+            //                    .andDataidEqualTo(uniqnum);
+            //            List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
+            //            for (ImportAgent agentsBusiness : importAgentsBusiness) {
+            //                agentsBusiness.setDealTime(new Date());
+            //                agentsBusiness.setDealstatus(Status.STATUS_2.status);
+            //                importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
+            //            }
+
             return ResultVO.success(null);
         } catch (Exception e) {
             logger.info("代理商导入业务失败{}",e.getMessage());
@@ -643,9 +647,9 @@ public class AimportServiceImpl implements AimportService {
             logger.info("解析json{}",obj.toJSONString());
             AgentContract a = new AgentContract();
             String id =  obj.getString(0);
-            if(null!=obj.getString(2))
+            if(obj.size()>2 && null!=obj.getString(2))
                 a.setContNum(obj.getString(2));
-            if(null!=obj.getString(3)) {
+            if(obj.size()>3 && null!=obj.getString(3)) {
                 //便利查询合同类型
                 List<Dict>  list = dictOptionsService.dictList(DictGroup.AGENT.name(),DictGroup.CONTRACT_TYPE.name());
                 BigDecimal v = null;
@@ -658,15 +662,15 @@ public class AimportServiceImpl implements AimportService {
                     logger.info("合同类型为空{}",obj.toJSONString());
                 a.setContType(v);
             }
-            if(null!=obj.getString(4)) {
+            if(obj.size()>4 && null!=obj.getString(4)) {
                 //便利查询合同类型
                 a.setContDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
             }
-            if(null!=obj.getString(5)) {
+            if(obj.size()>5 && null!=obj.getString(5)) {
                 //便利查询合同类型
                 a.setContEndDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy-MM-dd"}));
             }
-            if(obj.size()>=7 && null!=obj.getString(6)) {
+            if(obj.size()>6 && null!=obj.getString(6)) {
                 //便利查询合同类型
                 a.setRemark(obj.getString(6));
             }
@@ -683,39 +687,39 @@ public class AimportServiceImpl implements AimportService {
             Agent a = new Agent();
             String id =  obj.getString(0);
             a.setAgUniqNum(id);
-            if(null!=obj.getString(1))
+            if(obj.size()>1 && null!=obj.getString(1))
             a.setAgName(obj.getString(1));
-            if(null!=obj.getString(2))
+            if(obj.size()>2 && null!=obj.getString(2))
             a.setAgNature(AgNature.getAgNatureMsgString(obj.getString(2)));
-            if(null!=obj.getString(3))
+            if(obj.size()>3 && null!=obj.getString(3))
             a.setAgCapital(new BigDecimal(obj.getString(3)));
-            if(null!=obj.getString(4))
+            if(obj.size()>4 && null!=obj.getString(4))
                 a.setAgBusLic(obj.getString(4));
-            if(null!=obj.getString(5))
+            if(obj.size()>5 && null!=obj.getString(5))
                 a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy-MM-dd"}));
-            if(null!=obj.getString(6))
+            if(obj.size()>6 && null!=obj.getString(6))
                 a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(6),new String[]{"yyyy-MM-dd"}));
-            if(null!=obj.getString(7))
+            if(obj.size()>7 && null!=obj.getString(7))
                 a.setAgLegal(obj.getString(7));
-            if(null!=obj.getString(8))
+            if(obj.size()>8 && null!=obj.getString(8))
                 a.setAgLegalCertype(AgCertType.getAgCertTypeMsgString(obj.getString(8)));
-            if(null!=obj.getString(9))
+            if(obj.size()>9 && null!=obj.getString(9))
                 a.setAgLegalCernum(obj.getString(9));
-            if(null!=obj.getString(10))
+            if(obj.size()>10 && null!=obj.getString(10))
                 a.setAgLegalMobile(obj.getString(10));
-            if(null!=obj.getString(11))
+            if(obj.size()>11 && null!=obj.getString(11))
                 a.setAgHead(obj.getString(11));
-            if(null!=obj.getString(12))
+            if(obj.size()>12 && null!=obj.getString(12))
                 a.setAgHeadMobile(obj.getString(12));
-            if(null!=obj.getString(13))
+            if(obj.size()>13 && null!=obj.getString(13))
                 a.setAgRegAdd(obj.getString(13));
-            if(null!=obj.getString(14))
+            if(obj.size()>14 && null!=obj.getString(14))
                 a.setAgBusScope(obj.getString(14));
-            if(null!=obj.getString(15)) {
+            if(obj.size()>15 && null!=obj.getString(15)) {
                 COrganization org = departmentService.getByName(obj.getString(15));
                 a.setAgDocPro(org==null?null:org.getId()+"");
             }
-            if(null!=obj.getString(16)){
+            if(obj.size()>16 && null!=obj.getString(16)){
                 COrganization org = departmentService.getByName(obj.getString(16));
                 a.setAgDocDistrict(org==null?null:org.getId()+"");
             }
@@ -732,18 +736,18 @@ public class AimportServiceImpl implements AimportService {
         logger.info("解析json{}",obj.toJSONString());
         try {
             Capital c = new Capital();
-            if(org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(2))){
+            if(obj.size() >2 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(2))){
                 c.setcType(AgCapitalType.getAgNatureMsgString(obj.getString(2)));
 
             }
-            if(org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(3))){
+            if(obj.size() >3 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(3))){
                 c.setcAmount(new BigDecimal(obj.getString(3)));
 
             }
-            if(org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(4))){
+            if(obj.size() >4 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(4))){
                 c.setcPaytime(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
             }
-            if(obj.size()>=6 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
+            if(obj.size()>5 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
                 c.setRemark(obj.getString(5));
             }
 
@@ -771,17 +775,7 @@ public class AimportServiceImpl implements AimportService {
             if(AG.size()==0){
                 throw new ProcessException("代理商查询为空");
             }
-
             JSONObject busitem1 = new JSONObject();
-            JSONObject busitem2 = new JSONObject();
-            JSONObject busitem3 = new JSONObject();
-            JSONObject busitem4 = new JSONObject();
-            JSONObject busitem5 = new JSONObject();
-            JSONObject busitem6 = new JSONObject();
-            JSONObject busitem7 = new JSONObject();
-            JSONObject busitem8 = new JSONObject();
-            JSONObject busitem9 = new JSONObject();
-
             if(obj.size()>4 && StringUtils.isNotBlank(obj.getString(3))) {
                 busitem1.put("agId", AG.get(0).getId());
                 busitem1.put("uniqNum", uniqNum);
@@ -791,86 +785,106 @@ public class AimportServiceImpl implements AimportService {
                 busitem1.put("pn", obj.getString(4));
                 res.add(busitem1);
             }
-            if(obj.size()>6 && StringUtils.isNotBlank(obj.getString(5))) {
-                busitem2.put("agId", AG.get(0).getId());
-                busitem2.put("uniqNum", uniqNum);
-                busitem2.put("agName", agName);
-                busitem2.put("cwzbh", cwzbh);
-                busitem2.put("p", obj.getString(5));
-                busitem2.put("pn", obj.getString(6));
-                res.add(busitem2);
-            }
-
-            if(obj.size()>8 && StringUtils.isNotBlank(obj.getString(7))) {
-                busitem3.put("agId", AG.get(0).getId());
-                busitem3.put("uniqNum", uniqNum);
-                busitem3.put("agName", agName);
-                busitem3.put("cwzbh", cwzbh);
-                busitem3.put("p", obj.getString(7));
-                busitem3.put("pn", obj.getString(8));
-                res.add(busitem3);
-            }
-            if(obj.size()>10 && StringUtils.isNotBlank(obj.getString(9))) {
-                busitem4.put("agId", AG.get(0).getId());
-                busitem4.put("uniqNum", uniqNum);
-                busitem4.put("agName", agName);
-                busitem4.put("cwzbh", cwzbh);
-                busitem4.put("p", obj.getString(9));
-                busitem4.put("pn", obj.getString(10));
-                res.add(busitem4);
-            }
-
-            if(obj.size()>12 && StringUtils.isNotBlank(obj.getString(11))) {
-                busitem5.put("agId", AG.get(0).getId());
-                busitem5.put("uniqNum", uniqNum);
-                busitem5.put("agName", agName);
-                busitem5.put("cwzbh", cwzbh);
-                busitem5.put("p", obj.getString(11));
-                busitem5.put("pn", obj.getString(12));
-                res.add(busitem5);
-            }
-
-            if(obj.size()>14 && StringUtils.isNotBlank(obj.getString(13))) {
-                busitem6.put("agId", AG.get(0).getId());
-                busitem6.put("uniqNum", uniqNum);
-                busitem6.put("agName", agName);
-                busitem6.put("cwzbh", cwzbh);
-                busitem6.put("p", obj.getString(13));
-                busitem6.put("pn", obj.getString(14));
-                res.add(busitem6);
-            }
-
-            if(obj.size()>16 && StringUtils.isNotBlank(obj.getString(15))) {
-                busitem7.put("agId", AG.get(0).getId());
-                busitem7.put("uniqNum", uniqNum);
-                busitem7.put("agName", agName);
-                busitem7.put("cwzbh", cwzbh);
-                busitem7.put("p", obj.getString(15));
-                busitem7.put("pn", obj.getString(16));
-                res.add(busitem7);
-            }
-
-            if(obj.size()>18 &&StringUtils.isNotBlank(obj.getString(17))) {
-                busitem8.put("agId", AG.get(0).getId());
-                busitem8.put("uniqNum", uniqNum);
-                busitem8.put("agName", agName);
-                busitem8.put("cwzbh", cwzbh);
-                busitem8.put("p", obj.getString(17));
-                busitem8.put("pn", obj.getString(18));
-                res.add(busitem8);
-            }
-
-            if(obj.size()>20 &&StringUtils.isNotBlank(obj.getString(19))) {
-                busitem9.put("agId", AG.get(0).getId());
-                busitem9.put("uniqNum", uniqNum);
-                busitem9.put("agName", agName);
-                busitem9.put("cwzbh", cwzbh);
-                busitem9.put("p", obj.getString(19));
-                busitem9.put("pn", obj.getString(20));
-                res.add(busitem9);
-            }
-
             return res;
+//            JSONObject busitem1 = new JSONObject();
+//            JSONObject busitem2 = new JSONObject();
+//            JSONObject busitem3 = new JSONObject();
+//            JSONObject busitem4 = new JSONObject();
+//            JSONObject busitem5 = new JSONObject();
+//            JSONObject busitem6 = new JSONObject();
+//            JSONObject busitem7 = new JSONObject();
+//            JSONObject busitem8 = new JSONObject();
+//            JSONObject busitem9 = new JSONObject();
+//
+//            if(obj.size()>4 && StringUtils.isNotBlank(obj.getString(3))) {
+//                busitem1.put("agId", AG.get(0).getId());
+//                busitem1.put("uniqNum", uniqNum);
+//                busitem1.put("agName", agName);
+//                busitem1.put("cwzbh", cwzbh);
+//                busitem1.put("p", obj.getString(3));
+//                busitem1.put("pn", obj.getString(4));
+//                res.add(busitem1);
+//            }
+//            if(obj.size()>6 && StringUtils.isNotBlank(obj.getString(5))) {
+//                busitem2.put("agId", AG.get(0).getId());
+//                busitem2.put("uniqNum", uniqNum);
+//                busitem2.put("agName", agName);
+//                busitem2.put("cwzbh", cwzbh);
+//                busitem2.put("p", obj.getString(5));
+//                busitem2.put("pn", obj.getString(6));
+//                res.add(busitem2);
+//            }
+//
+//            if(obj.size()>8 && StringUtils.isNotBlank(obj.getString(7))) {
+//                busitem3.put("agId", AG.get(0).getId());
+//                busitem3.put("uniqNum", uniqNum);
+//                busitem3.put("agName", agName);
+//                busitem3.put("cwzbh", cwzbh);
+//                busitem3.put("p", obj.getString(7));
+//                busitem3.put("pn", obj.getString(8));
+//                res.add(busitem3);
+//            }
+//            if(obj.size()>10 && StringUtils.isNotBlank(obj.getString(9))) {
+//                busitem4.put("agId", AG.get(0).getId());
+//                busitem4.put("uniqNum", uniqNum);
+//                busitem4.put("agName", agName);
+//                busitem4.put("cwzbh", cwzbh);
+//                busitem4.put("p", obj.getString(9));
+//                busitem4.put("pn", obj.getString(10));
+//                res.add(busitem4);
+//            }
+//
+//            if(obj.size()>12 && StringUtils.isNotBlank(obj.getString(11))) {
+//                busitem5.put("agId", AG.get(0).getId());
+//                busitem5.put("uniqNum", uniqNum);
+//                busitem5.put("agName", agName);
+//                busitem5.put("cwzbh", cwzbh);
+//                busitem5.put("p", obj.getString(11));
+//                busitem5.put("pn", obj.getString(12));
+//                res.add(busitem5);
+//            }
+//
+//            if(obj.size()>14 && StringUtils.isNotBlank(obj.getString(13))) {
+//                busitem6.put("agId", AG.get(0).getId());
+//                busitem6.put("uniqNum", uniqNum);
+//                busitem6.put("agName", agName);
+//                busitem6.put("cwzbh", cwzbh);
+//                busitem6.put("p", obj.getString(13));
+//                busitem6.put("pn", obj.getString(14));
+//                res.add(busitem6);
+//            }
+//
+//            if(obj.size()>16 && StringUtils.isNotBlank(obj.getString(15))) {
+//                busitem7.put("agId", AG.get(0).getId());
+//                busitem7.put("uniqNum", uniqNum);
+//                busitem7.put("agName", agName);
+//                busitem7.put("cwzbh", cwzbh);
+//                busitem7.put("p", obj.getString(15));
+//                busitem7.put("pn", obj.getString(16));
+//                res.add(busitem7);
+//            }
+//
+//            if(obj.size()>18 &&StringUtils.isNotBlank(obj.getString(17))) {
+//                busitem8.put("agId", AG.get(0).getId());
+//                busitem8.put("uniqNum", uniqNum);
+//                busitem8.put("agName", agName);
+//                busitem8.put("cwzbh", cwzbh);
+//                busitem8.put("p", obj.getString(17));
+//                busitem8.put("pn", obj.getString(18));
+//                res.add(busitem8);
+//            }
+//
+//            if(obj.size()>20 &&StringUtils.isNotBlank(obj.getString(19))) {
+//                busitem9.put("agId", AG.get(0).getId());
+//                busitem9.put("uniqNum", uniqNum);
+//                busitem9.put("agName", agName);
+//                busitem9.put("cwzbh", cwzbh);
+//                busitem9.put("p", obj.getString(19));
+//                busitem9.put("pn", obj.getString(20));
+//                res.add(busitem9);
+//            }
+//
+//            return res;
         } catch (ProcessException e) {
             logger.info("解析json{}:{}",e.getMessage(),obj.toJSONString());
             e.printStackTrace();
@@ -922,7 +936,7 @@ public class AimportServiceImpl implements AimportService {
                 }
             }
 
-            if(StringUtils.isNotBlank(bus_json_array.getString(5))){
+            if(bus_json_array.size()>5 && StringUtils.isNotBlank(bus_json_array.getString(5))){
                 String type = bus_json_array.getString(5).trim();
                 for (Dict dict : bustype) {
                     if(dict.getdItemname().equals(type))
@@ -930,31 +944,31 @@ public class AimportServiceImpl implements AimportService {
                 }
             }
 
-            if(StringUtils.isNotBlank(bus_json_array.getString(10)))
+            if(bus_json_array.size()>10 && StringUtils.isNotBlank(bus_json_array.getString(10)))
             ab.setBusSentDirectly(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(10))));
-            if(StringUtils.isNotBlank(bus_json_array.getString(11)))
+            if(bus_json_array.size()>11 && StringUtils.isNotBlank(bus_json_array.getString(11)))
             ab.setBusDirectCashback(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(11))));
-            if(StringUtils.isNotBlank(bus_json_array.getString(12)))
+            if(bus_json_array.size()>12 && StringUtils.isNotBlank(bus_json_array.getString(12)))
             ab.setBusIndeAss(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(12))));
-            if(StringUtils.isNotBlank(bus_json_array.getString(13)))
+            if(bus_json_array.size()>13 && StringUtils.isNotBlank(bus_json_array.getString(13)))
             ab.setBusContact(bus_json_array.getString(13));
-            if(StringUtils.isNotBlank(bus_json_array.getString(14)))
+            if(bus_json_array.size()>14 && StringUtils.isNotBlank(bus_json_array.getString(14)))
             ab.setBusContactMobile(bus_json_array.getString(14));
-            if(StringUtils.isNotBlank(bus_json_array.getString(15)))
+            if(bus_json_array.size()>15 && StringUtils.isNotBlank(bus_json_array.getString(15)))
             ab.setBusContactEmail(bus_json_array.getString(15));
-            if(StringUtils.isNotBlank(bus_json_array.getString(16)))
+            if(bus_json_array.size()>16 && StringUtils.isNotBlank(bus_json_array.getString(16)))
             ab.setBusContactPerson(bus_json_array.getString(16));
-            if(StringUtils.isNotBlank(bus_json_array.getString(17)))
+            if(bus_json_array.size()>17 && StringUtils.isNotBlank(bus_json_array.getString(17)))
             ab.setBusRiskEmail(bus_json_array.getString(17));
-            if(StringUtils.isNotBlank(bus_json_array.getString(18)))
+            if(bus_json_array.size()>18 && StringUtils.isNotBlank(bus_json_array.getString(18)))
             ab.setCloTaxPoint(bus_json_array.getBigDecimal(18));
-            if(StringUtils.isNotBlank(bus_json_array.getString(19)))
+            if(bus_json_array.size()>19 && StringUtils.isNotBlank(bus_json_array.getString(19)))
             ab.setCloInvoice(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(19))));
-            if(StringUtils.isNotBlank(bus_json_array.getString(20)))
+            if(bus_json_array.size()>20 && StringUtils.isNotBlank(bus_json_array.getString(20)))
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
 
             //打款公司
-            if(StringUtils.isNotBlank(bus_json_array.getString(21)))
+            if(bus_json_array.size()>21 && StringUtils.isNotBlank(bus_json_array.getString(21)))
             for (PayComp payComp : payCompList) {
                 if(payComp.getComName().equals(bus_json_array.getString(21))) {
                     ab.setCloPayCompany(payComp.getId());
@@ -964,22 +978,22 @@ public class AimportServiceImpl implements AimportService {
 
             //设置打款账户
 
-            if(StringUtils.isNotBlank(bus_json_array.getString(22))) {
+            if(bus_json_array.size()>22 && StringUtils.isNotBlank(bus_json_array.getString(22))) {
                 AgentColinfo colinfo = new AgentColinfo();
                 //收款账户 对公对私
-                if (StringUtils.isNotBlank(bus_json_array.getString(22)))
+                if (bus_json_array.size()>22 && StringUtils.isNotBlank(bus_json_array.getString(22)))
                     colinfo.setCloType(BigDecimal.valueOf(gs.indexOf(bus_json_array.getString(22))));
                 //收款账户 realname
-                if (StringUtils.isNotBlank(bus_json_array.getString(23)))
+                if (bus_json_array.size()>23 && StringUtils.isNotBlank(bus_json_array.getString(23)))
                     colinfo.setCloRealname(bus_json_array.getString(23));
                 //收款账户 卡号
-                if (StringUtils.isNotBlank(bus_json_array.getString(24)))
+                if (bus_json_array.size()>24 && StringUtils.isNotBlank(bus_json_array.getString(24)))
                     colinfo.setCloBankAccount(bus_json_array.getString(24));
                 //收款账户 开户行
-                if (StringUtils.isNotBlank(bus_json_array.getString(25)))
+                if (bus_json_array.size()>25 && StringUtils.isNotBlank(bus_json_array.getString(25)))
                     colinfo.setCloBank(bus_json_array.getString(25));
                 //收款账户 开户支行
-                if (StringUtils.isNotBlank(bus_json_array.getString(26)))
+                if (bus_json_array.size()>26 && StringUtils.isNotBlank(bus_json_array.getString(26)))
                     colinfo.setCloBankBranch(bus_json_array.getString(26));
 
                 colinfo.setAgentId(ab.getAgentId());
