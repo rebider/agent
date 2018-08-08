@@ -51,26 +51,32 @@ public class TranDataJob {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+settleMonth);
         LOG.info("获取分润数据");
-        AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
-        JSONObject jsonObject = getTranData(settleMonth);
-        if (agentResult != null && agentResult.getData() != null) {
-            JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
-            if (json != null) {
-                BigDecimal tranAmt = BigDecimal.ZERO;
-                BigDecimal zyssAmt = BigDecimal.ZERO;
-                if (jsonObject != null && jsonObject.containsKey("info")) {
-                    JSONObject tranData = jsonObject.getJSONObject("info");
-                    zyssAmt = tranData.getBigDecimal("zyssAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyssAmt");;// 自营代理手刷总金额
-                    BigDecimal zydlPosAmt = tranData.getBigDecimal("zydlPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zydlPosAmt");;// 自营代理pos总金额
-                    BigDecimal zyPosAmt = tranData.getBigDecimal("zyPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyPosAmt");//自营交易总金额
-                    BigDecimal hyxJwAmt = tranData.getBigDecimal("hyxJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("hyxJwAmt");//汇银讯境外卡交易总金额
-                    BigDecimal orgJwAmt = tranData.getBigDecimal("orgJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("orgJwAmt");//代理商境外卡交易总金额
-                    tranAmt = zydlPosAmt.subtract(zyPosAmt).subtract(hyxJwAmt).subtract(orgJwAmt);
+        try {
+            AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
+            if (agentResult != null && agentResult.getData() != null) {
+                JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
+                if (json != null) {
+                    BigDecimal tranAmt = BigDecimal.ZERO;
+                    BigDecimal zyssAmt = BigDecimal.ZERO;
+                    JSONObject jsonObject = getTranData(settleMonth);
+                    if (jsonObject != null && jsonObject.containsKey("info")) {
+                        JSONObject tranData = jsonObject.getJSONObject("info");
+                        zyssAmt = tranData.getBigDecimal("zyssAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyssAmt");;// 自营代理手刷总金额
+                        BigDecimal zydlPosAmt = tranData.getBigDecimal("zydlPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zydlPosAmt");;// 自营代理pos总金额
+                        BigDecimal zyPosAmt = tranData.getBigDecimal("zyPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyPosAmt");//自营交易总金额
+                        BigDecimal hyxJwAmt = tranData.getBigDecimal("hyxPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("hyxPosJwAmt");//汇银讯境外卡交易总金额
+                        BigDecimal orgJwAmt = tranData.getBigDecimal("dlPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("dlPosJwAmt");//代理商境外卡交易总金额
+                        tranAmt = zydlPosAmt.subtract(zyPosAmt).subtract(hyxJwAmt).subtract(orgJwAmt);
+                    }
+                    insertOrUpdate(json, settleMonth, tranAmt, zyssAmt);//新增二维码
+                }else{
+                    LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
                 }
-                insertOrUpdate(json, settleMonth, tranAmt, zyssAmt);//新增二维码
-            }else{
-                LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
             }
+        }catch (Exception e) {
+            e.printStackTrace();
+            LOG.error("分润数据处理失败");
+            throw new RuntimeException("分润数据处理失败");
         }
     }
 

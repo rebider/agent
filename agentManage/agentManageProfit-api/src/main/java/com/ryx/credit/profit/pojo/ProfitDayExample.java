@@ -558,126 +558,6 @@ public class ProfitDayExample implements Serializable {
             return (Criteria) this;
         }
 
-        public Criteria andRhbProfitIsNull() {
-            addCriterion("RHB_PROFIT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitIsNotNull() {
-            addCriterion("RHB_PROFIT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitEqualTo(BigDecimal value) {
-            addCriterion("RHB_PROFIT =", value, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitNotEqualTo(BigDecimal value) {
-            addCriterion("RHB_PROFIT <>", value, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitGreaterThan(BigDecimal value) {
-            addCriterion("RHB_PROFIT >", value, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("RHB_PROFIT >=", value, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitLessThan(BigDecimal value) {
-            addCriterion("RHB_PROFIT <", value, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("RHB_PROFIT <=", value, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitIn(List<BigDecimal> values) {
-            addCriterion("RHB_PROFIT in", values, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitNotIn(List<BigDecimal> values) {
-            addCriterion("RHB_PROFIT not in", values, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("RHB_PROFIT between", value1, value2, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andRhbProfitNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("RHB_PROFIT not between", value1, value2, "rhbProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitIsNull() {
-            addCriterion("ZF_PROFIT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitIsNotNull() {
-            addCriterion("ZF_PROFIT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitEqualTo(BigDecimal value) {
-            addCriterion("ZF_PROFIT =", value, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitNotEqualTo(BigDecimal value) {
-            addCriterion("ZF_PROFIT <>", value, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitGreaterThan(BigDecimal value) {
-            addCriterion("ZF_PROFIT >", value, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("ZF_PROFIT >=", value, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitLessThan(BigDecimal value) {
-            addCriterion("ZF_PROFIT <", value, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("ZF_PROFIT <=", value, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitIn(List<BigDecimal> values) {
-            addCriterion("ZF_PROFIT in", values, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitNotIn(List<BigDecimal> values) {
-            addCriterion("ZF_PROFIT not in", values, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("ZF_PROFIT between", value1, value2, "zfProfit");
-            return (Criteria) this;
-        }
-
-        public Criteria andZfProfitNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("ZF_PROFIT not between", value1, value2, "zfProfit");
-            return (Criteria) this;
-        }
-
         public Criteria andTotalProfitIsNull() {
             addCriterion("TOTAL_PROFIT is null");
             return (Criteria) this;
@@ -735,6 +615,366 @@ public class ProfitDayExample implements Serializable {
 
         public Criteria andTotalProfitNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("TOTAL_PROFIT not between", value1, value2, "totalProfit");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyIsNull() {
+            addCriterion("FROZEN_MONEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyIsNotNull() {
+            addCriterion("FROZEN_MONEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyEqualTo(BigDecimal value) {
+            addCriterion("FROZEN_MONEY =", value, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyNotEqualTo(BigDecimal value) {
+            addCriterion("FROZEN_MONEY <>", value, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyGreaterThan(BigDecimal value) {
+            addCriterion("FROZEN_MONEY >", value, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FROZEN_MONEY >=", value, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyLessThan(BigDecimal value) {
+            addCriterion("FROZEN_MONEY <", value, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FROZEN_MONEY <=", value, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyIn(List<BigDecimal> values) {
+            addCriterion("FROZEN_MONEY in", values, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyNotIn(List<BigDecimal> values) {
+            addCriterion("FROZEN_MONEY not in", values, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FROZEN_MONEY between", value1, value2, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFrozenMoneyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FROZEN_MONEY not between", value1, value2, "frozenMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyIsNull() {
+            addCriterion("SUCCESS_MONEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyIsNotNull() {
+            addCriterion("SUCCESS_MONEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyEqualTo(BigDecimal value) {
+            addCriterion("SUCCESS_MONEY =", value, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyNotEqualTo(BigDecimal value) {
+            addCriterion("SUCCESS_MONEY <>", value, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyGreaterThan(BigDecimal value) {
+            addCriterion("SUCCESS_MONEY >", value, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUCCESS_MONEY >=", value, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyLessThan(BigDecimal value) {
+            addCriterion("SUCCESS_MONEY <", value, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUCCESS_MONEY <=", value, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyIn(List<BigDecimal> values) {
+            addCriterion("SUCCESS_MONEY in", values, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyNotIn(List<BigDecimal> values) {
+            addCriterion("SUCCESS_MONEY not in", values, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUCCESS_MONEY between", value1, value2, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuccessMoneyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUCCESS_MONEY not between", value1, value2, "successMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyIsNull() {
+            addCriterion("FAIL_MONEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyIsNotNull() {
+            addCriterion("FAIL_MONEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyEqualTo(BigDecimal value) {
+            addCriterion("FAIL_MONEY =", value, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyNotEqualTo(BigDecimal value) {
+            addCriterion("FAIL_MONEY <>", value, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyGreaterThan(BigDecimal value) {
+            addCriterion("FAIL_MONEY >", value, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FAIL_MONEY >=", value, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyLessThan(BigDecimal value) {
+            addCriterion("FAIL_MONEY <", value, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FAIL_MONEY <=", value, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyIn(List<BigDecimal> values) {
+            addCriterion("FAIL_MONEY in", values, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyNotIn(List<BigDecimal> values) {
+            addCriterion("FAIL_MONEY not in", values, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FAIL_MONEY between", value1, value2, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andFailMoneyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FAIL_MONEY not between", value1, value2, "failMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyIsNull() {
+            addCriterion("REAL_MONEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyIsNotNull() {
+            addCriterion("REAL_MONEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyEqualTo(BigDecimal value) {
+            addCriterion("REAL_MONEY =", value, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyNotEqualTo(BigDecimal value) {
+            addCriterion("REAL_MONEY <>", value, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyGreaterThan(BigDecimal value) {
+            addCriterion("REAL_MONEY >", value, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REAL_MONEY >=", value, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyLessThan(BigDecimal value) {
+            addCriterion("REAL_MONEY <", value, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REAL_MONEY <=", value, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyIn(List<BigDecimal> values) {
+            addCriterion("REAL_MONEY in", values, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyNotIn(List<BigDecimal> values) {
+            addCriterion("REAL_MONEY not in", values, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REAL_MONEY between", value1, value2, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealMoneyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REAL_MONEY not between", value1, value2, "realMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyIsNull() {
+            addCriterion("REDO_MONEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyIsNotNull() {
+            addCriterion("REDO_MONEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyEqualTo(BigDecimal value) {
+            addCriterion("REDO_MONEY =", value, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyNotEqualTo(BigDecimal value) {
+            addCriterion("REDO_MONEY <>", value, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyGreaterThan(BigDecimal value) {
+            addCriterion("REDO_MONEY >", value, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REDO_MONEY >=", value, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyLessThan(BigDecimal value) {
+            addCriterion("REDO_MONEY <", value, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REDO_MONEY <=", value, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyIn(List<BigDecimal> values) {
+            addCriterion("REDO_MONEY in", values, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyNotIn(List<BigDecimal> values) {
+            addCriterion("REDO_MONEY not in", values, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REDO_MONEY between", value1, value2, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andRedoMoneyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REDO_MONEY not between", value1, value2, "redoMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyIsNull() {
+            addCriterion("RETURN_MONEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyIsNotNull() {
+            addCriterion("RETURN_MONEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyEqualTo(BigDecimal value) {
+            addCriterion("RETURN_MONEY =", value, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyNotEqualTo(BigDecimal value) {
+            addCriterion("RETURN_MONEY <>", value, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyGreaterThan(BigDecimal value) {
+            addCriterion("RETURN_MONEY >", value, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("RETURN_MONEY >=", value, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyLessThan(BigDecimal value) {
+            addCriterion("RETURN_MONEY <", value, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("RETURN_MONEY <=", value, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyIn(List<BigDecimal> values) {
+            addCriterion("RETURN_MONEY in", values, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyNotIn(List<BigDecimal> values) {
+            addCriterion("RETURN_MONEY not in", values, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("RETURN_MONEY between", value1, value2, "returnMoney");
+            return (Criteria) this;
+        }
+
+        public Criteria andReturnMoneyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("RETURN_MONEY not between", value1, value2, "returnMoney");
             return (Criteria) this;
         }
     }

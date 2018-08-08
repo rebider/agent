@@ -157,6 +157,15 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+
+  <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.lang.Long">
+    select SUM(tatol_amt) from P_PROFIT_FACTOR
+     where
+    FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
+    AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
+
+
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
     update P_PROFIT_FACTOR
     <set>

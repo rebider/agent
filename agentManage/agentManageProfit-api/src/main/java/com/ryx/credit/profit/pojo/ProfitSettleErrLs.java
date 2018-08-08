@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitSettleErrLs implements Serializable {
-    private static final long serialVersionUID = 5649240609380076449L;
+    private static final long serialVersionUID = 14825224047240310L;
     private String id;
 
     private String errCode;
@@ -13,9 +13,7 @@ public class ProfitSettleErrLs implements Serializable {
 
     private String tranDate;
 
-
     private String tranDateStart;
-
 
     private String tranDateEnd;
 
@@ -24,6 +22,8 @@ public class ProfitSettleErrLs implements Serializable {
     private String cooperationMode;
 
     private String merchId;
+
+    private String merchName;
 
     private String merchType;
 
@@ -99,6 +99,14 @@ public class ProfitSettleErrLs implements Serializable {
 
     private String instId;
 
+    private BigDecimal mustDeductionAmt;
+
+    private BigDecimal mustSupplyAmt;
+
+    private BigDecimal mustCdAmt;
+
+    private BigDecimal yswsAmt;
+
     private String sourceId;
 
     public String getId() {
@@ -140,13 +148,6 @@ public class ProfitSettleErrLs implements Serializable {
     public void setBusinessType(String businessType) {
         this.businessType = businessType == null ? null : businessType.trim();
     }
-    public String getSourceId() {
-        return sourceId;
-    }
-
-    public void setSourceId(String sourceId) {
-        this.sourceId = sourceId == null ? null : sourceId.trim();
-    }
 
     public String getCooperationMode() {
         return cooperationMode;
@@ -162,6 +163,14 @@ public class ProfitSettleErrLs implements Serializable {
 
     public void setMerchId(String merchId) {
         this.merchId = merchId == null ? null : merchId.trim();
+    }
+
+    public String getMerchName() {
+        return merchName;
+    }
+
+    public void setMerchName(String merchName) {
+        this.merchName = merchName == null ? null : merchName.trim();
     }
 
     public String getMerchType() {
@@ -458,6 +467,46 @@ public class ProfitSettleErrLs implements Serializable {
 
     public void setInstId(String instId) {
         this.instId = instId == null ? null : instId.trim();
+    }
+
+    public BigDecimal getMustDeductionAmt() {
+        return mustDeductionAmt;
+    }
+
+    public void setMustDeductionAmt(BigDecimal mustDeductionAmt) {
+        this.mustDeductionAmt = mustDeductionAmt;
+    }
+
+    public BigDecimal getMustSupplyAmt() {
+        return mustSupplyAmt;
+    }
+
+    public void setMustSupplyAmt(BigDecimal mustSupplyAmt) {
+        this.mustSupplyAmt = mustSupplyAmt;
+    }
+
+    public BigDecimal getMustCdAmt() {
+        return mustCdAmt;
+    }
+
+    public void setMustCdAmt(BigDecimal mustCdAmt) {
+        this.mustCdAmt = mustCdAmt;
+    }
+
+    public BigDecimal getYswsAmt() {
+        return yswsAmt;
+    }
+
+    public void setYswsAmt(BigDecimal yswsAmt) {
+        this.yswsAmt = yswsAmt;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId == null ? null : sourceId.trim();
     }
 
     public String getTranDateStart() {

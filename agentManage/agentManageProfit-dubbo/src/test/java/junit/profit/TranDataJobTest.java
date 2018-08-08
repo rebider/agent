@@ -1,12 +1,6 @@
-package junit.profit;/**
- * @Auther: zhaodw
- * @Date: 2018/7/30 14:59
- * @Description:
- */
-
+package junit.profit;
 import com.ryx.credit.profit.jobs.ProfitDataJob;
-import com.ryx.credit.profit.jobs.RefundJob;
-import com.ryx.credit.profit.service.StagingService;
+import com.ryx.credit.profit.jobs.TranDataJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,12 +18,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class RefundJobTest {
+public class TranDataJobTest {
 
-    private Logger logger = LoggerFactory.getLogger(RefundJobTest.class);
+    private Logger logger = LoggerFactory.getLogger(TranDataJobTest.class);
 
     @Autowired
-    private RefundJob refundJob;
+    private TranDataJob tranDataJob;
 
     /*** 
     * @Description: 测试任务处理
@@ -40,6 +34,6 @@ public class RefundJobTest {
     */
     @Test
     public void testDeal() {
-        refundJob.deal();
+        tranDataJob.deal();
     }
 }
