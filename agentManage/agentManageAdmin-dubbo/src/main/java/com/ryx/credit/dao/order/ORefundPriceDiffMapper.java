@@ -2,8 +2,10 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ORefundPriceDiffMapper {
     long countByExample(ORefundPriceDiffExample example);
@@ -21,4 +23,6 @@ public interface ORefundPriceDiffMapper {
     int updateByPrimaryKeySelective(ORefundPriceDiff record);
 
     int updateByPrimaryKey(ORefundPriceDiff record);
+
+    List<Map<String,Object>> selectBySnAndOrderId(@Param("map") Map<String, Object> map);
 }

@@ -308,4 +308,31 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <sql id="B_Base_Column_List">
+    rp.ID, rp.APPLY_COMP_TYPE, rp.APPLY_COMP_AMT, rp.REL_COMP_TYPE, rp.REL_COMP_AMT, rp.MACH_OWE_AMT, rp.GATHER_TIME,
+    rp.GATHER_AMT, rp.REVIEW_STATUS, rp.S_TIME, rp.APPLY_REMARK, rp.DEDUCT_AMT, rp.C_TIME, rp.U_TIME, rp.C_USER,
+    rp.U_USER, rp.STATUS, rp.VERSION
+  </sql>
+  <sql id="D_Base_Column_List">
+    rpd.ID, rpd.SUB_ORDER_ID, rpd.AGENT_ID, rpd.ACTIVITY_FRONT_ID, rpd.ACTIVITY_REAL_ID, rpd.REFUND_PRICE_DIFF_ID,
+    rpd.PRO_ID, rpd.PRO_NAME, rpd.CHANGE_COUNT, rpd.ACTIVITY_NAME, rpd.ACTIVITY_WAY, rpd.ACTIVITY_RULE, rpd.FRONT_PRICE,
+    rpd.PRICE, rpd.S_TIME, rpd.BEGIN_SN, rpd.END_SN, rpd.VENDER, rpd.PRO_MODEL, rpd.C_TIME, rpd.U_TIME, rpd.C_USER, rpd.U_USER,
+    rpd.STATUS, rpd.VERSION, rpd.ORDER_ID
+  </sql>
+  <select id="selectBySnAndOrderId" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+    <include refid="B_Base_Column_List"/>,
+    <include refid="D_Base_Column_List"/>
+    from o_Refund_price_diff rp, o_Refund_price_diff_detail rpd
+    where rp.id = rpd.refund_price_diff_id
+    and rpd.begin_sn = #{map.beginSn}
+    and rpd.end_sn = #{map.endSn}
+    and order_id = #{map.orderId}
+    and review_status in
+    <foreach item="item" index="index" open="(" separator="," close=")" collection="map.reviewStatus">
+      #{item}
+    </foreach>
+  </select>
+
 </mapper>
