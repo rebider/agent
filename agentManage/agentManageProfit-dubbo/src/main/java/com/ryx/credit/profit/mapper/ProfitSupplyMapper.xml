@@ -236,8 +236,11 @@
   <sql id="BASE_WHERE_SQL">
     <where>
       <trim prefixOverrides="and">
-        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
-        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID}</if>
+        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}</if>
+        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID,jdbcType=VARCHAR}</if>
+        <if test="SUPPLY_TYPE != null and SUPPLY_TYPE != ''">AND SUPPLY_TYPE = #{SUPPLY_TYPE,jdbcType=CHAR}</if>
+        <if test="SUPPLY_DATE_START != null and SUPPLY_DATE_START != ''">AND SUPPLY_DATE &gt;= TO_CHAR(#{SUPPLY_DATE_START,jdbcType=VARCHAR},'yyyy-MM-dd')</if>
+        <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SUPPLY_DATE &lt;= TO_CHAR(#{SUPPLY_DATE_END,jdbcType=VARCHAR},'yyyy-MM-dd')</if>
       </trim>
     </where>
   </sql>
