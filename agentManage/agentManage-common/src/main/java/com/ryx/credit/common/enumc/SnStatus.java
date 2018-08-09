@@ -8,7 +8,7 @@ import java.math.BigDecimal;
  */
 public enum SnStatus {
 
-    FH(0, "发货"), TH(1, "退货"), THZ(2, "退货申请中");
+    FH(1, "发货"), THZ(2, "退货申请中"), THDH(3, "退货打回修改"), THWC(4, "退货完成");
 
     public BigDecimal code;
 

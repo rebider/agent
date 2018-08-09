@@ -161,6 +161,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         if(appStatus!=null){
             c.andCloReviewStatusEqualTo(appStatus);
         }
+        example.setOrderByClause(" c_time desc ");
         return agentColinfoMapper.selectByExample(example);
     }
 

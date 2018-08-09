@@ -20,6 +20,8 @@ public interface IOrderReturnService {
 
     Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson,String userid) throws ProcessException;
 
+    Map<String, Object> applyEdit(String agentId, OReturnOrder returnOrder, String productsJson,String userid) throws ProcessException;
+
     Map<String, Object> view(String returnId) throws ProcessException;
 
     Map<String, Object> saveCut(String returnId, String amt, String ctype);
@@ -35,4 +37,7 @@ public interface IOrderReturnService {
     void doPlan(String returnId, BigDecimal takeAmt, String userid);
 
 
+    void approvalReject(String processInstanceId, String activityName);
+
+    void approvalFinish(String processInstanceId, String activityName);
 }

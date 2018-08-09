@@ -431,7 +431,7 @@
                 <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
                 <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
                 <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-                <if test="beginTime!=null and endTime!=''"> and (o.c_time between #{beginTime} and #{endTime}) </if>
+                <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
               </where>
                 UNION
                 select
@@ -479,7 +479,7 @@
                   <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
                   <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
                   <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-                  <if test="beginTime!=null and endTime!=''"> and (o.c_time between #{beginTime} and #{endTime}) </if>
+                  <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
                 </where>
           )
           order by c_time desc
@@ -503,7 +503,7 @@
         <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
         <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
         <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-        <if test="beginTime!=null and endTime!=''"> and (o.c_time between #{beginTime} and #{endTime}) </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       </where>
         UNION
         select
@@ -522,7 +522,7 @@
         <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
         <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
         <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-        <if test="beginTime!=null and endTime!=''"> and (o.c_time between #{beginTime} and #{endTime}) </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       </where>
     )
   </select>
