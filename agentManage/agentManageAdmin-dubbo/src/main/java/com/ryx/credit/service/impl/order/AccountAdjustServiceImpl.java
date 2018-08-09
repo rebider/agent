@@ -73,6 +73,13 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
         Map<String, Object> result = new HashMap<>();
 
         try {
+            String paymentSrcType = "";
+            if(srcType.equals(AdjustType.TKTH.adjustType)){
+                paymentSrcType = PamentSrcType.TUIKUAN_DIKOU.code;
+            }else if(srcType.equals(AdjustType.TCJ.adjustType)){
+                paymentSrcType = PamentSrcType.TUICHAJIA_DIKOU.code;
+            }
+
             //退款金额
             BigDecimal leftAmt = adjustAmt;
 
@@ -122,7 +129,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
                         //更新订单状态全部明细为支付完成
                         if (isRealAdjust) {
-                            updatePaymentComplete(paymentId, srcId, srcType);
+                            updatePaymentComplete(paymentId, srcId, paymentSrcType);
                         }
 
                         leftAmt = leftAmt.subtract(payment.getOutstandingAmount());
@@ -248,7 +255,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         oneTakeoutRecord.put("payType", oPaymentDetails.get(0).getPayType());
                         oneTakeoutRecord.put("payAmt", leftAmt);
                         oneTakeoutRecord.put("srcId", srcId);
-                        oneTakeoutRecord.put("srcType", PamentSrcType.TUIKUAN_DIKOU.code);
+                        oneTakeoutRecord.put("srcType", paymentSrcType);
                         takeoutList.add(oneTakeoutRecord);
 
                         OPaymentDetail newDeatil = new OPaymentDetail();
@@ -262,7 +269,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         newDeatil.setPayTime(new Date());
                         newDeatil.setAgentId(agentId);
                         newDeatil.setSrcId(srcId);
-                        newDeatil.setSrcType(srcType);
+                        newDeatil.setSrcType(paymentSrcType);
                         newDeatil.setPaymentStatus(PaymentStatus.JQ.code);
                         newDeatil.setcDate(new Date());
                         newDeatil.setcUser(userid);
