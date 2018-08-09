@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.agent.DataChangeActivityService;
+import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -40,15 +41,18 @@ public class RefundTaskExecutionListener implements TaskListener, ExecutionListe
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
             DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            IOrderReturnService orderReturnService = (IOrderReturnService) MySpringContextHandler.applicationContext.getBean("orderReturnService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                orderReturnService.approvalReject(delegateExecution.getProcessInstanceId(),activityName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.name());
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                orderReturnService.approvalFinish(delegateExecution.getProcessInstanceId(),activityName);
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());

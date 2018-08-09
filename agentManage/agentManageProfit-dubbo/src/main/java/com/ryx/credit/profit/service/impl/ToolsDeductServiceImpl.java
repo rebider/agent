@@ -240,8 +240,8 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         successMap.put("srcId",profitDeduction.getId());
                         successList.add(successMap);
                     } catch (Exception e) {
+                        LOG.error("初始化机具分期失败，分期流水号:{}",map.get("ID").toString());
                         e.printStackTrace();
-                        throw new ProcessException("机具扣款调整申请审批流启动失败!:{}",e.getMessage());
                     }
                 }
             });
