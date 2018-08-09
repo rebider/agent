@@ -26,6 +26,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -72,6 +75,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private RegionService regionService;
+    @Autowired
+    private ApaycompService apaycompService;
 
     /**
      * 商户入网
@@ -703,7 +708,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public static BusinessPlatformService businessPlatformService;
 
     @Override
-    public List<AgentoutVo> exportAgent(Agent agent) {
+    public List<AgentoutVo> exportAgent(Agent agent) throws ParseException {
         List<AgentoutVo> agentoutVos = agentMapper.excelAgent(agent);
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
@@ -711,12 +716,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
                     if (null != value)
                         agentoutVo.setBusType(value.getdItemname());
-                }
-                if (null != agentoutVo.getBusIndeAss()) {
-                    if (agentoutVo.getBusIndeAss().equals("1")) {
-                        agentoutVo.setBusIndeAss("是");
-                    } else
-                        agentoutVo.setBusIndeAss("否");
                 }
                 if (null != agentoutVo.getBusPlatform()) {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
@@ -758,9 +757,46 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         if (null != agentById)
                             agentoutVo.setBusActivationParent(agentById.getAgName());
                     }
-
                 }
+
+                if (null != agentoutVo.getCloInvoice()) {
+                    if (agentoutVo.getCloInvoice().compareTo(new BigDecimal(1)) == 0) {
+                        agentoutVo.setYesOrNo("是");
+                    } else if (agentoutVo.getCloInvoice().compareTo(new BigDecimal(0)) == 0)
+                        agentoutVo.setYesOrNo("否");
+                }
+
+                if (null != agentoutVo.getCloType()) {
+                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name(), agentoutVo.getCloType().toString());
+                    if (null != value)
+                        agentoutVo.setCloString(value.getdItemname());
+                }
+                if (null != agentoutVo.getBankRegion() && !"".equals(agentoutVo.getBankRegion())) {
+                    String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
+                    if (StringUtils.isNotBlank(regionName))
+                        agentoutVo.setBankRegion(regionName);
+                }
+
+                if (null != agentoutVo.getCloPayCompany()) {
+                    PayComp payComp = apaycompService.selectById(agentoutVo.getCloPayCompany());
+                    if (null != payComp)
+                        agentoutVo.setCloPayCompany(payComp.getComName());
+                }
+
+                if (null != agentoutVo.getCloTaxPoint()) {
+                    NumberFormat numberFormat = NumberFormat.getPercentInstance();
+                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString()+"%");
+                    String point = numberFormat.format(parse);
+                    agentoutVo.setPoint(point);
+                }
+
             }
         return agentoutVos;
+    }
+    public static void main(String ar[]) throws ParseException {
+        NumberFormat numberFormat = NumberFormat.getPercentInstance();
+        Number parse = numberFormat.parse("6.0%");
+        String format1 = numberFormat.format(parse);
+
     }
 }
