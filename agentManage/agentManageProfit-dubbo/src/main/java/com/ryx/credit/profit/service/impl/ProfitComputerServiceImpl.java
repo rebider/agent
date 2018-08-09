@@ -54,6 +54,19 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return totalDay;
     }
 
+    @Override
+    public BigDecimal total_day2(String agentId,String month) {
+        if(null==month || "".equals(month)){
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1));
+            month = month.substring(0,6);
+        }
+        ProfitDay day = new ProfitDay();
+        day.setAgentId(agentId);
+        day.setTransDate(month);
+        long dayLong = dayMapper.totalMonthByAgentId(day);
+        BigDecimal totalDay = new BigDecimal(dayLong);
+        return totalDay;
+    }
 
     @Override
     public BigDecimal total_factor(String agentPid,String month) {

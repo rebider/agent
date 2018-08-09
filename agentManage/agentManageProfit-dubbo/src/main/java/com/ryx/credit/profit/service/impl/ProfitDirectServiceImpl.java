@@ -74,6 +74,12 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     }
 
     @Override
+    public ProfitDirect selectByAgentAndMon(ProfitDirect record) {
+        return directMapper.selectByAgentAndMon(record);
+    }
+
+
+    @Override
     public int updateByPrimaryKeySelective(ProfitDirect record) {
         return directMapper.updateByPrimaryKeySelective(record);
     }
@@ -82,5 +88,11 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     public int updateByPrimaryKey(ProfitDirect record) {
         return directMapper.updateByPrimaryKey(record);
     }
+
+    @Override
+    public long getSubBuckleByMonth(ProfitDirect record) {
+        return directMapper.getSubBuckleByMonth(record);
+    }
+
 
 }

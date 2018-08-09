@@ -18,11 +18,15 @@ public interface ProfitDirectMapper {
 
     ProfitDirect selectByPrimaryKey(String id);
 
+    ProfitDirect selectByAgentAndMon(ProfitDirect record);
+
     int updateByPrimaryKeySelective(ProfitDirect record);
 
     int updateByPrimaryKey(ProfitDirect record);
 
-    List<Map<String,Object>> getProfitDirectList(Map <String, Object> param);
+    List<Map<String,Object>> getProfitDirectList(Map<String, Object> param);
 
     Long getProfitDirectCount(Map <String, Object> param);
+
+    long getSubBuckleByMonth(ProfitDirect record);
 }
