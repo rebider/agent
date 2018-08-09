@@ -243,7 +243,7 @@ public class OrderServiceImpl implements OrderService {
         c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
         Date current  =  c.getTime();
 
-        if(threeMDay.compareTo(selDay)>0){
+        if(threeMDay.compareTo(selDay)<0){
             return AgentResult.fail("分期日超出三个月");
         }
 
