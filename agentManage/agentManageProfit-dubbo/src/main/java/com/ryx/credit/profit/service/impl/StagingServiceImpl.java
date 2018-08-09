@@ -78,8 +78,12 @@ public class StagingServiceImpl implements StagingService {
         LOG.info("分期id："+profitStagingDetail.getStagId());
         if (StringUtils.isNotBlank(profitStagingDetail.getStagId())) {
             criteria.andStagIdEqualTo(profitStagingDetail.getStagId());
-        }else if (StringUtils.isNotBlank(profitStagingDetail.getSourceId())){
+        }
+        if (StringUtils.isNotBlank(profitStagingDetail.getSourceId())){
             criteria.andSourceIdEqualTo(profitStagingDetail.getSourceId());
+        }
+        if (StringUtils.isNotBlank(profitStagingDetail.getDeductionDate())){
+            criteria.andDeductionDateEqualTo(profitStagingDetail.getDeductionDate());
         }
         example.setOrderByClause("DEDUCTION_DATE");
         profitDeductions = profitStagingDetailMapper.selectByExample(example);
@@ -208,7 +212,7 @@ public class StagingServiceImpl implements StagingService {
     }
 
     @Override
-    public void completeTaskEnterActivity(String insid, String status) throws ProcessException {
+    public void completeTaskEnterActivity(String insid, String status, String remark) throws ProcessException {
 
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
@@ -231,8 +235,10 @@ public class StagingServiceImpl implements StagingService {
                         LOG.info("3.删除分期明细");
                         deleteStagDetail(staging.getId());
                     }else{
-                        deduction.setMustDeductionAmt(deduction.getMustDeductionAmt().subtract(staging.getStagAmt()));
+                        BigDecimal upperNotDeductionAmt = deduction.getUpperNotDeductionAmt()==null?BigDecimal.ZERO:deduction.getUpperNotDeductionAmt();
+                        deduction.setMustDeductionAmt(upperNotDeductionAmt.add(staging.getStagAmt()));
                     }
+                    deduction.setRemark(remark);
                     profitDeductionServiceImpl.updateProfitDeduction(deduction);
                     LOG.info("更新审批流与业务对象");
                     taskApprovalService.updateABusActRel(rel);
@@ -249,6 +255,11 @@ public class StagingServiceImpl implements StagingService {
     @Override
     public void insetStagingDetail(ProfitStagingDetail stagingDetail) {
         profitStagingDetailMapper.insert(stagingDetail);
+    }
+
+    @Override
+    public void editStagingDetail(ProfitStagingDetail stagingDetail) {
+        profitStagingDetailMapper.updateByPrimaryKeySelective(stagingDetail);
     }
 
     @Override

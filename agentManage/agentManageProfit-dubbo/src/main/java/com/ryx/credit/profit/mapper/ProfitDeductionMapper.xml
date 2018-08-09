@@ -357,4 +357,23 @@
      AND S.STATUS = '0'
      AND S.DEDUCTION_DATE = #{deductDate}
   </select>
+
+  <select id="getNotDeductDetail" resultType="java.util.Map">
+    SELECT *
+    FROM P_DEDUCTION D
+    WHERE D.DEDUCTION_TYPE = '02'
+    AND D.DEDUCTION_DATE = #{beforeDeductDate}
+    AND D.NOT_DEDUCTION_AMT  <![CDATA[ <> ]]>  0
+    AND D.ID NOT IN (SELECT P.STAG_ID FROM P_STAGING_DETAIL P)
+    <if test="type == 1">
+      AND D.SOURCE_ID  IN
+    </if>
+    <if test="type == 2">
+      AND D.SOURCE_ID NOT IN
+    </if>
+    (SELECT N.SOURCE_ID
+    FROM P_DEDUCTION N
+    WHERE N.DEDUCTION_DATE = #{deductDate}
+    AND N.DEDUCTION_TYPE = '02')
+  </select>
 </mapper>

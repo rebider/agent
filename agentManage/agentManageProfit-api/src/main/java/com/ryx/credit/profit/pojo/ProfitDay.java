@@ -16,13 +16,19 @@ public class ProfitDay implements Serializable {
 
     private String remitDate;
 
-    private BigDecimal rhbProfit;
-
-    private BigDecimal zfProfit;
-
     private BigDecimal totalProfit;
 
-    private BigDecimal dailyMakeup;
+    private BigDecimal frozenMoney;
+
+    private BigDecimal successMoney;
+
+    private BigDecimal failMoney;
+
+    private BigDecimal realMoney;
+
+    private BigDecimal redoMoney;
+
+    private BigDecimal returnMoney;
 
     public String getId() {
         return id;
@@ -72,22 +78,6 @@ public class ProfitDay implements Serializable {
         this.remitDate = remitDate == null ? null : remitDate.trim();
     }
 
-    public BigDecimal getRhbProfit() {
-        return rhbProfit;
-    }
-
-    public void setRhbProfit(BigDecimal rhbProfit) {
-        this.rhbProfit = rhbProfit;
-    }
-
-    public BigDecimal getZfProfit() {
-        return zfProfit;
-    }
-
-    public void setZfProfit(BigDecimal zfProfit) {
-        this.zfProfit = zfProfit;
-    }
-
     public BigDecimal getTotalProfit() {
         return totalProfit;
     }
@@ -96,11 +86,51 @@ public class ProfitDay implements Serializable {
         this.totalProfit = totalProfit;
     }
 
-    public BigDecimal getDailyMakeup() {
-        return dailyMakeup;
+    public BigDecimal getFrozenMoney() {
+        return frozenMoney;
     }
 
-    public void setDailyMakeup(BigDecimal dailyMakeup) {
-        this.dailyMakeup = dailyMakeup;
+    public void setFrozenMoney(BigDecimal frozenMoney) {
+        this.frozenMoney = frozenMoney;
+    }
+
+    public BigDecimal getSuccessMoney() {
+        return successMoney;
+    }
+
+    public void setSuccessMoney(BigDecimal successMoney) {
+        this.successMoney = successMoney;
+    }
+
+    public BigDecimal getFailMoney() {
+        return failMoney;
+    }
+
+    public void setFailMoney(BigDecimal failMoney) {
+        this.failMoney = failMoney;
+    }
+
+    public BigDecimal getRealMoney() {
+        return realMoney;
+    }
+
+    public void setRealMoney(BigDecimal realMoney) {
+        this.realMoney = realMoney;
+    }
+
+    public BigDecimal getRedoMoney() {
+        return redoMoney;
+    }
+
+    public void setRedoMoney(BigDecimal redoMoney) {
+        this.redoMoney = redoMoney;
+    }
+
+    public BigDecimal getReturnMoney() {
+        return returnMoney;
+    }
+
+    public void setReturnMoney(BigDecimal returnMoney) {
+        this.returnMoney = returnMoney;
     }
 }

@@ -1,9 +1,5 @@
-package junit.profit;/**
- * @Auther: zhaodw
- * @Date: 2018/7/30 14:59
- * @Description:
- */
-
+package junit.profit;
+import com.ryx.credit.profit.jobs.ProfitDataJob;
 import com.ryx.credit.profit.jobs.TranDataJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;

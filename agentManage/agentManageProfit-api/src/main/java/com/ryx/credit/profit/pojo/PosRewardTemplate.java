@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class PosRewardTemplate implements Serializable{
-    private static final long serialVersionUID = -6219173161424776471L;
+/**
+ * @author RYX
+ */
+public class PosRewardTemplate implements Serializable {
+    private static final long serialVersionUID = -4413010631062670079L;
     private String id;
 
     private String tranContrastMonth;
@@ -21,6 +24,8 @@ public class PosRewardTemplate implements Serializable{
     private Date updateTime;
 
     private String operUser;
+
+    private String activityValid;
 
     public String getId() {
         return id;
@@ -84,5 +89,13 @@ public class PosRewardTemplate implements Serializable{
 
     public void setOperUser(String operUser) {
         this.operUser = operUser == null ? null : operUser.trim();
+    }
+
+    public String getActivityValid() {
+        return activityValid;
+    }
+
+    public void setActivityValid(String activityValid) {
+        this.activityValid = activityValid == null ? null : activityValid.trim();
     }
 }

@@ -5,6 +5,7 @@ import com.ryx.credit.profit.pojo.ProfitDayExample;
 import java.util.List;
 
 public interface ProfitDayMapper {
+
     int countByExample(ProfitDayExample example);
 
     int deleteByExample(ProfitDayExample example);
@@ -22,4 +23,6 @@ public interface ProfitDayMapper {
     int updateByPrimaryKeySelective(ProfitDay record);
 
     int updateByPrimaryKey(ProfitDay record);
+
+    long totalMonthByAgentPid(ProfitDay record);
 }

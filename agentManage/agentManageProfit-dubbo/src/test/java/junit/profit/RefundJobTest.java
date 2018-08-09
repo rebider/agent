@@ -29,7 +29,7 @@ public class RefundJobTest {
     private Logger logger = LoggerFactory.getLogger(RefundJobTest.class);
 
     @Autowired
-    private ProfitDataJob profitDataJob;
+    private RefundJob refundJob;
 
     /*** 
     * @Description: 测试任务处理
@@ -40,6 +40,6 @@ public class RefundJobTest {
     */
     @Test
     public void testDeal() {
-        profitDataJob.deal();
+        refundJob.deal();
     }
 }

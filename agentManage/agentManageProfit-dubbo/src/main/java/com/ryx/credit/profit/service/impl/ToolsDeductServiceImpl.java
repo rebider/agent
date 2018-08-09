@@ -217,7 +217,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 if(map.get("ID") != null && map.get("ORDER_ID") != null ){
                     try {
                         ProfitDeduction profitDeduction = new ProfitDeduction();
-                        profitDeduction.setId(map.get("ID").toString());
+                        profitDeduction.setId(idService.genId(TabId.P_DEDUCTION));
                         profitDeduction.setParentAgentId(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
                         profitDeduction.setParentAgentPid(map.get("ORDER_PLATFORM") == null ? "" : map.get("ORDER_PLATFORM").toString());
                         profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
@@ -235,14 +235,14 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
                         profitDeduction.setCreateDateTime(new Date());
                         profitDeductionMapper.insertSelective(profitDeduction);
+                        Map<String, Object> successMap = new HashMap<String, Object>(2);
+                        successMap.put("detailId",map.get("ID"));
+                        successMap.put("srcId",profitDeduction.getId());
+                        successList.add(successMap);
                     } catch (Exception e) {
                         e.printStackTrace();
                         throw new ProcessException("机具扣款调整申请审批流启动失败!:{}",e.getMessage());
                     }
-                    Map<String, Object> successMap = new HashMap<String, Object>(2);
-                    successMap.put("detailId",map.get("ID"));
-                    successMap.put("srcId",map.get("ORDER_ID"));
-                    successList.add(successMap);
                 }
             });
             return successList;
@@ -300,5 +300,20 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         } else {
             LOG.info("本月没有调整机具分期的订单");
         }
+    }
+
+    @Override
+    public void updateProfitStagingDetail(ProfitStagingDetail profitStagingDetail) {
+        if(profitStagingDetail != null){
+            profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getNotDeductDetail(String beforeDeductDate, String deductDate, String type) {
+        if(StringUtils.isBlank(beforeDeductDate)|| StringUtils.isBlank(deductDate)){
+            return null;
+        }
+        return profitDeductionMapper.getNotDeductDetail(beforeDeductDate, deductDate, type);
     }
 }

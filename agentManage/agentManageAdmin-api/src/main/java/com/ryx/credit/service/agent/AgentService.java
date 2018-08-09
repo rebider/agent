@@ -45,4 +45,6 @@ public interface AgentService {
 
     void createBackUserbyAgent(String agentId);
 
+    void createBackUserbyAgentByredis();
+
 }
