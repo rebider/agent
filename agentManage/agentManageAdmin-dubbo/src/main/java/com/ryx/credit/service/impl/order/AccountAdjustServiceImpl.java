@@ -61,7 +61,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
      * @Param isAdjustOrder 是否抵扣机具欠款(0-不抵扣  1-抵扣)
      * @Param agentId 代理商ID
      * @Param srcId 源ID（退货单ID、退差价ID）
-     * @Param srcType 源类型（THTK-退货退款  TCJ-退差价）
+     * @Param srcType 源类型（使用PamentSrcType枚举）
      * @Param userid 操作用户
      * @Date: 15:47 2018/7/24
      */
@@ -73,12 +73,6 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
         Map<String, Object> result = new HashMap<>();
 
         try {
-            String paymentSrcType = "";
-            if(srcType.equals(AdjustType.TKTH.adjustType)){
-                paymentSrcType = PamentSrcType.TUIKUAN_DIKOU.code;
-            }else if(srcType.equals(AdjustType.TCJ.adjustType)){
-                paymentSrcType = PamentSrcType.TUICHAJIA_DIKOU.code;
-            }
 
             //退款金额
             BigDecimal leftAmt = adjustAmt;
@@ -129,7 +123,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
                         //更新订单状态全部明细为支付完成
                         if (isRealAdjust) {
-                            updatePaymentComplete(paymentId, srcId, paymentSrcType);
+                            updatePaymentComplete(paymentId, srcId, srcType);
                         }
 
                         leftAmt = leftAmt.subtract(payment.getOutstandingAmount());
@@ -255,7 +249,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         oneTakeoutRecord.put("payType", oPaymentDetails.get(0).getPayType());
                         oneTakeoutRecord.put("payAmt", leftAmt);
                         oneTakeoutRecord.put("srcId", srcId);
-                        oneTakeoutRecord.put("srcType", paymentSrcType);
+                        oneTakeoutRecord.put("srcType", srcType);
                         takeoutList.add(oneTakeoutRecord);
 
                         OPaymentDetail newDeatil = new OPaymentDetail();
@@ -269,7 +263,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         newDeatil.setPayTime(new Date());
                         newDeatil.setAgentId(agentId);
                         newDeatil.setSrcId(srcId);
-                        newDeatil.setSrcType(paymentSrcType);
+                        newDeatil.setSrcType(srcType);
                         newDeatil.setPaymentStatus(PaymentStatus.JQ.code);
                         newDeatil.setcDate(new Date());
                         newDeatil.setcUser(userid);
