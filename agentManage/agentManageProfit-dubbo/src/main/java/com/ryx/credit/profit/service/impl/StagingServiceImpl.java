@@ -275,6 +275,11 @@ public class StagingServiceImpl implements StagingService {
         }
     }
 
+    @Override
+    public BigDecimal getNotDeductionAmt(String agentId){
+        return profitStagingMapper.getNotDeductionAmt(agentId);
+    }
+
     /**
      * 审批流与业务关联对象
      * @param profitStaging 分期对象

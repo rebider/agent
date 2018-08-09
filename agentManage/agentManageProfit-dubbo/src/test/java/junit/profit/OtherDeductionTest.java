@@ -43,7 +43,6 @@ public class OtherDeductionTest {
     public void testDeduction() {
         BigDecimal profitAmt = new BigDecimal("5000");
         String agentId = "JS00000313-Z00000818";
-        String deductionType = "03";
-        profitDeductionService.deductionAmt(profitAmt, deductionType, agentId);
+        profitDeductionService.otherDeduction(profitAmt, agentId);
     }
 }
