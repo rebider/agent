@@ -1120,22 +1120,31 @@ public class OrderServiceImpl implements OrderService {
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("guaranteeAgent"))){
                     oPayment.setGuaranteeAgent(agentVo.getoPayment().get("guaranteeAgent"));
                 }
+
                 //抵扣类型
-                if(StringUtils.isNotBlank(db.getPayMethod()) && db.getPayMethod().equals(SettlementType.QT.code)) {
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
-                        //抵扣金额查询
-                        oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
-                        AgentResult agentResult = queryAgentCapital(db.getAgentId(),oPayment.getDeductionType());
-                        if(agentResult.isOK()){
-                            FastMap f =   (FastMap)agentResult.getData();
-                            BigDecimal can = new BigDecimal(f.get("can")+"");
-                            if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
-                                throw new MessageException("收款公司不能为空");
-                            }
-                            oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
+                    //抵扣金额查询
+                    oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
+                    AgentResult agentResult = queryAgentCapital(db.getAgentId(),oPayment.getDeductionType());
+                    if(agentResult.isOK()){
+                        FastMap f =   (FastMap)agentResult.getData();
+                        BigDecimal can = new BigDecimal(f.get("can")+"");
+                        if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
+                            throw new MessageException("抵扣金额不足");
                         }
+                        if(agentVo.getoPayment().get("deductionAmount")!=null) {
+                            oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
+                        }else{
+                            throw new MessageException("请填写抵扣金额");
+                        }
+                    }else{
+                        throw new MessageException("不可抵扣");
                     }
+                }else{
+                    oPayment.setDeductionAmount(BigDecimal.ZERO);
                 }
+
+
 
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单数据储存失败");
