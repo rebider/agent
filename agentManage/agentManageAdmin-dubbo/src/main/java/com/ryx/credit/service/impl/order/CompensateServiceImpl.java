@@ -486,6 +486,7 @@ public class CompensateServiceImpl implements CompensateService {
                         agentVo.getoRefundPriceDiffVo().setMachOweAmt(oRefundPriceDiff.getRelCompAmt());
                     }
                     agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
+                    deductAmt = deductAmt.add(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                 }
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
                 if(!agentResult.isOK()){

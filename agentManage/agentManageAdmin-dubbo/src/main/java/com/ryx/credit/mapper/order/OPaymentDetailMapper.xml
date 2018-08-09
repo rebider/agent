@@ -343,7 +343,6 @@
     <update id="updatePaymentDetailByPaymentId" parameterType="java.lang.String">
     update O_PAYMENT_DETAIL
     set
-      PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
       REAL_PAY_AMOUNT = PAY_AMOUNT,
       PAY_TIME = sysdate,
       SRC_ID = #{srcId,jdbcType=VARCHAR},
