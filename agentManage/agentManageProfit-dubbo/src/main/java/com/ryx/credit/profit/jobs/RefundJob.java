@@ -49,7 +49,7 @@ public class RefundJob {
 
     private static  final  String DEDUCTION_DESC = "退单扣款";
 
-    private static  final  String SUPPLY_DESC = "退单补款";
+    public static  final  String SUPPLY_DESC = "退单补款";
 
     private final Object object = new Object();
 

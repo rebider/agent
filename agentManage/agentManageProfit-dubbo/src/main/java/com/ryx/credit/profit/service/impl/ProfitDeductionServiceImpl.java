@@ -11,21 +11,25 @@ import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
 import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.exceptions.StagingException;
+import com.ryx.credit.profit.jobs.RefundJob;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeductionExample;
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitDeducttionDetailService;
+import com.ryx.credit.profit.service.ProfitSupplyService;
 import com.ryx.credit.profit.service.StagingService;
 import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +55,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Autowired
     private ProfitDeducttionDetailService profitDeducttionDetailServiceImpl;
+
+    @Autowired
+    private ProfitSupplyService profitSupplyServiceImpl;
 
     @Override
     public PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page) {
@@ -183,6 +190,21 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             return profitDeductions;
         }
         return null;
+    }
+
+    @Override
+    public BigDecimal getSupplyAmt(String agentId, String bussType) {
+        Map<String, Object> param = new HashMap<>(3);
+        param.put("AGENT_PID", agentId);
+        param.put("SUPPLY_TYPE", RefundJob.SUPPLY_DESC);
+        param.put("SUPPLY_DATE", "");
+        PageInfo pageInfo = new PageInfo();
+        pageInfo = profitSupplyServiceImpl.getProfitSupplyList(param, pageInfo);
+        if (pageInfo != null && pageInfo.getTotal() > 0) {
+            List<Map<String, Object>> supplys = pageInfo.getRows();
+            return supplys.stream().map(supply->new BigDecimal(supply.get("SUPPLY_AMT")==null?"0":supply.get("SUPPLY_AMT").toString())).reduce(BigDecimal::add).get();
+        }
+        return BigDecimal.ZERO;
     }
 
     @Override
