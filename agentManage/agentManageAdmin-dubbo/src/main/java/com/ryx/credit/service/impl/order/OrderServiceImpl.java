@@ -1281,6 +1281,7 @@ public class OrderServiceImpl implements OrderService {
                         record.setOrderId(oPayment.getOrderId());
                         record.setPayType(PaymentType.DKFQ.code);
                         record.setPayAmount((BigDecimal) datum.get("item"));
+                        record.setRealPayAmount(BigDecimal.ZERO);
                         record.setRealPayAmount(new BigDecimal(0));
                         record.setPlanPayTime((Date) datum.get("date"));
                         record.setPlanNum((BigDecimal) datum.get("count"));
@@ -1379,7 +1380,7 @@ public class OrderServiceImpl implements OrderService {
                         record.setOrderId(oPayment.getOrderId());
                         record.setPayType(PaymentType.FRFQ.code);
                         record.setPayAmount((BigDecimal) datum.get("item"));
-                        record.setRealPayAmount(new BigDecimal(0));
+                        record.setRealPayAmount(BigDecimal.ZERO);
                         record.setPlanPayTime((Date) datum.get("date"));
                         record.setPlanNum((BigDecimal) datum.get("count"));
                         record.setAgentId(oPayment.getAgentId());
@@ -1476,7 +1477,7 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setOrderId(oPayment.getOrderId());
                         record_XXDK.setPayType(PaymentType.DK.code);
                         record_XXDK.setPayAmount(oPayment.getOutstandingAmount());
-                        record_XXDK.setRealPayAmount(oPayment.getOutstandingAmount());
+                        record_XXDK.setRealPayAmount(BigDecimal.ZERO);
                         record_XXDK.setPlanPayTime(d.getTime());
                         record_XXDK.setPlanNum(Status.STATUS_0.status);
                         record_XXDK.setAgentId(oPayment.getAgentId());
@@ -1586,7 +1587,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setOrderId(oPayment.getOrderId());
                             record.setPayType(PaymentType.FRFQ.code);
                             record.setPayAmount((BigDecimal) datum.get("item"));
-                            record.setRealPayAmount(new BigDecimal(0));
+                            record.setRealPayAmount(BigDecimal.ZERO);
                             record.setPlanPayTime((Date) datum.get("date"));
                             record.setPlanNum((BigDecimal) datum.get("count"));
                             record.setAgentId(oPayment.getAgentId());
@@ -1703,7 +1704,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setOrderId(oPayment.getOrderId());
                             record.setPayType(PaymentType.DKFQ.code);
                             record.setPayAmount((BigDecimal) datum.get("item"));
-                            record.setRealPayAmount(new BigDecimal(0));
+                            record.setRealPayAmount(BigDecimal.ZERO);
                             record.setPlanPayTime((Date) datum.get("date"));
                             record.setPlanNum((BigDecimal) datum.get("count"));
                             record.setAgentId(oPayment.getAgentId());
