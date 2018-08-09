@@ -110,9 +110,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     }
 
     /**
-     * 1、更新分期明细表状态为已扣款
-     * 2、更新扣款表状态与实扣金额
-     * 3、新增扣款明细
+     * 1、更新扣款表状态与实扣金额
+     * 2、新增扣款明细
      * @param profitDeductionList
      * @throws Exception
      */
@@ -124,16 +123,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 profitDeducttionDetailService.insertDeducttionDetail(profitDeductionList);
             }
             profitDeductionService.updateProfitDeduction(profitDeductionList);
-            if (profitDeductionList.getMustDeductionAmt().compareTo(profitDeductionList.getActualDeductionAmt()) == 0) {
-                List<ProfitStagingDetail> list = toolsDeductService.getProfitStagingDetailByStagId(profitDeductionList.getId());
-                if (list != null && !list.isEmpty()) {
-                    ProfitStagingDetail profitStagingDetail1 = list.get(0);
-                    if(profitStagingDetail1.getDeductionDate().equals(profitDeductionList.getDeductionDate())){
-                        profitStagingDetail1.setStatus(StagingDetailStatus.Y.getStatus());
-                        toolsDeductService.updateProfitStagingDetail(profitStagingDetail1);
-                    }
-                }
-            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("机具扣款更新失败。");
