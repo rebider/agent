@@ -17,12 +17,14 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.ognl.enhance.OrderedReturn;
 import org.apache.shiro.authz.annotation.Logical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +78,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     ReceiptPlanMapper receiptPlanMapper;
     @Autowired
     OLogisticsMapper logisticsMapper;
+    @Autowired
+    private BusActRelService busActRelService;
 
     /**
      * @Author: Zhang Lei
@@ -271,6 +275,123 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         return null;
     }
 
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 退回申请修改
+     * @Date: 17:09 2018/8/8
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> applyEdit(String agentId, OReturnOrder returnOrder, String productsJson, String userid) throws ProcessException {
+
+        List<Map> list = null;
+        try {
+            list = JSONObject.parseArray(productsJson, Map.class);
+        } catch (Exception e) {
+            log.error("解析退货商品失败", e);
+            throw new ProcessException("解析退货商品失败");
+        }
+
+        //删除旧退货明细
+        String returnId = returnOrder.getId();
+        OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+        example.or().andReturnIdEqualTo(returnId);
+        returnOrderDetailMapper.deleteByExample(example);
+
+        //删除旧的退货单和订单关系
+        OReturnOrderRelExample relExample = new OReturnOrderRelExample();
+        relExample.or().andReturnOrderIdEqualTo(returnId);
+        returnOrderRelMapper.deleteByExample(relExample);
+
+        //更新退货单
+        OReturnOrder returnOrderDB = returnOrderMapper.selectByPrimaryKey(returnId);
+        returnOrderDB.setRetSchedule(new BigDecimal(RetSchedule.SPZ.code));
+        returnOrderDB.setCutAmo(BigDecimal.ZERO);
+        returnOrderDB.setRelReturnAmo(BigDecimal.ZERO);
+        returnOrderDB.setuTime(new Date());
+        returnOrderDB.setuUser(userid);
+        returnOrderDB.setRetReceipt(returnOrder.getRetReceipt());
+        returnOrderDB.setRetInvoice(returnOrder.getRetInvoice());
+        returnOrderDB.setApplyRemark(returnOrder.getApplyRemark());
+        returnOrderDB.setGoodsReturnAmo(returnOrder.getReturnAmo());
+        returnOrderDB.setReturnAmo(returnOrder.getReturnAmo());
+        returnOrderMapper.updateByPrimaryKeySelective(returnOrderDB);
+
+
+        //退货单和订单关系
+        Set<String> relSet = new HashSet<>();
+
+        //生成新的退货单明细
+        for (Map<String, Object> map : list) {
+
+            String orderId = (String) map.get("orderId");
+            String startSn = (String) map.get("startSn");
+            String endSn = (String) map.get("endSn");
+
+            //生成退货明细
+            OReturnOrderDetail returnOrderDetail = null;
+            try {
+                returnOrderDetail = new OReturnOrderDetail();
+                returnOrderDetail.setId(idService.genId(TabId.o_return_order_detail));
+                returnOrderDetail.setReturnId(returnId);
+                returnOrderDetail.setAgentId(agentId);
+                returnOrderDetail.setOrderId(orderId);
+                returnOrderDetail.setSubOrderId((String) map.get("receiptId"));
+                returnOrderDetail.setProId((String) map.get("proId"));
+                returnOrderDetail.setProName((String) map.get("proName"));
+                returnOrderDetail.setProType((String) map.get("proType"));
+                returnOrderDetail.setProCom((String) map.get("proCom"));
+                returnOrderDetail.setProPrice(MapUtil.getBigDecimal(map, "proPrice"));
+                returnOrderDetail.setModel((String) map.get("proModel"));
+                returnOrderDetail.setBeginSn(startSn);
+                returnOrderDetail.setEndSn(endSn);
+                returnOrderDetail.setOrderPrice(MapUtil.getBigDecimal(map, "proPrice"));
+                returnOrderDetail.setReturnCount(MapUtil.getBigDecimal(map, "count"));
+                returnOrderDetail.setReturnAmt(MapUtil.getBigDecimal(map, "totalPrice"));
+                returnOrderDetail.setReturnTime(new Date());
+                returnOrderDetail.setcTime(new Date());
+                returnOrderDetail.setcUser(agentId);
+                returnOrderDetailMapper.insertSelective(returnOrderDetail);
+            } catch (Exception e) {
+                log.error("生成退货明细失败", e);
+                throw new ProcessException("生成退货明细失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
+            }
+
+            //更新物流明细表SN状态
+            try {
+                oLogisticsService.updateSnStatus(orderId, startSn, endSn, SnStatus.THDH.code);
+            } catch (Exception e) {
+                log.error("更新SN状态失败", e);
+                throw new ProcessException("更新SN状态失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
+            }
+
+
+            String setstr = returnOrderDetail.getOrderId() + "_" + returnOrderDetail.getSubOrderId() + "_" + returnOrderDetail.getReturnId();
+            relSet.add(setstr);
+        }
+
+        //生成退货和订单关系
+        for (String realId : relSet) {
+            try {
+                String[] ids = realId.split("_");
+                OReturnOrderRel returnOrderRel = new OReturnOrderRel();
+                returnOrderRel.setId(idService.genId(TabId.o_return_order_rel));
+                returnOrderRel.setOrderId(ids[0]);
+                returnOrderRel.setSubOrderId(ids[1]);
+                returnOrderRel.setReturnOrderId(ids[2]);
+                returnOrderRel.setcTime(new Date());
+                returnOrderRel.setcUser(agentId);
+                returnOrderRelMapper.insertSelective(returnOrderRel);
+            } catch (Exception e) {
+                log.error("生成退货关系失败", e);
+                throw new ProcessException("生成退货关系失败");
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @Author: Zhang Lei
      * @Description: 退貨申請
@@ -434,6 +555,38 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
     /**
+     * @Author: Zhang Lei
+     * @Description: 更新某一退货单中原始订单SN状态
+     * @Date: 16:18 2018/8/8
+     */
+    public void updateReturnOrderSnStatus(String returnId, BigDecimal snStatus) {
+        try {
+            OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+            example.or().andReturnIdEqualTo(returnId);
+            List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
+            for (OReturnOrderDetail detail : list) {
+                oLogisticsService.updateSnStatus(detail.getOrderId(), detail.getBeginSn(), detail.getEndSn(), snStatus);
+            }
+        } catch (Exception e) {
+            log.error("更新退货单中原始订单SN状态失败{},{}", returnId, snStatus, e);
+            throw new ProcessException("更新退货单中原始订单SN状态失败{" + returnId + "}");
+        }
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 更新退货单状态
+     * @Date: 16:50 2018/8/8
+     */
+    public void updateOrderReturn(String returnId,BigDecimal status){
+        OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+        returnOrder.setRetSchedule(status);
+        returnOrder.setuTime(new Date());
+        returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+    }
+
+
+    /**
      * 审批订单任务
      *
      * @param agentVo
@@ -445,22 +598,39 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
         try {
+
             //处理审批数据
-            log.info("订单提交审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
+            log.info("退货审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
 
             //业务处理
             String sid = agentVo.getSid();
 
+            String approveResult = agentVo.getApprovalResult();
+
+            //如果是代理商修改订单时，修改SN状态
+            if (approveResult.equals("pass") && sid.equals("sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE")) {
+                try {
+                    updateReturnOrderSnStatus(agentVo.getReturnId(), SnStatus.THZ.code);
+                } catch (ProcessException e) {
+                    return AgentResult.fail(e.getMessage());
+                }
+            }
+
             //业务审批时添加排单
-            if (sid.equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")) {
+            if (approveResult.equals("pass") && sid.equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")) {
                 AgentResult agentResult = savePlans(agentVo, userId);
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
                 }
             }
 
-            //财务审批时上传打款凭证
-            if (sid.equals("sid-4528CEA4-998C-4854-827B-1842BBA5DB4B")) {
+            //财务第一次审批时更新发货状态
+            if (approveResult.equals("pass") && sid.equals("sid-ECD4C817-99C4-4F9B-92A2-748BB554D673")) {
+                updateOrderReturn(agentVo.getReturnId(),new BigDecimal(RetSchedule.DFH.code));
+            }
+
+            //财务最后审批时上传打款凭证
+            if (approveResult.equals("pass") && sid.equals("sid-4528CEA4-998C-4854-827B-1842BBA5DB4B")) {
                 AgentResult agentResult = saveAttachments(agentVo, userId);
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
@@ -469,7 +639,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
             //代理商审批时判断是否上传物流信息
-            if (sid.equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")) {
+            if (approveResult.equals("pass") && sid.equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")) {
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
@@ -479,8 +649,19 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     example1.or().andReceiptPlanIdEqualTo(receiptPlanId);
                     List<OLogistics> oLogistics = logisticsMapper.selectByExample(example1);
                     if (oLogistics == null || oLogistics.size() <= 0) {
-                        throw new ProcessException("排单编号为"+receiptPlanId+"的排单未导入退货物流信息");
+                        throw new ProcessException("排单编号为" + receiptPlanId + "的排单未导入退货物流信息");
                     }
+                }
+                updateOrderReturn(agentVo.getReturnId(),new BigDecimal(RetSchedule.YFH.code));
+            }
+
+            //如果是退回修改订单信息时，修改SN状态
+            if (agentVo.getApprovalResult().equals("back")) {
+                try {
+                    updateReturnOrderSnStatus(agentVo.getReturnId(), SnStatus.THDH.code);
+                    updateOrderReturn(agentVo.getReturnId(),new BigDecimal(RetSchedule.TH.code));
+                } catch (ProcessException e) {
+                    return AgentResult.fail(e.getMessage());
                 }
             }
 
@@ -492,6 +673,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             reqMap.put("approvalPerson", userId);
             reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
             reqMap.put("taskId", agentVo.getTaskId());
+
             //下一个节点参数
             if (org.apache.commons.lang.StringUtils.isNotEmpty(agentVo.getOrderAprDept()))
                 reqMap.put("dept", agentVo.getOrderAprDept());
@@ -521,6 +703,51 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     /**
      * @Author: Zhang Lei
+     * @Description: 审批拒绝
+     * @Date: 16:38 2018/8/8
+     */
+    @Override
+    public void approvalReject(String processInstanceId, String activityName) {
+        try {
+            log.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
+            //审批流关系
+            BusActRel rel = busActRelService.findById(processInstanceId);
+            //退货编号
+            String returnId = rel.getBusId();
+            //更新退货单
+            updateOrderReturn(returnId,new BigDecimal(RetSchedule.JJ.code));
+            //更新订单SN
+            updateReturnOrderSnStatus(returnId,SnStatus.FH.code);
+        } catch (Exception e) {
+            log.error("退货审批拒绝回调",e);
+        }
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 审批完成
+     * @Date: 16:38 2018/8/8
+     */
+    @Override
+    public void approvalFinish(String processInstanceId, String activityName) {
+        try {
+            log.info("退货审批完成回调:{},{}", processInstanceId, activityName);
+            //审批流关系
+            BusActRel rel = busActRelService.findById(processInstanceId);
+            //退货编号
+            String returnId = rel.getBusId();
+            //更新退货单
+            updateOrderReturn(returnId,new BigDecimal(RetSchedule.WC.code));
+            //更新订单SN
+            updateReturnOrderSnStatus(returnId,SnStatus.THWC.code);
+        } catch (Exception e) {
+            log.error("退货审批完成回调",e);
+        }
+    }
+
+
+    /**
+     * @Author: Zhang Lei
      * @Description: 保存排单
      * @Date: 21:31 2018/8/2
      */
@@ -542,6 +769,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 String receiptProId = jsonObject.getString("receiptProId");
                 plannerService.savePlanner(receiptPlan, receiptProId);
             }
+
         } catch (Exception e) {
             log.error("保存退货排单失败", e);
             return AgentResult.fail("保存退货排单失败");
@@ -607,5 +835,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw e;
         }
     }
+
+
 
 }

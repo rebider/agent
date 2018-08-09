@@ -1,7 +1,9 @@
 package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.agent.Agent;
 
 import java.util.List;
@@ -28,6 +30,12 @@ public interface AgentService {
     Agent insertAgent(Agent agent, List<String> attrId) throws ProcessException;
 
     Agent getAgentById(String id);
+
+    List<CuserAgent>  queryByUserId(String userId);
+
+    Agent queryAgentByUserId(String userId);
+
+    AgentResult isAgent(String userId);
 
     int updateAgent(Agent agent);
 
