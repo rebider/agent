@@ -203,6 +203,7 @@ public class RefundJob {
         }else{
             deduction.setAgentId(agentId);
         }
+        deduction.setAgentPid(agentId);
         deduction.setId(deductionIdMap.get(agentId));
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setDeductionDesc(DEDUCTION_DESC);
@@ -214,7 +215,7 @@ public class RefundJob {
         deduction.setSumDeductionAmt(addAmt);
         deduction.setMustDeductionAmt(addAmt);
         deduction.setSourceId(bussType);
-        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
+        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitDeductionService.insert(deduction);
     }
 
