@@ -25,4 +25,6 @@ public interface ProfitDayMapper {
     int updateByPrimaryKey(ProfitDay record);
 
     long totalMonthByAgentPid(ProfitDay record);
+
+    long totalMonthByAgentId(ProfitDay record);
 }

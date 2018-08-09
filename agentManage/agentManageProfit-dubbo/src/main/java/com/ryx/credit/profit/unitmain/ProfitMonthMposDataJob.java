@@ -52,6 +52,7 @@ public class ProfitMonthMposDataJob {
         String data = JSONObject.parseObject(res).get("data").toString();
         List<HashMap> list = JSONObject.parseObject(data,List.class);
         System.out.println(data);
+
     }
 
     /**
@@ -96,6 +97,7 @@ public class ProfitMonthMposDataJob {
                 detailMonth.setRhbDgRealDeductionAmt((BigDecimal) map.get(""));
 
                 BigDecimal rhbProfit = (BigDecimal) map.get("");//瑞和宝分润
+
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
                 detailMonth.setBuDeductionAmt(factor);
                 detailMonth.setOtherSupplyAmt(otherSupply);
@@ -104,6 +106,7 @@ public class ProfitMonthMposDataJob {
                 detailMonth = new ProfitDetailMonth();
                 detailMonth.setId(idService.genId(TabId.P_PROFIT_M));
                 BigDecimal rhbProfit = (BigDecimal) map.get("");//瑞和宝分润
+
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
                 detailMonth.setBuDeductionAmt(factor);
                 detailMonth.setOtherSupplyAmt(otherSupply);
