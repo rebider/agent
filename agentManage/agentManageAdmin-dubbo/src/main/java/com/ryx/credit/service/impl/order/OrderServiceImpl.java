@@ -1074,22 +1074,16 @@ public class OrderServiceImpl implements OrderService {
                 OPayment oPayment = new OPayment();
                 oPayment.setId(db.getId());
                 oPayment.setVersion(db.getVersion());
-
-                //抵扣金额
-                if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionAmount"))){
-                    //抵扣类型
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
-                        oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
-                    }else{
-                        oPayment.setDeductionType("BAOZHENGJIN");
-                    }
-                    oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
-                }
-
                 //收款时间
-                if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))){
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate")) || StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
                     //收款金额
                     if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
+                        if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(BigDecimal.ZERO)<0){
+                            throw new MessageException("实收金额不能小于0");
+                        }
+                        if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(db.getOutstandingAmount())>0){
+                            throw new MessageException("实收不能大于待付");
+                        }
                         oPayment.setActualReceipt(new BigDecimal(agentVo.getoPayment().get("actualReceipt")));
                     }else{
                         throw new MessageException("实收金额不能为空");
@@ -1143,8 +1137,17 @@ public class OrderServiceImpl implements OrderService {
                 }else{
                     oPayment.setDeductionAmount(BigDecimal.ZERO);
                 }
-
-
+                if(oPayment.getDeductionAmount().compareTo(oPayment.getOutstandingAmount())>0){
+                    throw new MessageException("抵扣超出待付");
+                }
+                if(oPayment.getDownPayment()!=null) {
+                    if (oPayment.getDownPayment().compareTo(oPayment.getOutstandingAmount()) > 0) {
+                        throw new MessageException("首付超出待付");
+                    }
+                    if((oPayment.getDownPayment().add(oPayment.getDeductionAmount())).compareTo(oPayment.getOutstandingAmount())>0){
+                        throw new MessageException("首付加抵扣超出待付");
+                    }
+                }
 
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单数据储存失败");
