@@ -20,4 +20,6 @@ public interface PosRewardTemplateMapper {
     int updateByPrimaryKeySelective(PosRewardTemplate record);
 
     int updateByPrimaryKey(PosRewardTemplate record);
+
+    String selectCreditMonth(String record);
 }

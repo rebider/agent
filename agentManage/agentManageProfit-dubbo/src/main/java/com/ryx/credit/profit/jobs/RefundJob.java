@@ -76,10 +76,16 @@ public class RefundJob {
     public void deal() {
         // 上月的开始及结束日期
         JSONObject param = new JSONObject();
-        // 退单应扣分润
+        // pos退单应扣分润
+        param.put("bussType", "02");
         getDeductionListAndDeal(param);
+        // pos退单应补分润
+        getSupplyListAndDeal(param);
 
-        // 退单应补分润
+        param.put("bussType", "01");
+        // mpos退单应扣分润
+        getDeductionListAndDeal(param);
+        // 退mpos单应补分润
         getSupplyListAndDeal(param);
     }
 
@@ -95,16 +101,18 @@ public class RefundJob {
         if (result.containsKey("info") ) {
             JSONArray array = result.getJSONArray("info");
             LOG.info("生成补款信息。");
-            insertSupplyList(array);
+            insertSupplyList(array, param.getString("bussType"));
+        }else{
+            LOG.info("没有获取到补款信息。");
         }
     }
 
-    private void insertSupplyList(JSONArray array) {
+    private void insertSupplyList(JSONArray array, String bussType) {
         array.stream().
                 filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
                                 ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0)
                 .forEach(json->{
-                            insertSupply((JSONObject) json);
+                            insertSupply((JSONObject) json, bussType);
                         }
                 );
     }
@@ -115,7 +123,7 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/8/7
     */
-    private void insertSupply(JSONObject jsonObject) {
+    private void insertSupply(JSONObject jsonObject, String bussType) {
         Map<String,Object> agentMap = getAgentId(jsonObject.getString(jsonObject.getString("instId")));
         String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitSupply profitSupply = new ProfitSupply();
@@ -127,6 +135,7 @@ public class RefundJob {
         profitSupply.setAgentPid(jsonObject.getString("instId"));
         profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));
         profitSupply.setSupplyDate(supplyDate);
+        profitSupply.setSourceId(bussType);
         profitSupplyServiceImpl.insert(profitSupply);
     }
 
@@ -150,7 +159,7 @@ public class RefundJob {
             if (orgMap.size() > 0) {
                 Set<String> keys = orgMap.keySet();
                 for (String key : keys) {
-                    insertProfitDeduction(key, orgMap.get(key), deductionIdMap);
+                    insertProfitDeduction(key, orgMap.get(key), deductionIdMap, param.getString("bussType"));
                 }
             }
         }
@@ -174,11 +183,12 @@ public class RefundJob {
     * @Description: 获取扣款信息对象
     * @Param:  agentId 机构id
     * @Param:  addsum 新增扣款金额
+    * @Param:  bussType 业务类型
     * @Param:  id 主键
     * @Author: zhaodw
     * @Date: 2018/7/30
     */
-    private void insertProfitDeduction(String agentId, BigDecimal addAmt, Map<String, String> deductionIdMap) {
+    private void insertProfitDeduction(String agentId, BigDecimal addAmt, Map<String, String> deductionIdMap, String bussType) {
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         deduction.setAgentId(deductionIdMap.get(agentId+"-agentId"));
@@ -194,6 +204,7 @@ public class RefundJob {
         deduction.setAddDeductionAmt(addAmt);
         deduction.setSumDeductionAmt(deduction.getSumDeductionAmt().add(addAmt));
         deduction.setMustDeductionAmt(deduction.getSumDeductionAmt());
+        deduction.setSourceId(bussType);
         profitDeductionService.insert(deduction);
     }
 

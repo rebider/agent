@@ -24,6 +24,16 @@ public class PosReward implements Serializable {
 
     private String userId;
 
+    private String totalEndMonth;
+
+    public String getTotalEndMonth() {
+        return totalEndMonth;
+    }
+
+    public void setTotalEndMonth(String totalEndMonth) {
+        this.totalEndMonth = totalEndMonth;
+    }
+
     public String getUserId() {
         return userId;
     }
