@@ -37,7 +37,11 @@ public interface IProfitDirectService {
 
     ProfitDirect selectByPrimaryKey(String id);
 
+    ProfitDirect selectByAgentAndMon(ProfitDirect record);
+
     int updateByPrimaryKeySelective(ProfitDirect record);
 
     int updateByPrimaryKey(ProfitDirect record);
+
+    long getSubBuckleByMonth(ProfitDirect record);
 }
