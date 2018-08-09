@@ -111,10 +111,10 @@ public class ProfitZhiFaDataJob {
                 profitDirect.setBuckleAmt(buckle);
                 profitDirect.setShouldProfit(should);
                 profitDirect.setActualProfit(BigDecimal.ZERO);//实发分润
-                profitDirect.setParentBuckle(parent);
+//                profitDirect.setParentBuckle(parent);
             }else{
                 profitDirect = new ProfitDirect();
-                profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
+//                profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
             }
         }
     }
