@@ -266,6 +266,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         newDeatil.setPaymentStatus(PaymentStatus.JQ.code);
                         newDeatil.setcDate(new Date());
                         newDeatil.setcUser(userid);
+                        newDeatil.setPlanNum(BigDecimal.ZERO);
+                        newDeatil.setPlanPayTime(new Date());
 
                         if (isRealAdjust) {
                             paymentDetailMapper.insertSelective(newDeatil);
