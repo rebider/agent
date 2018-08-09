@@ -111,6 +111,27 @@ public class ProfitDetailMonth implements Serializable{
     private String payStatus;
 
     private String remark;
+    //新增
+    private BigDecimal zhifaBuckle;//直发扣款
+
+    private BigDecimal zhifaSupply;//直发补款
+
+    public BigDecimal getZhifaBuckle() {
+        return zhifaBuckle;
+    }
+
+    public void setZhifaBuckle(BigDecimal zhifaBuckle) {
+        this.zhifaBuckle = zhifaBuckle;
+    }
+
+    public BigDecimal getZhifaSupply() {
+        return zhifaSupply;
+    }
+
+    public void setZhifaSupply(BigDecimal zhifaSupply) {
+        this.zhifaSupply = zhifaSupply;
+    }
+
 
     public String getId() {
         return id;

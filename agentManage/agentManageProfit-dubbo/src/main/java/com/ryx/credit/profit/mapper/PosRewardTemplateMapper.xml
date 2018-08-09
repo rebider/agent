@@ -63,9 +63,9 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectCreditMonth" resultType="java.lang.String">
-    SELECT CREDIT_TRAN_CONTRAST_MONTH
-    FROM P_REWARD_TEMPLATE
-    ORDER BY CREDIT_TRAN_CONTRAST_MONTH DESC
+    SELECT * FROM (
+    SELECT CREDIT_TRAN_CONTRAST_MONTH, ID
+    FROM P_REWARD_TEMPLATE ORDER BY ID DESC ) WHERE ROWNUM = 1
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
