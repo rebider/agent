@@ -89,8 +89,13 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+  <select id="selectCreditMonth" resultType="java.lang.String">
+    SELECT CREDIT_TRAN_CONTRAST_MONTH
+    FROM P_REWARD_TEMPLATE
+    ORDER BY CREDIT_TRAN_CONTRAST_MONTH DESC
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from P_REWARD_TEMPLATE
     where ID = #{id,jdbcType=VARCHAR}

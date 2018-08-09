@@ -3,6 +3,7 @@ package com.ryx.credit.activity.task;
 import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.profit.service.IPosRewardService;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.agent.DataChangeActivityService;
 import com.ryx.credit.spring.MySpringContextHandler;
@@ -37,13 +38,14 @@ public class PosRewardTaskExecutionListener implements TaskListener, ExecutionLi
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
+            IPosRewardService posRewardService = (IPosRewardService) MySpringContextHandler.applicationContext.getBean("iPosRewardService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
+                posRewardService.completeTaskEnterActivity(delegateExecution.getProcessInstanceId(), activityName);
                 logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, "");
             }
         } else if ("take".equals(eventName)) {
