@@ -30,8 +30,10 @@ public interface OOrderMapper {
     Long getOrderCount(Map <String, Object> param);
 
     List<Map<String,Object>> queryOrderListView(Map <String, Object> param);
+    List<Map<String,Object>> queryAllOrderListView(Map <String, Object> param);
 
     int queryOrderListViewCount(Map <String, Object> param);
+    int queryAllOrderListViewCount(Map <String, Object> param);
 
     List<Map<String,Object>> queryOrderSubOrderProduct(@Param("orderId") String orderId,@Param("agentId") String agentId);
 
