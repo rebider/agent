@@ -1046,7 +1046,9 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.ok(null);
         } catch (MessageException e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常!");
+            throw e;
+        }catch (Exception e){
+            throw e;
         }
     }
 
@@ -1092,6 +1094,12 @@ public class OrderServiceImpl implements OrderService {
                 oPayment.setVersion(db.getVersion());
                 //收款时间
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate")) || StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
+                    if(StringUtils.isBlank(agentVo.getoPayment().get("actualReceiptDate"))){
+                        throw new MessageException("实收日期不能为空");
+                    }
+                    if(StringUtils.isBlank(agentVo.getoPayment().get("actualReceipt"))){
+                        throw new MessageException("实收金额不能为空");
+                    }
                     //收款金额
                     if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
                         if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(BigDecimal.ZERO)<0){
