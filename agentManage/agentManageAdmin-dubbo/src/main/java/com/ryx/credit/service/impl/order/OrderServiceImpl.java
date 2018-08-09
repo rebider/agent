@@ -886,7 +886,7 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
                 .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(order.getId());
-        oPaymentDetailExample.setOrderByClause(" plan_num asc, plan_pay_time asc ");
+        oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
