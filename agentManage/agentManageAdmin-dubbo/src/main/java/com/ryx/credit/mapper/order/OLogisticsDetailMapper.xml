@@ -3,13 +3,25 @@
 <mapper namespace="com.ryx.credit.dao.order.OLogisticsDetailMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
     <result column="LOGISTICS_ID" jdbcType="VARCHAR" property="logisticsId" />
+    <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
+    <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
+    <result column="SETTLEMENT_PRICE" jdbcType="DECIMAL" property="settlementPrice" />
+    <result column="ACTIVITY_ID" jdbcType="VARCHAR" property="activityId" />
+    <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
+    <result column="G_TIME" jdbcType="DECIMAL" property="gTime" />
     <result column="SN_NUM" jdbcType="VARCHAR" property="snNum" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="OPT_ID" jdbcType="VARCHAR" property="optId" />
+    <result column="OPT_TYPE" jdbcType="VARCHAR" property="optType" />
+    <result column="RETURN_ORDER_ID" jdbcType="VARCHAR" property="returnOrderId" />
     <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="RECORD_STATUS" jdbcType="DECIMAL" property="recordStatus" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
   </resultMap>
   <sql id="Example_Where_Clause">
@@ -42,7 +54,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, LOGISTICS_ID, SN_NUM, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME,
+    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, RECORD_STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -61,7 +75,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_LOGISTICS_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -73,14 +87,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    insert into O_LOGISTICS_DETAIL (ID, LOGISTICS_ID, SN_NUM, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, STATUS, VERSION
-      )
-    values (#{id,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR}, #{snNum,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID,
+    PRO_ID, PRO_NAME, SETTLEMENT_PRICE,
+    ACTIVITY_ID, ACTIVITY_NAME, G_TIME,
+    SN_NUM, AGENT_ID, OPT_ID,
+    OPT_TYPE, RETURN_ORDER_ID, C_TIME,
+    U_TIME, C_USER, U_USER,
+    STATUS, RECORD_STATUS, VERSION
+    )
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR},
+    #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
+    #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
+    #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR},
+    #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     insert into O_LOGISTICS_DETAIL
@@ -88,11 +110,44 @@
       <if test="id != null">
         ID,
       </if>
+      <if test="orderId != null">
+        ORDER_ID,
+      </if>
       <if test="logisticsId != null">
         LOGISTICS_ID,
       </if>
+      <if test="proId != null">
+        PRO_ID,
+      </if>
+      <if test="proName != null">
+        PRO_NAME,
+      </if>
+      <if test="settlementPrice != null">
+        SETTLEMENT_PRICE,
+      </if>
+      <if test="activityId != null">
+        ACTIVITY_ID,
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME,
+      </if>
+      <if test="gTime != null">
+        G_TIME,
+      </if>
       <if test="snNum != null">
         SN_NUM,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="optId != null">
+        OPT_ID,
+      </if>
+      <if test="optType != null">
+        OPT_TYPE,
+      </if>
+      <if test="returnOrderId != null">
+        RETURN_ORDER_ID,
       </if>
       <if test="cTime != null">
         C_TIME,
@@ -109,6 +164,9 @@
       <if test="status != null">
         STATUS,
       </if>
+      <if test="recordStatus != null">
+        RECORD_STATUS,
+      </if>
       <if test="version != null">
         VERSION,
       </if>
@@ -117,11 +175,44 @@
       <if test="id != null">
         #{id,jdbcType=VARCHAR},
       </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
       <if test="logisticsId != null">
         #{logisticsId,jdbcType=VARCHAR},
       </if>
+      <if test="proId != null">
+        #{proId,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null">
+        #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementPrice != null">
+        #{settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityName != null">
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="gTime != null">
+        #{gTime,jdbcType=DECIMAL},
+      </if>
       <if test="snNum != null">
         #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="optId != null">
+        #{optId,jdbcType=VARCHAR},
+      </if>
+      <if test="optType != null">
+        #{optType,jdbcType=VARCHAR},
+      </if>
+      <if test="returnOrderId != null">
+        #{returnOrderId,jdbcType=VARCHAR},
       </if>
       <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
@@ -138,6 +229,9 @@
       <if test="status != null">
         #{status,jdbcType=DECIMAL},
       </if>
+      <if test="recordStatus != null">
+        #{recordStatus,jdbcType=DECIMAL},
+      </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
       </if>
@@ -152,11 +246,44 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     update O_LOGISTICS_DETAIL
     <set>
+      <if test="orderId != null">
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
       <if test="logisticsId != null">
         LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
       </if>
+      <if test="proId != null">
+        PRO_ID = #{proId,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null">
+        PRO_NAME = #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementPrice != null">
+        SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="activityId != null">
+        ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="gTime != null">
+        G_TIME = #{gTime,jdbcType=DECIMAL},
+      </if>
       <if test="snNum != null">
         SN_NUM = #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="optId != null">
+        OPT_ID = #{optId,jdbcType=VARCHAR},
+      </if>
+      <if test="optType != null">
+        OPT_TYPE = #{optType,jdbcType=VARCHAR},
+      </if>
+      <if test="returnOrderId != null">
+        RETURN_ORDER_ID = #{returnOrderId,jdbcType=VARCHAR},
       </if>
       <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
@@ -173,6 +300,9 @@
       <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
+      <if test="recordStatus != null">
+        RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
+      </if>
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
@@ -181,19 +311,31 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     update O_LOGISTICS_DETAIL
-    set LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
+    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
+      PRO_ID = #{proId,jdbcType=VARCHAR},
+      PRO_NAME = #{proName,jdbcType=VARCHAR},
+      SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
+      ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
+      ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      G_TIME = #{gTime,jdbcType=DECIMAL},
       SN_NUM = #{snNum,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      OPT_ID = #{optId,jdbcType=VARCHAR},
+      OPT_TYPE = #{optType,jdbcType=VARCHAR},
+      RETURN_ORDER_ID = #{returnOrderId,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       U_TIME = #{uTime,jdbcType=TIMESTAMP},
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
+      RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
