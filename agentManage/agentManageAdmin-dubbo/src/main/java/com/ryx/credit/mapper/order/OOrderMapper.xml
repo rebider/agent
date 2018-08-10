@@ -531,7 +531,6 @@
   <!--查询订单数据-->
   <select id="queryAllOrderListView" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
-    (
     select
     o.id,
     o.o_num,
@@ -577,53 +576,6 @@
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
     </where>
-    UNION
-    select
-    o.id,
-    o.o_num,
-    o.order_platform,
-    o.payment_method,
-    o.o_amo,
-    o.pay_amo,
-    d.pay_amount,
-    d.real_amount,
-    d.outstanding_amount,
-    d.pay_status,
-    o.clear_status,
-    o.review_status,
-    o.order_status,
-    o.o_apytime,
-    o.c_time,
-    o.remark,
-    b.id as agentId,
-    b.ag_name,
-    b.ag_doc_pro ,
-    b.ag_doc_district,
-    nvl((select sum(o_payment_detail.pay_amount)
-    from o_payment_detail
-    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.payment_status in (1,3) ),0) as qk,
-    (
-    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
-    -
-    nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
-    )as dpd,
-    c.platform_name
-    from o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_platform c on c.platform_num = o.order_platform
-    left join o_payment d on d.order_id = o.id
-    <where>
-      <if test="1==1"> and  o.status = 1 </if>
-      <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
-      <if test="id!=null and id!=''"> and  o.id = #{id} </if>
-      <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
-      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-    </where>
-    )
     order by c_time desc
     <include refid="OracleDialectSuffix" />
   </select>
@@ -631,39 +583,22 @@
   <!--查询订单数量-->
   <select id="queryAllOrderListViewCount" parameterType="map" resultType="int">
     select count(id) from(
-    select
-    o.id
-    from o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_platform c on c.platform_num = o.order_platform
-    left join o_payment d on d.order_id = o.id
-    <where>
-      <if test="1==1"> and  o.status = 1 </if>
-      <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
-      <if test="id!=null and id!=''"> and  o.id = #{id} </if>
-      <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
-      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-    </where>
-    UNION
-    select
-    o.id
-    from o_order o
-    left join a_agent b on o.agent_id = b.id
-    left join a_platform c on c.platform_num = o.order_platform
-    left join o_payment d on d.order_id = o.id
-    <where>
-      <if test="1==1"> and  o.status = 1 </if>
-      <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
-      <if test="id!=null and id!=''"> and  o.id = #{id} </if>
-      <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
-      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
-      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
-    </where>
+      select
+      o.id
+      from o_order o
+      left join a_agent b on o.agent_id = b.id
+      left join a_platform c on c.platform_num = o.order_platform
+      left join o_payment d on d.order_id = o.id
+      <where>
+        <if test="1==1"> and  o.status = 1 </if>
+        <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+        <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+        <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+        <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+        <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+        <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      </where>
     )
   </select>
 
