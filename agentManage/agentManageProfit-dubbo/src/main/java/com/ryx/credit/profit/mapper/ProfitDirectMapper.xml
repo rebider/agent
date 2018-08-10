@@ -363,6 +363,28 @@
     WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR} AND TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    WHERE TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectBySupply"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    where AGENT_ID in
+    (select agent_id from p_profit_supply where agent_id is not null and SUPPLY_DATE=to_char(add_months(sysdate,-1),'YYYYMM') and supply_amt>0)
+  </select>
+
+  <select id="selectByBuckle"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    where TRANS_MONTH=to_char(add_months(sysdate,-1),'YYYYMM') AND PARENT_BUCKLE > 0
+  </select>
+
   <select id="getProfitDirectList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT
@@ -379,7 +401,7 @@
     <include refid="BASE_WHERE_SQL" />
   </select>
 
-  <select id="getSubBuckleByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.lang.Long">
+  <select id="getSubBuckleByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
     SELECT SUM(PARENT_BUCKLE)
     FROM P_PROFIT_DIRECT
     WHERE PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR} AND TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}

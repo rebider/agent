@@ -123,6 +123,13 @@
     where ID = #{id,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByAgentPid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
+
   <select id="selectByPIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     select
     <include refid="Base_Column_List" />
