@@ -147,9 +147,9 @@ public class ProfitDataJob {
         OrganTranMonthDetail organTranMonthDetail = new OrganTranMonthDetail();
         organTranMonthDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
         organTranMonthDetail.setAgentName((String)agentMap.get("AG_NAME"));
-        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("PFT_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_03_AMT"));
-        organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
-        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT"));
+        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("POS_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_03_AMT"));
+        organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("POS_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_02_AMT"));
+        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("POS_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_01_AMT"));
         organTranMonthDetail.setProfitId(profitId);
         organTranMonthDetailService.insert(organTranMonthDetail);
         organTranMonthDetail = null;
