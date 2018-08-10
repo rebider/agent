@@ -23,6 +23,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="RECORD_STATUS" jdbcType="DECIMAL" property="recordStatus" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ORDER_NUM" jdbcType="VARCHAR" property="orderNum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -54,9 +55,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME,
-    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, RECORD_STATUS, VERSION
+    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, 
+    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER, 
+    U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -75,7 +76,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
     from O_LOGISTICS_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -87,22 +88,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID,
-    PRO_ID, PRO_NAME, SETTLEMENT_PRICE,
-    ACTIVITY_ID, ACTIVITY_NAME, G_TIME,
-    SN_NUM, AGENT_ID, OPT_ID,
-    OPT_TYPE, RETURN_ORDER_ID, C_TIME,
-    U_TIME, C_USER, U_USER,
-    STATUS, RECORD_STATUS, VERSION
-    )
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR},
-    #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
-    #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
-    #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR},
-    #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
-    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-    )
+    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID, 
+      PRO_ID, PRO_NAME, SETTLEMENT_PRICE, 
+      ACTIVITY_ID, ACTIVITY_NAME, G_TIME, 
+      SN_NUM, AGENT_ID, OPT_ID, 
+      OPT_TYPE, RETURN_ORDER_ID, C_TIME, 
+      U_TIME, C_USER, U_USER, 
+      STATUS, RECORD_STATUS, VERSION, 
+      ORDER_NUM)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR}, 
+      #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL}, 
+      #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL}, 
+      #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR}, 
+      #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{orderNum,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     insert into O_LOGISTICS_DETAIL
@@ -170,6 +171,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="orderNum != null">
+        ORDER_NUM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -234,6 +238,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -306,6 +313,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="orderNum != null">
+        ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -330,12 +340,13 @@
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
       RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      ORDER_NUM = #{orderNum,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
+      select * from ( select row_.*, rownum rownum_ from ( 
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

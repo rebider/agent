@@ -47,6 +47,8 @@ public class OLogisticsDetail implements Serializable{
 
     private BigDecimal version;
 
+    private String orderNum;
+
     public String getId() {
         return id;
     }
@@ -213,5 +215,13 @@ public class OLogisticsDetail implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(String orderNum) {
+        this.orderNum = orderNum == null ? null : orderNum.trim();
     }
 }
