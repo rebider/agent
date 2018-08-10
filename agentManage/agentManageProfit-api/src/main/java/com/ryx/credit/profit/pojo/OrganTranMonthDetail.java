@@ -1,8 +1,10 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class OrganTranMonthDetail {
+public class OrganTranMonthDetail implements Serializable {
+    private static final long serialVersionUID = -6970085386873020157L;
     private String id;
 
     private String agentPid;
@@ -18,6 +20,14 @@ public class OrganTranMonthDetail {
     private BigDecimal posJlTranAmt;
 
     private String profitId;
+
+    private String agentType;
+
+    private BigDecimal allchildJlTranAmt;
+
+    private BigDecimal allchildTranAmt;
+
+    private String profitDate;
 
     public String getId() {
         return id;
@@ -81,5 +91,37 @@ public class OrganTranMonthDetail {
 
     public void setProfitId(String profitId) {
         this.profitId = profitId == null ? null : profitId.trim();
+    }
+
+    public String getAgentType() {
+        return agentType;
+    }
+
+    public void setAgentType(String agentType) {
+        this.agentType = agentType == null ? null : agentType.trim();
+    }
+
+    public BigDecimal getAllchildJlTranAmt() {
+        return allchildJlTranAmt;
+    }
+
+    public void setAllchildJlTranAmt(BigDecimal allchildJlTranAmt) {
+        this.allchildJlTranAmt = allchildJlTranAmt;
+    }
+
+    public BigDecimal getAllchildTranAmt() {
+        return allchildTranAmt;
+    }
+
+    public void setAllchildTranAmt(BigDecimal allchildTranAmt) {
+        this.allchildTranAmt = allchildTranAmt;
+    }
+
+    public String getProfitDate() {
+        return profitDate;
+    }
+
+    public void setProfitDate(String profitDate) {
+        this.profitDate = profitDate == null ? null : profitDate.trim();
     }
 }

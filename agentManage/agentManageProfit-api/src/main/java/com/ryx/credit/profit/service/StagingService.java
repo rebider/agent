@@ -89,7 +89,7 @@ public interface StagingService {
 
      /***
      * @Description: 获取代理商分期未扣完金额
-     * @Param:agentId 机构id
+     * @Param:agentId 业务平台机构id
      * @return: 未分期总金额
      * @Author: zhaodw
      * @Date: 2018/8/9

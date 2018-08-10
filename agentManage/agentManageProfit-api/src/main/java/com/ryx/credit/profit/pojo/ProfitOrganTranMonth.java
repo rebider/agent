@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitOrganTranMonth implements Serializable {
+    private static final long serialVersionUID = -194242998163037835L;
     private String id;
 
     private String productType;
@@ -17,6 +18,10 @@ public class ProfitOrganTranMonth implements Serializable {
     private String checkDate;
 
     private String profitDate;
+
+    private String profitDateStart;
+
+    private String profitDateEnd;
 
     private BigDecimal differenceAmt;
 
@@ -102,5 +107,21 @@ public class ProfitOrganTranMonth implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getProfitDateStart() {
+        return profitDateStart;
+    }
+
+    public void setProfitDateStart(String profitDateStart) {
+        this.profitDateStart = profitDateStart;
+    }
+
+    public String getProfitDateEnd() {
+        return profitDateEnd;
+    }
+
+    public void setProfitDateEnd(String profitDateEnd) {
+        this.profitDateEnd = profitDateEnd;
     }
 }
