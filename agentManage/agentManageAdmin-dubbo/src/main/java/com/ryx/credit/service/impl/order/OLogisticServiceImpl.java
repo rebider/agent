@@ -196,7 +196,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 } else {
                     ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     if (receiptPlan != null) {
-                        receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(21))));          // 发货数量
+                        receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(23))));          // 发货数量
                         receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
                         receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
                         int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
