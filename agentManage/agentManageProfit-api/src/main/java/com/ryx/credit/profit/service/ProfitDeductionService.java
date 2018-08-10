@@ -106,4 +106,6 @@ public interface ProfitDeductionService {
     * @Date: 2018/8/9
     */
     BigDecimal  getSupplyAmt(String agentId, String bussType);
+
+    BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
 }
