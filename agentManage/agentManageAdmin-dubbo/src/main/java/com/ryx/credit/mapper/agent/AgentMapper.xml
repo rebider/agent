@@ -473,7 +473,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
     </select>
 
     <select id="excelAgent" parameterType="com.ryx.credit.pojo.admin.agent.Agent" resultMap="AgentoutVo">
-        select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,
+        select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,
         bus.BUS_PLATFORM,bus.BUS_NUM,bus.BUS_TYPE,bus.BUS_PARENT,bus.BUS_RISK_PARENT,bus.BUS_ACTIVATION_PARENT,
         DECODE(bus.BUS_SENT_DIRECTLY,'1','是','0','否') as bus_sent_directly,DECODE(bus.bus_Inde_ass,'1','是','0','否') as
         bus_Inde_ass,bus.BUS_SCOPE,bus.BUS_REGION,bus.CLO_PAY_COMPANY,
@@ -520,6 +520,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR"/>
         <result column="BUS_SENT_DIRECTLY" property="busSentDirectly" jdbcType="VARCHAR"/>
         <result column="CLO_PAY_COMPANY" property="cloPayCompany" jdbcType="VARCHAR"/>
+        <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR"/>
 
 
         <result column="CLO_TYPE" property="cloType" jdbcType="DECIMAL"/>

@@ -733,13 +733,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     if (null != value)
                         agentoutVo.setBusScope(value.getdItemname());
                 }
-                if (null != agentoutVo.getBusParent()) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusParent(agentById.getAgName());
-                    }
+                if (null != agentoutVo.getBusParent() && null != agentoutVo.getAgentId() && null != agentoutVo.getBusPlatform()) {
+                    getBusParent(agentoutVo);
+
                 }
                 if (null != agentoutVo.getBusRiskParent()) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
@@ -785,7 +781,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
                 if (null != agentoutVo.getCloTaxPoint()) {
                     NumberFormat numberFormat = NumberFormat.getPercentInstance();
-                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString()+"%");
+                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
                     String point = numberFormat.format(parse);
                     agentoutVo.setPoint(point);
                 }
@@ -793,10 +789,58 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         return agentoutVos;
     }
-    public static void main(String ar[]) throws ParseException {
-        NumberFormat numberFormat = NumberFormat.getPercentInstance();
-        Number parse = numberFormat.parse("6.0%");
-        String format1 = numberFormat.format(parse);
 
+    private void getBusParent(AgentoutVo agentoutVo) {
+        List<AgentBusInfo> agentBusInfos = agentBusinfoService.queryParenFourLevel(new ArrayList<AgentBusInfo>(), agentoutVo.getBusPlatform(), agentoutVo.getAgentId());
+        if (null != agentBusInfos && agentBusInfos.size() > 0) {
+            if (agentBusInfos.size() == 1) {
+                AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                if (null != agentBusInfo) {
+                    agentoutVo.setBusParentId(agentBusInfo.getAgentId());
+                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setBusParent(agentBusInfo.getAgentId() + agentById.getAgName());
+                }
+            } else if (agentBusInfos.size() == 2) {
+                AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                if (null != agentBusInfo) {
+                    agentoutVo.setBusParentId(agentBusInfo.getAgentId());
+                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setBusParent(agentBusInfo.getAgentId() + agentById.getAgName());
+                }
+                AgentBusInfo twoParent = agentBusInfos.get(1);
+                if (null != twoParent) {
+                    agentoutVo.setBusParentId(twoParent.getAgentId());
+                    Agent agentById = agentService.getAgentById(twoParent.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setTwoParentId(twoParent.getAgentId() + agentById.getAgName());
+                }
+
+            } else if (agentBusInfos.size() == 3) {
+                AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                if (null != agentBusInfo) {
+                    agentoutVo.setBusParentId(agentBusInfo.getAgentId());
+                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setBusParent(agentBusInfo.getAgentId() + agentById.getAgName());
+                }
+                AgentBusInfo twoParent = agentBusInfos.get(1);
+                if (null != twoParent) {
+                    agentoutVo.setBusParentId(twoParent.getAgentId());
+                    Agent agentById = agentService.getAgentById(twoParent.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setTwoParentId(twoParent.getAgentId() + agentById.getAgName());
+                }
+                AgentBusInfo threeParent = agentBusInfos.get(1);
+                if (null != threeParent) {
+                    agentoutVo.setBusParentId(threeParent.getAgentId());
+                    Agent agentById = agentService.getAgentById(threeParent.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setThreeParentId(threeParent.getAgentId() + agentById.getAgName());
+                }
+            }
+        }
     }
+
 }
