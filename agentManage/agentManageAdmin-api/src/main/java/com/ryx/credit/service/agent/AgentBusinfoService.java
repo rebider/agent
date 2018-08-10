@@ -45,4 +45,14 @@ public interface AgentBusinfoService {
 
     public Map getRootFromBusInfo(String busId);
 
+
+    /**
+     * 查询给定的代理商平台的顺序上级
+     * @param list
+     * @param platformCode
+     * @param agentId
+     * @return
+     */
+    public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
+
 }
