@@ -325,13 +325,22 @@ public class AgentServiceImpl implements AgentService {
                 if (userVoSelect != null) {
                     return;
                 }
+                userVoSelect = iUserService.selectByName(agent.getId());
+                if (userVoSelect != null) {
+                    return;
+                }
                 UserVo userVo = new UserVo();
                 String salt = com.ryx.credit.commons.utils.StringUtils.getUUId();
                 String pwd = DigestUtils.hashByShiro("md5", redisService.hGet("config", "pass"), salt, 1);
                 userVo.setSalt(salt);
                 userVo.setPassword(pwd);
                 userVo.setLoginName(agent.getAgLegalMobile());
-                userVo.setName(agent.getAgName());
+                if(StringUtils.isNotBlank(agent.getAgName())){
+                    userVo.setName(agent.getAgName());
+                }else{
+                    userVo.setName(agent.getId());
+                }
+
                 userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
                 userVo.setRoleIds(redisService.hGet("config", "role"));
                 userVo.setUserType(1);
