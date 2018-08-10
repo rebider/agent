@@ -6,6 +6,8 @@ import java.math.BigDecimal;
  * Created by RYX on 2018/8/10.
  */
 public enum OLogisticsDetailStatus {
+
+
     STATUS_FH("1","发货"),
     STATUS_TH("2","退货"),
 

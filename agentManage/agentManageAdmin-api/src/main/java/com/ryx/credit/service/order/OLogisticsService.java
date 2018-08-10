@@ -22,7 +22,7 @@ public interface OLogisticsService {
 
     List<Map<String, Object>> getLogisticsBySn(String startSn, String endSn, String agentId) throws ProcessException;
 
-    ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish,String logisticsId, String cUser, String uUser) throws MessageException;
+    ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish,String logisticsId, String cUser, String planId) throws MessageException;
 
     public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish)throws Exception;
 
