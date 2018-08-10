@@ -80,6 +80,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     OLogisticsMapper logisticsMapper;
     @Autowired
     private BusActRelService busActRelService;
+    @Autowired
+    OLogisticsDetailMapper logisticsDetailMapper;
 
     /**
      * @Author: Zhang Lei
@@ -304,6 +306,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         relExample.or().andReturnOrderIdEqualTo(returnId);
         returnOrderRelMapper.deleteByExample(relExample);
 
+        //删除排单和物流
+        delReceiptAndLogistis(returnId);
+
         //更新退货单
         OReturnOrder returnOrderDB = returnOrderMapper.selectByPrimaryKey(returnId);
         returnOrderDB.setRetSchedule(new BigDecimal(RetSchedule.SPZ.code));
@@ -390,6 +395,29 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         return null;
+    }
+
+
+    public void delReceiptAndLogistis(String returnId){
+        //删除排单计划
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        receiptPlanExample.or().andReturnOrderDetailIdEqualTo(returnId);
+        List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
+        for(ReceiptPlan receiptPlan:receiptPlans){
+            String receiptPlanId = receiptPlan.getId();
+            //删除物流及物流明细
+            OLogisticsExample logisticsExample = new OLogisticsExample();
+            logisticsExample.or().andReceiptPlanIdEqualTo(receiptPlanId);
+            List<OLogistics> oLogistics = logisticsMapper.selectByExample(logisticsExample);
+            for(OLogistics logistics:oLogistics){
+                String logisticsId = logistics.getId();
+                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andLogisticsIdEqualTo(logisticsId);
+                logisticsDetailMapper.deleteByExample(oLogisticsDetailExample);
+            }
+            logisticsMapper.deleteByExample(logisticsExample);
+        }
+        receiptPlanMapper.deleteByExample(receiptPlanExample);
     }
 
     /**
@@ -707,6 +735,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 16:38 2018/8/8
      */
     @Override
+    @Transactional
     public void approvalReject(String processInstanceId, String activityName) {
         try {
             log.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
@@ -716,10 +745,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             String returnId = rel.getBusId();
             //更新退货单
             updateOrderReturn(returnId,new BigDecimal(RetSchedule.JJ.code));
-            //更新订单SN
+            //更新原始订单SN
             updateReturnOrderSnStatus(returnId,SnStatus.FH.code);
+            //删除排单和物流
+            delReceiptAndLogistis(returnId);
         } catch (Exception e) {
-            log.error("退货审批拒绝回调",e);
+            log.error("退货审批拒绝回调错误",e);
         }
     }
 

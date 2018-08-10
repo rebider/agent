@@ -278,73 +278,123 @@ public class PosRewardTemplateExample {
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalIsNull() {
-            addCriterion("TRAN_TOTAL is null");
+        public Criteria andTranTotalStartIsNull() {
+            addCriterion("TRAN_TOTAL_START is null");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalIsNotNull() {
-            addCriterion("TRAN_TOTAL is not null");
+        public Criteria andTranTotalStartIsNotNull() {
+            addCriterion("TRAN_TOTAL_START is not null");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalEqualTo(String value) {
-            addCriterion("TRAN_TOTAL =", value, "tranTotal");
+        public Criteria andTranTotalStartEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_START =", value, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalNotEqualTo(String value) {
-            addCriterion("TRAN_TOTAL <>", value, "tranTotal");
+        public Criteria andTranTotalStartNotEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_START <>", value, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalGreaterThan(String value) {
-            addCriterion("TRAN_TOTAL >", value, "tranTotal");
+        public Criteria andTranTotalStartGreaterThan(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_START >", value, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalGreaterThanOrEqualTo(String value) {
-            addCriterion("TRAN_TOTAL >=", value, "tranTotal");
+        public Criteria andTranTotalStartGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_START >=", value, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalLessThan(String value) {
-            addCriterion("TRAN_TOTAL <", value, "tranTotal");
+        public Criteria andTranTotalStartLessThan(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_START <", value, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalLessThanOrEqualTo(String value) {
-            addCriterion("TRAN_TOTAL <=", value, "tranTotal");
+        public Criteria andTranTotalStartLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_START <=", value, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalLike(String value) {
-            addCriterion("TRAN_TOTAL like", value, "tranTotal");
+        public Criteria andTranTotalStartIn(List<BigDecimal> values) {
+            addCriterion("TRAN_TOTAL_START in", values, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalNotLike(String value) {
-            addCriterion("TRAN_TOTAL not like", value, "tranTotal");
+        public Criteria andTranTotalStartNotIn(List<BigDecimal> values) {
+            addCriterion("TRAN_TOTAL_START not in", values, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalIn(List<String> values) {
-            addCriterion("TRAN_TOTAL in", values, "tranTotal");
+        public Criteria andTranTotalStartBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TRAN_TOTAL_START between", value1, value2, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalNotIn(List<String> values) {
-            addCriterion("TRAN_TOTAL not in", values, "tranTotal");
+        public Criteria andTranTotalStartNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TRAN_TOTAL_START not between", value1, value2, "tranTotalStart");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalBetween(String value1, String value2) {
-            addCriterion("TRAN_TOTAL between", value1, value2, "tranTotal");
+        public Criteria andTranTotalEndIsNull() {
+            addCriterion("TRAN_TOTAL_END is null");
             return (Criteria) this;
         }
 
-        public Criteria andTranTotalNotBetween(String value1, String value2) {
-            addCriterion("TRAN_TOTAL not between", value1, value2, "tranTotal");
+        public Criteria andTranTotalEndIsNotNull() {
+            addCriterion("TRAN_TOTAL_END is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_END =", value, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndNotEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_END <>", value, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndGreaterThan(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_END >", value, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_END >=", value, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndLessThan(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_END <", value, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("TRAN_TOTAL_END <=", value, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndIn(List<BigDecimal> values) {
+            addCriterion("TRAN_TOTAL_END in", values, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndNotIn(List<BigDecimal> values) {
+            addCriterion("TRAN_TOTAL_END not in", values, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TRAN_TOTAL_END between", value1, value2, "tranTotalEnd");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranTotalEndNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TRAN_TOTAL_END not between", value1, value2, "tranTotalEnd");
             return (Criteria) this;
         }
 
@@ -538,6 +588,76 @@ public class PosRewardTemplateExample {
             return (Criteria) this;
         }
 
+        public Criteria andActivityValidIsNull() {
+            addCriterion("ACTIVITY_VALID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidIsNotNull() {
+            addCriterion("ACTIVITY_VALID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID =", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID <>", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidGreaterThan(String value) {
+            addCriterion("ACTIVITY_VALID >", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidGreaterThanOrEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID >=", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidLessThan(String value) {
+            addCriterion("ACTIVITY_VALID <", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidLessThanOrEqualTo(String value) {
+            addCriterion("ACTIVITY_VALID <=", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidLike(String value) {
+            addCriterion("ACTIVITY_VALID like", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotLike(String value) {
+            addCriterion("ACTIVITY_VALID not like", value, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidIn(List<String> values) {
+            addCriterion("ACTIVITY_VALID in", values, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotIn(List<String> values) {
+            addCriterion("ACTIVITY_VALID not in", values, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidBetween(String value1, String value2) {
+            addCriterion("ACTIVITY_VALID between", value1, value2, "activityValid");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityValidNotBetween(String value1, String value2) {
+            addCriterion("ACTIVITY_VALID not between", value1, value2, "activityValid");
+            return (Criteria) this;
+        }
+
         public Criteria andUpdateTimeIsNull() {
             addCriterion("UPDATE_TIME is null");
             return (Criteria) this;
@@ -665,76 +785,6 @@ public class PosRewardTemplateExample {
 
         public Criteria andOperUserNotBetween(String value1, String value2) {
             addCriterion("OPER_USER not between", value1, value2, "operUser");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidIsNull() {
-            addCriterion("ACTIVITY_VALID is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidIsNotNull() {
-            addCriterion("ACTIVITY_VALID is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidEqualTo(String value) {
-            addCriterion("ACTIVITY_VALID =", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidNotEqualTo(String value) {
-            addCriterion("ACTIVITY_VALID <>", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidGreaterThan(String value) {
-            addCriterion("ACTIVITY_VALID >", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidGreaterThanOrEqualTo(String value) {
-            addCriterion("ACTIVITY_VALID >=", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidLessThan(String value) {
-            addCriterion("ACTIVITY_VALID <", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidLessThanOrEqualTo(String value) {
-            addCriterion("ACTIVITY_VALID <=", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidLike(String value) {
-            addCriterion("ACTIVITY_VALID like", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidNotLike(String value) {
-            addCriterion("ACTIVITY_VALID not like", value, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidIn(List<String> values) {
-            addCriterion("ACTIVITY_VALID in", values, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidNotIn(List<String> values) {
-            addCriterion("ACTIVITY_VALID not in", values, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidBetween(String value1, String value2) {
-            addCriterion("ACTIVITY_VALID between", value1, value2, "activityValid");
-            return (Criteria) this;
-        }
-
-        public Criteria andActivityValidNotBetween(String value1, String value2) {
-            addCriterion("ACTIVITY_VALID not between", value1, value2, "activityValid");
             return (Criteria) this;
         }
     }

@@ -353,7 +353,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                 oPaymentDetail.setRealPayAmount(supplement.getRealPayAmount());
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
-                oPaymentDetail.setSrcType(PamentSrcType.PamentSrcType_XXBK.code);
+                oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());

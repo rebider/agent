@@ -8,12 +8,14 @@ import java.util.Date;
  * @author RYX
  */
 public class PosRewardTemplate implements Serializable {
-    private static final long serialVersionUID = -4413010631062670079L;
+    private static final long serialVersionUID = 4685250900953322756L;
     private String id;
 
     private String tranContrastMonth;
 
-    private String tranTotal;
+    private BigDecimal tranTotalStart;
+
+    private BigDecimal tranTotalEnd;
 
     private String creditTranContrastMonth;
 
@@ -21,11 +23,11 @@ public class PosRewardTemplate implements Serializable {
 
     private Date createTime;
 
+    private String activityValid;
+
     private Date updateTime;
 
     private String operUser;
-
-    private String activityValid;
 
     public String getId() {
         return id;
@@ -43,12 +45,20 @@ public class PosRewardTemplate implements Serializable {
         this.tranContrastMonth = tranContrastMonth == null ? null : tranContrastMonth.trim();
     }
 
-    public String getTranTotal() {
-        return tranTotal;
+    public BigDecimal getTranTotalStart() {
+        return tranTotalStart;
     }
 
-    public void setTranTotal(String tranTotal) {
-        this.tranTotal = tranTotal == null ? null : tranTotal.trim();
+    public void setTranTotalStart(BigDecimal tranTotalStart) {
+        this.tranTotalStart = tranTotalStart;
+    }
+
+    public BigDecimal getTranTotalEnd() {
+        return tranTotalEnd;
+    }
+
+    public void setTranTotalEnd(BigDecimal tranTotalEnd) {
+        this.tranTotalEnd = tranTotalEnd;
     }
 
     public String getCreditTranContrastMonth() {
@@ -75,6 +85,14 @@ public class PosRewardTemplate implements Serializable {
         this.createTime = createTime;
     }
 
+    public String getActivityValid() {
+        return activityValid;
+    }
+
+    public void setActivityValid(String activityValid) {
+        this.activityValid = activityValid == null ? null : activityValid.trim();
+    }
+
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -89,13 +107,5 @@ public class PosRewardTemplate implements Serializable {
 
     public void setOperUser(String operUser) {
         this.operUser = operUser == null ? null : operUser.trim();
-    }
-
-    public String getActivityValid() {
-        return activityValid;
-    }
-
-    public void setActivityValid(String activityValid) {
-        this.activityValid = activityValid == null ? null : activityValid.trim();
     }
 }

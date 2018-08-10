@@ -15,7 +15,6 @@
         <result column="phone" property="phone" jdbcType="VARCHAR"/>
 
         <result column="organizationName" property="organizationName" jdbcType="VARCHAR"/>
-        <result column="organizationCode" property="organizationCode" jdbcType="VARCHAR"/>
 
         <collection property="rolesList" ofType="com.ryx.credit.pojo.admin.CRole">
             <id column="roleId" property="id"/>

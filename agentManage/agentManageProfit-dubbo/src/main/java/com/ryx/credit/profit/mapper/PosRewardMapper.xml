@@ -11,6 +11,7 @@
     <result column="CREDIT_CONS_MONTH" jdbcType="VARCHAR" property="creditConsMonth" />
     <result column="REWARD_SCALE" jdbcType="DECIMAL" property="rewardScale" />
     <result column="APPLY_STATUS" jdbcType="CHAR" property="applyStatus" />
+    <result column="TOTAL_END_MONTH" jdbcType="VARCHAR" property="totalEndMonth" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -43,7 +44,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, CREDIT_CONS_MONTH, 
-    REWARD_SCALE, APPLY_STATUS
+    REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -76,11 +77,12 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosReward">
     insert into P_POS_REWARD (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, 
-      CREDIT_CONS_MONTH, REWARD_SCALE, APPLY_STATUS
+      CREDIT_CONS_MONTH, REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH
       )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{totalConsMonth,jdbcType=VARCHAR}, #{growAmt,jdbcType=DECIMAL}, 
-      #{creditConsMonth,jdbcType=VARCHAR}, #{rewardScale,jdbcType=DECIMAL}, #{applyStatus,jdbcType=CHAR}
+      #{creditConsMonth,jdbcType=VARCHAR}, #{rewardScale,jdbcType=DECIMAL}, #{applyStatus,jdbcType=CHAR},
+      #{totalEndMonth,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosReward">
@@ -113,6 +115,9 @@
       <if test="applyStatus != null">
         APPLY_STATUS,
       </if>
+      <if test="totalEndMonth != null">
+        TOTAL_END_MONTH,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -141,6 +146,9 @@
       </if>
       <if test="applyStatus != null">
         #{applyStatus,jdbcType=CHAR},
+      </if>
+      <if test="totalEndMonth != null">
+        #{totalEndMonth,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -177,6 +185,9 @@
       <if test="applyStatus != null">
         APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
       </if>
+      <if test="totalEndMonth != null">
+        TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -189,7 +200,8 @@
       GROW_AMT = #{growAmt,jdbcType=DECIMAL},
       CREDIT_CONS_MONTH = #{creditConsMonth,jdbcType=VARCHAR},
       REWARD_SCALE = #{rewardScale,jdbcType=DECIMAL},
-      APPLY_STATUS = #{applyStatus,jdbcType=CHAR}
+      APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
+    TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

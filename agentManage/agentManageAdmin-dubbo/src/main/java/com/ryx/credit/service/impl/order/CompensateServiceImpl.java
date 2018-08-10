@@ -486,6 +486,7 @@ public class CompensateServiceImpl implements CompensateService {
                         agentVo.getoRefundPriceDiffVo().setMachOweAmt(oRefundPriceDiff.getRelCompAmt());
                     }
                     agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
+                    deductAmt = oRefundPriceDiff.getDeductAmt().add(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                 }
                 AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
                 if(!agentResult.isOK()){
@@ -529,6 +530,7 @@ public class CompensateServiceImpl implements CompensateService {
         if(agentVo.getFlag().equals("1")){
             updatePriceDiff.setRelCompAmt(agentVo.getoRefundPriceDiffVo().getRelCompAmt());
             updatePriceDiff.setMachOweAmt(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
+            updatePriceDiff.setDeductAmt(deductAmt);
         }
         updatePriceDiff.setuTime(new Date());
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
