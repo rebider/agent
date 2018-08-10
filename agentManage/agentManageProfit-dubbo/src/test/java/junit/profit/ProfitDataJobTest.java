@@ -5,7 +5,6 @@ package junit.profit;/**
  */
 
 import com.ryx.credit.profit.jobs.ProfitDataJob;
-import com.ryx.credit.profit.jobs.RefundJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,13 +29,6 @@ public class ProfitDataJobTest {
     @Autowired
     private ProfitDataJob profitDataJob;
 
-    /*** 
-    * @Description: 测试任务处理
-    * @Param:  
-    * @return:  
-    * @Author: zhaodw 
-    * @Date: 2018/7/30 
-    */
     @Test
     public void testDeal() {
         profitDataJob.deal();

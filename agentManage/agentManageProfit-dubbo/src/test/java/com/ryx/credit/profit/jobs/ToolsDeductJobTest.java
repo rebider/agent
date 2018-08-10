@@ -36,8 +36,8 @@ public class ToolsDeductJobTest {
         Map<String, Object> map = new HashMap<String, Object>(10);
         map.put("agentId", "AG20180803000000000005884");
         map.put("paltformNo", "6000");
-        map.put("deductDate", "2018-08");
-        map.put("agentProfitAmt", "500000");
+        map.put("deductDate", "2018-09");
+        map.put("agentProfitAmt", "0");
         map = profitToolsDeductService.executDeduct(map);
         System.out.println("应扣："+map.get("mustDeductionAmtSum"));
         System.out.println("实扣："+map.get("actualDeductionAmtSum"));
