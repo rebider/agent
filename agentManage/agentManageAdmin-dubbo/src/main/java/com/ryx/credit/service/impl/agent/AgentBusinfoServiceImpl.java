@@ -258,4 +258,36 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return map.get(0);
 	}
+
+
+	@Override
+	public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
+
+		if(list.size()==4)
+			return list;
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andAgentIdEqualTo(agentId)
+                .andBusPlatformEqualTo(platformCode).
+                andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
+		if(plats.size()==0)
+			return list;
+		AgentBusInfo platInfo = plats.get(0);
+		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
+			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
+			if(parent!=null){
+				list.add(parent);
+				if (StringUtils.isNotEmpty(parent.getAgentId())) {
+					return queryParenFourLevel(list, platformCode, parent.getAgentId());
+				}else{
+					return list;
+				}
+			}else{
+				return list;
+			}
+		}else{
+			return list;
+		}
+
+	}
 }

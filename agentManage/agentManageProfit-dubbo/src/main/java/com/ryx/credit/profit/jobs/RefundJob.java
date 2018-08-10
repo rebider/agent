@@ -49,7 +49,7 @@ public class RefundJob {
 
     private static  final  String DEDUCTION_DESC = "退单扣款";
 
-    private static  final  String SUPPLY_DESC = "退单补款";
+    public static  final  String SUPPLY_DESC = "退单补款";
 
     private final Object object = new Object();
 
@@ -68,6 +68,9 @@ public class RefundJob {
     @Autowired
     private ProfitSupplyService profitSupplyServiceImpl;
 
+
+    @Autowired
+    private StagingService stagingServiceImpl;
 
 
 
@@ -124,15 +127,17 @@ public class RefundJob {
     * @Date: 2018/8/7
     */
     private void insertSupply(JSONObject jsonObject, String bussType) {
-        Map<String,Object> agentMap = getAgentId(jsonObject.getString(jsonObject.getString("instId")));
+        Map<String,Object> agentMap = getAgentId(jsonObject.getString("instId"));
         String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitSupply profitSupply = new ProfitSupply();
         profitSupply.setId(idService.genId(TabId.p_profit_supply));
         profitSupply.setSupplyType(SUPPLY_DESC);
         profitSupply.setRemerk(SUPPLY_DESC);
-        profitSupply.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
-        profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
-        profitSupply.setAgentPid(jsonObject.getString("instId"));
+        if (agentMap !=null){
+            profitSupply.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
+            profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
+        }
+        profitSupply.setAgentId(jsonObject.getString("instId"));
         profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));
         profitSupply.setSupplyDate(supplyDate);
         profitSupply.setSourceId(bussType);
@@ -189,22 +194,28 @@ public class RefundJob {
     * @Date: 2018/7/30
     */
     private void insertProfitDeduction(String agentId, BigDecimal addAmt, Map<String, String> deductionIdMap, String bussType) {
+        Map<String,Object> agentMap = getAgentId(agentId);
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
-        deduction.setAgentId(deductionIdMap.get(agentId+"-agentId"));
-        deduction.setAgentPid(agentId);
-        PageInfo pageInfo = profitDeductionService.getProfitDeductionList(deduction, null);
-        if (pageInfo.getRows() != null && pageInfo.getRows().size()==1) {
-            deduction = (ProfitDeduction) pageInfo.getRows().get(0);
+        if (agentMap!=null) {
+            deduction.setAgentId((String) agentMap.get("AG_UNIQ_NUM"));
+            deduction.setAgentName((String) agentMap.get("AG_NAME"));
         }else{
-            deduction.setId(deductionIdMap.get(agentId));
-            deduction.setStagingStatus(DeductionStatus.UNREVIEWED.getStatus());
-            deduction.setDeductionDesc(DEDUCTION_DESC);
+            deduction.setAgentId(agentId);
         }
+        deduction.setAgentPid(agentId);
+        deduction.setId(deductionIdMap.get(agentId));
+        deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+        deduction.setDeductionDesc(DEDUCTION_DESC);
+        // 获取分期未扣完金额
+        BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(agentId);
+        stagNotDeductionSumAmt = stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt;
+        addAmt = addAmt.subtract(stagNotDeductionSumAmt);
         deduction.setAddDeductionAmt(addAmt);
-        deduction.setSumDeductionAmt(deduction.getSumDeductionAmt().add(addAmt));
-        deduction.setMustDeductionAmt(deduction.getSumDeductionAmt());
+        deduction.setSumDeductionAmt(addAmt);
+        deduction.setMustDeductionAmt(addAmt);
         deduction.setSourceId(bussType);
+        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitDeductionService.insert(deduction);
     }
 
@@ -236,39 +247,34 @@ public class RefundJob {
     private void insertSettleErr( JSONObject jsonObject, Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
         ProfitSettleErrLs settleErrLs = new ProfitSettleErrLs();
         settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
-        settleErrLs.setHostLs(jsonObject.getString("hostLs"));
         settleErrLs.setChargebackDate(jsonObject.getString("chargebackDate"));
         settleErrLs.setTranDate(jsonObject.getString("tranDate"));
         settleErrLs.setMerchId(jsonObject.getString("merchId"));
-        settleErrLs.setMerchName(jsonObject.getString("merchName"));
-        settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
         settleErrLs.setTranAmt(jsonObject.getBigDecimal("tranAmt"));
         settleErrLs.setNetAmt(jsonObject.getBigDecimal("netAmt"));
         settleErrLs.setOffsetBalanceAmt(jsonObject.getBigDecimal("offsetBalanceAmt"));
         settleErrLs.setBalanceAmt(jsonObject.getBigDecimal("balanceAmt"));// 剩余未销账金额
+        settleErrLs.setHostLs(jsonObject.getString("hostLs"));
+        settleErrLs.setMerchName(jsonObject.getString("merchName"));
+        settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
         settleErrLs.setBusinessType(jsonObject.getString("businessType"));
         settleErrLs.setCardNo(jsonObject.getString("cardNo"));
         settleErrLs.setErrDate(jsonObject.getString("errDate"));
-        settleErrLs.setNettingStatus(jsonObject.getString("nettingStatus"));
+        settleErrLs.setNettingStatus(jsonObject.getString("nettingStatusText"));
         settleErrLs.setErrDesc(jsonObject.getString("errDesc"));
-        settleErrLs.setMustDeductionAmt(jsonObject.getBigDecimal("shouldDeductAmt"));// 应扣分润
+        settleErrLs.setMustDeductionAmt(jsonObject.getBigDecimal("shouldDeductAmt").abs());// 应扣分润
         settleErrLs.setMustSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));//应补分润
+        settleErrLs.setErrCode(jsonObject.getString("errCode"));
+        settleErrLs.setCooperationMode(jsonObject.getString("cooperationMode"));
+        settleErrLs.setRealDeductAmt(jsonObject.getBigDecimal("realDeductAmt"));
+        settleErrLs.setOffsetLossAmt(jsonObject.getBigDecimal("offsetLossAmt"));
+        settleErrLs.setYswsAmt(jsonObject.getBigDecimal("ingshou"));
         synchronized (object) {
             if (orgMap.containsKey(jsonObject.getString("instId"))) {
-                orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt")));
+                orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt").abs()));
             }else {
-                orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt"));
+                orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt").abs());
                 deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
-                // 获取代理商平台id
-                AgentBusInfo agentBusInfo = new AgentBusInfo();
-                agentBusInfo.setBusNum(jsonObject.getString("instId"));
-                PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, null,null);
-                if (pageInfo != null && pageInfo.getTotal() > 0) {
-                    Map<String, Object> map  = (Map<String, Object>) pageInfo.getRows().get(0);
-                    if (map != null) {
-                        deductionIdMap.put(jsonObject.getString("instId")+"-agentId", String.valueOf(map.get("AGENT_ID")));
-                    }
-                }
             }
         }
         settleErrLs.setSourceId(deductionIdMap.get(jsonObject.getString("instId")));

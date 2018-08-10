@@ -12,14 +12,23 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     private String agHead;
 
+    private String agentId;
 
     private String busNum;
 
     private String busPlatform;
 
     private String busType;
+    private String busParentId;//直属上级id
 
     private String busParent;
+
+    private String twoParentId;//二级上级id
+    private String twoParentName;
+
+    private String threeParentId;//三级上级id
+    private String threeParentName;
+
 
     private String busRiskParent;
 
@@ -284,5 +293,53 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     public void setPoint(String point) {
         this.point = point;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getBusParentId() {
+        return busParentId;
+    }
+
+    public void setBusParentId(String busParentId) {
+        this.busParentId = busParentId;
+    }
+
+    public String getTwoParentId() {
+        return twoParentId;
+    }
+
+    public void setTwoParentId(String twoParentId) {
+        this.twoParentId = twoParentId;
+    }
+
+    public String getTwoParentName() {
+        return twoParentName;
+    }
+
+    public void setTwoParentName(String twoParentName) {
+        this.twoParentName = twoParentName;
+    }
+
+    public String getThreeParentId() {
+        return threeParentId;
+    }
+
+    public void setThreeParentId(String threeParentId) {
+        this.threeParentId = threeParentId;
+    }
+
+    public String getThreeParentName() {
+        return threeParentName;
+    }
+
+    public void setThreeParentName(String threeParentName) {
+        this.threeParentName = threeParentName;
     }
 }
