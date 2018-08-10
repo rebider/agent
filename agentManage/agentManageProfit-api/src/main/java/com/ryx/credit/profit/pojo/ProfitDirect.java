@@ -12,6 +12,17 @@ public class ProfitDirect implements Serializable {
 
     private String fristAgentPid;
 
+    //新增
+    private String fristAgentId;
+
+    public String getFristAgentId() {
+        return fristAgentId;
+    }
+
+    public void setFristAgentId(String fristAgentId) {
+        this.fristAgentId = fristAgentId;
+    }
+
     private String fristAgentName;
 
     private String parentAgentId;
