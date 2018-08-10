@@ -198,12 +198,12 @@ public class RefundJob {
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         if (agentMap!=null) {
-            deduction.setAgentId((String) agentMap.get("AG_UNIQ_NUM"));
+            deduction.setAgentPid((String) agentMap.get("AG_UNIQ_NUM"));
             deduction.setAgentName((String) agentMap.get("AG_NAME"));
         }else{
-            deduction.setAgentId(agentId);
+            deduction.setAgentPid(agentId);
         }
-        deduction.setAgentPid(agentId);
+        deduction.setAgentId(agentId);
         deduction.setId(deductionIdMap.get(agentId));
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setDeductionDesc(DEDUCTION_DESC);

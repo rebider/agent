@@ -10,6 +10,10 @@
     <result column="POS_TRAN_AMT" jdbcType="DECIMAL" property="posTranAmt" />
     <result column="POS_JL_TRAN_AMT" jdbcType="DECIMAL" property="posJlTranAmt" />
     <result column="PROFIT_ID" jdbcType="VARCHAR" property="profitId" />
+    <result column="AGENT_TYPE" jdbcType="VARCHAR" property="agentType" />
+    <result column="ALLCHILD_JL_TRAN_AMT" jdbcType="DECIMAL" property="allchildJlTranAmt" />
+    <result column="ALLCHILD_TRAN_AMT" jdbcType="DECIMAL" property="allchildTranAmt" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -42,7 +46,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, Z_POS_TRAN_AMT, POS_TRAN_AMT, POS_JL_TRAN_AMT, 
-    PROFIT_ID
+    PROFIT_ID, AGENT_TYPE, ALLCHILD_JL_TRAN_AMT, ALLCHILD_TRAN_AMT, PROFIT_DATE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -75,10 +79,14 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
     insert into P_ORGAN_TRAN_MONTH_DETAIL (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, Z_POS_TRAN_AMT, POS_TRAN_AMT, 
-      POS_JL_TRAN_AMT, PROFIT_ID)
+      POS_JL_TRAN_AMT, PROFIT_ID, AGENT_TYPE, 
+      ALLCHILD_JL_TRAN_AMT, ALLCHILD_TRAN_AMT, PROFIT_DATE
+      )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{zPosTranAmt,jdbcType=DECIMAL}, #{posTranAmt,jdbcType=DECIMAL}, 
-      #{posJlTranAmt,jdbcType=DECIMAL}, #{profitId,jdbcType=VARCHAR})
+      #{posJlTranAmt,jdbcType=DECIMAL}, #{profitId,jdbcType=VARCHAR}, #{agentType,jdbcType=VARCHAR}, 
+      #{allchildJlTranAmt,jdbcType=DECIMAL}, #{allchildTranAmt,jdbcType=DECIMAL}, #{profitDate,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
     insert into P_ORGAN_TRAN_MONTH_DETAIL
@@ -107,6 +115,18 @@
       <if test="profitId != null">
         PROFIT_ID,
       </if>
+      <if test="agentType != null">
+        AGENT_TYPE,
+      </if>
+      <if test="allchildJlTranAmt != null">
+        ALLCHILD_JL_TRAN_AMT,
+      </if>
+      <if test="allchildTranAmt != null">
+        ALLCHILD_TRAN_AMT,
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -133,8 +153,28 @@
       <if test="profitId != null">
         #{profitId,jdbcType=VARCHAR},
       </if>
+      <if test="agentType != null">
+        #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="allchildJlTranAmt != null">
+        #{allchildJlTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="allchildTranAmt != null">
+        #{allchildTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitDate != null">
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
+  <select id="getOrganTranMonthDetailList" resultMap="BaseResultMap">
+    select sum(ALLCHILD_TRAN_AMT) allchildTranAmt, sum(ALLCHILD_JL_TRAN_AMT) allchildJlTranAmt from P_ORGAN_TRAN_MONTH_DETAIL
+    where PROFIT_DATE=#{profitDate} and AGENT_ID in
+    <foreach close=")" collection="agentIdList" item="listItem" open="(" separator=",">
+      #{listItem}
+    </foreach>
+  </select>
+
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetailExample" resultType="java.lang.Long">
     select count(*) from P_ORGAN_TRAN_MONTH_DETAIL
     <if test="_parameter != null">
@@ -165,6 +205,18 @@
       <if test="profitId != null">
         PROFIT_ID = #{profitId,jdbcType=VARCHAR},
       </if>
+      <if test="agentType != null">
+        AGENT_TYPE = #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="allchildJlTranAmt != null">
+        ALLCHILD_JL_TRAN_AMT = #{allchildJlTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="allchildTranAmt != null">
+        ALLCHILD_TRAN_AMT = #{allchildTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -176,7 +228,11 @@
       Z_POS_TRAN_AMT = #{zPosTranAmt,jdbcType=DECIMAL},
       POS_TRAN_AMT = #{posTranAmt,jdbcType=DECIMAL},
       POS_JL_TRAN_AMT = #{posJlTranAmt,jdbcType=DECIMAL},
-      PROFIT_ID = #{profitId,jdbcType=VARCHAR}
+      PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      AGENT_TYPE = #{agentType,jdbcType=VARCHAR},
+      ALLCHILD_JL_TRAN_AMT = #{allchildJlTranAmt,jdbcType=DECIMAL},
+      ALLCHILD_TRAN_AMT = #{allchildTranAmt,jdbcType=DECIMAL},
+      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

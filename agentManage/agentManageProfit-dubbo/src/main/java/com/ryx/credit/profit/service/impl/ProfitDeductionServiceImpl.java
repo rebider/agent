@@ -76,12 +76,16 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentId())){
             criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
+            criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
+        }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
+        example.setOrderByClause("CREATE_DATE_TIME DESC ");
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
@@ -142,7 +146,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setMustDeductionAmt(amt);
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) );
-        deduction.setAgentId(list.get(0).toString());
+        deduction.setAgentPid(list.get(0).toString());
         deduction.setAgentName(list.get(2).toString());
         deduction.setRemark(list.get(3).toString());
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
@@ -193,9 +197,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal getSupplyAmt(String agentId, String bussType) {
+    public BigDecimal getSupplyAmt(String agentPid, String bussType) {
         Map<String, Object> param = new HashMap<>(3);
-        param.put("AGENT_PID", agentId);
+        param.put("AGENT_PID", agentPid);
         param.put("SUPPLY_TYPE", RefundJob.SUPPLY_DESC);
         param.put("SUPPLY_DATE", "");
         PageInfo pageInfo = new PageInfo();
@@ -208,10 +212,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal otherDeduction(BigDecimal profitAmt, String agentId) throws DeductionException {
+    public BigDecimal otherDeduction(BigDecimal profitAmt, String agentPid) throws DeductionException {
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         try {
-            return otherDeduction(profitAmt, agentId, deductionDate);
+            return otherDeduction(profitAmt, agentPid, deductionDate);
         }catch ( Exception e) {
             e.printStackTrace();
             throw new DeductionException("扣款失败。");
@@ -219,10 +223,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentId) throws DeductionException {
+    public BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentPid) throws DeductionException {
         // 获取退单扣款
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentId, deductionDate, DeductionType.SETTLE_ERR.getType(), bussType);
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.SETTLE_ERR.getType(), bussType);
         if (deductionList != null && deductionList.size() > 0) {
            if ("pos".equals(bussType)) {
               return getDeductionAmt(deductionList, profitAmt);
@@ -255,9 +259,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return  result;
     }
 
-    private List<ProfitDeduction> getProfitDeductionListByType(String agentId, String deductionDate, String type, String sourceId) {
+    private List<ProfitDeduction> getProfitDeductionListByType(String agentPid, String deductionDate, String type, String sourceId) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentId(agentId);
+        profitDeduction.setAgentPid(agentPid);
         profitDeduction.setDeductionType(type);
         profitDeduction.setDeductionDate(deductionDate);
         profitDeduction.setSourceId(sourceId);
@@ -273,9 +277,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/8
     */
-    private  BigDecimal otherDeduction(BigDecimal profitAmt, String agentId, String deductionDate) {
+    private  BigDecimal otherDeduction(BigDecimal profitAmt, String agentPid, String deductionDate) {
         // 获取代理商所有其它扣款信息
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentId, deductionDate, DeductionType.OTHER.getType(), null);
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.OTHER.getType(), null);
         return getDeductionAmt(deductionList, profitAmt);
     }
 
@@ -465,14 +469,5 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         BeanUtils.copy(profitDeductionTemp, deduction);
         deduction.setId(idService.genId(TabId.P_DEDUCTION));
         profitDeductionMapper.insert(deduction);
-//        // 记录扣款明细
-//        if (profitDeductionTemp.getActualDeductionAmt().doubleValue() > 0) {
-//            try {
-//                profitDeducttionDetailServiceImpl.insertDeducttionDetail(deduction);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                throw new DeductionException("保存扣款明细失败");
-//            }
-//        }
     }
 }

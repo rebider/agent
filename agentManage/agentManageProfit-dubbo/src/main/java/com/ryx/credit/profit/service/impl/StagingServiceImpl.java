@@ -238,7 +238,7 @@ public class StagingServiceImpl implements StagingService {
                         BigDecimal upperNotDeductionAmt = deduction.getUpperNotDeductionAmt()==null?BigDecimal.ZERO:deduction.getUpperNotDeductionAmt();
                         deduction.setMustDeductionAmt(upperNotDeductionAmt.add(staging.getStagAmt()));
                     }
-                    deduction.setRemark(remark);
+//                    deduction.setRemark(remark);
                     profitDeductionServiceImpl.updateProfitDeduction(deduction);
                     LOG.info("更新审批流与业务对象");
                     taskApprovalService.updateABusActRel(rel);
