@@ -174,6 +174,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
+    public BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction) {
+        return profitDeductionMapper.totalBuckleByMonth(profitDeduction);
+    }
+
+
+    @Override
     public BigDecimal deductionAmt(BigDecimal profitAmt, String deductionType, String agentId) throws DeductionException {
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         // 其它扣款
