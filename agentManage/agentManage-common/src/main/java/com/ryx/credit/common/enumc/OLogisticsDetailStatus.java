@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * Created by RYX on 2018/8/10.
  */
-public enum  OLogisticsDetail {
+public enum OLogisticsDetailStatus {
     STATUS_FH("1","发货"),
     STATUS_TH("2","退货"),
 
@@ -18,7 +18,7 @@ public enum  OLogisticsDetail {
 
     public String msg;
 
-    OLogisticsDetail(String c, String m){
+    OLogisticsDetailStatus(String c, String m){
         this.code = new BigDecimal(c);
         this.msg = m;
     }
