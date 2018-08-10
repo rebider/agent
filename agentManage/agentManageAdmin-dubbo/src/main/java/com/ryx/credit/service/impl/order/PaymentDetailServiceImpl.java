@@ -60,8 +60,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         paymentStatusList.add(PaymentStatus.YQ.code);
 
         example.or().andAgentIdEqualTo(agentId).andPayTypeIn(payTypeList).andPaymentStatusIn(paymentStatusList);
-        example.setOrderByClause("Payment_type asc");
-        example.setOrderByClause("order_id asc");
+        //example.setOrderByClause("Payment_type asc");
+        //example.setOrderByClause("order_id asc");
         example.setOrderByClause("plan_pay_time asc");
         return oPaymentDetailMapper.selectByExample(example);
     }
