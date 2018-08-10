@@ -354,4 +354,21 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryCompensateLList" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,
+      max(SN_NUM) as MAX_SN,min(SN_NUM) as MIN_SN,count(*) as PRO_NUM
+    from o_logistics_detail
+    where
+    sn_num &gt;= #{snBegin}
+    and sn_num &lt;= #{snEnd}
+    and status = #{status}
+    and RECORD_STATUS = #{recordStatus}
+    <if test="activityId != null">
+      and ACTIVITY_ID = #{activityId}
+    </if>
+    group by
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID
+  </select>
 </mapper>
