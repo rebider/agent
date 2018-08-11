@@ -36,7 +36,7 @@ public class PosOrganDataServiceImpl implements PosOrganDataService {
 
         String cooperator = Constants.cooperator;
         String charset = "UTF-8"; // 字符集
-        String tranCode = "PFT001"; // 交易码
+        String tranCode = "ORG003"; // 交易码
         String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
         String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
