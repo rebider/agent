@@ -257,16 +257,21 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 logger.info("不匹配,请检查数据是否正确");
                 throw new MessageException("不匹配,请检查数据是否正确");
             }
-            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-            PayComp payComp = new PayComp();
-            payComp.setId(agentBusInfo.getCloPayCompany());
-            payComp.setComName(String.valueOf(objectList.get(2)));
-            if (1 != payCompMapper.updateByPrimaryKeySelective(payComp)) {
+            //到这说明已经存在这条数据
+            PayCompExample payCompExample = new PayCompExample();
+            PayCompExample.Criteria criteria1 = payCompExample.or().andComNameEqualTo(String.valueOf(objectList.get(2)));
+            List<PayComp> payComps = payCompMapper.selectByExample(payCompExample);
+            if (null == payComps && payComps.size() == 0) {
+                logger.info("没有此公司");
+                throw new MessageException("没有此公司");
+            }
+            AgentBusInfo agentBus = agentBusInfos.get(0);
+            agentBus.setCloPayCompany(payComps.get(0).getId());
+            if (1 != agentBusInfoMapper.updateByPrimaryKeySelective(agentBus)) {
                 logger.info("更新失败");
                 throw new MessageException("更新失败");
             }
-            busList.add(agentBusInfo.getId());
-
+            busList.add(agentBus.getId());
         }
 
         return busList;
