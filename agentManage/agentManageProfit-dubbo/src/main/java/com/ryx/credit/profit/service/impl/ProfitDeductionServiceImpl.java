@@ -231,7 +231,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
            if ("pos".equals(bussType)) {
               return getDeductionAmt(deductionList, profitAmt);
            }else{
-               return getMposDeductionAmt(deductionList, profitAmt);
+              return getMposDeductionAmt(deductionList, profitAmt);
            }
         }
         return  BigDecimal.ZERO;

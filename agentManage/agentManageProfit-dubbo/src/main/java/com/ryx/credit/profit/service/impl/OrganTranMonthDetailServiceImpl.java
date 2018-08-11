@@ -64,7 +64,9 @@ public class OrganTranMonthDetailServiceImpl implements OrganTranMonthDetailServ
                 criteria.andAgentTypeEqualTo(organTranMonthDetail.getAgentType());
             }
         }
-
+        if (StringUtils.isNotBlank(organTranMonthDetail.getProfitId())){
+            criteria.andProfitIdEqualTo(organTranMonthDetail.getProfitId());
+        }
         return organTranMonthDetailMapper.selectByExample(example);
 
     }
