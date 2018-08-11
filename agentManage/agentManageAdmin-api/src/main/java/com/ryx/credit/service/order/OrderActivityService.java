@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -15,7 +16,7 @@ public interface OrderActivityService {
 
     PageInfo activityList(OActivity activity, Page page);
 
-    AgentResult saveActivity(OActivity activity);
+    AgentResult saveActivity(OActivity activity) throws MessageException;
 
     AgentResult updateActivity(OActivity activity);
 
