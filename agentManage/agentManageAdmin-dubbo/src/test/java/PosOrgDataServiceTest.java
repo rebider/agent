@@ -18,7 +18,7 @@ public class PosOrgDataServiceTest extends BaseSpringTest {
 
     @Test
     public void getPosDateTest() throws Exception {
-        AgentResult agentResult = posOrganDataService.getAllChild("");
+        AgentResult agentResult = posOrganDataService.getAllChild("O00000000220096");
         System.out.println(JSONObject.toJSONString(agentResult));
     }
 
