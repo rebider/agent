@@ -25,5 +25,5 @@ public interface OLogisticsDetailMapper {
 
     List<Map<String, Object>> queryCompensateLList(Map<String, Object> param);
 
-    int updateRecordStatusBySn(Map<String, Object> param);
+    int updateCompensate(Map<String, Object> param);
 }
