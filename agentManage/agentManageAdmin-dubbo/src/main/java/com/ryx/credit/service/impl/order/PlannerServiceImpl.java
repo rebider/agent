@@ -11,6 +11,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OReceiptOrderMapper;
 import com.ryx.credit.dao.order.OReceiptProMapper;
+import com.ryx.credit.dao.order.OSubOrderMapper;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
@@ -45,6 +46,8 @@ public class PlannerServiceImpl implements PlannerService {
     private ReceiptPlanMapper receiptPlanMapper;
     @Autowired
     private OReceiptProMapper receiptProMapper;
+    @Autowired
+    OSubOrderMapper oSubOrderMapper;
 
 
     @Override
@@ -82,6 +85,12 @@ public class PlannerServiceImpl implements PlannerService {
     public AgentResult savePlanner(ReceiptPlan receiptPlan, String receiptProId) throws Exception {
         AgentResult result = new AgentResult(500, "系统异常", "");
         try {
+
+            OReceiptPro oReceiptPro = receiptProMapper.selectByPrimaryKey(receiptProId);
+            if (oReceiptPro == null) {
+                throw new ProcessException("收货单商品未找到");
+            }
+
             String planId = idService.genId(TabId.o_receipt_plan);
             receiptPlan.setId(planId);
             receiptPlan.setPlanNum(planId);
@@ -90,12 +99,18 @@ public class PlannerServiceImpl implements PlannerService {
             receiptPlan.setStatus(Status.STATUS_1.status);
             receiptPlan.setVersion(Status.STATUS_1.status);
             receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesPlanner.getValue()));
+
+            //采购单商品
+            OSubOrderExample example = new OSubOrderExample();
+            example.or().andOrderIdEqualTo(oReceiptPro.getOrderid()).andProIdEqualTo(oReceiptPro.getProId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OSubOrder>  oSubOrders = oSubOrderMapper.selectByExample(example);
+            if(oSubOrders.size()==0){
+                throw new ProcessException("订购商品未找到");
+            }
+            OSubOrder  oSubOrderItem = oSubOrders.get(0);
+            receiptPlan.setProType(oSubOrderItem.getProType());
             int receiptInsert = receiptPlanMapper.insert(receiptPlan);
 
-            OReceiptPro oReceiptPro = receiptProMapper.selectByPrimaryKey(receiptProId);
-            if (oReceiptPro == null) {
-                throw new ProcessException("排单查询商品异常");
-            }
             OReceiptPro receiptPro = new OReceiptPro();
             receiptPro.setId(receiptProId);
             receiptPro.setSendNum(oReceiptPro.getSendNum().add(receiptPlan.getPlanProNum()));

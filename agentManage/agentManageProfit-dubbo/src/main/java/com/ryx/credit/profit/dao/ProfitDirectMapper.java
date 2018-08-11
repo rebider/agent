@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,12 @@ public interface ProfitDirectMapper {
 
     List<ProfitDirect> selectByExample(ProfitDirectExample example);
 
+    List<ProfitDirect> selectByMonth(ProfitDirect record);
+
+    List<ProfitDirect> selectBySupply();
+
+    List<ProfitDirect> selectByBuckle();
+
     ProfitDirect selectByPrimaryKey(String id);
 
     ProfitDirect selectByAgentAndMon(ProfitDirect record);
@@ -28,5 +36,5 @@ public interface ProfitDirectMapper {
 
     Long getProfitDirectCount(Map <String, Object> param);
 
-    long getSubBuckleByMonth(ProfitDirect record);
+    BigDecimal getSubBuckleByMonth(ProfitDirect record);
 }

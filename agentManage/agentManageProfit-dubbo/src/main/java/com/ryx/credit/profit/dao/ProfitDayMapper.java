@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProfitDayMapper {
@@ -24,7 +26,7 @@ public interface ProfitDayMapper {
 
     int updateByPrimaryKey(ProfitDay record);
 
-    long totalMonthByAgentPid(ProfitDay record);
+    BigDecimal totalMonthByAgentPid(ProfitDay record);
 
-    long totalMonthByAgentId(ProfitDay record);
+    BigDecimal totalMonthByAgentId(ProfitDay record);
 }

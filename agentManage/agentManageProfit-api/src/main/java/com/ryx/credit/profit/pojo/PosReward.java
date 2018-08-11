@@ -3,7 +3,11 @@ package com.ryx.credit.profit.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ *
+ */
 public class PosReward implements Serializable {
+    private static final long serialVersionUID = -1379167402707558577L;
     private String id;
 
     private String agentPid;

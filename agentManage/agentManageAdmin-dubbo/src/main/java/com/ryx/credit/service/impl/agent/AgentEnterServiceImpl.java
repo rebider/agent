@@ -832,7 +832,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     if (null != agentById.getAgName())
                         agentoutVo.setTwoParentId(twoParent.getAgentId() + agentById.getAgName());
                 }
-                AgentBusInfo threeParent = agentBusInfos.get(1);
+                AgentBusInfo threeParent = agentBusInfos.get(2);
                 if (null != threeParent) {
                     agentoutVo.setBusParentId(threeParent.getAgentId());
                     Agent agentById = agentService.getAgentById(threeParent.getAgentId());

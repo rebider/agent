@@ -6,13 +6,11 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.profit.pojo.ProfitDay;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitDirect;
-import com.ryx.credit.profit.service.IProfitDService;
-import com.ryx.credit.profit.service.IProfitDirectService;
-import com.ryx.credit.profit.service.ProfitComputerService;
+import com.ryx.credit.profit.dao.BuckleRunMapper;
+import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.dict.IdService;
+import jdk.nashorn.internal.objects.annotations.Where;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.omg.CosNaming.BindingHelper;
@@ -34,10 +32,15 @@ public class ProfitZhiFaDataJob {
     private ProfitComputerService computerService;
     @Autowired
     private IdService idService;
+    @Autowired
+    private ProfitDeductionService profitDeductionService;
+    @Autowired
+    private ProfitSupplyService profitSupplyService;
 
+    private String month = "";
 
     public static void main(String agrs[]){
-        /*String transDate = null;
+        String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
         map.put("pageNumber","1");
@@ -53,10 +56,7 @@ public class ProfitZhiFaDataJob {
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         List<HashMap> list = JSONObject.parseObject(data,List.class);
-        System.out.println(data);*/
-        BigDecimal a = new BigDecimal("58773.32");
-        BigDecimal b = new BigDecimal("58773.32");
-        System.out.println(b.compareTo(a));
+        System.out.println(data);
     }
 
     /**
@@ -65,7 +65,8 @@ public class ProfitZhiFaDataJob {
      */
     public void synchroProfitDirect(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
+        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6);
+        map.put("transDate",transDate==null?month:transDate);
         map.put("pageNumber","1");
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
@@ -85,37 +86,49 @@ public class ProfitZhiFaDataJob {
             logger.error("同步插入数据失败！");
             e.printStackTrace();
         }
+        try {
+            //计算直发补款
+            computerService.computer_Supply_ZhiFa();
+            //计算直发实际分润
+            computerService.computer_ZhiFa();
+            //计算不足扣款找上级代扣，并记录
+            computerService.computer_Buckle_ZhiFa();
+        } catch (Exception e) {
+            logger.error("直发分润计算出错！");
+            e.printStackTrace();
+        }
     }
 
     public void insertProfitDirect(List<HashMap> profitDirects){
         for(HashMap map:profitDirects){
-            ProfitDirect where = new ProfitDirect();
-            where.setAgentId((String)map.get("AGENTID"));
-            where.setTransMonth((String)map.get("TRANSMONTH"));
-            ProfitDirect profitDirect = profitDirectService.selectByAgentAndMon(where);
-            long subLong = profitDirectService.getSubBuckleByMonth(where);
-            BigDecimal total_day2 = computerService.total_day2((String)map.get("AGENTID"),(String)map.get("TRANSMONTH"));//日结分润
-            BigDecimal profit = (BigDecimal) map.get("PROFITAMT");//直发分润
-            BigDecimal tax = profit.add(total_day2).multiply(new BigDecimal("0.06"));//应扣税额
-            BigDecimal sub = new BigDecimal(subLong);//下级欠扣款
-            BigDecimal supply = null;//退单补款
-            BigDecimal buckle = null;//退单扣款
-            BigDecimal should = profit.add(supply).subtract(buckle).subtract(sub).subtract(tax);//应发分润 = 直发分润+退单补款-退单扣款-下级欠款-应扣税额
-            BigDecimal parent = BigDecimal.ZERO;//应找上级扣款
-            if(should.compareTo(BigDecimal.ZERO)<0){ //应发系负数
-                should = BigDecimal.ZERO;
-                parent = should.multiply(new BigDecimal("-1"));//此时该代理商上级如果是一代？
-            }
-            if(null!=profitDirect){//已存在本月该代理商分润
-                profitDirect.setSupplyAmt(supply);
-                profitDirect.setBuckleAmt(buckle);
-                profitDirect.setShouldProfit(should);
-                profitDirect.setActualProfit(BigDecimal.ZERO);//实发分润
-//                profitDirect.setParentBuckle(parent);
-            }else{
-                profitDirect = new ProfitDirect();
-//                profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
-            }
+            ProfitDeduction where = new ProfitDeduction();
+            where.setAgentPid((String)map.get("AGENTID"));
+            where.setDeductionType("01");
+            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -1)).substring(0,7));
+            BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
+            ProfitDirect profitDirect = new ProfitDirect();
+            profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
+            profitDirect.setAgentName((String)map.get("AGENTNAME"));//代理商名称
+            profitDirect.setAgentId((String)map.get("AGENTID"));//代理商编号
+            profitDirect.setParentAgentId((String)map.get("PARENTAGENTID"));//上级代理商编号
+            profitDirect.setParentAgentName((String)map.get("PARENTAGENTNAME"));//上级代理商名称
+            profitDirect.setFristAgentId((String)map.get("FRISTAGENTID"));//一级代理商编号
+            profitDirect.setFristAgentName((String)map.get("FRISTAGENTNAME"));//一级代理商名称
+            profitDirect.setFristAgentPid((String)map.get("FRISTAGENTPID"));//一级代理商唯一码
+            profitDirect.setTransAmt((BigDecimal)map.get("TRANSAMT"));//直发交易金额
+            profitDirect.setTransMonth((String)map.get("TRANSMONTH"));//月份
+            profitDirect.setTransFee((BigDecimal)map.get("TRANSFEE"));//直发交易手续费
+            profitDirect.setProfitAmt((BigDecimal) map.get("PROFITAMT"));//直发分润
+            profitDirect.setActualProfit(BigDecimal.ZERO);//实发分润
+            profitDirect.setAgentEmail((String)map.get("AGENTEMAIL"));//邮箱
+            profitDirect.setAccountCode((String)map.get("ACCOUNTCODE"));//账号
+            profitDirect.setAccountName((String)map.get("ACCOUNTNAME"));//户名
+            profitDirect.setBankOpen((String)map.get("BANKOPEN"));//开户行
+            profitDirect.setBankCode((String)map.get("BANKCODE"));//银行号
+            profitDirect.setBossCode((String)map.get("BOSSCODE"));//总行行号
+            profitDirect.setBuckleAmt(buckle==null?BigDecimal.ZERO:buckle);//退单扣款
+            //退单补款、应发分润、应找上级扣款需计算赋值
+            profitDirectService.insertSelective(profitDirect);
         }
     }
 }

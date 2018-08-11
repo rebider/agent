@@ -470,4 +470,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setId(idService.genId(TabId.P_DEDUCTION));
         profitDeductionMapper.insert(deduction);
     }
+
+    @Override
+    public BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction) {
+        return profitDeductionMapper.totalBuckleByMonth(profitDeduction);
+    }
 }
