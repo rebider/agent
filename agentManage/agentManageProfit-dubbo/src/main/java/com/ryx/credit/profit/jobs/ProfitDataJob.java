@@ -122,7 +122,8 @@ public class ProfitDataJob {
         ProfitMonth profitMonth = new ProfitMonth();
 
         profitMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
-        profitMonth.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        profitMonth.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
+        profitMonth.setAgentId(profitData.getString("ORG_ID"));
         profitMonth.setAgentName((String)agentMap.get("AG_NAME"));
         profitMonth.setStatus("4");
         profitMonth.setProfitDate(settleMonth);
@@ -145,12 +146,14 @@ public class ProfitDataJob {
      */
     private void insertOrganTranDetail(Map<String, Object> agentMap, JSONObject profitData, String settleMonth, String profitId) {
         OrganTranMonthDetail organTranMonthDetail = new OrganTranMonthDetail();
-        organTranMonthDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        organTranMonthDetail.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
         organTranMonthDetail.setAgentName((String)agentMap.get("AG_NAME"));
-        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("PFT_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_03_AMT"));
-        organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
-        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT"));
+        organTranMonthDetail.setAgentId(profitData.getString("ORG_ID"));
+        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("POS_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_03_AMT"));
+        organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("POS_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_02_AMT"));
+        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("POS_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_01_AMT"));
         organTranMonthDetail.setProfitId(profitId);
+        organTranMonthDetail.setAgentType((String)agentMap.get("BUS_TYPE"));
         organTranMonthDetailService.insert(organTranMonthDetail);
         organTranMonthDetail = null;
     }
@@ -166,8 +169,8 @@ public class ProfitDataJob {
     */
     private void insertProfitMonthDetail( Map<String, Object> agentMap, JSONObject profitData, String settleMonth, String profitId) {
         ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
-        profitDetailMonthTemp.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
-        profitDetailMonthTemp.setAgentPid(profitData.getString("ORG_ID"));
+        profitDetailMonthTemp.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
+        profitDetailMonthTemp.setAgentId(profitData.getString("ORG_ID"));
         profitDetailMonthTemp.setProfitDate(settleMonth);
         profitDetailMonthTemp.setAgentName((String)agentMap.get("AG_NAME"));
         profitDetailMonthTemp.setTranAmt(profitData.getBigDecimal("TRAN_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_01_AMT"));

@@ -666,6 +666,266 @@ public class OrganTranMonthDetailExample {
             addCriterion("PROFIT_ID not between", value1, value2, "profitId");
             return (Criteria) this;
         }
+
+        public Criteria andAgentTypeIsNull() {
+            addCriterion("AGENT_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIsNotNull() {
+            addCriterion("AGENT_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeEqualTo(String value) {
+            addCriterion("AGENT_TYPE =", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotEqualTo(String value) {
+            addCriterion("AGENT_TYPE <>", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeGreaterThan(String value) {
+            addCriterion("AGENT_TYPE >", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_TYPE >=", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLessThan(String value) {
+            addCriterion("AGENT_TYPE <", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_TYPE <=", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLike(String value) {
+            addCriterion("AGENT_TYPE like", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotLike(String value) {
+            addCriterion("AGENT_TYPE not like", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIn(List<String> values) {
+            addCriterion("AGENT_TYPE in", values, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotIn(List<String> values) {
+            addCriterion("AGENT_TYPE not in", values, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeBetween(String value1, String value2) {
+            addCriterion("AGENT_TYPE between", value1, value2, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotBetween(String value1, String value2) {
+            addCriterion("AGENT_TYPE not between", value1, value2, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtIsNull() {
+            addCriterion("ALLCHILD_JL_TRAN_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtIsNotNull() {
+            addCriterion("ALLCHILD_JL_TRAN_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT =", value, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtNotEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT <>", value, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtGreaterThan(BigDecimal value) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT >", value, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT >=", value, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtLessThan(BigDecimal value) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT <", value, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT <=", value, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtIn(List<BigDecimal> values) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT in", values, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtNotIn(List<BigDecimal> values) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT not in", values, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT between", value1, value2, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildJlTranAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ALLCHILD_JL_TRAN_AMT not between", value1, value2, "allchildJlTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtIsNull() {
+            addCriterion("ALLCHILD_TRAN_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtIsNotNull() {
+            addCriterion("ALLCHILD_TRAN_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_TRAN_AMT =", value, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtNotEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_TRAN_AMT <>", value, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtGreaterThan(BigDecimal value) {
+            addCriterion("ALLCHILD_TRAN_AMT >", value, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_TRAN_AMT >=", value, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtLessThan(BigDecimal value) {
+            addCriterion("ALLCHILD_TRAN_AMT <", value, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ALLCHILD_TRAN_AMT <=", value, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtIn(List<BigDecimal> values) {
+            addCriterion("ALLCHILD_TRAN_AMT in", values, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtNotIn(List<BigDecimal> values) {
+            addCriterion("ALLCHILD_TRAN_AMT not in", values, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ALLCHILD_TRAN_AMT between", value1, value2, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAllchildTranAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ALLCHILD_TRAN_AMT not between", value1, value2, "allchildTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateIsNull() {
+            addCriterion("PROFIT_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateIsNotNull() {
+            addCriterion("PROFIT_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateEqualTo(String value) {
+            addCriterion("PROFIT_DATE =", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotEqualTo(String value) {
+            addCriterion("PROFIT_DATE <>", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateGreaterThan(String value) {
+            addCriterion("PROFIT_DATE >", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateGreaterThanOrEqualTo(String value) {
+            addCriterion("PROFIT_DATE >=", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateLessThan(String value) {
+            addCriterion("PROFIT_DATE <", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateLessThanOrEqualTo(String value) {
+            addCriterion("PROFIT_DATE <=", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateLike(String value) {
+            addCriterion("PROFIT_DATE like", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotLike(String value) {
+            addCriterion("PROFIT_DATE not like", value, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateIn(List<String> values) {
+            addCriterion("PROFIT_DATE in", values, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotIn(List<String> values) {
+            addCriterion("PROFIT_DATE not in", values, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateBetween(String value1, String value2) {
+            addCriterion("PROFIT_DATE between", value1, value2, "profitDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitDateNotBetween(String value1, String value2) {
+            addCriterion("PROFIT_DATE not between", value1, value2, "profitDate");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

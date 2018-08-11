@@ -122,7 +122,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写结束SN位数");
                 throw new MessageException("请填写结束SN位数");
             }
-
             String snBeginNum = String.valueOf(String.valueOf(objectList.get(26)));   // 起始SN序列号
             String snEndNum = String.valueOf(String.valueOf(objectList.get(27)));   // 结束SN序列号
             begins = Integer.valueOf(String.valueOf(objectList.get(28)));   // 起始SN位数

@@ -43,4 +43,19 @@ public interface ProfitComputerService {
      * @return
      */
     BigDecimal total_supply(String agentPid,String month);
+
+    /**
+     * 计算直发分润（追溯本源，逐级往下补款）
+     */
+    void computer_Supply_ZhiFa();
+
+    /**
+     * 计算直发分润（逐级往上扣款）
+     */
+    void computer_Buckle_ZhiFa();
+
+    /**
+     * 直发分润计算（上月所有）
+     */
+    void computer_ZhiFa();
 }

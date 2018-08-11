@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
+import com.ryx.credit.profit.jobs.TranDataJob;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
@@ -15,6 +16,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -30,6 +33,9 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Autowired
     private ProfitOrganTranMonthMapper profitOrganTranMonthMapper;
+
+    @Autowired
+    private TranDataJob tranDataJob;
 
     @Override
     public void insert(ProfitOrganTranMonth profitOrganTranMonth) {
@@ -47,6 +53,16 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         example.setPage(page);
         ProfitOrganTranMonthExample.Criteria criteria = example.createCriteria();
         // 月份按开始到结束查询
+
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateEnd()))
+        {
+            criteria.andProfitDateBetween(profitOrganTranMonth.getProfitDateStart(),profitOrganTranMonth.getProfitDateEnd());
+        }else if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateStart())){
+            criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDateStart());
+        }else if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateEnd())){
+            criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDateEnd());
+        }
+
         if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate()))
         {
             criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDate());
@@ -79,5 +95,13 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
             throw new RuntimeException("删除失败。。");
         }
         profitOrganTranMonthMapper.deleteByExample(example);
+    }
+
+    @Override
+    public void importData() {
+        ProfitOrganTranMonth    profitOrganTranMonth = new ProfitOrganTranMonth();
+        profitOrganTranMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
+        delete(profitOrganTranMonth); // 删除原始数据
+        tranDataJob.deal();
     }
 }

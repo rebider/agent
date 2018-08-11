@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.pojo.ProfitSupplyExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ public interface ProfitSupplyMapper {
 
     Long getProfitSupplyCount(Map<String, Object> param);
 
-    Long getTotalByMonthAndPid(ProfitSupply record);
+    BigDecimal getTotalByMonthAndPid(ProfitSupply record);
 
     List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
 }

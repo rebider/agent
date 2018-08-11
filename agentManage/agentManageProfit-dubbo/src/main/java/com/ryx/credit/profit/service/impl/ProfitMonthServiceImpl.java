@@ -251,14 +251,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public BigDecimal getAgentProfit(String agentId, String profitDate) {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
-            ProfitMonthExample profitMonthExample = new ProfitMonthExample();
-            ProfitMonthExample.Criteria criteria = profitMonthExample.createCriteria();
-            criteria.andAgentIdEqualTo(agentId);
+            ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
+            ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+            criteria.andAgentPidEqualTo(agentId);
             criteria.andProfitDateEqualTo(profitDate);
-            List<ProfitMonth> list = profitMonthMapper.selectByExample(profitMonthExample);
+            List<ProfitDetailMonth> list = profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
             if(list != null && !list.isEmpty()){
-                ProfitMonth profitMonth= list.get(0);
-                return profitMonth.getPayProfit();
+                ProfitDetailMonth profitMonth = list.get(0);
+                return profitMonth.getProfitSumAmt();
             }
         }
         return BigDecimal.ZERO;

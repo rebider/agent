@@ -12,6 +12,17 @@ public class ProfitDirect implements Serializable {
 
     private String fristAgentPid;
 
+    //新增
+    private String fristAgentId;
+
+    public String getFristAgentId() {
+        return fristAgentId;
+    }
+
+    public void setFristAgentId(String fristAgentId) {
+        this.fristAgentId = fristAgentId;
+    }
+
     private String fristAgentName;
 
     private String parentAgentId;
@@ -33,6 +44,20 @@ public class ProfitDirect implements Serializable {
     private BigDecimal actualProfit;
 
     private String transMonth;
+
+    private String agentEmail;
+
+    private String accountCode;
+
+    private String accountName;
+
+    private String bankOpen;
+
+    private String bankCode;
+
+    private String bossCode;
+
+    private BigDecimal parentBuckle;
 
     public String getId() {
         return id;
@@ -152,5 +177,61 @@ public class ProfitDirect implements Serializable {
 
     public void setTransMonth(String transMonth) {
         this.transMonth = transMonth == null ? null : transMonth.trim();
+    }
+
+    public String getAgentEmail() {
+        return agentEmail;
+    }
+
+    public void setAgentEmail(String agentEmail) {
+        this.agentEmail = agentEmail == null ? null : agentEmail.trim();
+    }
+
+    public String getAccountCode() {
+        return accountCode;
+    }
+
+    public void setAccountCode(String accountCode) {
+        this.accountCode = accountCode == null ? null : accountCode.trim();
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName == null ? null : accountName.trim();
+    }
+
+    public String getBankOpen() {
+        return bankOpen;
+    }
+
+    public void setBankOpen(String bankOpen) {
+        this.bankOpen = bankOpen == null ? null : bankOpen.trim();
+    }
+
+    public String getBankCode() {
+        return bankCode;
+    }
+
+    public void setBankCode(String bankCode) {
+        this.bankCode = bankCode == null ? null : bankCode.trim();
+    }
+
+    public String getBossCode() {
+        return bossCode;
+    }
+
+    public void setBossCode(String bossCode) {
+        this.bossCode = bossCode == null ? null : bossCode.trim();
+    }
+
+    public BigDecimal getParentBuckle() {
+        return parentBuckle;
+    }
+
+    public void setParentBuckle(BigDecimal parentBuckle) {
+        this.parentBuckle = parentBuckle;
     }
 }

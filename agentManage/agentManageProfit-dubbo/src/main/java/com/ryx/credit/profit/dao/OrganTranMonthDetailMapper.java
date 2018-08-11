@@ -3,6 +3,7 @@ package com.ryx.credit.profit.dao;
 import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
 import com.ryx.credit.profit.pojo.OrganTranMonthDetailExample;
 import java.util.List;
+import java.util.Map;
 
 public interface OrganTranMonthDetailMapper {
     long countByExample(OrganTranMonthDetailExample example);
@@ -20,4 +21,6 @@ public interface OrganTranMonthDetailMapper {
     int updateByPrimaryKeySelective(OrganTranMonthDetail record);
 
     int updateByPrimaryKey(OrganTranMonthDetail record);
+
+    OrganTranMonthDetail getChildSumTranAmt(Map<String, Object> param);
 }

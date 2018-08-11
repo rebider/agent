@@ -2,13 +2,15 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.PProfitFactor;
 import com.ryx.credit.profit.pojo.PProfitFactorExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
 public interface PProfitFactorMapper {
     long countByExample(PProfitFactorExample example);
 
-    long getSumFactor(PProfitFactor record);
+    BigDecimal getSumFactor(PProfitFactor record);
 
     int deleteByExample(PProfitFactorExample example);
 
