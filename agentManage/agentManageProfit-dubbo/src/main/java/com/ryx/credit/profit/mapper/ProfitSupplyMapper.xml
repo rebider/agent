@@ -72,7 +72,9 @@
     select
     <include refid="Base_Column_List" />
     from P_PROFIT_SUPPLY
-    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+    <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
+    <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
   </select>
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
@@ -211,10 +213,12 @@
     </if>
   </sql>
 
-  <select id="getTotalByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.lang.Long">
+  <select id="getTotalByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    WHERE AGENT_PID = #{agentPid} AND SUPPLY_DATE= #{supplyDate}
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+    <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
+    <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
   </select>
 
   <select id="getProfitSupplyList" parameterType="java.util.Map" resultType="java.util.Map">

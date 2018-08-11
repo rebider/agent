@@ -204,7 +204,7 @@
     </if>
   </select>
 
-  <select id="totalMonthByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.lang.Long">
+  <select id="totalMonthByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
     SELECT SUM(TOTAL_PROFIT)
     FROM P_PROFIT_D
     where
@@ -212,7 +212,7 @@
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
   </select>
 
-  <select id="totalMonthByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.lang.Long">
+  <select id="totalMonthByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
     SELECT SUM(TOTAL_PROFIT)
     FROM P_PROFIT_D
     where

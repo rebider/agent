@@ -48,4 +48,12 @@ public interface ProfitOrganTranMonthService {
     * @Date: 2018/8/2 
     */ 
     void delete(ProfitOrganTranMonth profitOrganTranMonth);
+
+    /*** 
+    * @Description: 重新导入数据
+    * @Param:  profitOrganTranMonth 交易信息
+    * @Author: zhaodw
+    * @Date: 2018/8/10 
+    */ 
+    void importData();
 }

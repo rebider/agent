@@ -151,7 +151,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         String templateMonth = "";
         String month = templateMapper.selectCreditMonth(templateMonth);
         posReward.setCreditConsMonth(month);
-        System.out.println("贷记交易对比月---------------------"+ JSONObject.toJSON(month));
+        System.out.println("赋值贷记交易对比月---------------------"+ JSONObject.toJSON(month));
         rewardMapper.insertSelective(posReward);
 
         //启动审批流
@@ -226,7 +226,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("POS奖励审批流回调异常，activId：{}"+insid);
+            logger.error("POS奖励审批流回调异常，activId：{}" + insid);
         }
     }
 
@@ -260,5 +260,22 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
     }
 
+    @Override
+    public List<PosReward> selectByMonth(PosReward posReward) {
+        PosRewardExample example = new PosRewardExample();
+        PosRewardExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(posReward.getTotalConsMonth())){
+            criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
+        }
+        if(StringUtils.isNotBlank(posReward.getAgentId())){
+            criteria.andAgentIdEqualTo(posReward.getAgentId());
+        }
+        return rewardMapper.selectByExample(example);
+    }
+
+//    @Override
+//    public PosReward selectByVerifyMonth(String totalConsMonth) {
+//        return rewardMapper.selectByVerifyMonth(totalConsMonth);
+//    }
 
 }

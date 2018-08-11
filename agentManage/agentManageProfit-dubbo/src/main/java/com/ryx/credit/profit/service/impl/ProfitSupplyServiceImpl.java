@@ -88,6 +88,12 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
     }
 
     @Override
+    public BigDecimal getTotalByMonthAndPid(ProfitSupply record) {
+        return pProfitSupplyMapper.getTotalByMonthAndPid(record);
+    }
+
+
+    @Override
     public int updateByPrimaryKeySelective(ProfitSupply record) {
         return pProfitSupplyMapper.updateByPrimaryKeySelective(record);
     }

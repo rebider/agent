@@ -330,8 +330,15 @@ public class AgentServiceImpl implements AgentService {
                 String pwd = DigestUtils.hashByShiro("md5", redisService.hGet("config", "pass"), salt, 1);
                 userVo.setSalt(salt);
                 userVo.setPassword(pwd);
-                userVo.setLoginName(agent.getAgLegalMobile());
                 userVo.setName(agent.getAgName());
+                if(StringUtils.isNotBlank(agent.getAgLegalMobile())){
+                    userVo.setLoginName(agent.getAgLegalMobile());
+                }else if(StringUtils.isNotBlank(agent.getAgUniqNum())){
+                    userVo.setLoginName(agent.getAgUniqNum());
+                }else{
+                    userVo.setLoginName(agent.getId());
+                }
+
                 userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
                 userVo.setRoleIds(redisService.hGet("config", "role"));
                 userVo.setUserType(1);

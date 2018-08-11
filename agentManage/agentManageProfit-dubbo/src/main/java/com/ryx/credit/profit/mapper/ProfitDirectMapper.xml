@@ -6,6 +6,7 @@
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="FRIST_AGENT_PID" jdbcType="VARCHAR" property="fristAgentPid" />
+    <result column="FRIST_AGENT_ID" jdbcType="VARCHAR" property="fristAgentId" />
     <result column="FRIST_AGENT_NAME" jdbcType="VARCHAR" property="fristAgentName" />
     <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
     <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
@@ -55,7 +56,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_NAME, AGENT_ID, FRIST_AGENT_PID, FRIST_AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME, 
+    ID, AGENT_NAME, AGENT_ID, FRIST_AGENT_PID,FRIST_AGENT_ID, FRIST_AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME,
     TRANS_AMT, TRANS_FEE, PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT, SHOULD_PROFIT, ACTUAL_PROFIT, 
     TRANS_MONTH, AGENT_EMAIL, ACCOUNT_CODE, ACCOUNT_NAME, BANK_OPEN, BANK_CODE, BOSS_CODE, 
     PARENT_BUCKLE
@@ -90,7 +91,7 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
     insert into P_PROFIT_DIRECT (ID, AGENT_NAME, AGENT_ID, 
-      FRIST_AGENT_PID, FRIST_AGENT_NAME, PARENT_AGENT_ID, 
+      FRIST_AGENT_PID,FRIST_AGENT_ID, FRIST_AGENT_NAME, PARENT_AGENT_ID,
       PARENT_AGENT_NAME, TRANS_AMT, TRANS_FEE, 
       PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT, 
       SHOULD_PROFIT, ACTUAL_PROFIT, TRANS_MONTH, 
@@ -119,7 +120,10 @@
         AGENT_ID,
       </if>
       <if test="fristAgentPid != null">
-        FRIST_AGENT_PID,
+      FRIST_AGENT_PID,
+    </if>
+      <if test="fristAgentId != null">
+        FRIST_AGENT_ID,
       </if>
       <if test="fristAgentName != null">
         FRIST_AGENT_NAME,
@@ -263,6 +267,9 @@
       <if test="fristAgentPid != null">
         FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR},
       </if>
+      <if test="fristAgentId != null">
+        FRIST_AGENT_ID = #{fristAgentId,jdbcType=VARCHAR},
+      </if>
       <if test="fristAgentName != null">
         FRIST_AGENT_NAME = #{fristAgentName,jdbcType=VARCHAR},
       </if>
@@ -325,6 +332,7 @@
     set AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
       FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR},
+      FRIST_AGENT_ID = #{fristAgentId,jdbcType=VARCHAR},
       FRIST_AGENT_NAME = #{fristAgentName,jdbcType=VARCHAR},
       PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
       PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
@@ -363,6 +371,28 @@
     WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR} AND TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    WHERE TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectBySupply"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    where AGENT_ID in
+    (select agent_id from p_profit_supply where agent_id is not null and SUPPLY_DATE=to_char(add_months(sysdate,-1),'YYYYMM') and supply_amt>0)
+  </select>
+
+  <select id="selectByBuckle"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    where TRANS_MONTH=to_char(add_months(sysdate,-1),'YYYYMM') AND PARENT_BUCKLE > 0
+  </select>
+
   <select id="getProfitDirectList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT
@@ -379,7 +409,7 @@
     <include refid="BASE_WHERE_SQL" />
   </select>
 
-  <select id="getSubBuckleByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.lang.Long">
+  <select id="getSubBuckleByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
     SELECT SUM(PARENT_BUCKLE)
     FROM P_PROFIT_DIRECT
     WHERE PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR} AND TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}

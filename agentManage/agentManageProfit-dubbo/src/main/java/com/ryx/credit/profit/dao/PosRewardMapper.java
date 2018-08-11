@@ -21,4 +21,13 @@ public interface PosRewardMapper {
     int updateByPrimaryKeySelective(PosReward record);
 
     int updateByPrimaryKey(PosReward record);
+
+    List<PosReward> selectByMonth(PosReward posReward);
+
+    /**
+     * 查询此交易月份是否已申请
+     * @param verifyMonth
+     * @return
+     */
+//    PosReward selectByVerifyMonth(String verifyMonth);
 }

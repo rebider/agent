@@ -7,7 +7,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ */
 public class PosRewardExample implements Serializable {
+    private static final long serialVersionUID = 8248006142438852943L;
     protected String orderByClause;
 
     protected boolean distinct; 

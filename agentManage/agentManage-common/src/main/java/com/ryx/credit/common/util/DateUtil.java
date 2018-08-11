@@ -22,6 +22,9 @@ public class DateUtil {
     public final static SimpleDateFormat sdfDays = new SimpleDateFormat(
             "yyyyMMdd");
 
+    public final static SimpleDateFormat sdf_Days = new SimpleDateFormat(
+            "yyyy-MM-dd");
+
     /**
 	 * 将Date类型转换为字符串
 	 * 
@@ -141,10 +144,15 @@ public class DateUtil {
 		   return date;
 		}
 	public static void main(String[] args) {
-		 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		/* SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		 String a=format.format(new Date());
 		 Date b= DateUtil.StrToDate("20170727");
-		 System.out.println(b);
+		 System.out.println(b);*/
+
+        String month = null;
+        month = sdfDays.format(addMonth(new Date() , -1));
+        month = month.substring(0,6);
+        System.out.println(month);
 	}
 	
     /**  
@@ -395,4 +403,6 @@ public class DateUtil {
             e.printStackTrace();
         }
     }*/
+
+
 }

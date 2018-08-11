@@ -158,7 +158,7 @@
     </if>
   </select>
 
-  <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.lang.Long">
+  <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.math.BigDecimal">
     select SUM(tatol_amt) from P_PROFIT_FACTOR
      where
     FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
