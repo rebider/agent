@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.jobs;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
@@ -58,19 +59,21 @@ public class TranAmtSumJob {
                 if (agentResult != null && agentResult.getData() != null) {
                     JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
                     if (json != null && json.size() > 0) {
-
+                        JSONArray array = json.getJSONArray("orgList");
+                        if (array != null && array.size() > 0) {
+                            // 获取所有下级的交易金额汇总
+                            Map<String, Object> param = new HashMap<>();
+                            param.put("agentIdList", array.toJavaList(String.class));
+                            param.put("settleMonth", settleMonth);
+                            OrganTranMonthDetail sum = organTranMonthDetailServiceImpl.getChildSumTranAmt(param);
+                            if (sum != null) {
+                                organTranMonthDetail1.setAllchildJlTranAmt(sum.getAllchildJlTranAmt());
+                                organTranMonthDetail1.setAllchildTranAmt(sum.getAllchildTranAmt());
+                                organTranMonthDetailServiceImpl.update(organTranMonthDetail1);
+                            }
+                            param = null;
+                        }
                     }
-                    // 获取所有下级的交易金额汇总
-                    Map<String, Object> param = new HashMap<>();
-                    param.put("agentIdList", "");
-                    param.put("settleMonth", settleMonth);
-                    OrganTranMonthDetail sum = organTranMonthDetailServiceImpl.getChildSumTranAmt(param);
-                    if (sum != null) {
-                        organTranMonthDetail1.setAllchildJlTranAmt(sum.getAllchildJlTranAmt());
-                        organTranMonthDetail1.setAllchildTranAmt(sum.getAllchildTranAmt());
-                        organTranMonthDetailServiceImpl.update(organTranMonthDetail1);
-                    }
-                    param = null;
                 }
             });
         }catch (Exception e) {
