@@ -84,6 +84,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
+
+
             if (StringUtils.isBlank(String.valueOf(objectList.get(0)))) {
                 logger.info("排单编号为空");
                 throw new MessageException("排单编号为空");
@@ -126,6 +128,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             begins = Integer.valueOf(String.valueOf(objectList.get(28)));   // 起始SN位数
             finish = Integer.valueOf(String.valueOf(objectList.get(29)));   // 结束SN位数
 
+            //IDlist检查
             List<String> stringList = idList(snBeginNum, snEndNum, begins, finish);
             if (Integer.valueOf(String.valueOf(objectList.get(23))) != stringList.size()) {
                 logger.info("请仔细核对发货数量");
@@ -144,28 +147,18 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setOrderId(null != objectList.get(1) ? String.valueOf(objectList.get(1)) : "");       // 订单编号
             oLogistics.setProId(null != objectList.get(3) ? String.valueOf(objectList.get(3)) : "");         // 商品ID
             oLogistics.setProName(null != objectList.get(4) ? String.valueOf(objectList.get(4)) : "");       // 商品名称
-
-            //商品类型
-            if (StringUtils.isNotBlank(String.valueOf(objectList.get(5)))) {
-                Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(), String.valueOf(objectList.get(5)));
-                if (null != dictByName && !dictByName.getdItemname().equals(""))
-                    oLogistics.setProType(dictByName.getdItemvalue());      // 商品类型
-            }
-            //厂家
-            if (StringUtils.isBlank(String.valueOf(objectList.get(9)))) {
-                logger.info("未匹配到厂家:{}", String.valueOf(objectList.get(9)));
-                throw new MessageException("未匹配到厂家");
-            }
+            //排单信息
+            ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
+            if(planVo==null)throw new MessageException("排单信息未找到");
             //商品单价
             if (null != objectList.get(6) && !objectList.get(6).equals("") ) {
                 oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
             }
-            //厂家
-            Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), String.valueOf(objectList.get(9)));
-            if (null != dictByName && !dictByName.getdItemname().equals(""))
-                oLogistics.setProCom(dictByName.getdItemvalue());// 厂家
+            //商品信息从排单表里查
+            oLogistics.setProCom(planVo.getProCom());// 厂家
+            oLogistics.setProType(planVo.getProType());//TODO 排单添加商品类型
+            oLogistics.setProModel(planVo.getModel());//型号
             try {
-                oLogistics.setProModel(String.valueOf(objectList.get(11)));      // 机型
                 oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
                 oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司
                 oLogistics.setwNumber(null != objectList.get(25) ? String.valueOf(objectList.get(25)) : "");      // 物流单号
@@ -179,13 +172,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("插入失败！");
             }
             list.add(oLogistics.getId());
-            //排单计划
-            String planId = oLogistics.getReceiptPlanId();
-            //排单信息
-            ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(planId);
-            if(null==planVo){
-                throw new MessageException("插入失败！");
-            }
             //调用明细接口之前需要先去数据库进行查询是否已有数据
             List<String> idList = idList(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish);
             if (null != idList && idList.size() > 0) {
@@ -204,11 +190,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
                 }
             }
-            // 调用明细接口
+            // 调用明细接口 插入物流明细
             ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, planVo.getId());
+            //插入成功更新排单信息
             if (resultVO.isSuccess()) {
-                String id = "";
-                id = oLogistics.getReceiptPlanId();   // 排单编号
+                String id =  oLogistics.getReceiptPlanId();   // 排单编号
                 if (null == id) {
                     throw new MessageException("排单ID查询失败！");
                 } else {
@@ -221,16 +207,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
                         receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
                         receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
-                        int i = receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan);
-                        if (i != 1) {
+                        if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
                             throw new MessageException("更新排单数据失败！");
                         }
                         System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                     }
                 }
             }
-        }
 
+        }
         return list;
     }
 
