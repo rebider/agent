@@ -17,6 +17,8 @@ public interface ProfitDetailMonthMapper {
 
     ProfitDetailMonth selectByPrimaryKey(String id);
 
+    ProfitDetailMonth selectByAgentPid(String agentPid);
+
     ProfitDetailMonth selectByPIdAndMonth(ProfitDetailMonth record);
 
     int updateByPrimaryKeySelective(ProfitDetailMonth record);

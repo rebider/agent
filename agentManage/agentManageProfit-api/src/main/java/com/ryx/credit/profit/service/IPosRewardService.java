@@ -84,4 +84,13 @@ public interface IPosRewardService {
      */
     public void editRewardRegect(PosReward posReward)throws Exception;
 
+    List<PosReward> selectByMonth(PosReward posReward);
+
+    /**
+     * 查询此交易月份是否已申请
+     * @param totalConsMonth
+     * @return
+     */
+//    PosReward selectByVerifyMonth(String totalConsMonth);
+
 }

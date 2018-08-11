@@ -57,6 +57,8 @@ public enum TabId {
     P_PROFIT_DETAIL_M("P_PROFIT_DETAIL_M%s%015d"),
     P_PROFIT_D("PDAY%s%015d"),
     P_PROFIT_M("PRM%s%015d"),
+    P_PROFIT_DIRECT("PDIR%s%015d"),
+    P_BUCKLE_RUN("PBR%s%015d"),
     p_profit_unfreeze("UNF%s%015d"),
     p_profit_adjust("PPA%s%015d"),
     p_profit_factor("PF%s%015d"),
