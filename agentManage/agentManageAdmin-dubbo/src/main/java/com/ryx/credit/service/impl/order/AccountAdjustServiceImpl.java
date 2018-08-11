@@ -117,6 +117,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                             oneTakeoutRecord.put("payAmt", paymentDetail.getPayAmount());
                             oneTakeoutRecord.put("planPayTime", paymentDetail.getPlanPayTime());
                             oneTakeoutRecord.put("planNum", paymentDetail.getPlanNum());
+                            oneTakeoutRecord.put("payment", payment);
                             takeoutList.add(oneTakeoutRecord);
                         }
 
@@ -250,6 +251,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         oneTakeoutRecord.put("payAmt", leftAmt);
                         oneTakeoutRecord.put("srcId", srcId);
                         oneTakeoutRecord.put("srcType", srcType);
+                        oneTakeoutRecord.put("payment", payment);
                         takeoutList.add(oneTakeoutRecord);
 
                         OPaymentDetail newDeatil = new OPaymentDetail();

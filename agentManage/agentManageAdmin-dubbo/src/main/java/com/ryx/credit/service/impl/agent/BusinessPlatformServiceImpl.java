@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.AgImportType;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
@@ -24,10 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 业务平台管理
@@ -58,7 +56,10 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentDataHistoryService agentDataHistoryService;
     @Autowired
     private PayCompMapper payCompMapper;
-
+    @Autowired
+    private AimportService aimportService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
 
@@ -257,16 +258,40 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 logger.info("不匹配,请检查数据是否正确");
                 throw new MessageException("不匹配,请检查数据是否正确");
             }
-            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-            PayComp payComp = new PayComp();
-            payComp.setId(agentBusInfo.getCloPayCompany());
-            payComp.setComName(String.valueOf(objectList.get(2)));
-            if (1 != payCompMapper.updateByPrimaryKeySelective(payComp)) {
+            //到这说明已经存在这条数据
+            PayCompExample payCompExample = new PayCompExample();
+            PayCompExample.Criteria criteria1 = payCompExample.or().andComNameEqualTo(String.valueOf(objectList.get(2)));
+            List<PayComp> payComps = payCompMapper.selectByExample(payCompExample);
+            if (null == payComps && payComps.size() == 0) {
+                logger.info("没有此公司");
+                throw new MessageException("没有此公司");
+            }
+            AgentBusInfo agentBus = agentBusInfos.get(0);
+            agentBus.setCloPayCompany(payComps.get(0).getId());
+            if (1 != agentBusInfoMapper.updateByPrimaryKeySelective(agentBus)) {
                 logger.info("更新失败");
                 throw new MessageException("更新失败");
             }
-            busList.add(agentBusInfo.getId());
 
+            try {
+                ImportAgent importAgent = new ImportAgent();
+                importAgent.setDataid(agentBus.getId());
+                importAgent.setDatatype(AgImportType.BUSAPP.name());
+                importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+                importAgent.setcUser(userid);
+                if (1 != aimportService.insertAgentImportData(importAgent)) {
+                    logger.info("代理商审批通过-添加开户任务失败");
+                } else {
+                    logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agentBus.getId());
+                }
+
+                agentDataHistoryService.saveDataHistory(agentBus, DataHistoryType.BUSINESS.getValue());
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                agentNotifyService.asynNotifyPlatform();
+            }
+            busList.add(agentBus.getId());
         }
 
         return busList;
