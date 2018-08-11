@@ -319,7 +319,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             } else {
                 result = result.add(currentProfit);
             }
-        } else if (profitAmt.doubleValue() < 0) {
+        } else if (profitAmt.doubleValue() <= 0) {
             currentProfit = BigDecimal.ZERO;
             profitAmt = BigDecimal.ZERO;
         }
@@ -345,8 +345,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private void stagingDeal(BigDecimal profitAmt,BigDecimal resultAmt, ProfitDeduction profitDeductionTemp) {
         // 扣足
         profitDeductionTemp.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-        if (resultAmt.doubleValue() > 0) {
+        if (resultAmt.doubleValue() >= 0 && profitAmt.doubleValue() > 0) {
             profitDeductionTemp.setActualDeductionAmt(profitDeductionTemp.getMustDeductionAmt());
+            profitDeductionTemp.setNotDeductionAmt(BigDecimal.ZERO);
         }else{
             if (resultAmt.doubleValue() < 0) {
                 profitDeductionTemp.setActualDeductionAmt(profitAmt);
@@ -363,6 +364,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             createHisDeduction(profitDeductionTemp);
             if (stagAmt != null) {
                 profitDeductionTemp.setUpperNotDeductionAmt(profitDeductionTemp.getNotDeductionAmt());//上月未扣足=未扣足+下月分期
+            }else {
+                stagAmt = BigDecimal.ZERO;
             }
             // 更新当期未下期扣款
             profitDeductionTemp.setDeductionDate(LocalDate.now().toString().substring(0,7));
@@ -373,6 +376,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             profitDeductionTemp.setAddDeductionAmt(BigDecimal.ZERO);
             profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);
             profitDeductionTemp.setStagingStatus("3");
+            profitDeductionTemp.setCreateDateTime(new Date());
             updateStagingDetail(profitAmt, profitDeductionTemp);
         }
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionTemp);
@@ -431,8 +435,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     */
     private void generalDeal(BigDecimal profitAmt,BigDecimal resultAmt, ProfitDeduction profitDeductionTemp) {
         profitDeductionTemp.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-        if (resultAmt.doubleValue() > 0) {
-           profitDeductionTemp.setActualDeductionAmt(profitDeductionTemp.getMustDeductionAmt());
+        if (resultAmt.doubleValue() >= 0 && profitAmt.doubleValue() > 0) {
+            profitDeductionTemp.setActualDeductionAmt(profitDeductionTemp.getMustDeductionAmt());
+            profitDeductionTemp.setNotDeductionAmt(BigDecimal.ZERO);
         }else {
             if (resultAmt.doubleValue() < 0) {
                 profitDeductionTemp.setActualDeductionAmt(profitAmt);
@@ -452,6 +457,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 profitDeductionTemp.setNotDeductionAmt(BigDecimal.ZERO); // 未扣足请0
                 profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);// 实扣清0
                 profitDeductionTemp.setAddDeductionAmt(BigDecimal.ZERO);
+                profitDeductionTemp.setCreateDateTime(new Date());
             }
         }
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionTemp);
