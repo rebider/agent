@@ -1,9 +1,8 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.pojo.*;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -295,4 +295,42 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     }
 
 
+    /**
+     * 同步手刷月分润交易汇总
+     * @param transDate 交易日期（空则为上一月）
+     */
+    @Override
+    public BigDecimal synchroSSTotalTransAmt(String transDate){
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
+        map.put("pageNumber","1");
+        map.put("pageSize","20");
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("profit.month"),params);
+        System.out.println(res);
+        JSONObject json = JSONObject.parseObject(res);
+        if(!json.get("respCode").equals("000000")){
+            logger.error("请求同步失败！");
+            AppConfig.sendEmails("手刷月分润交易汇总失败","手刷月分润交易汇总失败");
+            return null;
+        }
+        BigDecimal fxAmount = json.getBigDecimal("fxAmount");//分销系统交易汇总
+        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount");//未计入分润汇总
+        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount");//未同步到分润
+
+        String data = JSONObject.parseObject(res).get("data").toString();
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
+        BigDecimal tranAmount = addTransAmt(list);//手刷交易额汇总
+
+        return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
+
+    }
+    public BigDecimal addTransAmt(List<JSONObject> profitMonths){
+        BigDecimal amt = BigDecimal.ZERO;
+        for(JSONObject json:profitMonths){
+            amt = amt.add(json.getBigDecimal("TRANAMT"));
+        }
+        return amt;
+    }
 }

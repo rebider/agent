@@ -58,4 +58,10 @@ public interface ProfitComputerService {
      * 直发分润计算（上月所有）
      */
     void computer_ZhiFa();
+
+    /**
+     * 同步手刷月分润交易汇总
+     * @param transDate 交易日期（空则为上一月）
+     */
+    public BigDecimal synchroSSTotalTransAmt(String transDate);
 }
