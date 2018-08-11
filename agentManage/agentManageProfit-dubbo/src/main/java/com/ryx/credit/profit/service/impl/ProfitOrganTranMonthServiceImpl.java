@@ -99,9 +99,6 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Override
     public void importData() {
-        ProfitOrganTranMonth    profitOrganTranMonth = new ProfitOrganTranMonth();
-        profitOrganTranMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
-        delete(profitOrganTranMonth); // 删除原始数据
         tranDataJob.deal();
     }
 }
