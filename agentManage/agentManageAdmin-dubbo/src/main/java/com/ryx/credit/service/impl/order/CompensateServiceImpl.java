@@ -230,12 +230,19 @@ public class CompensateServiceImpl implements CompensateService {
         reqParam.put("snBegin",snBegin);
         reqParam.put("snEnd",snEnd);
         reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-        reqParam.put("recordStatus",OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+        ArrayList<Object> recordStatusList = new ArrayList<>();
+        recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+        reqParam.put("recordStatusList",recordStatusList);
         Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
         reqParam.put("proCom",dictByName.getdItemvalue());
         reqParam.put("proModel",proModel);
         List<Map<String,Object>> compensateLList = logisticsDetailMapper.queryCompensateLList(reqParam);
-
+        if(null==compensateLList){
+            throw new ProcessException("导入解析文件失败");
+        }
+        if(compensateLList.size()==0){
+            throw new ProcessException("sn号在审批中或已退货");
+        }
         return compensateLList;
     }
 
@@ -255,7 +262,9 @@ public class CompensateServiceImpl implements CompensateService {
             reqParam.put("snBegin",beginSn);
             reqParam.put("snEnd",endSn);
             reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-            reqParam.put("recordStatus",OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            ArrayList<Object> recordStatusList = new ArrayList<>();
+            recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            reqParam.put("recordStatusList",recordStatusList);
             reqParam.put("activityId",oldActivityId);
             List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
             if(null==oLogisticsDetails){
@@ -357,7 +366,9 @@ public class CompensateServiceImpl implements CompensateService {
                 reqParam.put("snBegin",refundPriceDiffDetail.getBeginSn());
                 reqParam.put("snEnd",refundPriceDiffDetail.getEndSn());
                 reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-                reqParam.put("recordStatus",OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                ArrayList<Object> recordStatusList = new ArrayList<>();
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                reqParam.put("recordStatusList",recordStatusList);
                 reqParam.put("activityId",refundPriceDiffDetail.getActivityFrontId());
                 List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
                 if(null==oLogisticsDetails){
@@ -664,18 +675,28 @@ public class CompensateServiceImpl implements CompensateService {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
             if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId())){
-                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
-                criteria1.andSubOrderIdEqualTo(oRefundPriceDiffDetail.getSubOrderId());
-                criteria1.andActivityIdEqualTo(oRefundPriceDiffDetail.getActivityFrontId());
-                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                if(null==oSubOrderActivities){
-                    return null;
+                Map<String, Object> reqParam = new HashMap<>();
+                reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
+                reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
+                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+                ArrayList<Object> recordStatusList = new ArrayList<>();
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+                reqParam.put("recordStatusList",recordStatusList);
+                reqParam.put("activityId",oRefundPriceDiffDetail.getActivityFrontId());
+                List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+                if(null==oLogisticsDetails){
+                    log.info("calculatePriceDiff数据有误异常返回1");
+                    throw new ProcessException("查询活动异常");
                 }
-                OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                Dict dict1 = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oSubOrderActivity.getActivityWay());
-                oSubOrderActivity.setActivityWay(dict1.getdItemname());
-                oRefundPriceDiffDetail.setSubOrderActivity(oSubOrderActivity);
+                if(oLogisticsDetails.size()!=1){
+                    log.info("calculatePriceDiff数据有误异常返回2");
+                    throw new ProcessException("查询活动异常");
+                }
+                Map<String, Object> stringObjectMap = oLogisticsDetails.get(0);
+//                Dict dict1 = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oSubOrderActivity.getActivityWay());
+//                oSubOrderActivity.setActivityWay(dict1.getdItemname());
+                oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(stringObjectMap);
             }
         }
         return oRefundPriceDiff;

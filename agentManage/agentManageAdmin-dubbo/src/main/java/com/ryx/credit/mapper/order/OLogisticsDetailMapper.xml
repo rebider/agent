@@ -363,7 +363,10 @@
     where
     sn_num between #{snBegin} and #{snEnd}
     and status = #{status}
-    and RECORD_STATUS = #{recordStatus}
+    and RECORD_STATUS in
+    <foreach collection="recordStatusList" open="(" close=")" separator="," item="recordStatus">
+      #{recordStatus, jdbcType=SMALLINT}
+    </foreach>
     <if test="activityId != null">
       and ACTIVITY_ID = #{activityId}
     </if>
