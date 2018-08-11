@@ -194,6 +194,7 @@ public class RefundJob {
     * @Date: 2018/7/30
     */
     private void insertProfitDeduction(String agentId, BigDecimal addAmt, Map<String, String> deductionIdMap, String bussType) {
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         Map<String,Object> agentMap = getAgentId(agentId);
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
@@ -207,16 +208,39 @@ public class RefundJob {
         deduction.setId(deductionIdMap.get(agentId));
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setDeductionDesc(DEDUCTION_DESC);
-        // 获取分期未扣完金额
+        // 获取本月后面分期未扣完金额
         BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(agentId);
         stagNotDeductionSumAmt = stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt;
-        addAmt = addAmt.subtract(stagNotDeductionSumAmt);
+        // 获取本月总应扣
+        BigDecimal mustSumAmt = getCurrentMonthDeductionAmt(deduction);
+        mustSumAmt = mustSumAmt==null? BigDecimal.ZERO: mustSumAmt;
+        // 计算本月新增
+        addAmt = addAmt.subtract(stagNotDeductionSumAmt).subtract(mustSumAmt);
         deduction.setAddDeductionAmt(addAmt);
         deduction.setSumDeductionAmt(addAmt);
         deduction.setMustDeductionAmt(addAmt);
         deduction.setSourceId(bussType);
-        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
+        deduction.setDeductionDate(deductionDate);
         profitDeductionService.insert(deduction);
+    }
+
+    /***
+     * 获取本月应扣金额
+     * @param deduction 扣款对象
+     * @return 应扣总金额
+     */
+    private BigDecimal getCurrentMonthDeductionAmt( ProfitDeduction deduction ) {
+        // 获取本月退单扣款信息
+        ProfitDeduction query = new ProfitDeduction();
+        query.setDeductionDate(deduction.getDeductionDate());
+        query.setAgentPid(deduction.getAgentPid());
+        query.setDeductionType(DeductionType.SETTLE_ERR.getType());
+        List<ProfitDeduction> profitDeductions = profitDeductionService.getProfitDeduction(query);
+        if (profitDeductions != null && profitDeductions.size() > 0) {
+            return profitDeductions.stream().map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).get();
+        }else{
+            return BigDecimal.ZERO;
+        }
     }
 
     /*** 
