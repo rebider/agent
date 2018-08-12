@@ -10,6 +10,7 @@ import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -17,9 +18,12 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +47,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ActivityService activityService;
     @Autowired
     private TaskApprovalService taskApprovalService;
+
+    @Autowired
+    private ProfitDeductionService profitDeductionServiceImpl;
 
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
@@ -262,5 +269,88 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             }
         }
         return BigDecimal.ZERO;
+    }
+
+    @Override
+    public void computeProfitAMt() {
+        // 获取所有代理商月度分润明细
+        ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
+        profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
+        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
+        if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
+            profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
+                BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
+                // 退单补款+
+                sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
+                // 返现奖励+
+                // 其他补款+
+                // 机具扣款-
+                //退单扣款-
+                // 直发平台扣款
+                if (profitDetailMonthTemp.getAgentId().startsWith("6000")) {
+
+                }else {
+                    sumAmt = getTdDeductionAmt(profitDetailMonthTemp, sumAmt);
+                }
+                //考核扣款-
+                //保理扣款-
+                //其他扣款-
+                sumAmt = profitDeductionServiceImpl.otherDeduction(sumAmt, profitDetailMonthTemp.getAgentPid());
+                //税点-
+                // 实发分润
+                profitDetailMonthTemp.setRealProfitAmt(sumAmt);
+                profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
+            });
+        }else{
+            LOG.error("没有分润数据。");
+        }
+    }
+
+    /*** 
+    * @Description: 获取退单补款
+    * @Param:  分润明细
+    * @return:  退单补款
+    * @Author: zhaodw 
+    * @Date: 2018/8/12 
+    */ 
+    private BigDecimal getTdSupplyAmt(ProfitDetailMonth profitDetailMonthTemp) {
+        // pos退单补款
+        BigDecimal posSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentPid(),"02");
+        profitDetailMonthTemp.setPosTdSupplyAmt(posSupply);
+        // mpos退单补款
+        BigDecimal mposSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentPid(),"01");
+        profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply);
+       return posSupply.add(mposSupply);
+    }
+
+    /***
+     * @Description: 获取退单补款
+     * @Param:  分润明细
+     * @return:  退单补款
+     * @Author: zhaodw
+     * @Date: 2018/8/12
+     */
+    private BigDecimal getTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt) {
+        ProfitDeduction profitDeduction = new ProfitDeduction();
+        profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentPid());
+        profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
+        profitDeduction.setSourceId("02");
+        // pos退单应扣款
+        BigDecimal posMustDeductionAmt = profitDeductionServiceImpl.getSettleErrDeductionAmt(profitDeduction);
+        posMustDeductionAmt = posMustDeductionAmt==null? BigDecimal.ZERO: posMustDeductionAmt;
+        profitDetailMonthTemp.setPosTdMustDeductionAmt(posMustDeductionAmt);
+
+        if (posMustDeductionAmt.doubleValue() > 0) {
+            sumAmt = profitDeductionServiceImpl.settleErrDeduction(sumAmt, "02" , profitDetailMonthTemp.getAgentPid());
+        }
+        // mpos退单扣款
+        profitDeduction.setSourceId("01");
+        BigDecimal mposMustDeductionAmt = profitDeductionServiceImpl.getSettleErrDeductionAmt(profitDeduction);
+        mposMustDeductionAmt = mposMustDeductionAmt==null? BigDecimal.ZERO: mposMustDeductionAmt;
+        profitDetailMonthTemp.setMposTdMustDeductionAmt(mposMustDeductionAmt);
+        if (posMustDeductionAmt.doubleValue() > 0) {
+            sumAmt = profitDeductionServiceImpl.settleErrDeduction(sumAmt, "01" , profitDetailMonthTemp.getAgentPid());
+        }
+        return sumAmt;
     }
 }

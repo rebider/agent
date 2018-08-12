@@ -237,6 +237,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return  BigDecimal.ZERO;
     }
 
+    @Override
+    public BigDecimal getSettleErrDeductionAmt(ProfitDeduction profitDeduction) {
+        return profitDeductionMapper.getSettleErrDeductionAmt(profitDeduction);
+    }
+
     /***
     * @Description: 获取mpos扣款金额
     * @Param:   deductionList 扣款金额
@@ -251,9 +256,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (deductionList != null && deductionList.size() > 0) {
             BigDecimal currentProfit = null;
             for (ProfitDeduction profitDeductionTemp : deductionList) {
-              if (!profitDeductionTemp.getAgentPid().startsWith("600")) {
                   result = deduction(result, profitAmt, profitDeductionTemp);
-              }
             }
         }
         return  result;
