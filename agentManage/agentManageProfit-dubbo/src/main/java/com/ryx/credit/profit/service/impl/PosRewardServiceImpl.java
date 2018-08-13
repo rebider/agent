@@ -270,6 +270,9 @@ public class PosRewardServiceImpl implements IPosRewardService {
         if(StringUtils.isNotBlank(posReward.getAgentPid())){
             criteria.andAgentIdEqualTo(posReward.getAgentPid());
         }
+        if(StringUtils.isNotBlank(posReward.getApplyStatus())){
+            criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
+        }
         return rewardMapper.selectByExample(example);
     }
 

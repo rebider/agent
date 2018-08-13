@@ -42,5 +42,6 @@
     <dubbo:reference interface="com.ryx.credit.service.order.IPaymentDetailService" id="iPaymentDetailService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentColinfoService" id="agentColinfoService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.profit.PosOrganDataService" id="posOrganDataServiceImpl"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.agent.AgentBusinfoService" id="agentBusinfoService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
 </beans>
