@@ -48,14 +48,14 @@ public class ProfitDayMposDataJob {
             return;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<HashMap> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
         System.out.println(data);
     }
 
     /**
      * 同步日结分润数据
-     * @param transDate1 交易时间起（空则为当前日期上一天）
-     * @param transDate2 交易时间止（空则为当前日期上一天）
+     * @param transDate1 交易时间起（空则为当前日期上一天）yyyymmdd
+     * @param transDate2 交易时间止（空则为当前日期上一天）yyyymmdd
      */
     public void synchroProfitD(String transDate1,String transDate2){
         HashMap<String,String> map = new HashMap<String,String>();
@@ -73,7 +73,7 @@ public class ProfitDayMposDataJob {
             return;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<HashMap> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
             insertProfitD(list);
         } catch (Exception e) {
@@ -82,22 +82,22 @@ public class ProfitDayMposDataJob {
         }
     }
 
-    public void insertProfitD(List<HashMap> profitDays){
-        for(HashMap map:profitDays){
+    public void insertProfitD(List<JSONObject> profitDays){
+        for(JSONObject json:profitDays){
             ProfitDay profitD = new ProfitDay();
             profitD.setId(idService.genId(TabId.P_PROFIT_D));
-            profitD.setAgentId((String)map.get("AGENTID"));
-            profitD.setAgentName((String)map.get("AGENTNAME"));
-            profitD.setRemitDate((String)map.get("REMITDATE"));
-            profitD.setTransDate((String)map.get("TRANSDATE"));
-            profitD.setAgentPid((String)map.get("AGENTPID"));
-            profitD.setTotalProfit((BigDecimal) map.get("TOTALPROFIT"));
-            profitD.setFrozenMoney((BigDecimal) map.get("FROZENMONEY "));
-            profitD.setSuccessMoney((BigDecimal) map.get("SUCCESSMONEY "));
-            profitD.setFailMoney((BigDecimal) map.get("FAILMONEY "));
-            profitD.setRedoMoney((BigDecimal) map.get("REDOMONEY "));
-            profitD.setReturnMoney((BigDecimal) map.get("RETURNMONEY "));
-            profitD.setRealMoney((BigDecimal) map.get("REALMONEY "));
+            profitD.setAgentId(json.getString("AGENTID"));
+            profitD.setAgentName(json.getString("AGENTNAME"));
+            profitD.setRemitDate(json.getString("REMITDATE"));
+            profitD.setTransDate(json.getString("TRANSDATE"));
+            profitD.setAgentPid(json.getString("AGENTPID"));
+            profitD.setTotalProfit(json.getBigDecimal("TOTALPROFIT"));
+            profitD.setFrozenMoney(json.getBigDecimal("FROZENMONEY "));
+            profitD.setSuccessMoney(json.getBigDecimal("SUCCESSMONEY "));
+            profitD.setFailMoney(json.getBigDecimal("FAILMONEY "));
+            profitD.setRedoMoney(json.getBigDecimal("REDOMONEY "));
+            profitD.setReturnMoney(json.getBigDecimal("RETURNMONEY "));
+            profitD.setRealMoney(json.getBigDecimal("REALMONEY "));
             profitDService.insert(profitD);
         }
     }
