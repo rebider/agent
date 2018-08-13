@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import sun.nio.cs.ext.ISCII91;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -1056,7 +1055,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional( isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTaskBussiData(AgentVo agentVo, String userId) throws Exception {
-
         if (null != agentVo.getoPayment()) {
             if (StringUtils.isNotBlank(agentVo.getoPayment().get("id"))) {
                 //付款单
@@ -1082,7 +1080,6 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         }
-
         //如果有业务数据就保存
         if (null != agentVo.getoPayment()) {
             if(StringUtils.isNotBlank(agentVo.getoPayment().get("id"))){
@@ -1092,14 +1089,13 @@ public class OrderServiceImpl implements OrderService {
                 OPayment oPayment = new OPayment();
                 oPayment.setId(db.getId());
                 oPayment.setVersion(db.getVersion());
+
+
+
+
                 //收款时间
-                if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate")) || StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
-                    if(StringUtils.isBlank(agentVo.getoPayment().get("actualReceiptDate"))){
-                        throw new MessageException("实收日期不能为空");
-                    }
-                    if(StringUtils.isBlank(agentVo.getoPayment().get("actualReceipt"))){
-                        throw new MessageException("实收金额不能为空");
-                    }
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))
+                        || StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
                     //收款金额
                     if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
                         if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(BigDecimal.ZERO)<0){
@@ -1118,27 +1114,30 @@ public class OrderServiceImpl implements OrderService {
                     }else{
                         throw new MessageException("收款公司不能为空");
                     }
-                    oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
-                }
+                    //收款时间
+                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))){
+                        oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
+                    }else{
+                        throw new MessageException("收款时间不能为空");
+                    }
 
+                }
                 //结算价
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("settlementPrice"))){
                     oPayment.setSettlementPrice(new BigDecimal(agentVo.getoPayment().get("settlementPrice")));
-                    //分润模板
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("shareTemplet"))){
-                        oPayment.setShareTemplet(agentVo.getoPayment().get("shareTemplet"));
-                    }
-                    //是否开具发票
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("isCloInvoice"))){
-                        oPayment.setIsCloInvoice(new BigDecimal(agentVo.getoPayment().get("isCloInvoice")));
-                    }
                 }
-
+                //分润模板
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("shareTemplet"))){
+                    oPayment.setShareTemplet(agentVo.getoPayment().get("shareTemplet"));
+                }
+                //是否开具发票
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("isCloInvoice"))){
+                    oPayment.setIsCloInvoice(new BigDecimal(agentVo.getoPayment().get("isCloInvoice")));
+                }
                 //担保代理商
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("guaranteeAgent"))){
                     oPayment.setGuaranteeAgent(agentVo.getoPayment().get("guaranteeAgent"));
                 }
-
                 //抵扣类型
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
                     //抵扣金额查询
@@ -1147,13 +1146,13 @@ public class OrderServiceImpl implements OrderService {
                     if(agentResult.isOK()){
                         FastMap f =   (FastMap)agentResult.getData();
                         BigDecimal can = new BigDecimal(f.get("can")+"");
-                        if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
-                            throw new MessageException("抵扣金额不足");
-                        }
                         if(agentVo.getoPayment().get("deductionAmount")!=null) {
                             oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
                         }else{
                             throw new MessageException("请填写抵扣金额");
+                        }
+                        if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
+                            throw new MessageException("抵扣金额不足");
                         }
                     }else{
                         throw new MessageException("不可抵扣");
@@ -1161,9 +1160,13 @@ public class OrderServiceImpl implements OrderService {
                 }else{
                     oPayment.setDeductionAmount(BigDecimal.ZERO);
                 }
+
+                //抵扣审批判断
                 if(oPayment.getDeductionAmount().compareTo(db.getOutstandingAmount())>0){
                     throw new MessageException("抵扣超出待付");
                 }
+
+                //首付审批
                 if(oPayment.getDownPayment()!=null) {
                     if (oPayment.getDownPayment().compareTo(db.getOutstandingAmount()) > 0) {
                         throw new MessageException("首付超出待付");
@@ -1282,7 +1285,6 @@ public class OrderServiceImpl implements OrderService {
                         record.setPayType(PaymentType.DKFQ.code);
                         record.setPayAmount((BigDecimal) datum.get("item"));
                         record.setRealPayAmount(BigDecimal.ZERO);
-                        record.setRealPayAmount(new BigDecimal(0));
                         record.setPlanPayTime((Date) datum.get("date"));
                         record.setPlanNum((BigDecimal) datum.get("count"));
                         record.setAgentId(oPayment.getAgentId());

@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
+import com.ryx.credit.profit.service.ProfitComputerService;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
@@ -42,6 +43,8 @@ public class TranDataJob {
     @Autowired
     private ProfitOrganTranMonthService profitOrganTranMonthService;
 
+    @Autowired
+    private ProfitComputerService profitComputerService;
 
     @Autowired
     private IdService idService;
@@ -93,43 +96,10 @@ public class TranDataJob {
     private void insertOrUpdate(JSONObject json, String settleMonth, BigDecimal tranAmt, BigDecimal zyssAmt) {
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
         profitOrganTranMonth.setProfitDate(settleMonth);
-        PageInfo pageInfo = profitOrganTranMonthService.getProfitOrganTranMonthList(profitOrganTranMonth, null);
-        boolean hasQr = false;
-        boolean hasPos = false;
-        boolean hasMpos = false;
-        if(pageInfo != null && pageInfo.getTotal() > 0) {
-            List<ProfitOrganTranMonth> profitOrganTranMonths = pageInfo.getRows();
-            for (ProfitOrganTranMonth organTranMonth : profitOrganTranMonths) {
-                  if("01".equals(organTranMonth.getProductType())) {
-                      profitOrganTranMonth.setSettleAmt(json.getBigDecimal("PFT_POS_TRAN_AMT"));
-                      profitOrganTranMonth.setTranAmt(tranAmt);
-                      profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
-                      hasPos = true;
-                  }else if ("02".equals(organTranMonth.getProductType())) {
-                      hasMpos = true;
-                      organTranMonth.setTranAmt(zyssAmt);
-                      organTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
-                      if(organTranMonth.getSettleAmt() != null) {
-                          organTranMonth.setDifferenceAmt(organTranMonth.getSettleAmt().subtract(zyssAmt));
-                      }
-                  }else{
-                      hasQr = true;
-                      profitOrganTranMonth.setTranAmt(json.getBigDecimal("QR_TRAN_AMT"));
-                      profitOrganTranMonth.setSettleAmt(json.getBigDecimal("PFT_QR_TRAN_AMT"));
-                      profitOrganTranMonth.setDifferenceAmt(json.getBigDecimal("PFT_QR_TRAN_AMT").subtract(json.getBigDecimal("QR_TRAN_AMT")));
-                  }
-                  profitOrganTranMonthService.update(organTranMonth);
-            }
-        }
-        if (!hasPos) {
-            addPos(json, settleMonth, tranAmt);
-        }
-        if (!hasMpos) {
-            addMpos(settleMonth, zyssAmt);
-        }
-        if (!hasQr) {
-            addQr(json, settleMonth);
-        }
+        profitOrganTranMonthService.delete(profitOrganTranMonth);
+        addPos(json, settleMonth, tranAmt);
+        addMpos(settleMonth, zyssAmt);
+        addQr(json, settleMonth);
     }
 
     /***
@@ -146,6 +116,9 @@ public class TranDataJob {
         profitOrganTranMonth.setProductType("02");
         profitOrganTranMonth.setProductName("MPOS");
         profitOrganTranMonth.setTranAmt(tranAmt);
+        BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(profitOrganTranMonth.getProfitDate());
+        profitOrganTranMonth.setSettleAmt(settleAmt);
+        profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
         profitOrganTranMonthService.insert(profitOrganTranMonth);
     }
 

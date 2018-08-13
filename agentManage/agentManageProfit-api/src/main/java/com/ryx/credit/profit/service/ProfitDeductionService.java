@@ -78,7 +78,7 @@ public interface ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/7
     */
-    BigDecimal otherDeduction(BigDecimal profitAmt, String agentId) throws DeductionException;
+    BigDecimal otherDeductionByType(BigDecimal profitAmt, String agentId, String type) throws DeductionException;
 
     /***
      * @Description:退单扣款计算
@@ -90,6 +90,16 @@ public interface ProfitDeductionService {
      * @Date: 2018/8/7
      */
     BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentId) throws DeductionException;
+
+    /*** 
+    * @Description: 获取退单扣款总金额
+    * @Param:  profitDeduction 扣款信息
+    * @return: 总扣款金额
+    * @Author: zhaodw 
+    * @Date: 2018/8/12 
+    */ 
+    BigDecimal getSettleErrDeductionAmt( ProfitDeduction profitDeduction);
+    
     /**
      * 查询一条扣款信息
      * @param profitDeduction

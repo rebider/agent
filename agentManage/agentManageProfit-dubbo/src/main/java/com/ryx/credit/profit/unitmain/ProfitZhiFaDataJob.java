@@ -79,7 +79,7 @@ public class ProfitZhiFaDataJob {
             return;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<HashMap> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
             insertProfitDirect(list);
         } catch (Exception e) {
@@ -99,33 +99,33 @@ public class ProfitZhiFaDataJob {
         }
     }
 
-    public void insertProfitDirect(List<HashMap> profitDirects){
-        for(HashMap map:profitDirects){
+    public void insertProfitDirect(List<JSONObject> profitDirects){
+        for(JSONObject json:profitDirects){
             ProfitDeduction where = new ProfitDeduction();
-            where.setAgentPid((String)map.get("AGENTID"));
+            where.setAgentPid(json.getString("AGENTID"));
             where.setDeductionType("01");
             where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -1)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
-            profitDirect.setAgentName((String)map.get("AGENTNAME"));//代理商名称
-            profitDirect.setAgentId((String)map.get("AGENTID"));//代理商编号
-            profitDirect.setParentAgentId((String)map.get("PARENTAGENTID"));//上级代理商编号
-            profitDirect.setParentAgentName((String)map.get("PARENTAGENTNAME"));//上级代理商名称
-            profitDirect.setFristAgentId((String)map.get("FRISTAGENTID"));//一级代理商编号
-            profitDirect.setFristAgentName((String)map.get("FRISTAGENTNAME"));//一级代理商名称
-            profitDirect.setFristAgentPid((String)map.get("FRISTAGENTPID"));//一级代理商唯一码
-            profitDirect.setTransAmt((BigDecimal)map.get("TRANSAMT"));//直发交易金额
-            profitDirect.setTransMonth((String)map.get("TRANSMONTH"));//月份
-            profitDirect.setTransFee((BigDecimal)map.get("TRANSFEE"));//直发交易手续费
-            profitDirect.setProfitAmt((BigDecimal) map.get("PROFITAMT"));//直发分润
+            profitDirect.setAgentName(json.getString("AGENTNAME"));//代理商名称
+            profitDirect.setAgentId(json.getString("AGENTID"));//代理商编号
+            profitDirect.setParentAgentId(json.getString("PARENTAGENTID"));//上级代理商编号
+            profitDirect.setParentAgentName(json.getString("PARENTAGENTNAME"));//上级代理商名称
+            profitDirect.setFristAgentId(json.getString("FRISTAGENTID"));//一级代理商编号
+            profitDirect.setFristAgentName(json.getString("FRISTAGENTNAME"));//一级代理商名称
+            profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
+            profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
+            profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
+            profitDirect.setTransFee(json.getBigDecimal("TRANSFEE"));//直发交易手续费
+            profitDirect.setProfitAmt(json.getBigDecimal("PROFITAMT"));//直发分润
             profitDirect.setActualProfit(BigDecimal.ZERO);//实发分润
-            profitDirect.setAgentEmail((String)map.get("AGENTEMAIL"));//邮箱
-            profitDirect.setAccountCode((String)map.get("ACCOUNTCODE"));//账号
-            profitDirect.setAccountName((String)map.get("ACCOUNTNAME"));//户名
-            profitDirect.setBankOpen((String)map.get("BANKOPEN"));//开户行
-            profitDirect.setBankCode((String)map.get("BANKCODE"));//银行号
-            profitDirect.setBossCode((String)map.get("BOSSCODE"));//总行行号
+            profitDirect.setAgentEmail(json.getString("AGENTEMAIL"));//邮箱
+            profitDirect.setAccountCode(json.getString("ACCOUNTCODE"));//账号
+            profitDirect.setAccountName(json.getString("ACCOUNTNAME"));//户名
+            profitDirect.setBankOpen(json.getString("BANKOPEN"));//开户行
+            profitDirect.setBankCode(json.getString("BANKCODE"));//银行号
+            profitDirect.setBossCode(json.getString("BOSSCODE"));//总行行号
             profitDirect.setBuckleAmt(buckle==null?BigDecimal.ZERO:buckle);//退单扣款
             //退单补款、应发分润、应找上级扣款需计算赋值
             profitDirectService.insertSelective(profitDirect);

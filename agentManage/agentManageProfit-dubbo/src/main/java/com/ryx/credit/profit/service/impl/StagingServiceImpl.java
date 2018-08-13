@@ -280,7 +280,12 @@ public class StagingServiceImpl implements StagingService {
 
     @Override
     public BigDecimal getNotDeductionAmt(String agentId){
-        return profitStagingMapper.getNotDeductionAmt(agentId);
+        ProfitStaging profitStaging = profitStagingMapper.getNotDeductionAmt(agentId);
+
+        if (profitStaging != null) {
+            return profitStaging.getStagAmt();
+        }
+        return BigDecimal.ZERO;
     }
 
     /**

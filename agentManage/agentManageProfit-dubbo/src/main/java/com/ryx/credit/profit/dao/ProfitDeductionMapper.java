@@ -19,6 +19,8 @@ public interface ProfitDeductionMapper {
 
     BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
 
+    BigDecimal getSettleErrDeductionAmt(ProfitDeduction profitDeduction);
+
     List<ProfitDeduction> selectByExample(ProfitDeductionExample example);
 
     ProfitDeduction selectByPrimaryKey(String id);

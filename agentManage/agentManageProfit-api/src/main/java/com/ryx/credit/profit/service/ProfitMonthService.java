@@ -117,4 +117,11 @@ public interface ProfitMonthService {
      * @return
      */
     public BigDecimal getAgentProfit(String agentId, String profitDate);
+
+    /***
+    * @Description: 计算代理商分润金额
+    * @Author: zhaodw
+    * @Date: 2018/8/12
+    */
+    void computeProfitAMt();
 }

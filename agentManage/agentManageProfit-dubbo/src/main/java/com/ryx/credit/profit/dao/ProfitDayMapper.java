@@ -28,5 +28,9 @@ public interface ProfitDayMapper {
 
     BigDecimal totalMonthByAgentPid(ProfitDay record);
 
+    BigDecimal totalReturnByAgentPid(ProfitDay record);
+
     BigDecimal totalMonthByAgentId(ProfitDay record);
+
+    BigDecimal totalProfitAndReturn(ProfitDay record);
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author yangmx
@@ -54,12 +55,14 @@ public class PosRewardTemplateServiceImpl implements PosRewardTemplateService{
             BigDecimal finalTranTotal = tranTotal.divide(new BigDecimal(10000));
             List<PosRewardTemplate> posRewardTemplates = posRewardTemplateMapper.selectByExample(null);
             for (PosRewardTemplate posRewardTemplate : posRewardTemplates) {
-//                if(posRewardTemplate.getTranTotal().contains("~")) {
-//                    String[] spl = posRewardTemplate.getTranTotal().trim().split("~");
-//                    if (finalTranTotal.compareTo(new BigDecimal(spl[0])) >= 0 && finalTranTotal.compareTo(new BigDecimal(spl[1])) <= 0) {
-//                        return posRewardTemplate.getProportion();
-//                    }
-//                }
+                if(posRewardTemplate.getActivityValid().contains("~")) {
+                    String[] spl = posRewardTemplate.getActivityValid().trim().split("~");
+                    for (int i = 0; i < spl.length; i++) {
+                        if(Objects.equals(spl[i],"当前月份")){
+
+                        }
+                    }
+                }
             }
         }
         return BigDecimal.ZERO;
@@ -71,5 +74,10 @@ public class PosRewardTemplateServiceImpl implements PosRewardTemplateService{
             posRewardTemplate.setId(idService.genId(TabId.p_pos_reward));
             posRewardTemplateMapper.insertSelective(posRewardTemplate);
         }
+    }
+
+    @Override
+    public List<PosRewardTemplate> getPosRewardTemplateList() {
+        return posRewardTemplateMapper.selectByExample(null);
     }
 }

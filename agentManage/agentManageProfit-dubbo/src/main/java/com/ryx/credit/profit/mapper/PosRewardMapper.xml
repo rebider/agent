@@ -91,7 +91,7 @@
     <!--SELECT-->
     <!--<include refid="Base_Column_List" />-->
     <!--FROM P_POS_REWARD-->
-    <!--WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR} AND TOTAL_CONS_MONTH LIKE '%'||#{totalConsMonth,jdbcType=VARCHAR}||'%'-->
+    <!--WHERE AGENT_PID = #{agentPid,jdbcType=VARCHAR} AND TOTAL_CONS_MONTH LIKE '%'||#{totalConsMonth,jdbcType=VARCHAR}||'%'-->
   <!--</select>-->
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample">

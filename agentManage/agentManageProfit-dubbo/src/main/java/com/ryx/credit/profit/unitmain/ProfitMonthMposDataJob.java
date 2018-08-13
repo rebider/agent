@@ -33,6 +33,8 @@ public class ProfitMonthMposDataJob {
     @Autowired
     private IdService idService;
 
+    private String month="";
+    private static BigDecimal allAmount= BigDecimal.ZERO;
 
     public static void main(String agrs[]){
         String transDate = null;
@@ -42,70 +44,127 @@ public class ProfitMonthMposDataJob {
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.month"),params);
+                ("http://12.3.10.161:8003/qtfr/agentInterface/queryfrbymonth.do",params);
         System.out.println(res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            //logger.error("请求同步失败！");
-            AppConfig.sendEmails("日分润同步失败","日分润同步失败");
+        JSONObject json = JSONObject.parseObject(res);
+        if(!json.get("respCode").equals("000000")){
+            System.out.println("请求同步失败！");
+            AppConfig.sendEmails("月分润同步失败","月分润同步失败");
             return;
         }
+        BigDecimal fxAmount = json.getBigDecimal("fxAmount");//分销系统交易汇总
+        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount");//未计入分润汇总
+        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount");//未同步到分润
+        System.out.println(fxAmount);
+        System.out.println(wjrAmount);
+        System.out.println(wtbAmount);
+
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<HashMap> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
+        try {
+            //testList(list);
+        } catch (Exception e) {
+            System.out.println("同步月分润数据失败！");
+            e.printStackTrace();
+        }
+        System.out.println(allAmount);
         System.out.println(data);
 
     }
 
+    public static void testList(List<JSONObject> profitMonths){
+        for(JSONObject json:profitMonths){
+            allAmount = allAmount.add(json.getBigDecimal("TRANAMT"));
+            System.out.print("唯一码:"+json.getString("UNIQUECODE"));
+            System.out.print("||名称:"+json.getString("AGENTNAME"));
+            System.out.print("||瑞和宝分润:"+json.getBigDecimal("RHBPROFITAMT"));
+            System.out.print("||瑞银信分润:"+json.getBigDecimal("RYXPROFITAMT"));
+            System.out.print("||瑞银信活动:"+json.getBigDecimal("RYXHDPROFITAMT"));
+            System.out.print("||贴牌:"+json.getBigDecimal("TPPROFITAMT"));
+            System.out.print("||瑞刷:"+json.getBigDecimal("RSPROFITAMT"));
+            System.out.print("||瑞刷活动:"+json.getBigDecimal("RSHDPROFITAMT"));
+            System.out.print("||直发:"+json.getBigDecimal("ZFPROFITAMT"));
+            System.out.print("||交易额:"+json.getBigDecimal("TRANAMT"));
+            System.out.println();
+        }
+    }
+
     /**
-     * 同步月分润数据
+     * 同步手刷月分润明细数据
      * @param transDate 交易日期（空则为上一月）
      */
     public void synchroProfitMonth(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
+        month=transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate;
+        map.put("transDate",month);
         map.put("pageNumber","1");
         map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.month"),params);
         System.out.println(res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
+        JSONObject json = JSONObject.parseObject(res);
+        if(!json.get("respCode").equals("000000")){
             logger.error("请求同步失败！");
             AppConfig.sendEmails("月分润同步失败","月分润同步失败");
             return;
         }
+
+        BigDecimal fxAmount = json.getBigDecimal("fxAmount");//分销系统交易汇总
+        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount");//未计入分润汇总
+        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount");//未同步到分润
+
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<HashMap> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
             insertProfitMonth(list);
         } catch (Exception e) {
             logger.error("同步月分润数据失败！");
             e.printStackTrace();
         }
+
     }
 
-    public void insertProfitMonth(List<HashMap> profitMonths){
-        for(HashMap map:profitMonths){
+    public void insertProfitMonth(List<JSONObject> profitMonths){
+        for(JSONObject json:profitMonths){
+            allAmount = allAmount.add(json.getBigDecimal("TRANAMT"));//付款交易额-汇总所有
             ProfitDetailMonth where = new ProfitDetailMonth();
-            where.setAgentPid((String)map.get("AGENTPID"));
-            where.setProfitDate((String)map.get("PROFITDATE"));
+            where.setAgentPid(json.getString("UNIQUECODE"));//代理商唯一编号
+            where.setProfitDate(month);
             ProfitDetailMonth detailMonth = profitDetailMonthService.selectByPIdAndMonth(where);
-            BigDecimal totalDay = computerService.total_day((String)map.get("AGENTPID"),(String)map.get("PROFITDATE"));//瑞和宝日结分润汇总
-            BigDecimal factor = computerService.total_factor((String)map.get("AGENTPID"),(String)map.get("PROFITDATE"));//商业保理扣款
-            BigDecimal otherSupply = computerService.total_supply((String)map.get("AGENTPID"),(String)map.get("PROFITDATE"));//其他补款汇总
+            BigDecimal totalDay = computerService.total_day(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//瑞和宝日结分润汇总
+            BigDecimal factor = computerService.total_factor(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//商业保理扣款
+            BigDecimal otherSupply = computerService.total_supply(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//其他补款汇总
             if(null!=detailMonth){//已存在该分润
-                detailMonth.setRhbDgMustDeductionAmt((BigDecimal) map.get(""));
-                detailMonth.setRhbDgRealDeductionAmt((BigDecimal) map.get(""));
+                BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
+                detailMonth.setProfitDate(month);
 
-                BigDecimal rhbProfit = (BigDecimal) map.get("");//瑞和宝分润
+                detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
+                detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
+                detailMonth.setTpProfitAmt(json.getBigDecimal("TPPROFITAMT"));//贴牌分润
+                detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
+                detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
+                detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
 
-                detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
+
+                detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润=瑞和宝分润-日结分润
                 detailMonth.setBuDeductionAmt(factor);
                 detailMonth.setOtherSupplyAmt(otherSupply);
                 profitDetailMonthService.updateByPrimaryKeySelective(detailMonth);
             }else{
                 detailMonth = new ProfitDetailMonth();
-                detailMonth.setId(idService.genId(TabId.P_PROFIT_M));
-                BigDecimal rhbProfit = (BigDecimal) map.get("");//瑞和宝分润
+                detailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
+                detailMonth.setProfitDate(month);
+                detailMonth.setAgentPid(json.getString("UNIQUECODE"));
+                detailMonth.setAgentName(json.getString("AGENTNAME"));
+                BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
+
+                detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
+                detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
+                detailMonth.setTpProfitAmt(json.getBigDecimal("TPPROFITAMT"));//贴牌分润
+                detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
+                detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
+                detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
 
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
                 detailMonth.setBuDeductionAmt(factor);

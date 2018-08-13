@@ -8,5 +8,11 @@ import java.util.Map;
  */
 public interface DeductService {
 
-    public Map<String, Object> executDeduct(Map<String, Object> map) throws Exception;
+    /**
+     * 执行分润计算
+     * @param map
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> execut(Map<String, Object> map) throws Exception;
 }
