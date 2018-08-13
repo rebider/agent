@@ -23,5 +23,5 @@ public interface ProfitStagingMapper {
 
     int updateByPrimaryKey(ProfitStaging record);
 
-    BigDecimal getNotDeductionAmt(String agentId);
+    ProfitStaging getNotDeductionAmt(String agentId);
 }
