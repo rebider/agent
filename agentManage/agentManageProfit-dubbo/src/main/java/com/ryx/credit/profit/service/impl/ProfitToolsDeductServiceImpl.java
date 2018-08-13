@@ -23,7 +23,7 @@ import java.util.Map;
  * @author yangmx
  * @desc 机具分润扣款
  */
-@Service
+@Service("profitToolsDeductServiceImpl")
 public class ProfitToolsDeductServiceImpl implements DeductService {
 
     private static Logger LOG = LoggerFactory.getLogger(ProfitToolsDeductServiceImpl.class);
@@ -40,7 +40,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      * 代理商分润不足，扣减了担保代理商的分润，是否需要通知上层被扣减担保代理商是谁，扣减分润是多少？
      */
     @Override
-    public Map<String, Object> executDeduct(Map<String, Object> map) throws Exception {
+    public Map<String, Object> execut(Map<String, Object> map) throws Exception {
         LOG.info("机具分润扣款：{}", map);
         if (map == null) {
             throw new Exception("机具分润扣款参数为空");

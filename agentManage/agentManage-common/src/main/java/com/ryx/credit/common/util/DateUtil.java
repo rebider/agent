@@ -93,6 +93,15 @@ public class DateUtil {
         return cal.getTime();
     }
 
+
+    public static Date addMonth(String sdate, int month) {
+        Date date = format(sdate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.MONTH, month);
+        return cal.getTime();
+    }
+
 	/**
 	 * 将字符串转换为Date类型
 	 *
@@ -148,13 +157,36 @@ public class DateUtil {
 		 String a=format.format(new Date());
 		 Date b= DateUtil.StrToDate("20170727");
 		 System.out.println(b);*/
-
+		String date = "201808";
         String month = null;
         month = sdfDays.format(addMonth(new Date() , -1));
         month = month.substring(0,6);
-        System.out.println(month);
+        System.out.println(convert(date));
 	}
-	
+
+    /**
+     * 获取YYYYMM格式的上个月日期，也是YYYYMM
+     * @param source
+     * @return
+     */
+    public static String convert ( String source )
+    {
+        try
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat ("yyyyMM");
+            Date date = sdf.parse (source);
+            Calendar calendar = Calendar.getInstance ();
+            calendar.setTime (date);
+            calendar.add (Calendar.MONTH, -1);
+            return sdf.format (calendar.getTime ());
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace ();
+        }
+        return "";
+    }
+
     /**  
      * 计算两个日期之间相差的天数  
      * @param smdate 较小的时间 

@@ -1,9 +1,8 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.pojo.*;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -46,6 +46,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Autowired
     ProfitDetailMonthMapper detailMonthMapper;
     @Autowired
+    PTaxAdjustMapper adjustMapper;
+    @Autowired
+    PtaxHistoryMapper historyMapper;
+    @Autowired
     IdService idService;
 
     @Override
@@ -58,6 +62,22 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         day.setAgentPid(agentPid);
         day.setTransDate(month);
         BigDecimal totalDay = dayMapper.totalMonthByAgentPid(day);
+        if(null == totalDay){
+            totalDay = BigDecimal.ZERO;
+        }
+        return totalDay;
+    }
+
+    @Override
+    public BigDecimal total_dayR(String agentPid,String month) {
+        if(null==month || "".equals(month)){
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1));
+            month = month.substring(0,6);
+        }
+        ProfitDay day = new ProfitDay();
+        day.setAgentPid(agentPid);
+        day.setTransDate(month);
+        BigDecimal totalDay = dayMapper.totalReturnByAgentPid(day);
         if(null == totalDay){
             totalDay = BigDecimal.ZERO;
         }
@@ -295,4 +315,128 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     }
 
 
+    /**
+     * 同步手刷月分润交易汇总
+     * @param transDate 交易日期（空则为上一月）
+     */
+    @Override
+    public BigDecimal synchroSSTotalTransAmt(String transDate){
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
+        map.put("pageNumber","1");
+        map.put("pageSize","20");
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("profit.month"),params);
+        System.out.println(res);
+        JSONObject json = JSONObject.parseObject(res);
+        if(!json.get("respCode").equals("000000")){
+            logger.error("请求同步失败！");
+            AppConfig.sendEmails("手刷月分润交易汇总失败","手刷月分润交易汇总失败");
+            return null;
+        }
+        BigDecimal fxAmount = json.getBigDecimal("fxAmount");//分销系统交易汇总
+        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount");//未计入分润汇总
+        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount");//未同步到分润
+
+        String data = JSONObject.parseObject(res).get("data").toString();
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
+        BigDecimal tranAmount = addTransAmt(list);//手刷交易额汇总
+
+        return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
+
+    }
+    public BigDecimal addTransAmt(List<JSONObject> profitMonths){
+        BigDecimal amt = BigDecimal.ZERO;
+        for(JSONObject json:profitMonths){
+            amt = amt.add(json.getBigDecimal("TRANAMT"));
+        }
+        return amt;
+    }
+
+    @Override
+    public ProfitDetailMonth getTaxAndProfit(BigDecimal profitA,String agentPid,String subAgentPid,BigDecimal agentTax,String transDate){
+        ProfitDetailMonth detail = new ProfitDetailMonth();
+        PtaxHistory where  = new PtaxHistory();
+        where.setAgentPid(agentPid);
+        where.setTaxMonth(DateUtil.convert(transDate));//计算日期的上个月
+        //如果没有基础分润金额，则查询是否有历史欠税。如果没有历史欠税则反null
+        if(profitA.compareTo(BigDecimal.ZERO)<=0){
+            BigDecimal history = historyMapper.getHistoryAmt(where);
+            if(null==history){
+                return null;
+            }
+            detail.setDeductionTaxMonthAgoAmt(history);
+            inserHistory(transDate,agentPid,history);
+            return detail;
+        }
+        //-------------------本月税额计算-------------------
+        BigDecimal tax = adjustMapper.getTax(agentPid);
+        if(null == tax){
+            tax = agentTax==null?new BigDecimal("0.06"):agentTax;
+        }
+        detail.setDeductionTaxMonthAmt(profitA.multiply(tax));//@VALUE：本月税额
+        //-------------------查询该代理商下级代理应补税额-------------------
+        BigDecimal subTax1 = null;//直发补税
+        BigDecimal subTax2 = null;//非直发下级补税
+        if(tax.compareTo(new BigDecimal("0.06"))<0){//小于0.06才存在补税
+            ProfitDirect dirct = new ProfitDirect();
+            dirct.setFristAgentPid(agentPid);
+            dirct.setTransMonth(transDate);
+            subTax1 = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总
+            subTax1 = subTax1==null?BigDecimal.ZERO:subTax1;
+            subTax1 = subTax1.multiply(new BigDecimal("0.06")).subtract(subTax1.multiply(tax));
+            ProfitDetailMonth subDetail = detailMonthMapper.selectByAgentPid(subAgentPid);
+            if(tax.compareTo(subDetail.getTax())<0){//税点小于下级税点
+                subTax2 = subDetail.getRealProfitAmt()==null?BigDecimal.ZERO:subDetail.getRealProfitAmt()
+                        .multiply(subDetail.getTax()==null?BigDecimal.ZERO:subDetail.getTax())
+                        .subtract(subDetail.getRealProfitAmt()==null?BigDecimal.ZERO:subDetail.getRealProfitAmt().multiply(tax));//下级分润*下级税点-下级分润*上级税点
+            }
+            if(subTax2==null || subTax2.compareTo(BigDecimal.ZERO)<0){
+                subTax2 = BigDecimal.ZERO;
+            }
+        }
+        detail.setSupplyTaxAmt(subTax1.add(subTax2));//@VALUE：补下级税点
+        //-------------------计算本月之前税额（[日结+日返现]*税点+记录中上月税额）-------------------
+        ProfitDay day = new ProfitDay();
+        day.setAgentPid(agentPid);
+        day.setTransDate(transDate);
+        BigDecimal totalDay = dayMapper.totalProfitAndReturn(day);
+
+        if(agentPid.equals("JS00001159")||agentPid.equals("JS00001160")){//捷步、银点只算日结
+            totalDay = dayMapper.totalMonthByAgentPid(day);
+        }
+        BigDecimal taxDay = totalDay.multiply(tax);//日结分润应补税额部分
+        BigDecimal taxHistory = historyMapper.getHistoryAmt(where);//上月税额
+        detail.setDeductionTaxMonthAgoAmt(taxDay.add(taxHistory));//@VALUE：扣本月之前税额（含本月日）
+        //-------------------本月分润=基础分润-本月之前欠税额+下级补税点。
+        //-------------------实际分润=本月分润-本月税额。
+        // ------------------不足后，需记录本月之前欠税额-------------------
+        BigDecimal must = profitA.subtract(detail.getDeductionTaxMonthAgoAmt())
+                .add(detail.getSupplyTaxAmt());
+        BigDecimal actual = must.subtract(detail.getDeductionTaxMonthAmt());
+        if(actual.compareTo(BigDecimal.ZERO)<=0){//实际分润不足扣税
+            inserHistory(transDate,agentPid,actual.multiply(new BigDecimal("-1")));
+            actual = BigDecimal.ZERO;
+        }
+        must = must.compareTo(BigDecimal.ZERO)<0?BigDecimal.ZERO:must;
+        detail.setProfitMonthAmt(must);//@VALUE：本月分润
+        detail.setRealProfitAmt(actual);//@VALUE：实发分润
+        return detail;
+    }
+
+    /**
+     * 插入欠税历史
+     * @param transDate 欠税月份
+     * @param agentPid
+     * @param amt 欠税金额
+     */
+    public void inserHistory(String transDate,String agentPid,BigDecimal amt){
+        PtaxHistory history = new PtaxHistory();
+        history.setId(idService.genId(TabId.p_profit_adjust));
+        history.setTaxMonth(transDate);
+        history.setAgentPid(agentPid);
+        history.setTaxAmount(amt);
+        historyMapper.insert(history);
+    }
 }
