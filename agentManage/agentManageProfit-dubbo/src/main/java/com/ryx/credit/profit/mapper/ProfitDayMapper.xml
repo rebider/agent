@@ -9,6 +9,7 @@
     <result column="TRANS_DATE" jdbcType="VARCHAR" property="transDate" />
     <result column="REMIT_DATE" jdbcType="VARCHAR" property="remitDate" />
     <result column="TOTAL_PROFIT" jdbcType="DECIMAL" property="totalProfit" />
+    <result column="TOTAL_PROFIT1" jdbcType="DECIMAL" property="totalProfit1" />
     <result column="FROZEN_MONEY" jdbcType="DECIMAL" property="frozenMoney" />
     <result column="SUCCESS_MONEY" jdbcType="DECIMAL" property="successMoney" />
     <result column="FAIL_MONEY" jdbcType="DECIMAL" property="failMoney" />
@@ -46,7 +47,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TRANS_DATE, REMIT_DATE, TOTAL_PROFIT, FROZEN_MONEY,
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TRANS_DATE, REMIT_DATE, TOTAL_PROFIT,TOTAL_PROFIT1, FROZEN_MONEY,
     SUCCESS_MONEY, FAIL_MONEY, REAL_MONEY, REDO_MONEY, RETURN_MONEY
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultMap="BaseResultMap">
@@ -103,7 +104,7 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
     insert into P_PROFIT_D (ID, AGENT_PID, AGENT_ID,
     AGENT_NAME, TRANS_DATE, REMIT_DATE,
-    TOTAL_PROFIT, FROZEN_MONEY, SUCCESS_MONEY,
+    TOTAL_PROFIT,TOTAL_PROFIT1, FROZEN_MONEY, SUCCESS_MONEY,
     FAIL_MONEY, REAL_MONEY, REDO_MONEY,
     RETURN_MONEY)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
@@ -135,6 +136,9 @@
       </if>
       <if test="totalProfit != null">
         TOTAL_PROFIT,
+      </if>
+      <if test="totalProfit1 != null">
+        TOTAL_PROFIT1,
       </if>
       <if test="frozenMoney != null">
         FROZEN_MONEY,
@@ -241,6 +245,9 @@
       <if test="totalProfit != null">
         TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
       </if>
+      <if test="totalProfit1 != null">
+        TOTAL_PROFIT1 = #{totalProfit1,jdbcType=DECIMAL},
+      </if>
       <if test="frozenMoney != null">
         FROZEN_MONEY = #{frozenMoney,jdbcType=DECIMAL},
       </if>
@@ -270,6 +277,7 @@
     TRANS_DATE = #{transDate,jdbcType=VARCHAR},
     REMIT_DATE = #{remitDate,jdbcType=VARCHAR},
     TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
+    TOTAL_PROFIT1 = #{totalProfit1,jdbcType=DECIMAL},
     FROZEN_MONEY = #{frozenMoney,jdbcType=DECIMAL},
     SUCCESS_MONEY = #{successMoney,jdbcType=DECIMAL},
     FAIL_MONEY = #{failMoney,jdbcType=DECIMAL},
