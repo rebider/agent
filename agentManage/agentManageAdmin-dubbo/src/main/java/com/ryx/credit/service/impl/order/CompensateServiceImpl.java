@@ -170,7 +170,7 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("不能提交其他省区的退补差价");
             }
             String gTime = String.valueOf(stringObjectMap.get("G_TIME"));
-            if(StringUtils.isNotBlank(gTime)){
+            if(StringUtils.isNotBlank(gTime) && gTime!="null"){
                 BigDecimal gTimeB = new BigDecimal(gTime);
                 gTimeB = gTimeB.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
                 long activityCtime = oLogistics.getcTime().getTime();
@@ -195,7 +195,7 @@ public class CompensateServiceImpl implements CompensateService {
     public BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum){
         BigDecimal resultPrice = new BigDecimal(0);
         //之前参加过活动
-        if(StringUtils.isNotBlank(oldActivityId)){
+        if(StringUtils.isNotBlank(oldActivityId) && !oldActivityId.equals("undefined")){
             Map<String, Object> reqParam = new HashMap<>();
             reqParam.put("snBegin",beginSn);
             reqParam.put("snEnd",endSn);
@@ -218,10 +218,8 @@ public class CompensateServiceImpl implements CompensateService {
             BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
             resultPrice = oldPrice.subtract(newPrice);
         }else{
-            OSubOrder oSubOrder = null;
-            BigDecimal oldPrice = oSubOrder.getProPrice().multiply(proNum);
             BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
-            resultPrice = oldPrice.subtract(newPrice);
+            resultPrice = newPrice;
         }
         return resultPrice;
     }
@@ -299,7 +297,7 @@ public class CompensateServiceImpl implements CompensateService {
 
         refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
             Map<String, Object> logisticsDetail = null;
-            if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId())){
+            if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                 Map<String, Object> reqParam = new HashMap<>();
                 reqParam.put("snBegin",refundPriceDiffDetail.getBeginSn());
                 reqParam.put("snEnd",refundPriceDiffDetail.getEndSn());
@@ -657,7 +655,7 @@ public class CompensateServiceImpl implements CompensateService {
         for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
-            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId())){
+            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId()) && !oRefundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                 List<Map<String, Object>> oLogisticsDetails = null;
                 Map<String, Object> reqParam = new HashMap<>();
                 reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
