@@ -73,12 +73,12 @@
     where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='0'
   </select>
 
-  <select id="getTax" parameterType="java.lang.String" resultMap="java.math.BigDecimal">
-    select
-    tax_ing
-    from P_TAX_ADJUST
-    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='1'
-  </select>
+  <!--<select id="getTax" parameterType="java.lang.String" resultMap="java.math.BigDecimal">-->
+    <!--select-->
+    <!--tax_ing-->
+    <!--from P_TAX_ADJUST-->
+    <!--where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='1'-->
+  <!--</select>-->
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample">
     delete from P_TAX_ADJUST

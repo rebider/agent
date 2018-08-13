@@ -91,8 +91,8 @@ public class PosRewardServiceImpl implements IPosRewardService {
         if(StringUtils.isNotBlank(reward.getAgentName())){
             criteria.andAgentNameEqualTo(reward.getAgentName());
         }
-        if(StringUtils.isNotBlank(reward.getAgentId())){
-            criteria.andAgentIdEqualTo(reward.getAgentId());
+        if(StringUtils.isNotBlank(reward.getAgentPid())){
+            criteria.andAgentPidEqualTo(reward.getAgentPid());
         }
         return posRewardExample;
     }
@@ -160,7 +160,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
             PosRewardExample posRewardExample = new PosRewardExample();
             posRewardExample.createCriteria().andIdEqualTo(posReward.getId());
             rewardMapper.deleteByExample(posRewardExample);
-            logger.error("POS奖励审批流启动失败，代理商ID：{}", posReward.getAgentId());
+            logger.error("POS奖励审批流启动失败，代理商ID：{}", posReward.getAgentPid());
             throw new ProcessException("POS奖励审批流启动失败!");
         }
         BusActRel record = new BusActRel();
@@ -267,8 +267,8 @@ public class PosRewardServiceImpl implements IPosRewardService {
         if(StringUtils.isNotBlank(posReward.getTotalConsMonth())){
             criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
         }
-        if(StringUtils.isNotBlank(posReward.getAgentId())){
-            criteria.andAgentIdEqualTo(posReward.getAgentId());
+        if(StringUtils.isNotBlank(posReward.getAgentPid())){
+            criteria.andAgentIdEqualTo(posReward.getAgentPid());
         }
         return rewardMapper.selectByExample(example);
     }

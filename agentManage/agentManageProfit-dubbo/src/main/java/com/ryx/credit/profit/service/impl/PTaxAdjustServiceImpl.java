@@ -204,8 +204,8 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         if(StringUtils.isNotBlank(adjust.getAgentName())){
             criteria.andAgentNameEqualTo(adjust.getAgentName());
         }
-        if(StringUtils.isNotBlank(adjust.getAgentId())){
-            criteria.andAgentIdEqualTo(adjust.getAgentId());
+        if(StringUtils.isNotBlank(adjust.getAgentPid())){
+            criteria.andAgentPidEqualTo(adjust.getAgentPid());
         }
         return PTaxAdjustExample;
     }
