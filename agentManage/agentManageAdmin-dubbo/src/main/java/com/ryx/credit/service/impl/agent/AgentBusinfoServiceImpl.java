@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
@@ -11,7 +12,9 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
+import com.sun.org.glassfish.external.statistics.Stats;
 import org.apache.commons.lang.StringUtils;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -282,13 +285,15 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Override
 	public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
-
-		if(list.size()==4)
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		if(list.size()==4) {
 			return list;
+		}
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId)
-                .andBusPlatformEqualTo(platformCode).
-                andStatusEqualTo(Status.STATUS_1.status);
+                .andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0)
 			return list;
@@ -296,9 +301,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
 			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
 			if(parent!=null){
-				list.add(parent);
-				if (StringUtils.isNotEmpty(parent.getAgentId())) {
-					return queryParenFourLevel(list, platformCode, parent.getAgentId());
+				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
+					list.add(parent);
+					if (StringUtils.isNotEmpty(parent.getAgentId())) {
+						return queryParenFourLevel(list, platformCode, parent.getAgentId());
+					}else{
+						return list;
+					}
 				}else{
 					return list;
 				}
@@ -311,41 +320,51 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	}
 
-	@Deprecated
+	/**
+	 * 把给定的代理商指定的平台的下级节点全部放回
+	 * @param list
+	 * @param platformCode
+	 * @param agentId
+	 * @return
+	 */
 	@Override
-	public List<AgentBusInfo> queryChildFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
-
-		if(list.size()==4)
+	public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		if(list.size()==4) {
 			return list;
+		}
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId)
-				.andBusPlatformEqualTo(platformCode).
-				andStatusEqualTo(Status.STATUS_1.status);
+				.andBusPlatformEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 
-		if(plats.size()==0)
+		if(plats.size()==0) {
 			return list;
-
+		}
 		//查询下级代理商
 		AgentBusInfo platInfo = plats.get(0);
 
+
 		AgentBusInfoExample child_example = new AgentBusInfoExample();
-		child_example.or().andBusParentEqualTo(platInfo.getAgentId())
-				.andBusPlatformEqualTo(platformCode).
-				andStatusEqualTo(Status.STATUS_1.status);
-
+		child_example.or().andBusParentEqualTo(platInfo.getId())
+				.andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
-
         //没有下级别就返回
-		if(child_plat.size()==0)
+		if(child_plat.size()==0) {
 			return list;
+		}
 		//有就添加
-		AgentBusInfo child = child_plat.get(0);
+		list.addAll(child_plat);
+		//把孩子节点也加到list
+		for (AgentBusInfo agentBusInfo : child_plat) {
+			queryChildLevel(list,agentBusInfo.getBusPlatform(),agentBusInfo.getAgentId());
+		}
 
-		list.add(child);
-
-        //并返回获取的下一级
-        return queryChildFourLevel(list,child.getBusPlatform(),child.getAgentId());
+        return list;
 	}
 }
