@@ -84,8 +84,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
-
-
             if (StringUtils.isBlank(String.valueOf(objectList.get(0)))) {
                 logger.info("排单编号为空");
                 throw new MessageException("排单编号为空");
@@ -133,6 +131,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请仔细核对发货数量");
                 throw new MessageException("请仔细核对发货数量");
             }
+
             //物流信息
             OLogistics oLogistics = new OLogistics();
             oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
@@ -142,10 +141,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
             oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
             oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
             oLogistics.setIsdeall(Status.STATUS_1.status);
+
+            //ID信息
             oLogistics.setReceiptPlanId(null != objectList.get(0) ? String.valueOf(objectList.get(0)) : ""); // 排单编号
             oLogistics.setOrderId(null != objectList.get(1) ? String.valueOf(objectList.get(1)) : "");       // 订单编号
             oLogistics.setProId(null != objectList.get(3) ? String.valueOf(objectList.get(3)) : "");         // 商品ID
             oLogistics.setProName(null != objectList.get(4) ? String.valueOf(objectList.get(4)) : "");       // 商品名称
+
             //排单信息
             ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
             if(planVo==null)throw new MessageException("排单信息未找到");
@@ -153,10 +155,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if (null != objectList.get(6) && !objectList.get(6).equals("") ) {
                 oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
             }
+
             //商品信息从排单表里查
             oLogistics.setProCom(planVo.getProCom());// 厂家
-            oLogistics.setProType(planVo.getProType());//TODO 排单添加商品类型
+            oLogistics.setProType(planVo.getProType());//排单添加商品类型
             oLogistics.setProModel(planVo.getModel());//型号
+
             try {
                 oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
                 oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司

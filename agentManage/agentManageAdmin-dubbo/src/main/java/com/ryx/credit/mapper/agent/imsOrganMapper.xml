@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.imsOrganMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.imsOrgan">
+    <id column="ORG_ID" jdbcType="CHAR" property="orgId" />
+    <result column="SUP_ORG_ID" jdbcType="CHAR" property="supOrgId" />
+    <result column="ORG_LEVEL" jdbcType="DECIMAL" property="orgLevel" />
+    <result column="USE_ORGAN" jdbcType="CHAR" property="useOrgan" />
+    <result column="ORG_NAME" jdbcType="VARCHAR" property="orgName" />
+    <result column="PROVINCE" jdbcType="VARCHAR" property="province" />
+    <result column="CITY" jdbcType="VARCHAR" property="city" />
+    <result column="CITY_AREA" jdbcType="VARCHAR" property="cityArea" />
+    <result column="IS_LEAF" jdbcType="CHAR" property="isLeaf" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="CANCEL_TIME" jdbcType="VARCHAR" property="cancelTime" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="TOP_ORG_ID" jdbcType="CHAR" property="topOrgId" />
+    <result column="ATM_LIMIT" jdbcType="DECIMAL" property="atmLimit" />
+    <result column="OLD_ORG_ID" jdbcType="VARCHAR" property="oldOrgId" />
+    <result column="MER_SEQ" jdbcType="VARCHAR" property="merSeq" />
+    <result column="MER_PREFIX" jdbcType="VARCHAR" property="merPrefix" />
+    <result column="ORG_TYPE" jdbcType="VARCHAR" property="orgType" />
+    <result column="SUP_DORG_ID" jdbcType="CHAR" property="supDorgId" />
+    <result column="UNIQUE_ID" jdbcType="VARCHAR" property="uniqueId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ORG_ID, SUP_ORG_ID, ORG_LEVEL, USE_ORGAN, ORG_NAME, PROVINCE, CITY, CITY_AREA, IS_LEAF, 
+    CREATE_TIME, CANCEL_TIME, STATUS, TOP_ORG_ID, ATM_LIMIT, OLD_ORG_ID, MER_SEQ, MER_PREFIX, 
+    ORG_TYPE, SUP_DORG_ID, UNIQUE_ID
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.imsOrganExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_ORGAN
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_ORGAN
+    where ORG_ID = #{orgId,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.imsOrganExample">
+    delete from IMS_ORGAN
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.imsOrgan">
+    insert into IMS_ORGAN (ORG_ID, SUP_ORG_ID, ORG_LEVEL, 
+      USE_ORGAN, ORG_NAME, PROVINCE, 
+      CITY, CITY_AREA, IS_LEAF, 
+      CREATE_TIME, CANCEL_TIME, STATUS, 
+      TOP_ORG_ID, ATM_LIMIT, OLD_ORG_ID, 
+      MER_SEQ, MER_PREFIX, ORG_TYPE, 
+      SUP_DORG_ID, UNIQUE_ID)
+    values (#{orgId,jdbcType=CHAR}, #{supOrgId,jdbcType=CHAR}, #{orgLevel,jdbcType=DECIMAL}, 
+      #{useOrgan,jdbcType=CHAR}, #{orgName,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, 
+      #{city,jdbcType=VARCHAR}, #{cityArea,jdbcType=VARCHAR}, #{isLeaf,jdbcType=CHAR}, 
+      #{createTime,jdbcType=VARCHAR}, #{cancelTime,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, 
+      #{topOrgId,jdbcType=CHAR}, #{atmLimit,jdbcType=DECIMAL}, #{oldOrgId,jdbcType=VARCHAR}, 
+      #{merSeq,jdbcType=VARCHAR}, #{merPrefix,jdbcType=VARCHAR}, #{orgType,jdbcType=VARCHAR}, 
+      #{supDorgId,jdbcType=CHAR}, #{uniqueId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.imsOrgan">
+    insert into IMS_ORGAN
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="orgId != null">
+        ORG_ID,
+      </if>
+      <if test="supOrgId != null">
+        SUP_ORG_ID,
+      </if>
+      <if test="orgLevel != null">
+        ORG_LEVEL,
+      </if>
+      <if test="useOrgan != null">
+        USE_ORGAN,
+      </if>
+      <if test="orgName != null">
+        ORG_NAME,
+      </if>
+      <if test="province != null">
+        PROVINCE,
+      </if>
+      <if test="city != null">
+        CITY,
+      </if>
+      <if test="cityArea != null">
+        CITY_AREA,
+      </if>
+      <if test="isLeaf != null">
+        IS_LEAF,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="cancelTime != null">
+        CANCEL_TIME,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="topOrgId != null">
+        TOP_ORG_ID,
+      </if>
+      <if test="atmLimit != null">
+        ATM_LIMIT,
+      </if>
+      <if test="oldOrgId != null">
+        OLD_ORG_ID,
+      </if>
+      <if test="merSeq != null">
+        MER_SEQ,
+      </if>
+      <if test="merPrefix != null">
+        MER_PREFIX,
+      </if>
+      <if test="orgType != null">
+        ORG_TYPE,
+      </if>
+      <if test="supDorgId != null">
+        SUP_DORG_ID,
+      </if>
+      <if test="uniqueId != null">
+        UNIQUE_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="orgId != null">
+        #{orgId,jdbcType=CHAR},
+      </if>
+      <if test="supOrgId != null">
+        #{supOrgId,jdbcType=CHAR},
+      </if>
+      <if test="orgLevel != null">
+        #{orgLevel,jdbcType=DECIMAL},
+      </if>
+      <if test="useOrgan != null">
+        #{useOrgan,jdbcType=CHAR},
+      </if>
+      <if test="orgName != null">
+        #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null">
+        #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="cityArea != null">
+        #{cityArea,jdbcType=VARCHAR},
+      </if>
+      <if test="isLeaf != null">
+        #{isLeaf,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelTime != null">
+        #{cancelTime,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="topOrgId != null">
+        #{topOrgId,jdbcType=CHAR},
+      </if>
+      <if test="atmLimit != null">
+        #{atmLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="oldOrgId != null">
+        #{oldOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="merSeq != null">
+        #{merSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="merPrefix != null">
+        #{merPrefix,jdbcType=VARCHAR},
+      </if>
+      <if test="orgType != null">
+        #{orgType,jdbcType=VARCHAR},
+      </if>
+      <if test="supDorgId != null">
+        #{supDorgId,jdbcType=CHAR},
+      </if>
+      <if test="uniqueId != null">
+        #{uniqueId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.imsOrganExample" resultType="java.lang.Long">
+    select count(*) from IMS_ORGAN
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.imsOrgan">
+    update IMS_ORGAN
+    <set>
+      <if test="supOrgId != null">
+        SUP_ORG_ID = #{supOrgId,jdbcType=CHAR},
+      </if>
+      <if test="orgLevel != null">
+        ORG_LEVEL = #{orgLevel,jdbcType=DECIMAL},
+      </if>
+      <if test="useOrgan != null">
+        USE_ORGAN = #{useOrgan,jdbcType=CHAR},
+      </if>
+      <if test="orgName != null">
+        ORG_NAME = #{orgName,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null">
+        PROVINCE = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        CITY = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="cityArea != null">
+        CITY_AREA = #{cityArea,jdbcType=VARCHAR},
+      </if>
+      <if test="isLeaf != null">
+        IS_LEAF = #{isLeaf,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="cancelTime != null">
+        CANCEL_TIME = #{cancelTime,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="topOrgId != null">
+        TOP_ORG_ID = #{topOrgId,jdbcType=CHAR},
+      </if>
+      <if test="atmLimit != null">
+        ATM_LIMIT = #{atmLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="oldOrgId != null">
+        OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="merSeq != null">
+        MER_SEQ = #{merSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="merPrefix != null">
+        MER_PREFIX = #{merPrefix,jdbcType=VARCHAR},
+      </if>
+      <if test="orgType != null">
+        ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      </if>
+      <if test="supDorgId != null">
+        SUP_DORG_ID = #{supDorgId,jdbcType=CHAR},
+      </if>
+      <if test="uniqueId != null">
+        UNIQUE_ID = #{uniqueId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ORG_ID = #{orgId,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.imsOrgan">
+    update IMS_ORGAN
+    set SUP_ORG_ID = #{supOrgId,jdbcType=CHAR},
+      ORG_LEVEL = #{orgLevel,jdbcType=DECIMAL},
+      USE_ORGAN = #{useOrgan,jdbcType=CHAR},
+      ORG_NAME = #{orgName,jdbcType=VARCHAR},
+      PROVINCE = #{province,jdbcType=VARCHAR},
+      CITY = #{city,jdbcType=VARCHAR},
+      CITY_AREA = #{cityArea,jdbcType=VARCHAR},
+      IS_LEAF = #{isLeaf,jdbcType=CHAR},
+      CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      CANCEL_TIME = #{cancelTime,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=CHAR},
+      TOP_ORG_ID = #{topOrgId,jdbcType=CHAR},
+      ATM_LIMIT = #{atmLimit,jdbcType=DECIMAL},
+      OLD_ORG_ID = #{oldOrgId,jdbcType=VARCHAR},
+      MER_SEQ = #{merSeq,jdbcType=VARCHAR},
+      MER_PREFIX = #{merPrefix,jdbcType=VARCHAR},
+      ORG_TYPE = #{orgType,jdbcType=VARCHAR},
+      SUP_DORG_ID = #{supDorgId,jdbcType=CHAR},
+      UNIQUE_ID = #{uniqueId,jdbcType=VARCHAR}
+    where ORG_ID = #{orgId,jdbcType=CHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
