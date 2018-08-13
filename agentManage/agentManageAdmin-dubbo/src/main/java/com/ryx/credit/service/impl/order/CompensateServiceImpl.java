@@ -170,7 +170,7 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new ProcessException("不能提交其他省区的退补差价");
             }
             String gTime = String.valueOf(stringObjectMap.get("G_TIME"));
-            if(StringUtils.isNotBlank(gTime)){
+            if(StringUtils.isNotBlank(gTime) && gTime!="null"){
                 BigDecimal gTimeB = new BigDecimal(gTime);
                 gTimeB = gTimeB.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
                 long activityCtime = oLogistics.getcTime().getTime();
