@@ -28,10 +28,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -189,6 +186,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getRemark())){
+            if (!"POS考核扣款（新国都、瑞易送）".equals(profitDeduction.getRemark()) && !"手刷考核扣款（小蓝牙、MPOS）".equals(profitDeduction.getRemark())) {
+                criteria.andRemarkNotIn(Arrays.asList(new String[]{"POS考核扣款（新国都、瑞易送）", "手刷考核扣款（小蓝牙、MPOS）"}));
+            }else {
+                criteria.andRemarkEqualTo(profitDeduction.getRemark());
+            }
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         if(profitDeductions != null && !profitDeductions.isEmpty()){
             return profitDeductions;
@@ -212,10 +216,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal otherDeduction(BigDecimal profitAmt, String agentPid) throws DeductionException {
+    public BigDecimal otherDeductionByType(BigDecimal profitAmt, String agentPid, String type) throws DeductionException {
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         try {
-            return otherDeduction(profitAmt, agentPid, deductionDate);
+            return otherDeduction(profitAmt, agentPid, deductionDate, type);
         }catch ( Exception e) {
             e.printStackTrace();
             throw new DeductionException("扣款失败。");
@@ -226,7 +230,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     public BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentPid) throws DeductionException {
         // 获取退单扣款
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.SETTLE_ERR.getType(), bussType);
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.SETTLE_ERR.getType(), bussType, null);
         if (deductionList != null && deductionList.size() > 0) {
            if ("pos".equals(bussType)) {
               return getDeductionAmt(deductionList, profitAmt);
@@ -262,12 +266,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return  result;
     }
 
-    private List<ProfitDeduction> getProfitDeductionListByType(String agentPid, String deductionDate, String type, String sourceId) {
+    private List<ProfitDeduction> getProfitDeductionListByType(String agentPid, String deductionDate, String type, String sourceId, String remark) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentPid(agentPid);
         profitDeduction.setDeductionType(type);
         profitDeduction.setDeductionDate(deductionDate);
         profitDeduction.setSourceId(sourceId);
+        profitDeduction.setRemark(remark);
         return this.getProfitDeduction(profitDeduction);
     }
 
@@ -280,9 +285,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/8
     */
-    private  BigDecimal otherDeduction(BigDecimal profitAmt, String agentPid, String deductionDate) {
+    private  BigDecimal otherDeduction(BigDecimal profitAmt, String agentPid, String deductionDate, String type) {
         // 获取代理商所有其它扣款信息
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.OTHER.getType(), null);
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.OTHER.getType(), null, type);
         return getDeductionAmt(deductionList, profitAmt);
     }
 
