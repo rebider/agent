@@ -655,7 +655,7 @@ public class CompensateServiceImpl implements CompensateService {
         for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
-            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId())){
+            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId()) && !oRefundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                 List<Map<String, Object>> oLogisticsDetails = null;
                 Map<String, Object> reqParam = new HashMap<>();
                 reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
