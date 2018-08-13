@@ -357,7 +357,7 @@
 
   <select id="queryCompensateLList" parameterType="java.util.Map" resultType="java.util.Map">
     select
-      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME,
       max(SN_NUM) as MAX_SN,min(SN_NUM) as MIN_SN,count(*) as PRO_NUM
     from o_logistics_detail
     where
@@ -376,7 +376,7 @@
       and OPT_ID = #{optId}
     </if>
     group by
-      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME
   </select>
 
   <update id="updateCompensate" parameterType="java.util.Map">
