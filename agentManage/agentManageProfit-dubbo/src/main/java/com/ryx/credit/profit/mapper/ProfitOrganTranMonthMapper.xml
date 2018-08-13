@@ -68,12 +68,13 @@
     from P_ORGAN_TRAN_MONTH
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" >
+  <delete id="deleteByExample"  parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" >
     delete from P_ORGAN_TRAN_MONTH
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
+
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth" >
     insert into P_ORGAN_TRAN_MONTH (ID, PRODUCT_TYPE, PRODUCT_NAME, 
       TRAN_AMT, SETTLE_AMT, CHECK_DATE, 
