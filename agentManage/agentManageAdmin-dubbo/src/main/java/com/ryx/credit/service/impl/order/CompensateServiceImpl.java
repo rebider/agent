@@ -195,7 +195,7 @@ public class CompensateServiceImpl implements CompensateService {
     public BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum){
         BigDecimal resultPrice = new BigDecimal(0);
         //之前参加过活动
-        if(StringUtils.isNotBlank(oldActivityId)){
+        if(StringUtils.isNotBlank(oldActivityId) && !oldActivityId.equals("undefined")){
             Map<String, Object> reqParam = new HashMap<>();
             reqParam.put("snBegin",beginSn);
             reqParam.put("snEnd",endSn);
@@ -218,10 +218,8 @@ public class CompensateServiceImpl implements CompensateService {
             BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
             resultPrice = oldPrice.subtract(newPrice);
         }else{
-            OSubOrder oSubOrder = null;
-            BigDecimal oldPrice = oSubOrder.getProPrice().multiply(proNum);
             BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
-            resultPrice = oldPrice.subtract(newPrice);
+            resultPrice = newPrice;
         }
         return resultPrice;
     }
