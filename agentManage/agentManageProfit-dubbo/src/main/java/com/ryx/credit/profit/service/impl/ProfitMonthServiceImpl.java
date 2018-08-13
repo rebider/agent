@@ -10,6 +10,7 @@ import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.DeductService;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
@@ -18,6 +19,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitDeductionService profitDeductionServiceImpl;
 
     @Autowired
-    ProfitToolsDeductServiceImpl profitToolsDeductService;
+    @Qualifier("profitToolsDeductServiceImpl")
+    private DeductService profitToolsDeductService;
+
+    @Autowired
+    @Qualifier("posProfitComputeServiceImpl")
+    private DeductService posProfitComputeServiceImpl;
 
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
@@ -318,21 +325,21 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0,7));   //扣款月份
         map.put("agentProfitAmt", agentProfitAmt);     //代理商分润
         try {
-            profitToolsDeductService.executDeduct(map);
+            profitToolsDeductService.execut(map);
             profitDetailMonthTemp.setRhbDgMustDeductionAmt((BigDecimal) map.get("mustDeductionAmtSum"));
             profitDetailMonthTemp.setRhbDgRealDeductionAmt((BigDecimal) map.get("actualDeductionAmtSum"));
             agentProfitAmt = agentProfitAmt.subtract(profitDetailMonthTemp.getRhbDgRealDeductionAmt());
 
             map.put("paltformNo", "100003");      //POS
             map.put("agentProfitAmt", agentProfitAmt);     //代理商分润
-            profitToolsDeductService.executDeduct(map);
+            profitToolsDeductService.execut(map);
             profitDetailMonthTemp.setPosDgMustDeductionAmt((BigDecimal) map.get("mustDeductionAmtSum"));
             profitDetailMonthTemp.setPosDgRealDeductionAmt((BigDecimal) map.get("actualDeductionAmtSum"));
             agentProfitAmt = agentProfitAmt.subtract(profitDetailMonthTemp.getPosDgRealDeductionAmt());
 
             map.put("paltformNo", "100002");      //ZPOS
             map.put("agentProfitAmt", agentProfitAmt);     //代理商分润
-            profitToolsDeductService.executDeduct(map);
+            profitToolsDeductService.execut(map);
             profitDetailMonthTemp.setZposDgMustDeductionAmt((BigDecimal) map.get("mustDeductionAmtSum"));
             profitDetailMonthTemp.setZposTdRealDeductionAmt((BigDecimal) map.get("actualDeductionAmtSum"));
             agentProfitAmt = agentProfitAmt.subtract(profitDetailMonthTemp.getZposTdRealDeductionAmt());
