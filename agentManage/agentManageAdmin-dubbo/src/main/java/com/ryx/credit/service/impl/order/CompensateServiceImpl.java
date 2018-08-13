@@ -297,7 +297,7 @@ public class CompensateServiceImpl implements CompensateService {
 
         refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
             Map<String, Object> logisticsDetail = null;
-            if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId())){
+            if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
                 Map<String, Object> reqParam = new HashMap<>();
                 reqParam.put("snBegin",refundPriceDiffDetail.getBeginSn());
                 reqParam.put("snEnd",refundPriceDiffDetail.getEndSn());
