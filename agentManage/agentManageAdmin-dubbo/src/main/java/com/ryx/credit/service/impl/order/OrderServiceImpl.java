@@ -283,7 +283,7 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("请填写首付金额");
                 }
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("分期时间有误");
+                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("分期期数有误");
@@ -301,7 +301,7 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("请填写首付金额");
                 }
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("分期时间有误");
+                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("分期期数有误");
@@ -316,7 +316,7 @@ public class OrderServiceImpl implements OrderService {
                 return payment;
             case "FKFQ"://打款分期
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("分期时间有误");
+                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("分期期数有误");
@@ -326,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
                 return payment;
             case "FRFQ"://分润分期
                 if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
-                    throw new MessageException("分期时间有误");
+                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
                 if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
                     throw new MessageException("分期期数有误");
