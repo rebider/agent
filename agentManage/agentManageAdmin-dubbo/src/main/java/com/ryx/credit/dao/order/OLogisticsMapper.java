@@ -23,6 +23,7 @@ public interface OLogisticsMapper {
 
     int updateByPrimaryKey(OLogistics record);
 
+    OLogistics selectByPrimaryKey(String id);
 
     List<Map<String, Object>> getOLogisticsList(Map<String, Object> param);
 
@@ -34,5 +35,5 @@ public interface OLogisticsMapper {
 
     List<Map<String, Object>> queryLogisticsList(Map<String, Object> param);
 
-    void updateSnStatus(@Param("orderId") String orderId, @Param("startSn") String startSn, @Param("endSn") String endSn, @Param("status") BigDecimal status);
+    void updateSnStatus(@Param("orderId") String orderId, @Param("startSn") String startSn, @Param("endSn") String endSn, @Param("status") BigDecimal status, @Param("recordStatus") BigDecimal recordStatus,@Param("returnId") String returnId);
 }

@@ -17,11 +17,14 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.ORefundPriceDiffVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
 import com.ryx.credit.service.order.IAccountAdjustService;
+import com.ryx.credit.service.order.OrderActivityService;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 补差价处理
@@ -42,12 +46,6 @@ import java.util.*;
 public class CompensateServiceImpl implements CompensateService {
 
     private static Logger log = LoggerFactory.getLogger(CompensateServiceImpl.class);
-    @Autowired
-    private OLogisticsMapper logisticsMapper;
-    @Autowired
-    private OSubOrderMapper subOrderMapper;
-    @Autowired
-    private OSubOrderActivityMapper subOrderActivityMapper;
     @Autowired
     private OActivityMapper activityMapper;
     @Autowired
@@ -74,6 +72,14 @@ public class CompensateServiceImpl implements CompensateService {
     private CompensateService compensateService;
     @Autowired
     private OLogisticsDetailMapper logisticsDetailMapper;
+    @Autowired
+    private OrderActivityService orderActivityService;
+    @Autowired
+    private OLogisticsMapper logisticsMapper;
+    @Autowired
+    private IUserService userService;
+    @Autowired
+    private AgentService agentService;
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -99,6 +105,7 @@ public class CompensateServiceImpl implements CompensateService {
         if(null!=refundPriceDiff.getReviewStatus()){
             criteria.andReviewStatusEqualTo(refundPriceDiff.getReviewStatus());
         }
+        criteria.andCUserEqualTo(refundPriceDiff.getcUser());
         example.setPage(page);
         example.setOrderByClause("c_time desc");
         List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
@@ -109,121 +116,19 @@ public class CompensateServiceImpl implements CompensateService {
         return pageInfo;
     }
 
-
-//    @Override
-//    public OSubOrder getOrderMsgByExcel(List<Object> excelList)throws ProcessException{
-//        String agentName = "";
-//        String proCom = "";
-//        String proModel = "";
-//        String snBegin = "";
-//        String snEnd = "";
-//        String count = "";
-//        String orderNum = "";
-//        try {
-//            agentName =  String.valueOf(excelList.get(0));
-//            proCom =  String.valueOf(excelList.get(1));
-//            proModel =  String.valueOf(excelList.get(2));
-//            snBegin =  String.valueOf(excelList.get(3));
-//            snEnd =  String.valueOf(excelList.get(4));
-//            count =  String.valueOf(excelList.get(5));
-//            orderNum =  String.valueOf(excelList.get(6));
-//        } catch (Exception e) {
-//            throw new ProcessException("导入解析文件失败");
-//        }
-//
-//        Map<String, Object> reqMap = new HashMap<>();
-//        reqMap.put("beginSn",snBegin);
-//        reqMap.put("endSn",snEnd);
-//        reqMap.put("orderId",orderNum);
-//        ArrayList<Object> reviewStatusList = new ArrayList<>();
-//        reviewStatusList.add(AgStatus.Create.getValue());
-//        reviewStatusList.add(AgStatus.Approving.getValue());
-//        reqMap.put("reviewStatus",reviewStatusList);
-//        List<Map<String, Object>> resultMap = refundPriceDiffMapper.selectBySnAndOrderId(reqMap);
-//        if (resultMap == null) {
-//            throw new ProcessException("查询文件失败");
-//        }
-//        if (resultMap.size()>=1) {
-//            throw new ProcessException("记录审批中请勿重复提交");
-//        }
-//        Map<String, Object> reqParam = new HashMap<>();
-//        reqParam.put("snBegin",snBegin);
-//        reqParam.put("snEnd",snEnd);
-//        reqParam.put("status",Status.STATUS_1.status);
-//        reqParam.put("orderId",orderNum);
-//        Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
-//        reqParam.put("proCom",dictByName.getdItemvalue());
-//        reqParam.put("proModel",proModel);
-//        List<Map<String,Object>> oLogistics = logisticsMapper.queryLogisticsList(reqParam);
-//        if(oLogistics==null){
-//            log.info("数据有误异常返回01");
-//            throw new ProcessException("商品数据异常");
-//        }
-//        if(oLogistics.size()==0 || oLogistics.size()!=1){
-//            log.info("数据有误异常返回02");
-//            throw new ProcessException("未找到该商品");
-//        }
-//        Map<String, Object> logisticMap = oLogistics.get(0);
-//        String proId = String.valueOf(logisticMap.get("PRO_ID"));
-//        String orderId = String.valueOf(logisticMap.get("ORDER_ID"));
-//
-//        OSubOrderExample oSubOrderExample = new OSubOrderExample();
-//        OSubOrderExample.Criteria criteria1 = oSubOrderExample.createCriteria();
-//        criteria1.andOrderIdEqualTo(orderId);
-//        criteria1.andProIdEqualTo(proId);
-//        List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
-//        if(oSubOrders==null){
-//            log.info("数据有误异常返回03");
-//            throw new ProcessException("商品数据异常");
-//        }
-//        if(oSubOrders.size()==0 || oLogistics.size()!=1){
-//            log.info("数据有误异常返回04");
-//            throw new ProcessException("未找到该商品");
-//        }
-//        OSubOrder oSubOrder = oSubOrders.get(0);
-//        oSubOrder.setProNum(new BigDecimal(count));
-//        oSubOrder.setSnBegin(snBegin);
-//        oSubOrder.setSnEnd(snEnd);
-//        OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-//        OSubOrderActivityExample.Criteria criteria2 = oSubOrderActivityExample.createCriteria();
-//        criteria2.andSubOrderIdEqualTo(oSubOrder.getId());
-//        List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-//        if(null==oSubOrderActivities){
-//            log.info("数据有误异常返回05");
-//            throw new ProcessException("商品活动内部服务器异常");
-//        }
-//        if(oSubOrderActivities.size()==1){
-//            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-//            BigDecimal gTime = oSubOrderActivity.getgTime();
-//            gTime = gTime.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
-//            long activityCtime = oSubOrderActivity.getcTime().getTime();
-//            long nowTime = new Date().getTime();
-//            if((new BigDecimal(nowTime-activityCtime)).compareTo(gTime)==1){
-//                log.info("商品活动超出保价时间");
-//                throw new ProcessException("商品活动超出保价时间");
-//            }
-//            oSubOrder.setSubOrderActivity(oSubOrderActivity);
-//        }
-//        return oSubOrder;
-//    }
-
     @Override
-    public List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList)throws ProcessException{
-        String agentName = "";
+    public List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException{
         String proCom = "";
         String proModel = "";
         String snBegin = "";
         String snEnd = "";
         String count = "";
-        String orderNum = "";
         try {
-            agentName =  String.valueOf(excelList.get(0));
-            proCom =  String.valueOf(excelList.get(1));
-            proModel =  String.valueOf(excelList.get(2));
-            snBegin =  String.valueOf(excelList.get(3));
-            snEnd =  String.valueOf(excelList.get(4));
-            count =  String.valueOf(excelList.get(5));
-            orderNum =  String.valueOf(excelList.get(6));
+            proCom =  String.valueOf(excelList.get(0));
+            proModel =  String.valueOf(excelList.get(1));
+            snBegin =  String.valueOf(excelList.get(2));
+            snEnd =  String.valueOf(excelList.get(3));
+            count =  String.valueOf(excelList.get(4));
         } catch (Exception e) {
             throw new ProcessException("导入解析文件失败");
         }
@@ -232,12 +137,50 @@ public class CompensateServiceImpl implements CompensateService {
         reqParam.put("snBegin",snBegin);
         reqParam.put("snEnd",snEnd);
         reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-        reqParam.put("recordStatus",OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+        ArrayList<Object> recordStatusList = new ArrayList<>();
+        recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+        reqParam.put("recordStatusList",recordStatusList);
         Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
         reqParam.put("proCom",dictByName.getdItemvalue());
         reqParam.put("proModel",proModel);
         List<Map<String,Object>> compensateLList = logisticsDetailMapper.queryCompensateLList(reqParam);
-
+        if(null==compensateLList){
+            throw new ProcessException("导入解析文件失败");
+        }
+        if(compensateLList.size()==0){
+            throw new ProcessException("sn号在审批中或已退货");
+        }
+        String proNum = String.valueOf(compensateLList.get(0).get("PRO_NUM"));
+        if(!proNum.equals(count)){
+            throw new ProcessException("sn号数量不匹配");
+        }
+        //判断是否是自己省区下的订单
+        List<Map<String, Object>>  org = userService.orgCode(userId);
+        if(org.size()==0){throw new ProcessException("部门信息未找到");}
+        String orgId = String.valueOf(org.get(0).get("ORGID"));
+        if(StringUtils.isBlank(orgId)){
+            throw new ProcessException("省区部门参数为空");
+        }
+        String logisticsId = String.valueOf(compensateLList.get(0).get("LOGISTICS_ID"));
+        OLogistics oLogistics = logisticsMapper.selectByPrimaryKey(logisticsId);
+        for (Map<String, Object> stringObjectMap : compensateLList) {
+            Agent agent = agentService.getAgentById(String.valueOf(stringObjectMap.get("AGENT_ID")));
+            if(!orgId.equals(agent.getAgDocPro())){
+                log.info("不能提交其他省区的退补差价");
+                throw new ProcessException("不能提交其他省区的退补差价");
+            }
+            String gTime = String.valueOf(stringObjectMap.get("G_TIME"));
+            if(StringUtils.isNotBlank(gTime)){
+                BigDecimal gTimeB = new BigDecimal(gTime);
+                gTimeB = gTimeB.multiply(new BigDecimal(24)).multiply(new BigDecimal(60)).multiply(new BigDecimal(60)).multiply(new BigDecimal(1000));
+                long activityCtime = oLogistics.getcTime().getTime();
+                long nowTime = new Date().getTime();
+                if((new BigDecimal(nowTime-activityCtime)).compareTo(gTimeB)==1){
+                    log.info("商品活动超出保价时间");
+                    throw new ProcessException("商品活动超出保价时间");
+                }
+            }
+        }
         return compensateLList;
     }
 
@@ -257,7 +200,9 @@ public class CompensateServiceImpl implements CompensateService {
             reqParam.put("snBegin",beginSn);
             reqParam.put("snEnd",endSn);
             reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-            reqParam.put("recordStatus",OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            ArrayList<Object> recordStatusList = new ArrayList<>();
+            recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            reqParam.put("recordStatusList",recordStatusList);
             reqParam.put("activityId",oldActivityId);
             List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
             if(null==oLogisticsDetails){
@@ -330,7 +275,7 @@ public class CompensateServiceImpl implements CompensateService {
         int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
         if(refundDiffInsert!=1){
             log.info("插入补退差价申请表异常");
-            throw new ProcessException("系统异常");
+            throw new ProcessException("保存失败");
         }
 
         //添加新的附件
@@ -347,38 +292,42 @@ public class CompensateServiceImpl implements CompensateService {
                 int i = attachmentRelMapper.insertSelective(record);
                 if (1 != i) {
                     log.info("活动变更附件关系失败");
-                    throw new ProcessException("系统异常");
+                    throw new ProcessException("保存失败");
                 }
             });
         }
 
         refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
-            OSubOrderActivity oSubOrderActivity = null;
+            Map<String, Object> logisticsDetail = null;
             if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId())){
-                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
-                criteria.andSubOrderIdEqualTo(refundPriceDiffDetail.getSubOrderId());
-                criteria.andActivityIdEqualTo(refundPriceDiffDetail.getActivityFrontId());
-                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                if(null==oSubOrderActivities){
-                    log.info("查询oSubOrderActivities异常");
-                    throw new ProcessException("系统异常");
+                Map<String, Object> reqParam = new HashMap<>();
+                reqParam.put("snBegin",refundPriceDiffDetail.getBeginSn());
+                reqParam.put("snEnd",refundPriceDiffDetail.getEndSn());
+                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+                ArrayList<Object> recordStatusList = new ArrayList<>();
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                reqParam.put("recordStatusList",recordStatusList);
+                reqParam.put("activityId",refundPriceDiffDetail.getActivityFrontId());
+                List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+                if(null==oLogisticsDetails){
+                    log.info("calculatePriceDiff数据有误异常返回1");
+                    throw new ProcessException("保存失败");
                 }
-                if(oSubOrderActivities.size()!=1){
-                    log.info("查询oSubOrderActivities.size()异常");
-                    throw new ProcessException("系统异常");
+                if(oLogisticsDetails.size()!=1){
+                    log.info("calculatePriceDiff数据有误异常返回2");
+                    throw new ProcessException("保存失败");
                 }
-                oSubOrderActivity = oSubOrderActivities.get(0);
+                logisticsDetail = oLogisticsDetails.get(0);
             }
             //变更后活动实体
             OActivity oActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
             if(null==oActivity){
                 log.info("查询oActivity异常");
-                throw new ProcessException("系统异常");
+                throw new ProcessException("保存失败");
             }
             refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
             refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
-            refundPriceDiffDetail.setFrontPrice(oSubOrderActivity!=null?oSubOrderActivity.getPrice():new BigDecimal(0));
+            refundPriceDiffDetail.setFrontPrice(logisticsDetail!=null?new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()):new BigDecimal(0));
             refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
             refundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
             refundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
@@ -395,7 +344,7 @@ public class CompensateServiceImpl implements CompensateService {
             int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
             if(priceDiffDetailInsert!=1){
                 log.info("插入补退差价详情表异常");
-                throw new ProcessException("系统异常");
+                throw new ProcessException("保存失败");
             }
         });
         return AgentResult.ok(priceDiffId);
@@ -432,7 +381,7 @@ public class CompensateServiceImpl implements CompensateService {
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updateRefundPriceDiff);
         if (1 != i) {
             log.info("退补差价提交审批，更新订单基本信息失败{}:{}", id, cuser);
-            throw new ProcessException("退补差价提交审批，更新退补差价基本信息失败");
+            throw new MessageException("退补差价提交审批，更新退补差价基本信息失败");
         }
 
         Map startPar = agentEnterService.startPar(cuser);
@@ -451,7 +400,7 @@ public class CompensateServiceImpl implements CompensateService {
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proce == null) {
             log.info("退补差价提交审批，审批流启动失败{}:{}", id, cuser);
-            throw new ProcessException("审批流启动失败!");
+            throw new MessageException("审批流启动失败!");
         }
         //代理商业务视频关系
         BusActRel record = new BusActRel();
@@ -464,9 +413,31 @@ public class CompensateServiceImpl implements CompensateService {
         record.setActivStatus(AgStatus.Approving.name());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
-            throw new ProcessException("审批流启动失败:添加审批关系失败");
+            throw new MessageException("审批流启动失败:添加审批关系失败");
         }
 
+        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+        criteria.andRefundPriceDiffIdEqualTo(id);
+        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        if (null == oRefundPriceDiffDetails) {
+            throw new MessageException("审批流启动失败:查询明细异常");
+        }
+        for (ORefundPriceDiffDetail row : oRefundPriceDiffDetails) {
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put("setRecordStatus", OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+            updateMap.put("refundPriceDiffDetailId", row.getId());
+            //where条件
+            updateMap.put("snBegin", row.getBeginSn());
+            updateMap.put("snEnd", row.getEndSn());
+            updateMap.put("status", OLogisticsDetailStatus.STATUS_FH.code);
+            updateMap.put("recordStatus", OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            int j = logisticsDetailMapper.updateCompensate(updateMap);
+            if (!row.getChangeCount().equals(new BigDecimal(j))) {
+                log.info("插入补退差价锁定物流明细表异常");
+                throw new MessageException("已锁定请核对补差价信息!");
+            }
+        }
         return AgentResult.ok();
     }
 
@@ -606,6 +577,46 @@ public class CompensateServiceImpl implements CompensateService {
         if(i!=1){
             throw new ProcessException("更新退补差价数据申请失败");
         }
+
+        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+        criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
+        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        oRefundPriceDiffDetails.forEach(row->{
+            OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+            OLogisticsDetailExample.Criteria criteria1 = oLogisticsDetailExample.createCriteria();
+            criteria1.andSnNumBetween(row.getBeginSn(),row.getEndSn());
+            criteria1.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
+            criteria1.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+            List<OLogisticsDetail> oLogisticsDetails = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+            if(null==oLogisticsDetails){
+                throw new ProcessException("退补差价数据完成失败");
+            }
+            oLogisticsDetails.forEach(oLogisticsDetail->{
+                OLogisticsDetail upoLogisticsDetail = new OLogisticsDetail();
+                upoLogisticsDetail.setId(oLogisticsDetail.getId());
+                upoLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+                int update = logisticsDetailMapper.updateByPrimaryKeySelective(upoLogisticsDetail);
+                if(1!=update){
+                    throw new ProcessException("退补差价数据更新完成失败");
+                }
+                oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
+                oLogisticsDetail.setOptId(row.getId());
+                oLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
+                oLogisticsDetail.setActivityId(row.getActivityRealId());
+                oLogisticsDetail.setActivityName(row.getActivityName());
+                OActivity activity = orderActivityService.findById(row.getActivityRealId());
+                oLogisticsDetail.setgTime(activity.getgTime());
+                oLogisticsDetail.setSettlementPrice(row.getPrice());
+                oLogisticsDetail.setcTime(new Date());
+                oLogisticsDetail.setuTime(new Date());
+                oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                int insert = logisticsDetailMapper.insert(oLogisticsDetail);
+                if(1!=insert){
+                    throw new ProcessException("退补差价数据新增完成失败");
+                }
+            });
+        });
         return AgentResult.ok();
     }
 
@@ -647,18 +658,30 @@ public class CompensateServiceImpl implements CompensateService {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
             if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId())){
-                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
-                criteria1.andSubOrderIdEqualTo(oRefundPriceDiffDetail.getSubOrderId());
-                criteria1.andActivityIdEqualTo(oRefundPriceDiffDetail.getActivityFrontId());
-                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                if(null==oSubOrderActivities){
-                    return null;
+                List<Map<String, Object>> oLogisticsDetails = null;
+                Map<String, Object> reqParam = new HashMap<>();
+                reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
+                reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
+                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+                reqParam.put("activityId",oRefundPriceDiffDetail.getActivityFrontId());
+                if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
+                    ArrayList<Object> recordStatusList = new ArrayList<>();
+                    recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    reqParam.put("recordStatusList",recordStatusList);
+                }else{
+                    reqParam.put("optId",oRefundPriceDiffDetail.getId());
                 }
-                OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                Dict dict1 = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oSubOrderActivity.getActivityWay());
-                oSubOrderActivity.setActivityWay(dict1.getdItemname());
-                oRefundPriceDiffDetail.setSubOrderActivity(oSubOrderActivity);
+                oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+                if(null==oLogisticsDetails){
+                    log.info("calculatePriceDiff数据有误异常返回1");
+                    throw new ProcessException("查询活动异常");
+                }
+                if(oLogisticsDetails.size()!=1){
+                    log.info("calculatePriceDiff数据有误异常返回2");
+                    throw new ProcessException("查询活动异常");
+                }
+                Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
+                oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
         }
         return oRefundPriceDiff;

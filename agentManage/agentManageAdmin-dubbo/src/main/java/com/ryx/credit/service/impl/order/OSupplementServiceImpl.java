@@ -371,6 +371,10 @@ public class OSupplementServiceImpl implements OSupplementService {
                 }
                 OPayment oPayment = oPayments.get(0);
                 oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
+                if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
+                    logger.info("金额数据有误");
+                    throw new MessageException("金额数据有误!!!");
+                }
                 oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单修改失败");

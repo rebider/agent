@@ -175,6 +175,7 @@ public class StagingServiceImpl implements StagingService {
      * @param profitStaging 分期对象
      */
     private void validate(ProfitStaging profitStaging) {
+        String profitnew = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ofPattern("yyyy-MM"));
         if (profitStaging.getSumAmt()== null || StringUtils.isBlank(profitStaging.getSumAmt().toString())) {
             throw new StagingException("分期总金额不能为空");
         }
@@ -193,6 +194,8 @@ public class StagingServiceImpl implements StagingService {
         }
         if (!"0".equals(profitDeduction.getStagingStatus()) && !"4".equals(profitDeduction.getStagingStatus())) {
             throw new StagingException("已经存在分期");
+        }else if (!profitnew.equals(profitDeduction.getDeductionDate())) {
+            throw new StagingException("该数据不能生成分期，日期过期或下期处理。");
         }
     }
 

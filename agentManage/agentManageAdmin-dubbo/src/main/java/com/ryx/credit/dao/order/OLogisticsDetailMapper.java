@@ -24,4 +24,6 @@ public interface OLogisticsDetailMapper {
     int updateByPrimaryKey(OLogisticsDetail record);
 
     List<Map<String, Object>> queryCompensateLList(Map<String, Object> param);
+
+    int updateCompensate(Map<String, Object> param);
 }

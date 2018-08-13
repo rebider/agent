@@ -247,6 +247,20 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return list;
     }
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 退货时根据Sn号查询订单、物流信息
+     * @Date: 14:13 2018/7/26
+     */
+    @Override
+    public Map<String, Object> getLogisticsBySn(String sn, String agentId) throws ProcessException {
+        Map<String, Object> map = oLogisticsMapper.getOrderAndLogisticsBySn(sn, agentId);
+        if (map == null || map.size() <= 0) {
+            throw new ProcessException("sn号" + sn + "不是有效的发货状态，请核实是否属于您的订单或是否发起过退货");
+        }
+        return map;
+    }
+
 
     /**
      * @Author: Zhang Lei
@@ -254,8 +268,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * @Date: 20:18 2018/8/3
      */
     @Override
-    public void updateSnStatus(String orderId, String startSn, String endSn, BigDecimal status) throws Exception {
-        oLogisticsMapper.updateSnStatus(orderId, startSn, endSn, status);
+    public void updateSnStatus(String orderId, String startSn, String endSn, BigDecimal status, BigDecimal recordStatus,String returnId) throws Exception {
+        oLogisticsMapper.updateSnStatus(orderId, startSn, endSn, status, recordStatus,returnId);
     }
 
 
@@ -341,7 +355,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return ResultVO.success(null);
     }
 
-    public static List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
+    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
         //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
         int begin = begins - 1;
         ArrayList<String> list = new ArrayList<>();

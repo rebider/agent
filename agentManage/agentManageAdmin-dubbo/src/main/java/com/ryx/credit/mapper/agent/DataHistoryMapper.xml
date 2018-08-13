@@ -229,7 +229,7 @@
     <select id="selectAll" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
         select
-        ID,DATA_ID,DATA_TYPE,C_TIME,dbms_lob.substr(DATA_COTENT)as DATA_COTENT
+        ID,DATA_ID,DATA_TYPE,C_TIME,dbms_lob.substr(DATA_COTENT)as DATA_COTENT,C_USER
         from DATA_HISTORY where STATUS=1
         <if test="map.dataType != null and map.dataType != '' " >
             and DATA_TYPE = #{map.dataType}
@@ -237,6 +237,7 @@
         <if test="map.time != null and map.time != '' ">
             and to_char(C_TIME,'YYYY-MM-dd')=#{map.time}
         </if>
+        order by C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>
 
