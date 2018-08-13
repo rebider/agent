@@ -15,6 +15,7 @@ public interface AgentNotifyService {
 
     void asynNotifyPlatform(String busId);
 
+    void notifyPlatformNew(String busId,String impId)throws Exception;
     void notifyPlatform(String busId,String impId)throws Exception;
 
     PageInfo queryList(Page page,AgentPlatFormSyn agentPlatFormSyn);
