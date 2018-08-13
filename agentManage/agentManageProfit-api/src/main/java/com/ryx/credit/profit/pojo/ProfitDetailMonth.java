@@ -116,6 +116,16 @@ public class ProfitDetailMonth implements Serializable{
 
     private BigDecimal zhifaSupply;//直发补款
 
+    private BigDecimal tax;
+
+    public BigDecimal getTax() {
+        return tax;
+    }
+
+    public void setTax(BigDecimal tax) {
+        this.tax = tax;
+    }
+
     public BigDecimal getZhifaBuckle() {
         return zhifaBuckle;
     }
