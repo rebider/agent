@@ -122,6 +122,8 @@ public class AddressServiceImpl implements AddressService {
         if (StringUtils.isBlank(oAddress.getAddrRealname())) return AgentResult.fail("真实姓名不能为空");
         if (StringUtils.isBlank(oAddress.getAddrMobile())) return AgentResult.fail("联系方式不能为空");
         if (StringUtils.isBlank(oAddress.getuId())) return AgentResult.fail("用户信息不能为空");
+        if (StringUtils.isBlank(oAddress.getAddrDetail())) return AgentResult.fail("详细地址不能为空");
+        if (StringUtils.isBlank(oAddress.getZipCode())) return AgentResult.fail("邮编不能为空");
         if (null == oAddress.getuType()) oAddress.setuType(Status.STATUS_0.status);
         if (null == oAddress.getIsdefault()) oAddress.setIsdefault(Status.STATUS_0.status);
 
@@ -153,13 +155,15 @@ public class AddressServiceImpl implements AddressService {
     public AgentResult updateAddress(OAddress oAddress, String user) {
         if (null == oAddress) return AgentResult.fail("数据不能为空");
         if (null == user) return AgentResult.fail("操作用户不能为空");
-        if (StringUtils.isBlank(oAddress.getId())) return AgentResult.fail("省不能为空");
+        if (StringUtils.isBlank(oAddress.getId())) return AgentResult.fail("ID不能为空");
         if (StringUtils.isBlank(oAddress.getAddrProvince())) return AgentResult.fail("省不能为空");
         if (StringUtils.isBlank(oAddress.getAddrCity())) return AgentResult.fail("市不能为空");
         if (StringUtils.isBlank(oAddress.getAddrDistrict())) return AgentResult.fail("区不能为空");
         if (StringUtils.isBlank(oAddress.getAddrRealname())) return AgentResult.fail("真实姓名不能为空");
         if (StringUtils.isBlank(oAddress.getAddrMobile())) return AgentResult.fail("联系方式不能为空");
         if (StringUtils.isBlank(oAddress.getuId())) return AgentResult.fail("用户信息不能为空");
+        if (StringUtils.isBlank(oAddress.getAddrDetail())) return AgentResult.fail("详细地址不能为空");
+        if (StringUtils.isBlank(oAddress.getZipCode())) return AgentResult.fail("邮编不能为空");
         if (null == oAddress.getuType()) oAddress.setuType(Status.STATUS_0.status);
         if (null == oAddress.getIsdefault()) oAddress.setIsdefault(Status.STATUS_0.status);
         //更新默认地址
@@ -230,6 +234,14 @@ public class AddressServiceImpl implements AddressService {
             if (StringUtils.isBlank(String.valueOf(objectList.get(4)))) {
                 logger.info("区为空:{}", String.valueOf(objectList.get(4)));
                 throw new MessageException("请填写地址---区");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(5)))) {
+                logger.info("详细地址为空:{}", String.valueOf(objectList.get(5)));
+                throw new MessageException("请填写详细地址");
+            }
+            if (StringUtils.isBlank(String.valueOf(objectList.get(6)))) {
+                logger.info("邮编为空:{}", String.valueOf(objectList.get(6)));
+                throw new MessageException("请填写邮编");
             }
             OAddress oAddress = new OAddress();
             oAddress.setId(idService.genId(TabId.o_address));
