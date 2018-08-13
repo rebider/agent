@@ -10,6 +10,7 @@ import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.DeductService;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
@@ -18,6 +19,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitDeductionService profitDeductionServiceImpl;
 
     @Autowired
-    ProfitToolsDeductServiceImpl profitToolsDeductService;
+    @Qualifier("profitToolsDeductServiceImpl")
+    private DeductService profitToolsDeductService;
+
+    @Autowired
+    @Qualifier("posProfitComputeServiceImpl")
+    private DeductService posProfitComputeServiceImpl;
 
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
