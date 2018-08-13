@@ -54,12 +54,12 @@ public class PosRewardTemplateServiceImpl implements PosRewardTemplateService{
             BigDecimal finalTranTotal = tranTotal.divide(new BigDecimal(10000));
             List<PosRewardTemplate> posRewardTemplates = posRewardTemplateMapper.selectByExample(null);
             for (PosRewardTemplate posRewardTemplate : posRewardTemplates) {
-                if(posRewardTemplate.getTranTotal().contains("~")) {
-                    String[] spl = posRewardTemplate.getTranTotal().trim().split("~");
-                    if (finalTranTotal.compareTo(new BigDecimal(spl[0])) >= 0 && finalTranTotal.compareTo(new BigDecimal(spl[1])) <= 0) {
-                        return posRewardTemplate.getProportion();
-                    }
-                }
+//                if(posRewardTemplate.getTranTotal().contains("~")) {
+//                    String[] spl = posRewardTemplate.getTranTotal().trim().split("~");
+//                    if (finalTranTotal.compareTo(new BigDecimal(spl[0])) >= 0 && finalTranTotal.compareTo(new BigDecimal(spl[1])) <= 0) {
+//                        return posRewardTemplate.getProportion();
+//                    }
+//                }
             }
         }
         return BigDecimal.ZERO;

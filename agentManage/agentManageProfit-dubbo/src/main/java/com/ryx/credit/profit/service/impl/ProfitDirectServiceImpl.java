@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -69,9 +70,22 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     }
 
     @Override
+    public List<ProfitDirect> selectByMonth(ProfitDirect record) {
+        return directMapper.selectByMonth(record);
+    }
+
+    @Override
     public ProfitDirect selectByPrimaryKey(String id) {
         return directMapper.selectByPrimaryKey(id);
     }
+
+
+
+    @Override
+    public ProfitDirect selectByAgentAndMon(ProfitDirect record) {
+        return directMapper.selectByAgentAndMon(record);
+    }
+
 
     @Override
     public int updateByPrimaryKeySelective(ProfitDirect record) {
@@ -82,5 +96,11 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     public int updateByPrimaryKey(ProfitDirect record) {
         return directMapper.updateByPrimaryKey(record);
     }
+
+    @Override
+    public BigDecimal getSubBuckleByMonth(ProfitDirect record) {
+        return directMapper.getSubBuckleByMonth(record);
+    }
+
 
 }

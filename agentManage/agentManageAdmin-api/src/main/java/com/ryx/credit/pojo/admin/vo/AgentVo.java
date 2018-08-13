@@ -2,10 +2,7 @@ package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
-import com.ryx.credit.pojo.admin.order.ODeductCapital;
-import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
-import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
-import com.ryx.credit.pojo.admin.order.OPayment;
+import com.ryx.credit.pojo.admin.order.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -55,6 +52,8 @@ public class AgentVo implements Serializable {
     private String sid;
     //退货打款截图
     private String[] attachments;
+    private List<Map<String,Object>> reqListMap;
+    private ReceiptPlan receiptPlan;
 
     public Agent getAgent() {
         return agent;
@@ -294,5 +293,21 @@ public class AgentVo implements Serializable {
 
     public void setRealPayAmount(BigDecimal realPayAmount) {
         this.realPayAmount = realPayAmount;
+    }
+
+    public List<Map<String, Object>> getReqListMap() {
+        return reqListMap;
+    }
+
+    public void setReqListMap(List<Map<String, Object>> reqListMap) {
+        this.reqListMap = reqListMap;
+    }
+
+    public ReceiptPlan getReceiptPlan() {
+        return receiptPlan;
+    }
+
+    public void setReceiptPlan(ReceiptPlan receiptPlan) {
+        this.receiptPlan = receiptPlan;
     }
 }

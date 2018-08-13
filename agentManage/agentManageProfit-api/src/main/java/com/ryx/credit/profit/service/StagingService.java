@@ -6,6 +6,8 @@ import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitStaging;
 import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 
+import java.math.BigDecimal;
+
 /**
  * @author zhaodw
  * @Title: ProfitDeductionService
@@ -84,4 +86,14 @@ public interface StagingService {
     * @Date: 2018/8/2 
     */ 
      void editStaging(ProfitStaging profitStaging);
+
+     /***
+     * @Description: 获取代理商分期未扣完金额
+     * @Param:agentId 业务平台机构id
+     * @return: 未分期总金额
+     * @Author: zhaodw
+     * @Date: 2018/8/9
+     */
+     BigDecimal getNotDeductionAmt(String agentId);
+
 }

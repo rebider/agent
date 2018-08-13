@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.vo.ORefundPriceDiffVo;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/24.
@@ -23,11 +24,11 @@ public interface CompensateService {
 
     PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page);
 
-    OSubOrder getOrderMsgByExcel(List<Object> excelList)throws ProcessException;
+    List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException;
 
     BigDecimal calculateTotalPrice(String activityId, BigDecimal count);
 
-    BigDecimal calculatePriceDiff(String subOrderId,String oldActivityId,String activityId,BigDecimal proNum);
+    BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum);
 
     AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
 

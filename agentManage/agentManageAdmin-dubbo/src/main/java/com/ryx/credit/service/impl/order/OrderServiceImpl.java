@@ -143,6 +143,21 @@ public class OrderServiceImpl implements OrderService {
 
 
     /**
+     * 查询所有订单
+     * @param par
+     * @param page
+     * @return
+     */
+    @Override
+    public PageInfo allOderList(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        par.put("page",page);
+        pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par)) ;
+        pageInfo.setRows(orderMapper.queryAllOrderListView(par));
+        return pageInfo;
+    }
+
+    /**
      * 查询给定条件的订单的payment
      * @param agentId
      * @param approveStatus
@@ -870,7 +885,7 @@ public class OrderServiceImpl implements OrderService {
         oPaymentDetailExample.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
                 .andPaymentIdEqualTo(oPayment.getId()).andOrderIdEqualTo(order.getId());
-        oPaymentDetailExample.setOrderByClause(" plan_num asc, plan_pay_time asc ");
+        oPaymentDetailExample.setOrderByClause(" pay_time asc, plan_num asc, plan_pay_time asc ");
         List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
         f.putKeyV("oPaymentDetails", oPaymentDetails);
 
@@ -1030,7 +1045,9 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.ok(null);
         } catch (MessageException e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常!");
+            throw e;
+        }catch (Exception e){
+            throw e;
         }
     }
 
@@ -1146,6 +1163,21 @@ public class OrderServiceImpl implements OrderService {
                     }
                     if((oPayment.getDownPayment().add(oPayment.getDeductionAmount())).compareTo(oPayment.getOutstandingAmount())>0){
                         throw new MessageException("首付加抵扣超出待付");
+                    }else{
+                        throw new MessageException("不可抵扣");
+                    }
+                }else{
+                    oPayment.setDeductionAmount(BigDecimal.ZERO);
+                }
+                if(oPayment.getDeductionAmount().compareTo(db.getOutstandingAmount())>0){
+                    throw new MessageException("抵扣超出待付");
+                }
+                if(oPayment.getDownPayment()!=null) {
+                    if (oPayment.getDownPayment().compareTo(db.getOutstandingAmount()) > 0) {
+                        throw new MessageException("首付超出待付");
+                    }
+                    if((oPayment.getDownPayment().add(oPayment.getDeductionAmount())).compareTo(db.getOutstandingAmount())>0){
+                        throw new MessageException("首付加抵扣超出待付");
                     }
                 }
 
@@ -1257,6 +1289,7 @@ public class OrderServiceImpl implements OrderService {
                         record.setOrderId(oPayment.getOrderId());
                         record.setPayType(PaymentType.DKFQ.code);
                         record.setPayAmount((BigDecimal) datum.get("item"));
+                        record.setRealPayAmount(BigDecimal.ZERO);
                         record.setRealPayAmount(new BigDecimal(0));
                         record.setPlanPayTime((Date) datum.get("date"));
                         record.setPlanNum((BigDecimal) datum.get("count"));
@@ -1355,7 +1388,7 @@ public class OrderServiceImpl implements OrderService {
                         record.setOrderId(oPayment.getOrderId());
                         record.setPayType(PaymentType.FRFQ.code);
                         record.setPayAmount((BigDecimal) datum.get("item"));
-                        record.setRealPayAmount(new BigDecimal(0));
+                        record.setRealPayAmount(BigDecimal.ZERO);
                         record.setPlanPayTime((Date) datum.get("date"));
                         record.setPlanNum((BigDecimal) datum.get("count"));
                         record.setAgentId(oPayment.getAgentId());
@@ -1405,6 +1438,7 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setRealPayAmount(oPayment.getActualReceipt());
                         record_XXDK.setPlanPayTime(d.getTime());
                         record_XXDK.setPlanNum(Status.STATUS_0.status);
+                        record_XXDK.setPayTime(d.getTime());
                         record_XXDK.setAgentId(oPayment.getAgentId());
                         record_XXDK.setPaymentStatus(PaymentStatus.JQ.code);
                         record_XXDK.setcUser(oPayment.getUserId());
@@ -1451,7 +1485,7 @@ public class OrderServiceImpl implements OrderService {
                         record_XXDK.setOrderId(oPayment.getOrderId());
                         record_XXDK.setPayType(PaymentType.DK.code);
                         record_XXDK.setPayAmount(oPayment.getOutstandingAmount());
-                        record_XXDK.setRealPayAmount(oPayment.getOutstandingAmount());
+                        record_XXDK.setRealPayAmount(BigDecimal.ZERO);
                         record_XXDK.setPlanPayTime(d.getTime());
                         record_XXDK.setPlanNum(Status.STATUS_0.status);
                         record_XXDK.setAgentId(oPayment.getAgentId());
@@ -1505,6 +1539,7 @@ public class OrderServiceImpl implements OrderService {
                         record_SF1.setPayAmount(oPayment.getActualReceipt());
                         record_SF1.setRealPayAmount(oPayment.getActualReceipt());
                         record_SF1.setPlanPayTime(d.getTime());
+                        record_SF1.setPayTime(record_SF1.getPlanPayTime());
                         record_SF1.setPlanNum(Status.STATUS_0.status);
                         record_SF1.setAgentId(oPayment.getAgentId());
                         record_SF1.setPaymentStatus(PaymentStatus.JQ.code);
@@ -1560,7 +1595,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setOrderId(oPayment.getOrderId());
                             record.setPayType(PaymentType.FRFQ.code);
                             record.setPayAmount((BigDecimal) datum.get("item"));
-                            record.setRealPayAmount(new BigDecimal(0));
+                            record.setRealPayAmount(BigDecimal.ZERO);
                             record.setPlanPayTime((Date) datum.get("date"));
                             record.setPlanNum((BigDecimal) datum.get("count"));
                             record.setAgentId(oPayment.getAgentId());
@@ -1620,6 +1655,7 @@ public class OrderServiceImpl implements OrderService {
                         record_SF2.setPayAmount(oPayment.getActualReceipt());
                         record_SF2.setRealPayAmount(oPayment.getActualReceipt());
                         record_SF2.setPlanPayTime(d.getTime());
+                        record_SF2.setPayTime(record_SF2.getPlanPayTime());
                         record_SF2.setPlanNum(Status.STATUS_0.status);
                         record_SF2.setAgentId(oPayment.getAgentId());
                         record_SF2.setPaymentStatus(PaymentStatus.JQ.code);
@@ -1676,7 +1712,7 @@ public class OrderServiceImpl implements OrderService {
                             record.setOrderId(oPayment.getOrderId());
                             record.setPayType(PaymentType.DKFQ.code);
                             record.setPayAmount((BigDecimal) datum.get("item"));
-                            record.setRealPayAmount(new BigDecimal(0));
+                            record.setRealPayAmount(BigDecimal.ZERO);
                             record.setPlanPayTime((Date) datum.get("date"));
                             record.setPlanNum((BigDecimal) datum.get("count"));
                             record.setAgentId(oPayment.getAgentId());
@@ -1702,6 +1738,10 @@ public class OrderServiceImpl implements OrderService {
                     if (oPayment.getDeductionAmount() == null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成QT抵扣不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("代理商订单审批完成QT抵扣不可为空");
+                    }
+                    if (oPayment.getDeductionType() == null || StringUtils.isBlank(oPayment.getDeductionType())) {
+                        logger.info("代理商订单审批完成QT抵扣类型不可为空{}:{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
+                        throw new MessageException("抵扣类型不可为空");
                     }
                     //抵扣操作
                     AgentResult dealOrderDeductionRes =  dealOrderDeduction(oPayment);
@@ -1921,8 +1961,9 @@ public class OrderServiceImpl implements OrderService {
                 record_QT.setOrderId(payment.getOrderId());
                 record_QT.setPayType(payment.getDeductionType());
                 record_QT.setPayAmount(payment.getDeductionAmount());
+                record_QT.setPayTime(Calendar.getInstance().getTime());
                 record_QT.setRealPayAmount(payment.getDeductionAmount());
-                record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                record_QT.setPlanPayTime(record_QT.getPayTime());
                 record_QT.setPlanNum(Status.STATUS_0.status);
                 record_QT.setAgentId(payment.getAgentId());
                 record_QT.setSrcId(capital.getId());
@@ -1958,6 +1999,7 @@ public class OrderServiceImpl implements OrderService {
                 record_QT.setPayAmount(payment.getDeductionAmount());
                 record_QT.setRealPayAmount(payment.getDeductionAmount());
                 record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                record_QT.setPayTime(record_QT.getPlanPayTime());
                 record_QT.setPlanNum(Status.STATUS_0.status);
                 record_QT.setAgentId(payment.getAgentId());
                 record_QT.setPaymentStatus(PaymentStatus.JQ.code);
@@ -1994,6 +2036,7 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setPayAmount(for_deal);
                         record_QT.setRealPayAmount(for_deal);
                         record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                        record_QT.setPayTime(record_QT.getPlanPayTime());
                         record_QT.setPlanNum(Status.STATUS_0.status);
                         record_QT.setAgentId(payment.getAgentId());
                         record_QT.setPaymentStatus(PaymentStatus.JQ.code);
@@ -2026,6 +2069,7 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setPayAmount(for_deal);
                         record_QT.setRealPayAmount(for_deal);
                         record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                        record_QT.setPayTime(record_QT.getPlanPayTime());
                         record_QT.setPlanNum(Status.STATUS_0.status);
                         record_QT.setAgentId(payment.getAgentId());
                         record_QT.setPaymentStatus(PaymentStatus.JQ.code);
@@ -2059,6 +2103,7 @@ public class OrderServiceImpl implements OrderService {
                         record_QT.setPayAmount(camount);
                         record_QT.setRealPayAmount(camount);
                         record_QT.setPlanPayTime(Calendar.getInstance().getTime());
+                        record_QT.setPayTime(record_QT.getPlanPayTime());
                         record_QT.setPlanNum(Status.STATUS_0.status);
                         record_QT.setAgentId(payment.getAgentId());
                         record_QT.setPaymentStatus(PaymentStatus.JQ.code);
@@ -2448,4 +2493,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return AgentResult.ok();
     }
+
+
 }

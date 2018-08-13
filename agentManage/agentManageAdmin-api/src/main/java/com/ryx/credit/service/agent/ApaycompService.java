@@ -19,4 +19,6 @@ public interface ApaycompService {
      * @return
      */
     List<PayComp> recCompList();
+
+    PayComp selectById(String id);
 }

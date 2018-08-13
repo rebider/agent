@@ -353,7 +353,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                 oPaymentDetail.setRealPayAmount(supplement.getRealPayAmount());
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
-                oPaymentDetail.setSrcType(PamentSrcType.PamentSrcType_XXBK.code);
+                oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
@@ -371,6 +371,10 @@ public class OSupplementServiceImpl implements OSupplementService {
                 }
                 OPayment oPayment = oPayments.get(0);
                 oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
+                if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
+                    logger.info("金额数据有误");
+                    throw new MessageException("金额数据有误!!!");
+                }
                 oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPaymentDetail.getRealPayAmount()));
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单修改失败");

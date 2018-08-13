@@ -2,17 +2,20 @@ package com.ryx.credit.profit.jobs;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitMonth;
 import com.ryx.credit.profit.service.OrganTranMonthDetailService;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.ProfitMonthService;
+import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +57,9 @@ public class ProfitDataJob {
 
     @Autowired
     private OrganTranMonthDetailService organTranMonthDetailService;
+
+    @Autowired
+    private AgentColinfoService agentColinfoService;
 
 
     @Autowired
@@ -115,7 +122,8 @@ public class ProfitDataJob {
         ProfitMonth profitMonth = new ProfitMonth();
 
         profitMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
-        profitMonth.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        profitMonth.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
+        profitMonth.setAgentId(profitData.getString("ORG_ID"));
         profitMonth.setAgentName((String)agentMap.get("AG_NAME"));
         profitMonth.setStatus("4");
         profitMonth.setProfitDate(settleMonth);
@@ -138,12 +146,14 @@ public class ProfitDataJob {
      */
     private void insertOrganTranDetail(Map<String, Object> agentMap, JSONObject profitData, String settleMonth, String profitId) {
         OrganTranMonthDetail organTranMonthDetail = new OrganTranMonthDetail();
-        organTranMonthDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        organTranMonthDetail.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
         organTranMonthDetail.setAgentName((String)agentMap.get("AG_NAME"));
-        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("PFT_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_03_AMT"));
-        organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
-        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT"));
+        organTranMonthDetail.setAgentId(profitData.getString("ORG_ID"));
+        organTranMonthDetail.setPosJlTranAmt(profitData.getBigDecimal("POS_03_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_03_AMT"));
+        organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("POS_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_02_AMT"));
+        organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("POS_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_01_AMT"));
         organTranMonthDetail.setProfitId(profitId);
+        organTranMonthDetail.setAgentType((String)agentMap.get("BUS_TYPE"));
         organTranMonthDetailService.insert(organTranMonthDetail);
         organTranMonthDetail = null;
     }
@@ -159,8 +169,8 @@ public class ProfitDataJob {
     */
     private void insertProfitMonthDetail( Map<String, Object> agentMap, JSONObject profitData, String settleMonth, String profitId) {
         ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
-        profitDetailMonthTemp.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
-        profitDetailMonthTemp.setAgentPid(profitData.getString("ORG_ID"));
+        profitDetailMonthTemp.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
+        profitDetailMonthTemp.setAgentId(profitData.getString("ORG_ID"));
         profitDetailMonthTemp.setProfitDate(settleMonth);
         profitDetailMonthTemp.setAgentName((String)agentMap.get("AG_NAME"));
         profitDetailMonthTemp.setTranAmt(profitData.getBigDecimal("TRAN_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_01_AMT"));
@@ -171,6 +181,18 @@ public class ProfitDataJob {
         profitDetailMonthTemp.setPayProfitAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
         profitDetailMonthTemp.setProfitId(profitId);
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(profitData.getBigDecimal("PFT_DIFF_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_DIFF_AMT"));
+        // 获取账户信息
+        List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService((String)agentMap.get("AG_UNIQ_NUM"), null,AgStatus.Approved.status);
+
+        if (agentColinfos != null && agentColinfos.size() > 0) {
+            AgentColinfo agentColinfo = agentColinfos.get(0);
+            profitDetailMonthTemp.setAccountId(agentColinfo.getCloBankAccount());
+            profitDetailMonthTemp.setAccountName(agentColinfo.getCloRealname());
+            profitDetailMonthTemp.setOpenBankName(agentColinfo.getCloBankBranch());
+            profitDetailMonthTemp.setBankCode(agentColinfo.getBranchLineNum());
+            profitDetailMonthTemp.setTax(agentColinfo.getCloTaxPoint());
+        }
+
         profitDetailMonthServiceImpl.insert(profitDetailMonthTemp);
         profitDetailMonthTemp = null;
     }

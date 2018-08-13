@@ -22,7 +22,7 @@ public interface IAccountAdjustService {
      * @Param isAdjustOrder 是否抵扣机具欠款(0-不抵扣  1-抵扣)
      * @Param agentId 代理商ID
      * @Param srcId 源ID（退货单ID、退差价ID）
-     * @Param srcType 源类型（THTK-退货退款  TCJ-退差价）
+     * @Param srcType 源类型（使用PamentSrcType枚举）
      * @Param userid 操作用户
      * @Date: 15:47 2018/7/24
      */

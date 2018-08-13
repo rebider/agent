@@ -204,12 +204,20 @@
     </if>
   </select>
 
-  <select id="totalMonthByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.lang.Long">
+  <select id="totalMonthByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
     SELECT SUM(TOTAL_PROFIT)
     FROM P_PROFIT_D
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="totalMonthByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
+    SELECT SUM(TOTAL_PROFIT)
+    FROM P_PROFIT_D
+    where
+    to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">

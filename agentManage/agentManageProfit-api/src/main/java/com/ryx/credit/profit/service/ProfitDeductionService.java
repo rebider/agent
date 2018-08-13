@@ -71,19 +71,51 @@ public interface ProfitDeductionService {
     public List<Map<String, Object>> getDeductDetail(String deductDate);
 
     /***
-    * @Description:扣款计算
+    * @Description:其他扣款计算
     * @Param: profitAmt 分润金额
-    * @Param: deductionType 扣款类型 01 退单扣款 03 其他扣款
     * @Param: agentId 机构id
-    * @return: 应扣余额 扣足返回0 其他返回 未扣足
+    * @return: 应扣余额 扣足返回已扣款金额
     * @Author: zhaodw
     * @Date: 2018/8/7
     */
-    BigDecimal deductionAmt(BigDecimal profitAmt, String deductionType, String agentId) throws DeductionException;
+    BigDecimal otherDeductionByType(BigDecimal profitAmt, String agentId, String type) throws DeductionException;
+
+    /***
+     * @Description:退单扣款计算
+     * @Param: profitAmt 分润金额
+     * @Param: bussType 业务类型 pos mpos
+     * @Param: agentId 机构id
+     * @return: 应扣余额 扣足返回已扣款金额
+     * @Author: zhaodw
+     * @Date: 2018/8/7
+     */
+    BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentId) throws DeductionException;
+
+    /*** 
+    * @Description: 获取退单扣款总金额
+    * @Param:  profitDeduction 扣款信息
+    * @return: 总扣款金额
+    * @Author: zhaodw 
+    * @Date: 2018/8/12 
+    */ 
+    BigDecimal getSettleErrDeductionAmt( ProfitDeduction profitDeduction);
+    
     /**
      * 查询一条扣款信息
      * @param profitDeduction
      * @return
      */
     public List<ProfitDeduction> getProfitDeduction(ProfitDeduction profitDeduction);
+
+    /***
+    * @Description: 获取代理商补分润
+    * @Param:  agentId 代理商
+    * @Param:  bussType 业务类型
+    * @return:  补款总金额
+    * @Author: zhaodw
+    * @Date: 2018/8/9
+    */
+    BigDecimal  getSupplyAmt(String agentId, String bussType);
+
+    BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
 }

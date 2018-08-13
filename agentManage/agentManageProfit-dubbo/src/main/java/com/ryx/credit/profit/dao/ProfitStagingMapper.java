@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitStaging;
 import com.ryx.credit.profit.pojo.ProfitStagingExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProfitStagingMapper {
@@ -20,4 +22,6 @@ public interface ProfitStagingMapper {
     int updateByPrimaryKeySelective(ProfitStaging record);
 
     int updateByPrimaryKey(ProfitStaging record);
+
+    ProfitStaging getNotDeductionAmt(String agentId);
 }

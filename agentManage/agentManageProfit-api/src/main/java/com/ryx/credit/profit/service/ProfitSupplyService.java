@@ -5,6 +5,7 @@ import com.ryx.credit.profit.pojo.PProfitFactor;
 import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.pojo.ProfitSupplyExample;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,8 @@ public interface ProfitSupplyService {
     ProfitSupply selectByPrimaryKey(String id);
 
     ProfitSupply selectByAgentMonth(ProfitSupply record);
+
+    BigDecimal getTotalByMonthAndPid(ProfitSupply record);
 
     int updateByPrimaryKeySelective(ProfitSupply record);
 

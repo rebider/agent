@@ -30,4 +30,13 @@ public interface BusinessPlatformService {
     List<PlatForm> queryAblePlatForm();
 
     AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception;
+
+    /**
+     * 导入业务信息
+     * @param list
+     * @param userid
+     * @return
+     * @throws Exception
+     */
+    public List<String> addList(List<List<Object>> list, String userid) throws Exception;
 }

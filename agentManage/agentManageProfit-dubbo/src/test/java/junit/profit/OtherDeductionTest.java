@@ -41,9 +41,8 @@ public class OtherDeductionTest {
     */
     @Test
     public void testDeduction() {
-        BigDecimal profitAmt = new BigDecimal("5000");
-        String agentId = "JS00000313-Z00000818";
-        String deductionType = "03";
-        profitDeductionService.deductionAmt(profitAmt, deductionType, agentId);
+        BigDecimal profitAmt = new BigDecimal("4000");
+        String agentId = "AG20180803000000000005887";
+        profitDeductionService.settleErrDeduction(profitAmt,"02",agentId);
     }
 }

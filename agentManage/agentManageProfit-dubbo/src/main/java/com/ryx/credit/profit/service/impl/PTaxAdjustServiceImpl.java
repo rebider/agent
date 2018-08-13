@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.RewardStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -24,6 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +49,6 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     private PTaxAdjustMapper adjustMapper;
     @Autowired
     private IdService idService;
-
     @Autowired
     private ActivityService activityService;
     @Autowired
@@ -109,6 +112,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         return ResultVO.success(record);
     }
 
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void completeTaskEnterActivity(String insid, String status) {
         LocalDate date = LocalDate.now();
@@ -117,19 +121,19 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         try {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
-                PTaxAdjust taxAdjust = adjustMapper.selectByPrimaryKey(insid);
+                PTaxAdjust taxAdjust = adjustMapper.selectByPrimaryKey(rel.getBusId());
+                taxAdjust.setTaxStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
+                taxAdjust.setValidDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")));
                 logger.info("1.更新税点调整申请状态为通过，有效");
                 logger.info("审批通过，原税点：{},现税点：{}",taxAdjust.getTaxOld(),taxAdjust.getTaxIng());
-                taxAdjust.setTaxStatus("1");
-                taxAdjust.setValidDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")));
                 adjustMapper.updateByPrimaryKeySelective(taxAdjust);
-                logger.info("2更新审批流与业务对象");
+                logger.info("2.更新审批流与业务对象");
                 rel.setStatus(Status.STATUS_2.status);
                 taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("税点调整审批流回调异常，activId：{}", insid);
+            logger.error("税点调整审批流回调异常，activId：{}" + insid);
         }
     }
 
@@ -159,6 +163,36 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
             return result;
         }
         return AgentResult.ok(resultMap);
+    }
+
+    @Override
+    public PTaxAdjust getPosTaxById(String id) {
+        if (StringUtils.isNotBlank(id)) {
+            return adjustMapper.selectByPrimaryKey(id);
+        }else{
+            return null;
+        }
+    }
+
+    @Override
+    public List<PTaxAdjust> getPosTaxByDataId(String id) {
+        if(StringUtils.isNotBlank(id)){
+            PTaxAdjustExample taxAdjustExample = new PTaxAdjustExample();
+            PTaxAdjustExample.Criteria criteria = taxAdjustExample.createCriteria();
+            criteria.andIdEqualTo(id);
+            return adjustMapper.selectByExample(taxAdjustExample);
+        }
+        return null;
+    }
+
+    @Override
+    public void editPosTaxRegect(PTaxAdjust pTaxAdjust) throws Exception {
+        try {
+            adjustMapper.updateByPrimaryKeySelective(pTaxAdjust);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception();
+        }
     }
 
     private PTaxAdjustExample adjustEqualsTo(PTaxAdjust adjust) {

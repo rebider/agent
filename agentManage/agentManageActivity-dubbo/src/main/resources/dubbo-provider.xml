@@ -30,6 +30,8 @@
     <dubbo:reference interface="com.ryx.credit.profit.service.ToolsDeductService" id="toolsDeductService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.CompensateService" id="compensateService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.IOrderReturnService" id="orderReturnService"  timeout="1200000" registry="${zk.group}" check="false"/>
-
+    <dubbo:reference interface="com.ryx.credit.profit.service.IPosRewardService" id="iPosRewardService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.profit.service.IPosCheckService" id="iPosCheckService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.profit.service.IPTaxAdjustService" id="iPTaxAdjustService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
 </beans>

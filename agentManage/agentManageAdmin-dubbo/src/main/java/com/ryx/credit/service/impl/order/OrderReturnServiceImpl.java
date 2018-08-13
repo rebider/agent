@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.order;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
@@ -80,6 +81,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     OLogisticsMapper logisticsMapper;
     @Autowired
     private BusActRelService busActRelService;
+    @Autowired
+    OLogisticsDetailMapper logisticsDetailMapper;
+    @Resource
+    OLogisticsService oLogisticService;
 
     /**
      * @Author: Zhang Lei
@@ -293,6 +298,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("解析退货商品失败");
         }
 
+        //检查SN是否允许退货
+        try {
+            checkSn(list, agentId);
+        } catch (ProcessException e) {
+            throw e;
+        }
+
         //删除旧退货明细
         String returnId = returnOrder.getId();
         OReturnOrderDetailExample example = new OReturnOrderDetailExample();
@@ -303,6 +315,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         OReturnOrderRelExample relExample = new OReturnOrderRelExample();
         relExample.or().andReturnOrderIdEqualTo(returnId);
         returnOrderRelMapper.deleteByExample(relExample);
+
 
         //更新退货单
         OReturnOrder returnOrderDB = returnOrderMapper.selectByPrimaryKey(returnId);
@@ -360,7 +373,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //更新物流明细表SN状态
             try {
-                oLogisticsService.updateSnStatus(orderId, startSn, endSn, SnStatus.THDH.code);
+                oLogisticsService.updateSnStatus(orderId, startSn, endSn, OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code, returnId);
             } catch (Exception e) {
                 log.error("更新SN状态失败", e);
                 throw new ProcessException("更新SN状态失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
@@ -392,6 +405,54 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         return null;
     }
 
+
+    public void delReceiptAndLogistis(String returnId) {
+        //删除排单计划
+        ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+        receiptPlanExample.or().andReturnOrderDetailIdEqualTo(returnId);
+        List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
+        for (ReceiptPlan receiptPlan : receiptPlans) {
+            String receiptPlanId = receiptPlan.getId();
+            //删除物流及物流明细
+            OLogisticsExample logisticsExample = new OLogisticsExample();
+            logisticsExample.or().andReceiptPlanIdEqualTo(receiptPlanId);
+            List<OLogistics> oLogistics = logisticsMapper.selectByExample(logisticsExample);
+            for (OLogistics logistics : oLogistics) {
+                String logisticsId = logistics.getId();
+                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andLogisticsIdEqualTo(logisticsId);
+                logisticsDetailMapper.deleteByExample(oLogisticsDetailExample);
+            }
+            logisticsMapper.deleteByExample(logisticsExample);
+        }
+        receiptPlanMapper.deleteByExample(receiptPlanExample);
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 检查SN是否允许退货
+     * @Date: 20:33 2018/8/10
+     */
+    public void checkSn(List<Map> list, String agentId) {
+        try {
+            for (Map<String, Object> map : list) {
+                String startSn = (String) map.get("startSn");
+                String endSn = (String) map.get("endSn");
+                Integer begins = (Integer) map.get("begins");
+                Integer finish = (Integer) map.get("finish");
+                List<String> sns = oLogisticsService.idList(startSn, endSn, begins, finish);
+                for (String sn : sns) {
+                    //根据sn查询物流信息
+                    Map<String, Object> snmap = oLogisticService.getLogisticsBySn(sn, agentId);
+                }
+            }
+        } catch (MessageException e) {
+            throw new ProcessException(e.getMessage());
+        } catch (ProcessException e) {
+            throw e;
+        }
+    }
+
     /**
      * @Author: Zhang Lei
      * @Description: 退貨申請
@@ -407,6 +468,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         } catch (Exception e) {
             log.error("解析退货商品失败", e);
             throw new ProcessException("解析退货商品失败");
+        }
+
+        //检查SN是否允许退货
+        try {
+            checkSn(list, agentId);
+        } catch (ProcessException e) {
+            throw e;
         }
 
         String returnId = null;
@@ -467,7 +535,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //更新物流明细表SN状态
             try {
-                oLogisticsService.updateSnStatus(orderId, startSn, endSn, SnStatus.THZ.code);
+                oLogisticsService.updateSnStatus(orderId, startSn, endSn, OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code, returnId);
             } catch (Exception e) {
                 log.error("更新SN状态失败", e);
                 throw new ProcessException("更新SN状态失败,SN[" + (String) map.get("startSn") + "--" + (String) map.get("endSn") + "]");
@@ -559,13 +627,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 更新某一退货单中原始订单SN状态
      * @Date: 16:18 2018/8/8
      */
-    public void updateReturnOrderSnStatus(String returnId, BigDecimal snStatus) {
+    public void updateReturnOrderSnStatus(String returnId, BigDecimal snStatus, BigDecimal recordStatus) {
         try {
             OReturnOrderDetailExample example = new OReturnOrderDetailExample();
             example.or().andReturnIdEqualTo(returnId);
             List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
             for (OReturnOrderDetail detail : list) {
-                oLogisticsService.updateSnStatus(detail.getOrderId(), detail.getBeginSn(), detail.getEndSn(), snStatus);
+                oLogisticsService.updateSnStatus(detail.getOrderId(), detail.getBeginSn(), detail.getEndSn(), snStatus, recordStatus, returnId);
             }
         } catch (Exception e) {
             log.error("更新退货单中原始订单SN状态失败{},{}", returnId, snStatus, e);
@@ -578,7 +646,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 更新退货单状态
      * @Date: 16:50 2018/8/8
      */
-    public void updateOrderReturn(String returnId,BigDecimal status){
+    public void updateOrderReturn(String returnId, BigDecimal status) {
         OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
         returnOrder.setRetSchedule(status);
         returnOrder.setuTime(new Date());
@@ -610,7 +678,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //如果是代理商修改订单时，修改SN状态
             if (approveResult.equals("pass") && sid.equals("sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE")) {
                 try {
-                    updateReturnOrderSnStatus(agentVo.getReturnId(), SnStatus.THZ.code);
+                    updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 } catch (ProcessException e) {
                     return AgentResult.fail(e.getMessage());
                 }
@@ -626,7 +694,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //财务第一次审批时更新发货状态
             if (approveResult.equals("pass") && sid.equals("sid-ECD4C817-99C4-4F9B-92A2-748BB554D673")) {
-                updateOrderReturn(agentVo.getReturnId(),new BigDecimal(RetSchedule.DFH.code));
+                updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.DFH.code));
             }
 
             //财务最后审批时上传打款凭证
@@ -652,14 +720,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         throw new ProcessException("排单编号为" + receiptPlanId + "的排单未导入退货物流信息");
                     }
                 }
-                updateOrderReturn(agentVo.getReturnId(),new BigDecimal(RetSchedule.YFH.code));
+                updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.YFH.code));
             }
 
             //如果是退回修改订单信息时，修改SN状态
             if (agentVo.getApprovalResult().equals("back")) {
                 try {
-                    updateReturnOrderSnStatus(agentVo.getReturnId(), SnStatus.THDH.code);
-                    updateOrderReturn(agentVo.getReturnId(),new BigDecimal(RetSchedule.TH.code));
+                    updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.TH.code));
+                    //删除排单和物流
+                    delReceiptAndLogistis(agentVo.getReturnId());
                 } catch (ProcessException e) {
                     return AgentResult.fail(e.getMessage());
                 }
@@ -707,6 +777,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 16:38 2018/8/8
      */
     @Override
+    @Transactional
     public void approvalReject(String processInstanceId, String activityName) {
         try {
             log.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
@@ -715,11 +786,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //退货编号
             String returnId = rel.getBusId();
             //更新退货单
-            updateOrderReturn(returnId,new BigDecimal(RetSchedule.JJ.code));
-            //更新订单SN
-            updateReturnOrderSnStatus(returnId,SnStatus.FH.code);
+            updateOrderReturn(returnId, new BigDecimal(RetSchedule.JJ.code));
+            //更新原始订单SN
+            updateReturnOrderSnStatus(returnId, OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            //删除排单和物流
+            delReceiptAndLogistis(returnId);
         } catch (Exception e) {
-            log.error("退货审批拒绝回调",e);
+            log.error("退货审批拒绝回调错误", e);
         }
     }
 
@@ -737,11 +810,43 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //退货编号
             String returnId = rel.getBusId();
             //更新退货单
-            updateOrderReturn(returnId,new BigDecimal(RetSchedule.WC.code));
-            //更新订单SN
-            updateReturnOrderSnStatus(returnId,SnStatus.THWC.code);
+            updateOrderReturn(returnId, new BigDecimal(RetSchedule.WC.code));
+            //更新原始订单SN
+            updateReturnOrderSnStatus(returnId, OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+            //更新新订单SN状态
+            updateNewOrderSnStatus(returnId);
         } catch (Exception e) {
-            log.error("退货审批完成回调",e);
+            log.error("退货审批完成回调", e);
+        }
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 更新新订单物流明细SN状态
+     * @Date: 20:03 2018/8/10
+     */
+    public void updateNewOrderSnStatus(String returnId) {
+        try {
+            //根据returnId查询排单计划
+            ReceiptPlanExample example = new ReceiptPlanExample();
+            example.or().andReturnOrderDetailIdEqualTo(returnId);
+            List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
+            for (ReceiptPlan receiptPlan : receiptPlans) {
+                //查询发货物流
+                String receiptPlanId = receiptPlan.getId();
+                OLogisticsExample example2 = new OLogisticsExample();
+                example2.or().andReceiptPlanIdEqualTo(receiptPlanId);
+                List<OLogistics> logistics = logisticsMapper.selectByExample(example2);
+                for (OLogistics logi : logistics) {
+                    //更新物流明细表中新订单SN状态
+                    String orderId = logi.getOrderId();
+                    String startSn = logi.getSnBeginNum();
+                    String endSn = logi.getSnEndNum();
+                    oLogisticsService.updateSnStatus(orderId, startSn, endSn, OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code, null);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -835,7 +940,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw e;
         }
     }
-
 
 
 }

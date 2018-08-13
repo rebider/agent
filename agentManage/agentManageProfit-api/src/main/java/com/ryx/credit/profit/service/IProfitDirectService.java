@@ -7,6 +7,7 @@ import com.ryx.credit.profit.pojo.PosCheckExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -35,9 +36,15 @@ public interface IProfitDirectService {
 
     List<ProfitDirect> selectByExample(ProfitDirectExample example);
 
+    List<ProfitDirect> selectByMonth(ProfitDirect record);
+
     ProfitDirect selectByPrimaryKey(String id);
+
+    ProfitDirect selectByAgentAndMon(ProfitDirect record);
 
     int updateByPrimaryKeySelective(ProfitDirect record);
 
     int updateByPrimaryKey(ProfitDirect record);
+
+    BigDecimal getSubBuckleByMonth(ProfitDirect record);
 }

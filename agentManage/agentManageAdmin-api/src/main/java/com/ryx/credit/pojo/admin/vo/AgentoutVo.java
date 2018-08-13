@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class AgentoutVo extends AgentExtends implements Serializable {
     private String id;
@@ -11,18 +12,23 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     private String agHead;
 
-    private String agHeadMobile;
-
-    private String agRegAdd;
-
+    private String agentId;
 
     private String busNum;
 
     private String busPlatform;
 
     private String busType;
+    private String busParentId;//直属上级id
 
     private String busParent;
+
+    private String twoParentId;//二级上级id
+    private String twoParentName;
+
+    private String threeParentId;//三级上级id
+    private String threeParentName;
+
 
     private String busRiskParent;
 
@@ -30,12 +36,39 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     private String busRegion;
 
-    private String busIndeAss;
+    private String busSentDirectly;
 
-    private String busRiskEmail;
+    private String busIndeAss;
 
     private String busScope;
 
+    private BigDecimal cloType;
+
+    private String cloRealname;
+
+    private String cloBankAccount;
+
+    private String cloBank;
+
+    private String bankRegion;
+
+    private String cloBankBranch;
+
+    private String allLineNum;
+
+    private String branchLineNum;
+
+    private BigDecimal cloTaxPoint;
+
+    private BigDecimal cloInvoice;
+
+    private String cloPayCompany;
+
+    private String yesOrNo;
+
+    private String cloString;
+
+    private String point;
 
     public String getId() {
         return id;
@@ -67,22 +100,6 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     public void setAgHead(String agHead) {
         this.agHead = agHead;
-    }
-
-    public String getAgHeadMobile() {
-        return agHeadMobile;
-    }
-
-    public void setAgHeadMobile(String agHeadMobile) {
-        this.agHeadMobile = agHeadMobile;
-    }
-
-    public String getAgRegAdd() {
-        return agRegAdd;
-    }
-
-    public void setAgRegAdd(String agRegAdd) {
-        this.agRegAdd = agRegAdd;
     }
 
     public String getBusNum() {
@@ -141,6 +158,14 @@ public class AgentoutVo extends AgentExtends implements Serializable {
         this.busRegion = busRegion;
     }
 
+    public String getBusSentDirectly() {
+        return busSentDirectly;
+    }
+
+    public void setBusSentDirectly(String busSentDirectly) {
+        this.busSentDirectly = busSentDirectly;
+    }
+
     public String getBusIndeAss() {
         return busIndeAss;
     }
@@ -149,19 +174,172 @@ public class AgentoutVo extends AgentExtends implements Serializable {
         this.busIndeAss = busIndeAss;
     }
 
-    public String getBusRiskEmail() {
-        return busRiskEmail;
-    }
-
-    public void setBusRiskEmail(String busRiskEmail) {
-        this.busRiskEmail = busRiskEmail;
-    }
-
     public String getBusScope() {
         return busScope;
     }
 
     public void setBusScope(String busScope) {
         this.busScope = busScope;
+    }
+
+    public BigDecimal getCloType() {
+        return cloType;
+    }
+
+    public void setCloType(BigDecimal cloType) {
+        this.cloType = cloType;
+    }
+
+    public String getCloRealname() {
+        return cloRealname;
+    }
+
+    public void setCloRealname(String cloRealname) {
+        this.cloRealname = cloRealname;
+    }
+
+    public String getCloBankAccount() {
+        return cloBankAccount;
+    }
+
+    public void setCloBankAccount(String cloBankAccount) {
+        this.cloBankAccount = cloBankAccount;
+    }
+
+    public String getCloBank() {
+        return cloBank;
+    }
+
+    public void setCloBank(String cloBank) {
+        this.cloBank = cloBank;
+    }
+
+    public String getBankRegion() {
+        return bankRegion;
+    }
+
+    public void setBankRegion(String bankRegion) {
+        this.bankRegion = bankRegion;
+    }
+
+    public String getCloBankBranch() {
+        return cloBankBranch;
+    }
+
+    public void setCloBankBranch(String cloBankBranch) {
+        this.cloBankBranch = cloBankBranch;
+    }
+
+    public String getAllLineNum() {
+        return allLineNum;
+    }
+
+    public void setAllLineNum(String allLineNum) {
+        this.allLineNum = allLineNum;
+    }
+
+    public String getBranchLineNum() {
+        return branchLineNum;
+    }
+
+    public void setBranchLineNum(String branchLineNum) {
+        this.branchLineNum = branchLineNum;
+    }
+
+    public BigDecimal getCloTaxPoint() {
+        return cloTaxPoint;
+    }
+
+    public void setCloTaxPoint(BigDecimal cloTaxPoint) {
+        this.cloTaxPoint = cloTaxPoint;
+    }
+
+    public BigDecimal getCloInvoice() {
+        return cloInvoice;
+    }
+
+    public void setCloInvoice(BigDecimal cloInvoice) {
+        this.cloInvoice = cloInvoice;
+    }
+
+    public String getCloPayCompany() {
+        return cloPayCompany;
+    }
+
+    public void setCloPayCompany(String cloPayCompany) {
+        this.cloPayCompany = cloPayCompany;
+    }
+
+    public String getYesOrNo() {
+        return yesOrNo;
+    }
+
+    public void setYesOrNo(String yesOrNo) {
+
+        this.yesOrNo = yesOrNo;
+    }
+
+    public String getCloString() {
+        return cloString;
+    }
+
+    public void setCloString(String cloString) {
+        this.cloString = cloString;
+    }
+
+    public String getPoint() {
+        return point;
+    }
+
+    public void setPoint(String point) {
+        this.point = point;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getBusParentId() {
+        return busParentId;
+    }
+
+    public void setBusParentId(String busParentId) {
+        this.busParentId = busParentId;
+    }
+
+    public String getTwoParentId() {
+        return twoParentId;
+    }
+
+    public void setTwoParentId(String twoParentId) {
+        this.twoParentId = twoParentId;
+    }
+
+    public String getTwoParentName() {
+        return twoParentName;
+    }
+
+    public void setTwoParentName(String twoParentName) {
+        this.twoParentName = twoParentName;
+    }
+
+    public String getThreeParentId() {
+        return threeParentId;
+    }
+
+    public void setThreeParentId(String threeParentId) {
+        this.threeParentId = threeParentId;
+    }
+
+    public String getThreeParentName() {
+        return threeParentName;
+    }
+
+    public void setThreeParentName(String threeParentName) {
+        this.threeParentName = threeParentName;
     }
 }

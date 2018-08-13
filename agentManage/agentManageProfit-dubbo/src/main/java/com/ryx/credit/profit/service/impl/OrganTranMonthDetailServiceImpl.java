@@ -5,12 +5,21 @@ package com.ryx.credit.profit.service.impl;/**
  */
 
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.OrganTranMonthDetailMapper;
+import com.ryx.credit.profit.pojo.ImportDeductionDetail;
+import com.ryx.credit.profit.pojo.ImportDeductionDetailExample;
 import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
+import com.ryx.credit.profit.pojo.OrganTranMonthDetailExample;
 import com.ryx.credit.profit.service.OrganTranMonthDetailService;
 import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 代理商月交易明细业务接口实现
@@ -37,6 +46,33 @@ public class OrganTranMonthDetailServiceImpl implements OrganTranMonthDetailServ
 
     @Override
     public void update(OrganTranMonthDetail organTranMonthDetail) {
+        organTranMonthDetailMapper.updateByPrimaryKeySelective(organTranMonthDetail);
+    }
 
+    @Override
+    public List<OrganTranMonthDetail> getOrganTranMonthDetailList(OrganTranMonthDetail organTranMonthDetail) {
+        OrganTranMonthDetailExample example = new OrganTranMonthDetailExample();
+        OrganTranMonthDetailExample.Criteria criteria = example.createCriteria();
+
+        if (StringUtils.isNotBlank(organTranMonthDetail.getProfitDate())){
+            criteria.andProfitDateEqualTo(organTranMonthDetail.getProfitDate());
+        }
+        if (StringUtils.isNotBlank(organTranMonthDetail.getAgentType())){
+            if (organTranMonthDetail.getAgentType().contains(",")) {
+                criteria.andAgentIdIn(Arrays.asList(organTranMonthDetail.getAgentType().split(",")));
+            }else {
+                criteria.andAgentTypeEqualTo(organTranMonthDetail.getAgentType());
+            }
+        }
+        if (StringUtils.isNotBlank(organTranMonthDetail.getProfitId())){
+            criteria.andProfitIdEqualTo(organTranMonthDetail.getProfitId());
+        }
+        return organTranMonthDetailMapper.selectByExample(example);
+
+    }
+
+    @Override
+    public OrganTranMonthDetail getChildSumTranAmt(Map<String, Object> param) {
+        return organTranMonthDetailMapper.getChildSumTranAmt(param);
     }
 }

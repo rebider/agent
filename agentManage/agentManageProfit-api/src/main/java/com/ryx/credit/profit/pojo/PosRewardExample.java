@@ -7,7 +7,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ */
 public class PosRewardExample implements Serializable {
+    private static final long serialVersionUID = 8248006142438852943L;
     protected String orderByClause;
 
     protected boolean distinct; 
@@ -745,6 +749,76 @@ public class PosRewardExample implements Serializable {
 
         public Criteria andApplyStatusNotBetween(String value1, String value2) {
             addCriterion("APPLY_STATUS not between", value1, value2, "applyStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthIsNull() {
+            addCriterion("CREDIT_END_MONTH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthIsNotNull() {
+            addCriterion("CREDIT_END_MONTH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthEqualTo(String value) {
+            addCriterion("CREDIT_END_MONTH =", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthNotEqualTo(String value) {
+            addCriterion("CREDIT_END_MONTH <>", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthGreaterThan(String value) {
+            addCriterion("CREDIT_END_MONTH >", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthGreaterThanOrEqualTo(String value) {
+            addCriterion("CREDIT_END_MONTH >=", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthLessThan(String value) {
+            addCriterion("CREDIT_END_MONTH <", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthLessThanOrEqualTo(String value) {
+            addCriterion("CREDIT_END_MONTH <=", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthLike(String value) {
+            addCriterion("CREDIT_END_MONTH like", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthNotLike(String value) {
+            addCriterion("CREDIT_END_MONTH not like", value, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthIn(List<String> values) {
+            addCriterion("CREDIT_END_MONTH in", values, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthNotIn(List<String> values) {
+            addCriterion("CREDIT_END_MONTH not in", values, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthBetween(String value1, String value2) {
+            addCriterion("CREDIT_END_MONTH between", value1, value2, "creditEndMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreditEndMonthNotBetween(String value1, String value2) {
+            addCriterion("CREDIT_END_MONTH not between", value1, value2, "creditEndMonth");
             return (Criteria) this;
         }
     }

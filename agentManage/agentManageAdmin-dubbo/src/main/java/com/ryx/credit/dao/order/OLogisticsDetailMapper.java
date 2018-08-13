@@ -4,6 +4,7 @@ import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OLogisticsDetailMapper {
     long countByExample(OLogisticsDetailExample example);
@@ -21,4 +22,8 @@ public interface OLogisticsDetailMapper {
     int updateByPrimaryKeySelective(OLogisticsDetail record);
 
     int updateByPrimaryKey(OLogisticsDetail record);
+
+    List<Map<String, Object>> queryCompensateLList(Map<String, Object> param);
+
+    int updateCompensate(Map<String, Object> param);
 }
