@@ -7,7 +7,7 @@ import java.util.List;
 public interface ProfitOrganTranMonthMapper {
     int countByExample(ProfitOrganTranMonthExample example);
 
-    int deleteByExample(ProfitOrganTranMonthExample example);
+    void deleteByExample(ProfitOrganTranMonthExample example);
 
     int insert(ProfitOrganTranMonth record);
 

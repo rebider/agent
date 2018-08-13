@@ -89,8 +89,8 @@ public class PosCheckServiceImpl implements IPosCheckService {
         if(StringUtils.isNotBlank(check.getAgentName())){
             criteria.andAgentNameEqualTo(check.getAgentName());
         }
-        if(StringUtils.isNotBlank(check.getAgentId())){
-            criteria.andAgentIdEqualTo(check.getAgentId());
+        if(StringUtils.isNotBlank(check.getAgentPid())){
+            criteria.andAgentPidEqualTo(check.getAgentPid());
         }
         return posCheckExample;
     }
@@ -156,7 +156,7 @@ public class PosCheckServiceImpl implements IPosCheckService {
             PosCheckExample posCheckExample = new PosCheckExample();
             posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
             checkMapper.deleteByExample(posCheckExample);
-            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentId());
+            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentPid());
             throw new ProcessException("分润比例考核审批流启动失败!");
         }
         BusActRel record = new BusActRel();

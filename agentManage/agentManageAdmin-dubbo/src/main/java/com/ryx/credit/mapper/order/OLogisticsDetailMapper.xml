@@ -357,26 +357,35 @@
 
   <select id="queryCompensateLList" parameterType="java.util.Map" resultType="java.util.Map">
     select
-      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME,
       max(SN_NUM) as MAX_SN,min(SN_NUM) as MIN_SN,count(*) as PRO_NUM
     from o_logistics_detail
     where
     sn_num between #{snBegin} and #{snEnd}
     and status = #{status}
-    and RECORD_STATUS in
-    <foreach collection="recordStatusList" open="(" close=")" separator="," item="recordStatus">
-      #{recordStatus, jdbcType=SMALLINT}
-    </foreach>
+    <if test="recordStatusList != null">
+      and RECORD_STATUS in
+      <foreach collection="recordStatusList" open="(" close=")" separator="," item="recordStatus">
+        #{recordStatus, jdbcType=SMALLINT}
+      </foreach>
+    </if>
     <if test="activityId != null">
       and ACTIVITY_ID = #{activityId}
     </if>
+    <if test="optId != null">
+      and OPT_ID = #{optId}
+    </if>
     group by
-      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME
   </select>
 
-  <update id="updateRecordStatusBySn" parameterType="java.util.Map">
-      update o_logistics_detail set record_status = 2
+  <update id="updateCompensate" parameterType="java.util.Map">
+      update o_logistics_detail
+         set RECORD_STATUS = #{setRecordStatus},
+         OPT_ID = #{refundPriceDiffDetailId}
       where
-      sn_num between #{snBegin} and #{snEnd}
+      SN_NUM between #{snBegin} and #{snEnd}
+      and RECORD_STATUS = #{recordStatus}
+      and STATUS = #{status}
   </update>
 </mapper>

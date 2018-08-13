@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.PTaxAdjust;
 import com.ryx.credit.profit.pojo.PTaxAdjustExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface PTaxAdjustMapper {
@@ -23,4 +25,5 @@ public interface PTaxAdjustMapper {
 
     int updateByPrimaryKey(PTaxAdjust record);
 
+    BigDecimal getTax(String agentPid);
 }

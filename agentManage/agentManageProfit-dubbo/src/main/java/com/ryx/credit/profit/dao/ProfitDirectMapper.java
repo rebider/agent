@@ -37,4 +37,6 @@ public interface ProfitDirectMapper {
     Long getProfitDirectCount(Map <String, Object> param);
 
     BigDecimal getSubBuckleByMonth(ProfitDirect record);
+
+    BigDecimal selectSumTaxAmt(ProfitDirect record);
 }
