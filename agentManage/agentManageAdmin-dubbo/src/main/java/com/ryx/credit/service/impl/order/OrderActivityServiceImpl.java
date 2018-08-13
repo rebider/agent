@@ -6,6 +6,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OActivityMapper;
 import com.ryx.credit.dao.order.OProductMapper;
@@ -17,6 +18,9 @@ import com.ryx.credit.service.order.OrderActivityService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -43,6 +47,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andActivityNameEqualTo(activity.getActivityName());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        example.setOrderByClause("C_TIME desc");
         example.setPage(page);
         List<OActivity> activitys = activityMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
@@ -51,21 +56,20 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         return pageInfo;
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult saveActivity(OActivity activity) throws MessageException {
-        AgentResult result = new AgentResult(500, "系统异常", "");
+    public ResultVO saveActivity(OActivity activity) throws MessageException {
         if (StringUtils.isBlank(activity.getProductId())) {
             logger.info("请选择商品名称");
-            result.setMsg("请选择商品名称");
+            throw new MessageException("请选择商品名称");
         }
         if (StringUtils.isBlank(activity.getVender())) {
             logger.info("请选择厂家");
-            result.setMsg("请选择厂家");
+            throw new MessageException("请选择厂家");
         }
         if (StringUtils.isBlank(activity.getProModel())) {
             logger.info("请选择型号");
-            result.setMsg("请选择型号");
+            throw new MessageException("请选择型号");
         }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
@@ -74,10 +78,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         activity.setStatus(Status.STATUS_1.status);
         activity.setVersion(Status.STATUS_1.status);
         int insert = activityMapper.insert(activity);
-        if (insert == 1) {
-            return AgentResult.ok();
+        if (insert != 1) {
+            throw new MessageException("添加失败");
         }
-        return result;
+        return ResultVO.success("");
     }
 
 
