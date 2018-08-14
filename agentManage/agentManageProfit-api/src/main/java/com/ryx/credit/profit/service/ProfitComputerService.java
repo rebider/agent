@@ -42,7 +42,7 @@ public interface ProfitComputerService {
      */
     BigDecimal totalP_day_ZF(String agentId,String month);
     /**
-     * 商业保理汇总
+     * 商业保理扣款汇总
      * @param agentPid
      * @return
      */

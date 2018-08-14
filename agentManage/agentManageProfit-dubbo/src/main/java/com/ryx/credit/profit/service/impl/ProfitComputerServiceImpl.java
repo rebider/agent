@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IPosCheckService;
 import com.ryx.credit.profit.service.ProfitComputerService;
 import com.ryx.credit.profit.service.ProfitSupplyService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分润计算
@@ -51,6 +54,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     PtaxHistoryMapper historyMapper;
     @Autowired
     IdService idService;
+    @Autowired
+    AgentBusinfoService businfoService;
 
     @Override
     public BigDecimal totalP_day_RHB(String agentPid,String month) {
@@ -153,6 +158,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         logger.info(agentPid+"在【"+month+"】其他补款共计："+totalSupply);
         return totalSupply;
     }
+
+
 
     @Override
     public BigDecimal total_SupplyAndCashBack(String agentPid,String month){
@@ -264,8 +271,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             where.setProfitDate(profitDirect.getTransMonth());
             where.setAgentPid(profitDirect.getFristAgentPid());
             ProfitDetailMonth detailMonth = detailMonthMapper.selectByPIdAndMonth(where);//上级一代数据
-            BigDecimal buckle = detailMonth.getZhifaBuckle();
-            detailMonth.setZhifaBuckle(buckle.add(profitDirect.getParentBuckle()));
+            BigDecimal buckle = isDecimalNull(detailMonth.getZhifaBuckle());
+            detailMonth.setZhifaBuckle(buckle.add(isDecimalNull(profitDirect.getParentBuckle())));
             detailMonthMapper.updateByPrimaryKeySelective(detailMonth);
             //记录代扣承担关系
             BuckleRun buckleRun = new BuckleRun();
@@ -389,9 +396,17 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     public void computerTax(String profitDate){
         List<ProfitDetailMonth> detailMonths = detailMonthMapper.selectByDate(profitDate);
         for(ProfitDetailMonth detailMonth:detailMonths){
+            boolean isJieYin = false;
             String subAgentPid = "";//下级代理商唯一码
-            boolean isOpenTicket = false;
-            ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt(),detailMonth.getAgentPid(),subAgentPid,detailMonth.getTax(),profitDate,isOpenTicket);
+            List<AgentBusInfo> subs = businfoService.queryChildLevel(null,"","");
+            List<AgentBusInfo> parents = businfoService.queryParenFourLevel(null,"","");
+            if(parents.size()>0){
+                AgentBusInfo first = parents.get(parents.size()-1);
+                if(first.getAgZbh().equals("JS00001159")||first.getAgZbh().equals("JS00001160")) {//捷步、银点只算日结
+                    isJieYin = true;
+                }
+            }
+            ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt(),detailMonth.getAgentPid(),subAgentPid,detailMonth.getTax(),profitDate,isJieYin);
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
 
