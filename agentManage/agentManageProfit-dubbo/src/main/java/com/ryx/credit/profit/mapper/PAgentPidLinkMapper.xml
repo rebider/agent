@@ -62,6 +62,21 @@
     from P_AGENT_PID_LINK
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectByPrimaryPid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_AGENT_PID_LINK
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} AND AGENT_ID is not null
+  </select>
+
+  <select id="selectListByPid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_AGENT_PID_LINK
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} AND AGENT_ID is not null
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PAgentPidLinkExample">
     delete from P_AGENT_PID_LINK
     <if test="_parameter != null">

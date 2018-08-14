@@ -17,6 +17,10 @@ public interface PAgentPidLinkMapper {
 
     PAgentPidLink selectByPrimaryKey(String id);
 
+    PAgentPidLink selectByPrimaryPid(String agentPid);
+
+    List<PAgentPidLink> selectListByPid(String agentPid);
+
     int updateByPrimaryKeySelective(PAgentPidLink record);
 
     int updateByPrimaryKey(PAgentPidLink record);

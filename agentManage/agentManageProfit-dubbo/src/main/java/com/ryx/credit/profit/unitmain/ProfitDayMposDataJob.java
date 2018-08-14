@@ -26,7 +26,7 @@ public class ProfitDayMposDataJob {
     private IProfitDService profitDService;
     @Autowired
     private IdService idService;
-
+    private int index = 1;//页数
 
     public static void main(String agrs[]){
         HashMap<String,String> map = new HashMap<String,String>();
@@ -61,8 +61,8 @@ public class ProfitDayMposDataJob {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("transStartDate",transDate1==null?DateUtil.getAfterDayDate("-1",DateUtil.sdfDays):transDate1);
         map.put("transEndDate",transDate2==null?DateUtil.getAfterDayDate("-1",DateUtil.sdfDays):transDate2);
-        map.put("pageNumber","1");
-        map.put("pageSize","20");
+        map.put("pageNumber",index++ +"");
+        map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.day"),params);
@@ -75,14 +75,16 @@ public class ProfitDayMposDataJob {
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
-            insertProfitD(list);
+            if(list.size()>0){
+                insertProfitD(list,transDate1,transDate2);
+            }
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
             e.printStackTrace();
         }
     }
 
-    public void insertProfitD(List<JSONObject> profitDays){
+    public void insertProfitD(List<JSONObject> profitDays,String transDate1,String transDate2){
         for(JSONObject json:profitDays){
             ProfitDay profitD = new ProfitDay();
             profitD.setId(idService.genId(TabId.P_PROFIT_D));
@@ -100,5 +102,6 @@ public class ProfitDayMposDataJob {
             profitD.setRealMoney(json.getBigDecimal("REALMONEY "));
             profitDService.insert(profitD);
         }
+        synchroProfitD(transDate1,transDate2);
     }
 }
