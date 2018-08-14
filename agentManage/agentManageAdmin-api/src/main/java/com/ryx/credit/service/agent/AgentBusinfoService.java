@@ -47,6 +47,13 @@ public interface AgentBusinfoService {
 
 
     /**
+     * 根据业务平台id查询上级
+     * @param list
+     * @param busId
+     * @return
+     */
+    public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId);
+    /**
      * 查询给定的代理商平台的顺序上级
      * @param list
      * @param platformCode
