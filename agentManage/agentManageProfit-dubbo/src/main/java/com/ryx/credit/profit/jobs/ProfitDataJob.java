@@ -153,6 +153,7 @@ public class ProfitDataJob {
         organTranMonthDetail.setzPosTranAmt(profitData.getBigDecimal("POS_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_02_AMT"));
         organTranMonthDetail.setPosTranAmt(profitData.getBigDecimal("POS_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_01_AMT"));
         organTranMonthDetail.setProfitId(profitId);
+        organTranMonthDetail.setProfitDate(settleMonth);
         organTranMonthDetail.setAgentType((String)agentMap.get("BUS_TYPE"));
         organTranMonthDetailService.insert(organTranMonthDetail);
         organTranMonthDetail = null;
@@ -180,6 +181,7 @@ public class ProfitDataJob {
         profitDetailMonthTemp.setTranProfitAmt(profitData.getBigDecimal("PFT_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_01_AMT"));
         profitDetailMonthTemp.setPayProfitAmt(profitData.getBigDecimal("PFT_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_02_AMT"));
         profitDetailMonthTemp.setProfitId(profitId);
+        profitDetailMonthTemp.setBusPlatForm((String)agentMap.get("BUS_PLATFORM"));
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(profitData.getBigDecimal("PFT_DIFF_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_DIFF_AMT"));
         // 获取账户信息
         List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService((String)agentMap.get("AG_UNIQ_NUM"), null,AgStatus.Approved.status);

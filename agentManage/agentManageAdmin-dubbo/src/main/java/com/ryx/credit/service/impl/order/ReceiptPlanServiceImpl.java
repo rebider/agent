@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.PlatformType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.order.ReceiptPlanMapper;
@@ -51,6 +48,7 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
 
     @Override
     public PageInfo getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo) {
+        param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         List<Map<String, Object>> list = receiptPlanMapper.getReceipPlanList(param);
         for (Map<String, Object> maps : list) {
