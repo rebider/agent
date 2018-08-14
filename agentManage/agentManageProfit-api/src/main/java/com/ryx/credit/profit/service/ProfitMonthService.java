@@ -101,6 +101,13 @@ public interface ProfitMonthService {
     ProfitUnfreeze getProfitUnfreezeById(String id);
 
     /**
+     * @author zhaodw
+     * @param profitId 分润id不能为空
+     * @return 解冻审批对象
+     */
+    ProfitUnfreeze getProfitUnfreezeByProfitId(String profitId);
+
+    /**
      *
      * 功能描述: 任务完成执行业务接口方法
      *

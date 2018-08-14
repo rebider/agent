@@ -237,6 +237,23 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
+    public ProfitUnfreeze getProfitUnfreezeByProfitId(String profitId) {
+        if (StringUtils.isNotBlank(profitId)) {
+            ProfitUnfreeze unfreeze = new ProfitUnfreeze();
+            unfreeze.setProfitId(profitId);
+            ProfitUnfreezeExample example = new ProfitUnfreezeExample();
+            ProfitUnfreezeExample.Criteria criteria = example.createCriteria();
+            criteria.andProfitIdEqualTo(profitId);
+            List<ProfitUnfreeze> profitUnfreezes = profitUnfreezeMapper.selectByExample(example);
+
+            if (profitUnfreezes != null && profitUnfreezes.size() > 0) {
+                return profitUnfreezes.get(0);
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void completeTaskEnterActivity(String insid, String status) {
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
