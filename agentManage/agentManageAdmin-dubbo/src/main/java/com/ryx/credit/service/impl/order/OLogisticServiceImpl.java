@@ -87,7 +87,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
+    public List<String> addList(List<List<Object>> data, String user) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
             String planNum = "";
