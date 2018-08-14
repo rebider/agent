@@ -372,9 +372,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             AppConfig.sendEmails("手刷月分润交易汇总失败","手刷月分润交易汇总失败");
             return null;
         }
-        BigDecimal fxAmount = json.getBigDecimal("fxAmount");//分销系统交易汇总
-        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount");//未计入分润汇总
-        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount");//未同步到分润
+        BigDecimal fxAmount = isDecimalNull(json.getBigDecimal("fxAmount"));//分销系统交易汇总
+        BigDecimal wjrAmount = isDecimalNull(json.getBigDecimal("wjrAmount"));//未计入分润汇总
+        BigDecimal wtbAmount = isDecimalNull(json.getBigDecimal("wtbAmount"));//未同步到分润
 
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
