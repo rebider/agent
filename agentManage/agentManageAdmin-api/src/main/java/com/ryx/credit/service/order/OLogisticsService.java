@@ -24,7 +24,7 @@ public interface OLogisticsService {
 
     ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish,String logisticsId, String cUser, String planId) throws MessageException;
 
-    public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish)throws Exception;
+    public List<String> addList(List<List<Object>> data, String user)throws Exception;
 
     public int insertImportData(OLogistics oLogistics);
 
