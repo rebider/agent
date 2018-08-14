@@ -140,7 +140,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	@Override
-	public AgentBusInfo getByAgentIdAndCode(String platformCode, String busid) {
+	public AgentBusInfo getByBusidAndCode(String platformCode, String busid) {
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(busid).andBusPlatformEqualTo(platformCode);
 		List<AgentBusInfo>  res = agentBusInfoMapper.selectByExample(example);

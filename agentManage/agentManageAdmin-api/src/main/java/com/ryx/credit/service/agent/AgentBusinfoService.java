@@ -35,7 +35,7 @@ public interface AgentBusinfoService {
 
     public AgentBusInfo getById(String id);
 
-    public AgentBusInfo getByAgentIdAndCode(String platformCode,String busid);
+    public AgentBusInfo getByBusidAndCode(String platformCode,String busid);
 
     public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception;
 
