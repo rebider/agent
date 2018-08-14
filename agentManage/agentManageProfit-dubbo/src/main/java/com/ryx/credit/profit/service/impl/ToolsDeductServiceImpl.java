@@ -63,6 +63,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
      * @param userId
      * @throws ProcessException
      */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void applyAdjustment(ProfitDeduction profitDeduction, String userId, String workId) throws ProcessException {
 

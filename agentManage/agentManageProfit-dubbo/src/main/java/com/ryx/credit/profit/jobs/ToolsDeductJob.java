@@ -35,9 +35,9 @@ public class ToolsDeductJob {
 //    @Scheduled(cron = "0 0/20/40 10 20 * ?")
     public void execut(){
         //String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String deductDate = "2018-08";
+        String deductDate = "2018-09";
         //String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
-        String beforeDeductDate = "2018-07";
+        String beforeDeductDate = "2018-08";
         try {
             int count = profitDeductionService.getProfitDeductionCount(DeductionType.MACHINE.getType(), deductDate);
             LOG.info("当月已初始化机具扣款分期数据：{} 条", count);

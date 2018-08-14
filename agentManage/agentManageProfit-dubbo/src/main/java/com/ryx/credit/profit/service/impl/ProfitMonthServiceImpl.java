@@ -10,10 +10,7 @@ import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
-import com.ryx.credit.profit.service.DeductService;
-import com.ryx.credit.profit.service.OrganTranMonthDetailService;
-import com.ryx.credit.profit.service.ProfitDeductionService;
-import com.ryx.credit.profit.service.ProfitMonthService;
+import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
@@ -62,6 +59,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Autowired
     private OrganTranMonthDetailService organTranMonthDetailService;
+
+    @Autowired
+    private ProfitComputerService profitComputerService;
 
 
     @Override
@@ -269,7 +269,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public BigDecimal getAgentProfit(String agentId, String profitDate) {
+    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate) {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
@@ -278,10 +278,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             List<ProfitDetailMonth> list = profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
             if(list != null && !list.isEmpty()){
                 ProfitDetailMonth profitMonth = list.get(0);
-                return profitMonth.getProfitSumAmt();
+                return profitMonth;
             }
         }
-        return BigDecimal.ZERO;
+        return null;
     }
 
     @Override
@@ -296,6 +296,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 // 退单补款+
                 sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
                 // 其他补款+
+                profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.total_supply(profitDetailMonthTemp.getAgentPid(), null));
+                sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
                 // POS考核奖励
                 if ("100003".equals(profitDetailMonthTemp.getBusPlatForm())) {
                      getPosReward(profitDetailMonthTemp);
@@ -306,10 +308,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 // 机具扣款-
                 sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt);
                 //退单扣款-
-                // 直发平台扣款
-                if (profitDetailMonthTemp.getAgentId().startsWith("6000")) {
-
-                }else {
+                if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
                     sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt);
                 }
                 //POS考核扣款（新国都、瑞易送）-
@@ -317,6 +316,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 //手刷考核扣款（小蓝牙、MPOS）-
                 profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(sumAmt, profitDetailMonthTemp.getAgentPid(),"手刷考核扣款（小蓝牙、MPOS）"));
                 //保理扣款-
+                profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentPid(), null));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
                 //其他扣款-
                 profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(sumAmt, profitDetailMonthTemp.getAgentPid(),"1"));
                 sumAmt = sumAmt.subtract(profitDetailMonthTemp.getOtherDeductionAmt());

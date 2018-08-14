@@ -62,6 +62,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = oLogisticsMapper.getOLogisticsCount(param);
         List<Map<String, Object>> list = oLogisticsMapper.getOLogisticsList(param);
+        for (Map<String, Object> stringObjectMap : list) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),String.valueOf(stringObjectMap.get("PRO_COM")));
+            if(dict!=null){
+                stringObjectMap.put("PRO_COM",dict.getdItemname());
+            }
+        }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
         System.out.println("查询/导出============================================" + JSONObject.toJSON(list));
@@ -81,143 +87,169 @@ public class OLogisticServiceImpl implements OLogisticsService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public List<String> addList(List<List<Object>> data, String user, Integer begins, Integer finish) throws Exception {
+    public List<String> addList(List<List<Object>> data, String user) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
-            if (StringUtils.isBlank(String.valueOf(objectList.get(0)))) {
+            String planNum = "";
+            String orderId = "";
+            String proCode = "";
+            String proId = "";
+            String proName = "";
+            String sendProNum = "";
+            String beginSn = "";
+            String endSn = "";
+            String beginSnCount = "";
+            String endSnCount = "";
+            String logCom = "";
+            String wNumber = "";
+            try {
+                planNum = String.valueOf(objectList.get(0));
+                orderId = String.valueOf(objectList.get(1));
+                proCode = String.valueOf(objectList.get(2));
+                proId = String.valueOf(objectList.get(3));
+                proName = String.valueOf(objectList.get(4));
+                sendProNum = String.valueOf(objectList.get(19));
+                beginSn = String.valueOf(objectList.get(22));
+                endSn = String.valueOf(objectList.get(23));
+                beginSnCount = String.valueOf(objectList.get(24));
+                endSnCount = String.valueOf(objectList.get(25));
+                logCom = String.valueOf(objectList.get(20));
+                wNumber = String.valueOf(objectList.get(21));
+            } catch (Exception e) {
+                throw new MessageException("Excel参数错误");
+            }
+            if (StringUtils.isBlank(planNum)) {
                 logger.info("排单编号为空");
                 throw new MessageException("排单编号为空");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(1)))) {
+            if (StringUtils.isBlank(orderId)){
                 logger.info("订单编号为空");
                 throw new MessageException("订单编号为空");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(2)))) {
+            if (StringUtils.isBlank(proCode)) {
                 logger.info("商品编号为空");
                 throw new MessageException("商品编号为空");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(3)))) {
+            if (StringUtils.isBlank(proId)) {
                 logger.info("商品ID为空");
                 throw new MessageException("商品ID为空");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(23)))) {
+            if (StringUtils.isBlank(sendProNum)) {
                 logger.info("请填写发货数量");
                 throw new MessageException("请填写发货数量");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(26)))) {
+            if (StringUtils.isBlank(beginSn)) {
                 logger.info("请填写起始SN序列号");
                 throw new MessageException("请填写起始SN序列号");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(27)))) {
+            if (StringUtils.isBlank(endSn)){
                 logger.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(28)))) {
+            if (StringUtils.isBlank(beginSnCount)) {
                 logger.info("请填写起始SN位数");
                 throw new MessageException("请填写起始SN位数");
             }
-            if (StringUtils.isBlank(String.valueOf(objectList.get(29)))) {
+            if (StringUtils.isBlank(endSnCount)) {
                 logger.info("请填写结束SN位数");
                 throw new MessageException("请填写结束SN位数");
             }
-            String snBeginNum = String.valueOf(String.valueOf(objectList.get(26)));   // 起始SN序列号
-            String snEndNum = String.valueOf(String.valueOf(objectList.get(27)));   // 结束SN序列号
-            begins = Integer.valueOf(String.valueOf(objectList.get(28)));   // 起始SN位数
-            finish = Integer.valueOf(String.valueOf(objectList.get(29)));   // 结束SN位数
-
-            //IDlist检查
-            List<String> stringList = idList(snBeginNum, snEndNum, begins, finish);
-            if (Integer.valueOf(String.valueOf(objectList.get(23))) != stringList.size()) {
-                logger.info("请仔细核对发货数量");
-                throw new MessageException("请仔细核对发货数量");
+            if (StringUtils.isBlank(logCom)) {
+                logger.info("请填写物流公司");
+                throw new MessageException("请填写物流公司");
             }
-
-            //物流信息
-            OLogistics oLogistics = new OLogistics();
-            oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
-            oLogistics.setcUser(user);                                      // 创建人
-            oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
-            oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
-            oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
-            oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
-            oLogistics.setIsdeall(Status.STATUS_1.status);
-
-            //ID信息
-            oLogistics.setReceiptPlanId(null != objectList.get(0) ? String.valueOf(objectList.get(0)) : ""); // 排单编号
-            oLogistics.setOrderId(null != objectList.get(1) ? String.valueOf(objectList.get(1)) : "");       // 订单编号
-            oLogistics.setProId(null != objectList.get(3) ? String.valueOf(objectList.get(3)) : "");         // 商品ID
-            oLogistics.setProName(null != objectList.get(4) ? String.valueOf(objectList.get(4)) : "");       // 商品名称
-
-            //排单信息
-            ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
-            if(planVo==null)throw new MessageException("排单信息未找到");
-            //商品单价
-            if (null != objectList.get(6) && !objectList.get(6).equals("") ) {
-                oLogistics.setProPrice(new BigDecimal(String.valueOf(objectList.get(6))));   // 商品单价
+            if (StringUtils.isBlank(wNumber)) {
+                logger.info("请填写物流单号");
+                throw new MessageException("请填写物流单号");
             }
-
-            //商品信息从排单表里查
-            oLogistics.setProCom(planVo.getProCom());// 厂家
-            oLogistics.setProType(planVo.getProType());//排单添加商品类型
-            oLogistics.setProModel(planVo.getModel());//型号
-
             try {
-                oLogistics.setSendNum(new BigDecimal(String.valueOf(objectList.get(23))));  // 发货数量
-                oLogistics.setLogCom(null != objectList.get(24) ? String.valueOf(objectList.get(24)) : "");       // 物流公司
-                oLogistics.setwNumber(null != objectList.get(25) ? String.valueOf(objectList.get(25)) : "");      // 物流单号
-                oLogistics.setSnBeginNum(null != objectList.get(26) ? String.valueOf(objectList.get(26)) : "");   // 起始SN序列号
-                oLogistics.setSnEndNum(null != objectList.get(27) ? String.valueOf(objectList.get(27)) : "");     // 结束SN序列号
-            } catch (Exception e) {
-                throw new MessageException("Excel参数错误！");
-            }
-            logger.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
-            if (1 != insertImportData(oLogistics)) {
-                throw new MessageException("插入失败！");
-            }
-            list.add(oLogistics.getId());
-            //调用明细接口之前需要先去数据库进行查询是否已有数据
-            List<String> idList = idList(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish);
-            if (null != idList && idList.size() > 0) {
-                for (String snNum : idList) {
-                    //检查sn是否存在物流状态和记录状态
-                    OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-                    OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
-                    criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
-                    criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                    criteria.andSnNumEqualTo(snNum);
-                    List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
-                    if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
-                        //说明已经存在数据
-                        logger.info("此物流已经存在,正在发货中!!!");
-                        throw new MessageException("此物流已经存在,正在发货中!!!");
-                    }
+                //IDlist检查
+                List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
+                if (Integer.valueOf(sendProNum) != stringList.size()) {
+                    logger.info("请仔细核对发货数量");
+                    throw new MessageException("请仔细核对发货数量");
                 }
-            }
-            // 调用明细接口 插入物流明细
-            ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(), begins, finish, oLogistics.getId(), user, planVo.getId());
-            //插入成功更新排单信息
-            if (resultVO.isSuccess()) {
-                String id =  oLogistics.getReceiptPlanId();   // 排单编号
-                if (null == id) {
-                    throw new MessageException("排单ID查询失败！");
-                } else {
-                    ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
-                    if (receiptPlan != null) {
-                        if(receiptPlan.getSendProNum()==null || receiptPlan.getSendProNum().compareTo(BigDecimal.ZERO)==0) {// 发货数量
-                            receiptPlan.setSendProNum(new BigDecimal(String.valueOf(objectList.get(21))));
-                        }else{
-                            receiptPlan.setSendProNum(receiptPlan.getSendProNum().add(new BigDecimal(String.valueOf(objectList.get(21)))));
-                        }
-                        receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
-                        receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
-                        if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
-                            throw new MessageException("更新排单数据失败！");
-                        }
-                        System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
-                    }
-                }
-            }
 
+                //物流信息
+                OLogistics oLogistics = new OLogistics();
+                oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
+                oLogistics.setcUser(user);                                      // 创建人
+                oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
+                oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+                oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
+                oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
+                oLogistics.setIsdeall(Status.STATUS_1.status);
+
+                //ID信息
+                oLogistics.setReceiptPlanId(planNum); // 排单编号
+                oLogistics.setOrderId(orderId);       // 订单编号
+                oLogistics.setProId(proId);         // 商品ID
+                oLogistics.setProName(proName);       // 商品名称
+
+                //排单信息
+                ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
+                if(planVo==null)throw new MessageException("排单信息未找到");
+
+                //商品信息从排单表里查
+                oLogistics.setProCom(planVo.getProCom());// 厂家
+                oLogistics.setProType(planVo.getProType());//排单添加商品类型
+                oLogistics.setProModel(planVo.getModel());//型号
+
+                oLogistics.setSendNum(new BigDecimal(sendProNum));  // 发货数量
+                oLogistics.setLogCom(logCom);       // 物流公司
+                oLogistics.setwNumber(wNumber);      // 物流单号
+                oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
+                oLogistics.setSnEndNum(endSn);     // 结束SN序列号
+
+                logger.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
+                if (1 != insertImportData(oLogistics)) {
+                    throw new MessageException("插入失败！");
+                }
+                list.add(oLogistics.getId());
+                //调用明细接口之前需要先去数据库进行查询是否已有数据
+                if (null != stringList && stringList.size() > 0) {
+                    for (String snNum : stringList) {
+                        //检查sn是否存在物流状态和记录状态
+                        OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                        OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
+                        criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
+                        criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                        criteria.andSnNumEqualTo(snNum);
+                        List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                        if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
+                            //说明已经存在数据
+                            logger.info("此物流已经存在,正在发货中!!!");
+                            throw new MessageException("此物流已经存在,正在发货中!!!");
+                        }
+                    }
+                }
+                // 调用明细接口 插入物流明细
+                ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
+                //插入成功更新排单信息
+                if (resultVO.isSuccess()) {
+                    String id =  oLogistics.getReceiptPlanId();   // 排单编号
+                    if (null == id) {
+                        throw new MessageException("排单ID查询失败！");
+                    } else {
+                        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
+                        if (receiptPlan != null) {
+                            if(receiptPlan.getSendProNum()==null || receiptPlan.getSendProNum().compareTo(BigDecimal.ZERO)==0) {// 发货数量
+                                receiptPlan.setSendProNum(new BigDecimal(sendProNum));
+                            }else{
+                                receiptPlan.setSendProNum(receiptPlan.getSendProNum().add(new BigDecimal(sendProNum)));
+                            }
+                            receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
+                            receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
+                            if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
+                                throw new MessageException("更新排单数据失败！");
+                            }
+                            System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new MessageException("导入物流失败");
+            }
         }
         return list;
     }

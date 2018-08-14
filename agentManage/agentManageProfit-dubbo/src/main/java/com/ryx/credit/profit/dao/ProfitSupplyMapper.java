@@ -30,5 +30,7 @@ public interface ProfitSupplyMapper {
 
     BigDecimal getTotalByMonthAndPid(ProfitSupply record);
 
+    BigDecimal getBuckleByMonthAndPid(ProfitSupply record);
+
     List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
 }
