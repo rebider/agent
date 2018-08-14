@@ -14,6 +14,8 @@ public interface PlatformSynService {
 
     public Boolean isMyPlatform(String id);
 
+    public Boolean isMyPlatformByPlatformCode(String platformCode);
+
 
     /**
      * 代理商升级 进入入网管理
