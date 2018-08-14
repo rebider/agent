@@ -63,6 +63,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Autowired
     private OrganTranMonthDetailService organTranMonthDetailService;
 
+
     @Override
     public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
@@ -355,14 +356,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return BigDecimal.ZERO;
     }
 
-    /*** 
+    /***
     * @Description: 执行机具扣款
     * @Param:  profitDetailMonthTemp 月分润信息
     * @Param:  agentProfitAmt 分润金额
     * @return: 扣款金额
-    * @Author: zhaodw 
-    * @Date: 2018/8/13 
-    */ 
+    * @Author: zhaodw
+    * @Date: 2018/8/13
+    */
     private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt) {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentId", profitDetailMonthTemp.getAgentId()); //业务平台编号
