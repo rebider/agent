@@ -14,7 +14,7 @@ import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
 public interface AgentNotifyService {
 
     void asynNotifyPlatform(String busId);
-
+    void asynNotifyPlatformById(String id);
     void notifyPlatformNew(String busId,String impId)throws Exception;
     void notifyPlatform(String busId,String impId)throws Exception;
 
