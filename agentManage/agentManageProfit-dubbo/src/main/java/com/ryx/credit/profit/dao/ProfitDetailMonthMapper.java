@@ -15,6 +15,13 @@ public interface ProfitDetailMonthMapper {
 
     List<ProfitDetailMonth> selectByExample(ProfitDetailMonthExample example);
 
+    /**
+     * 根据月份获取该月分润明细列表
+     * @param profitDate
+     * @return
+     */
+    List<ProfitDetailMonth> selectByDate(String profitDate);
+
     ProfitDetailMonth selectByPrimaryKey(String id);
 
     ProfitDetailMonth selectByAgentPid(String agentPid);
