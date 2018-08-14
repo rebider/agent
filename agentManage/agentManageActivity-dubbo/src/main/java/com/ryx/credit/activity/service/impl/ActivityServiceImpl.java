@@ -21,6 +21,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskInfo;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -102,15 +100,16 @@ public class ActivityServiceImpl implements ActivityService {
             taskListGroup = processEngine.getTaskService().createTaskQuery().taskCandidateGroup(group).list();
         }
         taskList.addAll(taskListGroup);
-        for (Task task : taskList) {
-            logger.info("待办" + task.getId());
-            logger.info("任务名" + task.getName());
-            logger.info("任务开始时间" + task.getCreateTime());
-            logger.info("办理人" + task.getAssignee());
-            logger.info("流程实例ID" + task.getProcessInstanceId());
-            logger.info("执行对象ID" + task.getExecutionId());
-            logger.info("流程定义ID" + task.getProcessDefinitionId());
-        }
+        taskList.sort(Comparator.comparing(TaskInfo::getCreateTime));
+//        for (Task task : taskList) {
+//            logger.info("待办" + task.getId());
+//            logger.info("任务名" + task.getName());
+//            logger.info("任务开始时间" + task.getCreateTime());
+//            logger.info("办理人" + task.getAssignee());
+//            logger.info("流程实例ID" + task.getProcessInstanceId());
+//            logger.info("执行对象ID" + task.getExecutionId());
+//            logger.info("流程定义ID" + task.getProcessDefinitionId());
+//        }
         return taskList;
 
     }
@@ -143,16 +142,16 @@ public class ActivityServiceImpl implements ActivityService {
             ProcessEngine processEngine = processEngineConfiguration
                     .buildProcessEngine();
             list = processEngine.getRepositoryService().createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
-            for (ProcessDefinition processDefinition : list) {
-                logger.info("待办" + processDefinition.getId());
-                logger.info("任务名" + processDefinition.getName());
-                logger.info("getKey" + processDefinition.getKey());
-                logger.info("getVersion" + processDefinition.getVersion());
-                logger.info("bpmn文件" + processDefinition.getResourceName());
-                logger.info("png" + processDefinition.getDiagramResourceName());
-                logger.info("部署ID" + processDefinition.getDeploymentId());
-                logger.info("=================");
-            }
+//            for (ProcessDefinition processDefinition : list) {
+//                logger.info("待办" + processDefinition.getId());
+//                logger.info("任务名" + processDefinition.getName());
+//                logger.info("getKey" + processDefinition.getKey());
+//                logger.info("getVersion" + processDefinition.getVersion());
+//                logger.info("bpmn文件" + processDefinition.getResourceName());
+//                logger.info("png" + processDefinition.getDiagramResourceName());
+//                logger.info("部署ID" + processDefinition.getDeploymentId());
+//                logger.info("=================");
+//            }
         } catch (Exception e) {
             logger.error("findProcessDefinition error", e);
         }

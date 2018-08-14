@@ -39,7 +39,7 @@ public interface OrderService {
 
     PageInfo allOderList(Map par, Page page);
 
-
+    public PageInfo agentOderList(Map par, Page page);
     /**
      * 根据审批状态来查询付款单信息
      * @param agentId

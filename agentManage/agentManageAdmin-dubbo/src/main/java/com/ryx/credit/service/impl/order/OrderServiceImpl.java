@@ -128,6 +128,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 分页查询订单列表
+     * 公司内部查看订单
      * @param par
      * @param page
      * @return
@@ -144,6 +145,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 查询所有订单
+     * 查看所有订单
      * @param par
      * @param page
      * @return
@@ -151,6 +153,27 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageInfo allOderList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
+        par.put("page",page);
+        pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par)) ;
+        pageInfo.setRows(orderMapper.queryAllOrderListView(par));
+        return pageInfo;
+    }
+
+
+
+    /**
+     * 查询代理商订单
+     *
+     * @param par
+     * @param page
+     * @return
+     */
+    @Override
+    public PageInfo agentOderList(Map par, Page page) {
+        PageInfo pageInfo = new PageInfo();
+        if(par==null)return pageInfo;
+        if(par.get("agentId")==null)return pageInfo;
+        if(StringUtils.isBlank(par.get("agentId").toString()))return pageInfo;
         par.put("page",page);
         pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par)) ;
         pageInfo.setRows(orderMapper.queryAllOrderListView(par));
@@ -617,7 +640,8 @@ public class OrderServiceImpl implements OrderService {
             logger.info("下订单:{}", "商品价格数据错误");
             throw new MessageException("付款方式不能为空");
         }
-
+        //插入付款单
+        oPayment_db = initPayment(oPayment_db);
         //订单总金额
         BigDecimal forPayAmount = new BigDecimal(0);
         //订单应付金额
@@ -931,6 +955,13 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("订单提交审批，禁止重复提交审批");
         }
         OOrder order = orderMapper.selectByPrimaryKey(id);
+
+        //提交审批的用户必须是创建人
+        if (!order.getUserId().equals(cuser)) {
+            logger.info("提交审批的用户必须是创建订单的用户{}:{}", id, cuser);
+            return AgentResult.fail("提交审批的用户必须是创建订单的用户");
+        }
+
         if (order.getReviewStatus().equals(AgStatus.Approving.name())) {
             logger.info("订单提交审批,禁止重复提交审批{}:{}", id, cuser);
             return AgentResult.fail("订单提交审批，禁止重复提交审批");
@@ -1089,9 +1120,6 @@ public class OrderServiceImpl implements OrderService {
                 OPayment oPayment = new OPayment();
                 oPayment.setId(db.getId());
                 oPayment.setVersion(db.getVersion());
-
-
-
 
                 //收款时间
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))
