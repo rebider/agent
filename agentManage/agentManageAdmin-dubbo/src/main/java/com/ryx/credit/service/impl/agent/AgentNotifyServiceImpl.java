@@ -165,6 +165,69 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         });
     }
 
+
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public void asynNotifyPlatformById(String id) {
+
+                       AgentPlatFormSyn agentPlatFormSyn = agentPlatFormSynMapper.selectByPrimaryKey(id);
+                       AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentPlatFormSyn.getBusId());
+
+                        for (PlatformSynService platformSynService : platformSynServiceList) {
+                            if(platformSynService.isMyPlatformByPlatformCode(agentPlatFormSyn.getPlatformCode())) {
+                                log.info("开平台{}平台编号不为空走升级接口,请求参数{}", agentPlatFormSyn.getPlatformCode(), agentPlatFormSyn.getNotifyJson());
+
+                                AgentResult res = null;
+                                try {
+                                    //发送请求
+                                    res = platformSynService.agencyLevelUpdateChange(JSONObject.parseObject(agentPlatFormSyn.getSendJson()));
+                                } catch (MessageException e) {
+                                    e.printStackTrace();
+                                    res = AgentResult.fail(e.getMsg());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    res = AgentResult.fail(e.getLocalizedMessage());
+                                }
+                                if(res.isOK()){
+
+                                    agentPlatFormSyn.setSuccesTime(new Date());
+                                    agentPlatFormSyn.setNotifyStatus(Status.STATUS_1.status);
+                                    agentPlatFormSyn.setNotifyJson(res.getData().toString());
+                                    agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn);
+
+                                    //更新入网状态
+                                    Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
+
+                                    //更新入网状态
+                                    Agent updateAgent = new Agent();
+                                    updateAgent.setId(agent.getId());
+                                    updateAgent.setVersion(agent.getVersion());
+                                    updateAgent.setcIncomStatus(AgentInStatus.IN.status);
+                                    Date nowDate = new Date();
+                                    updateAgent.setcIncomTime(nowDate);
+                                    updateAgent.setcUtime(nowDate);
+                                    int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
+                                    log.info("开平台{}平台编号不为空走升级接口,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
+
+                                    agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                                    agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+
+                                }else{
+
+                                    agentPlatFormSyn.setSuccesTime(new Date());
+                                    agentPlatFormSyn.setNotifyStatus(Status.STATUS_0.status);
+                                    agentPlatFormSyn.setNotifyJson((res.getData()!=null?JSONObject.toJSONString(res.getData()):res.getMsg().toString()));
+                                    agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn);
+
+                                    agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                                    agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                                }
+
+                            }
+                        }
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public void notifyPlatformNew(String busId, String impId) throws Exception {
@@ -174,7 +237,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         //业务平台编号已存在
         if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
             log.info("开平台{}平台编号不为空走升级接口",agentBusInfo.getBusNum());
+
             for (PlatformSynService platformSynService : platformSynServiceList) {
+
                 log.info("开平台{}平台编号不为空走升级接口 服务类{}",agentBusInfo.getBusNum(),platformSynService.getClass().getSimpleName());
                 if(platformSynService.isMyPlatform(agentBusInfo.getId())){
                     log.info("开平台{}平台编号不为空走升级接口 匹配服务类{}",agentBusInfo.getBusNum(),platformSynService.getClass().getSimpleName());
@@ -190,7 +255,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                                 .putKeyV("processingId",importAgent.getBatchcode()));
 
                         log.info("开平台{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
-
                         AgentResult res = null;
                         try {
                             //发送请求
@@ -200,13 +264,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             res=AgentResult.fail(e.getMsg());
                         }catch (Exception e) {
                             e.printStackTrace();
-                            res=AgentResult.fail(e.getLocalizedMessage());
+                            res=AgentResult.fail("接口调用异常");
                         }
                         log.info("开平台{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
                         record.setId(id);
                         String sendJson = JsonUtil.objectToJson(req_data);
                         record.setSendJson(sendJson);
-                        record.setNotifyJson(JsonUtil.objectToJson(res.getData()));
+                        record.setNotifyJson(res.getData().toString());
                         record.setNotifyTime(new Date());
                         record.setAgentId(agentBusInfo.getAgentId());
                         record.setBusId(agentBusInfo.getId());

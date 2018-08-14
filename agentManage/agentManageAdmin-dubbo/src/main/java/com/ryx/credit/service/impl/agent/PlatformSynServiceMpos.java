@@ -53,6 +53,20 @@ public class PlatformSynServiceMpos implements PlatformSynService {
     }
 
     @Override
+    public Boolean isMyPlatformByPlatformCode(String platformCode) {
+        PlatFormExample example = new PlatFormExample();
+        example.or().andPlatformNumEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status);
+        List<PlatForm> list = platFormMapper.selectByExample(example);
+        if(list.size()>0){
+            PlatForm p = list.get(0);
+            if("MPOS".equals(p.getPlatformType())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject request(Map data,String url) throws Exception {
         String json = JsonUtil.objectToJson(data);
         log.info("通知手刷请求参数：{}",json);
