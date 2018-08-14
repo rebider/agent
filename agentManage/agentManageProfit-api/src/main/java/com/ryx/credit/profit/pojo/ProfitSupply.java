@@ -18,9 +18,20 @@ public class ProfitSupply implements Serializable {
 
     private String supplyDate;
 
+    public String getSupplyCode() {
+        return supplyCode;
+    }
+
+    public void setSupplyCode(String supplyCode) {
+        this.supplyCode = supplyCode;
+    }
+
     private String remerk;
 
     private String sourceId;
+    //补款码
+    private String supplyCode;
+
 
     public String getId() {
         return id;

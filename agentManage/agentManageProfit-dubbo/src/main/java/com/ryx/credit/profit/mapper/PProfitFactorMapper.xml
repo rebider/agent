@@ -159,7 +159,7 @@
   </select>
 
   <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.math.BigDecimal">
-    select SUM(tatol_amt) from P_PROFIT_FACTOR
+    select SUM(BUCKLE_AMT) from P_PROFIT_FACTOR
      where
     FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
