@@ -64,6 +64,20 @@ public class PlatformSynServicePos implements PlatformSynService {
     }
 
     @Override
+    public Boolean isMyPlatformByPlatformCode(String platformCode) {
+        PlatFormExample example = new PlatFormExample();
+        example.or().andPlatformNumEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status);
+        List<PlatForm> list = platFormMapper.selectByExample(example);
+        if(list.size()>0){
+            PlatForm p = list.get(0);
+            if("POS".equals(p.getPlatformType()) || "ZPOS".equals(p.getPlatformType())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject request(Map data,String url)throws Exception {
         try {
 
@@ -206,6 +220,8 @@ public class PlatformSynServicePos implements PlatformSynService {
                 return ag;
             }
         } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage(),e);
             log.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
