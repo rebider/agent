@@ -48,7 +48,7 @@ public class PlannerServiceImpl implements PlannerService {
     @Autowired
     private OReceiptProMapper receiptProMapper;
     @Autowired
-    OSubOrderMapper oSubOrderMapper;
+    private OSubOrderMapper oSubOrderMapper;
 
 
     @Override
