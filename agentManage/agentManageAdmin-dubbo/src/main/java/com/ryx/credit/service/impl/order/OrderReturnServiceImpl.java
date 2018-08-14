@@ -51,6 +51,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
 
+    private static String refund_agent_modify_id = AppConfig.getProperty("refund_agent_modify_id");
+    private static String refund_business1_id = AppConfig.getProperty("refund_business1_id");
+    private static String refund_finc1_id = AppConfig.getProperty("refund_finc1_id");
+    private static String refund_finc2_id = AppConfig.getProperty("refund_finc2_id");
+    private static String refund_agent_upload_id = AppConfig.getProperty("refund_agent_upload_id");
+
+
     @Autowired
     OReturnOrderMapper returnOrderMapper;
     @Resource
@@ -85,6 +92,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     OLogisticsDetailMapper logisticsDetailMapper;
     @Resource
     OLogisticsService oLogisticService;
+    @Autowired
+    OAccountAdjustMapper accountAdjustMapper;
 
     /**
      * @Author: Zhang Lei
@@ -320,15 +329,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         //更新退货单
         OReturnOrder returnOrderDB = returnOrderMapper.selectByPrimaryKey(returnId);
         returnOrderDB.setRetSchedule(new BigDecimal(RetSchedule.SPZ.code));
+        returnOrderDB.setGoodsReturnAmo(returnOrder.getReturnAmo());
+        returnOrderDB.setReturnAmo(returnOrder.getReturnAmo());
         returnOrderDB.setCutAmo(BigDecimal.ZERO);
         returnOrderDB.setRelReturnAmo(BigDecimal.ZERO);
+        returnOrderDB.setTakeOutAmo(BigDecimal.ZERO);
         returnOrderDB.setuTime(new Date());
         returnOrderDB.setuUser(userid);
         returnOrderDB.setRetReceipt(returnOrder.getRetReceipt());
         returnOrderDB.setRetInvoice(returnOrder.getRetInvoice());
         returnOrderDB.setApplyRemark(returnOrder.getApplyRemark());
-        returnOrderDB.setGoodsReturnAmo(returnOrder.getReturnAmo());
-        returnOrderDB.setReturnAmo(returnOrder.getReturnAmo());
         returnOrderMapper.updateByPrimaryKeySelective(returnOrderDB);
 
 
@@ -488,6 +498,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             returnOrder.setcUser(userid);
             returnOrder.setAgentId(agentId);
             returnOrder.setCutAmo(BigDecimal.ZERO);
+            returnOrder.setTakeOutAmo(BigDecimal.ZERO);
             returnOrder.setRelReturnAmo(BigDecimal.ZERO);
             returnOrderMapper.insertSelective(returnOrder);
         } catch (Exception e) {
@@ -670,13 +681,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //处理审批数据
             log.info("退货审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
 
+            String returnId = agentVo.getReturnId();
+            OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+
             //业务处理
             String sid = agentVo.getSid();
 
             String approveResult = agentVo.getApprovalResult();
 
             //如果是代理商修改订单时，修改SN状态
-            if (approveResult.equals("pass") && sid.equals("sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE")) {
+            if (approveResult.equals("pass") && sid.equals(refund_agent_modify_id)) {
                 try {
                     updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 } catch (ProcessException e) {
@@ -685,7 +699,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //业务审批时添加排单
-            if (approveResult.equals("pass") && sid.equals("sid-C911F512-9E63-44CC-9E6E-763484FA0E5B")) {
+            if (approveResult.equals("pass") && sid.equals(refund_business1_id)) {
                 AgentResult agentResult = savePlans(agentVo, userId);
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
@@ -693,12 +707,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //财务第一次审批时更新发货状态
-            if (approveResult.equals("pass") && sid.equals("sid-ECD4C817-99C4-4F9B-92A2-748BB554D673")) {
+            if (approveResult.equals("pass") && sid.equals(refund_finc1_id)) {
                 updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.DFH.code));
             }
 
-            //财务最后审批时上传打款凭证
-            if (approveResult.equals("pass") && sid.equals("sid-4528CEA4-998C-4854-827B-1842BBA5DB4B")) {
+            //财务最后审批时上传打款凭证,并且是已经执行退款方案
+            if (approveResult.equals("pass") && sid.equals(refund_finc2_id)) {
+                OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
+                oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
+                List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
+                if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {
+                    return AgentResult.fail("您还未执行退款方案");
+                }
+
+                if(returnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO)>0 && agentVo.getAttachments().length<=0){
+                    return AgentResult.fail("有线下退款金额时，必须上传打款凭证");
+                }
+
                 AgentResult agentResult = saveAttachments(agentVo, userId);
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
@@ -706,8 +731,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
 
-            //代理商审批时判断是否上传物流信息
-            if (approveResult.equals("pass") && sid.equals("sid-F315F787-E98B-40FA-A6DC-6A962201075D")) {
+            //代理商上传物流信息时判断是否上传物流信息
+            if (approveResult.equals("pass") && sid.equals(refund_agent_upload_id)) {
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
@@ -923,8 +948,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
             BigDecimal returnAmo = oReturnOrder.getReturnAmo();
+            oReturnOrder.setTakeOutAmo(takeAmt);
+            oReturnOrder.setRelReturnAmo(returnAmo.subtract(takeAmt));
 
-            if ((returnAmo.subtract(takeAmt)).compareTo(BigDecimal.ZERO) > 0) {
+            if (oReturnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO) > 0) {
                 oReturnOrder.setRetSchedule(new BigDecimal(RetSchedule.TKZ.code));
             } else {
                 oReturnOrder.setRetSchedule(new BigDecimal(RetSchedule.WC.code));
