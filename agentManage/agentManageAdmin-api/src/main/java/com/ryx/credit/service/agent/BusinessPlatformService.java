@@ -39,4 +39,6 @@ public interface BusinessPlatformService {
      * @throws Exception
      */
     public List<String> addList(List<List<Object>> list, String userid) throws Exception;
+
+    int updateBusPlatDkgsBySelective(AgentBusInfo agentBusInfo,String userId);
 }
