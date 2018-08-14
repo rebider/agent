@@ -113,6 +113,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 List<ImportAgent> importAgents = importAgentMapper.selectByExample(example);
                 log.info("接收入网查询列表开始:size：{}",importAgents.size());
                 for (ImportAgent importAgent : importAgents) {
+
                     if(importAgent.getDatatype().equals(AgImportType.NETINAPP.getValue())){
                         AgentBusInfoExample AgBusExample = new AgentBusInfoExample();
                         AgentBusInfoExample.Criteria AgBusCriteria = AgBusExample.createCriteria();
@@ -127,6 +128,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             }
                         }
                     }
+
                     if(importAgent.getDatatype().equals(AgImportType.BUSAPP.getValue())){
                         try {
                             agentNotifyService.notifyPlatformNew(importAgent.getDataid(),importAgent.getId());
