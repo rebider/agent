@@ -344,8 +344,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             map.put("posJlTranAmt", detail.getPosJlTranAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
-                map.get("posRewardAmt");
-                profitDetailMonthTemp.setposre
+                profitDetailMonthTemp.setPosRewardAmt((BigDecimal) map.get("posRewardAmt"));
 
             } catch (Exception e) {
                 e.printStackTrace();
