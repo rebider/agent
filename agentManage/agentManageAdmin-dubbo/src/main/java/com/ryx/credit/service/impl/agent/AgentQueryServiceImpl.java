@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.FastMap;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +55,16 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     @Autowired
     private OReturnOrderMapper returnOrderMapper;
 
+
+    @Override
+    public List<Agent> queryAgentListByIds(List<String> ids) {
+        if(ids==null || ids.size()==0)return new ArrayList<Agent>();
+        AgentExample example = new AgentExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status)
+                .andAgStatusEqualTo(AgStatus.Approved.name())
+                .andIdIn(ids);
+        return  agentMapper.selectByExample(example);
+    }
 
     @Override
     public Agent informationQuery(String id) {
