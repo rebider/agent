@@ -132,9 +132,9 @@ public class ProfitMonthMposDataJob {
             where.setAgentPid(json.getString("UNIQUECODE"));//代理商唯一编号
             where.setProfitDate(month);
             ProfitDetailMonth detailMonth = profitDetailMonthService.selectByPIdAndMonth(where);
-            BigDecimal totalDay = computerService.total_day(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//瑞和宝日结分润汇总
-            BigDecimal factor = computerService.total_factor(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//商业保理扣款
-            BigDecimal otherSupply = computerService.total_supply(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//其他补款汇总
+            BigDecimal totalDay = computerService.totalP_day_RHB(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//瑞和宝日结分润汇总
+            //BigDecimal factor = computerService.total_factor(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//商业保理扣款
+            //BigDecimal otherSupply = computerService.total_supply(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//其他补款汇总
             if(null!=detailMonth){//已存在该分润
                 BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
                 detailMonth.setProfitDate(month);
@@ -148,8 +148,6 @@ public class ProfitMonthMposDataJob {
 
 
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润=瑞和宝分润-日结分润
-                detailMonth.setBuDeductionAmt(factor);
-                detailMonth.setOtherSupplyAmt(otherSupply);
                 profitDetailMonthService.updateByPrimaryKeySelective(detailMonth);
             }else{
                 detailMonth = new ProfitDetailMonth();
@@ -167,8 +165,6 @@ public class ProfitMonthMposDataJob {
                 detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
 
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
-                detailMonth.setBuDeductionAmt(factor);
-                detailMonth.setOtherSupplyAmt(otherSupply);
                 profitDetailMonthService.insertSelective(detailMonth);
             }
         }
