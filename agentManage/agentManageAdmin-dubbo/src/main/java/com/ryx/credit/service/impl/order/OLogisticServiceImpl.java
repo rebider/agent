@@ -163,6 +163,21 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("请填写物流单号");
             }
             try {
+                OLogisticsExample oLogisticsExample = new OLogisticsExample();
+                OLogisticsExample.Criteria criteria1 = oLogisticsExample.createCriteria();
+                criteria1.andSnBeginNumEqualTo(beginSn);
+                criteria1.andSnEndNumEqualTo(endSn);
+                criteria1.andWNumberEqualTo(wNumber);
+                criteria1.andLogComEqualTo(logCom);
+                List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
+                if(null==oLogistics1){
+                    logger.info("该商品已发货请勿重复提交1");
+                    throw new MessageException("该商品已发货请勿重复提交");
+                }
+                if(oLogistics1.size()!=0){
+                    logger.info("该商品已发货请勿重复提交2");
+                    throw new MessageException("该商品已发货请勿重复提交");
+                }
                 //IDlist检查
                 List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
                 if (Integer.valueOf(sendProNum) != stringList.size()) {

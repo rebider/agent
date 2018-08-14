@@ -193,7 +193,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
                                     agentPlatFormSyn.setSuccesTime(new Date());
                                     agentPlatFormSyn.setNotifyStatus(Status.STATUS_1.status);
-                                    agentPlatFormSyn.setNotifyJson(res.getData().toString());
+                                    agentPlatFormSyn.setNotifyJson((res.getData()!=null?res.getData().toString():res.getMsg()));
                                     agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn);
 
                                     //更新入网状态
@@ -246,16 +246,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     AgentPlatFormSyn record = new AgentPlatFormSyn();
                     String id = idService.genId(TabId.a_agent_platformsyn);
                     for(int i=0;i<5;i++){
-
-                        log.info("开平台{}平台编号不为空走升级接口,获取请求参数",agentBusInfo.getBusNum());
-
-                        //请求参数构建
-                        Map req_data =  platformSynService.agencyLevelUpdateChangeData(FastMap.fastSuccessMap()
-                                .putKeyV("agentBusinfoId",agentBusInfo.getId())
-                                .putKeyV("processingId",importAgent.getBatchcode()));
-
-                        log.info("开平台{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
                         AgentResult res = null;
+
+                            log.info("开平台{}平台编号不为空走升级接口,获取请求参数",agentBusInfo.getBusNum());
+                            //请求参数构建
+                            Map req_data =  platformSynService.agencyLevelUpdateChangeData(FastMap.fastSuccessMap()
+                                    .putKeyV("agentBusinfoId",agentBusInfo.getId())
+                                    .putKeyV("processingId",importAgent.getBatchcode()));
+
+                            log.info("开平台{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
                         try {
                             //发送请求
                             res = platformSynService.agencyLevelUpdateChange(req_data);
