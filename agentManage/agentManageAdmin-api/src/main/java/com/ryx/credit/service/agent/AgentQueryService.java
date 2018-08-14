@@ -57,5 +57,12 @@ public interface AgentQueryService {
     public Map<String,Object> queryInfoByProInsId(String proid);
 
 
+    /**
+     * 查询给定的代理商
+     * @param ids
+     * @return
+     */
+    public List<Agent> queryAgentListByIds(List<String> ids);
+
 
 }
