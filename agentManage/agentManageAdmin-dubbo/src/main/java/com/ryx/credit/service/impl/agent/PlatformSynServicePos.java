@@ -157,16 +157,21 @@ public class PlatformSynServicePos implements PlatformSynService {
     @Override
     public Map agencyLevelUpdateChangeData(Map data) {
         Map data_res = new HashMap();
-        data_res.put("agencyLevelUpdateChangeData","agencyLevelUpdateChangeData");
-        Object agentBusinfo = data.get("agentBusinfoId");
-        AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
-        data_res.put("orgId", agentBusInfo.getBusNum());
-        //普通二代 升级为 直签
-        data_res.put("operType", "2");
-        //查询代理商的上级代理
-        AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
-        if(parent!=null) {
-            data_res.put("supOrgId", parent.getBusNum());
+        try {
+            data_res.put("agencyLevelUpdateChangeData","agencyLevelUpdateChangeData");
+            Object agentBusinfo = data.get("agentBusinfoId");
+            AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
+            data_res.put("orgId", agentBusInfo.getBusNum());
+            //普通二代 升级为 直签
+            data_res.put("operType", "2");
+            //查询代理商的上级代理
+            AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
+            if(parent!=null) {
+                data_res.put("supOrgId", parent.getBusNum());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            data_res.put("msg",e.getLocalizedMessage());
         }
         return data_res;
     }
