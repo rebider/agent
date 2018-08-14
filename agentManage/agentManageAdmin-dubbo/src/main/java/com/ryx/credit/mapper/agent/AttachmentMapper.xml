@@ -206,7 +206,7 @@
         <include refid="all"/> from A_ATTACHMENT att left join A_ATTACHMENT_REL attrel on att.id=attrel.ATT_ID
         where att.STATUS=1 and attrel.STATUS=1
         <if test="map.attName != null and map.attName != '' ">
-            AND att.ATT_NAME LIKE #{map.attName}||'%'
+            AND att.ATT_NAME LIKE CONCAT(CONCAT('%',#{map.attName}),'%')
         </if>
         <if test="map.busType != null and map.busType != '' ">
             AND attrel.BUS_TYPE=#{map.busType}
