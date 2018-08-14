@@ -13,34 +13,27 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * 手刷日结分润数据同步、定时
+ * 手刷补差数据同步
  */
-public class ProfitDayMposDataJob {
+public class ProfitMposDiffDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
     private IProfitDService profitDService;
     @Autowired
     private IdService idService;
-    private int index = 1;//页数
+    private int index = 1;
+
 
     public static void main(String agrs[]){
         HashMap<String,String> map = new HashMap<String,String>();
-        //map.put("paymoneyStartDate","20180724");
-        //map.put("paymoneyEndDate","20180724");
-        String transDate1 = null;
-        String transDate2 = null;
-        map.put("transStartDate",transDate1==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):transDate1);
-        map.put("transEndDate",transDate2==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):transDate2);
-        map.put("pageNumber","1");
-        map.put("pageSize","20");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.day"),params);
+                (AppConfig.getProperty("profit.bucha"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             //logger.error("请求同步失败！");
@@ -52,20 +45,15 @@ public class ProfitDayMposDataJob {
         System.out.println(data);
     }
 
-    /**
-     * 同步日结分润数据
-     * @param transDate1 交易时间起（空则为当前日期上一天）yyyymmdd
-     * @param transDate2 交易时间止（空则为当前日期上一天）yyyymmdd
-     */
-    public void synchroProfitD(String transDate1,String transDate2){
+    public void synchroProfitDiff(String month){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transStartDate",transDate1==null?DateUtil.getAfterDayDate("-1",DateUtil.sdfDays):transDate1);
-        map.put("transEndDate",transDate2==null?DateUtil.getAfterDayDate("-1",DateUtil.sdfDays):transDate2);
+        month = month==null? DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):month;
+        map.put("Frmonth",month);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.day"),params);
+                (AppConfig.getProperty("profit.bucha"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
@@ -76,7 +64,7 @@ public class ProfitDayMposDataJob {
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
             if(list.size()>0){
-                insertProfitD(list,transDate1,transDate2);
+                insertProfitD(list,month);
             }
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
@@ -84,24 +72,14 @@ public class ProfitDayMposDataJob {
         }
     }
 
-    public void insertProfitD(List<JSONObject> profitDays,String transDate1,String transDate2){
+    public void insertProfitD(List<JSONObject> profitDays,String date){
         for(JSONObject json:profitDays){
             ProfitDay profitD = new ProfitDay();
             profitD.setId(idService.genId(TabId.P_PROFIT_D));
-            profitD.setAgentId(json.getString("AGENTID"));
-            profitD.setAgentName(json.getString("AGENTNAME"));
-            profitD.setRemitDate(json.getString("REMITDATE"));
-            profitD.setTransDate(json.getString("TRANSDATE"));
-            profitD.setAgentPid(json.getString("AGENTPID"));
-            profitD.setTotalProfit(json.getBigDecimal("TOTALPROFIT"));
-            profitD.setFrozenMoney(json.getBigDecimal("FROZENMONEY "));
-            profitD.setSuccessMoney(json.getBigDecimal("SUCCESSMONEY "));
-            profitD.setFailMoney(json.getBigDecimal("FAILMONEY "));
-            profitD.setRedoMoney(json.getBigDecimal("REDOMONEY "));
-            profitD.setReturnMoney(json.getBigDecimal("RETURNMONEY "));
-            profitD.setRealMoney(json.getBigDecimal("REALMONEY "));
+
             profitDService.insert(profitD);
+
         }
-        synchroProfitD(transDate1,transDate2);
+        synchroProfitDiff(date);
     }
 }
