@@ -269,7 +269,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public BigDecimal getAgentProfit(String agentId, String profitDate) {
+    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate) {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
@@ -278,10 +278,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             List<ProfitDetailMonth> list = profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
             if(list != null && !list.isEmpty()){
                 ProfitDetailMonth profitMonth = list.get(0);
-                return profitMonth.getProfitSumAmt();
+                return profitMonth;
             }
         }
-        return BigDecimal.ZERO;
+        return null;
     }
 
     @Override
