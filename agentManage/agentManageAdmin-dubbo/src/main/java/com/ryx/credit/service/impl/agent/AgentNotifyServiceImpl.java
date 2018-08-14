@@ -174,7 +174,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         //业务平台编号已存在
         if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
             log.info("开平台{}平台编号不为空走升级接口",agentBusInfo.getBusNum());
+
             for (PlatformSynService platformSynService : platformSynServiceList) {
+
                 log.info("开平台{}平台编号不为空走升级接口 服务类{}",agentBusInfo.getBusNum(),platformSynService.getClass().getSimpleName());
                 if(platformSynService.isMyPlatform(agentBusInfo.getId())){
                     log.info("开平台{}平台编号不为空走升级接口 匹配服务类{}",agentBusInfo.getBusNum(),platformSynService.getClass().getSimpleName());
@@ -190,7 +192,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                                 .putKeyV("processingId",importAgent.getBatchcode()));
 
                         log.info("开平台{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
-
                         AgentResult res = null;
                         try {
                             //发送请求
@@ -200,13 +201,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             res=AgentResult.fail(e.getMsg());
                         }catch (Exception e) {
                             e.printStackTrace();
-                            res=AgentResult.fail(e.getLocalizedMessage());
+                            res=AgentResult.fail("接口调用异常");
                         }
                         log.info("开平台{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
                         record.setId(id);
                         String sendJson = JsonUtil.objectToJson(req_data);
                         record.setSendJson(sendJson);
-                        record.setNotifyJson(JsonUtil.objectToJson(res.getData()));
+                        record.setNotifyJson(res.getData().toString());
                         record.setNotifyTime(new Date());
                         record.setAgentId(agentBusInfo.getAgentId());
                         record.setBusId(agentBusInfo.getId());
