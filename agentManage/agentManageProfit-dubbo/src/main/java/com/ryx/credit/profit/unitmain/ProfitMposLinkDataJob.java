@@ -6,6 +6,8 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.profit.dao.PAgentPidLinkMapper;
+import com.ryx.credit.profit.pojo.PAgentPidLink;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.service.IProfitDService;
 import com.ryx.credit.service.dict.IdService;
@@ -23,7 +25,7 @@ import java.util.List;
 public class ProfitMposLinkDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
-    private IProfitDService profitDService;
+    private PAgentPidLinkMapper pidLinkMapper;
     @Autowired
     private IdService idService;
     private int index = 1;
@@ -72,10 +74,12 @@ public class ProfitMposLinkDataJob {
 
     public void insertProfitD(List<JSONObject> profitDays){
         for(JSONObject json:profitDays){
-            ProfitDay profitD = new ProfitDay();
-            profitD.setId(idService.genId(TabId.P_PROFIT_D));
-
-            profitDService.insert(profitD);
+            PAgentPidLink link = new PAgentPidLink();
+            link.setId(idService.genId(TabId.P_AGENT_PID_LINK));
+            link.setDeptCode(json.getString("platFormNum"));
+            link.setAgentId(json.getString("agencyId"));
+            link.setAgentPid(json.getString("uniqueCode"));
+            pidLinkMapper.insert(link);
         }
         synchroProfitLink();
     }
