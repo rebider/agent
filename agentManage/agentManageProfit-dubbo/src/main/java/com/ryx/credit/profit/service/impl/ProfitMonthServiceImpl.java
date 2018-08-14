@@ -297,9 +297,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
                 // 其他补款+
                 // POS考核奖励
-                if ("".equals(profitDetailMonthTemp.getBusPlatForm())) {
-                   BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
-                   profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
+                if ("100003".equals(profitDetailMonthTemp.getBusPlatForm())) {
+                     getPosReward(profitDetailMonthTemp);
+                    sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
                 }else{
                     profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
                 }
@@ -329,7 +329,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
     }
 
-    private BigDecimal getPosReward(ProfitDetailMonth profitDetailMonthTemp) {
+    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp) {
         OrganTranMonthDetail detail = new OrganTranMonthDetail();
         detail.setProfitId(profitDetailMonthTemp.getId());
         List<OrganTranMonthDetail> organTranMonthDetails = organTranMonthDetailService.getOrganTranMonthDetailList(detail);
@@ -344,15 +344,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             map.put("posJlTranAmt", detail.getPosJlTranAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
-                profitDetailMonthTemp.setPosRewardAmt((BigDecimal) map.get("posRewardAmt"));
-
+                BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
+                profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
+                profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.error("获取pos奖励失败");
                 throw new RuntimeException("获取pos奖励失败");
             }
         }
-        return BigDecimal.ZERO;
     }
 
     /***

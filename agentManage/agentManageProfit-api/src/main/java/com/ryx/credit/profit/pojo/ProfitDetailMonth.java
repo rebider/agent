@@ -127,7 +127,13 @@ public class ProfitDetailMonth implements Serializable{
         return serialVersionUID;
     }
 
-    
+    public BigDecimal getPosRewardDeductionAmt() {
+        return posRewardDeductionAmt;
+    }
+
+    public void setPosRewardDeductionAmt(BigDecimal posRewardDeductionAmt) {
+        this.posRewardDeductionAmt = posRewardDeductionAmt;
+    }
 
     public String getBusPlatForm() {
         return busPlatForm;
