@@ -142,6 +142,18 @@
     where AGENT_PID = #{agentPid,jdbcType=VARCHAR}
   </select>
 
+
+  <select id="findByIds" resultType="java.math.BigDecimal">
+    select
+    SUM(REAL_PROFIT_AMT)
+    from P_PROFIT_DETAIL_M
+    where
+    <foreach item="item" index="index" collection="list"
+             open="(" separator="," close=")">
+      #{ids}
+    </foreach>
+  </select>
+
   <select id="selectByPIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     select
     <include refid="Base_Column_List" />
