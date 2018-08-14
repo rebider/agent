@@ -30,6 +30,16 @@ public class ProfitDay implements Serializable {
 
     private BigDecimal returnMoney;
 
+    private BigDecimal totalProfit1;//新增
+
+    public BigDecimal getTotalProfit1() {
+        return totalProfit1;
+    }
+
+    public void setTotalProfit1(BigDecimal totalProfit1) {
+        this.totalProfit1 = totalProfit1;
+    }
+
     public String getId() {
         return id;
     }
