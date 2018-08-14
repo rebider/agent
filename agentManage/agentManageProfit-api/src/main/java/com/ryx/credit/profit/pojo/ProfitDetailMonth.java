@@ -120,7 +120,7 @@ public class ProfitDetailMonth implements Serializable{
 
     private String busPlatForm;
 
-    private BigDecimal posRewardDeduction_amt;
+    private BigDecimal posRewardDeductionAmt;
 
 
     public static long getSerialVersionUID() {
