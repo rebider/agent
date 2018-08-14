@@ -192,6 +192,7 @@ public class PlatformSynServicePos implements PlatformSynService {
             reqdata.put("operType",data.get("operType")); //使用范围
             if(data.get("supOrgId")==null || StringUtils.isEmpty(data.get("supOrgId")+""))throw new MessageException("迁移上级");
             reqdata.put("supOrgId",data.get("supOrgId"));
+
             JSONObject res = request(reqdata,"ORG004");
 
             String respCode = res.getString("respCode");

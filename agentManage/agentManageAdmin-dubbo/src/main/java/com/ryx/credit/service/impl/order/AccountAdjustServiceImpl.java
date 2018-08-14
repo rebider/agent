@@ -333,7 +333,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             }
 
             //抵扣欠款金额
-            BigDecimal takeAmt = adjustAmt.subtract(leftAmt);
+            BigDecimal takeAmt = BigDecimal.ZERO;
+            takeAmt = adjustAmt.subtract(leftAmt);
 
             //更新退货表
             if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {

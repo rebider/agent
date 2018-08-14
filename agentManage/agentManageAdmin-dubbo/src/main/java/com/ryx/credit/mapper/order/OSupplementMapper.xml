@@ -280,6 +280,9 @@
         <if test="map.time != null and map.time != '' ">
             and to_char(C_TIME,'YYYY-MM-dd')=#{map.time}
         </if>
+        <if test="map.agentId != null and map.agentId != '' ">
+            and AGENT_ID = #{map.agentId}
+        </if>
         order by C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>

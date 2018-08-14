@@ -30,7 +30,7 @@ import java.util.List;
  * @date 2018/7/2911:34
  */
 @Service("tranDataJob")
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class TranDataJob {
 
     private static final Logger LOG = Logger.getLogger(TranDataJob.class);
@@ -116,8 +116,13 @@ public class TranDataJob {
         profitOrganTranMonth.setProductType("02");
         profitOrganTranMonth.setProductName("MPOS");
         profitOrganTranMonth.setTranAmt(tranAmt);
-        BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(profitOrganTranMonth.getProfitDate());
-        profitOrganTranMonth.setSettleAmt(settleAmt);
+        try {
+            BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(profitOrganTranMonth.getProfitDate());
+            profitOrganTranMonth.setSettleAmt(settleAmt);
+        }catch(Exception e) {
+            e.printStackTrace();
+            throw  new RuntimeException("获取手刷分润交易数据失败");
+        }
         profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
         profitOrganTranMonthService.insert(profitOrganTranMonth);
     }
