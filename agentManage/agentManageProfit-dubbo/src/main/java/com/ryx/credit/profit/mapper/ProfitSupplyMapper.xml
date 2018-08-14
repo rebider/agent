@@ -11,6 +11,7 @@
     <result column="SUPPLY_DATE" property="supplyDate" jdbcType="VARCHAR" />
     <result column="REMERK" property="remerk" jdbcType="VARCHAR" />
     <result column="SOURCE_ID" property="sourceId" jdbcType="VARCHAR" />
+    <result column="SUPPLY_CODE" property="supplyCode" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -43,7 +44,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, SUPPLY_DATE, REMERK, 
-    SOURCE_ID
+    SOURCE_ID, SUPPLY_CODE
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
     <include refid="OracleDialectPrefix" />
@@ -86,7 +87,7 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
     insert into P_PROFIT_SUPPLY (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, 
-      SUPPLY_DATE, REMERK, SOURCE_ID
+      SUPPLY_DATE, REMERK, SOURCE_ID, SUPPLY_CODE
       )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{supplyType,jdbcType=CHAR}, #{supplyAmt,jdbcType=DECIMAL}, 
@@ -123,6 +124,9 @@
       <if test="sourceId != null" >
         SOURCE_ID,
       </if>
+      <if test="supplyCode != null" >
+        SUPPLY_CODE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -151,6 +155,9 @@
       </if>
       <if test="sourceId != null" >
         #{sourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyCode != null" >
+        #{supplyCode,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -184,8 +191,8 @@
       <if test="remerk != null" >
         REMERK = #{remerk,jdbcType=VARCHAR},
       </if>
-      <if test="sourceId != null" >
-        SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
+      <if test="supplyCode != null" >
+        SUPPLY_CODE = #{supplyCode,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -199,7 +206,8 @@
       SUPPLY_AMT = #{supplyAmt,jdbcType=DECIMAL},
       SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR},
       REMERK = #{remerk,jdbcType=VARCHAR},
-      SOURCE_ID = #{sourceId,jdbcType=VARCHAR}
+      SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
+      SUPPLY_CODE = #{supplyCode,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >

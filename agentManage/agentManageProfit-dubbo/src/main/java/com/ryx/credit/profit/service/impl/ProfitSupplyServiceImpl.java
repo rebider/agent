@@ -122,6 +122,8 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 //profitSupply.setAgentId(null != objectList.get(3) ? String.valueOf(objectList.get(3)) : "");   // 代理商编号
                 profitSupply.setSupplyType(null != objectList.get(3) ? String.valueOf(objectList.get(3)) : "");    // 补款类型
                 profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(objectList.get(4))));   // 补款金额
+                profitSupply.setSupplyCode(null != objectList.get(5) ? String.valueOf(objectList.get(5)) : "");   // 补款码
+
                 //profitSupply.setRemark(null != objectList.get(7) ? String.valueOf(objectList.get(5)) : "");   // 备注
             } catch (Exception e) {
                 logger.info("Excel参数错误！");
