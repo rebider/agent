@@ -91,13 +91,14 @@ public interface ProfitComputerService {
      * PS：补下级税点计算必须先计算所有代理商的税前应发分润
      * @param profitA 基础分润
      * @param agentPid 代理商唯一码
-     * @param subPgentPid 下级代理商唯一码
+     * @param subAmt 所有下级的应发分润汇总
      * @param agentTax 代理商税点
      * @param transDate 月份
      * @param isOpenTicket 是否开票
+     * @param isRYX 是否瑞银信打款
      * @return ProfitDetailMonth（本月税额、补下级税点、扣本月之前税额（含日）、本月分润、实发分润）
      */
-    ProfitDetailMonth getTaxAndProfit(BigDecimal profitA,String agentPid,String subPgentPid,BigDecimal agentTax,String transDate,boolean isOpenTicket);
+    ProfitDetailMonth getTaxAndProfit(BigDecimal profitA,String agentPid,BigDecimal subAmt,BigDecimal agentTax,String transDate,boolean isOpenTicket,boolean isRYX);
 
     /**
      * 计算：本月税额、补下级税点、本月之前税额、本月分润、实发分润
