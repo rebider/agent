@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.OReceiptStatus;
 import com.ryx.credit.common.enumc.PlannerStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
@@ -88,9 +89,11 @@ public class PlannerServiceImpl implements PlannerService {
 
             OReceiptPro oReceiptPro = receiptProMapper.selectByPrimaryKey(receiptProId);
             if (oReceiptPro == null) {
-                throw new ProcessException("收货单商品未找到");
+                throw new MessageException("收货单商品未找到!");
             }
-
+            if(receiptPlan.getPlanProNum().compareTo(oReceiptPro.getProNum().subtract(oReceiptPro.getSendNum()))>0){
+                throw new MessageException("排单数量不能大于订货量!");
+            }
             String planId = idService.genId(TabId.o_receipt_plan);
             receiptPlan.setId(planId);
             receiptPlan.setPlanNum(planId);
@@ -105,7 +108,7 @@ public class PlannerServiceImpl implements PlannerService {
             example.or().andOrderIdEqualTo(oReceiptPro.getOrderid()).andProIdEqualTo(oReceiptPro.getProId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OSubOrder>  oSubOrders = oSubOrderMapper.selectByExample(example);
             if(oSubOrders.size()==0){
-                throw new ProcessException("订购商品未找到");
+                throw new MessageException("订购商品未找到!");
             }
             OSubOrder  oSubOrderItem = oSubOrders.get(0);
             receiptPlan.setProType(oSubOrderItem.getProType());
@@ -120,7 +123,7 @@ public class PlannerServiceImpl implements PlannerService {
             int receiptProUpdate = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
             if (receiptInsert != 1 || receiptProUpdate != 1) {
                 log.info("保存排单异常");
-                throw new ProcessException("保存排单异常");
+                throw new MessageException("保存排单异常!");
             }
             //没有待排单的商品更新收货单状态
             OReceiptProExample oReceiptProExample = new OReceiptProExample();
@@ -134,14 +137,14 @@ public class PlannerServiceImpl implements PlannerService {
                 receiptOrder.setReceiptStatus(OReceiptStatus.DISPATCHED_ORDER.code);
                 int receiptOrdUpdate = receiptOrderMapper.updateByPrimaryKeySelective(receiptOrder);
                 if (receiptOrdUpdate != 1) {
-                    throw new ProcessException("保存排单异常");
+                    throw new MessageException("保存排单异常!");
                 }
             }
             result.setStatus(200);
             result.setMsg("处理成功");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ProcessException("保存排单异常");
+            throw new MessageException("保存排单异常!");
         }
         return result;
     }
@@ -158,4 +161,34 @@ public class PlannerServiceImpl implements PlannerService {
         return list;
     }
 
+
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult batchPlanner(List<Map<String, Object>> reqListMap,ReceiptPlan receiptPlan,String userId) throws Exception {
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        int i = 0;
+        for (Map<String, Object> stringObjectMap : reqListMap) {
+            i++;
+            try {
+                String receiptProId = String.valueOf(stringObjectMap.get("RECEIPT_PRO_ID"));
+                String orderId = String.valueOf(stringObjectMap.get("ORDER_ID"));
+                String receiptId = String.valueOf(stringObjectMap.get("ID"));
+                ReceiptPlan saveReceiptPlan = new ReceiptPlan();
+                saveReceiptPlan.setOrderId(orderId);
+                saveReceiptPlan.setReceiptId(receiptId);
+                saveReceiptPlan.setProCom(receiptPlan.getProCom());
+                saveReceiptPlan.setPlanProNum(receiptPlan.getPlanProNum());
+                saveReceiptPlan.setModel(receiptPlan.getModel());
+                saveReceiptPlan.setUserId(userId);
+                saveReceiptPlan.setcUser(userId);
+                saveReceiptPlan.setProId(receiptProId);
+                result = savePlanner(saveReceiptPlan, receiptProId);
+            } catch (MessageException e) {
+                result.setMsg("第"+i+"条"+e.getMsg());
+                throw new MessageException("第"+i+"条"+e.getMsg()+",请核对发货数量");
+            }
+        }
+        return result;
+    }
 }

@@ -22,4 +22,5 @@ public interface PlannerService {
 
     List<Map<String, Object>> queryOrderReceiptPlanInfo(Map<String, String> params) throws ProcessException;
 
+    AgentResult batchPlanner(List<Map<String, Object>> reqListMap,ReceiptPlan receiptPlan,String userId) throws Exception;
 }

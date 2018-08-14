@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.PosRewardTemplate;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author yangmx
@@ -43,4 +44,9 @@ public interface PosRewardTemplateService {
      * @param posRewardTemplate
      */
     public void insertPosRewardTemplate(PosRewardTemplate posRewardTemplate);
+
+    /**
+     * 查询奖励模板
+     */
+    List<PosRewardTemplate> getPosRewardTemplateList();
 }

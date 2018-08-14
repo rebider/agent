@@ -179,18 +179,17 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 throw new ProcessException("更新数据申请失败");
                             }
                         }
-
                         //入网程序调用
                         try {
                             ImportAgent importAgent = new ImportAgent();
                             importAgent.setDataid(vo.getAgent().getId());
-                            importAgent.setDatatype(AgImportType.NETINAPP.name());
-                            importAgent.setBatchcode(UUID.randomUUID().toString().replace("-", ""));
+                            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+                            importAgent.setBatchcode(proIns);
                             importAgent.setcUser(rel.getcUser());
                             if (1 != aimportService.insertAgentImportData(importAgent)) {
                                 logger.info("代理商修改审批通过-添加开户任务失败");
                             } else {
-                                logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.NETINAPP.getValue(), vo.getAgent().getId());
+                                logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
