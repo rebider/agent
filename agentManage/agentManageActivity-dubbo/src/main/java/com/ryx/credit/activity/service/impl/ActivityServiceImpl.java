@@ -51,12 +51,14 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private ActRuTaskService actRuTaskService;
 
+    public static ProcessEngine processEngine;
+
     @Override
     public void createTable() {
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
-
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             logger.info("------processEngine:" + processEngine);
         } catch (Exception e) {
             logger.error("createTable error", e);
@@ -66,8 +68,9 @@ public class ActivityServiceImpl implements ActivityService {
     public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map) {
 
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             List<ProcessDefinition> processDefinitions = findProcessDefinition();
             if (processDefinitions.size() == 0) {
                 Deployment deployment = processEngine.getRepositoryService().createDeployment().name(deployName).addClasspathResource(activityPath).addClasspathResource(activityImagePath).deploy();
@@ -88,8 +91,9 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     public List<Task> findMyPersonTask(String assignee,String group) {
-        ProcessEngine processEngine = processEngineConfiguration
-                .buildProcessEngine();
+        if (processEngine == null) {
+            processEngine = processEngineConfiguration.buildProcessEngine();
+        }
         List<Task> taskList = new ArrayList<>();
         List<Task> taskListGroup = new ArrayList<>();
 
@@ -118,8 +122,9 @@ public class ActivityServiceImpl implements ActivityService {
     public Map completeTask(String taskId, Map<String,Object>  map) {
         Map<String,Object> rs = new HashMap<>(5);
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             TaskService taskService = processEngine.getTaskService();
             taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
             taskService.complete(taskId, map);
@@ -139,8 +144,9 @@ public class ActivityServiceImpl implements ActivityService {
     public List<ProcessDefinition> findProcessDefinition() {
         List<ProcessDefinition> list = null;
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             list = processEngine.getRepositoryService().createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
 //            for (ProcessDefinition processDefinition : list) {
 //                logger.info("待办" + processDefinition.getId());
@@ -172,8 +178,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public void setValue(String taskId, Map<String, Object> map) {
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             TaskService taskService = processEngine.getTaskService();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 taskService.setVariable(taskId, entry.getKey(), entry.getValue());
@@ -187,8 +194,9 @@ public class ActivityServiceImpl implements ActivityService {
     public Object getValue(String taskId, String key) {
         Object o = null;
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             TaskService taskService = processEngine.getTaskService();
             o = taskService.getVariable(taskId, key);
         } catch (Exception e) {
@@ -201,8 +209,9 @@ public class ActivityServiceImpl implements ActivityService {
     public Map getImage(String taskId)  {
         Map<String,Object> map = null;
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
+            if (processEngine == null) {
+                processEngine = processEngineConfiguration.buildProcessEngine();
+            }
             RepositoryService repositoryService = processEngine.getRepositoryService();
             HistoryService historyService = processEngine.getHistoryService();
             TaskService taskService = processEngine.getTaskService();
