@@ -89,7 +89,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
         	agentBusInfo.setStatus(Status.STATUS_1.status);
 			agentBusInfo.setVersion(Status.STATUS_1.status);
-
+			//激活返现如果无值默人填写自己
+			if(StringUtils.isEmpty(agentBusInfo.getBusActivationParent())) {
+				agentBusInfo.setBusActivationParent(agentBusInfo.getId());
+			}
 			if(StringUtils.isNotEmpty(agentBusInfo.getBusParent())){
 				if(StringUtils.isNotEmpty(agentBusInfo.getBusPlatform())){
 					AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
