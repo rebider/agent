@@ -957,7 +957,7 @@ public class OrderServiceImpl implements OrderService {
         OOrder order = orderMapper.selectByPrimaryKey(id);
 
         //提交审批的用户必须是创建人
-        if (order.getUserId().equals(cuser)) {
+        if (!order.getUserId().equals(cuser)) {
             logger.info("提交审批的用户必须是创建订单的用户{}:{}", id, cuser);
             return AgentResult.fail("提交审批的用户必须是创建订单的用户");
         }
