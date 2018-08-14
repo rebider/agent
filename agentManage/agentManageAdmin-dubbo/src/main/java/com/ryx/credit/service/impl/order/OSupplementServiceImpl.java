@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OSupplementService;
@@ -57,9 +58,11 @@ public class OSupplementServiceImpl implements OSupplementService {
     private AgentMapper agentMapper;
     @Autowired
     private OPaymentMapper oPaymentMapper;
+    @Autowired
+    private AgentService agentService;
 
     @Override
-    public PageInfo selectAll(Page page, OSupplement oSupplement, String time) {
+    public PageInfo selectAll(Page page, OSupplement oSupplement, String time, String userId) {
         Map<String, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(oSupplement.getPkType())) {
             map.put("pkType", oSupplement.getPkType());
@@ -74,6 +77,14 @@ public class OSupplementServiceImpl implements OSupplementService {
             String reltime = time.substring(0, 10);
             map.put("time", reltime);
         }
+        AgentResult result = agentService.isAgent(userId);
+        if (result.isOK()) {
+            //说明有代理商
+            Agent data = (Agent) result.getData();
+            map.put("agentId", data.getId());
+        }
+
+
         List<Map<String, Object>> supplementList = oSupplementMapper.selectAll(map, page);
         for (Map<String, Object> maps : supplementList) {
             maps.put("PK_TYPE", PkType.gePkTypeValue(String.valueOf(maps.get("PK_TYPE"))));//补款类型
