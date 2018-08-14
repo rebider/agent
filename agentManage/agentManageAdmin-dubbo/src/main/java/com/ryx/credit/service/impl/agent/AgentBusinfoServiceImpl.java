@@ -12,9 +12,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
-import com.sun.org.glassfish.external.statistics.Stats;
 import org.apache.commons.lang.StringUtils;
-import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -282,6 +280,31 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return map.get(0);
 	}
 
+
+	@Override
+	public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		AgentBusInfo plat = agentBusInfoMapper.selectByPrimaryKey(busId);
+		if(plat==null)
+			return list;
+		if(StringUtils.isNotEmpty(plat.getBusParent())) {
+			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(plat.getBusParent());
+			if(parent!=null){
+				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
+					list.add(parent);
+					return queryParenLevel(list, parent.getId());
+				}else{
+					return list;
+				}
+			}else{
+				return list;
+			}
+		}else{
+			return list;
+		}
+	}
 
 	@Override
 	public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
