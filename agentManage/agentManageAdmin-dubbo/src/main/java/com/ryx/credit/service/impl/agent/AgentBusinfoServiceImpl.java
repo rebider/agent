@@ -282,10 +282,15 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 
 	@Override
-	public Map getRootFromBusInfo(String busId) {
+	public Map getRootFromBusInfo(List<Map> list,String busId) {
+		if(list==null)list=new ArrayList<Map>();
+
 		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		if(map.size()>0){
+			list.add(map.get(0));
+		}
 		if(map.size()>0 && map.get(0).get("BUS_PARENT")!=null &&  StringUtils.isNotEmpty(map.get(0).get("BUS_PARENT")+"")){
-			return getRootFromBusInfo(map.get(0).get("BUS_PARENT")+"");
+			return getRootFromBusInfo(list,map.get(0).get("BUS_PARENT")+"");
 		}
         if(map.size()!=1){
 			return null;
@@ -293,6 +298,21 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return map.get(0);
 	}
 
+	@Override
+	public List<Map> getParentListFromBusInfo(List<Map> list, String busId) {
+		if(list==null)list=new ArrayList<Map>();
+		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		if(map.size()>0){
+			list.add(map.get(0));
+		}
+		if(map.size()>0 && map.get(0).get("BUS_PARENT")!=null &&  StringUtils.isNotEmpty(map.get(0).get("BUS_PARENT")+"")){
+			return getParentListFromBusInfo(list,map.get(0).get("BUS_PARENT")+"");
+		}
+		if(map.size()!=1){
+			return list;
+		}
+		return list;
+	}
 
 	@Override
 	public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId) {
