@@ -480,16 +480,20 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         col.CLO_TYPE,col.CLO_REALNAME,col.CLO_BANK_ACCOUNT,col.CLO_BANK,col.BANK_REGION,col.CLO_BANK_BRANCH,
         col.ALL_LINE_NUM,col.BRANCH_LINE_NUM,col.CLO_TAX_POINT,col.CLO_INVOICE
         from A_AGENT agent left join A_agent_businfo bus on (agent.id=bus.AGENT_ID )
-        left join A_AGENT_COLINFO col on(agent.id=col.AGENT_ID)
+        left join A_AGENT_COLINFO col on(agent.id=col.AGENT_ID) left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
+        left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
         <where>
-            1=1
+            1=1 and  agent.status=1
             <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
             <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
             <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
             <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-            <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
-            <if test="busNum!=null and busNum!=''"> and bus.BUS_NUM=#{busNum}</if>
-            <if test="busPlatform!=null and busPlatform!=''"> AND bus.BUS_PLATFORM=#{busPlatform}</if>
+            <if test="busNum!=null and busNum!=''">and bus.BUS_NUM=#{busNum}</if>
+            <if test="busPlatform!=null and busPlatform!=''">AND bus.BUS_PLATFORM=#{busPlatform}</if>
+            <if test="agDocDistrict!=null and agDocDistrict!=''">
+                and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
+            </if>
+
         </where>
         order by agent.c_utime desc
     </select>
@@ -529,22 +533,26 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
 
     <select id="queryAgentListViewCount" parameterType="map" resultType="int">
 
-        select count(id) from A_AGENT agent
+        select count(agent.id) from A_AGENT agent
+        left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
+        left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
         where 1=1 and agent.status=1
         <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
         <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
         <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
         <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
         <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
-           and  BUS_PLATFORM=#{busPlatform}  and agent.id=agent_id)
+            and BUS_PLATFORM=#{busPlatform} and agent.id=agent_id)
         </if>
         <if test="busNum!=null and busNum!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
-            and BUS_NUM=#{busNum}  and agent.id=agent_id)
+            and BUS_NUM=#{busNum} and agent.id=agent_id)
         </if>
         <if test="busNum!=null and busNum!='' and busPlatform!=null and busPlatform!=''">and EXISTS(select * from
             A_AGENT_BUSINFO where status=1 and
-            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum}  and agent.id=agent_id)
+            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum} and agent.id=agent_id)
+        </if>
+        <if test="agDocDistrict!=null and agDocDistrict!=''">
+            and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
     </select>
 
@@ -553,26 +561,34 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
         agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
         agent.AG_STATUS ,agent.AG_REMARK ,
-        agent.C_TIME,agent.AG_DOC_DISTRICT,agent.AG_DOC_PRO
+        agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO
         from A_AGENT agent
+
+        left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
+        left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
+
         where 1=1 and agent.status=1
         <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
         <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
         <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
         <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
         <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
             status=1 and
-            BUS_PLATFORM=#{busPlatform}  and agent.id=agent_id)
+            BUS_PLATFORM=#{busPlatform} and agent.id=agent_id)
         </if>
         <if test="busNum!=null and busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where status=1
-            and BUS_NUM=#{busNum}  and agent.id=agent_id)
+            and BUS_NUM=#{busNum} and agent.id=agent_id)
         </if>
         <if test="busNum!=null and busNum!='' and busPlatform!=null and busPlatform!=''">and EXISTS(select
             CLO_REVIEW_STATUS from
             A_AGENT_BUSINFO where status=1 and
-            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum}  and agent.id=agent_id)
+            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum} and agent.id=agent_id)
         </if>
+
+        <if test="agDocDistrict!=null and agDocDistrict!=''">
+            and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
+        </if>
+
         order by c_time desc
         <include refid="OracleDialectSuffix"/>
     </select>
