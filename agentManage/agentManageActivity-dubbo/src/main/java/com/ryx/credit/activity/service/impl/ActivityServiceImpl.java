@@ -37,9 +37,8 @@ import java.util.regex.Pattern;
  * ActivityServiceImpl
  * Created by IntelliJ IDEA.
  *
- * @Author Wang Qi
- * @Date 2017/6/29
- * @Time: 13:47
+ * @author Wang Qi
+ * @version 2017/6/29
  * To change this template use File | Settings | File Templates.
  */
 @Service("activityService")
@@ -53,24 +52,21 @@ public class ActivityServiceImpl implements ActivityService {
 
     public static ProcessEngine processEngine;
 
+    @ActivityEntity(true)
     @Override
     public void createTable() {
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             logger.info("------processEngine:" + processEngine);
         } catch (Exception e) {
             logger.error("createTable error", e);
         }
     }
+
+    @ActivityEntity(true)
     @Override
     public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map) {
 
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             List<ProcessDefinition> processDefinitions = findProcessDefinition();
             if (processDefinitions.size() == 0) {
                 Deployment deployment = processEngine.getRepositoryService().createDeployment().name(deployName).addClasspathResource(activityPath).addClasspathResource(activityImagePath).deploy();
@@ -88,12 +84,9 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return null;
     }
-
+    @ActivityEntity(true)
     @Override
     public List<Task> findMyPersonTask(String assignee,String group) {
-        if (processEngine == null) {
-            processEngine = processEngineConfiguration.buildProcessEngine();
-        }
         List<Task> taskList = new ArrayList<>();
         List<Task> taskListGroup = new ArrayList<>();
 
@@ -118,13 +111,11 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
+    @ActivityEntity(true)
     @Override
     public Map completeTask(String taskId, Map<String,Object>  map) {
         Map<String,Object> rs = new HashMap<>(5);
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             TaskService taskService = processEngine.getTaskService();
             taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
             taskService.complete(taskId, map);
@@ -140,13 +131,11 @@ public class ActivityServiceImpl implements ActivityService {
         return rs;
     }
 
+    @ActivityEntity(true)
     @Override
     public List<ProcessDefinition> findProcessDefinition() {
         List<ProcessDefinition> list = null;
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             list = processEngine.getRepositoryService().createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
 //            for (ProcessDefinition processDefinition : list) {
 //                logger.info("待办" + processDefinition.getId());
@@ -164,6 +153,7 @@ public class ActivityServiceImpl implements ActivityService {
         return list;
     }
 
+    @ActivityEntity(true)
     @Override
     public void delProcessDefinition(String deploymentId) {
         try {
@@ -175,12 +165,10 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    @ActivityEntity(true)
     @Override
     public void setValue(String taskId, Map<String, Object> map) {
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             TaskService taskService = processEngine.getTaskService();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 taskService.setVariable(taskId, entry.getKey(), entry.getValue());
@@ -190,13 +178,11 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    @ActivityEntity(true)
     @Override
     public Object getValue(String taskId, String key) {
         Object o = null;
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             TaskService taskService = processEngine.getTaskService();
             o = taskService.getVariable(taskId, key);
         } catch (Exception e) {
@@ -205,13 +191,11 @@ public class ActivityServiceImpl implements ActivityService {
         return o;
     }
 
+    @ActivityEntity(true)
     @Override
     public Map getImage(String taskId)  {
         Map<String,Object> map = null;
         try {
-            if (processEngine == null) {
-                processEngine = processEngineConfiguration.buildProcessEngine();
-            }
             RepositoryService repositoryService = processEngine.getRepositoryService();
             HistoryService historyService = processEngine.getHistoryService();
             TaskService taskService = processEngine.getTaskService();
