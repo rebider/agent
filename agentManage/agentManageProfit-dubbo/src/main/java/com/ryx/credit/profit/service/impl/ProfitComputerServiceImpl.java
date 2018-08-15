@@ -405,9 +405,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):profitDate;
         List<ProfitDetailMonth> detailMonths = detailMonthMapper.selectByDate(profitDate);
         for(ProfitDetailMonth detailMonth:detailMonths){
-            boolean isJieYin = false;
-            boolean isRYX = false;
-            String subAgentPid = "";//下级代理商唯一码
+            boolean isJieYin = false;//是否所属捷步、银点
+            boolean isRYX = false;//是否瑞银信打款
             List<PAgentPidLink> links = pidLinkMapper.selectListByPid(detailMonth.getAgentPid());//获取代理商所有业务平台编码
             if(null!=detailMonth.getAgentId() && null!=detailMonth.getBusPlatForm()){
                 PAgentPidLink pos = new PAgentPidLink();
