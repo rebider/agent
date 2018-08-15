@@ -378,4 +378,9 @@ public class AgentServiceImpl implements AgentService {
         });
 
     }
+
+    @Override
+    public int updateByPrimaryKeySelective(Agent record) {
+        return agentMapper.updateByPrimaryKeySelective(record);
+    }
 }

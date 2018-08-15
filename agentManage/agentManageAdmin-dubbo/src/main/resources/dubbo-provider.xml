@@ -51,7 +51,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AimportService" ref="aimportService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentNotifyService" ref="agentNotifyService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.BusActRelService" ref="busActRelService"  timeout="1200000" registry="${zk.group}"/>
-
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentColinfoService" ref="agentColinfoService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />

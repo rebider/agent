@@ -47,4 +47,5 @@ public interface AgentService {
 
     void createBackUserbyAgentByredis();
 
+    int updateByPrimaryKeySelective(Agent record);
 }

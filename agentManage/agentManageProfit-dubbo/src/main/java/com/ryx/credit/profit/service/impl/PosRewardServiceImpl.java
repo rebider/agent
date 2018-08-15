@@ -102,6 +102,8 @@ public class PosRewardServiceImpl implements IPosRewardService {
         return rewardMapper.countByExample(example);
     }
 
+
+
     @Override
     public int deleteByExample(PosRewardExample example) {
         return rewardMapper.deleteByExample(example);
@@ -272,9 +274,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         if(StringUtils.isNotBlank(posReward.getAgentId())){
             criteria.andAgentIdEqualTo(posReward.getAgentId());
-        }
-        if(StringUtils.isNotBlank(posReward.getApplyStatus())){
-            criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
         }
         return rewardMapper.selectByExample(example);
     }
