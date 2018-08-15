@@ -54,7 +54,7 @@ public class ProfitMposDiffDataJob {
     public void synchroProfitDiff(String month){
         HashMap<String,String> map = new HashMap<String,String>();
         month = month==null? DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):month;
-        map.put("Frmonth",month);
+        map.put("frMonth",month);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);

@@ -35,33 +35,29 @@ public class ToolsDeductJob {
 //    @Scheduled(cron = "0 0/20/40 10 20 * ?")
     public void execut(){
         //String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String deductDate = "2018-09";
+        String deductDate = "2019-01";
         //String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
-        String beforeDeductDate = "2018-08";
+        String beforeDeductDate = "2018-12";
         try {
-            int count = profitDeductionService.getProfitDeductionCount(DeductionType.MACHINE.getType(), deductDate);
-            LOG.info("当月已初始化机具扣款分期数据：{} 条", count);
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             if(list!= null && !list.isEmpty()){
                 LOG.info("接口获取机具扣款分期数据：{} 条", list.size());
-                if(list.size() > count && count == 0 ){
-                    List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
-                    LOG.info("机具扣款分期入库成功：{} 条", successList.size());
-                    try {
-                        //通知结果
-                        iPaymentDetailService.uploadStatus(successList);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
-                    if(detailList != null && !detailList.isEmpty()){
-                        LOG.info("上月存在调整成功的机具扣款：{} 条，调整金额补充到本月扣款", detailList.size());
-                        toolsDeductService.deductCompletionInfo(detailList);
-                    }
-                    this.initNormalDeductDetail(beforeDeductDate, deductDate);
-                    this.initNotDeductDetailList(beforeDeductDate, deductDate);
+                List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
+                LOG.info("机具扣款分期入库成功：{} 条", successList.size());
+                try {
+                    //通知结果
+                    iPaymentDetailService.uploadStatus(successList);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+                List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
+                if(detailList != null && !detailList.isEmpty()){
+                    LOG.info("上月存在调整成功的机具扣款：{} 条，调整金额补充到本月扣款", detailList.size());
+                    toolsDeductService.deductCompletionInfo(detailList);
+                }
+                this.initNormalDeductDetail(beforeDeductDate, deductDate);
+                this.initNotDeductDetailList(beforeDeductDate, deductDate);
             }
         } catch (Exception e){
             LOG.error("初始化机具扣款数据失败");

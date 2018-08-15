@@ -158,7 +158,7 @@ public class ProfitMonthMposDataJob {
                 detailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
                 detailMonth.setProfitDate(month);
                 detailMonth.setAgentPid(json.getString("UNIQUECODE"));
-                detailMonth.setAgentName(json.getString("AGENTNAME"));
+                //detailMonth.setAgentName(json.getString("AGENTNAME"));
                 BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
                 detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
                 detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
