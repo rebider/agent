@@ -20,23 +20,29 @@ public interface ProfitComputerService {
      * 瑞和宝日结分润汇总
      * @param agentPid 代理商唯一码
      */
-    BigDecimal total_day(String agentPid,String month);
+    BigDecimal totalP_day_RHB(String agentPid,String month);
 
     /**
-     * 瑞和宝日结返现汇总
+     * 日结返现汇总
      * @param agentPid 代理商唯一码
      */
-    BigDecimal total_dayR(String agentPid,String month);
+    BigDecimal totalR_day(String agentPid,String month);
 
     /**
      * 日结分润汇总
+     * @param agentPid 代理商唯一码
+     */
+    BigDecimal totalP_day(String agentPid,String month);
+
+    /**
+     * 直发日结分润汇总
      * @param agentId 代理商编号
      * @param month
      * @return
      */
-    BigDecimal total_day2(String agentId,String month);
+    BigDecimal totalP_day_ZF(String agentId,String month);
     /**
-     * 商业保理汇总
+     * 商业保理扣款汇总
      * @param agentPid
      * @return
      */
@@ -49,6 +55,14 @@ public interface ProfitComputerService {
      * @return
      */
     BigDecimal total_supply(String agentPid,String month);
+
+    /**
+     * 日结返现+返现奖励+其他补款月汇总
+     * @param agentPid
+     * @param month
+     * @return
+     */
+    BigDecimal total_SupplyAndCashBack(String agentPid,String month);
 
     /**
      * 计算直发分润（追溯本源，逐级往下补款）
@@ -77,10 +91,18 @@ public interface ProfitComputerService {
      * PS：补下级税点计算必须先计算所有代理商的税前应发分润
      * @param profitA 基础分润
      * @param agentPid 代理商唯一码
-     * @param subPgentPid 下级代理商唯一码
+     * @param subAmt 所有下级的应发分润汇总
      * @param agentTax 代理商税点
      * @param transDate 月份
+     * @param isOpenTicket 是否开票
+     * @param isRYX 是否瑞银信打款
      * @return ProfitDetailMonth（本月税额、补下级税点、扣本月之前税额（含日）、本月分润、实发分润）
      */
-    ProfitDetailMonth getTaxAndProfit(BigDecimal profitA,String agentPid,String subPgentPid,BigDecimal agentTax,String transDate);
+    ProfitDetailMonth getTaxAndProfit(BigDecimal profitA,String agentPid,BigDecimal subAmt,BigDecimal agentTax,String transDate,boolean isOpenTicket,boolean isRYX);
+
+    /**
+     * 计算：本月税额、补下级税点、本月之前税额、本月分润、实发分润
+     * @param profitDate 计算月份
+     */
+    void computerTax(String profitDate);
 }

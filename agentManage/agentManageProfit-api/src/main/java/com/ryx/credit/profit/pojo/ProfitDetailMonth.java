@@ -118,6 +118,31 @@ public class ProfitDetailMonth implements Serializable{
 
     private BigDecimal tax;
 
+    private String busPlatForm;
+
+    private BigDecimal posRewardDeductionAmt;
+
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public BigDecimal getPosRewardDeductionAmt() {
+        return posRewardDeductionAmt;
+    }
+
+    public void setPosRewardDeductionAmt(BigDecimal posRewardDeductionAmt) {
+        this.posRewardDeductionAmt = posRewardDeductionAmt;
+    }
+
+    public String getBusPlatForm() {
+        return busPlatForm;
+    }
+
+    public void setBusPlatForm(String busPlatForm) {
+        this.busPlatForm = busPlatForm;
+    }
+
     public BigDecimal getTax() {
         return tax;
     }

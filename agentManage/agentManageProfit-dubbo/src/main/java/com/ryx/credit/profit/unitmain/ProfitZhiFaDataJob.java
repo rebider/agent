@@ -17,6 +17,7 @@ import org.omg.CosNaming.BindingHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -38,16 +39,27 @@ public class ProfitZhiFaDataJob {
     private ProfitSupplyService profitSupplyService;
 
     private String month = "";
-
+    private int index = 1;
+    private static int c = 1;
     public static void main(String agrs[]){
+        List a = new ArrayList();
+        a.add("aaaa");
+        a.add("bbbb");
+        a.add("cccc");
+        System.out.println(a.size());
+        System.out.println(a.get(a.size()-1));
+        //test();
+    }
+
+    public static void test(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
-        map.put("pageNumber","1");
-        map.put("pageSize","20");
+        map.put("pageNumber",c++ +"");
+        map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.zhifa"),params);
+                ("http://12.3.10.161:8003/qtfr/agentInterface/agencyZfMoney.do",params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             //logger.error("请求同步失败！");
@@ -56,9 +68,11 @@ public class ProfitZhiFaDataJob {
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         List<HashMap> list = JSONObject.parseObject(data,List.class);
+        if(list.size()>0){
+            test();
+        }
         System.out.println(data);
     }
-
     /**
      * 同步直发分润数据
      * @param transDate 交易月份（空则为上一月）
@@ -67,8 +81,8 @@ public class ProfitZhiFaDataJob {
         HashMap<String,String> map = new HashMap<String,String>();
         month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6);
         map.put("transDate",transDate==null?month:transDate);
-        map.put("pageNumber","1");
-        map.put("pageSize","20");
+        map.put("pageNumber",index++ +"");
+        map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.zhifa"),params);
@@ -80,12 +94,18 @@ public class ProfitZhiFaDataJob {
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
-        try {
-            insertProfitDirect(list);
-        } catch (Exception e) {
-            logger.error("同步插入数据失败！");
-            e.printStackTrace();
+        if(list.size()>0){
+            try {
+                insertProfitDirect(list,transDate);
+            } catch (Exception e) {
+                logger.error("同步插入数据失败！");
+                e.printStackTrace();
+            }
         }
+        computer();
+    }
+
+    public void computer(){
         try {
             //计算直发补款
             computerService.computer_Supply_ZhiFa();
@@ -99,7 +119,7 @@ public class ProfitZhiFaDataJob {
         }
     }
 
-    public void insertProfitDirect(List<JSONObject> profitDirects){
+    public void insertProfitDirect(List<JSONObject> profitDirects,String transDate){
         for(JSONObject json:profitDirects){
             ProfitDeduction where = new ProfitDeduction();
             where.setAgentPid(json.getString("AGENTID"));
@@ -130,5 +150,6 @@ public class ProfitZhiFaDataJob {
             //退单补款、应发分润、应找上级扣款需计算赋值
             profitDirectService.insertSelective(profitDirect);
         }
+        synchroProfitDirect(transDate);
     }
 }

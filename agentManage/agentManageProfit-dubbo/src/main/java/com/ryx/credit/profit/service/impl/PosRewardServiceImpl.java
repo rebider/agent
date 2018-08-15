@@ -268,7 +268,10 @@ public class PosRewardServiceImpl implements IPosRewardService {
             criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
         }
         if(StringUtils.isNotBlank(posReward.getAgentPid())){
-            criteria.andAgentIdEqualTo(posReward.getAgentPid());
+            criteria.andAgentPidEqualTo(posReward.getAgentPid());
+        }
+        if(StringUtils.isNotBlank(posReward.getAgentId())){
+            criteria.andAgentIdEqualTo(posReward.getAgentId());
         }
         if(StringUtils.isNotBlank(posReward.getApplyStatus())){
             criteria.andApplyStatusEqualTo(posReward.getApplyStatus());

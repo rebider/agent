@@ -64,7 +64,6 @@ public interface AgentBusinfoService {
      */
     public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
-    @Deprecated
     public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
 
