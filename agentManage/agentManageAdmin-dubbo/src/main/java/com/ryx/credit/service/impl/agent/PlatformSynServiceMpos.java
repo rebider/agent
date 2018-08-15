@@ -89,7 +89,7 @@ public class PlatformSynServiceMpos implements PlatformSynService {
             //查询代理商的上级代理
             fastMap.putKeyV("agencyId",agentBusInfo.getBusNum());
             fastMap.putKeyV("newparentAgencyId",parent.getBusNum());
-            fastMap.putKeyV("type","1");
+            fastMap.putKeyV("type","0");
             fastMap.putKeyV("createName",data.get("processingId"));
         } catch (Exception e) {
             e.printStackTrace();
