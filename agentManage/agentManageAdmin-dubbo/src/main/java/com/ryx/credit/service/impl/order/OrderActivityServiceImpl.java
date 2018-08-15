@@ -46,6 +46,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         if (StringUtils.isNotBlank(activity.getActivityName())) {
             criteria.andActivityNameEqualTo(activity.getActivityName());
         }
+        if (StringUtils.isNotBlank(activity.getPlatform())) {
+            criteria.andPlatformEqualTo(activity.getPlatform());
+        }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause("C_TIME desc");
         example.setPage(page);
