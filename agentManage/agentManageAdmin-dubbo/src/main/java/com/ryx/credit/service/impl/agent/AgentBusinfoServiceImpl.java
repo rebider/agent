@@ -89,7 +89,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
         	agentBusInfo.setStatus(Status.STATUS_1.status);
 			agentBusInfo.setVersion(Status.STATUS_1.status);
-
+			//激活返现如果无值默人填写自己
+			if(StringUtils.isEmpty(agentBusInfo.getBusActivationParent())) {
+				agentBusInfo.setBusActivationParent(agentBusInfo.getId());
+			}
 			if(StringUtils.isNotEmpty(agentBusInfo.getBusParent())){
 				if(StringUtils.isNotEmpty(agentBusInfo.getBusPlatform())){
 					AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
@@ -136,6 +139,16 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfo;
 	}
 
+	@Override
+	public AgentBusInfo getByBusidAndCode(String platformCode, String busid) {
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(busid).andBusPlatformEqualTo(platformCode);
+		List<AgentBusInfo>  res = agentBusInfoMapper.selectByExample(example);
+		if(res.size()>0){
+			return res.get(0);
+		}
+		return null;
+	}
 
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override

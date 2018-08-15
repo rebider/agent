@@ -64,6 +64,20 @@ public class PlatformSynServicePos implements PlatformSynService {
     }
 
     @Override
+    public Boolean isMyPlatformByPlatformCode(String platformCode) {
+        PlatFormExample example = new PlatFormExample();
+        example.or().andPlatformNumEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status);
+        List<PlatForm> list = platFormMapper.selectByExample(example);
+        if(list.size()>0){
+            PlatForm p = list.get(0);
+            if("POS".equals(p.getPlatformType()) || "ZPOS".equals(p.getPlatformType())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject request(Map data,String url)throws Exception {
         try {
 
@@ -143,16 +157,21 @@ public class PlatformSynServicePos implements PlatformSynService {
     @Override
     public Map agencyLevelUpdateChangeData(Map data) {
         Map data_res = new HashMap();
-        data_res.put("agencyLevelUpdateChangeData","agencyLevelUpdateChangeData");
-        Object agentBusinfo = data.get("agentBusinfoId");
-        AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
-        data_res.put("orgId", agentBusInfo.getBusNum());
-        //普通二代 升级为 直签
-        data_res.put("operType", "2");
-        //查询代理商的上级代理
-        AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
-        if(parent!=null) {
-            data_res.put("supOrgId", parent.getBusNum());
+        try {
+            data_res.put("agencyLevelUpdateChangeData","agencyLevelUpdateChangeData");
+            Object agentBusinfo = data.get("agentBusinfoId");
+            AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
+            data_res.put("orgId", agentBusInfo.getBusNum());
+            //普通二代 升级为 直签
+            data_res.put("operType", "2");
+            //查询代理商的上级代理
+            AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
+            if(parent!=null) {
+                data_res.put("supOrgId", parent.getBusNum());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            data_res.put("msg",e.getLocalizedMessage());
         }
         return data_res;
     }
@@ -206,6 +225,8 @@ public class PlatformSynServicePos implements PlatformSynService {
                 return ag;
             }
         } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage(),e);
             log.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }

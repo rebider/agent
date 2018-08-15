@@ -53,6 +53,20 @@ public class PlatformSynServiceMpos implements PlatformSynService {
     }
 
     @Override
+    public Boolean isMyPlatformByPlatformCode(String platformCode) {
+        PlatFormExample example = new PlatFormExample();
+        example.or().andPlatformNumEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status);
+        List<PlatForm> list = platFormMapper.selectByExample(example);
+        if(list.size()>0){
+            PlatForm p = list.get(0);
+            if("MPOS".equals(p.getPlatformType())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public JSONObject request(Map data,String url) throws Exception {
         String json = JsonUtil.objectToJson(data);
         log.info("通知手刷请求参数：{}",json);
@@ -68,14 +82,19 @@ public class PlatformSynServiceMpos implements PlatformSynService {
     public Map agencyLevelUpdateChangeData(Map data) {
         //待请求参数
         FastMap fastMap = FastMap.fastMap("agencyLevelUpdateChangeData","agencyLevelUpdateChangeData");
-        Object agentBusinfo = data.get("agentBusinfoId");
-        AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
-        AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
-        //查询代理商的上级代理
-        fastMap.putKeyV("agencyId",agentBusInfo.getBusNum());
-        fastMap.putKeyV("newparentAgencyId",parent.getBusNum());
-        fastMap.putKeyV("type","1");
-        fastMap.putKeyV("createName",data.get("processingId"));
+        try {
+            Object agentBusinfo = data.get("agentBusinfoId");
+            AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
+            AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
+            //查询代理商的上级代理
+            fastMap.putKeyV("agencyId",agentBusInfo.getBusNum());
+            fastMap.putKeyV("newparentAgencyId",parent.getBusNum());
+            fastMap.putKeyV("type","1");
+            fastMap.putKeyV("createName",data.get("processingId"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fastMap.putKeyV("msg",e.getLocalizedMessage());
+        }
         return fastMap;
     }
 

@@ -488,7 +488,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             </if>
 
             <if test='null!= agent.agName and agent.agName !="" '>
-                AND agent.AG_NAME LIKE #{agent.agName}||'%'
+                AND agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agent.agName}),'%')
             </if>
             <if test='null!= agent.agStatus and agent.agStatus !="" '>
                 AND agent.AG_STATUS =#{agent.agStatus}
