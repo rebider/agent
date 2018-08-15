@@ -100,7 +100,7 @@ public class AgentServiceImpl implements AgentService {
         if (agent != null && StringUtils.isNotEmpty(agent.getAgZbh())) {
             c.andAgZbhLike("%" + agent.getAgZbh() + "%");
         }
-        c.andCUserEqualTo(agent.getcUser());
+//        c.andCUserEqualTo(agent.getcUser());
         c.andStatusEqualTo(Status.STATUS_1.status);
         int count = agentMapper.countByExample(example);
         example.setOrderByClause(" c_utime desc ");
@@ -123,6 +123,23 @@ public class AgentServiceImpl implements AgentService {
         page.setRows(list);
         page.setTotal(count);
         return page;
+    }
+
+    @Override
+    public PageInfo queryAgentAll(Page page, Map map) {
+        if (null != map) {
+            String time = String.valueOf(map.get("time"));
+            if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
+                String reltime = time.substring(0, 10);
+                map.put("time", reltime);
+            }
+        }
+        PageInfo pageInfo = new PageInfo();
+        map.put("page", page);
+        pageInfo.setRows(agentMapper.queryAgentListView(map));
+        pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));
+
+        return pageInfo;
     }
 
 
@@ -192,19 +209,19 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public List<CuserAgent>  queryByUserId(String userId) {
-        CuserAgentExample example  = new CuserAgentExample();
+    public List<CuserAgent> queryByUserId(String userId) {
+        CuserAgentExample example = new CuserAgentExample();
         example.or().andUseridEqualTo(userId).andStatusEqualTo(Status.STATUS_1.status);
-        return   cuserAgentMapper.selectByExample(example);
+        return cuserAgentMapper.selectByExample(example);
     }
 
     @Override
     public Agent queryAgentByUserId(String userId) {
-        List<CuserAgent>   cas =  queryByUserId(userId);
+        List<CuserAgent> cas = queryByUserId(userId);
         for (CuserAgent ca : cas) {
-            if(StringUtils.isNotEmpty(ca.getAgentid())) {
+            if (StringUtils.isNotEmpty(ca.getAgentid())) {
                 Agent agent = agentMapper.selectByPrimaryKey(ca.getAgentid());
-                if(agent!=null)return agent;
+                if (agent != null) return agent;
             }
         }
         return null;
@@ -212,8 +229,8 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public AgentResult isAgent(String userId) {
-        Agent agent  = queryAgentByUserId(userId);
-        return agent==null?AgentResult.fail():AgentResult.ok(agent);
+        Agent agent = queryAgentByUserId(userId);
+        return agent == null ? AgentResult.fail() : AgentResult.ok(agent);
     }
 
     @Override
@@ -332,11 +349,11 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setSalt(salt);
                 userVo.setPassword(pwd);
                 userVo.setName(agent.getAgName());
-                if(StringUtils.isNotBlank(agent.getAgLegalMobile())){
+                if (StringUtils.isNotBlank(agent.getAgLegalMobile())) {
                     userVo.setLoginName(agent.getAgLegalMobile());
-                }else if(StringUtils.isNotBlank(agent.getAgUniqNum())){
+                } else if (StringUtils.isNotBlank(agent.getAgUniqNum())) {
                     userVo.setLoginName(agent.getAgUniqNum());
-                }else{
+                } else {
                     userVo.setLoginName(agent.getId());
                 }
 
@@ -369,8 +386,8 @@ public class AgentServiceImpl implements AgentService {
         List<CuserAgent> cuserAgents = iCuserAgentService.selectByExample(new CuserAgentExample());
         cuserAgents.forEach((cuserAgent) -> {
             try {
-                String agent=  redisService.hGet("agent", String.valueOf(cuserAgent.getUserid()));
-                if(StringUtils.isBlank(agent)){
+                String agent = redisService.hGet("agent", String.valueOf(cuserAgent.getUserid()));
+                if (StringUtils.isBlank(agent)) {
                     redisService.hSet("agent", String.valueOf(cuserAgent.getUserid()), cuserAgent.getAgentid());
                 }
             } catch (Exception e) {
