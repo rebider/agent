@@ -242,6 +242,11 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
     }
 
+    /**
+     * 检索原税点
+     * @param agentColinfo
+     * @return
+     */
     @Override
     public AgentColinfo queryPoint(AgentColinfo agentColinfo) {
         if (StringUtils.isBlank(agentColinfo.getAgentId())) {
