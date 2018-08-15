@@ -100,6 +100,7 @@ public class AgentServiceImpl implements AgentService {
         if (agent != null && StringUtils.isNotEmpty(agent.getAgZbh())) {
             c.andAgZbhLike("%" + agent.getAgZbh() + "%");
         }
+        c.andCUserEqualTo(agent.getcUser());
         c.andStatusEqualTo(Status.STATUS_1.status);
         int count = agentMapper.countByExample(example);
         example.setOrderByClause(" c_utime desc ");
