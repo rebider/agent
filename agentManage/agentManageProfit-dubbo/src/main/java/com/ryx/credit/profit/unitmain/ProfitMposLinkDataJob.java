@@ -74,9 +74,15 @@ public class ProfitMposLinkDataJob {
 
     public void insertProfitD(List<JSONObject> profitDays){
         for(JSONObject json:profitDays){
+            String platFormNum = json.getString("platFormNum")==null?"":json.getString("platFormNum");
+            if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
+                    && !"1111".equals(platFormNum) && !"3000".equals(platFormNum) && !"6000".equals(platFormNum)
+                    && !"4000".equals(platFormNum)){
+                platFormNum = "1001";
+            }
             PAgentPidLink link = new PAgentPidLink();
             link.setId(idService.genId(TabId.P_AGENT_PID_LINK));
-            link.setDeptCode(json.getString("platFormNum"));
+            link.setDeptCode(platFormNum);
             link.setAgentId(json.getString("agencyId"));
             link.setAgentPid(json.getString("uniqueCode"));
             pidLinkMapper.insert(link);

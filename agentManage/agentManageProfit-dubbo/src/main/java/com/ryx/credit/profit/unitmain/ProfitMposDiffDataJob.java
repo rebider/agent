@@ -6,12 +6,16 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.profit.dao.ProfitSupplyDiffMapper;
 import com.ryx.credit.profit.pojo.ProfitDay;
+import com.ryx.credit.profit.pojo.ProfitSupplyDiff;
 import com.ryx.credit.profit.service.IProfitDService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,10 +24,12 @@ import java.util.List;
 /**
  * 手刷补差数据同步
  */
+@Service("profitMposDiffDataJob")
+@Transactional(rollbackFor=RuntimeException.class)
 public class ProfitMposDiffDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
-    private IProfitDService profitDService;
+    private ProfitSupplyDiffMapper supplyDiffMapper;
     @Autowired
     private IdService idService;
     private int index = 1;
@@ -64,7 +70,7 @@ public class ProfitMposDiffDataJob {
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
             if(list.size()>0){
-                insertProfitD(list,month);
+                insertProfitDiff(list,month);
             }
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
@@ -72,12 +78,20 @@ public class ProfitMposDiffDataJob {
         }
     }
 
-    public void insertProfitD(List<JSONObject> profitDays,String date){
+    public void insertProfitDiff(List<JSONObject> profitDays,String date){
         for(JSONObject json:profitDays){
-            ProfitDay profitD = new ProfitDay();
-            profitD.setId(idService.genId(TabId.P_PROFIT_D));
-
-            profitDService.insert(profitD);
+            ProfitSupplyDiff profitDiff = new ProfitSupplyDiff();
+            profitDiff.setId(idService.genId(TabId.P_PROFIT_SUPPLU_DIFF));
+            profitDiff.setAgentId(json.getString("AGENTID"));
+            profitDiff.setAgentPid(json.getString("AGENTPID"));
+            profitDiff.setDiffAmt(json.getBigDecimal("DIFFAMT"));
+            profitDiff.setDiffDate(json.getString("DIFFDATE"));
+            profitDiff.setDiffType(json.getString("DIFFTYPE"));
+            profitDiff.setParentAgentid(json.getString("PARENTAGENTID"));
+            profitDiff.setParentAgentpid(json.getString("PARENTAGENTPID"));
+            profitDiff.setAgentName(json.getString("AGENTNAME"));
+            profitDiff.setParentAgentname(json.getString("PARENTAGENTNAME"));
+            supplyDiffMapper.insert(profitDiff);
 
         }
         synchroProfitDiff(date);
