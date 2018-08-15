@@ -59,8 +59,8 @@
     <result column="ZHIFA_SUPPLY" property="zhifaSupply" jdbcType="DECIMAL" />
     <result column="ZHIFA_SUPPLY" property="zhifaSupply" jdbcType="DECIMAL" />
     <result column="TAX" property="tax" jdbcType="DECIMAL" />
-    <result column="POS_REWARD_DEDUCTION_AMT" property="POS_REWARD_DEDUCTION_AMT" jdbcType="DECIMAL" />
-    <result column="BUS_PLATFORM" property="BUS_PLATFORM" jdbcType="VARCHAR" />
+    <result column="POS_REWARD_DEDUCTION_AMT" property="posRewardDeductionAmt" jdbcType="DECIMAL" />
+    <result column="BUS_PLATFORM" property="busPlatForm" jdbcType="VARCHAR" />
 
   </resultMap>
   <sql id="Example_Where_Clause" >
