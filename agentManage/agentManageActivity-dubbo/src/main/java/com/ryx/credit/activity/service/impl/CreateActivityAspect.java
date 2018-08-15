@@ -5,8 +5,11 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.lang.annotation.Annotation;
 
 /**
  * CreateActivityAspect
@@ -23,8 +26,12 @@ public class CreateActivityAspect {
     @Autowired
     private StandaloneProcessEngineConfiguration processEngineConfiguration;
 
+//    @Before("execution(* com.ryx.credit.activity.service.impl.ActivityServiceImpl.*(..))")
     @Before("@annotation(ActivityEntity)")
     private void pre(JoinPoint pjp) {
+//        MethodSignature methodSig = (MethodSignature) pjp.getSignature();
+//        Annotation[] annotations = methodSig.getMethod().getDeclaredAnnotations();
+//        ActivityEntity annotation = (ActivityEntity) annotations[0];
         if (ActivityServiceImpl.processEngine == null) {
             ActivityServiceImpl.processEngine = processEngineConfiguration
                     .buildProcessEngine();

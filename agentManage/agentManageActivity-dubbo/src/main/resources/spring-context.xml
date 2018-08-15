@@ -18,13 +18,13 @@
     <aop:config>
         <!-- 切入点 -->
         <aop:pointcut
-            expression="execution(* com.ryx.*.service.impl.*.*(..))"
+            expression="execution(* com.ryx.credit.activity.service.impl.*.*(..))"
             id="myPointcut" />
         <!-- 切面： 将哪个对象中的哪个方法，织入到哪个切入点 -->
         <aop:aspect id="aspectLog" ref="logService">
            <!--  前置通知 -->
-        <!-- <aop:before method="log" pointcut-ref="myPointcut" />
-        <aop:after method="logArg" pointcut-ref="myPointcut" /> --> 
+        <!-- <aop:before method="log" pointcut-ref="myPointcut" />-->
+            <aop:after method="logArg" pointcut-ref="myPointcut" />
         <aop:after-returning method="logArgAndReturn" returning="returnObj" pointcut-ref="myPointcut"/>
         </aop:aspect>
     </aop:config>
