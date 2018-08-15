@@ -517,7 +517,6 @@
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
       and ag_status = #{reqMap.agStatus}
-      and b.c_user = #{reqMap.cUser}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
         and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
