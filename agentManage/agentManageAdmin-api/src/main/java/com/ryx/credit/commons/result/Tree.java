@@ -113,4 +113,18 @@ public class Tree implements java.io.Serializable {
     public void settType(BigDecimal tType) {
         this.tType = tType;
     }
+
+
+    public static void setState(Tree tree){
+        if(tree==null)return;
+        if(tree.getChildren()!=null && tree.getChildren().size()>0){
+            tree.setState(0);
+            List<Tree> trees = tree.getChildren();
+            for (Tree tree1 : trees) {
+                setState(tree1);
+            }
+        }else{
+            tree.setState(1);
+        }
+    }
 }

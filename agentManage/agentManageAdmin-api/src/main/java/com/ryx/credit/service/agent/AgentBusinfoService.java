@@ -45,8 +45,9 @@ public interface AgentBusinfoService {
     public List<Map> agentBusChild(String busId);
 
 
-    public Map getRootFromBusInfo(String busId);
+    public Map getRootFromBusInfo(List<Map> list,String busId);
 
+    public List<Map> getParentListFromBusInfo(List<Map> list,String busId);
 
     /**
      * 根据业务平台id查询上级
@@ -64,7 +65,6 @@ public interface AgentBusinfoService {
      */
     public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
-    @Deprecated
     public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
 

@@ -116,7 +116,7 @@ public interface ProfitMonthService {
      * @param profitDate
      * @return
      */
-    public BigDecimal getAgentProfit(String agentId, String profitDate);
+    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate);
 
     /***
     * @Description: 计算代理商分润金额

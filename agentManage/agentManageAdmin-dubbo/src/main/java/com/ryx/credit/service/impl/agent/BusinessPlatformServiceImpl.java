@@ -83,6 +83,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getCloReviewStatus() != null) {
             reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
         }
+        reqMap.put("cUser",agentBusInfo.getcUser());
         reqMap.put("status", Status.STATUS_1.status);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
@@ -276,7 +277,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             try {
                 ImportAgent importAgent = new ImportAgent();
                 importAgent.setDataid(agentBus.getId());
-                importAgent.setDatatype(AgImportType.BUSAPP.name());
+                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
                 importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
                 importAgent.setcUser(userid);
                 if (1 != aimportService.insertAgentImportData(importAgent)) {
@@ -295,6 +296,36 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         }
 
         return busList;
+    }
+
+
+    @Override
+    public int updateBusPlatDkgsBySelective(AgentBusInfo agentBusInfo,String userId) {
+        if (StringUtils.isBlank(agentBusInfo.getId())) {
+            return 0;
+        }
+        AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getId());
+        agentBusInfo.setVersion(agbus.getVersion());
+        int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+        try {
+            ImportAgent importAgent = new ImportAgent();
+            importAgent.setDataid(agbus.getId());
+            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+            importAgent.setcUser(userId);
+            if (1 != aimportService.insertAgentImportData(importAgent)) {
+                logger.info("代理商审批通过-添加开户任务失败");
+            } else {
+                logger.info("代理商审批通过-添加开户任务成功!{},{}", AgImportType.BUSAPP.getValue(), agbus.getId());
+            }
+
+            agentDataHistoryService.saveDataHistory(agbus, DataHistoryType.BUSINESS.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            agentNotifyService.asynNotifyPlatform();
+        }
+        return i;
     }
 
 }
