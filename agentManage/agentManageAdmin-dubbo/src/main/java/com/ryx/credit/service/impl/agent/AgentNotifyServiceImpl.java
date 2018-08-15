@@ -108,6 +108,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 List<String> dataType = new ArrayList<>();
                 dataType.add(AgImportType.NETINAPP.getValue());
                 dataType.add(AgImportType.BUSAPP.getValue());
+                dataType.add(AgImportType.DATACHANGEAPP.getValue());
                 criteria.andDatatypeIn(dataType);
                 criteria.andDealstatusEqualTo(Status.STATUS_0.status);
                 List<ImportAgent> importAgents = importAgentMapper.selectByExample(example);
@@ -128,7 +129,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             }
                         }
                     }
-
                     if(importAgent.getDatatype().equals(AgImportType.BUSAPP.getValue())){
                         try {
                             agentNotifyService.notifyPlatformNew(importAgent.getDataid(),importAgent.getId());
@@ -141,10 +141,22 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         try {
                             agentNotifyService.notifyPlatform(importAgent.getDataid(),importAgent.getId());
                         } catch (Exception e) {
-                            log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.BUSAPP.getValue());
+                            log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
                             e.printStackTrace();
                         }
                     }
+
+                    //只处理一次
+                    ImportAgent importAgentAfter  = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                    if(importAgentAfter.getDealstatus().equals(Status.STATUS_0.status)){
+                        importAgentAfter.setDealstatus(Status.STATUS_3.status);
+                         if(1!=importAgentMapper.updateByPrimaryKeySelective(importAgentAfter)){
+                             log.info("异步通知更新ImportAgent失败:busId:{},--{}",importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
+                         }else{
+                             log.info("异步通知更新ImportAgent成功:busId:{},--{}",importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
+                         }
+                    }
+
                 }
             }
         });
@@ -169,15 +181,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public void asynNotifyPlatformById(String id) {
-
+    public void asynNotifyPlatformById(String id,String userid) {
+                       log.info("开平台升级接口请求发起用户{}操作ID{}", userid, id);
                        AgentPlatFormSyn agentPlatFormSyn = agentPlatFormSynMapper.selectByPrimaryKey(id);
                        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentPlatFormSyn.getBusId());
-
                         for (PlatformSynService platformSynService : platformSynServiceList) {
                             if(platformSynService.isMyPlatformByPlatformCode(agentPlatFormSyn.getPlatformCode())) {
                                 log.info("开平台{}平台编号不为空走升级接口,请求参数{}", agentPlatFormSyn.getPlatformCode(), agentPlatFormSyn.getNotifyJson());
-
                                 AgentResult res = null;
                                 try {
                                     //发送请求
@@ -476,7 +486,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 if(upResult1!=1 || upResult2!=1){
                     if(i==5){
                         if(impId!=null) {
-                            updateImportAgent(impId, Status.STATUS_1.status, "更新异常");
+                            updateImportAgent(impId, Status.STATUS_3.status, "更新异常");
                         }
                     }
                     throw new Exception("更新入网状态/业务编号异常");
