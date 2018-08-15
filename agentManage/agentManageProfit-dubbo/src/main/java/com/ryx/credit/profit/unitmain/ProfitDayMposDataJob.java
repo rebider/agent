@@ -104,7 +104,7 @@ public class ProfitDayMposDataJob {
             profitD.setRedoMoney(json.getBigDecimal("REDOMONEY "));
             profitD.setReturnMoney(json.getBigDecimal("RETURNMONEY "));
             profitD.setRealMoney(json.getBigDecimal("REALMONEY "));
-            profitDService.insert(profitD);
+            profitDService.insertSelective(profitD);
         }
         synchroProfitD(transDate1,transDate2);
     }
