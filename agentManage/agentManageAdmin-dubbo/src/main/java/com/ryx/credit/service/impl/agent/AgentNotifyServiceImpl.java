@@ -108,6 +108,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 List<String> dataType = new ArrayList<>();
                 dataType.add(AgImportType.NETINAPP.getValue());
                 dataType.add(AgImportType.BUSAPP.getValue());
+                dataType.add(AgImportType.DATACHANGEAPP.getValue());
                 criteria.andDatatypeIn(dataType);
                 criteria.andDealstatusEqualTo(Status.STATUS_0.status);
                 List<ImportAgent> importAgents = importAgentMapper.selectByExample(example);
@@ -128,7 +129,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             }
                         }
                     }
-
                     if(importAgent.getDatatype().equals(AgImportType.BUSAPP.getValue())){
                         try {
                             agentNotifyService.notifyPlatformNew(importAgent.getDataid(),importAgent.getId());
@@ -141,10 +141,22 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         try {
                             agentNotifyService.notifyPlatform(importAgent.getDataid(),importAgent.getId());
                         } catch (Exception e) {
-                            log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.BUSAPP.getValue());
+                            log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
                             e.printStackTrace();
                         }
                     }
+
+                    //只处理一次
+                    ImportAgent importAgentAfter  = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                    if(importAgentAfter.getDealstatus().equals(Status.STATUS_0.status)){
+                        importAgentAfter.setDealstatus(Status.STATUS_3.status);
+                         if(1!=importAgentMapper.updateByPrimaryKeySelective(importAgentAfter)){
+                             log.info("异步通知更新ImportAgent失败:busId:{},--{}",importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
+                         }else{
+                             log.info("异步通知更新ImportAgent成功:busId:{},--{}",importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
+                         }
+                    }
+
                 }
             }
         });
@@ -169,63 +181,71 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public void asynNotifyPlatformById(String id) {
+    public void asynNotifyPlatformById(String id,String userid) {
+       log.info("开平台升级接口请求发起用户{}操作ID{}", userid, id);
+       AgentPlatFormSyn agentPlatFormSyn = agentPlatFormSynMapper.selectByPrimaryKey(id);
+       AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentPlatFormSyn.getBusId());
+        for (PlatformSynService platformSynService : platformSynServiceList) {
+            if(platformSynService.isMyPlatformByPlatformCode(agentPlatFormSyn.getPlatformCode())) {
+                log.info("开平台{}平台编号不为空走升级接口,请求参数{}", agentPlatFormSyn.getPlatformCode(), agentPlatFormSyn.getNotifyJson());
+                AgentResult res = null;
+                try {
+                    //发送请求
+                    res = platformSynService.agencyLevelUpdateChange(JSONObject.parseObject(agentPlatFormSyn.getSendJson()));
+                } catch (MessageException e) {
+                    e.printStackTrace();
+                    res = AgentResult.fail(e.getMsg());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    res = AgentResult.fail(e.getLocalizedMessage());
+                }
+                if(res.isOK()){
 
-                       AgentPlatFormSyn agentPlatFormSyn = agentPlatFormSynMapper.selectByPrimaryKey(id);
-                       AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentPlatFormSyn.getBusId());
+                    agentPlatFormSyn.setSuccesTime(new Date());
+                    agentPlatFormSyn.setNotifyStatus(Status.STATUS_1.status);
+                    agentPlatFormSyn.setNotifyJson((res.getData()!=null?res.getData().toString():res.getMsg()));
+                    if(1!=agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn)){
 
-                        for (PlatformSynService platformSynService : platformSynServiceList) {
-                            if(platformSynService.isMyPlatformByPlatformCode(agentPlatFormSyn.getPlatformCode())) {
-                                log.info("开平台{}平台编号不为空走升级接口,请求参数{}", agentPlatFormSyn.getPlatformCode(), agentPlatFormSyn.getNotifyJson());
+                    }
 
-                                AgentResult res = null;
-                                try {
-                                    //发送请求
-                                    res = platformSynService.agencyLevelUpdateChange(JSONObject.parseObject(agentPlatFormSyn.getSendJson()));
-                                } catch (MessageException e) {
-                                    e.printStackTrace();
-                                    res = AgentResult.fail(e.getMsg());
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    res = AgentResult.fail(e.getLocalizedMessage());
-                                }
-                                if(res.isOK()){
+                    //更新入网状态
+                    Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
+                    //更新入网状态
+                    Agent updateAgent = new Agent();
+                    updateAgent.setId(agent.getId());
+                    updateAgent.setVersion(agent.getVersion());
+                    updateAgent.setcIncomStatus(AgentInStatus.IN.status);
+                    Date nowDate = new Date();
+                    updateAgent.setcIncomTime(nowDate);
+                    updateAgent.setcUtime(nowDate);
+                    if(agentMapper.updateByPrimaryKeySelective(updateAgent)==1){
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地代理商{},更新成功",updateAgent.getId(),"入网成功");
+                    }else{
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地代理商{},更新失败",updateAgent.getId(),"入网成功");
+                    }
+                    log.info("开平台{}平台编号不为空走升级接口,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
+                    agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                    if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",agentBusInfo.getId(),"入网成功");
+                    }else{
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新失败",agentBusInfo.getId(),"入网成功");
+                    }
 
-                                    agentPlatFormSyn.setSuccesTime(new Date());
-                                    agentPlatFormSyn.setNotifyStatus(Status.STATUS_1.status);
-                                    agentPlatFormSyn.setNotifyJson((res.getData()!=null?res.getData().toString():res.getMsg()));
-                                    agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn);
+                }else{
+                    agentPlatFormSyn.setSuccesTime(new Date());
+                    agentPlatFormSyn.setNotifyStatus(Status.STATUS_0.status);
+                    agentPlatFormSyn.setNotifyJson((res.getData()!=null?JSONObject.toJSONString(res.getData()):res.getMsg().toString()));
+                    agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn);
 
-                                    //更新入网状态
-                                    Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
-
-                                    //更新入网状态
-                                    Agent updateAgent = new Agent();
-                                    updateAgent.setId(agent.getId());
-                                    updateAgent.setVersion(agent.getVersion());
-                                    updateAgent.setcIncomStatus(AgentInStatus.IN.status);
-                                    Date nowDate = new Date();
-                                    updateAgent.setcIncomTime(nowDate);
-                                    updateAgent.setcUtime(nowDate);
-                                    int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
-                                    log.info("开平台{}平台编号不为空走升级接口,更新本地平台{}",agentBusInfo.getBusNum(),"入网成功");
-
-                                    agentBusInfo.setBusStatus(Status.STATUS_1.status);
-                                    agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-
-                                }else{
-
-                                    agentPlatFormSyn.setSuccesTime(new Date());
-                                    agentPlatFormSyn.setNotifyStatus(Status.STATUS_0.status);
-                                    agentPlatFormSyn.setNotifyJson((res.getData()!=null?JSONObject.toJSONString(res.getData()):res.getMsg().toString()));
-                                    agentPlatFormSynMapper.updateByPrimaryKeySelective(agentPlatFormSyn);
-
-                                    agentBusInfo.setBusStatus(Status.STATUS_0.status);
-                                    agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                                }
-
-                            }
-                        }
+                    agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                    if(1==agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",agentBusInfo.getId(),"入网失败");
+                    }else{
+                        log.info("开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新失败",agentBusInfo.getId(),"入网失败");
+                    }
+                }
+            }
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
@@ -247,22 +267,22 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     String id = idService.genId(TabId.a_agent_platformsyn);
                     for(int i=0;i<5;i++){
                         AgentResult res = null;
-
-                            log.info("开平台{}平台编号不为空走升级接口,获取请求参数",agentBusInfo.getBusNum());
-                            //请求参数构建
-                            Map req_data =  platformSynService.agencyLevelUpdateChangeData(FastMap.fastSuccessMap()
-                                    .putKeyV("agentBusinfoId",agentBusInfo.getId())
-                                    .putKeyV("processingId",importAgent.getBatchcode()));
-
-                            log.info("开平台{}平台编号不为空走升级接口,请求参数{}",agentBusInfo.getBusNum(),req_data);
+                        log.info("开平台{}平台编号不为空走升级接口,获取请求参数,审批流{}",agentBusInfo.getBusNum(),importAgent.getBatchcode());
+                        //请求参数构建
+                        Map req_data =  platformSynService.agencyLevelUpdateChangeData(FastMap.fastSuccessMap()
+                                .putKeyV("agentBusinfoId",agentBusInfo.getId())
+                                .putKeyV("processingId",importAgent.getBatchcode()));
+                        log.info("开平台{}平台编号不为空走升级接口,请求参数{},审批流{}",agentBusInfo.getBusNum(),req_data,importAgent.getBatchcode());
                         try {
                             //发送请求
                             res = platformSynService.agencyLevelUpdateChange(req_data);
                         }catch (MessageException e) {
                             e.printStackTrace();
+                            log.error(e.getMsg(),e);
                             res=AgentResult.fail(e.getMsg());
                         }catch (Exception e) {
                             e.printStackTrace();
+                            log.error(e.getMessage(),e);
                             res=AgentResult.fail("接口调用异常");
                         }
                         log.info("开平台{}平台编号不为空走升级接口,请求结果{}",agentBusInfo.getBusNum(),res.getMsg());
@@ -476,7 +496,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 if(upResult1!=1 || upResult2!=1){
                     if(i==5){
                         if(impId!=null) {
-                            updateImportAgent(impId, Status.STATUS_1.status, "更新异常");
+                            updateImportAgent(impId, Status.STATUS_3.status, "更新异常");
                         }
                     }
                     throw new Exception("更新入网状态/业务编号异常");
