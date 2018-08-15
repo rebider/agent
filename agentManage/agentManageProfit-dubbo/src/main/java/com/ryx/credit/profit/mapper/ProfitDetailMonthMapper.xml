@@ -209,7 +209,7 @@
       #{supplyTaxAmt,jdbcType=DECIMAL}, #{realProfitAmt,jdbcType=DECIMAL}, #{profitMonthAmt,jdbcType=DECIMAL}, 
       #{accountId,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{openBankName,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR}, 
-      #{remark,jdbcType=VARCHAR}), #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL}, #{tax,jdbcType=DECIMAL},
+      #{remark,jdbcType=VARCHAR}, #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL}, #{tax,jdbcType=DECIMAL},
       #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
@@ -561,7 +561,7 @@
         #{busPlatForm,jdbcType=VARCHAR},
       </if>
       <if test="posRewardDeductionAmt != null" >
-        #{POS_REWARD_DEDUCTION_AMT,jdbcType=DECIMAL},
+        #{posRewardDeductionAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>

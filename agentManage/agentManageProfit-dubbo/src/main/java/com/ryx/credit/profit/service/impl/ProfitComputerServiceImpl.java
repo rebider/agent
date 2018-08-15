@@ -384,7 +384,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
         if(list.size()>0){
-            tranAmount = tranAmount.add(addTransAmt(list));//手刷交易额汇总
+            addTransAmt(list,transDate);//手刷交易额汇总
         }
         BigDecimal fxAmount = isDecimalNull(json.getBigDecimal("fxAmount"));//分销系统交易汇总
         BigDecimal wjrAmount = isDecimalNull(json.getBigDecimal("wjrAmount"));//未计入分润汇总
@@ -392,13 +392,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
 
     }
-    public BigDecimal addTransAmt(List<JSONObject> profitMonths){
-        BigDecimal amt = BigDecimal.ZERO;
+    public void addTransAmt(List<JSONObject> profitMonths,String transDate){
         for(JSONObject json:profitMonths){
             BigDecimal transAmt = isDecimalNull(json.getBigDecimal("TRANAMT"));
-            amt = amt.add(transAmt);
+            tranAmount = tranAmount.add(transAmt);
         }
-        return amt;
+        synchroSSTotalTransAmt(transDate);
     }
 
     @Override
