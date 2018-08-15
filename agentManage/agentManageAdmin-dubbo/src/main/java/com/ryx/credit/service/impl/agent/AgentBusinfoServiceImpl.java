@@ -101,7 +101,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 			}
-
         	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}

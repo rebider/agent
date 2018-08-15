@@ -720,8 +720,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public static BusinessPlatformService businessPlatformService;
 
     @Override
-    public List<AgentoutVo> exportAgent(Agent agent) throws ParseException {
-        List<AgentoutVo> agentoutVos = agentMapper.excelAgent(agent);
+    public List<AgentoutVo> exportAgent(Map map) throws ParseException {
+        if (null != map) {
+            String time = String.valueOf(map.get("time"));
+            if (org.apache.commons.lang.StringUtils.isNotBlank(time)&&!time.equals("null")) {
+                String reltime = time.substring(0, 10);
+                map.put("time", reltime);
+            }
+        }
+        List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
                 if (null != agentoutVo.getBusType()) {
