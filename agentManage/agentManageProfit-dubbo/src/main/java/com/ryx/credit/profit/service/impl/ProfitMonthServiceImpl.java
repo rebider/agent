@@ -311,6 +311,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
         Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
+        Map<String, BigDecimal> toolMap = new HashMap<>(5);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
                 BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
@@ -327,7 +328,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
                 }
                 // 机具扣款-
-                sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt);
+                sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt, toolMap);
                 //退单扣款-
                 if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
                     sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt);
@@ -417,7 +418,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     * @Author: zhaodw
     * @Date: 2018/8/13
     */
-    private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt) {
+    private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt, Map<String, BigDecimal> toolMap) {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentId", profitDetailMonthTemp.getAgentId()); //业务平台编号
         map.put("paltformNo", "5000");      //瑞和宝
@@ -448,6 +449,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             throw new RuntimeException("机具扣款失败");
         }
         return agentProfitAmt;
+    }
+
+    private void getParentTool(Map<String, Object> toolMap, Map<String, Object> deductionMap) {
+
     }
 
     /*** 
