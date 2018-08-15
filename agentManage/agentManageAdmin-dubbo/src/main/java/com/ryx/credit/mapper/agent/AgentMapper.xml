@@ -482,10 +482,9 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         from A_AGENT agent left join A_agent_businfo bus on (agent.id=bus.AGENT_ID )
         left join A_AGENT_COLINFO col on(agent.id=col.AGENT_ID)
         <where>
-            1=1
-            <if test='null!= agent.agUniqNum and agent.agUniqNum !="" '>
-                AND agent.AG_UNIQ_NUM = #{agent.agUniqNum}
-            </if>
+            1=1 <if test='null!= agent.agUniqNum and agent.agUniqNum !="" '>
+            AND agent.AG_UNIQ_NUM = #{agent.agUniqNum}
+        </if>
 
             <if test='null!= agent.agName and agent.agName !="" '>
                 AND agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agent.agName}),'%')
@@ -499,6 +498,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             <if test='null!= agent.agDocDistrict and agent.agDocDistrict !="" '>
                 AND agent.AG_DOC_DISTRICT = #{agent.agDocDistrict}
             </if>
+
         </where>
         order by agent.c_utime desc
     </select>
@@ -534,5 +534,55 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <result column="CLO_TAX_POINT" property="cloTaxPoint" jdbcType="DECIMAL"/>
         <result column="CLO_INVOICE" property="cloInvoice" jdbcType="DECIMAL"/>
     </resultMap>
+
+
+    <select id="queryAgentListViewCount" parameterType="map" resultType="int">
+
+        select count(id) from A_AGENT agent
+        where 1=1 and agent.status=1
+        <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
+        <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
+        <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
+        <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
+        <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
+        <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
+            BUS_PLATFORM=#{busPlatform})
+        </if>
+        <if test="busNum!=null and busNum!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
+            and BUS_NUM=#{busNum})
+        </if>
+        <if test="busNum!=null and busNum!='' and busPlatform!=null and busPlatform!=''">and EXISTS(select * from
+            A_AGENT_BUSINFO where status=1
+            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum})
+        </if>
+    </select>
+
+    <select id="queryAgentListView" parameterType="map" resultType="map">
+        <include refid="OracleDialectPrefix"/>
+        select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
+        agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
+        agent.AG_STATUS ,agent.AG_REMARK ,
+        agent.C_TIME,agent.AG_DOC_DISTRICT,agent.AG_DOC_PRO
+        from A_AGENT agent
+        where 1=1 and agent.status=1
+        <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
+        <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
+        <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
+        <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
+        <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
+        <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where status=1
+            BUS_PLATFORM=#{busPlatform})
+        </if>
+        <if test="busNum!=null and busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where status=1
+            and BUS_NUM=#{busNum})
+        </if>
+        <if test="busNum!=null and busNum!='' and busPlatform!=null and busPlatform!=''">and EXISTS(select
+            CLO_REVIEW_STATUS from
+            A_AGENT_BUSINFO where status=1
+            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum})
+        </if>
+        order by c_time desc
+        <include refid="OracleDialectSuffix"/>
+    </select>
 
 </mapper>

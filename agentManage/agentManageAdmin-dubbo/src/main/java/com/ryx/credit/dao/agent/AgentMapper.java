@@ -31,4 +31,8 @@ public interface AgentMapper {
     List<Map<String,Object>> queryDeptNameDis(String agDocDistrict);
 
     List<AgentoutVo> excelAgent( @Param("agent")Agent agent);
+
+    int queryAgentListViewCount(Map<String,Object> map);
+
+    List<Map<String,Object>> queryAgentListView(Map<String,Object> map);
 }
