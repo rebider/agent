@@ -302,11 +302,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public void computeProfitAMt() {
+    public void computeProfitAmt() {
         // 获取所有代理商月度分润明细
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
+        Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
                 BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
@@ -317,7 +318,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
                 // POS考核奖励
                 if ("100003".equals(profitDetailMonthTemp.getBusPlatForm())) {
-                     getPosReward(profitDetailMonthTemp);
+                     getPosReward(profitDetailMonthTemp, parentPosReward);
                     sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
                 }else{
                     profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
@@ -347,7 +348,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
     }
 
-    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp) {
+    /*** 
+    * @Description: 获取pos奖励
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/8/14 
+    */ 
+    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, Map<String, BigDecimal> parentPosReward) {
         OrganTranMonthDetail detail = new OrganTranMonthDetail();
         detail.setProfitId(profitDetailMonthTemp.getId());
         List<OrganTranMonthDetail> organTranMonthDetails = organTranMonthDetailService.getOrganTranMonthDetailList(detail);
@@ -365,6 +373,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
                 profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
                 profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
+                if (!"0".equals(map.get("parentDeductPosRewardAmt").toString())) {
+                    parentPosReward.put(map.get("parentAgentPid").toString(), (BigDecimal) map.get("parentDeductPosRewardAmt"));
+                }
+                // 判断是否存在奖励
+                if (parentPosReward.containsKey(profitDetailMonthTemp.getAgentPid())) {
+                    profitDetailMonthTemp.setPosRewardAmt(profitDetailMonthTemp.getPosRewardAmt().add(parentPosReward.get(profitDetailMonthTemp.getAgentPid())));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.error("获取pos奖励失败");

@@ -130,5 +130,5 @@ public interface ProfitMonthService {
     * @Author: zhaodw
     * @Date: 2018/8/12
     */
-    void computeProfitAMt();
+    void computeProfitAmt();
 }
