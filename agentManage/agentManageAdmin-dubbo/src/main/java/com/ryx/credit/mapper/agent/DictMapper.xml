@@ -58,14 +58,14 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.DictKey" >
-    select 
-    <include refid="Base_Column_List" />
-    from D_DICT
-    where D_GROUP = #{dGroup,jdbcType=VARCHAR}
-      and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
-      and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
-  </select>
+  <!--<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.DictKey" >-->
+    <!--select -->
+    <!--<include refid="Base_Column_List" />-->
+    <!--from D_DICT-->
+    <!--where D_GROUP = #{dGroup,jdbcType=VARCHAR}-->
+      <!--and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}-->
+      <!--and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}-->
+  <!--</select>-->
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.DictExample" >
     delete from D_DICT
     <if test="_parameter != null" >
@@ -135,26 +135,26 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
-    update D_DICT
-    <set >
-      <if test="dItemname != null" >
-        D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},
-      </if>
-      <if test="dItemnremark != null" >
-        D_ITEMNREMARK = #{dItemnremark,jdbcType=VARCHAR},
-      </if>
-      <if test="dSort != null" >
-        D_SORT = #{dSort,jdbcType=DECIMAL},
-      </if>
-      <if test="dStatus != null" >
-        D_STATUS = #{dStatus,jdbcType=DECIMAL},
-      </if>
-    </set>
-    where D_GROUP = #{dGroup,jdbcType=VARCHAR}
-      and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
-      and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
-  </update>
+  <!--<update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >-->
+    <!--update D_DICT-->
+    <!--<set >-->
+      <!--<if test="dItemname != null" >-->
+        <!--D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},-->
+      <!--</if>-->
+      <!--<if test="dItemnremark != null" >-->
+        <!--D_ITEMNREMARK = #{dItemnremark,jdbcType=VARCHAR},-->
+      <!--</if>-->
+      <!--<if test="dSort != null" >-->
+        <!--D_SORT = #{dSort,jdbcType=DECIMAL},-->
+      <!--</if>-->
+      <!--<if test="dStatus != null" >-->
+        <!--D_STATUS = #{dStatus,jdbcType=DECIMAL},-->
+      <!--</if>-->
+    <!--</set>-->
+    <!--where D_GROUP = #{dGroup,jdbcType=VARCHAR}-->
+      <!--and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}-->
+      <!--and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}-->
+  <!--</update>-->
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
     update D_DICT
     set D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},
@@ -208,14 +208,14 @@
     and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
   </update>
 
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
-    select
-    <include refid="Base_Column_List" />
-    from A_PLATFORM
-    where D_GROUP = #{dGroup,jdbcType=VARCHAR}
-    and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
-    and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
-  </select>
+  <!--<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >-->
+    <!--select-->
+    <!--<include refid="Base_Column_List" />-->
+    <!--from A_PLATFORM-->
+    <!--where D_GROUP = #{dGroup,jdbcType=VARCHAR}-->
+    <!--and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}-->
+    <!--and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}-->
+  <!--</select>-->
 
   <select id="countDict" parameterType="map" resultType="Integer">
     select count(*) from D_DICT

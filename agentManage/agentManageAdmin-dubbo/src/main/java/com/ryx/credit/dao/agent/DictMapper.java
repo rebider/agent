@@ -20,7 +20,7 @@ public interface DictMapper {
 
     List<Dict> selectByExample(DictExample example);
 
-    Dict selectByPrimaryKey(DictKey key);
+//    Dict selectByPrimaryKey(DictKey key);
 
     int updateByPrimaryKey(Dict record);
 
