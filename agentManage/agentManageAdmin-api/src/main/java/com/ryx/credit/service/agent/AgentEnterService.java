@@ -77,6 +77,6 @@ public interface AgentEnterService {
      * 代理商入网导出
      */
 
-    public List<AgentoutVo> exportAgent(Agent agent) throws ParseException;
+    public List<AgentoutVo> exportAgent(Map map) throws ParseException;
 
 }
