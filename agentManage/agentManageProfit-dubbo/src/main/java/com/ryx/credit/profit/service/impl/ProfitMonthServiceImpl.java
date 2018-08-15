@@ -356,6 +356,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (StringUtils.isNotBlank(agentId)) {
             ProfitDetailMonth month = new ProfitDetailMonth();
             month.setAgentPid(agentId);
+            month.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
             List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList (null, month);
 
             if (profitDetailMonthList!=null && profitDetailMonthList.size() > 0) {
