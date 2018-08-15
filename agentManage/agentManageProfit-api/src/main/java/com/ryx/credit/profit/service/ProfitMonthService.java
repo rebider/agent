@@ -131,4 +131,13 @@ public interface ProfitMonthService {
     * @Date: 2018/8/12
     */
     void computeProfitAmt();
+
+    /***
+    * @Description: 根据代理商唯一码获取交易金额
+    * @Param:  agentId 代理商唯一编码
+    * @return:  交易金额
+    * @Author: zhaodw
+    * @Date: 2018/8/15
+    */
+    BigDecimal getTranByAgentId(String agentId);
 }
