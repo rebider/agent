@@ -556,6 +556,9 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="agDocDistrict!=null and agDocDistrict!=''">
             and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
+        <if test="userId!=null and userId!=''">
+            and agent.C_USER = #{userId}
+        </if>
     </select>
 
     <select id="queryAgentListView" parameterType="map" resultType="map">
@@ -587,11 +590,12 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             A_AGENT_BUSINFO where status=1 and
             BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum} and agent.id=agent_id)
         </if>
-
         <if test="agDocDistrict!=null and agDocDistrict!=''">
             and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
         </if>
-
+        <if test="userId!=null and userId!=''">
+            and agent.C_USER = #{userId}
+        </if>
         order by c_time desc
         <include refid="OracleDialectSuffix"/>
     </select>
