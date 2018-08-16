@@ -104,6 +104,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
                     //退款可全部抵扣此订单欠款时，直接更新订单
                     if (payment.getOutstandingAmount().compareTo(leftAmt) <= 0) {
+                        leftAmt = leftAmt.subtract(payment.getOutstandingAmount());
+
                         List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
                         for (OPaymentDetail paymentDetail : oPaymentDetails) {
                             //一条抵扣记录
@@ -127,14 +129,14 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                             updatePaymentComplete(paymentId, srcId, srcType);
                         }
 
-                        leftAmt = leftAmt.subtract(payment.getOutstandingAmount());
 
-                    } else {//退款不足以抵消订单欠款时，需要插入一条抵扣记录，并且更新付款计划
+
+                        //退款不足以抵消订单欠款时，需要插入一条抵扣记录，并且更新付款计划
+                    } else {
 
                         List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
 
                         //生成新的付款计划。先计算剩余代付金额和剩余期数
-
 
                         List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId);
                         //现在付款计划未还部分
@@ -244,7 +246,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         Map<String, Object> oneTakeoutRecord = new HashMap<>();
                         oneTakeoutRecord.put("orderId", payment.getOrderId());
                         oneTakeoutRecord.put("paymentId", paymentId);
-                        oneTakeoutRecord.put("paymentDetailId", oPaymentDetails.get(0).getId());
+                        //oneTakeoutRecord.put("paymentDetailId", oPaymentDetails.get(0).getId());
                         oneTakeoutRecord.put("batchCode", oPaymentDetails.get(0).getBatchCode());
                         oneTakeoutRecord.put("paymentType", oPaymentDetails.get(0).getPaymentType());
                         oneTakeoutRecord.put("payType", oPaymentDetails.get(0).getPayType());
@@ -276,7 +278,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                             paymentDetailMapper.insertSelective(newDeatil);
                         }
 
-                        leftAmt = leftAmt.subtract(leftAmt);
+                        leftAmt = BigDecimal.ZERO;
 
                     }
 
