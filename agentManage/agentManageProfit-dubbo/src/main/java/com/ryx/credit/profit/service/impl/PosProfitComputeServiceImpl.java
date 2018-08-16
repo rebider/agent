@@ -74,7 +74,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
             posRewardList.forEach(posReward1 -> {
                 /** 到达考核月份，执行季度考核*/
-                if(Objects.equals(posReward1.getTotalEndMonth(), "2018-08")){
+                if(Objects.equals(posReward1.getTotalEndMonth(), deductDate)){
                     quarterAssessment(posReward1, posMap);
                 }
             });
@@ -287,15 +287,14 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 ProfitDetailMonth profitDetailMonth = list.get(0);
                 LOG.info("代理商ID：{}，上级代理商ID：{}，上级代理POS奖励:{}，扣减奖励：{}，实发分润也正常扣减", posMap.get("agentId"),
                         posMap.get("parentAgentId"), profitDetailMonth.getPosRewardAmt(), posMap.get("posRewardAmt"));
-                BigDecimal praentPosRewardAmt = profitDetailMonth.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonth.getPosRewardAmt();
                 BigDecimal praentRealProfitAmt = profitDetailMonth.getRealProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonth.getRealProfitAmt();
+                BigDecimal praentPosRewardAmt = profitDetailMonth.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonth.getPosRewardAmt();
                 BigDecimal posRewardAmt = praentPosRewardAmt.subtract(new BigDecimal(posMap.get("posRewardAmt").toString()));
-                BigDecimal realProfitAmt = praentRealProfitAmt.subtract(new BigDecimal(posMap.get("posRewardAmt").toString()));
                 if(praentRealProfitAmt.compareTo(BigDecimal.ZERO) > 0){
                     ProfitDetailMonth update = new ProfitDetailMonth();
                     update.setId(profitDetailMonth.getId());
                     update.setPosRewardAmt(posRewardAmt);
-                    update.setRealProfitAmt(realProfitAmt);
+                    update.setRealProfitAmt(praentRealProfitAmt.subtract(new BigDecimal(posMap.get("posRewardAmt").toString())));
                     profitDetailMonthServiceImpl.updateByPrimaryKeySelective(update);
                 } else {
                     posMap.put("parentDeductPosRewardAmt", posRewardAmt);

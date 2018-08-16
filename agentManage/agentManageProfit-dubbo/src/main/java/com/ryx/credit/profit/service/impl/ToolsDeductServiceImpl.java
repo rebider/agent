@@ -122,12 +122,10 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 ProfitStagingDetail profitStagingDetail = profitStagingDetailMapper.selectByPrimaryKey(rel.getBusId());
                 if (profitStagingDetail != null) {
                     ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(profitStagingDetail.getStagId());
-                    if(!Objects.equals(profitDeduction.getStagingStatus(),DeductionStatus.YES_WITHHOLD.getStatus())){
-                        LOG.info("1.更新机具扣款申请状态为申请通过");
-                        LOG.info("审批通过，未申请前本月实扣：{},申请扣款数：{}",profitDeduction.getActualDeductionAmt(),profitStagingDetail.getRealAmt());
-                        profitDeduction.setStagingStatus(DeductionStatus.PASS.getStatus());
-                        profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
-                    }
+                    LOG.info("1.更新机具扣款申请状态为申请通过");
+                    LOG.info("审批通过，未申请前本月实扣：{},申请扣款数：{}",profitDeduction.getActualDeductionAmt(),profitStagingDetail.getRealAmt());
+                    profitDeduction.setStagingStatus(DeductionStatus.PASS.getStatus());
+                    profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
                     LOG.info("2更新审批流与业务对象");
                     rel.setStatus(Status.STATUS_2.status);
                     taskApprovalService.updateABusActRel(rel);

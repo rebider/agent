@@ -37,10 +37,10 @@ public class ToolsDeductJobTest {
     @Test
     public void computeToolsDeduct() throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(10);
-        map.put("agentId", "AG20180803000000000005884"); //业务平台编号
-        map.put("paltformNo", "6000");      //平台编号
-        map.put("deductDate", "2018-09");   //扣款月份
-        map.put("agentProfitAmt", "0");     //代理商分润
+        map.put("agentPid", "AG20180816000000000006084"); //AG20180813000000000006020
+        map.put("paltformNo", "2000");        //平台编号
+        map.put("deductDate", "2018-09");       //扣款月份
+        map.put("agentProfitAmt", "777777");        //代理商分润
         map = profitToolsDeductService.execut(map);
         System.out.println("应扣："+map.get("mustDeductionAmtSum"));//返回应扣金额
         System.out.println("实扣："+map.get("actualDeductionAmtSum"));//实扣金额
@@ -49,17 +49,17 @@ public class ToolsDeductJobTest {
     @Test
     public void computePosreWard() throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(10);
-        map.put("agentType", "3");//机构一代
-        map.put("agentId", "O00000000106311");
-        map.put("agentPid", "AG20180726000000000003327");
-        map.put("posTranAmt", "21100000");
-        map.put("posJlTranAmt", "21100000");
+//        map.put("agentType", "3");//机构一代
+//        map.put("agentId", "O00000000106311");
+//        map.put("agentPid", "AG20180726000000000003327");
+//        map.put("posTranAmt", "21100000");
+//        map.put("posJlTranAmt", "21100000");
 
-//        map.put("agentType", "2");//机构
-//        map.put("agentId", "O00000000000607");
-//        map.put("agentPid", "AG20180726000000000003321");
-//        map.put("posTranAmt", "70000000");
-//        map.put("posJlTranAmt", "50000000");
+        map.put("agentType", "2");//机构
+        map.put("agentId", "O00000000000607");
+        map.put("agentPid", "AG20180726000000000003321");
+        map.put("posTranAmt", "70000000");
+        map.put("posJlTranAmt", "50000000");
 
 //        map.put("agentType", "6");//标准一代
 //        map.put("agentId", "O00000000138599");

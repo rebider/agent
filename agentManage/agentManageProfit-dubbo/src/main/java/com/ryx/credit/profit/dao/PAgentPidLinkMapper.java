@@ -9,6 +9,8 @@ public interface PAgentPidLinkMapper {
 
     int deleteByExample(PAgentPidLinkExample example);
 
+    int deleteAll();
+
     int insert(PAgentPidLink record);
 
     int insertSelective(PAgentPidLink record);

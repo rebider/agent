@@ -13,7 +13,8 @@ import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
 import com.ryx.credit.pojo.admin.order.OProduct;
-import com.ryx.credit.profit.service.ProfitMonthService;
+
+//import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -40,8 +39,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private IdService idService;
     @Autowired
     private OProductMapper oProductMapper;
-    @Autowired
-    private ProfitMonthService profitMonthService;
+
+//    @Autowired
+//    private ProfitMonthService profitMonthService;
 
     @Override
     public PageInfo activityList(OActivity activity, Page page) {
@@ -49,9 +49,6 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         OActivityExample.Criteria criteria = example.createCriteria();
         if (StringUtils.isNotBlank(activity.getActivityName())) {
             criteria.andActivityNameEqualTo(activity.getActivityName());
-        }
-        if (StringUtils.isNotBlank(activity.getPlatform())) {
-            criteria.andPlatformEqualTo(activity.getPlatform());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setOrderByClause("C_TIME desc");
@@ -143,39 +140,13 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         return activitys;
     }
 
-
     @Override
     public List<OActivity> productActivity(String product, String angetId) {
         //TODO 检查代理商销售额
-//        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
-        BigDecimal transAmt = new BigDecimal(800000000);
         OProduct productObj = oProductMapper.selectByPrimaryKey(product);
         OActivityExample example = new OActivityExample();
-        example.or().andProductIdEqualTo(productObj.getId())
-        .andBeginTimeLessThanOrEqualTo(new Date())
-        .andEndTimeGreaterThanOrEqualTo(new Date());
+        example.or().andProductIdEqualTo(productObj.getId()).andBeginTimeLessThanOrEqualTo(new Date()).andEndTimeGreaterThanOrEqualTo(new Date());
         List<OActivity> activitys = activityMapper.selectByExample(example);
-        List<OActivity> newActivitys = new ArrayList<>();
-        for (OActivity activity : activitys) {
-            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
-            if(activity.getActivityCondition().equals(">")){
-                if(transAmt.compareTo(activityRule) > 0) {
-                    newActivitys.add(activity);
-                }
-            }else if(activity.getActivityCondition().equals(">=")){
-                if(transAmt.compareTo(activityRule) >= 0) {
-                    newActivitys.add(activity);
-                }
-            }else if(activity.getActivityCondition().equals("<=")){
-                if(transAmt.compareTo(activityRule) <= 0) {
-                    newActivitys.add(activity);
-                }
-            }else if(activity.getActivityCondition().equals("<")){
-                if(transAmt.compareTo(activityRule) < 0) {
-                    newActivitys.add(activity);
-                }
-            }
-        }
-        return newActivitys;
+        return activitys;
     }
 }
