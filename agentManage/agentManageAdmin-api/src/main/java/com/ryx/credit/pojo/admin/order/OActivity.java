@@ -47,6 +47,7 @@ public class OActivity implements Serializable{
 
     private String venderName;
 
+
     private String activityCondition;
 
     public String getActivityCondition() {
