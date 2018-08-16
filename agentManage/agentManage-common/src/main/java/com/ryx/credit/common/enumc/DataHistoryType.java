@@ -15,7 +15,8 @@ public enum DataHistoryType {
     CONTRACT("contract","合同信息"),
     PAYMENT("payment","缴纳款项"),
     GATHER("gather","收款账户"),
-    PAYMENT_DETAIL("paymentDetail","付款明细");
+    PAYMENT_DETAIL("paymentDetail","付款明细"),
+    ORDER("order","订单");
 
     public String code;
 

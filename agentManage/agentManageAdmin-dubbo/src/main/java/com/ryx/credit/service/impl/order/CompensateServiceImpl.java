@@ -649,32 +649,33 @@ public class CompensateServiceImpl implements CompensateService {
         for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
+
+            List<Map<String, Object>> oLogisticsDetails = null;
+            Map<String, Object> reqParam = new HashMap<>();
+            reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
+            reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
+            reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
             if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId()) && !oRefundPriceDiffDetail.getActivityFrontId().equals("undefined")){
-                List<Map<String, Object>> oLogisticsDetails = null;
-                Map<String, Object> reqParam = new HashMap<>();
-                reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
-                reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
-                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
                 reqParam.put("activityId",oRefundPriceDiffDetail.getActivityFrontId());
-                if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
-                    ArrayList<Object> recordStatusList = new ArrayList<>();
-                    recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                    reqParam.put("recordStatusList",recordStatusList);
-                }else{
-                    reqParam.put("optId",oRefundPriceDiffDetail.getId());
-                }
-                oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
-                if(null==oLogisticsDetails){
-                    log.info("calculatePriceDiff数据有误异常返回1");
-                    throw new ProcessException("查询活动异常");
-                }
-                if(oLogisticsDetails.size()!=1){
-                    log.info("calculatePriceDiff数据有误异常返回2");
-                    throw new ProcessException("查询活动异常");
-                }
-                Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
-                oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
+            if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
+                ArrayList<Object> recordStatusList = new ArrayList<>();
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                reqParam.put("recordStatusList",recordStatusList);
+            }else{
+                reqParam.put("optId",oRefundPriceDiffDetail.getId());
+            }
+            oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+            if(null==oLogisticsDetails){
+                log.info("calculatePriceDiff数据有误异常返回1");
+                throw new ProcessException("查询活动异常");
+            }
+            if(oLogisticsDetails.size()!=1){
+                log.info("calculatePriceDiff数据有误异常返回2");
+                throw new ProcessException("查询活动异常");
+            }
+            Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
+            oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
         }
         return oRefundPriceDiff;
     }
