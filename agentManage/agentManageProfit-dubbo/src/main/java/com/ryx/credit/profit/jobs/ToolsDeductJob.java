@@ -10,9 +10,12 @@ import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +35,12 @@ public class ToolsDeductJob {
     @Autowired
     private ProfitDeductionService profitDeductionService;
 
-//    @Scheduled(cron = "0 0/20/40 10 20 * ?")
+//    @Scheduled(cron = "0 0 10 20 * ?")
     public void execut(){
-        //String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String deductDate = "2019-03";
-        //String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
-        String beforeDeductDate = "2019-02";
+//        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String deductDate = "2018-09";
+//        String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
+        String beforeDeductDate = "2018-08";
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             if(list!= null && !list.isEmpty()){

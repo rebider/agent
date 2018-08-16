@@ -170,7 +170,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         try {
             if(Objects.equals(DeductionStatus.REVIEWING.getStatus(), profitDeductionList.getStagingStatus())){
                 profitDeductionList.setRemark("系统自动扣款日期已到，审批中的扣款将按照扣款总额进行扣款，调整的扣款金额将被重置。");
-                //减掉申请调整的扣款分期任务
                 ProfitStagingDetailExample profitStagingDetailExample = new ProfitStagingDetailExample();
                 ProfitStagingDetailExample.Criteria criteria = profitStagingDetailExample.createCriteria();
                 criteria.andStagIdEqualTo(profitDeductionList.getId());
@@ -202,18 +201,19 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      * @param paltformNo
      */
     private void updateProfitMonth(ProfitDetailMonth profitMonth, BigDecimal jjDudecutAmt, String paltformNo){
+        LOG.info("代理商编号：{}，扣减担保代理商分润:{}，扣减机具金额：{}，机具类型：{}", profitMonth.getAgentPid(), jjDudecutAmt, paltformNo);
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setId(profitMonth.getId());
         profitDetailMonth.setRealProfitAmt(profitMonth.getRealProfitAmt().subtract(jjDudecutAmt));
         if(Objects.equals("100003", paltformNo)){//POS
-//            profitDetailMonth.setPosDgMustDeductionAmt();
-//            profitDetailMonth.setPosDgRealDeductionAmt();
+            profitDetailMonth.setPosDgMustDeductionAmt(profitDetailMonth.getPosDgMustDeductionAmt().add(jjDudecutAmt));
+            profitDetailMonth.setPosDgRealDeductionAmt(profitDetailMonth.getPosDgRealDeductionAmt().add(jjDudecutAmt));
         } else if(Objects.equals("100002", paltformNo)){//ZPOS
-//            profitDetailMonth.setZposDgMustDeductionAmt();
-//            profitDetailMonth.setZposTdRealDeductionAmt();
+            profitDetailMonth.setZposDgMustDeductionAmt(profitDetailMonth.getZposDgMustDeductionAmt().add(jjDudecutAmt));
+            profitDetailMonth.setZposTdRealDeductionAmt(profitDetailMonth.getZposTdRealDeductionAmt().add(jjDudecutAmt));
         }else if(Objects.equals("5000", paltformNo)){//瑞和宝
-//            profitDetailMonth.setRhbDgMustDeductionAmt();
-//            profitDetailMonth.setRhbDgRealDeductionAmt();
+            profitDetailMonth.setRhbDgMustDeductionAmt(profitDetailMonth.getRhbDgMustDeductionAmt().add(jjDudecutAmt));
+            profitDetailMonth.setRhbDgRealDeductionAmt(profitDetailMonth.getRhbDgRealDeductionAmt().add(jjDudecutAmt));
         }
         profitDetailMonthServiceImpl.updateByPrimaryKeySelective(profitDetailMonth);
     }
