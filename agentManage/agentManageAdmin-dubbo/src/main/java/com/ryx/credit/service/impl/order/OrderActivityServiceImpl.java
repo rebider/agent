@@ -13,7 +13,7 @@ import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
 import com.ryx.credit.pojo.admin.order.OProduct;
-import com.ryx.credit.profit.service.ProfitMonthService;
+//import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
 import org.slf4j.LoggerFactory;
@@ -40,8 +40,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private IdService idService;
     @Autowired
     private OProductMapper oProductMapper;
-    @Autowired
-    private ProfitMonthService profitMonthService;
+//    @Autowired
+//    private ProfitMonthService profitMonthService;
 
     @Override
     public PageInfo activityList(OActivity activity, Page page) {
