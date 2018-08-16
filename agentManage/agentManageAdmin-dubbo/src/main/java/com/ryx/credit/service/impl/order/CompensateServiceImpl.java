@@ -194,33 +194,27 @@ public class CompensateServiceImpl implements CompensateService {
     @Override
     public BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum){
         BigDecimal resultPrice = new BigDecimal(0);
-        //之前参加过活动
-        if(StringUtils.isNotBlank(oldActivityId) && !oldActivityId.equals("undefined")){
-            Map<String, Object> reqParam = new HashMap<>();
-            reqParam.put("snBegin",beginSn);
-            reqParam.put("snEnd",endSn);
-            reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-            ArrayList<Object> recordStatusList = new ArrayList<>();
-            recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-            reqParam.put("recordStatusList",recordStatusList);
-            reqParam.put("activityId",oldActivityId);
-            List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
-            if(null==oLogisticsDetails){
-                log.info("calculatePriceDiff数据有误异常返回1");
-                return null;
-            }
-            if(oLogisticsDetails.size()!=1){
-                log.info("calculatePriceDiff数据有误异常返回2");
-                return null;
-            }
-            Map<String, Object> logisticsDetail = oLogisticsDetails.get(0);
-            BigDecimal oldPrice = new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()).multiply(proNum);
-            BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
-            resultPrice = oldPrice.subtract(newPrice);
-        }else{
-            BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
-            resultPrice = newPrice;
+
+        Map<String, Object> reqParam = new HashMap<>();
+        reqParam.put("snBegin",beginSn);
+        reqParam.put("snEnd",endSn);
+        reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+        ArrayList<Object> recordStatusList = new ArrayList<>();
+        recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+        reqParam.put("recordStatusList",recordStatusList);
+        List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+        if(null==oLogisticsDetails){
+            log.info("calculatePriceDiff数据有误异常返回1");
+            return null;
         }
+        if(oLogisticsDetails.size()!=1){
+            log.info("calculatePriceDiff数据有误异常返回2");
+            return null;
+        }
+        Map<String, Object> logisticsDetail = oLogisticsDetails.get(0);
+        BigDecimal oldPrice = new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()).multiply(proNum);
+        BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
+        resultPrice = oldPrice.subtract(newPrice);
         return resultPrice;
     }
 

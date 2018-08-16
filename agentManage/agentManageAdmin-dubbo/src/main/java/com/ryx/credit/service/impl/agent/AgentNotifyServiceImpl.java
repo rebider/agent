@@ -187,7 +187,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentPlatFormSyn.getBusId());
         for (PlatformSynService platformSynService : platformSynServiceList) {
             if(platformSynService.isMyPlatformByPlatformCode(agentPlatFormSyn.getPlatformCode())) {
-                log.info("开平台{}平台编号不为空走升级接口,请求参数{}", agentPlatFormSyn.getPlatformCode(), agentPlatFormSyn.getNotifyJson());
+                log.info("开平台{}平台编号不为空走升级接口,请求参数{}", agentPlatFormSyn.getPlatformCode(), agentPlatFormSyn.getSendJson());
                 AgentResult res = null;
                 try {
                     //发送请求
