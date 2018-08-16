@@ -627,7 +627,7 @@
     left join a_platform c on c.platform_num = a.bus_platform
     left join d_dict d on d.d_group='AGENT' AND d.d_artifact = 'BUS_TYPE' and d.d_itemvalue = a.bus_type
       <where>
-         a.status=1 and b.status=1
+         a.status=1 and b.status=1 and a.bus_status=1
         <if test="id!=null and id!=''"> and a.id=#{id}</if>
         <if test="busPlatform!=null and busPlatform!=''">and a.bus_platform =#{busPlatform}</if>
         <if test="agentId!=null and agentId!=''">and a.agent_id = #{agentId}</if>
