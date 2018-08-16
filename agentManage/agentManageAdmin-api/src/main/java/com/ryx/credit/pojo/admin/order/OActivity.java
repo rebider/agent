@@ -57,6 +57,16 @@ public class OActivity implements Serializable{
         this.activityCondition = activityCondition;
     }
 
+    private String proTypeName;
+
+    public String getProTypeName() {
+        return proTypeName;
+    }
+
+    public void setProTypeName(String proTypeName) {
+        this.proTypeName = proTypeName;
+    }
+
     public String getVenderName() {
         return venderName;
     }
