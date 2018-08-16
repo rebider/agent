@@ -83,6 +83,11 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
+
+  <delete id="deleteAll">
+    delete from P_AGENT_PID_LINK
+  </delete>
+
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PAgentPidLink">
     insert into P_AGENT_PID_LINK (ID, AGENT_ID, AGENT_PID, 
       AGENT_NAME, DEPT_CODE)
