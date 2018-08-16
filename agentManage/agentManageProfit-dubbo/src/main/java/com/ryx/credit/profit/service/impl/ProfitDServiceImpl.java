@@ -107,7 +107,15 @@ public class ProfitDServiceImpl implements IProfitDService {
     public PageInfo profitDList(ProfitDay record, Page page) {
         ProfitDayExample example = new ProfitDayExample();
         ProfitDayExample.Criteria criteria = example.createCriteria();
-
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentName())){
+            criteria.andAgentNameEqualTo(record.getAgentName());
+        }
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentId())){
+            criteria.andAgentIdEqualTo(record.getAgentId());
+        }
+        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getTransDate())){
+            criteria.andTransDateEqualTo(record.getTransDate());
+        }
         List<ProfitDay> profitD = profitDMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);

@@ -102,5 +102,10 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
         return directMapper.getSubBuckleByMonth(record);
     }
 
+    /*@Override
+    public void updateByAgentId(ProfitDirect profitDirect) {
+        directMapper.updateByAgentId(profitDirect);
+    }*/
+
 
 }

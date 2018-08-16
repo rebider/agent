@@ -79,6 +79,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             return profitMonthExample;
         }
         ProfitMonthExample.Criteria criteria = profitMonthExample.createCriteria();
+        // 月份按开始到结束查询
+        if (StringUtils.isNotBlank(profitMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitMonth.getProfitDateEnd()))
+        {
+            criteria.andProfitDateBetween(profitMonth.getProfitDateStart(),profitMonth.getProfitDateEnd());
+        }else if (StringUtils.isNotBlank(profitMonth.getProfitDateStart())){
+            criteria.andProfitDateEqualTo(profitMonth.getProfitDateStart());
+        }else if (StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
+            criteria.andProfitDateEqualTo(profitMonth.getProfitDateEnd());
+        }
         if(StringUtils.isNotBlank(profitMonth.getAgentName())){
             criteria.andAgentNameEqualTo(profitMonth.getAgentName());
         }
