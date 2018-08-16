@@ -49,4 +49,7 @@ public interface IProfitDirectService {
     BigDecimal getSubBuckleByMonth(ProfitDirect record);
 
     //void updateByAgentId(ProfitDirect profitDirect);
+
+    //直发分润页面导出
+    /*public List<ProfitDirect> exportProfitDirect(ProfitDirect record);*/
 }

@@ -102,6 +102,12 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
         return directMapper.getSubBuckleByMonth(record);
     }
 
+    //直发分润导出
+    /*@Override
+    public List<ProfitDirect> exportProfitDirect(ProfitDirect record) {
+        return directMapper.selectByWhere(record);
+    }*/
+
     /*@Override
     public void updateByAgentId(ProfitDirect profitDirect) {
         directMapper.updateByAgentId(profitDirect);

@@ -39,4 +39,7 @@ public interface ProfitDirectMapper {
     BigDecimal getSubBuckleByMonth(ProfitDirect record);
 
     BigDecimal selectSumTaxAmt(ProfitDirect record);
+
+    //直发分润导出
+    /*List<ProfitDirect> selectByWhere(ProfitDirect record);*/
 }
