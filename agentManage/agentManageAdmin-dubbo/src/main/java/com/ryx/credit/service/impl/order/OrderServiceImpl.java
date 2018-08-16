@@ -93,6 +93,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderService orderService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
     /**
      * 根据ID查询订单
@@ -100,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    public OOrder getById(String orderId){
+    public OOrder getById(String orderId) {
         return orderMapper.selectByPrimaryKey(orderId);
     }
 
@@ -135,8 +137,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageInfo orderList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
-        par.put("page",page);
-        pageInfo.setTotal(orderMapper.queryOrderListViewCount(par)) ;
+        par.put("page", page);
+        pageInfo.setTotal(orderMapper.queryOrderListViewCount(par));
         pageInfo.setRows(orderMapper.queryOrderListView(par));
         return pageInfo;
     }
@@ -145,6 +147,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 查询所有订单
      * 查看所有订单
+     *
      * @param par
      * @param page
      * @return
@@ -152,12 +155,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageInfo allOderList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
-        par.put("page",page);
-        pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par)) ;
+        par.put("page", page);
+        pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par));
         pageInfo.setRows(orderMapper.queryAllOrderListView(par));
         return pageInfo;
     }
-
 
 
     /**
@@ -170,24 +172,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageInfo agentOderList(Map par, Page page) {
         PageInfo pageInfo = new PageInfo();
-        if(par==null)return pageInfo;
-        if(par.get("agentId")==null)return pageInfo;
-        if(StringUtils.isBlank(par.get("agentId").toString()))return pageInfo;
-        par.put("page",page);
-        pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par)) ;
+        if (par == null) return pageInfo;
+        if (par.get("agentId") == null) return pageInfo;
+        if (StringUtils.isBlank(par.get("agentId").toString())) return pageInfo;
+        par.put("page", page);
+        pageInfo.setTotal(orderMapper.queryAllOrderListViewCount(par));
         pageInfo.setRows(orderMapper.queryAllOrderListView(par));
         return pageInfo;
     }
 
     /**
      * 查询给定条件的订单的payment
+     *
      * @param agentId
      * @param approveStatus
      * @param orderStatus
      * @return
      */
     @Override
-    public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus,List<BigDecimal> orderStatus) {
+    public List<OPayment> queryApprovePayment(String agentId, BigDecimal approveStatus, List<BigDecimal> orderStatus) {
         OOrderExample example = new OOrderExample();
         example.or()
                 .andStatusEqualTo(Status.STATUS_1.status)
@@ -195,7 +198,7 @@ public class OrderServiceImpl implements OrderService {
                 .andReviewStatusEqualTo(approveStatus)
                 .andOrderStatusIn(orderStatus);
         List<OOrder> orders = orderMapper.selectByExample(example);
-        List<String>  ids =  orders.stream().map(OOrder::getId).collect(Collectors.toList());
+        List<String> ids = orders.stream().map(OOrder::getId).collect(Collectors.toList());
         OPaymentExample oPaymentExample = new OPaymentExample();
         oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdIn(ids);
         return oPaymentMapper.selectByExample(oPaymentExample);
@@ -216,13 +219,15 @@ public class OrderServiceImpl implements OrderService {
         if (StringUtils.isBlank(orderFormVo.getOrderPlatform())) {
             return AgentResult.fail("请选择平台");
         }
-        if (orderFormVo.getoSubOrder()==null || orderFormVo.getoSubOrder().size()==0) {
+        if (orderFormVo.getoSubOrder() == null || orderFormVo.getoSubOrder().size() == 0) {
             return AgentResult.fail("请选择商品");
         }
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = setOrderFormValue(orderFormVo, userId);
 
+        //添加到数据历史表
+        agentDataHistoryService.saveDataHistory(orderFormVo, DataHistoryType.ORDER.getValue());
         return AgentResult.ok(orderFormVo.getId());
     }
 
@@ -235,7 +240,7 @@ public class OrderServiceImpl implements OrderService {
         if (StringUtils.isBlank(orderFormVo.getOrderPlatform())) {
             return AgentResult.fail("请选择平台");
         }
-        if (orderFormVo.getoSubOrder()==null || orderFormVo.getoSubOrder().size()==0) {
+        if (orderFormVo.getoSubOrder() == null || orderFormVo.getoSubOrder().size() == 0) {
             return AgentResult.fail("请选择商品");
         }
         if (StringUtils.isBlank(orderFormVo.getId())) {
@@ -244,6 +249,7 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = updateOrderFormValue(orderFormVo, userId);
+        agentDataHistoryService.saveDataHistory(orderFormVo, DataHistoryType.ORDER.getValue());
         return AgentResult.ok(orderFormVo.getId());
     }
 
@@ -256,37 +262,37 @@ public class OrderServiceImpl implements OrderService {
         int day = c.get(Calendar.DAY_OF_MONTH);
 
         //三个月后
-        c.add(Calendar.MONTH,3);
-        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
-        c.set(Calendar.HOUR,c.getActualMinimum(Calendar.HOUR));
-        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
-        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
-        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
-        Date threeMDay =  c.getTime();
+        c.add(Calendar.MONTH, 3);
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR, c.getActualMinimum(Calendar.HOUR));
+        c.set(Calendar.MINUTE, c.getActualMinimum(Calendar.MINUTE));
+        c.set(Calendar.SECOND, c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MILLISECOND, c.getActualMinimum(Calendar.MILLISECOND));
+        Date threeMDay = c.getTime();
 
         //用户选择
         c.setTime(date);
-        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
-        c.set(Calendar.HOUR,c.getActualMinimum(Calendar.HOUR));
-        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
-        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
-        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
-        Date selDay =  c.getTime();
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR, c.getActualMinimum(Calendar.HOUR));
+        c.set(Calendar.MINUTE, c.getActualMinimum(Calendar.MINUTE));
+        c.set(Calendar.SECOND, c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MILLISECOND, c.getActualMinimum(Calendar.MILLISECOND));
+        Date selDay = c.getTime();
 
         c.setTime(new Date());
-        c.set(Calendar.DAY_OF_MONTH,c.getActualMinimum(Calendar.DAY_OF_MONTH));
-        c.set(Calendar.HOUR,c.getActualMinimum(Calendar.HOUR));
-        c.set(Calendar.MINUTE,c.getActualMinimum(Calendar.MINUTE));
-        c.set(Calendar.SECOND,c.getActualMinimum(Calendar.SECOND));
-        c.set(Calendar.MILLISECOND,c.getActualMinimum(Calendar.MILLISECOND));
-        Date current  =  c.getTime();
+        c.set(Calendar.DAY_OF_MONTH, c.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c.set(Calendar.HOUR, c.getActualMinimum(Calendar.HOUR));
+        c.set(Calendar.MINUTE, c.getActualMinimum(Calendar.MINUTE));
+        c.set(Calendar.SECOND, c.getActualMinimum(Calendar.SECOND));
+        c.set(Calendar.MILLISECOND, c.getActualMinimum(Calendar.MILLISECOND));
+        Date current = c.getTime();
 
-        if(threeMDay.compareTo(selDay)<0){
+        if (threeMDay.compareTo(selDay) < 0) {
             return AgentResult.fail("分期日超出三个月");
         }
 
-        if(day>5){
-            if(current.compareTo(selDay)==0){
+        if (day > 5) {
+            if (current.compareTo(selDay) == 0) {
                 return AgentResult.fail("5号以后只能选择下月开始分期");
             }
         }
@@ -295,70 +301,71 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 根据支付类型初始化付款单参数
+     *
      * @param payment
      * @return
      */
     @Override
-    public OPayment initPayment(OPayment payment) throws MessageException{
-        switch (payment.getPayMethod()){
+    public OPayment initPayment(OPayment payment) throws MessageException {
+        switch (payment.getPayMethod()) {
             case "SF1"://首付+分润分期
-                if(payment.getDownPayment()==null||payment.getDownPayment().compareTo(BigDecimal.ZERO)==0){
+                if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
                     throw new MessageException("请填写首付金额");
                 }
-                if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
-                if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
-                if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
                 }
-                AgentResult SF1_checkDownPaymentDateres  = checkDownPaymentDate(payment.getDownPaymentDate());
-                if(!SF1_checkDownPaymentDateres.isOK()){
+                AgentResult SF1_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
+                if (!SF1_checkDownPaymentDateres.isOK()) {
                     throw new MessageException(SF1_checkDownPaymentDateres.getMsg());
                 }
                 return payment;
             case "SF2"://首付+打款分期
-                if(payment.getDownPayment()==null||payment.getDownPayment().compareTo(BigDecimal.ZERO)==0){
+                if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
                     throw new MessageException("请填写首付金额");
                 }
-                if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
-                if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
-                if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
                 }
-                AgentResult SF2_checkDownPaymentDateres  = checkDownPaymentDate(payment.getDownPaymentDate());
-                if(!SF2_checkDownPaymentDateres.isOK()){
+                AgentResult SF2_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
+                if (!SF2_checkDownPaymentDateres.isOK()) {
                     throw new MessageException(SF2_checkDownPaymentDateres.getMsg());
                 }
                 return payment;
             case "FKFQ"://打款分期
-                if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
-                if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "FRFQ"://分润分期
-                if(payment.getDownPaymentDate()==null || payment.getDownPaymentDate().compareTo(new Date())<0){
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
                 }
-                if(payment.getDownPaymentCount()==null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "XXDK"://线下打款
-                if(payment.getActualReceipt()==null || payment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
+                if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
@@ -382,12 +389,12 @@ public class OrderServiceImpl implements OrderService {
      * @param userId
      * @return
      */
-    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo, String userId)throws Exception {
-        logger.info("下订单:{}{}",userId, orderFormVo.getAgentId());
+    private OrderFormVo setOrderFormValue(OrderFormVo orderFormVo, String userId) throws Exception {
+        logger.info("下订单:{}{}", userId, orderFormVo.getAgentId());
         //订单基础数据
         Date d = Calendar.getInstance().getTime();
         orderFormVo.setId(idService.genId(TabId.o_order));
-        orderFormVo.setoNum(idService.genOrderId(TabId.o_order,Integer.valueOf(userId)));
+        orderFormVo.setoNum(idService.genOrderId(TabId.o_order, Integer.valueOf(userId)));
         orderFormVo.setoApytime(orderFormVo.getcTime());
         orderFormVo.setUserId(userId);
         orderFormVo.setPayAmo(orderFormVo.getoAmo());
@@ -423,7 +430,7 @@ public class OrderServiceImpl implements OrderService {
         oPayment.setRealAmount(Status.STATUS_0.status);//已付金额
         oPayment.setPayStatus(PayStatus.NON_PAYMENT.code);
         oPayment.setStatus(Status.STATUS_1.status);
-        if(StringUtils.isBlank(orderFormVo.getPaymentMethod())){
+        if (StringUtils.isBlank(orderFormVo.getPaymentMethod())) {
             logger.info("下订单:{}", "商品价格数据错误");
             throw new MessageException("付款方式不能为空");
         }
@@ -436,7 +443,7 @@ public class OrderServiceImpl implements OrderService {
 
         //子订单接口 计算整个订单数据
         List<OSubOrder> OSubOrders = orderFormVo.getoSubOrder();
-        if(OSubOrders==null || OSubOrders.size()==0){
+        if (OSubOrders == null || OSubOrders.size() == 0) {
             logger.info("下订单:{}", "请选择商品");
             throw new MessageException("请选择商品");
         }
@@ -469,9 +476,9 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setAgentId(orderFormVo.getAgentId());
             //商品参加的活动
             String oActivity = oSubOrder.getActivity();
-            if(StringUtils.isNotBlank(oActivity)){
+            if (StringUtils.isNotBlank(oActivity)) {
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
-                if (activity!= null && activity.getPrice()!=null && activity.getPrice().compareTo(BigDecimal.ZERO)>0) {
+                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
                     oSubOrder.setProRelPrice(activity.getPrice());
                     OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
                     oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
@@ -494,16 +501,16 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setuUser(userId);
                     oSubOrderActivity.setStatus(Status.STATUS_1.status);
                     oSubOrderActivity.setVersion(Status.STATUS_0.status);
-                    if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
-                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动失败");
+                    if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
+                        logger.info("下订单:{}{}", activity.getActivityName(), "商品添加活动失败");
                         throw new MessageException("商品添加活动失败");
-                    }else{
-                        logger.info("下订单:{}{}",activity.getActivityName(), "商品添加活动成功");
+                    } else {
+                        logger.info("下订单:{}{}", activity.getActivityName(), "商品添加活动成功");
                     }
-                }else{
+                } else {
                     oSubOrder.setProRelPrice(oSubOrder.getProPrice());
                 }
-            }else{
+            } else {
                 oSubOrder.setProRelPrice(oSubOrder.getProPrice());
             }
             //插入订单商品信息
@@ -517,7 +524,7 @@ public class OrderServiceImpl implements OrderService {
             forRealPayAmount = forRealPayAmount.add(oSubOrder.getProRelPrice().multiply(oSubOrder.getProNum()));
         }
         //收货地址
-        if(orderFormVo.getoReceiptOrderList()!=null) {
+        if (orderFormVo.getoReceiptOrderList() != null) {
             List<OReceiptOrderVo> OReceiptOrderVos = orderFormVo.getoReceiptOrderList();
             for (OReceiptOrderVo oReceiptOrderVo : OReceiptOrderVos) {
                 oReceiptOrderVo.setId(idService.genId(TabId.o_receipt_order));
@@ -580,7 +587,7 @@ public class OrderServiceImpl implements OrderService {
         }
         //附件信息
         List<Attachment> attr = orderFormVo.getAttachments();
-        if(attr!=null && attr.size()>0) {
+        if (attr != null && attr.size() > 0) {
             for (Attachment attachment : attr) {
                 if (org.apache.commons.lang.StringUtils.isEmpty(attachment.getId())) continue;
                 AttachmentRel record = new AttachmentRel();
@@ -619,9 +626,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    private OrderFormVo updateOrderFormValue(OrderFormVo orderFormVo, String userId)throws Exception {
+    private OrderFormVo updateOrderFormValue(OrderFormVo orderFormVo, String userId) throws Exception {
 
-        logger.info("下订单:{}{}",userId, orderFormVo.getAgentId());
+        logger.info("下订单:{}{}", userId, orderFormVo.getAgentId());
 
         //订单基础数据
         OOrder order_db = orderMapper.selectByPrimaryKey(orderFormVo.getId());
@@ -664,7 +671,7 @@ public class OrderServiceImpl implements OrderService {
         oPayment_db.setActualReceipt(oPayment.getActualReceipt());
         oPayment_db.setCollectCompany(oPayment.getCollectCompany());
         oPayment_db.setRemark(oPayment.getRemark());
-        if(StringUtils.isBlank(orderFormVo.getPaymentMethod())){
+        if (StringUtils.isBlank(orderFormVo.getPaymentMethod())) {
             logger.info("下订单:{}", "商品价格数据错误");
             throw new MessageException("付款方式不能为空");
         }
@@ -686,8 +693,8 @@ public class OrderServiceImpl implements OrderService {
         for (OSubOrder fordele_subOrder : fordele_subOrders) {
             fordele_subOrder.setStatus(Status.STATUS_0.status);
             fordele_subOrder.setuUser(userId);
-            if(1!=oSubOrderMapper.updateByPrimaryKeySelective(fordele_subOrder)){
-                logger.info("下订单:{}{}", "删除订购单失败",fordele_subOrder.getId());
+            if (1 != oSubOrderMapper.updateByPrimaryKeySelective(fordele_subOrder)) {
+                logger.info("下订单:{}{}", "删除订购单失败", fordele_subOrder.getId());
                 throw new MessageException("删除订购单失败");
             }
         }
@@ -710,28 +717,28 @@ public class OrderServiceImpl implements OrderService {
             //商品参加的活动
             String oActivity = oSubOrder.getActivity();
             //商品活动对象
-            OSubOrderActivity oSubOrderActivity =null;
+            OSubOrderActivity oSubOrderActivity = null;
             //订购单不为空，删除之前参与的活动
-            if(StringUtils.isNotBlank(oSubOrder.getId())){
+            if (StringUtils.isNotBlank(oSubOrder.getId())) {
                 OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
                 oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                List<OSubOrderActivity>  OSubOrderActivitys =  oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                List<OSubOrderActivity> OSubOrderActivitys = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
                 for (OSubOrderActivity subOrderActivity : OSubOrderActivitys) {
                     subOrderActivity.setStatus(Status.STATUS_0.status);
                     subOrderActivity.setuUser(userId);
-                    if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(subOrderActivity)){
-                        logger.info("下订单:{}{}", "删除活动有误",subOrderActivity.getId());
+                    if (1 != oSubOrderActivityMapper.updateByPrimaryKeySelective(subOrderActivity)) {
+                        logger.info("下订单:{}{}", "删除活动有误", subOrderActivity.getId());
                         throw new MessageException("删除活动有误");
                     }
                 }
             }
 
             //参与活动
-            if(StringUtils.isNotBlank(oActivity)){
+            if (StringUtils.isNotBlank(oActivity)) {
                 //查询活动
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
                 //活动存在
-                if (activity!= null && activity.getPrice()!=null && activity.getPrice().compareTo(BigDecimal.ZERO)>0) {
+                if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
                     //设置商品实际单价
                     oSubOrder.setProRelPrice(activity.getPrice());
                     //缓存活动信息
@@ -756,11 +763,11 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setuUser(userId);
                     oSubOrderActivity.setVersion(Status.STATUS_0.status);
                     oSubOrderActivity.setStatus(Status.STATUS_1.status);
-                }else{
+                } else {
                     //设置商品实际单价
                     oSubOrder.setProRelPrice(product.getProPrice());
                 }
-            }else{
+            } else {
                 //设置商品实际单价
                 oSubOrder.setProRelPrice(product.getProPrice());
             }
@@ -784,15 +791,15 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setAgentId(order_db.getAgentId());
             oSubOrder.setId(idService.genId(TabId.o_sub_order));
 
-            OSubOrderExample oSubOrderExamplesureExist =  new OSubOrderExample();
+            OSubOrderExample oSubOrderExamplesureExist = new OSubOrderExample();
             oSubOrderExamplesureExist.or()
                     .andOrderIdEqualTo(oSubOrder.getOrderId())
                     .andProIdEqualTo(oSubOrder.getProId())
                     .andStatusEqualTo(Status.STATUS_1.status);
 
             List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderExamplesureExist);
-            if(oSubOrderList.size()>0){
-                logger.info("下订单:{}{}", oSubOrder.getOrderId(),"订单商品重复");
+            if (oSubOrderList.size() > 0) {
+                logger.info("下订单:{}{}", oSubOrder.getOrderId(), "订单商品重复");
                 throw new MessageException("订单商品重复");
             }
             //插入订单商品信息
@@ -801,13 +808,13 @@ public class OrderServiceImpl implements OrderService {
                 throw new MessageException("oPayment添加失败");
             }
             //更新商品参与活动
-            if(oSubOrderActivity!=null) {
+            if (oSubOrderActivity != null) {
                 oSubOrderActivity.setSubOrderId(oSubOrder.getId());
                 if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
                     logger.info("下订单:{}{}", oSubOrderActivity.getActivityName(), "商品添加活动失败");
                     throw new MessageException("商品添加活动失败");
                 } else {
-                    logger.info("下订单:{}{}{}",order_db.getId(), oSubOrderActivity.getActivityName(), "商品添加活动成功");
+                    logger.info("下订单:{}{}{}", order_db.getId(), oSubOrderActivity.getActivityName(), "商品添加活动成功");
                 }
             }
             //计算订单金额
@@ -823,33 +830,33 @@ public class OrderServiceImpl implements OrderService {
                 .andBusTypeEqualTo(AttachmentRelType.Order.name())
                 .andSrcIdEqualTo(orderFormVo.getId())
                 .andStatusEqualTo(Status.STATUS_1.status);
-        List<AttachmentRel>  attachmentRels = attachmentRelMapper.selectByExample(deleAttr);
-        if(attachmentRels.size()>0){
+        List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(deleAttr);
+        if (attachmentRels.size() > 0) {
             for (AttachmentRel attachmentRelItem : attachmentRels) {
                 attachmentRelItem.setStatus(Status.STATUS_0.status);
-                if(attachmentRelMapper.updateByPrimaryKeySelective(attachmentRelItem)!=1){
-                    logger.info("下订单:{},{},{}",order_db.getId(), "删除附件失败",userId);
+                if (attachmentRelMapper.updateByPrimaryKeySelective(attachmentRelItem) != 1) {
+                    logger.info("下订单:{},{},{}", order_db.getId(), "删除附件失败", userId);
                     throw new MessageException("删除附件失败");
                 }
-                logger.info("下订单:{},{},{}",order_db.getId(), "删除附件成功",userId);
+                logger.info("下订单:{},{},{}", order_db.getId(), "删除附件成功", userId);
             }
         }
 
         //添加新附件
         for (Attachment attachment : attr) {
             if (org.apache.commons.lang.StringUtils.isEmpty(attachment.getId())) continue;
-                AttachmentRel record = new AttachmentRel();
-                record.setAttId(attachment.getId());
-                record.setSrcId(orderFormVo.getId());
-                record.setcUser(userId);
-                record.setcTime(d);
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.Order.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                if (1 != attachmentRelMapper.insertSelective(record)) {
-                    logger.info("下订单:{},{}",order_db.getId(), "附件添加失败");
-                    throw new MessageException("附件添加失败");
-                }
+            AttachmentRel record = new AttachmentRel();
+            record.setAttId(attachment.getId());
+            record.setSrcId(orderFormVo.getId());
+            record.setcUser(userId);
+            record.setcTime(d);
+            record.setStatus(Status.STATUS_1.status);
+            record.setBusType(AttachmentRelType.Order.name());
+            record.setId(idService.genId(TabId.a_attachment_rel));
+            if (1 != attachmentRelMapper.insertSelective(record)) {
+                logger.info("下订单:{},{}", order_db.getId(), "附件添加失败");
+                throw new MessageException("附件添加失败");
+            }
         }
 
         //需要手动计算付款金额
@@ -877,6 +884,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 加载订单数据
+     *
      * @param id
      * @return
      */
@@ -946,7 +954,7 @@ public class OrderServiceImpl implements OrderService {
         f.putKeyV("attrs", attr);
 
         //收款公司
-        List<PayComp>  comp =  apaycompService.recCompList();
+        List<PayComp> comp = apaycompService.recCompList();
         f.putKeyV("comp", comp);
 
         return AgentResult.ok(f);
@@ -1119,17 +1127,17 @@ public class OrderServiceImpl implements OrderService {
                 //付款单
                 OPayment pre_oPayment =  oPaymentMapper.selectByPrimaryKey(agentVo.getoPayment().get("id"));
                 //抵扣类型
-                if(StringUtils.isNotBlank(pre_oPayment.getPayMethod()) && pre_oPayment.getPayMethod().equals(SettlementType.QT.code)) {
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
+                if (StringUtils.isNotBlank(pre_oPayment.getPayMethod()) && pre_oPayment.getPayMethod().equals(SettlementType.QT.code)) {
+                    if (StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))) {
                         //抵扣金额查询
                         pre_oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
                         //可使用的抵扣金额
-                        AgentResult agentResult = queryAgentCapital(pre_oPayment.getAgentId(),pre_oPayment.getDeductionType());
-                        if(agentResult.isOK()){
-                            FastMap f =   (FastMap)agentResult.getData();
-                            BigDecimal can = new BigDecimal(f.get("can")+"");
+                        AgentResult agentResult = queryAgentCapital(pre_oPayment.getAgentId(), pre_oPayment.getDeductionType());
+                        if (agentResult.isOK()) {
+                            FastMap f = (FastMap) agentResult.getData();
+                            BigDecimal can = new BigDecimal(f.get("can") + "");
                             //可抵扣金额小于传递过来的抵扣金额
-                            if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
+                            if (can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount"))) < 0) {
                                 logger.info("订单提交审批，完成任务{}:{}：{},其他支付方式，抵扣金额超出可用余额", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
                                 return AgentResult.fail("其他支付方式，抵扣金额超出可用余额");
                             }
@@ -1279,34 +1287,34 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("代理商订单审批完成:待付金额不能为空:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("待付金额不能为空");
                     }
-                    if(oPayment.getDownPaymentCount()==null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
+                    if (oPayment.getDownPaymentCount() == null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
-                       throw new MessageException("分期数有误");
+                        throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<0){
+                    if (oPayment.getDownPaymentDate() == null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime()) < 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期日期错误");
                     }
 
                     //待付 订单待付减去抵扣
-                    if(oPayment.getDeductionAmount()!=null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)>0){
+                    if (oPayment.getDeductionAmount() != null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
                         //已付款 加上抵扣金额
                         oPayment.setRealAmount(oPayment.getRealAmount().add(oPayment.getDeductionAmount()));
                         //待付款处理 减去抵扣金额
                         oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPayment.getDeductionAmount()));
                         //抵扣操作
-                        AgentResult dealOrderDeductionRes =  dealOrderDeduction(oPayment);
-                        if(dealOrderDeductionRes.isOK()){
-                            List<OPaymentDetail> details =  (List<OPaymentDetail>)dealOrderDeductionRes.getData();
+                        AgentResult dealOrderDeductionRes = dealOrderDeduction(oPayment);
+                        if (dealOrderDeductionRes.isOK()) {
+                            List<OPaymentDetail> details = (List<OPaymentDetail>) dealOrderDeductionRes.getData();
                             for (OPaymentDetail detail : details) {
-                                if(1!=oPaymentDetailMapper.insertSelective(detail)){
+                                if (1 != oPaymentDetailMapper.insertSelective(detail)) {
                                     logger.info("代理商订单审批完成:抵扣款项插入失败:{},{},{},{}",
                                             order.getId(),
                                             oPayment.getPayMethod(),
                                             oPayment.getDeductionType(),
                                             oPayment.getDeductionAmount());
                                     throw new MessageException("抵扣操作失败");
-                                }else{
+                                } else {
                                     logger.info("代理商订单审批完成:抵扣款项插入成功:{},{},{},{},{}",
                                             order.getId(),
                                             oPayment.getPayMethod(),
@@ -1315,7 +1323,7 @@ public class OrderServiceImpl implements OrderService {
                                             detail.getPayAmount());
                                 }
                             }
-                        }else{
+                        } else {
                             throw new MessageException("抵扣操作失败");
                         }
                     }
@@ -1369,38 +1377,38 @@ public class OrderServiceImpl implements OrderService {
 
                 case "FRFQ":
 
-                    if(oPayment.getOutstandingAmount()==null || oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO)<=0){
+                    if (oPayment.getOutstandingAmount() == null || oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成:待付金额不能为空:{},{}", order.getId(), oPayment.getPayMethod());
                         throw new MessageException("待付金额不能为空");
                     }
-                    if(oPayment.getDownPaymentCount()==null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO)<=0){
+                    if (oPayment.getDownPaymentCount() == null || oPayment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime())<0){
+                    if (oPayment.getDownPaymentDate() == null || oPayment.getDownPaymentDate().compareTo(Calendar.getInstance().getTime()) < 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期日期错误");
                     }
 
                     //待付 订单待付减去抵扣
-                    if(oPayment.getDeductionAmount()!=null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)>0){
+                    if (oPayment.getDeductionAmount() != null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
                         //已付款 加上抵扣金额
                         oPayment.setRealAmount(oPayment.getRealAmount().add(oPayment.getDeductionAmount()));
                         //待付款处理 减去抵扣金额
                         oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPayment.getDeductionAmount()));
                         //抵扣操作
-                        AgentResult dealOrderDeductionRes =  dealOrderDeduction(oPayment);
-                        if(dealOrderDeductionRes.isOK()){
-                            List<OPaymentDetail> details =  (List<OPaymentDetail>)dealOrderDeductionRes.getData();
+                        AgentResult dealOrderDeductionRes = dealOrderDeduction(oPayment);
+                        if (dealOrderDeductionRes.isOK()) {
+                            List<OPaymentDetail> details = (List<OPaymentDetail>) dealOrderDeductionRes.getData();
                             for (OPaymentDetail detail : details) {
-                                if(1!=oPaymentDetailMapper.insertSelective(detail)){
+                                if (1 != oPaymentDetailMapper.insertSelective(detail)) {
                                     logger.info("代理商订单审批完成:抵扣款项插入失败:{},{},{},{}",
                                             order.getId(),
                                             oPayment.getPayMethod(),
                                             oPayment.getDeductionType(),
                                             oPayment.getDeductionAmount());
                                     throw new MessageException("抵扣操作失败");
-                                }else{
+                                } else {
                                     logger.info("代理商订单审批完成:抵扣款项插入成功:{},{},{},{},{}",
                                             order.getId(),
                                             oPayment.getPayMethod(),
@@ -1409,7 +1417,7 @@ public class OrderServiceImpl implements OrderService {
                                             detail.getPayAmount());
                                 }
                             }
-                        }else{
+                        } else {
                             throw new MessageException("抵扣操作失败");
                         }
                     }
@@ -1464,7 +1472,7 @@ public class OrderServiceImpl implements OrderService {
                     break;
                 case "XXDK":
 
-                    if(oPayment.getActualReceipt()==null || oPayment.getActualReceipt().compareTo(BigDecimal.ZERO)<=0){
+                    if (oPayment.getActualReceipt() == null || oPayment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                         logger.info("代理商订单审批完成:实际收款金额不能为空:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("实际收款金额不能为空");
                     }
@@ -1502,30 +1510,30 @@ public class OrderServiceImpl implements OrderService {
                     }
 
                     //待付 订单待付减去抵扣
-                    if(oPayment.getDeductionAmount()!=null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)>0){
+                    if (oPayment.getDeductionAmount() != null && oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
                         //已付款 加上抵扣金额
                         oPayment.setRealAmount(oPayment.getRealAmount().add(oPayment.getDeductionAmount()));
                         //待付款处理 减去抵扣金额
                         oPayment.setOutstandingAmount(oPayment.getOutstandingAmount().subtract(oPayment.getDeductionAmount()));
                         //抵扣操作
-                        AgentResult dealOrderDeductionRes =  dealOrderDeduction(oPayment);
-                        if(dealOrderDeductionRes.isOK()){
-                            List<OPaymentDetail> details =  (List<OPaymentDetail>)dealOrderDeductionRes.getData();
+                        AgentResult dealOrderDeductionRes = dealOrderDeduction(oPayment);
+                        if (dealOrderDeductionRes.isOK()) {
+                            List<OPaymentDetail> details = (List<OPaymentDetail>) dealOrderDeductionRes.getData();
                             for (OPaymentDetail detail : details) {
-                                if(1!=oPaymentDetailMapper.insertSelective(detail)){
+                                if (1 != oPaymentDetailMapper.insertSelective(detail)) {
                                     logger.info("代理商订单审批完成:抵扣款项插入失败:{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount());
                                     throw new MessageException("抵扣操作失败");
-                                }else{
-                                    logger.info("代理商订单审批完成:抵扣款项插入成功:{},{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount(),detail.getPayAmount());
+                                } else {
+                                    logger.info("代理商订单审批完成:抵扣款项插入成功:{},{},{},{},{}", order.getId(), oPayment.getPayMethod(), oPayment.getDeductionType(), oPayment.getDeductionAmount(), detail.getPayAmount());
                                 }
                             }
-                        }else{
+                        } else {
                             throw new MessageException("抵扣操作失败");
                         }
                     }
 
                     //未付清生成待付明细
-                    if(oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO)>0) {
+                    if (oPayment.getOutstandingAmount().compareTo(BigDecimal.ZERO) > 0) {
                         //添加打款明细
                         OPaymentDetail record_XXDK = new OPaymentDetail();
                         record_XXDK.setId(idService.genId(TabId.o_payment_detail));
@@ -2027,7 +2035,7 @@ public class OrderServiceImpl implements OrderService {
                 OPaymentDetail.add(record_QT);
                 return AgentResult.ok(OPaymentDetail);
 
-            }else if(capital.getcAmount().compareTo(deductionAmount)>0){
+            } else if (capital.getcAmount().compareTo(deductionAmount) > 0) {
 
                 //扣除缴款项
                 capital.setcAmount(capital.getcAmount().subtract(deductionAmount));
@@ -2035,7 +2043,7 @@ public class OrderServiceImpl implements OrderService {
                 capital.setcIsin(Status.STATUS_0.status);
                 capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
 
-                if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                if (capitalMapper.updateByPrimaryKeySelective(capital) != 1) {
                     throw new MessageException("更新缴款项失败");
                 }
                 //添加抵扣明细
@@ -2062,17 +2070,17 @@ public class OrderServiceImpl implements OrderService {
                 OPaymentDetail.add(record_QT);
                 return AgentResult.ok(OPaymentDetail);
 
-            }else if(capital.getcAmount().compareTo(for_deal)<0){
+            } else if (capital.getcAmount().compareTo(for_deal) < 0) {
 
                 for (Capital capitalItem : listc) {
 
-                    if(capital.getcAmount().compareTo(for_deal)>0){
+                    if (capital.getcAmount().compareTo(for_deal) > 0) {
                         //扣除缴款项
                         capital.setcAmount(capital.getcAmount().subtract(for_deal));
                         capital.setcInAmount(for_deal);
                         capital.setcIsin(Status.STATUS_0.status);
                         capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
-                        if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                        if (capitalMapper.updateByPrimaryKeySelective(capital) != 1) {
                             throw new MessageException("更新缴款项失败");
                         }
                         //添加抵扣明细
@@ -2099,13 +2107,13 @@ public class OrderServiceImpl implements OrderService {
                         OPaymentDetail.add(record_QT);
                         for_deal = new BigDecimal(0);
                         break;
-                    }else if(capital.getcAmount().compareTo(for_deal)==0){
+                    } else if (capital.getcAmount().compareTo(for_deal) == 0) {
                         //扣除缴款项
                         capital.setcAmount(capital.getcAmount().subtract(for_deal));
                         capital.setcInAmount(for_deal);
                         capital.setcIsin(Status.STATUS_0.status);
                         capital.setcBusStatus(Status.STATUS_4.status);//已扣款，已拆分，已冻结 部分扣款等
-                        if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                        if (capitalMapper.updateByPrimaryKeySelective(capital) != 1) {
                             throw new MessageException("更新缴款项失败");
                         }
                         //添加抵扣明细
@@ -2132,14 +2140,14 @@ public class OrderServiceImpl implements OrderService {
                         OPaymentDetail.add(record_QT);
                         for_deal = new BigDecimal(0);
                         break;
-                    }else if(capital.getcAmount().compareTo(for_deal) < 0){
+                    } else if (capital.getcAmount().compareTo(for_deal) < 0) {
                         BigDecimal camount = capital.getcAmount();
                         //扣除缴款项
                         capital.setcInAmount(camount);
                         capital.setcAmount(new BigDecimal(0));
                         capital.setcIsin(Status.STATUS_1.status);
                         capital.setcBusStatus(Status.STATUS_1.status);//已扣款，已拆分，已冻结 部分扣款等
-                        if(capitalMapper.updateByPrimaryKeySelective(capital)!=1){
+                        if (capitalMapper.updateByPrimaryKeySelective(capital) != 1) {
                             throw new MessageException("更新缴款项失败");
                         }
                         //添加抵扣明细
@@ -2169,7 +2177,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         }
-        if(for_deal.compareTo(BigDecimal.ZERO)!=0)return AgentResult.fail();
+        if (for_deal.compareTo(BigDecimal.ZERO) != 0) return AgentResult.fail();
         return AgentResult.ok(OPaymentDetail);
     }
 
@@ -2184,10 +2192,10 @@ public class OrderServiceImpl implements OrderService {
         criteria.andOrderIdEqualTo(orderId);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<OPayment> oPayments = oPaymentMapper.selectByExample(oPaymentExample);
-        if (1 != oPayments.size()){
+        if (1 != oPayments.size()) {
             return null;
         }
-            return oPayments.get(0);
+        return oPayments.get(0);
     }
 
     /**
@@ -2208,6 +2216,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 根据给定的类型查询用户的缴款项金额和可用余额
+     *
      * @param agentId
      * @param type
      * @return
@@ -2215,31 +2224,31 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult queryAgentCapital(String agentId, String type) {
         FastMap f = FastMap.fastSuccessMap();
-        List<Capital>  listc =  agentQueryService.capitalQuery(agentId,type);
-        if(listc.size()==0){
-            f.putKeyV("all",0);
-            f.putKeyV("can",0);
-        }else{
+        List<Capital> listc = agentQueryService.capitalQuery(agentId, type);
+        if (listc.size() == 0) {
+            f.putKeyV("all", 0);
+            f.putKeyV("can", 0);
+        } else {
             //总资金
             BigDecimal all = new BigDecimal(0);
             for (Capital capital : listc) {
                 all = all.add(capital.getcAmount());
             }
-            f.putKeyV("all",all);
+            f.putKeyV("all", all);
             //可用资金 审批中的订单
-            List<OPayment>  pamentS  =  queryApprovePayment(agentId,AgStatus.Approving.status,Arrays.asList(OrderStatus.CREATE.status));
+            List<OPayment> pamentS = queryApprovePayment(agentId, AgStatus.Approving.status, Arrays.asList(OrderStatus.CREATE.status));
             BigDecimal cannot = new BigDecimal(0);
             for (OPayment pament : pamentS) {
-              if(StringUtils.isNotBlank(pament.getDeductionType())
-                      && pament.getDeductionType().equals(type)
-                      && pament.getDeductionAmount()!=null
-                      &&  pament.getDeductionAmount().compareTo(BigDecimal.ZERO)>0)  {
-                  cannot = cannot.add(pament.getDeductionAmount());
-              }
+                if (StringUtils.isNotBlank(pament.getDeductionType())
+                        && pament.getDeductionType().equals(type)
+                        && pament.getDeductionAmount() != null
+                        && pament.getDeductionAmount().compareTo(BigDecimal.ZERO) > 0) {
+                    cannot = cannot.add(pament.getDeductionAmount());
+                }
             }
-            if(all.compareTo(cannot)>=0) {
+            if (all.compareTo(cannot) >= 0) {
                 f.putKeyV("can", all.subtract(cannot));
-            }else{
+            } else {
                 f.putKeyV("can", 0);
             }
         }
@@ -2249,11 +2258,12 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 查询订单付款
+     *
      * @param orderId
      * @return
      */
     @Override
-    public AgentResult queryOrderForOSupplementPaymentdetail(String orderId,String agentId) {
+    public AgentResult queryOrderForOSupplementPaymentdetail(String orderId, String agentId) {
         OOrder order = orderMapper.selectByPrimaryKey(orderId);
         OPaymentDetailExample example = new OPaymentDetailExample();
         example.or().andOrderIdEqualTo(orderId)
@@ -2262,9 +2272,9 @@ public class OrderServiceImpl implements OrderService {
                 .andAgentIdEqualTo(agentId);
         example.setOrderByClause(" plan_pay_time asc ");
         List<OPaymentDetail> paymentDetails = oPaymentDetailMapper.selectByExample(example);
-        if(paymentDetails.size()>0){
-            return AgentResult.ok(FastMap.fastSuccessMap().putKeyV("order",order).putKeyV("paymentDetails",paymentDetails.get(0)));
-        }else{
+        if (paymentDetails.size() > 0) {
+            return AgentResult.ok(FastMap.fastSuccessMap().putKeyV("order", order).putKeyV("paymentDetails", paymentDetails.get(0)));
+        } else {
             return AgentResult.fail("没有需要补款的欠款");
         }
     }
@@ -2272,31 +2282,34 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 查询订单的订购单信息
+     *
      * @param agentId
      * @param orderId
      * @return
      */
     @Override
-    public List<Map<String,Object>> querySubOrderInfoList(String agentId, String orderId) {
-        return orderMapper.queryOrderSubOrderProduct(orderId,agentId);
+    public List<Map<String, Object>> querySubOrderInfoList(String agentId, String orderId) {
+        return orderMapper.queryOrderSubOrderProduct(orderId, agentId);
     }
 
 
     /**
      * 查询已派单信息
+     *
      * @param agentId
      * @param orderId
      * @return
      */
 
     @Override
-    public List<Map<String,Object>> queryHavePeiHuoProduct(String agentId, String orderId) {
-        return orderMapper.queryHavePeiHuoProduct(orderId,agentId);
+    public List<Map<String, Object>> queryHavePeiHuoProduct(String agentId, String orderId) {
+        return orderMapper.queryHavePeiHuoProduct(orderId, agentId);
     }
 
 
     /**
      * 配货操作
+     *
      * @param oReceiptOrder
      * @param oReceiptPro
      * @param sendNum
@@ -2305,20 +2318,20 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult subOrderPeiHuo(OReceiptOrder oReceiptOrder, OReceiptPro oReceiptPro,int sendNum) throws Exception {
+    public AgentResult subOrderPeiHuo(OReceiptOrder oReceiptOrder, OReceiptPro oReceiptPro, int sendNum) throws Exception {
 
-        if(StringUtils.isBlank(oReceiptOrder.getOrderId())
+        if (StringUtils.isBlank(oReceiptOrder.getOrderId())
                 || StringUtils.isBlank(oReceiptOrder.getAddressId())
                 || StringUtils.isBlank(oReceiptOrder.getAgentId())
                 || StringUtils.isBlank(oReceiptPro.getProId())
                 || StringUtils.isBlank(oReceiptOrder.getuUser())
-                || sendNum<=0){
+                || sendNum <= 0) {
 
-                return AgentResult.fail("参数错误");
+            return AgentResult.fail("参数错误");
         }
 
         OOrder order = orderMapper.selectByPrimaryKey(oReceiptOrder.getOrderId());
-        if(AgStatus.Approved.status.compareTo(order.getReviewStatus())!=0){
+        if (AgStatus.Approved.status.compareTo(order.getReviewStatus()) != 0) {
             return AgentResult.fail("审批未通过");
         }
         Calendar d = Calendar.getInstance();
@@ -2345,9 +2358,9 @@ public class OrderServiceImpl implements OrderService {
         //订货单记录是否存在
         List<OReceiptOrder> OReceiptOrderList = oReceiptOrderMapper.selectByExample(oReceiptOrderQuery);
         OReceiptOrder receiptOrder_option = null;
-        if(OReceiptOrderList.size()>0){
+        if (OReceiptOrderList.size() > 0) {
             receiptOrder_option = OReceiptOrderList.get(0);
-        }else{
+        } else {
             //不存在则新增
             OReceiptOrder receiptOrder_db = new OReceiptOrder();
             receiptOrder_db.setId(idService.genId(TabId.o_receipt_order));
@@ -2371,7 +2384,7 @@ public class OrderServiceImpl implements OrderService {
             receiptOrder_db.setVersion(Status.STATUS_0.status);
             receiptOrder_db.setAgentId(oReceiptOrder.getAgentId());
 
-            if(1!=oReceiptOrderMapper.insertSelective(receiptOrder_db)){
+            if (1 != oReceiptOrderMapper.insertSelective(receiptOrder_db)) {
                 throw new MessageException("收货单添加失败");
             }
             receiptOrder_option = receiptOrder_db;
@@ -2384,7 +2397,7 @@ public class OrderServiceImpl implements OrderService {
                 .andOrderIdEqualTo(receiptOrder_option.getOrderId())
                 .andProIdEqualTo(oReceiptPro.getProId());
         List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderQuery);
-        if(oSubOrderList.size()==0)throw new MessageException("订购单信息未找到");
+        if (oSubOrderList.size() == 0) throw new MessageException("订购单信息未找到");
         OSubOrder oSubOrder = oSubOrderList.get(0);
 
         //检查已配货的商品数量
@@ -2394,13 +2407,13 @@ public class OrderServiceImpl implements OrderService {
                 .andProIdEqualTo(oSubOrder.getProId())
                 .andStatusEqualTo(Status.STATUS_1.status);
         //计算已配货的商品数量
-        List<OReceiptPro> OReceiptProListHaveIn =  oReceiptProMapper.selectByExample(oReceiptProQuery);
+        List<OReceiptPro> OReceiptProListHaveIn = oReceiptProMapper.selectByExample(oReceiptProQuery);
         BigDecimal have_peihuo_count = new BigDecimal(0);
         for (OReceiptPro receiptPro : OReceiptProListHaveIn) {
             have_peihuo_count = have_peihuo_count.add(receiptPro.getProNum());
         }
-        if(have_peihuo_count.add(new BigDecimal(sendNum)).compareTo(oSubOrder.getProNum())>0){
-            throw  new MessageException("配货商品数量已超出订单商品数量");
+        if (have_peihuo_count.add(new BigDecimal(sendNum)).compareTo(oSubOrder.getProNum()) > 0) {
+            throw new MessageException("配货商品数量已超出订单商品数量");
         }
 
         //添加配货单商品
@@ -2420,11 +2433,11 @@ public class OrderServiceImpl implements OrderService {
         oReceiptPro.setStatus(Status.STATUS_1.status);
         oReceiptPro.setVersion(Status.STATUS_0.status);
         oReceiptPro.setReceiptProStatus(OReceiptStatus.TEMPORARY_STORAGE.code);
-        if(1!=oReceiptProMapper.insertSelective(oReceiptPro)){
+        if (1 != oReceiptProMapper.insertSelective(oReceiptPro)) {
             throw new MessageException("收货单商品添加失败");
         }
         //数据库配货地址同步
-        AgentResult  sysn = sysnReceiptOrderPorNum(oReceiptPro.getReceiptId());
+        AgentResult sysn = sysnReceiptOrderPorNum(oReceiptPro.getReceiptId());
         return sysn;
     }
 
@@ -2432,7 +2445,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult subOrderPeiHuoUpdate(OReceiptPro oReceiptPro) throws Exception {
 
-        logger.info("用户{}修改{}",oReceiptPro.getuUser(),JSONObject.toJSONString(oReceiptPro));
+        logger.info("用户{}修改{}", oReceiptPro.getuUser(), JSONObject.toJSONString(oReceiptPro));
 
         //数据库配货地址商品
         OReceiptPro oReceiptPro_db = oReceiptProMapper.selectByPrimaryKey(oReceiptPro.getId());
@@ -2441,51 +2454,49 @@ public class OrderServiceImpl implements OrderService {
 
         //检查订单状态
         OOrder order = orderMapper.selectByPrimaryKey(oReceiptPro_db.getOrderid());
-        if(AgStatus.Approved.status.compareTo(order.getReviewStatus())!=0){
+        if (AgStatus.Approved.status.compareTo(order.getReviewStatus()) != 0) {
             return AgentResult.fail("审批未通过");
         }
 
 
-        if(oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code)==0) {
-            logger.info("用户{}修改{},{},更新发货商品失败请重试",oReceiptPro.getuUser(),oReceiptPro.getId(),oReceiptPro.getProNum());
+        if (oReceiptPro_db.getReceiptProStatus().compareTo(OReceiptStatus.DISPATCHED_ORDER.code) == 0) {
+            logger.info("用户{}修改{},{},更新发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
             return AgentResult.fail("发货商品已排单禁止修改");
         }
 
-        if(null !=oReceiptPro.getProNum()) {
+        if (null != oReceiptPro.getProNum()) {
             oReceiptPro_db.setProNum(oReceiptPro.getProNum());
             if (oReceiptPro_db.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 oReceiptPro_db.setStatus(Status.STATUS_0.status);
             }
         }
 
-        if(null !=oReceiptPro.getReceiptProStatus()) {
+        if (null != oReceiptPro.getReceiptProStatus()) {
             oReceiptPro_db.setReceiptProStatus(oReceiptPro.getReceiptProStatus());
         }
 
-        if(1!=oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro_db)){
-            logger.info("用户{}修改{},{},更新发货商品失败请重试",oReceiptPro.getuUser(),oReceiptPro.getId(),oReceiptPro.getProNum());
+        if (1 != oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro_db)) {
+            logger.info("用户{}修改{},{},更新发货商品失败请重试", oReceiptPro.getuUser(), oReceiptPro.getId(), oReceiptPro.getProNum());
             throw new MessageException("更新发货商品失败请重试");
         }
 
         //数据库配货地址同步
-        AgentResult  sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
+        AgentResult sysn = sysnReceiptOrderPorNum(oReceiptPro_db.getReceiptId());
         return sysn;
     }
 
 
-
-
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult subOrderPeiHuoUpdateStatus(String orderId,String agentId) throws Exception {
-        OOrder order =  orderMapper.selectByPrimaryKey(orderId);
-        if(!order.getAgentId().equals(agentId)){
+    public AgentResult subOrderPeiHuoUpdateStatus(String orderId, String agentId) throws Exception {
+        OOrder order = orderMapper.selectByPrimaryKey(orderId);
+        if (!order.getAgentId().equals(agentId)) {
             logger.info("配货信息修改失败，订单代理商和参数代理商不匹配");
             AgentResult.fail("信息错误");
         }
         OReceiptProExample example = new OReceiptProExample();
         example.or().andOrderidEqualTo(orderId).andStatusEqualTo(Status.STATUS_1.status).andReceiptProStatusEqualTo(OReceiptStatus.TEMPORARY_STORAGE.code);
-        List<OReceiptPro> oReceiptProList =   oReceiptProMapper.selectByExample(example);
+        List<OReceiptPro> oReceiptProList = oReceiptProMapper.selectByExample(example);
         for (OReceiptPro oReceiptPro : oReceiptProList) {
             oReceiptPro.setReceiptProStatus(OReceiptStatus.WAITING_LIST.code);
             oReceiptProMapper.updateByPrimaryKeySelective(oReceiptPro);
@@ -2495,6 +2506,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 同步发货单数量
+     *
      * @param receiptOrder
      * @return
      * @throws Exception
@@ -2507,16 +2519,16 @@ public class OrderServiceImpl implements OrderService {
 
         //检查订单状态
         OOrder order = orderMapper.selectByPrimaryKey(oReceiptOrder_db.getOrderId());
-        if(AgStatus.Approved.status.compareTo(order.getReviewStatus())!=0){
+        if (AgStatus.Approved.status.compareTo(order.getReviewStatus()) != 0) {
             return AgentResult.fail("审批未通过");
         }
 
         OReceiptProExample oReceiptProQuery = new OReceiptProExample();
         oReceiptProQuery.or().andReceiptIdEqualTo(receiptOrder).andStatusEqualTo(Status.STATUS_1.status);
-        List<OReceiptPro>  oReceiptProList =  oReceiptProMapper.selectByExample(oReceiptProQuery);
+        List<OReceiptPro> oReceiptProList = oReceiptProMapper.selectByExample(oReceiptProQuery);
         BigDecimal allCount = BigDecimal.ZERO;
 
-        if(oReceiptProList.size()>0) {
+        if (oReceiptProList.size() > 0) {
             for (OReceiptPro oReceiptPro : oReceiptProList) {
                 if (oReceiptPro.getProNum() == null || oReceiptPro.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                     oReceiptPro.setStatus(Status.STATUS_0.status);
@@ -2533,11 +2545,11 @@ public class OrderServiceImpl implements OrderService {
             } else {
                 oReceiptOrder_db.setProNum(allCount);
             }
-        }else{
+        } else {
             oReceiptOrder_db.setProNum(BigDecimal.ZERO);
             oReceiptOrder_db.setStatus(Status.STATUS_0.status);
         }
-        if(1!=oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder_db)){
+        if (1 != oReceiptOrderMapper.updateByPrimaryKeySelective(oReceiptOrder_db)) {
             throw new MessageException("更新发货订单失败请重试");
 
         }
