@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.bank;
 
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
@@ -99,6 +100,37 @@ public class PosRegionServiceImpl implements PosRegionService {
         tree.setState(posRegionMapper.findCountByCode(region.getCode()) == 0 ? 1 : 0);
         tree.settType(new BigDecimal(region.getCodeType()));
         return tree;
+    }
+
+
+    /**
+     * 构建pos业务范围树
+     * @param code
+     * @param level
+     * @return
+     */
+    @Override
+    public List<Tree> queryPosRegion(String code, String level) {
+        DPosRegionExample example = new DPosRegionExample();
+        DPosRegionExample.Criteria c = example.or();
+        if(StringUtils.isBlank(code)){
+            c.andCodeLevelEqualTo(level);
+        }else{
+            c.andCodeLevelEqualTo(level);
+            c.andParentCodeEqualTo(code);
+        }
+        List<DPosRegion> list = posRegionMapper.selectByExample(example);
+        List<Tree> trees = new ArrayList<Tree>();
+        for (DPosRegion dPosRegion : list) {
+            Tree tree = new Tree();
+            tree.setId(Long.valueOf(dPosRegion.getCode()) + "");
+            tree.setPid(Long.valueOf(dPosRegion.getParentCode()) + "");
+            tree.setText(dPosRegion.getName());
+            tree.setState("2".equals(level)?1:0);
+            tree.settType(new BigDecimal(dPosRegion.getCodeType()));
+            trees.add(tree);
+        }
+        return trees;
     }
 }
 
