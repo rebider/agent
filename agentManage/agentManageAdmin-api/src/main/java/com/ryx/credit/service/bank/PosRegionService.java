@@ -1,5 +1,7 @@
 package com.ryx.credit.service.bank;
 
+import com.ryx.credit.commons.result.Tree;
+
 import java.util.List;
 
 /**
@@ -11,4 +13,5 @@ public interface PosRegionService {
 
     List<String> findRegionByCityId(String cityId);
 
+    List<Tree> queryAllRegion(String pCode);
 }
