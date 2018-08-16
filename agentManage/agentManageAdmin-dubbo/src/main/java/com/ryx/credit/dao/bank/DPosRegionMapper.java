@@ -17,4 +17,10 @@ public interface DPosRegionMapper {
     List<DPosRegion> selectByExample(DPosRegionExample example);
 
     List<DPosRegion> findRegionByProvinceName(String provinceName);
+
+    List<DPosRegion> findByPcode(String pCode);
+
+    List<DPosRegion> findByPosRegion(DPosRegion dPosRegions);
+
+    int findCountByCode(String pCode);
 }

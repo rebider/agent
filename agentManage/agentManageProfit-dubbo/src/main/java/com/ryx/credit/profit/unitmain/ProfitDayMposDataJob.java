@@ -12,6 +12,8 @@ import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -20,6 +22,8 @@ import java.util.List;
 /**
  * 手刷日结分润数据同步、定时
  */
+@Service("profitDayMposDataJob")
+@Transactional(rollbackFor=RuntimeException.class)
 public class ProfitDayMposDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
@@ -54,13 +58,13 @@ public class ProfitDayMposDataJob {
 
     /**
      * 同步日结分润数据
-     * @param transDate1 交易时间起（空则为当前日期上一天）yyyymmdd
-     * @param transDate2 交易时间止（空则为当前日期上一天）yyyymmdd
+     * @param transDate1 交易时间起（空则为当前日期上2天）yyyymmdd
+     * @param transDate2 交易时间止（空则为当前日期上2天）yyyymmdd
      */
     public void synchroProfitD(String transDate1,String transDate2){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transStartDate",transDate1==null?DateUtil.getAfterDayDate("-1",DateUtil.sdfDays):transDate1);
-        map.put("transEndDate",transDate2==null?DateUtil.getAfterDayDate("-1",DateUtil.sdfDays):transDate2);
+        map.put("transStartDate",transDate1==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):transDate1);
+        map.put("transEndDate",transDate2==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):transDate2);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
@@ -100,7 +104,7 @@ public class ProfitDayMposDataJob {
             profitD.setRedoMoney(json.getBigDecimal("REDOMONEY "));
             profitD.setReturnMoney(json.getBigDecimal("RETURNMONEY "));
             profitD.setRealMoney(json.getBigDecimal("REALMONEY "));
-            profitDService.insert(profitD);
+            profitDService.insertSelective(profitD);
         }
         synchroProfitD(transDate1,transDate2);
     }

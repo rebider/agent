@@ -15,6 +15,8 @@ import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -24,6 +26,8 @@ import java.util.List;
 /**
  * 手刷月分润数据同步、定时
  */
+@Service("profitMonthMposDataJob")
+@Transactional(rollbackFor=RuntimeException.class)
 public class ProfitMonthMposDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
@@ -111,9 +115,9 @@ public class ProfitMonthMposDataJob {
             return;
         }
 
-        BigDecimal fxAmount = json.getBigDecimal("fxAmount")==null?BigDecimal.ZERO:json.getBigDecimal("fxAmount");//分销系统交易汇总
-        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount")==null?BigDecimal.ZERO:json.getBigDecimal("wjrAmount");//未计入分润汇总
-        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount")==null?BigDecimal.ZERO:json.getBigDecimal("wtbAmount");//未同步到分润
+        //BigDecimal fxAmount = json.getBigDecimal("fxAmount")==null?BigDecimal.ZERO:json.getBigDecimal("fxAmount");//分销系统交易汇总
+        //BigDecimal wjrAmount = json.getBigDecimal("wjrAmount")==null?BigDecimal.ZERO:json.getBigDecimal("wjrAmount");//未计入分润汇总
+        //BigDecimal wtbAmount = json.getBigDecimal("wtbAmount")==null?BigDecimal.ZERO:json.getBigDecimal("wtbAmount");//未同步到分润
 
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
@@ -141,15 +145,12 @@ public class ProfitMonthMposDataJob {
             if(null!=detailMonth){//已存在该分润
                 BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
                 detailMonth.setProfitDate(month);
-
                 detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
                 detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
                 detailMonth.setTpProfitAmt(json.getBigDecimal("TPPROFITAMT"));//贴牌分润
                 detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
                 detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
                 detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
-
-
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润=瑞和宝分润-日结分润
                 profitDetailMonthService.updateByPrimaryKeySelective(detailMonth);
             }else{
@@ -157,16 +158,14 @@ public class ProfitMonthMposDataJob {
                 detailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
                 detailMonth.setProfitDate(month);
                 detailMonth.setAgentPid(json.getString("UNIQUECODE"));
-                detailMonth.setAgentName(json.getString("AGENTNAME"));
+                //detailMonth.setAgentName(json.getString("AGENTNAME"));
                 BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
-
                 detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
                 detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
                 detailMonth.setTpProfitAmt(json.getBigDecimal("TPPROFITAMT"));//贴牌分润
                 detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
                 detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
                 detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
-
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
                 profitDetailMonthService.insertSelective(detailMonth);
             }

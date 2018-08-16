@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.RewardStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
@@ -12,13 +13,16 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PTaxAdjustMapper;
-import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IPTaxAdjustService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentColinfoService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -29,6 +33,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -53,6 +58,11 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     private ActivityService activityService;
     @Autowired
     private TaskApprovalService taskApprovalService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+    @Autowired
+    private AgentService agentService;
+
     /**
      * 处理分页用到的信息
      *
@@ -127,6 +137,31 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
                 logger.info("1.更新税点调整申请状态为通过，有效");
                 logger.info("审批通过，原税点：{},现税点：{}",taxAdjust.getTaxOld(),taxAdjust.getTaxIng());
                 adjustMapper.updateByPrimaryKeySelective(taxAdjust);
+
+                String agentId = taxAdjust.getAgentPid();   // 代理商唯一码
+
+                // 更新收款账户表的 税点值
+                AgentColinfo colinfo = new AgentColinfo();
+                colinfo.setAgentId(agentId);
+                AgentColinfo agentColinfo = agentColinfoService.queryPoint(colinfo);    // 查询数据
+                if (agentColinfo != null) {
+                    BigDecimal colinfoPoint = taxAdjust.getTaxIng();
+                    agentColinfo.setCloTaxPoint(colinfoPoint);
+                    if (agentColinfoService.updateByPrimaryKeySelective(agentColinfo)!=1) {
+                        throw new MessageException("更新收款账户税点值失败！");
+                    }
+                }
+
+                // 更新代理商表的 税点值
+                Agent agent = agentService.getAgentById(agentId);    // 查询数据
+                if (agent != null) {
+                    BigDecimal agentPoint = taxAdjust.getTaxIng();
+                    agent.setCloTaxPoint(agentPoint);
+                    if (agentService.updateByPrimaryKeySelective(agent)!=1) {
+                        throw new MessageException("更新代理商税点值失败！");
+                    }
+                }
+
                 logger.info("2.更新审批流与业务对象");
                 rel.setStatus(Status.STATUS_2.status);
                 taskApprovalService.updateABusActRel(rel);

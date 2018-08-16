@@ -124,6 +124,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(profitDetailMonth.getAgentId())){
             criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
         }
+        if(StringUtils.isNotBlank(profitDetailMonth.getAgentPid())){
+            criteria.andAgentPidEqualTo(profitDetailMonth.getAgentPid());
+        }
         if(StringUtils.isNotBlank(profitDetailMonth.getProfitId())){
             criteria.andProfitIdEqualTo(profitDetailMonth.getProfitId());
         }
@@ -237,6 +240,23 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
+    public ProfitUnfreeze getProfitUnfreezeByProfitId(String profitId) {
+        if (StringUtils.isNotBlank(profitId)) {
+            ProfitUnfreeze unfreeze = new ProfitUnfreeze();
+            unfreeze.setProfitId(profitId);
+            ProfitUnfreezeExample example = new ProfitUnfreezeExample();
+            ProfitUnfreezeExample.Criteria criteria = example.createCriteria();
+            criteria.andProfitIdEqualTo(profitId);
+            List<ProfitUnfreeze> profitUnfreezes = profitUnfreezeMapper.selectByExample(example);
+
+            if (profitUnfreezes != null && profitUnfreezes.size() > 0) {
+                return profitUnfreezes.get(0);
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void completeTaskEnterActivity(String insid, String status) {
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
@@ -285,11 +305,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public void computeProfitAMt() {
+    public void computeProfitAmt() {
         // 获取所有代理商月度分润明细
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
+        Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
                 BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
@@ -300,7 +321,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
                 // POS考核奖励
                 if ("100003".equals(profitDetailMonthTemp.getBusPlatForm())) {
-                     getPosReward(profitDetailMonthTemp);
+                     getPosReward(profitDetailMonthTemp, parentPosReward);
                     sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
                 }else{
                     profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
@@ -330,28 +351,59 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
     }
 
-    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp) {
+    @Override
+    public BigDecimal getTranByAgentId(String agentId) {
+        if (StringUtils.isNotBlank(agentId)) {
+            ProfitDetailMonth month = new ProfitDetailMonth();
+            month.setAgentPid(agentId);
+            List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList (null, month);
+
+            if (profitDetailMonthList!=null && profitDetailMonthList.size() > 0) {
+                return profitDetailMonthList.get(0).getTranAmt();
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    /*** 
+    * @Description: 获取pos奖励
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/8/14 
+    */ 
+    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, Map<String, BigDecimal> parentPosReward) {
         OrganTranMonthDetail detail = new OrganTranMonthDetail();
         detail.setProfitId(profitDetailMonthTemp.getId());
         List<OrganTranMonthDetail> organTranMonthDetails = organTranMonthDetailService.getOrganTranMonthDetailList(detail);
 
         if (organTranMonthDetails != null && organTranMonthDetails.size() > 0) {
             detail = organTranMonthDetails.get(0);
-            Map<String, Object> map = new HashMap<>(10);
-            map.put("agentType", detail.getAgentType());
-            map.put("agentId", profitDetailMonthTemp.getAgentId());
-            map.put("agentPid", profitDetailMonthTemp.getAgentPid());
-            map.put("posTranAmt", detail.getPosTranAmt());
-            map.put("posJlTranAmt", detail.getPosJlTranAmt());
-            try {
-                map = posProfitComputeServiceImpl.execut(map);
-                BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
-                profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
-                profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOG.error("获取pos奖励失败");
-                throw new RuntimeException("获取pos奖励失败");
+            if("2".equals(detail.getAgentType()) || "3".equals(detail.getAgentType()) || "6".equals(detail.getAgentType()))
+            {
+                Map<String, Object> map = new HashMap<>(10);
+                map.put("agentType", detail.getAgentType());
+                map.put("agentId", profitDetailMonthTemp.getAgentId());
+                map.put("agentPid", profitDetailMonthTemp.getAgentPid());
+                map.put("posTranAmt", detail.getPosTranAmt());
+                map.put("posJlTranAmt", detail.getPosJlTranAmt());
+                try {
+                    map = posProfitComputeServiceImpl.execut(map);
+                    BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
+                    profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
+                    profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
+                    if (!"0".equals(map.get("parentDeductPosRewardAmt").toString())) {
+                        parentPosReward.put(map.get("parentAgentPid").toString(), (BigDecimal) map.get("parentDeductPosRewardAmt"));
+                    }
+                    // 判断是否存在奖励
+                    if (parentPosReward.containsKey(profitDetailMonthTemp.getAgentPid())) {
+                        profitDetailMonthTemp.setPosRewardAmt(profitDetailMonthTemp.getPosRewardAmt().add(parentPosReward.get(profitDetailMonthTemp.getAgentPid())));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    LOG.error("获取pos奖励失败");
+                    throw new RuntimeException("获取pos奖励失败");
+                }
             }
         }
     }

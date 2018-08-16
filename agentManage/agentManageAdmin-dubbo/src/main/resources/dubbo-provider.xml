@@ -51,10 +51,11 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AimportService" ref="aimportService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentNotifyService" ref="agentNotifyService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.BusActRelService" ref="busActRelService"  timeout="1200000" registry="${zk.group}"/>
-
+    <dubbo:service interface="com.ryx.credit.service.agent.AgentColinfoService" ref="agentColinfoService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />
+    <dubbo:reference interface="com.ryx.credit.profit.service.ProfitMonthService" id="profitMonthService"  timeout="1200000" registry="${zk.group}" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.bank.EtbSyscardinfoService" ref="etbSyscardinfoService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}"/>
@@ -72,6 +73,7 @@
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsService" ref="oLogisticService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IOrderReturnService" ref="orderReturnService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IAccountAdjustService" ref="accountAdjustService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.bank.PosRegionService" ref="posRegionService"  timeout="1200000" registry="${zk.group}"/>
 
     <!-- 基础资源维护-->
     <dubbo:service interface="com.ryx.credit.service.dict.PayCompService" ref="payCompService" timeout="1200000" registry="${zk.group}"></dubbo:service>
