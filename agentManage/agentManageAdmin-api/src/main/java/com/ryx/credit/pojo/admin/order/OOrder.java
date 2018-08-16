@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OOrder implements Serializable{
+public class OOrder implements Serializable {
     private String id;
 
     private String oNum;
@@ -46,8 +46,6 @@ public class OOrder implements Serializable{
     private Date uTime;
 
     private BigDecimal version;
-
-    private String busId;
 
     public String getId() {
         return id;
@@ -215,13 +213,5 @@ public class OOrder implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
-    }
-
-    public String getBusId() {
-        return busId;
-    }
-
-    public void setBusId(String busId) {
-        this.busId = busId == null ? null : busId.trim();
     }
 }

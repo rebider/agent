@@ -46,7 +46,6 @@ public enum DictGroup {
     ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型"),
     ACTIVITY_DIS_TYPE("活动优惠方式"),
-    ACTIVITY_CONDITION("活动参与条件"),
     C_TYPE("扣款款项资金类型"),
     ACT_ORDER_RETURN("退货审批流名称"),
     TOOLS("机具押金扣款调整"),

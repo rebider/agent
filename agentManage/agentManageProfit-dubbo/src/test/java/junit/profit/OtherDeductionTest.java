@@ -41,15 +41,8 @@ public class OtherDeductionTest {
     */
     @Test
     public void testDeduction() {
-//        profitDeductionService.settleErrDeduction(new BigDecimal("29.8"),"02","AG20180809000000000005966");
-//        profitDeductionService.settleErrDeduction(new BigDecimal("25"),"02","AG20180810000000000005980");
-//        profitDeductionService.settleErrDeduction(new BigDecimal("20"),"02","AG20180813000000000006020");
-//        profitDeductionService.settleErrDeduction(new BigDecimal("25"),"02","AG20180809000000000005961");
-//        profitDeductionService.settleErrDeduction(new BigDecimal("50"),"02","AG20180811000000000006000");
-        profitDeductionService.otherDeductionByType(new BigDecimal("100.22"),"AG20180803000000000005884",null );
-        profitDeductionService.otherDeductionByType(new BigDecimal("175.42"),"AG20180804000000000005901",null );
-//        profitDeductionService.otherDeductionByType(new BigDecimal("300.33"),"AG20180809000000000005961",null );
-////        profitDeductionService.otherDeductionByType(new BigDecimal("200.22"),"AG20180808000000000005960",null );
-        profitDeductionService.otherDeductionByType(new BigDecimal("100.33"),"AG20180813000000000006020",null );
+        BigDecimal profitAmt = new BigDecimal("4000");
+        String agentId = "AG20180803000000000005887";
+        profitDeductionService.settleErrDeduction(profitAmt,"02",agentId);
     }
 }
