@@ -52,7 +52,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     public static ProcessEngine processEngine;
 
-    @ActivityEntity(true)
+    
     @Override
     public void createTable() {
         try {
@@ -62,7 +62,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map) {
 
@@ -84,7 +84,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return null;
     }
-    @ActivityEntity(true)
+    
     @Override
     public List<Task> findMyPersonTask(String assignee,String group) {
         List<Task> taskList = new ArrayList<>();
@@ -111,7 +111,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public Map completeTask(String taskId, Map<String,Object>  map) {
         Map<String,Object> rs = new HashMap<>(5);
@@ -131,7 +131,7 @@ public class ActivityServiceImpl implements ActivityService {
         return rs;
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public List<ProcessDefinition> findProcessDefinition() {
         List<ProcessDefinition> list = null;
@@ -153,7 +153,7 @@ public class ActivityServiceImpl implements ActivityService {
         return list;
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public void delProcessDefinition(String deploymentId) {
         try {
@@ -165,7 +165,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public void setValue(String taskId, Map<String, Object> map) {
         try {
@@ -178,7 +178,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public Object getValue(String taskId, String key) {
         Object o = null;
@@ -191,7 +191,7 @@ public class ActivityServiceImpl implements ActivityService {
         return o;
     }
 
-    @ActivityEntity(true)
+    
     @Override
     public Map getImage(String taskId)  {
         Map<String,Object> map = null;
