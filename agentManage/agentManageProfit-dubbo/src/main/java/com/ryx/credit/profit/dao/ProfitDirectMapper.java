@@ -39,4 +39,6 @@ public interface ProfitDirectMapper {
     BigDecimal getSubBuckleByMonth(ProfitDirect record);
 
     BigDecimal selectSumTaxAmt(ProfitDirect record);
+
+    void updateFristAgentStatus(String agentPid);
 }

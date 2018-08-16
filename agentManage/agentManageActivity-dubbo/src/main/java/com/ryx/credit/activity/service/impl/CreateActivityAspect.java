@@ -26,12 +26,8 @@ public class CreateActivityAspect {
     @Autowired
     private StandaloneProcessEngineConfiguration processEngineConfiguration;
 
-//    @Before("execution(* com.ryx.credit.activity.service.impl.ActivityServiceImpl.*(..))")
-    @Before("@annotation(ActivityEntity)")
+    @Before("execution(* com.ryx.credit.activity.service.impl.ActivityServiceImpl.*(..))")
     private void pre(JoinPoint pjp) {
-//        MethodSignature methodSig = (MethodSignature) pjp.getSignature();
-//        Annotation[] annotations = methodSig.getMethod().getDeclaredAnnotations();
-//        ActivityEntity annotation = (ActivityEntity) annotations[0];
         if (ActivityServiceImpl.processEngine == null) {
             ActivityServiceImpl.processEngine = processEngineConfiguration
                     .buildProcessEngine();
