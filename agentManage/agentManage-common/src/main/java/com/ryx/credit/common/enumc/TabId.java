@@ -47,10 +47,10 @@ public enum TabId {
     o_receipt_plan("ORP%s%015d"),
     o_account_adjust_detail("AJD%s%014d"),
     P_ORGAN_TRAN_MONTH("P_ORGAN_TRAN_MONTH%s%015d"),
-    P_IMPORT_DEDUCTION_DETAIL("PIDD_SEQID%s%015d"),
+    PIDD("PIDD%s%015d"),
     P_STAGING_DETAIL("PSD%s%015d"),
     P_STAGING("P_STAGING%s%015d"),
-    P_ORGAN_TRAN_MONTH_DETAIL("POTMD%s%015d"),
+    POTMD("POTMD%s%015d"),
     P_DEDUCTION("P_DEDUCT%s%015d"),
     P_SETTLE_ERR_LS("PSERR%s%015d"),
     P_PROFIT_DETAIL("PDE%s%015d"),
@@ -66,7 +66,9 @@ public enum TabId {
     p_pos_reward("PPR%s%015d"),
     p_pos_check("PPC%s%015d"),
     p_profit_supply("PPS%s%015d"),
-    P_DEDUCTION_DETAIL("PDD%s%015d");
+    P_DEDUCTION_DETAIL("PDD%s%015d"),
+    P_AGENT_PID_LINK("PAPL%s%015d"),
+    P_PROFIT_SUPPLU_DIFF("PPSD%s%015d");
 
     TabId(String thePatt){
            this.patt = thePatt;

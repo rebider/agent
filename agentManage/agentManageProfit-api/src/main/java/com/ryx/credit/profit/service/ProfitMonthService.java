@@ -101,6 +101,13 @@ public interface ProfitMonthService {
     ProfitUnfreeze getProfitUnfreezeById(String id);
 
     /**
+     * @author zhaodw
+     * @param profitId 分润id不能为空
+     * @return 解冻审批对象
+     */
+    ProfitUnfreeze getProfitUnfreezeByProfitId(String profitId);
+
+    /**
      *
      * 功能描述: 任务完成执行业务接口方法
      *
@@ -123,5 +130,14 @@ public interface ProfitMonthService {
     * @Author: zhaodw
     * @Date: 2018/8/12
     */
-    void computeProfitAMt();
+    void computeProfitAmt();
+
+    /***
+    * @Description: 根据代理商唯一码获取交易金额
+    * @Param:  agentId 代理商唯一编码
+    * @return:  交易金额
+    * @Author: zhaodw
+    * @Date: 2018/8/15
+    */
+    BigDecimal getTranByAgentId(String agentId);
 }

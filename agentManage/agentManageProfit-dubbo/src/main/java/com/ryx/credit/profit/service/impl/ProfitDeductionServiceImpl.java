@@ -370,9 +370,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (resultAmt.doubleValue() < 0 || stagAmt!=null) {
             // 将当期扣款对象存入历史
             createHisDeduction(profitDeductionTemp);
-            if (stagAmt != null) {
-                profitDeductionTemp.setUpperNotDeductionAmt(profitDeductionTemp.getNotDeductionAmt());//上月未扣足=未扣足+下月分期
-            }else {
+            profitDeductionTemp.setUpperNotDeductionAmt(profitDeductionTemp.getNotDeductionAmt());//上月未扣足
+            if (stagAmt == null) {
                 stagAmt = BigDecimal.ZERO;
             }
             // 更新当期未下期扣款

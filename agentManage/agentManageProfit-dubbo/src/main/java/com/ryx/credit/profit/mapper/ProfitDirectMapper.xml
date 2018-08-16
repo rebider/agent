@@ -196,6 +196,9 @@
       <if test="fristAgentName != null">
         #{fristAgentName,jdbcType=VARCHAR},
       </if>
+      <if test="fristAgentId != null">
+        #{fristAgentId,jdbcType=VARCHAR},
+      </if>
       <if test="parentAgentId != null">
         #{parentAgentId,jdbcType=VARCHAR},
       </if>

@@ -39,7 +39,7 @@ public class OrganTranMonthDetailServiceImpl implements OrganTranMonthDetailServ
     @Override
     public void insert(OrganTranMonthDetail organTranMonthDetail) {
         if (organTranMonthDetail.getId()== null) {
-            organTranMonthDetail.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH_DETAIL));
+            organTranMonthDetail.setId(idService.genId(TabId.PIDD));
         }
         organTranMonthDetailMapper.insert(organTranMonthDetail);
     }

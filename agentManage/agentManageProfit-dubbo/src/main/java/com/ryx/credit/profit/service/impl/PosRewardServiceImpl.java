@@ -102,6 +102,8 @@ public class PosRewardServiceImpl implements IPosRewardService {
         return rewardMapper.countByExample(example);
     }
 
+
+
     @Override
     public int deleteByExample(PosRewardExample example) {
         return rewardMapper.deleteByExample(example);

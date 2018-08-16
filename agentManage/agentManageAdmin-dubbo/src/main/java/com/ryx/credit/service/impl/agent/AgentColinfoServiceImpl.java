@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -243,5 +240,32 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+     * 检索原税点
+     * @param agentColinfo
+     * @return
+     */
+    @Override
+    public AgentColinfo queryPoint(AgentColinfo agentColinfo) {
+        if (StringUtils.isBlank(agentColinfo.getAgentId())) {
+            return null;
+        }
+        AgentColinfoExample example = new AgentColinfoExample();
+        AgentColinfoExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentColinfo.getAgentId());
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentColinfo> colinfos = agentColinfoMapper.selectByExample(example);
+        if (colinfos.size() != 1) {
+            return null;
+        }
+        return colinfos.get(0);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(AgentColinfo record) {
+        return agentColinfoMapper.updateByPrimaryKeySelective(record);
     }
 }

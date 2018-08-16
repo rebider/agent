@@ -117,7 +117,7 @@ public class TranDataJob {
         profitOrganTranMonth.setProductName("MPOS");
         profitOrganTranMonth.setTranAmt(tranAmt);
         try {
-            BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(profitOrganTranMonth.getProfitDate());
+            BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(null);
             profitOrganTranMonth.setSettleAmt(settleAmt);
         }catch(Exception e) {
             e.printStackTrace();
