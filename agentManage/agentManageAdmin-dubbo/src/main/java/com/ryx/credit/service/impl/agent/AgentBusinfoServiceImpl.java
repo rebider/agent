@@ -260,8 +260,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	@Override
-	public List<Map> agentBus(String angetId) {
-		return agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("angetId",angetId));
+	public List<Map> agentBus(String agentId) {
+		List<Map> data = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("agentId",agentId));
+		return data;
 	}
 
 	@Override

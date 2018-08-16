@@ -18,10 +18,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
 import com.ryx.credit.service.ActivityService;
-import com.ryx.credit.service.agent.AgentEnterService;
-import com.ryx.credit.service.agent.AgentQueryService;
-import com.ryx.credit.service.agent.ApaycompService;
-import com.ryx.credit.service.agent.BusActRelService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
@@ -94,6 +91,8 @@ public class OrderServiceImpl implements OrderService {
     private AgentQueryService agentQueryService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
     /**
      * 根据ID查询订单
@@ -223,6 +222,7 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = setOrderFormValue(orderFormVo, userId);
+
         return AgentResult.ok(orderFormVo.getId());
     }
 
@@ -399,6 +399,19 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setuUser(userId);
         orderFormVo.setuTime(d);
         orderFormVo.setVersion(Status.STATUS_0.status);
+
+        //平台信息错误
+        String orderPatform = orderFormVo.getOrderPlatform();
+        if(StringUtils.isNotBlank(orderPatform)){
+            AgentBusInfo ainfo =  agentBusinfoService.getById(orderPatform);
+            if(ainfo!=null && ainfo.getAgentId().equals(orderFormVo.getAgentId())) {
+                orderFormVo.setOrderPlatform(ainfo.getBusPlatform());
+                orderFormVo.setBusId(ainfo.getId());
+            }else{
+                logger.info("下订单:{}{}",orderPatform, "平台数据错误");
+                throw new MessageException("平台数据错误");
+            }
+        }
 
         //支付方式
         OPayment oPayment = orderFormVo.getoPayment();
@@ -621,6 +634,21 @@ public class OrderServiceImpl implements OrderService {
         order_db.setoAmo(orderFormVo.getoAmo());
         order_db.setPaymentMethod(orderFormVo.getPaymentMethod());
         order_db.setRemark(orderFormVo.getRemark());
+
+
+        //平台信息错误
+        String orderPatform = order_db.getOrderPlatform();
+        if(StringUtils.isNotBlank(orderPatform)){
+            AgentBusInfo ainfo =  agentBusinfoService.getById(orderPatform);
+            if(ainfo!=null && ainfo.getAgentId().equals(order_db.getAgentId())) {
+                order_db.setOrderPlatform(ainfo.getBusPlatform());
+                order_db.setBusId(ainfo.getId());
+            }else{
+                logger.info("下订单:{}{}",orderPatform, "平台数据错误");
+                throw new MessageException("平台数据错误");
+            }
+        }
+
         //支付方式
         OPayment oPayment = orderFormVo.getoPayment();
 
