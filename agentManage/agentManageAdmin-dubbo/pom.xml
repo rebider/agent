@@ -34,6 +34,11 @@
             <version>${agentManage.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageProfit-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.batch</groupId>
             <artifactId>spring-batch-core</artifactId>
             <version>3.0.6.RELEASE</version>
@@ -92,6 +97,12 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aspects</artifactId>
             <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageActivity-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>

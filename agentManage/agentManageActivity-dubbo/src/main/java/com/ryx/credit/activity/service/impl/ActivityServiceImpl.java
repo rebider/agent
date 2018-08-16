@@ -1,11 +1,7 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
 import net.sf.json.JSONObject;
@@ -23,6 +19,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.activiti.image.ProcessDiagramGenerator;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

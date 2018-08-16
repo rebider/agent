@@ -488,7 +488,6 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
             <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
             <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-            <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
             <if test="busNum!=null and busNum!=''">and bus.BUS_NUM=#{busNum}</if>
             <if test="busPlatform!=null and busPlatform!=''">AND bus.BUS_PLATFORM=#{busPlatform}</if>
             <if test="agDocDistrict!=null and agDocDistrict!=''">
@@ -542,7 +541,6 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
         <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
         <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
         <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
             and BUS_PLATFORM=#{busPlatform} and agent.id=agent_id)
         </if>
@@ -577,7 +575,6 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
         <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
         <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">and agent.AG_DOC_DISTRICT = #{agDocDistrict}</if>
         <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
             status=1 and
             BUS_PLATFORM=#{busPlatform} and agent.id=agent_id)

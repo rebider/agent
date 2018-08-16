@@ -6,11 +6,11 @@
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://code.alibabatech.com/schema/dubbo
        http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
-    
 
-   	<!-- 提供方应用信息，用于计算依赖关系 -->
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="pms-dubbo-server"/>
- 
+
     <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
     <!-- 用dubbo协议在22880端口暴露服务 -->
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
@@ -55,6 +55,7 @@
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />
+    <dubbo:reference interface="com.ryx.credit.profit.service.ProfitMonthService" id="profitMonthService"  timeout="1200000" registry="${zk.group}" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.bank.EtbSyscardinfoService" ref="etbSyscardinfoService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}"/>
