@@ -40,6 +40,10 @@ public interface ProfitDirectMapper {
 
     BigDecimal selectSumTaxAmt(ProfitDirect record);
 
+
     //直发分润导出
     /*List<ProfitDirect> selectByWhere(ProfitDirect record);*/
+
+    void updateFristAgentStatus(String agentPid);
+
 }

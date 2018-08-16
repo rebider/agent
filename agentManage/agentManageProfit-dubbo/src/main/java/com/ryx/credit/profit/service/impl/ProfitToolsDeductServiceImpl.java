@@ -72,7 +72,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 if(Objects.equals(DeductionStatus.YES_WITHHOLD.getStatus(),profitDeductionList.getStagingStatus())){
                     continue;
                 } else if(Objects.equals(DeductionStatus.REVIEWING.getStatus(),profitDeductionList.getStagingStatus())){
+                    mustDeductionAmtSum = mustDeductionAmtSum.add(profitDeductionList.getSumDeductionAmt());
                     profitDeductionList.setMustDeductionAmt(profitDeductionList.getSumDeductionAmt());
+                } else {
+                    mustDeductionAmtSum = mustDeductionAmtSum.add(profitDeductionList.getMustDeductionAmt());
                 }
                 LOG.info("机具分润扣款：代理商编号：{}，机具类型：{}，代理商分润：{}", agentId, paltformNo, agentProfitAmt.toString());
                 LOG.info("扣款信息：代理商编号：{}，扣款总额：{}，应扣：{}", profitDeductionList.getAgentId(), profitDeductionList.getSumDeductionAmt(), profitDeductionList.getMustDeductionAmt());
@@ -80,9 +83,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 if (agentProfitAmt.compareTo(profitDeductionList.getMustDeductionAmt()) >= 0) {
                     agentProfitAmt = agentProfitAmt.subtract(profitDeductionList.getMustDeductionAmt());
                     profitDeductionList.setActualDeductionAmt(profitDeductionList.getMustDeductionAmt());
-                    profitDeductionList.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-                    this.updateDeductionInfo(profitDeductionList);
                     actualDeductionAmtSum = actualDeductionAmtSum.add(profitDeductionList.getMustDeductionAmt());
+                    this.updateDeductionInfo(profitDeductionList);
                 } else {
                     LOG.info("机具分润扣款：代理商编号：{}，代理商分润不足，查找担保代理商分润进行扣款", agentId);
                     //未扣足部分
@@ -131,6 +133,47 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     }
 
     /**
+     * 担保代理商扣减分润
+     * @param profitDeductionList
+     * @param profitMonth
+     * @param notDeductionAmt
+     */
+    private Map<String, Object> deductParentAgentProfit(ProfitDeduction profitDeductionList, ProfitDetailMonth profitMonth, BigDecimal notDeductionAmt) {
+        BigDecimal realProfitAmt = profitMonth.getRealProfitAmt() == null ? BigDecimal.ZERO : profitMonth.getRealProfitAmt();
+        if(realProfitAmt.compareTo(BigDecimal.ZERO) > 0){
+            //实发分润，计算
+            BigDecimal jjDudecutAmt = this.computeProfit(profitDeductionList, realProfitAmt, notDeductionAmt);
+            //更新已经计算的代理商分润
+            this.updateProfitMonth(profitMonth, jjDudecutAmt, profitDeductionList.getDeductionDesc());
+            return null;
+        } else {
+            //分润汇总，计算，返回到大流程中更新代理商分润
+            BigDecimal profitSumAmt = profitMonth.getProfitSumAmt() == null ? BigDecimal.ZERO : profitMonth.getProfitSumAmt();
+            BigDecimal jjDudecutAmt = this.computeProfit(profitDeductionList, profitSumAmt, notDeductionAmt);
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("agentPid", profitMonth.getAgentPid());
+            map.put("jjDudecutAmt", jjDudecutAmt);
+            return map;
+        }
+    }
+
+    private BigDecimal computeProfit(ProfitDeduction profitDeductionList, BigDecimal profitAmt, BigDecimal notDeductionAmt) {
+        if (profitAmt.compareTo(notDeductionAmt) >= 0) {
+            profitDeductionList.setActualDeductionAmt(profitDeductionList.getMustDeductionAmt());
+            return notDeductionAmt;
+        } else {
+            LOG.info("机具分润扣款：代理商编号：{}，担保代理商分润不足", profitDeductionList.getParentAgentPid());
+            //担保代理商月分润不足
+            BigDecimal parentProfitNotDeductionAmt = notDeductionAmt.subtract(profitAmt);
+            //担保代理商月分润已扣完。
+            profitDeductionList.setNotDeductionAmt(parentProfitNotDeductionAmt);
+            profitDeductionList.setActualDeductionAmt(profitDeductionList.getMustDeductionAmt().subtract(parentProfitNotDeductionAmt));
+            return profitAmt;
+        }
+    }
+
+
+    /**
      * 1、更新扣款表状态与实扣金额
      * 2、新增扣款明细
      * @param profitDeductionList
@@ -141,6 +184,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         try {
             if(Objects.equals(DeductionStatus.REVIEWING.getStatus(),profitDeductionList.getStagingStatus())){
                 profitDeductionList.setRemark("系统自动扣款日期已到，审批中的扣款按照应扣款总额进行扣款，调整的扣款金额，将不会累计到下月分期中");
+            if(Objects.equals(DeductionStatus.REVIEWING.getStatus(), profitDeductionList.getStagingStatus())){
+                profitDeductionList.setRemark("系统自动扣款日期已到，审批中的扣款将按照扣款总额进行扣款，调整的扣款金额将被重置。");
                 //减掉申请调整的扣款分期任务
                 ProfitStagingDetailExample profitStagingDetailExample = new ProfitStagingDetailExample();
                 ProfitStagingDetailExample.Criteria criteria = profitStagingDetailExample.createCriteria();

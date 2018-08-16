@@ -461,6 +461,7 @@
     </if>
   </sql>
 
+
   <!--<update id="updateByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
     update P_PROFIT_DIRECT
     set STAIUS = '1'
@@ -482,4 +483,9 @@
 
     </where>
   </select>-->
+
+  <update id="updateFristAgentStatus" parameterType="java.lang.String">
+    UPDATE P_PROFIT_DIRECT P SET  P.STATUS ='1' WHERE P.FRIST_AGENT_PID =#{agentPid}
+  </update>
+
 </mapper>

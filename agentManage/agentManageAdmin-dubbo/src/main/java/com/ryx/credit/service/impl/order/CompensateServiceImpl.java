@@ -681,6 +681,37 @@ public class CompensateServiceImpl implements CompensateService {
                 Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
                 oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
             }
+
+            List<Map<String, Object>> oLogisticsDetails = null;
+            Map<String, Object> reqParam = new HashMap<>();
+            reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
+            reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
+            reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+
+            ArrayList<Object> recordStatusList = new ArrayList<>();
+            //新建
+            if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approving.getValue())){
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+            }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approved.getValue()) || oRefundPriceDiff.getReviewStatus().equals(AgStatus.Refuse.getValue())){
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+            }
+            reqParam.put("recordStatusList",recordStatusList);
+            if(!oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
+                reqParam.put("optId",oRefundPriceDiffDetail.getId());
+            }
+            oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+            if(null==oLogisticsDetails){
+                log.info("calculatePriceDiff数据有误异常返回1");
+                throw new ProcessException("查询活动异常");
+            }
+            if(oLogisticsDetails.size()!=1){
+                log.info("calculatePriceDiff数据有误异常返回2");
+                throw new ProcessException("查询活动异常");
+            }
+            Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
+            oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
         }
         return oRefundPriceDiff;
     }

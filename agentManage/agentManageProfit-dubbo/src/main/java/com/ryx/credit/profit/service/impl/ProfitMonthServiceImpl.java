@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
+import com.ryx.credit.profit.dao.ProfitDirectMapper;
 import com.ryx.credit.profit.dao.ProfitMonthMapper;
 import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
@@ -62,6 +63,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Autowired
     private ProfitComputerService profitComputerService;
+    @Autowired
+    private ProfitDirectMapper directMapper;
 
 
     @Override
@@ -284,7 +287,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     profitUnfreeze.setUpdateTime(new Date());
                     profitUnfreeze.setFreezeStatus(thawStatus);
                     profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
-
+                    //解冻下级所有代理商
+                    directMapper.updateFristAgentStatus(profitUnfreeze.getAgentPid());
                     LOG.info("3更新审批流与业务对象");
                     taskApprovalService.updateABusActRel(rel);
                 }
