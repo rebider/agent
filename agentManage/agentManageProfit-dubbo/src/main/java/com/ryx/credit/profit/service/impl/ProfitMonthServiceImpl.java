@@ -240,7 +240,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public ProfitUnfreeze getProfitUnfreezeById(String id) {
         if (StringUtils.isNotBlank(id)) {
-           return profitUnfreezeMapper.selectByPrimaryKey(id);
+            return profitUnfreezeMapper.selectByPrimaryKey(id);
         }
         return null;
     }
@@ -327,7 +327,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
                 // POS考核奖励
                 if ("100003".equals(profitDetailMonthTemp.getBusPlatForm())) {
-                     getPosReward(profitDetailMonthTemp, parentPosReward);
+                    getPosReward(profitDetailMonthTemp, parentPosReward);
                     sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
                 }else{
                     profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
@@ -358,12 +358,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     /*** 
-    * @Description: 获取pos奖励
-    * @Param:  
-    * @return:  
-    * @Author: zhaodw 
-    * @Date: 2018/8/14 
-    */ 
+     * @Description: 获取pos奖励
+     * @Param:
+     * @return:
+     * @Author: zhaodw
+     * @Date: 2018/8/14
+     */
     private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, Map<String, BigDecimal> parentPosReward) {
         OrganTranMonthDetail detail = new OrganTranMonthDetail();
         detail.setProfitId(profitDetailMonthTemp.getId());
@@ -398,13 +398,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     /***
-    * @Description: 执行机具扣款
-    * @Param:  profitDetailMonthTemp 月分润信息
-    * @Param:  agentProfitAmt 分润金额
-    * @return: 扣款金额
-    * @Author: zhaodw
-    * @Date: 2018/8/13
-    */
+     * @Description: 执行机具扣款
+     * @Param:  profitDetailMonthTemp 月分润信息
+     * @Param:  agentProfitAmt 分润金额
+     * @return: 扣款金额
+     * @Author: zhaodw
+     * @Date: 2018/8/13
+     */
     private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt) {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentId", profitDetailMonthTemp.getAgentId()); //业务平台编号
@@ -439,12 +439,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     /*** 
-    * @Description: 获取退单补款
-    * @Param:  分润明细
-    * @return:  退单补款
-    * @Author: zhaodw 
-    * @Date: 2018/8/12 
-    */ 
+     * @Description: 获取退单补款
+     * @Param:  分润明细
+     * @return:  退单补款
+     * @Author: zhaodw
+     * @Date: 2018/8/12
+     */
     private BigDecimal getTdSupplyAmt(ProfitDetailMonth profitDetailMonthTemp) {
         // pos退单补款
         BigDecimal posSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentPid(),"02");
@@ -452,7 +452,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         // mpos退单补款
         BigDecimal mposSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentPid(),"01");
         profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply);
-       return posSupply.add(mposSupply);
+        return posSupply.add(mposSupply);
     }
 
     /***
