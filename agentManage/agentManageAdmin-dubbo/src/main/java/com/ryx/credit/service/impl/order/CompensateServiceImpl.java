@@ -655,14 +655,18 @@ public class CompensateServiceImpl implements CompensateService {
             reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
             reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
             reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId()) && !oRefundPriceDiffDetail.getActivityFrontId().equals("undefined")){
-                reqParam.put("activityId",oRefundPriceDiffDetail.getActivityFrontId());
-            }
+
+            ArrayList<Object> recordStatusList = new ArrayList<>();
+            //新建
             if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
-                ArrayList<Object> recordStatusList = new ArrayList<>();
                 recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                reqParam.put("recordStatusList",recordStatusList);
-            }else{
+            }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approving.getValue())){
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+            }else if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Approved.getValue()) || oRefundPriceDiff.getReviewStatus().equals(AgStatus.Refuse.getValue())){
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+            }
+            reqParam.put("recordStatusList",recordStatusList);
+            if(!oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
                 reqParam.put("optId",oRefundPriceDiffDetail.getId());
             }
             oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
