@@ -17,8 +17,13 @@ import java.util.TimeZone;
  */
 public class DateUtil {
 
+    public final static String DATE_FORMAT_1 = "yyyy-MM-dd HH:mm:ss";
+
     public final static SimpleDateFormat sdfDays = new SimpleDateFormat(
             "yyyyMMdd");
+
+    public final static SimpleDateFormat sdf_Days = new SimpleDateFormat(
+            "yyyy-MM-dd");
 
     /**
 	 * 将Date类型转换为字符串
@@ -88,6 +93,15 @@ public class DateUtil {
         return cal.getTime();
     }
 
+
+    public static Date addMonth(String sdate, int month) {
+        Date date = format(sdate);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.MONTH, month);
+        return cal.getTime();
+    }
+
 	/**
 	 * 将字符串转换为Date类型
 	 *
@@ -139,12 +153,40 @@ public class DateUtil {
 		   return date;
 		}
 	public static void main(String[] args) {
-		 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		/* SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		 String a=format.format(new Date());
 		 Date b= DateUtil.StrToDate("20170727");
-		 System.out.println(b);
+		 System.out.println(b);*/
+		String date = "201808";
+        String month = null;
+        month = sdfDays.format(addMonth(new Date() , -1));
+        month = month.substring(0,6);
+        System.out.println(convert(date));
 	}
-	
+
+    /**
+     * 获取YYYYMM格式的上个月日期，也是YYYYMM
+     * @param source
+     * @return
+     */
+    public static String convert ( String source )
+    {
+        try
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat ("yyyyMM");
+            Date date = sdf.parse (source);
+            Calendar calendar = Calendar.getInstance ();
+            calendar.setTime (date);
+            calendar.add (Calendar.MONTH, -1);
+            return sdf.format (calendar.getTime ());
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace ();
+        }
+        return "";
+    }
+
     /**  
      * 计算两个日期之间相差的天数  
      * @param smdate 较小的时间 
@@ -366,6 +408,24 @@ public class DateUtil {
         return sdfDays.format(new Date());
     }
 
+    /**
+     * 得到n天之后的日期
+     * @param days
+     * "yyyy-MM-dd HH:mm:ss"
+     * @return
+     */
+    public static String getAfterDayDate(String days , SimpleDateFormat starttime2) {
+        int daysInt = Integer.parseInt(days);
+
+        Calendar canlendar = Calendar.getInstance(); // java.util�?
+        canlendar.add(Calendar.DATE, daysInt); // 日期�?如果不够减会将月变动
+        Date date = canlendar.getTime();
+
+        String dateStr = starttime2.format(date);
+
+        return dateStr;
+    }
+
    /* @Test
     public void test(){
         try {
@@ -375,4 +435,6 @@ public class DateUtil {
             e.printStackTrace();
         }
     }*/
+
+
 }

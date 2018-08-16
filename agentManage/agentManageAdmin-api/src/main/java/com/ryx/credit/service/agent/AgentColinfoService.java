@@ -32,4 +32,8 @@ public interface AgentColinfoService {
     public int update(AgentColinfo a);
 
     public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent);
+
+    public AgentColinfo queryPoint(AgentColinfo agentColinfo);
+
+    int updateByPrimaryKeySelective(AgentColinfo record);
 }

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.OrganTranMonthDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="Z_POS_TRAN_AMT" jdbcType="DECIMAL" property="zPosTranAmt" />
+    <result column="POS_TRAN_AMT" jdbcType="DECIMAL" property="posTranAmt" />
+    <result column="POS_JL_TRAN_AMT" jdbcType="DECIMAL" property="posJlTranAmt" />
+    <result column="PROFIT_ID" jdbcType="VARCHAR" property="profitId" />
+    <result column="AGENT_TYPE" jdbcType="VARCHAR" property="agentType" />
+    <result column="ALLCHILD_JL_TRAN_AMT" jdbcType="DECIMAL" property="allchildJlTranAmt" />
+    <result column="ALLCHILD_TRAN_AMT" jdbcType="DECIMAL" property="allchildTranAmt" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, Z_POS_TRAN_AMT, POS_TRAN_AMT, POS_JL_TRAN_AMT, 
+    PROFIT_ID, AGENT_TYPE, ALLCHILD_JL_TRAN_AMT, ALLCHILD_TRAN_AMT, PROFIT_DATE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_ORGAN_TRAN_MONTH_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_ORGAN_TRAN_MONTH_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetailExample">
+    delete from P_ORGAN_TRAN_MONTH_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
+    insert into P_ORGAN_TRAN_MONTH_DETAIL (ID, AGENT_PID, AGENT_ID, 
+      AGENT_NAME, Z_POS_TRAN_AMT, POS_TRAN_AMT, 
+      POS_JL_TRAN_AMT, PROFIT_ID, AGENT_TYPE, 
+      ALLCHILD_JL_TRAN_AMT, ALLCHILD_TRAN_AMT, PROFIT_DATE
+      )
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{zPosTranAmt,jdbcType=DECIMAL}, #{posTranAmt,jdbcType=DECIMAL}, 
+      #{posJlTranAmt,jdbcType=DECIMAL}, #{profitId,jdbcType=VARCHAR}, #{agentType,jdbcType=VARCHAR}, 
+      #{allchildJlTranAmt,jdbcType=DECIMAL}, #{allchildTranAmt,jdbcType=DECIMAL}, #{profitDate,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
+    insert into P_ORGAN_TRAN_MONTH_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="zPosTranAmt != null">
+        Z_POS_TRAN_AMT,
+      </if>
+      <if test="posTranAmt != null">
+        POS_TRAN_AMT,
+      </if>
+      <if test="posJlTranAmt != null">
+        POS_JL_TRAN_AMT,
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID,
+      </if>
+      <if test="agentType != null">
+        AGENT_TYPE,
+      </if>
+      <if test="allchildJlTranAmt != null">
+        ALLCHILD_JL_TRAN_AMT,
+      </if>
+      <if test="allchildTranAmt != null">
+        ALLCHILD_TRAN_AMT,
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="zPosTranAmt != null">
+        #{zPosTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTranAmt != null">
+        #{posTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posJlTranAmt != null">
+        #{posJlTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitId != null">
+        #{profitId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentType != null">
+        #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="allchildJlTranAmt != null">
+        #{allchildJlTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="allchildTranAmt != null">
+        #{allchildTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitDate != null">
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="getOrganTranMonthDetailList" resultMap="BaseResultMap">
+    select sum(ALLCHILD_TRAN_AMT) allchildTranAmt, sum(ALLCHILD_JL_TRAN_AMT) allchildJlTranAmt from P_ORGAN_TRAN_MONTH_DETAIL
+    where PROFIT_DATE=#{profitDate} and AGENT_ID in
+    <foreach close=")" collection="agentIdList" item="listItem" open="(" separator=",">
+      #{listItem}
+    </foreach>
+  </select>
+
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetailExample" resultType="java.lang.Long">
+    select count(*) from P_ORGAN_TRAN_MONTH_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
+    update P_ORGAN_TRAN_MONTH_DETAIL
+    <set>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="zPosTranAmt != null">
+        Z_POS_TRAN_AMT = #{zPosTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTranAmt != null">
+        POS_TRAN_AMT = #{posTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posJlTranAmt != null">
+        POS_JL_TRAN_AMT = #{posJlTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentType != null">
+        AGENT_TYPE = #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="allchildJlTranAmt != null">
+        ALLCHILD_JL_TRAN_AMT = #{allchildJlTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="allchildTranAmt != null">
+        ALLCHILD_TRAN_AMT = #{allchildTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.OrganTranMonthDetail">
+    update P_ORGAN_TRAN_MONTH_DETAIL
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      Z_POS_TRAN_AMT = #{zPosTranAmt,jdbcType=DECIMAL},
+      POS_TRAN_AMT = #{posTranAmt,jdbcType=DECIMAL},
+      POS_JL_TRAN_AMT = #{posJlTranAmt,jdbcType=DECIMAL},
+      PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      AGENT_TYPE = #{agentType,jdbcType=VARCHAR},
+      ALLCHILD_JL_TRAN_AMT = #{allchildJlTranAmt,jdbcType=DECIMAL},
+      ALLCHILD_TRAN_AMT = #{allchildTranAmt,jdbcType=DECIMAL},
+      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

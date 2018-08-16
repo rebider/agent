@@ -2,12 +2,13 @@ package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OPaymentExample {
+public class OPaymentExample implements Serializable {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -665,6 +666,66 @@ public class OPaymentExample {
 
         public Criteria andRealAmountNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("REAL_AMOUNT not between", value1, value2, "realAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountIsNull() {
+            addCriterion("OUTSTANDING_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountIsNotNull() {
+            addCriterion("OUTSTANDING_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT =", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountNotEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT <>", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountGreaterThan(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT >", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT >=", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountLessThan(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT <", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("OUTSTANDING_AMOUNT <=", value, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountIn(List<BigDecimal> values) {
+            addCriterion("OUTSTANDING_AMOUNT in", values, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountNotIn(List<BigDecimal> values) {
+            addCriterion("OUTSTANDING_AMOUNT not in", values, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("OUTSTANDING_AMOUNT between", value1, value2, "outstandingAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andOutstandingAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("OUTSTANDING_AMOUNT not between", value1, value2, "outstandingAmount");
             return (Criteria) this;
         }
 
@@ -1488,6 +1549,76 @@ public class OPaymentExample {
             return (Criteria) this;
         }
 
+        public Criteria andCollectCompanyIsNull() {
+            addCriterion("COLLECT_COMPANY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIsNotNull() {
+            addCriterion("COLLECT_COMPANY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY =", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY <>", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyGreaterThan(String value) {
+            addCriterion("COLLECT_COMPANY >", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyGreaterThanOrEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY >=", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLessThan(String value) {
+            addCriterion("COLLECT_COMPANY <", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLessThanOrEqualTo(String value) {
+            addCriterion("COLLECT_COMPANY <=", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyLike(String value) {
+            addCriterion("COLLECT_COMPANY like", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotLike(String value) {
+            addCriterion("COLLECT_COMPANY not like", value, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyIn(List<String> values) {
+            addCriterion("COLLECT_COMPANY in", values, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotIn(List<String> values) {
+            addCriterion("COLLECT_COMPANY not in", values, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyBetween(String value1, String value2) {
+            addCriterion("COLLECT_COMPANY between", value1, value2, "collectCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andCollectCompanyNotBetween(String value1, String value2) {
+            addCriterion("COLLECT_COMPANY not between", value1, value2, "collectCompany");
+            return (Criteria) this;
+        }
+
         public Criteria andRemarkIsNull() {
             addCriterion("REMARK is null");
             return (Criteria) this;
@@ -1675,6 +1806,126 @@ public class OPaymentExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptIsNull() {
+            addCriterion("ACTUAL_RECEIPT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptIsNotNull() {
+            addCriterion("ACTUAL_RECEIPT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT =", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptNotEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT <>", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptGreaterThan(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT >", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT >=", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptLessThan(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT <", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_RECEIPT <=", value, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptIn(List<BigDecimal> values) {
+            addCriterion("ACTUAL_RECEIPT in", values, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptNotIn(List<BigDecimal> values) {
+            addCriterion("ACTUAL_RECEIPT not in", values, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTUAL_RECEIPT between", value1, value2, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTUAL_RECEIPT not between", value1, value2, "actualReceipt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateIsNull() {
+            addCriterion("ACTUAL_RECEIPT_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateIsNotNull() {
+            addCriterion("ACTUAL_RECEIPT_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE =", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateNotEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE <>", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateGreaterThan(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE >", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateGreaterThanOrEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE >=", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateLessThan(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE <", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateLessThanOrEqualTo(Date value) {
+            addCriterion("ACTUAL_RECEIPT_DATE <=", value, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateIn(List<Date> values) {
+            addCriterion("ACTUAL_RECEIPT_DATE in", values, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateNotIn(List<Date> values) {
+            addCriterion("ACTUAL_RECEIPT_DATE not in", values, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateBetween(Date value1, Date value2) {
+            addCriterion("ACTUAL_RECEIPT_DATE between", value1, value2, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualReceiptDateNotBetween(Date value1, Date value2) {
+            addCriterion("ACTUAL_RECEIPT_DATE not between", value1, value2, "actualReceiptDate");
             return (Criteria) this;
         }
     }

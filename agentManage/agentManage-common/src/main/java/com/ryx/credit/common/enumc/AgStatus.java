@@ -15,7 +15,20 @@ public enum AgStatus {
     public BigDecimal status;
 
     public String  msg;
-
+    /**
+     * 取得枚举对象值
+     * @return 枚举对象值
+     */
+    public BigDecimal getValue() {
+        return this.status;
+    }
+    /**
+     * 取得缓存内容
+     * @return 缓存内容
+     */
+    public String getContent() {
+        return this.msg;
+    }
     AgStatus(int status,String s){
         this.status = new BigDecimal(status);
         msg = s;
@@ -51,5 +64,13 @@ public enum AgStatus {
         }
         return "";
     }
-
+    public static String getMsg(BigDecimal s){
+        if(s==null)return null;
+        for (AgStatus agStatus : AgStatus.values()) {
+            if(agStatus.status.compareTo(s)==0){
+                return agStatus.msg;
+            }
+        }
+        return "";
+    }
 }

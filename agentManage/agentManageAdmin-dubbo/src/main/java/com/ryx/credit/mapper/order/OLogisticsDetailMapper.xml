@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OLogisticsDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="LOGISTICS_ID" jdbcType="VARCHAR" property="logisticsId" />
+    <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
+    <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
+    <result column="SETTLEMENT_PRICE" jdbcType="DECIMAL" property="settlementPrice" />
+    <result column="ACTIVITY_ID" jdbcType="VARCHAR" property="activityId" />
+    <result column="ACTIVITY_NAME" jdbcType="VARCHAR" property="activityName" />
+    <result column="G_TIME" jdbcType="DECIMAL" property="gTime" />
+    <result column="SN_NUM" jdbcType="VARCHAR" property="snNum" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="OPT_ID" jdbcType="VARCHAR" property="optId" />
+    <result column="OPT_TYPE" jdbcType="VARCHAR" property="optType" />
+    <result column="RETURN_ORDER_ID" jdbcType="VARCHAR" property="returnOrderId" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="RECORD_STATUS" jdbcType="DECIMAL" property="recordStatus" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ORDER_NUM" jdbcType="VARCHAR" property="orderNum" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, 
+    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER, 
+    U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_LOGISTICS_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_LOGISTICS_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample">
+    delete from O_LOGISTICS_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID, 
+      PRO_ID, PRO_NAME, SETTLEMENT_PRICE, 
+      ACTIVITY_ID, ACTIVITY_NAME, G_TIME, 
+      SN_NUM, AGENT_ID, OPT_ID, 
+      OPT_TYPE, RETURN_ORDER_ID, C_TIME, 
+      U_TIME, C_USER, U_USER, 
+      STATUS, RECORD_STATUS, VERSION, 
+      ORDER_NUM)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR}, 
+      #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL}, 
+      #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL}, 
+      #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR}, 
+      #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{orderNum,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+    insert into O_LOGISTICS_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="orderId != null">
+        ORDER_ID,
+      </if>
+      <if test="logisticsId != null">
+        LOGISTICS_ID,
+      </if>
+      <if test="proId != null">
+        PRO_ID,
+      </if>
+      <if test="proName != null">
+        PRO_NAME,
+      </if>
+      <if test="settlementPrice != null">
+        SETTLEMENT_PRICE,
+      </if>
+      <if test="activityId != null">
+        ACTIVITY_ID,
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME,
+      </if>
+      <if test="gTime != null">
+        G_TIME,
+      </if>
+      <if test="snNum != null">
+        SN_NUM,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="optId != null">
+        OPT_ID,
+      </if>
+      <if test="optType != null">
+        OPT_TYPE,
+      </if>
+      <if test="returnOrderId != null">
+        RETURN_ORDER_ID,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="uTime != null">
+        U_TIME,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="recordStatus != null">
+        RECORD_STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="orderNum != null">
+        ORDER_NUM,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsId != null">
+        #{logisticsId,jdbcType=VARCHAR},
+      </if>
+      <if test="proId != null">
+        #{proId,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null">
+        #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementPrice != null">
+        #{settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="activityId != null">
+        #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityName != null">
+        #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="gTime != null">
+        #{gTime,jdbcType=DECIMAL},
+      </if>
+      <if test="snNum != null">
+        #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="optId != null">
+        #{optId,jdbcType=VARCHAR},
+      </if>
+      <if test="optType != null">
+        #{optType,jdbcType=VARCHAR},
+      </if>
+      <if test="returnOrderId != null">
+        #{returnOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="recordStatus != null">
+        #{recordStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="orderNum != null">
+        #{orderNum,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultType="java.lang.Long">
+    select count(*) from O_LOGISTICS_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+    update O_LOGISTICS_DETAIL
+    <set>
+      <if test="orderId != null">
+        ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="logisticsId != null">
+        LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
+      </if>
+      <if test="proId != null">
+        PRO_ID = #{proId,jdbcType=VARCHAR},
+      </if>
+      <if test="proName != null">
+        PRO_NAME = #{proName,jdbcType=VARCHAR},
+      </if>
+      <if test="settlementPrice != null">
+        SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="activityId != null">
+        ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityName != null">
+        ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="gTime != null">
+        G_TIME = #{gTime,jdbcType=DECIMAL},
+      </if>
+      <if test="snNum != null">
+        SN_NUM = #{snNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="optId != null">
+        OPT_ID = #{optId,jdbcType=VARCHAR},
+      </if>
+      <if test="optType != null">
+        OPT_TYPE = #{optType,jdbcType=VARCHAR},
+      </if>
+      <if test="returnOrderId != null">
+        RETURN_ORDER_ID = #{returnOrderId,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="recordStatus != null">
+        RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="orderNum != null">
+        ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
+    update O_LOGISTICS_DETAIL
+    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+      LOGISTICS_ID = #{logisticsId,jdbcType=VARCHAR},
+      PRO_ID = #{proId,jdbcType=VARCHAR},
+      PRO_NAME = #{proName,jdbcType=VARCHAR},
+      SETTLEMENT_PRICE = #{settlementPrice,jdbcType=DECIMAL},
+      ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
+      ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+      G_TIME = #{gTime,jdbcType=DECIMAL},
+      SN_NUM = #{snNum,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      OPT_ID = #{optId,jdbcType=VARCHAR},
+      OPT_TYPE = #{optType,jdbcType=VARCHAR},
+      RETURN_ORDER_ID = #{returnOrderId,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      ORDER_NUM = #{orderNum,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="queryCompensateLList" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME,
+      max(SN_NUM) as MAX_SN,min(SN_NUM) as MIN_SN,count(*) as PRO_NUM
+    from o_logistics_detail
+    where
+    sn_num between #{snBegin} and #{snEnd}
+    and status = #{status}
+    <if test="recordStatusList != null">
+      and RECORD_STATUS in
+      <foreach collection="recordStatusList" open="(" close=")" separator="," item="recordStatus">
+        #{recordStatus, jdbcType=SMALLINT}
+      </foreach>
+    </if>
+    <if test="activityId != null">
+      and ACTIVITY_ID = #{activityId}
+    </if>
+    <if test="optId != null">
+      and OPT_ID = #{optId}
+    </if>
+    group by
+      ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME
+  </select>
+
+  <update id="updateCompensate" parameterType="java.util.Map">
+      update o_logistics_detail
+         set RECORD_STATUS = #{setRecordStatus},
+         OPT_ID = #{refundPriceDiffDetailId}
+      where
+      SN_NUM between #{snBegin} and #{snEnd}
+      and RECORD_STATUS = #{recordStatus}
+      and STATUS = #{status}
+  </update>
+</mapper>

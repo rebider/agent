@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PTaxAdjustMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PTaxAdjust">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="TAX_OLD" jdbcType="DECIMAL" property="taxOld" />
+    <result column="TAX_ING" jdbcType="DECIMAL" property="taxIng" />
+    <result column="VALID_DATE" jdbcType="VARCHAR" property="validDate" />
+    <result column="TAX_STATUS" jdbcType="CHAR" property="taxStatus" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TAX_OLD, TAX_ING, VALID_DATE, TAX_STATUS
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_TAX_ADJUST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_TAX_ADJUST
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByAgentPid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_TAX_ADJUST
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='0'
+  </select>
+
+  <select id="getTax" parameterType="string" resultType="java.math.BigDecimal">
+    select
+    tax_ing
+    from P_TAX_ADJUST
+    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='1'
+  </select>
+
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample">
+    delete from P_TAX_ADJUST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PTaxAdjust">
+    insert into P_TAX_ADJUST (ID, AGENT_PID, AGENT_ID, 
+      AGENT_NAME, TAX_OLD, TAX_ING, 
+      VALID_DATE, TAX_STATUS)
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{taxOld,jdbcType=DECIMAL}, #{taxIng,jdbcType=DECIMAL}, 
+      #{validDate,jdbcType=VARCHAR}, #{taxStatus,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PTaxAdjust">
+    insert into P_TAX_ADJUST
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="taxOld != null">
+        TAX_OLD,
+      </if>
+      <if test="taxIng != null">
+        TAX_ING,
+      </if>
+      <if test="validDate != null">
+        VALID_DATE,
+      </if>
+      <if test="taxStatus != null">
+        TAX_STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="taxOld != null">
+        #{taxOld,jdbcType=DECIMAL},
+      </if>
+      <if test="taxIng != null">
+        #{taxIng,jdbcType=DECIMAL},
+      </if>
+      <if test="validDate != null">
+        #{validDate,jdbcType=VARCHAR},
+      </if>
+      <if test="taxStatus != null">
+        #{taxStatus,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample" resultType="java.lang.Long">
+    select count(*) from P_TAX_ADJUST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PTaxAdjust">
+    update P_TAX_ADJUST
+    <set>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="taxOld != null">
+        TAX_OLD = #{taxOld,jdbcType=DECIMAL},
+      </if>
+      <if test="taxIng != null">
+        TAX_ING = #{taxIng,jdbcType=DECIMAL},
+      </if>
+      <if test="validDate != null">
+        VALID_DATE = #{validDate,jdbcType=VARCHAR},
+      </if>
+      <if test="taxStatus != null">
+        TAX_STATUS = #{taxStatus,jdbcType=CHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PTaxAdjust">
+    update P_TAX_ADJUST
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      TAX_OLD = #{taxOld,jdbcType=DECIMAL},
+      TAX_ING = #{taxIng,jdbcType=DECIMAL},
+      VALID_DATE = #{validDate,jdbcType=VARCHAR},
+      TAX_STATUS = #{taxStatus,jdbcType=CHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

@@ -343,4 +343,332 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="getOrderList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT O.O_APYTIME,O_NUM,O.O_AMO,A.AG_NAME,A.AG_UNIQ_NUM,
+    R.EXPRESS_REMARK,R.ADDR_REALNAME,R.ADDR_MOBILE,R.ADDR_DETAIL,
+    S.PRO_NAME,S.MODEL,S.PRO_NUM,S.PRO_PRICE
+    FROM O_ORDER O
+    LEFT JOIN O_RECEIPT_ORDER R ON O.ID = R.ORDER_ID
+    LEFT JOIN A_AGENT A ON A.ID = O.AGENT_ID
+    LEFT JOIN O_RECEIPT_PRO P ON R.ORDER_ID = P.ID
+    LEFT JOIN O_SUB_ORDER S ON O.ID = S.ORDER_ID
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getOrderCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM O_ORDER O
+    LEFT JOIN O_RECEIPT_ORDER R ON O.ID = R.ORDER_ID
+    LEFT JOIN A_AGENT A ON A.ID = O.AGENT_ID
+    LEFT JOIN O_RECEIPT_PRO P ON R.ORDER_ID = P.ID
+    LEFT JOIN O_SUB_ORDER S ON O.ID = S.ORDER_ID
+  </select>
+
+  <sql id='SORTING'>
+    ORDER BY O.O_APYTIME DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
+
+  <select id="queryOrderListView" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+          (
+              select
+                  o.id,
+                  o.o_num,
+                  o.order_platform,
+                  o.payment_method,
+                  o.o_amo,
+                  o.pay_amo,
+                  d.pay_amount,
+                  d.real_amount,
+                  d.outstanding_amount,
+                  d.pay_status,
+                  o.clear_status,
+                  o.review_status,
+                  o.order_status,
+                  o.o_apytime,
+                  o.c_time,
+                  o.remark,
+                  b.id as agentId,
+                  b.ag_name,
+                  b.ag_doc_pro ,
+                  b.ag_doc_district,
+                  nvl((select sum(o_payment_detail.pay_amount)
+                       from o_payment_detail
+                       where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+                       and o_payment_detail.payment_status in (1,3) ),0) as qk,
+                  (
+                    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
+                    -
+                    nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
+                  )as dpd,
+                  c.platform_name
+              from o_order o
+              left join a_agent b on o.agent_id = b.id
+              left join a_platform c on c.platform_num = o.order_platform
+              left join o_payment d on d.order_id = o.id
+              <where>
+                o.user_id=#{userId}
+                <if test="1==1"> and  o.status = 1 </if>
+                <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+                <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+                <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+                <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+                <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+                <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+                <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+              </where>
+                UNION
+                select
+                o.id,
+                o.o_num,
+                o.order_platform,
+                o.payment_method,
+                o.o_amo,
+                o.pay_amo,
+                d.pay_amount,
+                d.real_amount,
+                d.outstanding_amount,
+                d.pay_status,
+                o.clear_status,
+                o.review_status,
+                o.order_status,
+                o.o_apytime,
+                o.c_time,
+                o.remark,
+                b.id as agentId,
+                b.ag_name,
+                b.ag_doc_pro ,
+                b.ag_doc_district,
+                nvl((select sum(o_payment_detail.pay_amount)
+                from o_payment_detail
+                where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+                and o_payment_detail.payment_status in (1,3) ),0) as qk,
+                (
+                nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
+                -
+                nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
+                )as dpd,
+                c.platform_name
+                from o_order o
+                left join a_agent b on o.agent_id = b.id
+                left join a_platform c on c.platform_num = o.order_platform
+                left join o_payment d on d.order_id = o.id
+                <where>
+                  <if test="doc==null"> and 1=2 </if>
+                  <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
+                  <if test="1==1"> and  o.status = 1 </if>
+                  <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+                  <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+                  <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+                  <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+                  <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+                  <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+                  <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+                </where>
+          )
+          order by c_time desc
+       <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryOrderListViewCount" parameterType="map" resultType="int">
+    select count(id) from(
+        select
+        o.id
+        from o_order o
+        left join a_agent b on o.agent_id = b.id
+        left join a_platform c on c.platform_num = o.order_platform
+        left join o_payment d on d.order_id = o.id
+      <where>
+        o.user_id=#{userId}
+        <if test="1==1"> and  o.status = 1 </if>
+        <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+        <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+        <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+        <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+        <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+        <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      </where>
+        UNION
+        select
+        o.id
+        from o_order o
+        left join a_agent b on o.agent_id = b.id
+        left join a_platform c on c.platform_num = o.order_platform
+        left join o_payment d on d.order_id = o.id
+      <where>
+        <if test="doc==null"> and 1=2 </if>
+        <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
+        <if test="1==1"> and  o.status = 1 </if>
+        <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+        <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+        <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+        <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+        <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+        <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      </where>
+    )
+  </select>
+
+
+  <!--查询订单数据-->
+  <select id="queryAllOrderListView" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    o.id,
+    o.o_num,
+    o.order_platform,
+    o.payment_method,
+    o.o_amo,
+    o.pay_amo,
+    d.pay_amount,
+    d.real_amount,
+    d.outstanding_amount,
+    d.pay_status,
+    o.clear_status,
+    o.review_status,
+    o.order_status,
+    o.o_apytime,
+    o.c_time,
+    o.remark,
+    b.id as agentId,
+    b.ag_name,
+    b.ag_doc_pro ,
+    b.ag_doc_district,
+    nvl((select sum(o_payment_detail.pay_amount)
+    from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+    and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    (
+    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
+    -
+    nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
+    )as dpd,
+    c.platform_name
+    from o_order o
+    left join a_agent b on o.agent_id = b.id
+    left join a_platform c on c.platform_num = o.order_platform
+    left join o_payment d on d.order_id = o.id
+    <where>
+      <if test="1==1"> and  o.status = 1 </if>
+      <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+      <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+      <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+    </where>
+    order by c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <!--查询订单数量-->
+  <select id="queryAllOrderListViewCount" parameterType="map" resultType="int">
+    select count(id) from(
+      select
+      o.id
+      from o_order o
+      left join a_agent b on o.agent_id = b.id
+      left join a_platform c on c.platform_num = o.order_platform
+      left join o_payment d on d.order_id = o.id
+      <where>
+        <if test="1==1"> and  o.status = 1 </if>
+        <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+        <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+        <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+        <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+        <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+        <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      </where>
+    )
+  </select>
+
+
+
+  <!--待配货商品-->
+  <select id="queryOrderSubOrderProduct" resultType="map" parameterType="string">
+    select
+        o_sub_order.id,
+        o_sub_order.order_id,
+        o_sub_order.pro_id,
+        o_sub_order.pro_code,
+        o_sub_order.pro_name,
+        o_sub_order.pro_type,
+        o_sub_order.pro_price,
+        o_sub_order.pro_num,
+        o_sub_order.pro_rel_price,
+        o_sub_order.send_num,
+        o_sub_order.agent_id,
+        nvl(
+          (
+            select sum(o_receipt_pro.pro_num)
+            from o_receipt_pro
+            where o_receipt_pro.orderid = o_sub_order.order_id
+            and o_sub_order.pro_id = o_receipt_pro.pro_id
+            and o_receipt_pro.status=1
+          ),
+        0)as havePhCount
+        from o_sub_order
+      where o_sub_order.order_id = #{orderId} and o_sub_order.status=1 and o_sub_order.agent_id=#{agentId}
+      order by  o_sub_order.c_time asc
+  </select>
+
+
+  <!--已配货商品-->
+  <select id="queryHavePeiHuoProduct" resultType="map" parameterType="string">
+    select
+      O_Receipt_order.Id,
+      O_Receipt_order.Order_Id,
+      O_Receipt_order.Receipt_Num,
+      O_Receipt_order.Address_Id,
+      O_Receipt_order.Addr_Realname,
+      O_Receipt_order.Addr_Mobile,
+      O_Receipt_order.Addr_Province,
+      O_Receipt_order.Addr_City,
+      O_Receipt_order.Addr_District,
+      dr_pro.r_name as Addr_Province_string,
+      dr_cit.r_name as Addr_City_string,
+      dr_di.r_name as Addr_District_string,
+      O_Receipt_order.Addr_Detail,
+      O_Receipt_order.Remark,
+      O_Receipt_order.Zip_Code,
+      O_Receipt_order.Pro_Num,
+      O_Receipt_order.Express_Remark,
+      O_Receipt_order.Express_Suc_Date,
+      O_Receipt_order.Receipt_Status,
+      o_receipt_pro.id as receipt_pro_id,
+      o_receipt_pro.pro_code,
+      o_receipt_pro.pro_name,
+      o_receipt_pro.pro_num as pro_num_count,
+      o_receipt_pro.receipt_pro_status
+    from O_Receipt_order
+    left join o_receipt_pro on O_Receipt_order.Id = o_receipt_pro.receipt_id and o_receipt_pro.status=1
+    left join d_region dr_pro on dr_pro.r_code = O_Receipt_order.Addr_Province
+    left join d_region dr_cit on dr_cit.r_code = O_Receipt_order.Addr_City
+    left join d_region dr_di on dr_di.r_code = O_Receipt_order.Addr_District
+    where O_Receipt_order.Status=1 and O_Receipt_order.Order_Id=#{orderId}  and O_Receipt_order.Agent_Id = #{agentId}
+    order by O_Receipt_order.Address_Id asc, o_receipt_pro.c_time desc
+  </select>
+
+
+
 </mapper>

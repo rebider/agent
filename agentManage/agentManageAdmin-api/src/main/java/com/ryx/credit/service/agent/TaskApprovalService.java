@@ -16,6 +16,28 @@ import java.util.Map;
  */
 public interface TaskApprovalService {
 
+    /**
+     * 添加
+     * @param busActRel
+     * @return
+     */
+    int addABusActRel(BusActRel busActRel)throws Exception;
+
+    /**
+     * 更新关系
+     * @param busActRel
+     * @return
+     */
+    int updateABusActRel(BusActRel busActRel)throws Exception;
+
+    /**
+     * 查询
+     * @param busActRel
+     * @return
+     */
+    BusActRel queryBusActRel(BusActRel busActRel)throws Exception;
+
+
     List<Map<String, Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo);
 
     List<Map<String, Object>> queryBusInfoAndRemitByBusId(String busId);

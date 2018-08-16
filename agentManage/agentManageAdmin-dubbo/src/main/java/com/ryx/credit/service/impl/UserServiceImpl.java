@@ -50,12 +50,12 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         CUser user = BeanUtils.copy(userVo, CUser.class);
         user.setCreateTime(new Date());
         this.insert(user);
-        
-        Long id = user.getId();
+
+        UserVo userVoNew = selectByName(user.getName());
         String[] roles = userVo.getRoleIds().split(",");
         CUserRole userRole = new CUserRole();
         for (String string : roles) {
-            userRole.setUserId(id);
+            userRole.setUserId(userVoNew.getId());
             userRole.setRoleId(Long.valueOf(string));
             userRoleMapper.insert(userRole);
         }

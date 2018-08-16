@@ -13,6 +13,7 @@ public class AgentNotifyVo {
 
     private String uniqueId;
     private String useOrgan;  //885:自营，886：代理商，A00：机构，887：手刷
+    private String orgId;
     private String orgName;
     private String province;
     private String city;
@@ -23,6 +24,7 @@ public class AgentNotifyVo {
     private String agHeadMobile;
     private Agent baseMessage;
     private AgentBusInfo busMessage;
+    private String[] busiAreas;
 
     public String getUniqueId() {
         return uniqueId;
@@ -30,6 +32,14 @@ public class AgentNotifyVo {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 
     public String getUseOrgan() {
@@ -118,5 +128,13 @@ public class AgentNotifyVo {
 
     public void setBusMessage(AgentBusInfo busMessage) {
         this.busMessage = busMessage;
+    }
+
+    public String[] getBusiAreas() {
+        return busiAreas;
+    }
+
+    public void setBusiAreas(String[] busiAreas) {
+        this.busiAreas = busiAreas;
     }
 }

@@ -35,6 +35,8 @@ public interface AgentBusinfoService {
 
     public AgentBusInfo getById(String id);
 
+    public AgentBusInfo getByBusidAndCode(String platformCode,String busid);
+
     public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception;
 
 
@@ -43,6 +45,27 @@ public interface AgentBusinfoService {
     public List<Map> agentBusChild(String busId);
 
 
-    public Map getRootFromBusInfo(String busId);
+    public Map getRootFromBusInfo(List<Map> list,String busId);
+
+    public List<Map> getParentListFromBusInfo(List<Map> list,String busId);
+
+    /**
+     * 根据业务平台id查询上级
+     * @param list
+     * @param busId
+     * @return
+     */
+    public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId);
+    /**
+     * 查询给定的代理商平台的顺序上级
+     * @param list
+     * @param platformCode
+     * @param agentId
+     * @return
+     */
+    public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
+
+    public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
+
 
 }

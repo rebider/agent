@@ -21,6 +21,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
+import org.activiti.engine.task.TaskInfo;
 import org.activiti.image.ProcessDiagramGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +30,15 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
  * ActivityServiceImpl
  * Created by IntelliJ IDEA.
  *
- * @Author Wang Qi
- * @Date 2017/6/29
- * @Time: 13:47
+ * @author Wang Qi
+ * @version 2017/6/29
  * To change this template use File | Settings | File Templates.
  */
 @Service("activityService")
@@ -53,23 +50,23 @@ public class ActivityServiceImpl implements ActivityService {
     @Autowired
     private ActRuTaskService actRuTaskService;
 
+    public static ProcessEngine processEngine;
+
+    
     @Override
     public void createTable() {
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
-
             logger.info("------processEngine:" + processEngine);
         } catch (Exception e) {
             logger.error("createTable error", e);
         }
     }
+
+    
     @Override
     public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map) {
 
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
             List<ProcessDefinition> processDefinitions = findProcessDefinition();
             if (processDefinitions.size() == 0) {
                 Deployment deployment = processEngine.getRepositoryService().createDeployment().name(deployName).addClasspathResource(activityPath).addClasspathResource(activityImagePath).deploy();
@@ -87,11 +84,9 @@ public class ActivityServiceImpl implements ActivityService {
         }
         return null;
     }
-
+    
     @Override
     public List<Task> findMyPersonTask(String assignee,String group) {
-        ProcessEngine processEngine = processEngineConfiguration
-                .buildProcessEngine();
         List<Task> taskList = new ArrayList<>();
         List<Task> taskListGroup = new ArrayList<>();
 
@@ -102,25 +97,25 @@ public class ActivityServiceImpl implements ActivityService {
             taskListGroup = processEngine.getTaskService().createTaskQuery().taskCandidateGroup(group).list();
         }
         taskList.addAll(taskListGroup);
-        for (Task task : taskList) {
-            logger.info("待办" + task.getId());
-            logger.info("任务名" + task.getName());
-            logger.info("任务开始时间" + task.getCreateTime());
-            logger.info("办理人" + task.getAssignee());
-            logger.info("流程实例ID" + task.getProcessInstanceId());
-            logger.info("执行对象ID" + task.getExecutionId());
-            logger.info("流程定义ID" + task.getProcessDefinitionId());
-        }
+        taskList.sort(Comparator.comparing(TaskInfo::getCreateTime));
+//        for (Task task : taskList) {
+//            logger.info("待办" + task.getId());
+//            logger.info("任务名" + task.getName());
+//            logger.info("任务开始时间" + task.getCreateTime());
+//            logger.info("办理人" + task.getAssignee());
+//            logger.info("流程实例ID" + task.getProcessInstanceId());
+//            logger.info("执行对象ID" + task.getExecutionId());
+//            logger.info("流程定义ID" + task.getProcessDefinitionId());
+//        }
         return taskList;
 
     }
 
+    
     @Override
     public Map completeTask(String taskId, Map<String,Object>  map) {
         Map<String,Object> rs = new HashMap<>(5);
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
             TaskService taskService = processEngine.getTaskService();
             taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
             taskService.complete(taskId, map);
@@ -136,29 +131,29 @@ public class ActivityServiceImpl implements ActivityService {
         return rs;
     }
 
+    
     @Override
     public List<ProcessDefinition> findProcessDefinition() {
         List<ProcessDefinition> list = null;
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
             list = processEngine.getRepositoryService().createProcessDefinitionQuery().orderByProcessDefinitionVersion().asc().list();
-            for (ProcessDefinition processDefinition : list) {
-                logger.info("待办" + processDefinition.getId());
-                logger.info("任务名" + processDefinition.getName());
-                logger.info("getKey" + processDefinition.getKey());
-                logger.info("getVersion" + processDefinition.getVersion());
-                logger.info("bpmn文件" + processDefinition.getResourceName());
-                logger.info("png" + processDefinition.getDiagramResourceName());
-                logger.info("部署ID" + processDefinition.getDeploymentId());
-                logger.info("=================");
-            }
+//            for (ProcessDefinition processDefinition : list) {
+//                logger.info("待办" + processDefinition.getId());
+//                logger.info("任务名" + processDefinition.getName());
+//                logger.info("getKey" + processDefinition.getKey());
+//                logger.info("getVersion" + processDefinition.getVersion());
+//                logger.info("bpmn文件" + processDefinition.getResourceName());
+//                logger.info("png" + processDefinition.getDiagramResourceName());
+//                logger.info("部署ID" + processDefinition.getDeploymentId());
+//                logger.info("=================");
+//            }
         } catch (Exception e) {
             logger.error("findProcessDefinition error", e);
         }
         return list;
     }
 
+    
     @Override
     public void delProcessDefinition(String deploymentId) {
         try {
@@ -170,11 +165,10 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    
     @Override
     public void setValue(String taskId, Map<String, Object> map) {
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
             TaskService taskService = processEngine.getTaskService();
             for (Map.Entry<String, Object> entry : map.entrySet()) {
                 taskService.setVariable(taskId, entry.getKey(), entry.getValue());
@@ -184,12 +178,11 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
+    
     @Override
     public Object getValue(String taskId, String key) {
         Object o = null;
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
             TaskService taskService = processEngine.getTaskService();
             o = taskService.getVariable(taskId, key);
         } catch (Exception e) {
@@ -198,12 +191,11 @@ public class ActivityServiceImpl implements ActivityService {
         return o;
     }
 
+    
     @Override
     public Map getImage(String taskId)  {
         Map<String,Object> map = null;
         try {
-            ProcessEngine processEngine = processEngineConfiguration
-                    .buildProcessEngine();
             RepositoryService repositoryService = processEngine.getRepositoryService();
             HistoryService historyService = processEngine.getHistoryService();
             TaskService taskService = processEngine.getTaskService();

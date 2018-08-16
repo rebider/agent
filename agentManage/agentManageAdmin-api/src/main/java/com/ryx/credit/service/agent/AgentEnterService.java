@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import sun.management.resources.agent;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +77,6 @@ public interface AgentEnterService {
      * 代理商入网导出
      */
 
-    public List<AgentoutVo> exportAgent(Agent agent);
+    public List<AgentoutVo> exportAgent(Map map) throws ParseException;
 
 }

@@ -38,7 +38,7 @@ public class LogServiceImpl implements ILogService{
                     log.info(JSON.toJSON(obj) + ",");
                 }
                 if(returnObj!=null){
-                    log.info("执行结果是：" + JSON.toJSON(returnObj));
+                    log.info("执行结果是：" + returnObj);
                 }
             }
         } catch (Exception e) {

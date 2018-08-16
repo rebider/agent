@@ -39,7 +39,7 @@ public class OReceiptOrder implements Serializable {
 
     private String cUser;
 
-    private String uTime;
+    private Date uTime;
 
     private BigDecimal receiptStatus;
 
@@ -48,6 +48,8 @@ public class OReceiptOrder implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String agentId;
 
     public String getId() {
         return id;
@@ -185,12 +187,12 @@ public class OReceiptOrder implements Serializable {
         this.cUser = cUser == null ? null : cUser.trim();
     }
 
-    public String getuTime() {
+    public Date getuTime() {
         return uTime;
     }
 
-    public void setuTime(String uTime) {
-        this.uTime = uTime == null ? null : uTime.trim();
+    public void setuTime(Date uTime) {
+        this.uTime = uTime;
     }
 
     public BigDecimal getReceiptStatus() {
@@ -223,5 +225,13 @@ public class OReceiptOrder implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId == null ? null : agentId.trim();
     }
 }

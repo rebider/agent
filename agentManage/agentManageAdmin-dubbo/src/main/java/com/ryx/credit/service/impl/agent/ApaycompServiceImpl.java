@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.pojo.admin.agent.PayComp;
@@ -21,13 +22,37 @@ public class ApaycompServiceImpl implements com.ryx.credit.service.agent.Apaycom
 
     /**
      * 打款公司列表
+     *
      * @return
      */
     @Override
-    public List<PayComp> compList(){
+    public List<PayComp> compList() {
         PayCompExample example = new PayCompExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status);
         return payCompMapper.selectByExample(example);
     }
 
+    /**
+     * 收款公司
+     *
+     * @return
+     */
+    @Override
+    public List<PayComp> recCompList() {
+        PayCompExample example = new PayCompExample();
+        example.or().andStatusEqualTo(Status.STATUS_2.status);
+        return payCompMapper.selectByExample(example);
+    }
+
+    @Override
+    public PayComp selectById(String id) {
+        PayCompExample example = new PayCompExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(id);
+        List<PayComp> payComps = payCompMapper.selectByExample(example);
+        if (1 != payComps.size()) {
+            return null;
+        }
+
+        return payComps.get(0);
+    }
 }

@@ -517,6 +517,7 @@
       from A_agent a,A_agent_businfo b
       where a.id=b.agent_id
       and ag_status = #{reqMap.agStatus}
+      and b.c_user = #{reqMap.cUser}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
         and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
@@ -534,6 +535,9 @@
       </if>
       <if test="reqMap.id != null and reqMap.id != '' " >
         and b.id = #{reqMap.id}
+      </if>
+      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
+        and b.C_USER = #{reqMap.cUser}
       </if>
       and b.status = #{reqMap.status}
       order by b.c_time desc
@@ -560,6 +564,9 @@
       </if>
       <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
         and b.clo_review_status = #{reqMap.cloReviewStatus}
+      </if>
+      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
+        and b.C_USER = #{reqMap.cUser}
       </if>
       and b.status = #{reqMap.status}
       order by b.c_time desc

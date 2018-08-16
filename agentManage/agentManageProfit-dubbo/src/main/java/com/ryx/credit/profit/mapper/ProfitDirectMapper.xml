@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitDirectMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitDirect">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="FRIST_AGENT_PID" jdbcType="VARCHAR" property="fristAgentPid" />
+    <result column="FRIST_AGENT_ID" jdbcType="VARCHAR" property="fristAgentId" />
+    <result column="FRIST_AGENT_NAME" jdbcType="VARCHAR" property="fristAgentName" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="TRANS_AMT" jdbcType="DECIMAL" property="transAmt" />
+    <result column="TRANS_FEE" jdbcType="DECIMAL" property="transFee" />
+    <result column="PROFIT_AMT" jdbcType="DECIMAL" property="profitAmt" />
+    <result column="SUPPLY_AMT" jdbcType="DECIMAL" property="supplyAmt" />
+    <result column="BUCKLE_AMT" jdbcType="DECIMAL" property="buckleAmt" />
+    <result column="SHOULD_PROFIT" jdbcType="DECIMAL" property="shouldProfit" />
+    <result column="ACTUAL_PROFIT" jdbcType="DECIMAL" property="actualProfit" />
+    <result column="TRANS_MONTH" jdbcType="VARCHAR" property="transMonth" />
+    <result column="AGENT_EMAIL" jdbcType="VARCHAR" property="agentEmail" />
+    <result column="ACCOUNT_CODE" jdbcType="VARCHAR" property="accountCode" />
+    <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
+    <result column="BANK_OPEN" jdbcType="VARCHAR" property="bankOpen" />
+    <result column="BANK_CODE" jdbcType="VARCHAR" property="bankCode" />
+    <result column="BOSS_CODE" jdbcType="VARCHAR" property="bossCode" />
+    <result column="PARENT_BUCKLE" jdbcType="DECIMAL" property="parentBuckle" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_NAME, AGENT_ID, FRIST_AGENT_PID,FRIST_AGENT_ID, FRIST_AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME,
+    TRANS_AMT, TRANS_FEE, PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT, SHOULD_PROFIT, ACTUAL_PROFIT,
+    TRANS_MONTH, AGENT_EMAIL, ACCOUNT_CODE, ACCOUNT_NAME, BANK_OPEN, BANK_CODE, BOSS_CODE,
+    PARENT_BUCKLE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDirectExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DIRECT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DIRECT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDirectExample">
+    delete from P_PROFIT_DIRECT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
+    insert into P_PROFIT_DIRECT (ID, AGENT_NAME, AGENT_ID,
+    FRIST_AGENT_PID,FRIST_AGENT_ID, FRIST_AGENT_NAME, PARENT_AGENT_ID,
+    PARENT_AGENT_NAME, TRANS_AMT, TRANS_FEE,
+    PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT,
+    SHOULD_PROFIT, ACTUAL_PROFIT, TRANS_MONTH,
+    AGENT_EMAIL, ACCOUNT_CODE, ACCOUNT_NAME,
+    BANK_OPEN, BANK_CODE, BOSS_CODE,
+    PARENT_BUCKLE)
+    values (#{id,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+    #{fristAgentPid,jdbcType=VARCHAR}, #{fristAgentName,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR},
+    #{parentAgentName,jdbcType=VARCHAR}, #{transAmt,jdbcType=DECIMAL}, #{transFee,jdbcType=DECIMAL},
+    #{profitAmt,jdbcType=DECIMAL}, #{supplyAmt,jdbcType=DECIMAL}, #{buckleAmt,jdbcType=DECIMAL},
+    #{shouldProfit,jdbcType=DECIMAL}, #{actualProfit,jdbcType=DECIMAL}, #{transMonth,jdbcType=VARCHAR},
+    #{agentEmail,jdbcType=VARCHAR}, #{accountCode,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR},
+    #{bankOpen,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{bossCode,jdbcType=VARCHAR},
+    #{parentBuckle,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
+    insert into P_PROFIT_DIRECT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="fristAgentPid != null">
+        FRIST_AGENT_PID,
+      </if>
+      <if test="fristAgentId != null">
+        FRIST_AGENT_ID,
+      </if>
+      <if test="fristAgentName != null">
+        FRIST_AGENT_NAME,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="transAmt != null">
+        TRANS_AMT,
+      </if>
+      <if test="transFee != null">
+        TRANS_FEE,
+      </if>
+      <if test="profitAmt != null">
+        PROFIT_AMT,
+      </if>
+      <if test="supplyAmt != null">
+        SUPPLY_AMT,
+      </if>
+      <if test="buckleAmt != null">
+        BUCKLE_AMT,
+      </if>
+      <if test="shouldProfit != null">
+        SHOULD_PROFIT,
+      </if>
+      <if test="actualProfit != null">
+        ACTUAL_PROFIT,
+      </if>
+      <if test="transMonth != null">
+        TRANS_MONTH,
+      </if>
+      <if test="agentEmail != null">
+        AGENT_EMAIL,
+      </if>
+      <if test="accountCode != null">
+        ACCOUNT_CODE,
+      </if>
+      <if test="accountName != null">
+        ACCOUNT_NAME,
+      </if>
+      <if test="bankOpen != null">
+        BANK_OPEN,
+      </if>
+      <if test="bankCode != null">
+        BANK_CODE,
+      </if>
+      <if test="bossCode != null">
+        BOSS_CODE,
+      </if>
+      <if test="parentBuckle != null">
+        PARENT_BUCKLE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="fristAgentPid != null">
+        #{fristAgentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="fristAgentName != null">
+        #{fristAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="fristAgentId != null">
+        #{fristAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="transAmt != null">
+        #{transAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="transFee != null">
+        #{transFee,jdbcType=DECIMAL},
+      </if>
+      <if test="profitAmt != null">
+        #{profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyAmt != null">
+        #{supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="buckleAmt != null">
+        #{buckleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shouldProfit != null">
+        #{shouldProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="actualProfit != null">
+        #{actualProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="transMonth != null">
+        #{transMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="agentEmail != null">
+        #{agentEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="accountCode != null">
+        #{accountCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankOpen != null">
+        #{bankOpen,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCode != null">
+        #{bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bossCode != null">
+        #{bossCode,jdbcType=VARCHAR},
+      </if>
+      <if test="parentBuckle != null">
+        #{parentBuckle,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDirectExample" resultType="java.lang.Long">
+    select count(*) from P_PROFIT_DIRECT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
+    update P_PROFIT_DIRECT
+    <set>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="fristAgentPid != null">
+        FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="fristAgentId != null">
+        FRIST_AGENT_ID = #{fristAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="fristAgentName != null">
+        FRIST_AGENT_NAME = #{fristAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="transAmt != null">
+        TRANS_AMT = #{transAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="transFee != null">
+        TRANS_FEE = #{transFee,jdbcType=DECIMAL},
+      </if>
+      <if test="profitAmt != null">
+        PROFIT_AMT = #{profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyAmt != null">
+        SUPPLY_AMT = #{supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="buckleAmt != null">
+        BUCKLE_AMT = #{buckleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shouldProfit != null">
+        SHOULD_PROFIT = #{shouldProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="actualProfit != null">
+        ACTUAL_PROFIT = #{actualProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="transMonth != null">
+        TRANS_MONTH = #{transMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="agentEmail != null">
+        AGENT_EMAIL = #{agentEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="accountCode != null">
+        ACCOUNT_CODE = #{accountCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankOpen != null">
+        BANK_OPEN = #{bankOpen,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCode != null">
+        BANK_CODE = #{bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="bossCode != null">
+        BOSS_CODE = #{bossCode,jdbcType=VARCHAR},
+      </if>
+      <if test="parentBuckle != null">
+        PARENT_BUCKLE = #{parentBuckle,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
+    update P_PROFIT_DIRECT
+    set AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR},
+    FRIST_AGENT_ID = #{fristAgentId,jdbcType=VARCHAR},
+    FRIST_AGENT_NAME = #{fristAgentName,jdbcType=VARCHAR},
+    PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+    PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+    TRANS_AMT = #{transAmt,jdbcType=DECIMAL},
+    TRANS_FEE = #{transFee,jdbcType=DECIMAL},
+    PROFIT_AMT = #{profitAmt,jdbcType=DECIMAL},
+    SUPPLY_AMT = #{supplyAmt,jdbcType=DECIMAL},
+    BUCKLE_AMT = #{buckleAmt,jdbcType=DECIMAL},
+    SHOULD_PROFIT = #{shouldProfit,jdbcType=DECIMAL},
+    ACTUAL_PROFIT = #{actualProfit,jdbcType=DECIMAL},
+    TRANS_MONTH = #{transMonth,jdbcType=VARCHAR},
+    AGENT_EMAIL = #{agentEmail,jdbcType=VARCHAR},
+    ACCOUNT_CODE = #{accountCode,jdbcType=VARCHAR},
+    ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+    BANK_OPEN = #{bankOpen,jdbcType=VARCHAR},
+    BANK_CODE = #{bankCode,jdbcType=VARCHAR},
+    BOSS_CODE = #{bossCode,jdbcType=VARCHAR},
+    PARENT_BUCKLE = #{parentBuckle,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="selectByAgentAndMon" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR} AND TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    WHERE TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectSumTaxAmt" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
+    SELECT
+    SUM(SHOULD_PROFIT)
+    FROM P_PROFIT_DIRECT
+    WHERE TRANS_MONTH = #{transMonth,jdbcType=VARCHAR} AND FRIST_AGENT_PID =  #{fristAgentPid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectBySupply"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    where AGENT_ID in
+    (select agent_id from p_profit_supply where agent_id is not null and SUPPLY_DATE=to_char(add_months(sysdate,-1),'YYYYMM') and supply_amt>0 and SUPPLY_TYPE='退单补款')
+  </select>
+
+  <select id="selectByBuckle"  resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    where TRANS_MONTH=to_char(add_months(sysdate,-1),'YYYYMM') AND BUCKLE_AMT > 0
+  </select>
+
+  <select id="getProfitDirectList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_DIRECT
+    <include refid="BASE_WHERE_SQL" />
+    <include refid="SORTING" />
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getProfitDirectCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM P_PROFIT_DIRECT
+    <include refid="BASE_WHERE_SQL" />
+  </select>
+
+  <select id="getSubBuckleByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
+    SELECT SUM(PARENT_BUCKLE)
+    FROM P_PROFIT_DIRECT
+    WHERE PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR} AND TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      <trim prefixOverrides="and">
+        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+        <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID}</if>
+      </trim>
+    </where>
+  </sql>
+
+  <sql id="SORTING">
+    ORDER BY TRANS_MONTH DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
+
+</mapper>

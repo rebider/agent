@@ -11,11 +11,26 @@ public enum AttachmentRelType {
     Capital("缴款项"),
     Business("业务"),
     Proceeds("收款"),
-    Clear("结算附件");
+    Order("订单"),
+    ActivityEdit("退补差价代理商打款附件"),
+    ActivityFinanceEdit("退补差价财务打款附件"),
+    Clear("结算附件"),
+    Return("退货打款附件");
 
     public String  msg;
 
     AttachmentRelType(String s){
         msg = s;
     }
+
+    public static String getItemsString(String key){
+        AttachmentRelType[] valus = AttachmentRelType.values();
+        for (AttachmentRelType busActRelBusType : valus) {
+            if(busActRelBusType.name().equals(key)){
+                return busActRelBusType.msg;
+            }
+        }
+        return null;
+    }
+
 }

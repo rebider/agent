@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
@@ -67,16 +68,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusType()) ||
-        			null == agentBusInfo.getBusSentDirectly() ||
-        			null == agentBusInfo.getBusDirectCashback() ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContactMobile()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
-        			null == agentBusInfo.getCloReceipt() ||
-        			StringUtils.isEmpty(agentBusInfo.getcUser())
+        			StringUtils.isEmpty(agentBusInfo.getBusType())
+//					||
+//        			null == agentBusInfo.getBusSentDirectly() ||
+//        			null == agentBusInfo.getBusDirectCashback() ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContactMobile()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
+//        			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
+//        			null == agentBusInfo.getCloReceipt() ||
+//        			StringUtils.isEmpty(agentBusInfo.getcUser())
         			){
                 throw new ProcessException("业务数据不完整");
         	}
@@ -87,6 +89,18 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
         	agentBusInfo.setStatus(Status.STATUS_1.status);
 			agentBusInfo.setVersion(Status.STATUS_1.status);
+			//激活返现如果无值默人填写自己
+			if(StringUtils.isEmpty(agentBusInfo.getBusActivationParent())) {
+				agentBusInfo.setBusActivationParent(agentBusInfo.getId());
+			}
+			if(StringUtils.isNotEmpty(agentBusInfo.getBusParent())){
+				if(StringUtils.isNotEmpty(agentBusInfo.getBusPlatform())){
+					AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+					if(!busInfoParent.getBusPlatform().equals(agentBusInfo.getBusPlatform())){
+						throw new ProcessException("代理商上级平台和本业务平台不匹配");
+					}
+				}
+			}
         	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
@@ -124,6 +138,16 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return agentBusInfo;
 	}
 
+	@Override
+	public AgentBusInfo getByBusidAndCode(String platformCode, String busid) {
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(busid).andBusPlatformEqualTo(platformCode);
+		List<AgentBusInfo>  res = agentBusInfoMapper.selectByExample(example);
+		if(res.size()>0){
+			return res.get(0);
+		}
+		return null;
+	}
 
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
@@ -177,6 +201,16 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setStatus(agentBusInfoVo.getStatus());
 					db_AgentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
 					db_AgentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
+
+					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
+						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
+							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
+							if(!busInfoParent.getBusPlatform().equals(db_AgentBusInfo.getBusPlatform())){
+								throw new ProcessException("代理商上级平台和本业务平台不匹配");
+							}
+						}
+					}
+
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new ProcessException("更新业务信息失败");
 					}
@@ -247,14 +281,145 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 
 	@Override
-	public Map getRootFromBusInfo(String busId) {
+	public Map getRootFromBusInfo(List<Map> list,String busId) {
+		if(list==null)list=new ArrayList<Map>();
+
 		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		if(map.size()>0){
+			list.add(map.get(0));
+		}
 		if(map.size()>0 && map.get(0).get("BUS_PARENT")!=null &&  StringUtils.isNotEmpty(map.get(0).get("BUS_PARENT")+"")){
-			return getRootFromBusInfo(map.get(0).get("BUS_PARENT")+"");
+			return getRootFromBusInfo(list,map.get(0).get("BUS_PARENT")+"");
 		}
         if(map.size()!=1){
 			return null;
 		}
 		return map.get(0);
+	}
+
+	@Override
+	public List<Map> getParentListFromBusInfo(List<Map> list, String busId) {
+		if(list==null)list=new ArrayList<Map>();
+		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		if(map.size()>0){
+			list.add(map.get(0));
+		}
+		if(map.size()>0 && map.get(0).get("BUS_PARENT")!=null &&  StringUtils.isNotEmpty(map.get(0).get("BUS_PARENT")+"")){
+			return getParentListFromBusInfo(list,map.get(0).get("BUS_PARENT")+"");
+		}
+		if(map.size()!=1){
+			return list;
+		}
+		return list;
+	}
+
+	@Override
+	public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		AgentBusInfo plat = agentBusInfoMapper.selectByPrimaryKey(busId);
+		if(plat==null)
+			return list;
+		if(StringUtils.isNotEmpty(plat.getBusParent())) {
+			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(plat.getBusParent());
+			if(parent!=null){
+				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
+					list.add(parent);
+					return queryParenLevel(list, parent.getId());
+				}else{
+					return list;
+				}
+			}else{
+				return list;
+			}
+		}else{
+			return list;
+		}
+	}
+
+	@Override
+	public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		if(list.size()==4) {
+			return list;
+		}
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andAgentIdEqualTo(agentId)
+                .andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
+		if(plats.size()==0)
+			return list;
+		AgentBusInfo platInfo = plats.get(0);
+		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
+			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
+			if(parent!=null){
+				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
+					list.add(parent);
+					if (StringUtils.isNotEmpty(parent.getAgentId())) {
+						return queryParenFourLevel(list, platformCode, parent.getAgentId());
+					}else{
+						return list;
+					}
+				}else{
+					return list;
+				}
+			}else{
+				return list;
+			}
+		}else{
+			return list;
+		}
+
+	}
+
+	/**
+	 * 把给定的代理商指定的平台的下级节点全部放回
+	 * @param list
+	 * @param platformCode
+	 * @param agentId
+	 * @return
+	 */
+	@Override
+	public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		if(list.size()==4) {
+			return list;
+		}
+		//当前代理商
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andAgentIdEqualTo(agentId)
+				.andBusPlatformEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
+
+		if(plats.size()==0) {
+			return list;
+		}
+		//查询下级代理商
+		AgentBusInfo platInfo = plats.get(0);
+
+
+		AgentBusInfoExample child_example = new AgentBusInfoExample();
+		child_example.or().andBusParentEqualTo(platInfo.getId())
+				.andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
+        //没有下级别就返回
+		if(child_plat.size()==0) {
+			return list;
+		}
+		//有就添加
+		list.addAll(child_plat);
+		//把孩子节点也加到list
+		for (AgentBusInfo agentBusInfo : child_plat) {
+			queryChildLevel(list,agentBusInfo.getBusPlatform(),agentBusInfo.getAgentId());
+		}
+
+        return list;
 	}
 }

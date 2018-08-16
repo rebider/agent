@@ -16,6 +16,8 @@
         <module>agentManageActivity-api</module>
         <module>agentManageActivity-dubbo</module>
         <module>agentManageAdmin-dubbo</module>
+        <module>agentManageProfit-api</module>
+        <module>agentManageProfit-dubbo</module>
     </modules>
     <properties>
         <spring.version>4.3.7.RELEASE</spring.version>
@@ -142,7 +144,7 @@
         <dependency>
             <groupId>org.mybatis.generator</groupId>
             <artifactId>mybatis-generator-core</artifactId>
-            <version>1.3.2</version>
+            <version>1.3.7</version>
         </dependency>
         <!-- redis连接包 -->
         <dependency>

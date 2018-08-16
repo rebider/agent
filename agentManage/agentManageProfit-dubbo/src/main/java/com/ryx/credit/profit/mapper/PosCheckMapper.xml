@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PosCheckMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosCheck">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="CHECK_DATE_S" jdbcType="VARCHAR" property="checkDateS" />
+    <result column="CHECK_DATE_E" jdbcType="VARCHAR" property="checkDateE" />
+    <result column="TOTAL_AMT" jdbcType="DECIMAL" property="totalAmt" />
+    <result column="POS_ORDERS" jdbcType="DECIMAL" property="posOrders" />
+    <result column="PROFIT_SCALE" jdbcType="DECIMAL" property="profitScale" />
+    <result column="APP_DATE" jdbcType="VARCHAR" property="appDate" />
+    <result column="CHECK_STATUS" jdbcType="CHAR" property="checkStatus" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, TOTAL_AMT, POS_ORDERS, 
+    PROFIT_SCALE, APP_DATE, CHECK_STATUS
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_POS_CHECK
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_POS_CHECK
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample">
+    delete from P_POS_CHECK
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosCheck">
+    insert into P_POS_CHECK (ID, AGENT_PID, AGENT_ID, 
+      AGENT_NAME, CHECK_DATE_S, CHECK_DATE_E, 
+      TOTAL_AMT, POS_ORDERS, PROFIT_SCALE, 
+      APP_DATE, CHECK_STATUS)
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{checkDateS,jdbcType=VARCHAR}, #{checkDateE,jdbcType=VARCHAR}, 
+      #{totalAmt,jdbcType=DECIMAL}, #{posOrders,jdbcType=DECIMAL}, #{profitScale,jdbcType=DECIMAL}, 
+      #{appDate,jdbcType=VARCHAR}, #{checkStatus,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosCheck">
+    insert into P_POS_CHECK
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="checkDateS != null">
+        CHECK_DATE_S,
+      </if>
+      <if test="checkDateE != null">
+        CHECK_DATE_E,
+      </if>
+      <if test="totalAmt != null">
+        TOTAL_AMT,
+      </if>
+      <if test="posOrders != null">
+        POS_ORDERS,
+      </if>
+      <if test="profitScale != null">
+        PROFIT_SCALE,
+      </if>
+      <if test="appDate != null">
+        APP_DATE,
+      </if>
+      <if test="checkStatus != null">
+        CHECK_STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDateS != null">
+        #{checkDateS,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDateE != null">
+        #{checkDateE,jdbcType=VARCHAR},
+      </if>
+      <if test="totalAmt != null">
+        #{totalAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posOrders != null">
+        #{posOrders,jdbcType=DECIMAL},
+      </if>
+      <if test="profitScale != null">
+        #{profitScale,jdbcType=DECIMAL},
+      </if>
+      <if test="appDate != null">
+        #{appDate,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample" resultType="java.lang.Long">
+    select count(*) from P_POS_CHECK
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PosCheck">
+    update P_POS_CHECK
+    <set>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDateS != null">
+        CHECK_DATE_S = #{checkDateS,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDateE != null">
+        CHECK_DATE_E = #{checkDateE,jdbcType=VARCHAR},
+      </if>
+      <if test="totalAmt != null">
+        TOTAL_AMT = #{totalAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posOrders != null">
+        POS_ORDERS = #{posOrders,jdbcType=DECIMAL},
+      </if>
+      <if test="profitScale != null">
+        PROFIT_SCALE = #{profitScale,jdbcType=DECIMAL},
+      </if>
+      <if test="appDate != null">
+        APP_DATE = #{appDate,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        CHECK_STATUS = #{checkStatus,jdbcType=CHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PosCheck">
+    update P_POS_CHECK
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      CHECK_DATE_S = #{checkDateS,jdbcType=VARCHAR},
+      CHECK_DATE_E = #{checkDateE,jdbcType=VARCHAR},
+      TOTAL_AMT = #{totalAmt,jdbcType=DECIMAL},
+      POS_ORDERS = #{posOrders,jdbcType=DECIMAL},
+      PROFIT_SCALE = #{profitScale,jdbcType=DECIMAL},
+      APP_DATE = #{appDate,jdbcType=VARCHAR},
+      CHECK_STATUS = #{checkStatus,jdbcType=CHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

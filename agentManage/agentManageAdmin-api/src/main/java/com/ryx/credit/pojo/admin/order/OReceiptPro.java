@@ -4,8 +4,10 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OReceiptPro implements Serializable {
+public class OReceiptPro implements Serializable{
     private String id;
+
+    private String orderid;
 
     private String receiptId;
 
@@ -15,23 +17,9 @@ public class OReceiptPro implements Serializable {
 
     private String proName;
 
-    private String proType;
-
-    private BigDecimal proPrice;
-
-    private BigDecimal isDeposit;
-
-    private BigDecimal deposit;
-
-    private String remark;
-
     private BigDecimal proNum;
 
-    private BigDecimal proRelPrice;
-
     private BigDecimal sendNum;
-
-    private String ruleid;
 
     private String cUser;
 
@@ -45,7 +33,7 @@ public class OReceiptPro implements Serializable {
 
     private BigDecimal version;
 
-    private String 活动id;
+    private BigDecimal receiptProStatus;
 
     public String getId() {
         return id;
@@ -53,6 +41,14 @@ public class OReceiptPro implements Serializable {
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
+    }
+
+    public String getOrderid() {
+        return orderid;
+    }
+
+    public void setOrderid(String orderid) {
+        this.orderid = orderid == null ? null : orderid.trim();
     }
 
     public String getReceiptId() {
@@ -87,46 +83,6 @@ public class OReceiptPro implements Serializable {
         this.proName = proName == null ? null : proName.trim();
     }
 
-    public String getProType() {
-        return proType;
-    }
-
-    public void setProType(String proType) {
-        this.proType = proType == null ? null : proType.trim();
-    }
-
-    public BigDecimal getProPrice() {
-        return proPrice;
-    }
-
-    public void setProPrice(BigDecimal proPrice) {
-        this.proPrice = proPrice;
-    }
-
-    public BigDecimal getIsDeposit() {
-        return isDeposit;
-    }
-
-    public void setIsDeposit(BigDecimal isDeposit) {
-        this.isDeposit = isDeposit;
-    }
-
-    public BigDecimal getDeposit() {
-        return deposit;
-    }
-
-    public void setDeposit(BigDecimal deposit) {
-        this.deposit = deposit;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark == null ? null : remark.trim();
-    }
-
     public BigDecimal getProNum() {
         return proNum;
     }
@@ -135,28 +91,12 @@ public class OReceiptPro implements Serializable {
         this.proNum = proNum;
     }
 
-    public BigDecimal getProRelPrice() {
-        return proRelPrice;
-    }
-
-    public void setProRelPrice(BigDecimal proRelPrice) {
-        this.proRelPrice = proRelPrice;
-    }
-
     public BigDecimal getSendNum() {
         return sendNum;
     }
 
     public void setSendNum(BigDecimal sendNum) {
         this.sendNum = sendNum;
-    }
-
-    public String getRuleid() {
-        return ruleid;
-    }
-
-    public void setRuleid(String ruleid) {
-        this.ruleid = ruleid == null ? null : ruleid.trim();
     }
 
     public String getcUser() {
@@ -207,11 +147,11 @@ public class OReceiptPro implements Serializable {
         this.version = version;
     }
 
-    public String get活动id() {
-        return 活动id;
+    public BigDecimal getReceiptProStatus() {
+        return receiptProStatus;
     }
 
-    public void set活动id(String 活动id) {
-        this.活动id = 活动id == null ? null : 活动id.trim();
+    public void setReceiptProStatus(BigDecimal receiptProStatus) {
+        this.receiptProStatus = receiptProStatus;
     }
 }

@@ -26,6 +26,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -72,6 +75,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private RegionService regionService;
+    @Autowired
+    private ApaycompService apaycompService;
+
     /**
      * 商户入网
      *
@@ -418,6 +424,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         AgentBusInfo bus = agentBusinfoService.getById(busId);
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Approved.status);
+        if(StringUtils.isNotBlank(bus.getBusNum())){
+            bus.setBusStatus(Status.STATUS_0.status);
+        }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批通过，更新业务本信息失败{}:{}", processingId, bus.getId());
             throw new ProcessException("代理商审批通过，更新业务本信息失败");
@@ -447,7 +456,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             ImportAgent importAgent = new ImportAgent();
             importAgent.setDataid(busId);
             importAgent.setDatatype(AgImportType.BUSAPP.name());
-            importAgent.setBatchcode(Calendar.getInstance().getTime().toString());
+            importAgent.setBatchcode(processingId);
             importAgent.setcUser(rel.getcUser());
             if (1 != aimportService.insertAgentImportData(importAgent)) {
                 logger.info("代理商审批通过-添加开户任务失败");
@@ -478,6 +487,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         AgentBusInfo bus = agentBusinfoService.getById(busId);
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Refuse.status);
+        if(StringUtils.isNotBlank(bus.getBusNum())){
+            bus.setBusStatus(Status.STATUS_0.status);
+        }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, bus.getId());
             throw new ProcessException("代理商审批通过，更新业务本信息失败");
@@ -530,6 +542,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         //获取代理商有效的业务
         List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId(), null, AgStatus.Approving.status);
         for (AgentBusInfo agentBusInfo : aginfo) {
+            if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+                agentBusInfo.setBusStatus(Status.STATUS_0.status);
+            }
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
             if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
@@ -563,7 +578,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             ImportAgent importAgent = new ImportAgent();
             importAgent.setDataid(busId);
             importAgent.setDatatype(AgImportType.NETINAPP.name());
-            importAgent.setBatchcode(UUID.randomUUID().toString().replace("-", ""));
+            importAgent.setBatchcode(processingId);
             importAgent.setcUser(rel.getcUser());
             if (1 != aimportService.insertAgentImportData(importAgent)) {
                 logger.info("代理商审批通过-添加开户任务失败");
@@ -573,6 +588,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            //todo 生成后台用户
+            agentService.createBackUserbyAgent(agent.getId());
             agentNotifyService.asynNotifyPlatform();
         }
 
@@ -603,6 +620,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         for (AgentBusInfo agentBusInfo : aginfo) {
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Refuse.status);
+            if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
+                agentBusInfo.setBusStatus(Status.STATUS_0.status);
+            }
             if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                 logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, agentBusInfo.getId());
                 throw new ProcessException("代理商审批通过，更新业务本信息失败");
@@ -700,52 +720,146 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public static BusinessPlatformService businessPlatformService;
 
     @Override
-    public List<AgentoutVo> exportAgent(Agent agent) {
-        List<AgentoutVo> agentoutVos = agentMapper.excelAgent(agent);
+    public List<AgentoutVo> exportAgent(Map map) throws ParseException {
+        if (null != map) {
+            String time = String.valueOf(map.get("time"));
+            if (org.apache.commons.lang.StringUtils.isNotBlank(time)&&!time.equals("null")) {
+                String reltime = time.substring(0, 10);
+                map.put("time", reltime);
+            }
+        }
+        List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
-                if (null!=agentoutVo.getBusType()){
+                if (null != agentoutVo.getBusType()) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
-                    agentoutVo.setBusType(value.getdItemname());
+                    if (null != value)
+                        agentoutVo.setBusType(value.getdItemname());
                 }
-                if(null!=agentoutVo.getBusIndeAss()){
-                    if(agentoutVo.getBusIndeAss().equals("1")){
-                        agentoutVo.setBusIndeAss("是");
-                    }else
-                        agentoutVo.setBusIndeAss("否");
-                }
-                if (null!=agentoutVo.getBusPlatform()){
+                if (null != agentoutVo.getBusPlatform()) {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
-                   if (null!=platForm)
-                       agentoutVo.setBusPlatform( platForm.getPlatformName());
+                    if (null != platForm)
+                        agentoutVo.setBusPlatform(platForm.getPlatformName());
                 }
-                if(null!=agentoutVo.getBusRegion()){
-                    String regionName = regionService.getRegionName(agentoutVo.getBusRegion());
-                    agentoutVo.setBusRegion(regionName);
+                if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
+
+                    String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
+                    if (StringUtils.isNotBlank(regionName))
+                        agentoutVo.setBusRegion(regionName);
                 }
-                if (null!=agentoutVo.getBusScope()){
+                if (null != agentoutVo.getBusScope()) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
-                    agentoutVo.setBusScope(value.getdItemname());
+                    if (null != value)
+                        agentoutVo.setBusScope(value.getdItemname());
                 }
-                if (null!=agentoutVo.getBusParent()){
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusParent());
-                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                    if(null!=agentById)
-                        agentoutVo.setBusParent(agentById.getAgName());
+                if (null != agentoutVo.getBusParent() && null != agentoutVo.getAgentId() && null != agentoutVo.getBusPlatform()) {
+                    getBusParent(agentoutVo);
+
                 }
-                if (null!=agentoutVo.getBusRiskParent()){
+                if (null != agentoutVo.getBusRiskParent()) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
-                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                    if(null!=agentById)
-                    agentoutVo.setBusRiskParent(agentById.getAgName());
+                    if (null != agentBusInfo) {
+                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                        if (null != agentById)
+                            agentoutVo.setBusRiskParent(agentById.getAgName());
+                    }
+
                 }
-                if (null!=agentoutVo.getBusActivationParent()){
+                if (null != agentoutVo.getBusActivationParent()) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
-                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                    if(null!=agentById)
-                    agentoutVo.setBusActivationParent(agentById.getAgName());
+                    if (null != agentBusInfo) {
+                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                        if (null != agentById)
+                            agentoutVo.setBusActivationParent(agentById.getAgName());
+                    }
                 }
+
+                if (null != agentoutVo.getCloInvoice()) {
+                    if (agentoutVo.getCloInvoice().compareTo(new BigDecimal(1)) == 0) {
+                        agentoutVo.setYesOrNo("是");
+                    } else if (agentoutVo.getCloInvoice().compareTo(new BigDecimal(0)) == 0)
+                        agentoutVo.setYesOrNo("否");
+                }
+
+                if (null != agentoutVo.getCloType()) {
+                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name(), agentoutVo.getCloType().toString());
+                    if (null != value)
+                        agentoutVo.setCloString(value.getdItemname());
+                }
+                if (null != agentoutVo.getBankRegion() && !"".equals(agentoutVo.getBankRegion())) {
+                    String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
+                    if (StringUtils.isNotBlank(regionName))
+                        agentoutVo.setBankRegion(regionName);
+                }
+
+                if (null != agentoutVo.getCloPayCompany()) {
+                    PayComp payComp = apaycompService.selectById(agentoutVo.getCloPayCompany());
+                    if (null != payComp)
+                        agentoutVo.setCloPayCompany(payComp.getComName());
+                }
+
+                if (null != agentoutVo.getCloTaxPoint()) {
+                    NumberFormat numberFormat = NumberFormat.getPercentInstance();
+                    Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
+                    String point = numberFormat.format(parse);
+                    agentoutVo.setPoint(point);
+                }
+
             }
         return agentoutVos;
     }
+
+    private void getBusParent(AgentoutVo agentoutVo) {
+        List<AgentBusInfo> agentBusInfos = agentBusinfoService.queryParenFourLevel(new ArrayList<AgentBusInfo>(), agentoutVo.getBusPlatform(), agentoutVo.getAgentId());
+        if (null != agentBusInfos && agentBusInfos.size() > 0) {
+            if (agentBusInfos.size() == 1) {
+                AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                if (null != agentBusInfo) {
+                    agentoutVo.setBusParentId(agentBusInfo.getAgentId());
+                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setBusParent(agentBusInfo.getAgentId() + agentById.getAgName());
+                }
+            } else if (agentBusInfos.size() == 2) {
+                AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                if (null != agentBusInfo) {
+                    agentoutVo.setBusParentId(agentBusInfo.getAgentId());
+                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setBusParent(agentBusInfo.getAgentId() + agentById.getAgName());
+                }
+                AgentBusInfo twoParent = agentBusInfos.get(1);
+                if (null != twoParent) {
+                    agentoutVo.setBusParentId(twoParent.getAgentId());
+                    Agent agentById = agentService.getAgentById(twoParent.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setTwoParentId(twoParent.getAgentId() + agentById.getAgName());
+                }
+
+            } else if (agentBusInfos.size() == 3) {
+                AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+                if (null != agentBusInfo) {
+                    agentoutVo.setBusParentId(agentBusInfo.getAgentId());
+                    Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setBusParent(agentBusInfo.getAgentId() + agentById.getAgName());
+                }
+                AgentBusInfo twoParent = agentBusInfos.get(1);
+                if (null != twoParent) {
+                    agentoutVo.setBusParentId(twoParent.getAgentId());
+                    Agent agentById = agentService.getAgentById(twoParent.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setTwoParentId(twoParent.getAgentId() + agentById.getAgName());
+                }
+                AgentBusInfo threeParent = agentBusInfos.get(2);
+                if (null != threeParent) {
+                    agentoutVo.setBusParentId(threeParent.getAgentId());
+                    Agent agentById = agentService.getAgentById(threeParent.getAgentId());
+                    if (null != agentById.getAgName())
+                        agentoutVo.setThreeParentId(threeParent.getAgentId() + agentById.getAgName());
+                }
+            }
+        }
+    }
+
 }

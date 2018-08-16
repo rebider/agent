@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PosRewardTemplateMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosRewardTemplate">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="TRAN_CONTRAST_MONTH" jdbcType="VARCHAR" property="tranContrastMonth" />
+    <result column="TRAN_TOTAL_START" jdbcType="DECIMAL" property="tranTotalStart" />
+    <result column="TRAN_TOTAL_END" jdbcType="DECIMAL" property="tranTotalEnd" />
+    <result column="CREDIT_TRAN_CONTRAST_MONTH" jdbcType="VARCHAR" property="creditTranContrastMonth" />
+    <result column="PROPORTION" jdbcType="DECIMAL" property="proportion" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="ACTIVITY_VALID" jdbcType="VARCHAR" property="activityValid" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="OPER_USER" jdbcType="VARCHAR" property="operUser" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, TRAN_CONTRAST_MONTH, TRAN_TOTAL_START, TRAN_TOTAL_END, CREDIT_TRAN_CONTRAST_MONTH, 
+    PROPORTION, CREATE_TIME, ACTIVITY_VALID, UPDATE_TIME, OPER_USER
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplateExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_REWARD_TEMPLATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectCreditMonth" resultType="java.lang.String">
+    SELECT * FROM (
+    SELECT CREDIT_TRAN_CONTRAST_MONTH, ID
+    FROM P_REWARD_TEMPLATE ORDER BY ID DESC ) WHERE ROWNUM = 1
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_REWARD_TEMPLATE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplateExample">
+    delete from P_REWARD_TEMPLATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
+    insert into P_REWARD_TEMPLATE (ID, TRAN_CONTRAST_MONTH, TRAN_TOTAL_START, 
+      TRAN_TOTAL_END, CREDIT_TRAN_CONTRAST_MONTH, 
+      PROPORTION, CREATE_TIME, ACTIVITY_VALID, 
+      UPDATE_TIME, OPER_USER)
+    values (#{id,jdbcType=VARCHAR}, #{tranContrastMonth,jdbcType=VARCHAR}, #{tranTotalStart,jdbcType=DECIMAL}, 
+      #{tranTotalEnd,jdbcType=DECIMAL}, #{creditTranContrastMonth,jdbcType=VARCHAR}, 
+      #{proportion,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, #{activityValid,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{operUser,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
+    insert into P_REWARD_TEMPLATE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="tranContrastMonth != null">
+        TRAN_CONTRAST_MONTH,
+      </if>
+      <if test="tranTotalStart != null">
+        TRAN_TOTAL_START,
+      </if>
+      <if test="tranTotalEnd != null">
+        TRAN_TOTAL_END,
+      </if>
+      <if test="creditTranContrastMonth != null">
+        CREDIT_TRAN_CONTRAST_MONTH,
+      </if>
+      <if test="proportion != null">
+        PROPORTION,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="activityValid != null">
+        ACTIVITY_VALID,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="operUser != null">
+        OPER_USER,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="tranContrastMonth != null">
+        #{tranContrastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="tranTotalStart != null">
+        #{tranTotalStart,jdbcType=DECIMAL},
+      </if>
+      <if test="tranTotalEnd != null">
+        #{tranTotalEnd,jdbcType=DECIMAL},
+      </if>
+      <if test="creditTranContrastMonth != null">
+        #{creditTranContrastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="proportion != null">
+        #{proportion,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityValid != null">
+        #{activityValid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="operUser != null">
+        #{operUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplateExample" resultType="java.lang.Long">
+    select count(*) from P_REWARD_TEMPLATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
+    update P_REWARD_TEMPLATE
+    <set>
+      <if test="tranContrastMonth != null">
+        TRAN_CONTRAST_MONTH = #{tranContrastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="tranTotalStart != null">
+        TRAN_TOTAL_START = #{tranTotalStart,jdbcType=DECIMAL},
+      </if>
+      <if test="tranTotalEnd != null">
+        TRAN_TOTAL_END = #{tranTotalEnd,jdbcType=DECIMAL},
+      </if>
+      <if test="creditTranContrastMonth != null">
+        CREDIT_TRAN_CONTRAST_MONTH = #{creditTranContrastMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="proportion != null">
+        PROPORTION = #{proportion,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityValid != null">
+        ACTIVITY_VALID = #{activityValid,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="operUser != null">
+        OPER_USER = #{operUser,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PosRewardTemplate">
+    update P_REWARD_TEMPLATE
+    set TRAN_CONTRAST_MONTH = #{tranContrastMonth,jdbcType=VARCHAR},
+      TRAN_TOTAL_START = #{tranTotalStart,jdbcType=DECIMAL},
+      TRAN_TOTAL_END = #{tranTotalEnd,jdbcType=DECIMAL},
+      CREDIT_TRAN_CONTRAST_MONTH = #{creditTranContrastMonth,jdbcType=VARCHAR},
+      PROPORTION = #{proportion,jdbcType=DECIMAL},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+      ACTIVITY_VALID = #{activityValid,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+      OPER_USER = #{operUser,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

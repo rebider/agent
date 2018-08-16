@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -64,18 +61,18 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         if(StringUtils.isEmpty(ac.getAgentId())){
             throw new ProcessException("代理商ID不能为空");
         }
-        if(StringUtils.isEmpty(ac.getCloBank())){
-            throw new ProcessException("收款开户行不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getCloRealname())){
-            throw new ProcessException("收款账户名不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getCloBankAccount())){
-            throw new ProcessException("收款账号不能为空");
-        }
-        if(StringUtils.isEmpty(ac.getCloType())){
-            throw new ProcessException("收款账户类型不能为空");
-        }
+//        if(StringUtils.isEmpty(ac.getCloBank())){
+//            throw new ProcessException("收款开户行不能为空");
+//        }
+//        if(StringUtils.isEmpty(ac.getCloRealname())){
+//            throw new ProcessException("收款账户名不能为空");
+//        }
+//        if(StringUtils.isEmpty(ac.getCloBankAccount())){
+//            throw new ProcessException("收款账号不能为空");
+//        }
+//        if(StringUtils.isEmpty(ac.getCloType())){
+//            throw new ProcessException("收款账户类型不能为空");
+//        }
         Date d = Calendar.getInstance().getTime();
         ac.setcTime(d);
         ac.setcUtime(d);
@@ -161,6 +158,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         if(appStatus!=null){
             c.andCloReviewStatusEqualTo(appStatus);
         }
+        example.setOrderByClause(" c_time desc ");
         return agentColinfoMapper.selectByExample(example);
     }
 
@@ -242,5 +240,32 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             e.printStackTrace();
             throw e;
         }
+    }
+
+    /**
+     * 检索原税点
+     * @param agentColinfo
+     * @return
+     */
+    @Override
+    public AgentColinfo queryPoint(AgentColinfo agentColinfo) {
+        if (StringUtils.isBlank(agentColinfo.getAgentId())) {
+            return null;
+        }
+        AgentColinfoExample example = new AgentColinfoExample();
+        AgentColinfoExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentColinfo.getAgentId());
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approved.status);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentColinfo> colinfos = agentColinfoMapper.selectByExample(example);
+        if (colinfos.size() != 1) {
+            return null;
+        }
+        return colinfos.get(0);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(AgentColinfo record) {
+        return agentColinfoMapper.updateByPrimaryKeySelective(record);
     }
 }

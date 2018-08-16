@@ -74,15 +74,15 @@ public class AppConfig extends Thread {
 
     public void run() {
         while (!appConfig.getProperty("ServerStop").equals("0")) {
-            try {
-                sleep(300000);//隔5分钟重读配置文件
-            } catch (Exception ex1) {
-                logger.fatal(ex1);
-            }
-            loadConfig();
+        try {
+            sleep(300000);//隔5分钟重读配置文件
+        } catch (Exception ex1) {
+            logger.fatal(ex1);
         }
-        logger.debug("AppConfig thread is exiting...");
+        loadConfig();
     }
+        logger.debug("AppConfig thread is exiting...");
+}
 
 
     public static String getProperty(String propName) {
@@ -273,5 +273,15 @@ public class AppConfig extends Thread {
         for(String email:emails.split("\\,")){
             AppConfig.sendEmailAndAtt(email, msg, title, newFile,fileName);
         }
+    }
+
+    /**
+     * 机具扣款调整通知
+     * @param msg
+     * @param title
+     */
+    public static void sendEmailsPosBack(String msg,String title){
+        String emails = PropUtils.getProp("posBackEmails");
+        AppConfig.sendEmail(emails.split("\\,"), msg, title);
     }
 }

@@ -2,23 +2,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AimportService;
 import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 
-import com.ryx.credit.service.impl.agent.AimportServiceImpl;
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.aspectj.AspectJAsyncConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -35,6 +34,9 @@ public class DictServiceTest extends BaseSpringTest {
 
     @Autowired
     private DateChangeReqService dateChangeReqService;
+
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
     @Autowired
     private AimportService aimportService;
@@ -75,6 +77,16 @@ public class DictServiceTest extends BaseSpringTest {
         logger.info("=======testImPortAgent=====");
     }
 
-
+    @Test
+    public void testParent(){
+        logger.info("=======testImPortAgent=====");
+        try {
+            List<AgentBusInfo> d= agentBusinfoService.queryParenFourLevel(new ArrayList<AgentBusInfo>(),"100007","AG20180615000000000000300");
+            logger.info("======="+JSONObject.toJSONString(d)+"=====");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        logger.info("=======testImPortAgent=====");
+    }
 
 }

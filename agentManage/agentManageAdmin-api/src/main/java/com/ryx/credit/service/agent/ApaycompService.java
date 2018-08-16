@@ -13,4 +13,12 @@ public interface ApaycompService {
      * @return
      */
     List<PayComp> compList();
+
+    /**
+     * 收款款公司列表
+     * @return
+     */
+    List<PayComp> recCompList();
+
+    PayComp selectById(String id);
 }

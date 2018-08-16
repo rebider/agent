@@ -58,14 +58,14 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.DictKey" >
-    select 
-    <include refid="Base_Column_List" />
-    from D_DICT
-    where D_GROUP = #{dGroup,jdbcType=VARCHAR}
-      and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
-      and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
-  </select>
+  <!--<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.DictKey" >-->
+    <!--select -->
+    <!--<include refid="Base_Column_List" />-->
+    <!--from D_DICT-->
+    <!--where D_GROUP = #{dGroup,jdbcType=VARCHAR}-->
+      <!--and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}-->
+      <!--and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}-->
+  <!--</select>-->
   <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.DictExample" >
     delete from D_DICT
     <if test="_parameter != null" >
@@ -135,26 +135,26 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
-    update D_DICT
-    <set >
-      <if test="dItemname != null" >
-        D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},
-      </if>
-      <if test="dItemnremark != null" >
-        D_ITEMNREMARK = #{dItemnremark,jdbcType=VARCHAR},
-      </if>
-      <if test="dSort != null" >
-        D_SORT = #{dSort,jdbcType=DECIMAL},
-      </if>
-      <if test="dStatus != null" >
-        D_STATUS = #{dStatus,jdbcType=DECIMAL},
-      </if>
-    </set>
-    where D_GROUP = #{dGroup,jdbcType=VARCHAR}
-      and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
-      and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
-  </update>
+  <!--<update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >-->
+    <!--update D_DICT-->
+    <!--<set >-->
+      <!--<if test="dItemname != null" >-->
+        <!--D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},-->
+      <!--</if>-->
+      <!--<if test="dItemnremark != null" >-->
+        <!--D_ITEMNREMARK = #{dItemnremark,jdbcType=VARCHAR},-->
+      <!--</if>-->
+      <!--<if test="dSort != null" >-->
+        <!--D_SORT = #{dSort,jdbcType=DECIMAL},-->
+      <!--</if>-->
+      <!--<if test="dStatus != null" >-->
+        <!--D_STATUS = #{dStatus,jdbcType=DECIMAL},-->
+      <!--</if>-->
+    <!--</set>-->
+    <!--where D_GROUP = #{dGroup,jdbcType=VARCHAR}-->
+      <!--and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}-->
+      <!--and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}-->
+  <!--</update>-->
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
     update D_DICT
     set D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},
@@ -177,5 +177,106 @@
   </sql>
 
   <select id="sqlId" parameterType="string" resultType="long">select ${tableName}_seqid.nextval from dual</select>
+
+  <insert id="insertDict" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
+    insert into D_DICT (D_GROUP, D_ARTIFACT, D_ITEMVALUE,
+    D_ITEMNAME, D_ITEMNREMARK, D_SORT, D_STATUS)
+    values (#{dGroup,jdbcType=VARCHAR}, #{dArtifact,jdbcType=VARCHAR}, #{dItemvalue,jdbcType=VARCHAR},
+    #{dItemname,jdbcType=VARCHAR}, #{dItemnremark,jdbcType=VARCHAR}, #{dSort,jdbcType=DECIMAL},
+    #{dStatus,jdbcType=DECIMAL})
+  </insert>
+
+  <!--删除（编辑）状态-->
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >
+    update D_DICT
+    <set >
+      <if test="dItemname != null" >
+        D_ITEMNAME = #{dItemname,jdbcType=VARCHAR},
+      </if>
+      <if test="dItemnremark != null" >
+        D_ITEMNREMARK = #{dItemnremark,jdbcType=VARCHAR},
+      </if>
+      <if test="dSort != null" >
+        D_SORT = #{dSort,jdbcType=DECIMAL},
+      </if>
+      <if test="dStatus != null" >
+        D_STATUS = #{dStatus,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where D_GROUP = #{dGroup,jdbcType=VARCHAR}
+    and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}
+    and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}
+  </update>
+
+  <!--<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.Dict" >-->
+    <!--select-->
+    <!--<include refid="Base_Column_List" />-->
+    <!--from A_PLATFORM-->
+    <!--where D_GROUP = #{dGroup,jdbcType=VARCHAR}-->
+    <!--and D_ARTIFACT = #{dArtifact,jdbcType=VARCHAR}-->
+    <!--and D_ITEMVALUE = #{dItemvalue,jdbcType=VARCHAR}-->
+  <!--</select>-->
+
+  <select id="countDict" parameterType="map" resultType="Integer">
+    select count(*) from D_DICT
+    <where>
+    <if test="dGroup != null and  ''!=dGroup" >
+    and D_GROUP=#{dGroup}
+    </if>
+    <if test="dArtifact != null and  ''!=dArtifact">
+    and D_ARTIFACT=#{dArtifact}
+    </if>
+    <if test="dItemvalue != null and  ''!=dItemvalue">
+    and D_ITEMVALUE=#{dItemvalue}
+    </if>
+    <if test="dItemname != null and  ''!=dItemname">
+    and D_ITEMNAME=#{dItemname}
+    </if>
+    <if test="dItemnremark != null and  ''!=dItemnremark">
+    and D_ITEMNREMARK=#{dItemnremark}
+    </if>
+    <if test="dSort != null and  ''!=dSort">
+    and D_SORT=#{dSort}
+    </if>
+    <if test="dStatus != null and  ''!=dStatus">
+    and D_STATUS=#{dStatus}
+    </if>
+    </where>
+  </select>
+
+  <!--查询-->
+  <select id="selectDict" parameterType="map" resultMap="BaseResultMap">
+    select B.* from (
+    select A.* ,ROWNUM rn from (
+    select * from D_DICT
+    <where>
+      <if test="dGroup != null and  ''!=dGroup" >
+        and D_GROUP=#{dGroup}
+      </if>
+      <if test="dArtifact != null and  ''!=dArtifact">
+        and D_ARTIFACT=#{dArtifact}
+      </if>
+      <if test="dItemvalue != null and  ''!=dItemvalue">
+        and D_ITEMVALUE=#{dItemvalue}
+      </if>
+      <if test="dItemname != null and  ''!=dItemname">
+        and D_ITEMNAME=#{dItemname}
+      </if>
+      <if test="dItemnremark != null and  ''!=dItemnremark">
+        and D_ITEMNREMARK=#{dItemnremark}
+      </if>
+      <if test="dSort != null and  ''!=dSort">
+        and D_SORT=#{dSort}
+      </if>
+    </where>
+    )A
+    <if test='pageNumStop != null and pageNumStop!=""'>
+      <![CDATA[where ROWNUM <=#{pageNumStop}]]>
+    </if>
+    )B
+    <if test='pageNumBegin != null and pageNumBegin!=""'>
+      Where rn >=#{pageNumBegin}
+    </if>
+  </select>
 
 </mapper>

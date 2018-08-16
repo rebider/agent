@@ -1437,6 +1437,76 @@ public class OSubOrderExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
