@@ -554,7 +554,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
             and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
         </if>
-        <if test="map.userIdList!=null">
+        <if test="map.userIdList!=null and map.userIdList.size()>0">
             and agent.C_USER in
             <foreach collection="map.userIdList" open="(" close=")" separator="," item="user">
                 #{user}
@@ -593,7 +593,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
             and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
         </if>
-        <if test="map.userIdList!=null">
+        <if test="map.userIdList!=null and map.userIdList.size()>0">
             and agent.C_USER in
             <foreach collection="map.userIdList" item="user" open="(" close=")" separator="," >
                 #{user}
