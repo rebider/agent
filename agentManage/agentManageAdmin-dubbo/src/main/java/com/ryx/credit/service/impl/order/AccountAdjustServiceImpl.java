@@ -107,21 +107,22 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         leftAmt = leftAmt.subtract(payment.getOutstandingAmount());
 
                         List<OPaymentDetail> oPaymentDetails = paymentDetailService.getPaymentDetails(paymentId, "DF", "BF", "YQ");
-                        for (OPaymentDetail paymentDetail : oPaymentDetails) {
+                        OPaymentDetail paymentDetail = oPaymentDetails.get(0);
+                        //for (OPaymentDetail paymentDetail : oPaymentDetails) {
                             //一条抵扣记录
                             Map<String, Object> oneTakeoutRecord = new HashMap<>();
-                            oneTakeoutRecord.put("orderId", paymentDetail.getOrderId());
+                            oneTakeoutRecord.put("orderId", payment.getOrderId());
                             oneTakeoutRecord.put("paymentId", paymentId);
                             oneTakeoutRecord.put("paymentDetailId", paymentDetail.getId());
                             oneTakeoutRecord.put("batchCode", paymentDetail.getBatchCode());
                             oneTakeoutRecord.put("paymentType", paymentDetail.getPaymentType());
                             oneTakeoutRecord.put("payType", paymentDetail.getPayType());
-                            oneTakeoutRecord.put("payAmt", paymentDetail.getPayAmount());
-                            oneTakeoutRecord.put("planPayTime", paymentDetail.getPlanPayTime());
-                            oneTakeoutRecord.put("planNum", paymentDetail.getPlanNum());
+                            oneTakeoutRecord.put("payAmt", payment.getOutstandingAmount());
+                            //oneTakeoutRecord.put("planPayTime", paymentDetail.getPlanPayTime());
+                            //oneTakeoutRecord.put("planNum", paymentDetail.getPlanNum());
                             oneTakeoutRecord.put("payment", payment);
                             takeoutList.add(oneTakeoutRecord);
-                        }
+                        //}
 
 
                         //更新订单状态全部明细为支付完成
