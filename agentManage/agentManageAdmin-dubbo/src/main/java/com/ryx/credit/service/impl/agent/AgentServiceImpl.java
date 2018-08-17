@@ -1,17 +1,13 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.DigestUtils;
+import com.ryx.credit.dao.COrganizationMapper;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
@@ -37,10 +33,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 代理商基础信息管理服务类
@@ -50,6 +44,8 @@ import java.util.Map;
 public class AgentServiceImpl implements AgentService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
+
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
 
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
@@ -69,6 +65,9 @@ public class AgentServiceImpl implements AgentService {
     private ICuserAgentService iCuserAgentService;
     @Autowired
     private CuserAgentMapper cuserAgentMapper;
+    @Autowired
+    private CUserMapper cUserMapper;
+
 
     /**
      * 查询代理商信息
@@ -125,8 +124,33 @@ public class AgentServiceImpl implements AgentService {
         return page;
     }
 
+    @Autowired
+    private COrganizationMapper organizationMapper;
+
     @Override
-    public PageInfo queryAgentAll(Page page, Map map) {
+    public PageInfo queryAgentAll(Page page, Map map ,Long userId) {
+
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+
+        if(JURIS_DICTION.contains(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")))){
+            if(StringUtils.isNotBlank(orgId) && !orgId.equals("null")){
+                List<COrganization> cOrganizations = organizationMapper.selectByOrgPid(orgId);
+                List<String> userIdList = new ArrayList<>();
+                userIdList.add(String.valueOf(userId));
+                cOrganizations.forEach(cOrganization->{
+                    List<UserVo> userVos = cUserMapper.selectUserByOrgId(cOrganization.getId());
+                    userVos.forEach(userVo->{
+                        userIdList.add(String.valueOf(userVo.getId()));
+                    });
+                });
+                map.put("userIdList",userIdList);
+            }
+        }
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
@@ -135,8 +159,7 @@ public class AgentServiceImpl implements AgentService {
             }
         }
         PageInfo pageInfo = new PageInfo();
-        map.put("page", page);
-        pageInfo.setRows(agentMapper.queryAgentListView(map));
+        pageInfo.setRows(agentMapper.queryAgentListView(map,page));
         pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));
 
         return pageInfo;

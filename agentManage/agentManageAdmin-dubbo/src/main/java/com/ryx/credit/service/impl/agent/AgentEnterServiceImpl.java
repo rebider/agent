@@ -6,10 +6,12 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
@@ -41,7 +43,7 @@ import static com.ryx.credit.common.enumc.AgStatus.getAgStatusByValue;
 public class AgentEnterServiceImpl implements AgentEnterService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
-
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
 
     @Autowired
     private AgentService agentService;
@@ -77,7 +79,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private RegionService regionService;
     @Autowired
     private ApaycompService apaycompService;
-
+    @Autowired
+    private COrganizationMapper organizationMapper;
+    @Autowired
+    private CUserMapper cUserMapper;
     /**
      * 商户入网
      *
@@ -720,7 +725,28 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public static BusinessPlatformService businessPlatformService;
 
     @Override
-    public List<AgentoutVo> exportAgent(Map map) throws ParseException {
+    public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+
+        if(JURIS_DICTION.contains(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")))){
+            if(org.apache.commons.lang.StringUtils.isNotBlank(orgId) && !orgId.equals("null")){
+                List<COrganization> cOrganizations = organizationMapper.selectByOrgPid(orgId);
+                List<String> userIdList = new ArrayList<>();
+                userIdList.add(String.valueOf(userId));
+                cOrganizations.forEach(cOrganization->{
+                    List<UserVo> userVos = cUserMapper.selectUserByOrgId(cOrganization.getId());
+                    userVos.forEach(userVo->{
+                        userIdList.add(String.valueOf(userVo.getId()));
+                    });
+                });
+                map.put("userIdList",userIdList);
+            }
+        }
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (org.apache.commons.lang.StringUtils.isNotBlank(time)&&!time.equals("null")) {
