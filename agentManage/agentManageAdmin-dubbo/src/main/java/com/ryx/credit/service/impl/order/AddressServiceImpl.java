@@ -214,34 +214,36 @@ public class AddressServiceImpl implements AddressService {
             logger.info("导入的数据为空");
             throw new MessageException("导入的数据为空");
         }
+        int i=2;
         for (List<Object> objectList : list) {
+            int j=i++;
             if (StringUtils.isBlank(String.valueOf(objectList.get(0)))) {
                 logger.info("收货人为空:{}", String.valueOf(objectList.get(0)));
-                throw new MessageException("请填写收货人姓名");
+                throw new MessageException("请填写第"+j+"行数据的收货人姓名");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(1)))) {
                 logger.info("联系电话为空:{}", String.valueOf(objectList.get(1)));
-                throw new MessageException("请填写联系电话");
+                throw new MessageException("请填写第"+j+"行数据的联系电话");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(2)))) {
                 logger.info("省为空:{}", String.valueOf(objectList.get(2)));
-                throw new MessageException("请填写地址---省");
+                throw new MessageException("请填写第"+j+"行数据的地址---省");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(3)))) {
                 logger.info("市为空:{}", String.valueOf(objectList.get(3)));
-                throw new MessageException("请填写地址---市");
+                throw new MessageException("请填写第"+j+"行数据的地址---市");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(4)))) {
                 logger.info("区为空:{}", String.valueOf(objectList.get(4)));
-                throw new MessageException("请填写地址---区");
+                throw new MessageException("请填写第"+j+"行数据的地址---区");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(5)))) {
                 logger.info("详细地址为空:{}", String.valueOf(objectList.get(5)));
-                throw new MessageException("请填写详细地址");
+                throw new MessageException("请填写第"+j+"行数据的详细地址");
             }
             if (StringUtils.isBlank(String.valueOf(objectList.get(6)))) {
                 logger.info("邮编为空:{}", String.valueOf(objectList.get(6)));
-                throw new MessageException("请填写邮编");
+                throw new MessageException("请填写第"+j+"行数据的邮编");
             }
             OAddress oAddress = new OAddress();
             oAddress.setId(idService.genId(TabId.o_address));
@@ -272,8 +274,8 @@ public class AddressServiceImpl implements AddressService {
             criteria.andRNameEqualTo(String.valueOf(objectList.get(2)));
             List<Region> regions = regionMapper.selectByExample(regionExample);
             if (1 != regions.size()) {
-                logger.info("没有该省");
-                throw new MessageException("没有该省");
+                logger.info("第"+j+"行数据没有该省");
+                throw new MessageException("第"+j+"行数据没有该省");
             }
             Region region = regions.get(0);
             oAddress.setAddrProvince(region.getrCode());
@@ -286,8 +288,8 @@ public class AddressServiceImpl implements AddressService {
             criteriaCity.andPCodeEqualTo(region.getrCode());
             List<Region> regionsCity = regionMapper.selectByExample(regionExam);
             if (1 != regionsCity.size()) {
-                logger.info("没有该市");
-                throw new MessageException("没有该市");
+                logger.info("第"+j+"行数据没有该市");
+                throw new MessageException("第"+j+"行数据没有该市");
             }
             Region regionCity = regionsCity.get(0);
             oAddress.setAddrCity(regionCity.getrCode());
@@ -300,13 +302,11 @@ public class AddressServiceImpl implements AddressService {
             criteriaDis.andPCodeEqualTo(regionCity.getrCode());
             List<Region> regionsDis = regionMapper.selectByExample(regionExa);
             if (1 != regionsDis.size()) {
-                logger.info("没有该区");
-                throw new MessageException("没有该区");
+                logger.info("第"+j+"行数据没有该区");
+                throw new MessageException("第"+j+"行数据没有该区");
             }
             Region regionDis = regionsDis.get(0);
             oAddress.setAddrDistrict(regionDis.getrCode());
-
-
             //进行添加
             if (1 != oAddressMapper.insertSelective(oAddress)) {
                 logger.info("插入失败!");
