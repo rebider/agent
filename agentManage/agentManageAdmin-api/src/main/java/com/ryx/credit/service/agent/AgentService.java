@@ -21,7 +21,7 @@ public interface AgentService {
      * @return
      */
     PageInfo queryAgentList(PageInfo page, Agent agent);
-    PageInfo queryAgentAll(Page page, Map map);
+    PageInfo queryAgentAll(Page page, Map map,Long userId);
 
     /**
      * 代理商新曾
