@@ -485,7 +485,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andBusNumEqualTo(busNum)
-				.andBusParentEqualTo(platformCode)
+				.andBusPlatformEqualTo(platformCode)
 				.andStatusEqualTo(Status.STATUS_1.status)
 				.andBusStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
