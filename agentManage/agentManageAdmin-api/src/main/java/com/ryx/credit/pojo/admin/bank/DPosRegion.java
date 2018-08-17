@@ -62,4 +62,20 @@ public class DPosRegion implements Serializable{
     public void setCodeType(String codeType) {
         this.codeType = codeType == null ? null : codeType.trim();
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DPosRegion that = (DPosRegion) o;
+
+        return code != null ? code.equals(that.code) : that.code == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return code != null ? code.hashCode() : 0;
+    }
 }
