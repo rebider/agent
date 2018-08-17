@@ -450,4 +450,8 @@
     </if>
   </sql>
 
+  <update id="updateFristAgentStatus" parameterType="java.lang.String">
+    UPDATE P_PROFIT_DIRECT P SET  P.STATUS ='1' WHERE P.FRIST_AGENT_PID =#{agentPid}
+  </update>
+
 </mapper>
