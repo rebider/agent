@@ -131,7 +131,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
      * @return
      */
     @Override
-    public ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus) {
+    public ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus)throws Exception {
         try {
             BusActRelExample example = new BusActRelExample();
             example.or().andStatusEqualTo(Status.STATUS_1.status).andActivIdEqualTo(proIns).andActivStatusEqualTo(AgStatus.Approving.name());
@@ -213,12 +213,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 }
             } catch (ProcessException e) {
                 e.printStackTrace();
-                return ResultVO.fail(e.getMessage());
+               throw e;
             }
             return ResultVO.success(dr);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResultVO.fail(e.getMessage());
+            throw e;
         }
     }
 }
