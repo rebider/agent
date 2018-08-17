@@ -45,7 +45,7 @@ public class AgentServiceImpl implements AgentService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
 
-    private final String JURIS_DICTION = AppConfig.getProperty("agencyChange_mpos_notify_url");
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
 
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
