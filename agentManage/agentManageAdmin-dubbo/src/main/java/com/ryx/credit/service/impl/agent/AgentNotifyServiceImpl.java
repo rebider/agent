@@ -337,8 +337,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentResult result = null;
         try {
             record.setId(id);
-            String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-            record.setSendJson(sendJson);
             record.setNotifyTime(new Date());
             record.setAgentId(agentBusInfo.getAgentId());
             record.setBusId(agentBusInfo.getId());
@@ -361,6 +359,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 //POS传递的唯一ID是业务平台记录ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
                 result = httpRequestForPos(agentNotifyVo);
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
                 log.info("已有编号进行入网修改：接收入网请求结束POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
 
@@ -370,6 +370,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 //MPOS传递的唯一id为代理商唯一ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 result = httpRequestForMPOS(agentNotifyVo);
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
                 log.info("已有编号进行入网修改：接收入网请求结束MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
 
@@ -615,8 +617,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentResult result = null;
         try {
             record.setId(id);
-            String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-            record.setSendJson(sendJson);
+
             record.setNotifyTime(new Date());
             record.setAgentId(agentBusInfo.getAgentId());
             record.setBusId(agentBusInfo.getId());
@@ -635,12 +636,16 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 //POS传递业务ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
                 result = httpRequestForPos(agentNotifyVo);
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
 
                 //首刷传递代理商ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 result = httpRequestForMPOS(agentNotifyVo);
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
             }
             log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
             record.setNotifyJson(String.valueOf(result.getData()));

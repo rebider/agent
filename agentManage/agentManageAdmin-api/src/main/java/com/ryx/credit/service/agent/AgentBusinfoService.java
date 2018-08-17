@@ -65,6 +65,16 @@ public interface AgentBusinfoService {
      */
     public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
+
+    /**
+     * 查询给定的代理商机构编号上级
+     * @param list
+     * @param platformCode
+     * @param busNum
+     * @return
+     */
+    public List<AgentBusInfo> queryParenFourLevelBusNum(List<AgentBusInfo> list, String platformCode, String busNum);
+
     public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
     /**

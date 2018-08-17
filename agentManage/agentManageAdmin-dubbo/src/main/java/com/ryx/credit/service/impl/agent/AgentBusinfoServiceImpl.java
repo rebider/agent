@@ -382,6 +382,43 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	}
 
+
+	@Override
+	public List<AgentBusInfo> queryParenFourLevelBusNum(List<AgentBusInfo> list, String platformCode, String busNum) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		if(list.size()==4) {
+			return list;
+		}
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andBusNumEqualTo(busNum)
+				.andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
+		if(plats.size()==0)
+			return list;
+		AgentBusInfo platInfo = plats.get(0);
+		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
+			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
+			if(parent!=null){
+				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
+					list.add(parent);
+					if (StringUtils.isNotEmpty(parent.getAgentId())) {
+						return queryParenFourLevel(list, platformCode, parent.getBusNum());
+					}else{
+						return list;
+					}
+				}else{
+					return list;
+				}
+			}else{
+				return list;
+			}
+		}else{
+			return list;
+		}
+	}
+
 	/**
 	 * 把给定的代理商指定的平台的下级节点全部放回
 	 * @param list
