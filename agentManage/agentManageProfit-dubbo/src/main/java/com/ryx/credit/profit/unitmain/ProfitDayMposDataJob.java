@@ -85,6 +85,7 @@ public class ProfitDayMposDataJob {
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
             e.printStackTrace();
+            throw new RuntimeException("分润数据处理失败");
         }
     }
 

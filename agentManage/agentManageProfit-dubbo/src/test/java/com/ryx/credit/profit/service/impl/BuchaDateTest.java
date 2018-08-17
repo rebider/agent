@@ -1,4 +1,4 @@
-package com.ryx.credit.profit.unitmain;
+package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
@@ -6,49 +6,55 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.profit.dao.PAgentPidLinkMapper;
 import com.ryx.credit.profit.dao.ProfitSupplyDiffMapper;
-import com.ryx.credit.profit.pojo.ProfitDay;
+import com.ryx.credit.profit.pojo.PAgentPidLink;
 import com.ryx.credit.profit.pojo.ProfitSupplyDiff;
 import com.ryx.credit.profit.service.IProfitDService;
+import com.ryx.credit.profit.service.IProfitDirectService;
+import com.ryx.credit.profit.service.ProfitDeductionService;
+import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * 手刷补差数据同步
+ * @author yangmx
+ * @desc
  */
-@Service("profitMposDiffDataJob")
-@Transactional(rollbackFor=RuntimeException.class)
-public class ProfitMposDiffDataJob {
-    Logger logger = LogManager.getLogger(this.getClass());
-    @Autowired
-    private ProfitSupplyDiffMapper supplyDiffMapper;
-    @Autowired
-    private IdService idService;
-    private int index = 1;
+@RunWith(SpringJUnit4ClassRunner.class)
+// 加载配置文件
+@ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
+public class BuchaDateTest {
 
+    @Autowired
+    IdService idService;
+    @Autowired
+    IProfitDService profitDService;
+    @Autowired
+    ProfitComputerServiceImpl computerService;
+    @Autowired
+    ProfitDetailMonthService profitDetailMonthService;
+    @Autowired
+    IProfitDirectService profitDirectService;
+    @Autowired
+    ProfitDeductionService profitDeductionService;
+    @Autowired
+    PAgentPidLinkMapper pidLinkMapper;
+    @Autowired
+    ProfitSupplyDiffMapper supplyDiffMapper;
+    private int index=1;
 
-    public static void main(String agrs[]){
-        HashMap<String,String> map = new HashMap<String,String>();
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.bucha"),params);
-        System.out.println(res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            //logger.error("请求同步失败！");
-            AppConfig.sendEmails("日分润同步失败","日分润同步失败");
-            return;
-        }
-        String data = JSONObject.parseObject(res).get("data").toString();
-        List<JSONObject> list = JSONObject.parseObject(data,List.class);
-        System.out.println(data);
+    @Test
+    public void testX(){
+        synchroProfitDiff(null);
     }
 
     public void synchroProfitDiff(String month){
@@ -62,7 +68,7 @@ public class ProfitMposDiffDataJob {
                 (AppConfig.getProperty("profit.bucha"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            logger.error("请求同步失败！");
+            System.out.println("请求同步失败！");
             AppConfig.sendEmails("日分润同步失败","日分润同步失败");
             return;
         }
@@ -73,7 +79,7 @@ public class ProfitMposDiffDataJob {
                 insertProfitDiff(list,month);
             }
         } catch (Exception e) {
-            logger.error("同步插入数据失败！");
+            System.out.println("同步插入数据失败！");
             e.printStackTrace();
             throw new RuntimeException("分润数据处理失败");
         }
@@ -97,4 +103,5 @@ public class ProfitMposDiffDataJob {
         }
         synchroProfitDiff(date);
     }
+
 }

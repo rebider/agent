@@ -433,11 +433,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             AgentBusInfo me = new AgentBusInfo();//本代理商业务信息
             List<String> allSubs = new ArrayList<String>();//该代理商所有业务平台下级agentid
             for(PAgentPidLink link:links){
-                List<AgentBusInfo> subs = businfoService.queryChildLevel(null,link.getDeptCode(),link.getAgentId());//子类
+                List<AgentBusInfo> subs = businfoService.queryChildLevelByBusNum(null,link.getDeptCode(),link.getAgentId());//子类
                 for(AgentBusInfo sub:subs){
                     allSubs.add(sub.getAgentId());
                 }
-                if(me.getCloPayCompany()==null){//如果打款公司为空。轮番轰炸
+
+                if(null==me || me.getCloPayCompany()==null){//如果打款公司为空。轮番轰炸
                     me = businfoService.getByBusidAndCode(link.getDeptCode(),link.getAgentId());
                 }
 
@@ -447,20 +448,25 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             for(Agent agent:agents){
                 ids.add(agent.getAgUniqNum());//唯一码
             }
+            if(ids.size()==0){
+                ids.add("0");
+            }
             BigDecimal subAmt = detailMonthMapper.findByIds(ids);//所有下级的基础分润汇总
 
-            List<AgentBusInfo> parents = businfoService.queryParenFourLevel(null,links.get(0).getDeptCode(),links.get(0).getAgentId());//父类
-            if(me.getCloPayCompany().equals("6")){//打款公司瑞银信
+            List<AgentBusInfo> parents = businfoService.queryParenFourLevelBusNum(null,links.get(0).getDeptCode(),links.get(0).getAgentId());//父类
+            if(me.getCloPayCompany()!=null && me.getCloPayCompany().equals("6")){//打款公司瑞银信
                 isRYX = true;
             }
             if(parents.size()>0){
                 AgentBusInfo first = parents.get(parents.size()-1);
                 Agent agent = agentService.getAgentById(first.getAgentId());
-                if(agent.getAgUniqNum().equals("JS00001159")||agent.getAgUniqNum().equals("JS00001160")) {//捷步、银点只算日结
+                if(agent.getAgUniqNum().equals("JS00001159")||agent.getAgUniqNum().equals("JS00001160")
+                        ||agent.getAgUniqNum().equals("JS00000007")) {//捷步、银点只算日结
                     isJieYin = true;
                 }
             }
-            ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt(),detailMonth.getAgentPid(),subAmt,detailMonth.getTax(),profitDate,isJieYin,isRYX);
+            ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt(),detailMonth.getAgentPid(),isDecimalNull(subAmt),detailMonth.getTax(),profitDate,isJieYin,isRYX);
+            updateDetail.setId(detailMonth.getId());
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
 
@@ -491,8 +497,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
         //-------------------本月税额计算-------------------
         BigDecimal tax = adjustMapper.getTax(agentPid);
-        if(null == tax){
-            tax = agentTax==null?new BigDecimal("0.06"):agentTax;
+        if (null != tax){
+            tax = tax.multiply(new BigDecimal("0.01"));
+        }else{
+            tax = agentTax==null?new BigDecimal("0.06"):agentTax.multiply(new BigDecimal("0.01"));
         }
         logger.info("税点："+tax);
         //-------------------查询该代理商下级代理应补税额-------------------
@@ -503,7 +511,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         dirct.setFristAgentPid(agentPid);
         dirct.setTransMonth(transDate);
         if(tax.compareTo(new BigDecimal("0.06"))<0 && isRYX){//小于0.06才存在补税 & 开票代理商无需再计算税务部分
-            subTax1 = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总
+            subTax1 = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总(直发部分)
             subTax1 = subTax1==null?BigDecimal.ZERO:subTax1;
             logger.info("开票补所有");
             subTax1 = subTax1.multiply(new BigDecimal("0.06"));
@@ -519,7 +527,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             return detail;
         }else if(tax.compareTo(new BigDecimal("0.06"))<0){//小于0.06才存在补税
             logger.info("不开票补税点");
-            subTax1 = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总
+            subTax1 = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总(直发部分)
             subTax1 = subTax1==null?BigDecimal.ZERO:subTax1;
             subTax1 = subTax1.multiply(new BigDecimal("0.06")).subtract(subTax1.multiply(tax));//下级分润*下级税点-下级分润*上级税点
             subTax2 = subAmt.multiply(new BigDecimal("0.06")).subtract(subAmt.multiply(tax));//下级分润*下级税点-下级分润*上级税点
@@ -538,7 +546,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             logger.info("日结分润："+totalDay);
         }
         BigDecimal taxDay = isDecimalNull(totalDay).multiply(tax);//日结分润应补税额部分
-        BigDecimal taxHistory = historyMapper.getHistoryAmt(where);//上月税额
+        BigDecimal taxHistory = historyMapper.getHistoryAmt(where);//上月日结欠税额
         detail.setDeductionTaxMonthAgoAmt(taxDay.add(isDecimalNull(taxHistory)));//@@@@@@VALUE：扣本月之前税额（含本月日）
         logger.info("@扣本月之前税额（含本月日）："+detail.getDeductionTaxMonthAgoAmt());
         //-------------------本月分润=基础分润-本月之前欠税额+下级补税点。
@@ -546,15 +554,15 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         // ------------------不足后，需记录本月之前欠税额-------------------
         BigDecimal must = profitA.subtract(detail.getDeductionTaxMonthAgoAmt())
                 .add(detail.getSupplyTaxAmt());
-        detail.setProfitMonthAmt(must.compareTo(BigDecimal.ZERO)<0?BigDecimal.ZERO:must);//@@@@@@VALUE：本月分润
+        if(must.compareTo(BigDecimal.ZERO)<0){//分润不足扣上月欠税
+            inserHistory(transDate,agentPid,must.multiply(new BigDecimal("-1")));
+            must = BigDecimal.ZERO;
+        }
+        detail.setProfitMonthAmt(must);//@@@@@@VALUE：本月分润
         logger.info("@本月分润:"+detail.getProfitMonthAmt());
         detail.setDeductionTaxMonthAmt(must.multiply(tax));//@@@@@@VALUE：本月税额
         logger.info("@本月税额:"+detail.getDeductionTaxMonthAmt());
         BigDecimal actual = must.subtract(detail.getDeductionTaxMonthAmt());
-        if(actual.compareTo(BigDecimal.ZERO)<=0){//实际分润不足扣税
-            inserHistory(transDate,agentPid,actual.multiply(new BigDecimal("-1")));
-            actual = BigDecimal.ZERO;
-        }
         detail.setRealProfitAmt(actual);//@@@@@@VALUE：实发分润
         logger.info("@实发分润:"+actual);
         return detail;

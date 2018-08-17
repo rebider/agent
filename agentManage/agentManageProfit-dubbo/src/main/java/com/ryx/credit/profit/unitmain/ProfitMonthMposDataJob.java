@@ -128,6 +128,7 @@ public class ProfitMonthMposDataJob {
         } catch (Exception e) {
             logger.error("同步月分润数据失败！");
             e.printStackTrace();
+            throw new RuntimeException("分润数据处理失败");
         }
 
     }
@@ -151,6 +152,8 @@ public class ProfitMonthMposDataJob {
                 detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
                 detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
                 detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
+                BigDecimal tranAmt = detailMonth.getTranAmt()==null?BigDecimal.ZERO:detailMonth.getTranAmt();
+                detailMonth.setTranAmt(json.getBigDecimal("TRANAMT").add(tranAmt));
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润=瑞和宝分润-日结分润
                 profitDetailMonthService.updateByPrimaryKeySelective(detailMonth);
             }else{
@@ -166,6 +169,7 @@ public class ProfitMonthMposDataJob {
                 detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
                 detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
                 detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
+                detailMonth.setTranAmt(json.getBigDecimal("TRANAMT"));
                 detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
                 profitDetailMonthService.insertSelective(detailMonth);
             }
