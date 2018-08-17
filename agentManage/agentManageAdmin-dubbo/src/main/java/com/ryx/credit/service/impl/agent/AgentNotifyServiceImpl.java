@@ -832,15 +832,14 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         try {
             Map<String,Object> jsonParams = new HashMap<>();
             jsonParams.put("uniqueId",agentNotifyVo.getUniqueId());
+            if(StringUtils.isNotBlank(agentNotifyVo.getOrgId()))
+                jsonParams.put("orgId",agentNotifyVo.getOrgId());
             jsonParams.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             jsonParams.put("orgName",agentNotifyVo.getOrgName());
             jsonParams.put("busPlatform",agentNotifyVo.getBusPlatform());
             jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
             jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
             jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
-
-            if(StringUtils.isNotBlank(agentNotifyVo.getOrgId()))
-                jsonParams.put("orgId",agentNotifyVo.getOrgId());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 jsonParams.put("province",agentNotifyVo.getProvince());
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))

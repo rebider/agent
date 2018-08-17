@@ -85,10 +85,12 @@ public class PlatformSynServiceMpos implements PlatformSynService {
         try {
             Object agentBusinfo = data.get("agentBusinfoId");
             AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentBusinfo+"");
-            AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
+            if(StringUtils.isNotBlank(agentBusInfo.getBusParent())) {
+                AgentBusInfo parent = agentBusinfoService.getById(agentBusInfo.getBusParent());
+                fastMap.putKeyV("newparentAgencyId",parent.getBusNum());
+            }
             //查询代理商的上级代理
             fastMap.putKeyV("agencyId",agentBusInfo.getBusNum());
-            fastMap.putKeyV("newparentAgencyId",parent.getBusNum());
             fastMap.putKeyV("type","0");
             fastMap.putKeyV("createName",data.get("processingId"));
         } catch (Exception e) {
@@ -118,7 +120,6 @@ public class PlatformSynServiceMpos implements PlatformSynService {
 
             if(null!=data.get("oldparentAgencyId"))
             jsonParams.put("oldparentAgencyId",data.get("oldparentAgencyId")); //使用范围
-
             jsonParams.put("newparentAgencyId",data.get("newparentAgencyId"));
             jsonParams.put("type",data.get("type"));
             jsonParams.put("createName",data.get("createName"));
