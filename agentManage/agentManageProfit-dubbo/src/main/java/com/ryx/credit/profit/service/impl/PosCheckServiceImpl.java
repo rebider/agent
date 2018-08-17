@@ -73,6 +73,7 @@ public class PosCheckServiceImpl implements IPosCheckService {
     @Override
     public PageInfo PosCheckList(PosCheck record, Page page) {
         PosCheckExample example = checkEqualsTo(record);
+        example.setOrderByClause("APP_DATE "+Page.ORDER_DIRECTION_DESC);
         List<PosCheck> profitD = checkMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);
