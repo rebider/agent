@@ -429,4 +429,45 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
         return list;
 	}
+
+
+	@Override
+	public List<AgentBusInfo> queryChildLevelByBusNum(List<AgentBusInfo> list, String platformCode, String busNum) {
+		if(list==null) {
+			list = new ArrayList<AgentBusInfo>();
+		}
+		if(list.size()==100) {
+			return list;
+		}
+		//当前代理商
+		AgentBusInfoExample example = new AgentBusInfoExample();
+		example.or().andBusNumEqualTo(busNum)
+				.andBusParentEqualTo(platformCode)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
+		if(plats.size()==0) {
+			return list;
+		}
+		//查询下级代理商
+		AgentBusInfo platInfo = plats.get(0);
+
+		AgentBusInfoExample child_example = new AgentBusInfoExample();
+		child_example.or().andBusParentEqualTo(platInfo.getId())
+				.andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status);
+		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
+		//没有下级别就返回
+		if(child_plat.size()==0) {
+			return list;
+		}
+		//有就添加
+		list.addAll(child_plat);
+		//把孩子节点也加到list
+		for (AgentBusInfo agentBusInfo : child_plat) {
+			queryChildLevel(list,platformCode,agentBusInfo.getBusNum());
+		}
+		return list;
+	}
 }
