@@ -45,6 +45,8 @@ public class AgentServiceImpl implements AgentService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
 
+    private final String JURIS_DICTION = AppConfig.getProperty("agencyChange_mpos_notify_url");
+
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
@@ -134,7 +136,8 @@ public class AgentServiceImpl implements AgentService {
         }
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-        if("south,north".contains(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")))){
+
+        if(JURIS_DICTION.contains(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")))){
             if(StringUtils.isNotBlank(orgId) && !orgId.equals("null")){
                 List<COrganization> cOrganizations = organizationMapper.selectByOrgPid(orgId);
                 List<String> userIdList = new ArrayList<>();
