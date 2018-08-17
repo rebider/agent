@@ -23,7 +23,7 @@ public interface DataChangeActivityService {
      * @param agStatus
      * @return
      */
-    public ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus);
+    public ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus)throws Exception;
 
 
 

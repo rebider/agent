@@ -62,7 +62,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         return page;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentBusInfo agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception{
     		if(agentBusInfo == null ||
@@ -167,7 +167,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
-							throw new ProcessException("业务分管协议添加失败");
+							throw new MessageException("业务分管协议添加失败");
 						}
 					}
 					logger.info("代理商业务添加:{}{}","添加代理商合同成功",agentBusInfoVo.getId());
@@ -206,13 +206,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
 							if(!busInfoParent.getBusPlatform().equals(db_AgentBusInfo.getBusPlatform())){
-								throw new ProcessException("代理商上级平台和本业务平台不匹配");
+								throw new MessageException("代理商上级平台和本业务平台不匹配");
 							}
 						}
 					}
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
-						throw new ProcessException("更新业务信息失败");
+						throw new MessageException("更新业务信息失败");
 					}
                     //更新分管协议
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
@@ -228,7 +228,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						for (AssProtoColRel rel : rels) {
 							rel.setStatus(Status.STATUS_0.status);
 							if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
-								throw new ProcessException("业务分管协议更新失败");
+								throw new MessageException("业务分管协议更新失败");
 							}
 						}
 
@@ -236,7 +236,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
-							throw new ProcessException("业务分管协议添加失败");
+							throw new MessageException("业务分管协议添加失败");
 						}
 					//删除分管协议
 					}else{
@@ -244,7 +244,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						for (AssProtoColRel rel : rels) {
 							rel.setStatus(Status.STATUS_0.status);
 							if(1!=agentAssProtocolService.updateAssProtoColRel(rel)){
-								throw new ProcessException("业务分管协议更新失败");
+								throw new MessageException("业务分管协议更新失败");
 							}
 						}
 
