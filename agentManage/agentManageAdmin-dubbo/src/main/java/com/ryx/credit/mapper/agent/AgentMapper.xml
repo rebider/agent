@@ -537,25 +537,28 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
         left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
         where 1=1 and agent.status=1
-        <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
-        <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
-        <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
-        <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-        <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
-            and BUS_PLATFORM=#{busPlatform} and agent.id=agent_id)
+        <if test="map.agUniqNum!=null and map.agUniqNum!=''">and agent.AG_UNIQ_NUM = #{map.agUniqNum}</if>
+        <if test="map.agName!=null and map.agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
+        <if test="map.agStatus!=null and map.agStatus!=''">and agent.AG_STATUS = #{map.agStatus}</if>
+        <if test="map.time!=null and map.time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}</if>
+        <if test="map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
+            and BUS_PLATFORM=#{map.busPlatform} and agent.id=agent_id)
         </if>
-        <if test="busNum!=null and busNum!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
-            and BUS_NUM=#{busNum} and agent.id=agent_id)
+        <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
+            and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
-        <if test="busNum!=null and busNum!='' and busPlatform!=null and busPlatform!=''">and EXISTS(select * from
+        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select * from
             A_AGENT_BUSINFO where status=1 and
-            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum} and agent.id=agent_id)
+            BUS_PLATFORM=#{map.busPlatform} and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">
-            and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
+        <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
+            and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
         </if>
-        <if test="userId!=null and userId!=''">
-            and agent.C_USER = #{userId}
+        <if test="map.userIdList!=null and map.userIdList.size()>0">
+            and agent.C_USER in
+            <foreach collection="map.userIdList" open="(" close=")" separator="," item="user">
+                #{user}
+            </foreach>
         </if>
     </select>
 
@@ -571,27 +574,30 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
 
         where 1=1 and agent.status=1
-        <if test="agUniqNum!=null and agUniqNum!=''">and agent.AG_UNIQ_NUM = #{agUniqNum}</if>
-        <if test="agName!=null and agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{agName}),'%')</if>
-        <if test="agStatus!=null and agStatus!=''">and agent.AG_STATUS = #{agStatus}</if>
-        <if test="time!=null and time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{time}</if>
-        <if test="busPlatform!=null and busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
+        <if test="map.agUniqNum!=null and map.agUniqNum!=''">and agent.AG_UNIQ_NUM = #{map.agUniqNum}</if>
+        <if test="map.agName!=null and map.agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
+        <if test="map.agStatus!=null and map.agStatus!=''">and agent.AG_STATUS = #{map.agStatus}</if>
+        <if test="map.time!=null and map.time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}</if>
+        <if test="map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
             status=1 and
-            BUS_PLATFORM=#{busPlatform} and agent.id=agent_id)
+            BUS_PLATFORM=#{map.busPlatform} and agent.id=agent_id)
         </if>
-        <if test="busNum!=null and busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where status=1
-            and BUS_NUM=#{busNum} and agent.id=agent_id)
+        <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where status=1
+            and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
-        <if test="busNum!=null and busNum!='' and busPlatform!=null and busPlatform!=''">and EXISTS(select
+        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select
             CLO_REVIEW_STATUS from
             A_AGENT_BUSINFO where status=1 and
-            BUS_PLATFORM=#{busPlatform} and BUS_NUM=#{busNum} and agent.id=agent_id)
+            BUS_PLATFORM=#{map.busPlatform} and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
-        <if test="agDocDistrict!=null and agDocDistrict!=''">
-            and (agent.AG_DOC_PRO = #{agDocDistrict} or agent.AG_DOC_DISTRICT = #{agDocDistrict})
+        <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
+            and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
         </if>
-        <if test="userId!=null and userId!=''">
-            and agent.C_USER = #{userId}
+        <if test="map.userIdList!=null and map.userIdList.size()>0">
+            and agent.C_USER in
+            <foreach collection="map.userIdList" item="user" open="(" close=")" separator="," >
+                #{user}
+            </foreach>
         </if>
         order by c_time desc
         <include refid="OracleDialectSuffix"/>

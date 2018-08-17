@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.COrganizationMapper">
-
+    <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.COrganization">
+        <id column="ID" jdbcType="DECIMAL" property="id" />
+        <result column="NAME" jdbcType="VARCHAR" property="name" />
+        <result column="ADDRESS" jdbcType="VARCHAR" property="address" />
+        <result column="CODE" jdbcType="VARCHAR" property="code" />
+        <result column="ICON" jdbcType="VARCHAR" property="icon" />
+        <result column="PID" jdbcType="DECIMAL" property="pid" />
+        <result column="SEQ" jdbcType="DECIMAL" property="seq" />
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
     <!-- 通用查询结果列-->
     <sql id="Base_Column_List">
         id, name, address, code, icon, pid, seq, create_time AS createTime
@@ -11,6 +20,12 @@
         select
         <include refid="Base_Column_List" />
         from c_organization where c_organization.name =#{name}
+    </select>
+
+    <select id="selectByOrgPid" parameterType="string" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from c_organization where pid =#{orgPid}
     </select>
 
 </mapper> 

@@ -26,4 +26,6 @@ public interface CUserMapper extends BaseMapper<CUser> {
 
     List<Map<String, Object>> selectOrganizationCodeById(@Param("id") Long id);
 
+    List<UserVo> selectUserByOrgId(Long orgId);
+
 }

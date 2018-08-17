@@ -111,4 +111,14 @@
             t.id = #{id}
         </where>
     </select>
+
+    <select id="selectUserByOrgId" resultMap="userVoResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List" />
+        from  C_USER
+        <where>
+            organization_id = #{orgId}
+        </where>
+    </select>
+
 </mapper>
