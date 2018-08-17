@@ -159,7 +159,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         if(res.isSuccess()){
                             dr.setAppyStatus(AgStatus.Approved.status);
                             dr.setcUpdate(Calendar.getInstance().getTime());
-                            logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请失败");
+                            logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
                             }
@@ -174,7 +174,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         if(res.isSuccess()){
                             dr.setAppyStatus(AgStatus.Approved.status);
                             dr.setcUpdate(Calendar.getInstance().getTime());
-                            logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请失败");
+                            logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
                             }

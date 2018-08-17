@@ -391,6 +391,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(list.size()==4) {
 			return list;
 		}
+		if(platformCode==null) {
+			return  new ArrayList<AgentBusInfo>();
+		}
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
@@ -446,7 +449,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		//查询下级代理商
 		AgentBusInfo platInfo = plats.get(0);
 
-
 		AgentBusInfoExample child_example = new AgentBusInfoExample();
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
@@ -473,8 +475,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		if(list==null) {
 			list = new ArrayList<AgentBusInfo>();
 		}
+
 		if(list.size()==100) {
 			return list;
+		}
+		if(platformCode==null) {
+			return  new ArrayList<AgentBusInfo>();
 		}
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();

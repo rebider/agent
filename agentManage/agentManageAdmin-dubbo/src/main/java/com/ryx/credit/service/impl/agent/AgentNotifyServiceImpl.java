@@ -355,23 +355,23 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
             //调用POST接口
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-                log.info("已有编号进行入网修改：接收入网请求开始POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 //POS传递的唯一ID是业务平台记录ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
-                result = httpRequestForPos(agentNotifyVo);
+                log.info("已有编号进行入网修改：接收入网请求开始POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
+                result = httpRequestForPos(agentNotifyVo);
                 log.info("已有编号进行入网修改：接收入网请求结束POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
 
             //调用首刷接口
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-                log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 //MPOS传递的唯一id为代理商唯一ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
-                result = httpRequestForMPOS(agentNotifyVo);
+                log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
+                result = httpRequestForMPOS(agentNotifyVo);
                 log.info("已有编号进行入网修改：接收入网请求结束MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
 
@@ -381,6 +381,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             log.info("已有编号进行入网修改：通知pos手刷http请求异常:{}",e.getMessage());
             record.setNotifyJson(e.getLocalizedMessage());
             record.setNotifyCount(BigDecimal.ONE);
+            result = AgentResult.fail(e.getLocalizedMessage());
         }
         //接口请求成功
         if(null!=result && !"".equals(result) && result.isOK()){
@@ -635,23 +636,24 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
                 //POS传递业务ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
-                result = httpRequestForPos(agentNotifyVo);
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
+                result = httpRequestForPos(agentNotifyVo);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
 
                 //首刷传递代理商ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
-                result = httpRequestForMPOS(agentNotifyVo);
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
                 record.setSendJson(sendJson);
+                result = httpRequestForMPOS(agentNotifyVo);
             }
             log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
             record.setNotifyJson(String.valueOf(result.getData()));
         } catch (Exception e) {
             log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
             record.setNotifyCount(new BigDecimal(1));
+            result = AgentResult.fail(e.getLocalizedMessage());
         }
         if(null!=result && !"".equals(result) && result.isOK()){
             record.setSuccesTime(new Date());
@@ -828,7 +830,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
+            throw e;
         }
     }
 
