@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -132,5 +133,25 @@ public class PosRegionServiceImpl implements PosRegionService {
         }
         return trees;
     }
+
+
+    @Override
+    public List<DPosRegion> queryByCodes(String codes) {
+        if(StringUtils.isBlank(codes)){
+            return new ArrayList<>();
+        }
+        String [] codesItems = codes.split(",");
+        DPosRegionExample example = new DPosRegionExample();
+        example.or().andCodeIn(Arrays.asList(codesItems));
+        List<DPosRegion> list = posRegionMapper.selectByExample(example);
+        List<DPosRegion> res = new ArrayList<>();
+        for (DPosRegion dPosRegion : list) {
+            if(!res.contains(dPosRegion)){
+                res.add(dPosRegion);
+            }
+        }
+        return res;
+    }
+
 }
 
