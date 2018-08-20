@@ -3,12 +3,10 @@ package com.ryx.credit.service.impl.order;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
-import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
-import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
@@ -22,8 +20,6 @@ import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
-import com.sun.org.apache.xerces.internal.util.*;
-import net.sf.ehcache.transaction.xa.EhcacheXAException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -2556,5 +2551,30 @@ public class OrderServiceImpl implements OrderService {
         return AgentResult.ok();
     }
 
-
+    /**
+     * 根据代理商id查询线下打款数据
+     * @param agentId
+     * @return
+     */
+    @Override
+    public AgentResult queryPaymentXXDK(String agentId){
+        AgentResult result = new AgentResult(500,"参数错误","");
+        Map<String,Object> params = new HashMap<>();
+        params.put("agentId",agentId);
+        params.put("reviewStatus",AgStatus.Approved.getValue());
+        params.put("payMethod",SettlementType.XXDK.code);
+        List<Map<String,Object>> resultListMap = oPaymentMapper.queryPaymentXXDK(params);
+        if(resultListMap==null){
+            result.setMsg("查询异常");
+            return result;
+        }
+        if(resultListMap.size()==0){
+            result.setMsg("暂无数据");
+            return result;
+        }
+        result.setStatus(200);
+        result.setMsg("查询成功");
+        result.setData(resultListMap);
+        return result;
+    }
 }

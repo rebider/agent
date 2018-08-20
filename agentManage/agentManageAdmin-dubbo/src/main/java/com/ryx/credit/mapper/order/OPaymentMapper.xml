@@ -425,4 +425,15 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryPaymentXXDK" parameterType="map" resultType="map">
+    select p.id,p.Actual_Receipt from O_order o
+    inner join o_Payment p on o.id=p.order_id
+    <where>
+      p.pay_method=#{params.payMethod}
+      and o.review_status=#{params.reviewStatus}
+      and o.agent_id=#{params.agentId}
+    </where>
+  </select>
+
 </mapper>

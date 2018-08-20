@@ -197,5 +197,6 @@ public interface OrderService {
     public AgentResult sysnReceiptOrderPorNum(String receiptOrder)throws Exception;
 
 
+    AgentResult queryPaymentXXDK(String agentId);
 
 }
