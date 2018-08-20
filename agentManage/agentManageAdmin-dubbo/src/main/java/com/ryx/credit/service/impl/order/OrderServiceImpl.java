@@ -2586,7 +2586,7 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult updateProfitTaxAmt(List<OPayment> taxAmtList){
+    public AgentResult updateProfitTaxAmt(List<OPayment> taxAmtList)throws Exception{
         AgentResult result = new AgentResult(500,"参数错误","");
         if(null==taxAmtList){
             return result;
