@@ -78,11 +78,17 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
 
     /**
      * @Author: Zhang Lei
-     * @Description: 查询一个付款单下付款明细，可根据付款状态筛选
+     * @Description: 查询一个付款单下付款明细（只查分期类型），可根据付款状态筛选
      * @Date: 9:32 2018/7/28
      */
     @Override
     public List<OPaymentDetail> getPaymentDetails(String paymentId, String... paymentStatus) throws ProcessException {
+
+        //付款类型过滤条件
+        List<String> payTypeList = new ArrayList<>();
+        payTypeList.add(PaymentType.DKFQ.code);
+        payTypeList.add(PaymentType.FRFQ.code);
+
         OPaymentDetailExample example = new OPaymentDetailExample();
         OPaymentDetailExample.Criteria c = example.or();
         c.andPaymentIdEqualTo(paymentId);
@@ -94,6 +100,9 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 c.andPaymentStatusIn(paymentStatusList);
             }
         }
+
+        c.andPayTypeIn(payTypeList);
+
         example.setOrderByClause("plan_num asc");
         return oPaymentDetailMapper.selectByExample(example);
     }
