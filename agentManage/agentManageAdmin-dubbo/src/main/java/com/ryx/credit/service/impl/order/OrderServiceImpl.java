@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
@@ -2576,5 +2577,48 @@ public class OrderServiceImpl implements OrderService {
         result.setMsg("查询成功");
         result.setData(resultListMap);
         return result;
+    }
+
+    /**
+     * 批量更新分润税点抵扣金额
+     * @param taxAmtList
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult updateProfitTaxAmt(List<OPayment> taxAmtList){
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if(null==taxAmtList){
+            return result;
+        }
+        if(taxAmtList.size()==0){
+            return result;
+        }
+        for (OPayment payment : taxAmtList) {
+            String id = payment.getId();
+            BigDecimal profitTaxAmt = payment.getProfitTaxAmt();
+            if (StringUtils.isBlank(id) || id.equals("null")) {
+                logger.info("批量更新分润税点抵扣金额:{}", "操作id不能为空");
+                throw new ProcessException("操作id不能为空");
+            }
+            if (null==profitTaxAmt || profitTaxAmt.equals("null")) {
+                logger.info("批量更新分润税点抵扣金额:{}", "操作amt不能为空");
+                throw new ProcessException("操作amt不能为空");
+            }
+            OPayment selectPayment= oPaymentMapper.selectByPrimaryKey(id);
+            BigDecimal selectProfitTaxAmt = selectPayment.getProfitTaxAmt();
+            if(null==selectProfitTaxAmt){
+                selectProfitTaxAmt = new BigDecimal(0);
+            }
+            OPayment oPayment = new OPayment();
+            oPayment.setId(id);
+            oPayment.setProfitTaxAmt(selectProfitTaxAmt.add(profitTaxAmt));
+            int i = oPaymentMapper.updateByPrimaryKeySelective(oPayment);
+            if(i!=1){
+                logger.info("批量更新分润税点抵扣金额:{}", "更新异常");
+                throw new ProcessException("批量更新异常");
+            }
+        }
+        return AgentResult.ok("批量更新成功");
     }
 }

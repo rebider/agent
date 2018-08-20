@@ -2,13 +2,12 @@ package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OPaymentExample implements Serializable {
+public class OPaymentExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -1926,6 +1925,66 @@ public class OPaymentExample implements Serializable {
 
         public Criteria andActualReceiptDateNotBetween(Date value1, Date value2) {
             addCriterion("ACTUAL_RECEIPT_DATE not between", value1, value2, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtIsNull() {
+            addCriterion("PROFIT_TAX_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtIsNotNull() {
+            addCriterion("PROFIT_TAX_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT =", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtNotEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT <>", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtGreaterThan(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT >", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT >=", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtLessThan(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT <", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT <=", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_TAX_AMT in", values, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtNotIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_TAX_AMT not in", values, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_TAX_AMT between", value1, value2, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_TAX_AMT not between", value1, value2, "profitTaxAmt");
             return (Criteria) this;
         }
     }

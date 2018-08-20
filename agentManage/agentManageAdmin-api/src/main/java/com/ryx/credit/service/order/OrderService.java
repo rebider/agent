@@ -199,4 +199,7 @@ public interface OrderService {
 
     AgentResult queryPaymentXXDK(String agentId);
 
+
+    AgentResult updateProfitTaxAmt(List<OPayment> taxAmtList);
+
 }
