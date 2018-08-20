@@ -4,8 +4,10 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OPaymentMapper {
     long countByExample(OPaymentExample example);
@@ -23,4 +25,6 @@ public interface OPaymentMapper {
     int updateByPrimaryKeySelective(OPayment record);
 
     int updateByPrimaryKey(OPayment record);
+
+    List<Map<String,Object>> queryPaymentXXDK(@Param("params") Map<String,Object> params);
 }
