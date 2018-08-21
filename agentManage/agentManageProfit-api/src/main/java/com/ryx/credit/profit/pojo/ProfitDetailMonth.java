@@ -122,6 +122,16 @@ public class ProfitDetailMonth implements Serializable{
 
     private BigDecimal posRewardDeductionAmt;
 
+    //新增 20180821
+    private BigDecimal basicsProfitAmt;
+
+    public BigDecimal getBasicsProfitAmt() {
+        return basicsProfitAmt;
+    }
+
+    public void setBasicsProfitAmt(BigDecimal basicsProfitAmt) {
+        this.basicsProfitAmt = basicsProfitAmt;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
