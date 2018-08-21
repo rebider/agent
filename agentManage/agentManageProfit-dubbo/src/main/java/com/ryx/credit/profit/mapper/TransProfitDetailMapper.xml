@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.TransProfitDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.TransProfitDetail">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PARENT_BUS_NUM" jdbcType="VARCHAR" property="parentBusNum" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
+    <result column="IN_TRANS_AMT" jdbcType="DECIMAL" property="inTransAmt" />
+    <result column="OUT_TRANS_AMT" jdbcType="DECIMAL" property="outTransAmt" />
+    <result column="PROFIT_AMT" jdbcType="DECIMAL" property="profitAmt" />
+    <result column="BUS_CODE" jdbcType="VARCHAR" property="busCode" />
+    <result column="IN_PROFIT_SCALE" jdbcType="DECIMAL" property="inProfitScale" />
+    <result column="OUT_PROFIT_SCALE" jdbcType="DECIMAL" property="outProfitScale" />
+    <result column="IN_PROFIT_AMT" jdbcType="DECIMAL" property="inProfitAmt" />
+    <result column="OUT_PROFIT_AMT" jdbcType="DECIMAL" property="outProfitAmt" />
+    <result column="POS_CREDIT_AMT" jdbcType="DECIMAL" property="posCreditAmt" />
+    <result column="IPOS_CREDIT_AMT" jdbcType="DECIMAL" property="iposCreditAmt" />
+    <result column="POS_REWARD_AMT" jdbcType="DECIMAL" property="posRewardAmt" />
+    <result column="PAY_COMPANY" jdbcType="VARCHAR" property="payCompany" />
+    <result column="NOTAX_AMT" jdbcType="DECIMAL" property="notaxAmt" />
+    <result column="SUPPLY_AMT" jdbcType="DECIMAL" property="supplyAmt" />
+    <result column="TRANS_FEE" jdbcType="DECIMAL" property="transFee" />
+    <result column="UNICODE" jdbcType="VARCHAR" property="unicode" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE, 
+    IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, OUT_PROFIT_SCALE, 
+    IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY, 
+    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample">
+    delete from TRANS_PROFIT_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
+    insert into TRANS_PROFIT_DETAIL (ID, BUS_NUM, AGENT_ID, 
+      AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, 
+      PROFIT_DATE, IN_TRANS_AMT, OUT_TRANS_AMT, 
+      PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, 
+      OUT_PROFIT_SCALE, IN_PROFIT_AMT, OUT_PROFIT_AMT, 
+      POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, 
+      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT, 
+      TRANS_FEE, UNICODE)
+    values (#{id,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
+      #{profitDate,jdbcType=VARCHAR}, #{inTransAmt,jdbcType=DECIMAL}, #{outTransAmt,jdbcType=DECIMAL}, 
+      #{profitAmt,jdbcType=DECIMAL}, #{busCode,jdbcType=VARCHAR}, #{inProfitScale,jdbcType=DECIMAL}, 
+      #{outProfitScale,jdbcType=DECIMAL}, #{inProfitAmt,jdbcType=DECIMAL}, #{outProfitAmt,jdbcType=DECIMAL}, 
+      #{posCreditAmt,jdbcType=DECIMAL}, #{iposCreditAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL}, 
+      #{payCompany,jdbcType=VARCHAR}, #{notaxAmt,jdbcType=DECIMAL}, #{supplyAmt,jdbcType=DECIMAL}, 
+      #{transFee,jdbcType=DECIMAL}, #{unicode,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
+    insert into TRANS_PROFIT_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="parentBusNum != null">
+        PARENT_BUS_NUM,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE,
+      </if>
+      <if test="inTransAmt != null">
+        IN_TRANS_AMT,
+      </if>
+      <if test="outTransAmt != null">
+        OUT_TRANS_AMT,
+      </if>
+      <if test="profitAmt != null">
+        PROFIT_AMT,
+      </if>
+      <if test="busCode != null">
+        BUS_CODE,
+      </if>
+      <if test="inProfitScale != null">
+        IN_PROFIT_SCALE,
+      </if>
+      <if test="outProfitScale != null">
+        OUT_PROFIT_SCALE,
+      </if>
+      <if test="inProfitAmt != null">
+        IN_PROFIT_AMT,
+      </if>
+      <if test="outProfitAmt != null">
+        OUT_PROFIT_AMT,
+      </if>
+      <if test="posCreditAmt != null">
+        POS_CREDIT_AMT,
+      </if>
+      <if test="iposCreditAmt != null">
+        IPOS_CREDIT_AMT,
+      </if>
+      <if test="posRewardAmt != null">
+        POS_REWARD_AMT,
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY,
+      </if>
+      <if test="notaxAmt != null">
+        NOTAX_AMT,
+      </if>
+      <if test="supplyAmt != null">
+        SUPPLY_AMT,
+      </if>
+      <if test="transFee != null">
+        TRANS_FEE,
+      </if>
+      <if test="unicode != null">
+        UNICODE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentBusNum != null">
+        #{parentBusNum,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null">
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="inTransAmt != null">
+        #{inTransAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="outTransAmt != null">
+        #{outTransAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitAmt != null">
+        #{profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="busCode != null">
+        #{busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="inProfitScale != null">
+        #{inProfitScale,jdbcType=DECIMAL},
+      </if>
+      <if test="outProfitScale != null">
+        #{outProfitScale,jdbcType=DECIMAL},
+      </if>
+      <if test="inProfitAmt != null">
+        #{inProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="outProfitAmt != null">
+        #{outProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posCreditAmt != null">
+        #{posCreditAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="iposCreditAmt != null">
+        #{iposCreditAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posRewardAmt != null">
+        #{posRewardAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payCompany != null">
+        #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="notaxAmt != null">
+        #{notaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyAmt != null">
+        #{supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="transFee != null">
+        #{transFee,jdbcType=DECIMAL},
+      </if>
+      <if test="unicode != null">
+        #{unicode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultType="java.lang.Long">
+    select count(*) from TRANS_PROFIT_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
