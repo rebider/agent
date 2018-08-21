@@ -1177,7 +1177,7 @@ public class OrderServiceImpl implements OrderService {
                     //收款时间
                     if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))){
                         oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
-                    }else{
+                    }else if (null!=agentVo.getPayMethod()  &&  !agentVo.getPayMethod().equals(SettlementType.XXDK.code)){
                         throw new MessageException("收款时间不能为空");
                     }
 

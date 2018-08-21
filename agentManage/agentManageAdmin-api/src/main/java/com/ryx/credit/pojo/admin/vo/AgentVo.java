@@ -55,6 +55,16 @@ public class AgentVo implements Serializable {
     private List<Map<String,Object>> reqListMap;
     private ReceiptPlan receiptPlan;
 
+    private String payMethod;
+
+    public String getPayMethod() {
+        return payMethod;
+    }
+
+    public void setPayMethod(String payMethod) {
+        this.payMethod = payMethod;
+    }
+
     public Agent getAgent() {
         return agent;
     }
