@@ -70,6 +70,8 @@ public class AgentBusInfo implements Serializable {
 
     private String busScope;
 
+    private BigDecimal dredgeS0;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -344,5 +346,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setBusScope(String busScope) {
         this.busScope = busScope;
+    }
+
+    public BigDecimal getDredgeS0() {
+        return dredgeS0;
+    }
+
+    public void setDredgeS0(BigDecimal dredgeS0) {
+        this.dredgeS0 = dredgeS0;
     }
 }
