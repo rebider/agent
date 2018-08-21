@@ -48,6 +48,16 @@ public class TransProfitDetail {
     private BigDecimal transFee;
 
     private String unicode;
+    //新增 20180821
+    private String sourceInfo;
+
+    public String getSourceInfo() {
+        return sourceInfo;
+    }
+
+    public void setSourceInfo(String sourceInfo) {
+        this.sourceInfo = sourceInfo;
+    }
 
     public String getId() {
         return id;
