@@ -124,6 +124,15 @@ public class ProfitDetailMonth implements Serializable{
 
     //新增 20180821
     private BigDecimal basicsProfitAmt;
+    private String parentAgentId;
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId;
+    }
 
     public BigDecimal getBasicsProfitAmt() {
         return basicsProfitAmt;
