@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 分润计算
+ * 分润计算(财务自编码)
  * Created by IntelliJ IDEA.
  *
  * @Author Wang y
@@ -460,8 +460,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             if(parents.size()>0){
                 AgentBusInfo first = parents.get(parents.size()-1);
                 Agent agent = agentService.getAgentById(first.getAgentId());
-                if(agent.getAgUniqNum().equals("JS00001159")||agent.getAgUniqNum().equals("JS00001160")
-                        ||agent.getAgUniqNum().equals("JS00000007")) {//捷步、银点只算日结
+                if(agent.getAgUniqNum().equals("JS00001159")||agent.getAgUniqNum().equals("JS00001160")) {//捷步、银点只算日结
+                    isJieYin = true;
+                }
+            }else{
+                if(detailMonth.getAgentPid().equals("JS00001159")||detailMonth.getAgentPid().equals("JS00001160")) {//捷步、银点只算日结
                     isJieYin = true;
                 }
             }
@@ -520,10 +523,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             subTax2 = subTax2==null?BigDecimal.ZERO:subTax2;
             logger.info("下级分润补税点差额："+subTax2);
             detail.setSupplyTaxAmt(subTax1.add(subTax2));//@@@@@@VALUE：补下级税点
-            detail.setDeductionTaxMonthAmt(BigDecimal.ZERO);
-            detail.setRealProfitAmt(BigDecimal.ZERO);
-            detail.setProfitMonthAmt(BigDecimal.ZERO);
-            detail.setDeductionTaxMonthAgoAmt(BigDecimal.ZERO);
+            detail.setDeductionTaxMonthAmt(BigDecimal.ZERO);//本月税额
+            detail.setProfitMonthAmt(profitA.add(detail.getSupplyTaxAmt()));//本月分润]c
+            detail.setRealProfitAmt(detail.getProfitMonthAmt());//实发分润
+            detail.setDeductionTaxMonthAgoAmt(BigDecimal.ZERO);//本月及本月之前欠税
             return detail;
         }else if(tax.compareTo(new BigDecimal("0.06"))<0){//小于0.06才存在补税
             logger.info("不开票补税点");
