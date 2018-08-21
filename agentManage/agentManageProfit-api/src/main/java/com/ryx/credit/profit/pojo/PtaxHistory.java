@@ -11,6 +11,17 @@ public class PtaxHistory implements Serializable{
     private BigDecimal taxAmount;
 
     private String agentPid;
+    //新增 20180821
+    private String agentId;
+    private String parentAgentId;
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
 
     public String getId() {
         return id;

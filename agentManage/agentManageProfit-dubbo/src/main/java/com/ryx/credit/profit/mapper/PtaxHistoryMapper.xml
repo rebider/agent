@@ -6,6 +6,8 @@
     <result column="TAX_MONTH" jdbcType="VARCHAR" property="taxMonth" />
     <result column="TAX_AMOUNT" jdbcType="DECIMAL" property="taxAmount" />
     <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -37,7 +39,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, TAX_MONTH, TAX_AMOUNT, AGENT_PID
+    ID, TAX_MONTH, TAX_AMOUNT, AGENT_PID, AGENT_ID, PARENT_AGENT_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PtaxHistoryExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -63,9 +65,9 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PtaxHistory">
     insert into P_TAX_HISTORY (ID, TAX_MONTH, TAX_AMOUNT, 
-      AGENT_PID)
+      AGENT_PID, AGENT_ID, PARENT_AGENT_ID)
     values (#{id,jdbcType=VARCHAR}, #{taxMonth,jdbcType=VARCHAR}, #{taxAmount,jdbcType=DECIMAL}, 
-      #{agentPid,jdbcType=VARCHAR})
+      #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PtaxHistory">
     insert into P_TAX_HISTORY
@@ -82,6 +84,12 @@
       <if test="agentPid != null">
         AGENT_PID,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -95,6 +103,12 @@
       </if>
       <if test="agentPid != null">
         #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
