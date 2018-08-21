@@ -266,7 +266,7 @@
   </sql>
 
   <sql id='SORTING'>
-    ORDER BY SUPPLY_DATE DESC
+    ORDER BY SOURCE_ID DESC
   </sql>
 
   <sql id="PAGING_START">
