@@ -4,11 +4,14 @@ import com.ryx.credit.activity.dao.ActRuTaskMapper;
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.activity.entity.ActRuTaskExample;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.service.ActRuTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ActRuTaskServiceImpl
@@ -88,5 +91,25 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
         } else {
             return null;
         }
+    }
+
+
+    @Override
+    public List<Map<String, Object>>  queryMyTask(Map<String,Object> param){
+        List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTask(param);
+        return taskList;
+    }
+
+
+    @Override
+    public PageInfo queryMyTaskPage(Page page, Map<String,Object> param){
+
+
+        List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(taskList);
+        pageInfo.setTotal(actRuTaskMapper.queryMyTaskCount(param));
+
+        return pageInfo;
     }
 }
