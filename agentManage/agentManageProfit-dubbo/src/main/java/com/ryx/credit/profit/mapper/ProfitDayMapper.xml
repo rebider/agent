@@ -224,6 +224,14 @@
         AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
     </select>
 
+  <select id="totalRPByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
+    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1)
+    FROM P_PROFIT_D
+    where
+    to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+  </select>
+
   <select id="totalReturnByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
     SELECT SUM(RETURN_MONEY)
     FROM P_PROFIT_D
@@ -246,6 +254,14 @@
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="totalProfitAndReturnById" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
+    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1+RETURN_MONEY)
+    FROM P_PROFIT_D
+    where
+    to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">

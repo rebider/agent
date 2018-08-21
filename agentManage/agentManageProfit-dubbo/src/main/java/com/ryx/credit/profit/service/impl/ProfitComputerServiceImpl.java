@@ -35,7 +35,7 @@ import java.util.List;
  * @Time: 17:44
  * To change this template use File | Settings | File Templates.
  */
-@Service("profitComputerService")
+@Service
 public class ProfitComputerServiceImpl implements ProfitComputerService {
     protected Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
@@ -154,6 +154,24 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     }
 
     @Override
+    public BigDecimal new_total_factor(String agentId,String parentId,String month) {
+        if(null==month || "".equals(month)){
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1));
+            month = month.substring(0,6);
+        }
+        PProfitFactor factor = new PProfitFactor();
+        factor.setAgentId(agentId);
+        factor.setParentAgentId(parentId);
+        factor.setFactorMonth(month);
+        BigDecimal totalFactor = factorMapper.getSumFactor(factor);
+        if(null == totalFactor){
+            totalFactor = BigDecimal.ZERO;
+        }
+        logger.info(agentId+"在【"+month+"】商业保理扣款共计："+totalFactor);
+        return totalFactor;
+    }
+
+    @Override
     public BigDecimal total_supply(String agentPid,String month) {
         if(null==month || "".equals(month)){
             month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1));
@@ -170,7 +188,23 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return totalSupply;
     }
 
-
+    @Override
+    public BigDecimal new_total_supply(String agentId,String parentId,String month) {
+        if(null==month || "".equals(month)){
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1));
+            month = month.substring(0,6);
+        }
+        ProfitSupply supply = new ProfitSupply();
+        supply.setAgentId(agentId);
+        supply.setParentAgentId(parentId);
+        supply.setSupplyDate(month);
+        BigDecimal totalSupply = profitSupplyMapper.getTotalByMonthAndPid(supply);
+        if(null == totalSupply){
+            totalSupply = BigDecimal.ZERO;
+        }
+        logger.info(agentId+"在【"+month+"】其他补款共计："+totalSupply);
+        return totalSupply;
+    }
 
     @Override
     public BigDecimal total_SupplyAndCashBack(String agentPid,String month){

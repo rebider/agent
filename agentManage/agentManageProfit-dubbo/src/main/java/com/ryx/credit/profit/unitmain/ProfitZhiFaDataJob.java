@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.omg.CosNaming.BindingHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 /**
  * 直发分润数据同步、定时
  */
+@Service
 public class ProfitZhiFaDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired

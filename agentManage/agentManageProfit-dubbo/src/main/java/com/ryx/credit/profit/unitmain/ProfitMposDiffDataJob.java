@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 手刷补差数据同步
  */
-@Service("profitMposDiffDataJob")
+@Service
 @Transactional(rollbackFor=RuntimeException.class)
 public class ProfitMposDiffDataJob {
     Logger logger = LogManager.getLogger(this.getClass());

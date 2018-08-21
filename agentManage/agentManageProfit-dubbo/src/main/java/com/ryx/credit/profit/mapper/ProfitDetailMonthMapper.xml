@@ -164,7 +164,18 @@
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
   </select>
 
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
+    <select id="selectByIdAndParent" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+        select
+        <include refid="Base_Column_List" />
+        from P_PROFIT_DETAIL_M
+        where
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+        AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+        AND PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
+    </select>
+
+
+    <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
     delete from P_PROFIT_DETAIL_M
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />

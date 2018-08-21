@@ -14,6 +14,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * 手刷唯一码和业务平台编号关系同步
  */
+@Service
 public class ProfitMposLinkDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired

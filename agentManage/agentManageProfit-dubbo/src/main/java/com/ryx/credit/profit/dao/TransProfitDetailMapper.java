@@ -14,4 +14,6 @@ public interface TransProfitDetailMapper {
     int insertSelective(TransProfitDetail record);
 
     List<TransProfitDetail> selectByExample(TransProfitDetailExample example);
+
+    List<TransProfitDetail> selectListByDate(String profitDate);
 }

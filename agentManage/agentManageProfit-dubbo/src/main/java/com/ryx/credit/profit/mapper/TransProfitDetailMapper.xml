@@ -79,6 +79,16 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+
+  <select id="selectListByDate" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE SOURCE_INFO='MPOS' and PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    ORDER BY AGENT_ID
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample">
     delete from TRANS_PROFIT_DETAIL
     <if test="_parameter != null">
