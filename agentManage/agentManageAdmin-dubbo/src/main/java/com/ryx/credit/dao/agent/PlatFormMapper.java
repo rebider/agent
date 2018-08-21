@@ -35,4 +35,6 @@ public interface PlatFormMapper {
     int updateByPrimaryKeySelective(PlatForm record);  // 删除（编辑）状态
 
     int updateByPrimaryKey(PlatForm record);
+
+    PlatForm selectByPlatformNum(String platformNum);
 }
