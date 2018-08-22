@@ -35,7 +35,7 @@ import java.util.List;
  * @Time: 17:44
  * To change this template use File | Settings | File Templates.
  */
-@Service
+@Service("profitComputerService")
 public class ProfitComputerServiceImpl implements ProfitComputerService {
     protected Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
