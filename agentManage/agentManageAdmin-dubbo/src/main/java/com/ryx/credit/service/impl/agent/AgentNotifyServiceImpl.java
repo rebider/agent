@@ -607,6 +607,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
+        agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
@@ -761,6 +762,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             data.put("orgName",agentNotifyVo.getOrgName());
             data.put("busiAreas",agentNotifyVo.getBusiAreas());
+            data.put("hasS0",agentNotifyVo.getHasS0());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
             }
