@@ -23,4 +23,6 @@ public interface DPosRegionMapper {
     List<DPosRegion> findByPosRegion(DPosRegion dPosRegions);
 
     int findCountByCode(String pCode);
+
+    List<String> queryNationwide();
 }
