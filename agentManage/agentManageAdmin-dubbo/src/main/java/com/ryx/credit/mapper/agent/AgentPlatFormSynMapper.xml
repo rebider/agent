@@ -286,10 +286,12 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-    <select id="queryList" parameterType="map" resultType="map">
+    <select id="queryList" parameterType="map" resultMap="ResultMapWithBLOBs">
         <include refid="OracleDialectPrefix" />
         select
-        <include refid="Base_Column_List"/>, dbms_lob.substr(SEND_JSON)AS SEND_JSON
+          <include refid="Base_Column_List" />
+          ,
+          <include refid="Blob_Column_List" />
         from a_agent_platformsyn
         WHERE 1=1
         <if test="map.agentId !=null and map.agentId!=''">

@@ -571,7 +571,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <include refid="OracleDialectPrefix"/>
         select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
         agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
-        agent.AG_STATUS ,agent.AG_REMARK ,
+        agent.AG_STATUS ,agent.AG_REMARK ,agent.C_INCOM_STATUS,
         agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO
         from A_AGENT agent
 
