@@ -46,4 +46,8 @@ public interface ProfitDirectMapper {
 
     void updateFristAgentStatus(String agentPid);
 
+    //直发分润查询
+    List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect);
+    //直发分润修改状态
+    void  updateByStatus(ProfitDirect profitDirectSingleList);
 }
