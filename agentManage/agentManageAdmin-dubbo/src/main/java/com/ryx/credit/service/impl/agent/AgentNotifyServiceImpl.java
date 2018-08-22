@@ -9,7 +9,9 @@ import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
@@ -73,14 +75,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private RegionService regionService;
     @Autowired
     private PosRegionService posRegionService;
-
     @Resource(name="platformSynServicePos")
     private  PlatformSynService  platformSynServicePos;
     @Resource(name="platformSynServiceMpos")
     private  PlatformSynService  platformSynServiceMpos;
-
     private List<PlatformSynService> platformSynServiceList ;
-
+    @Autowired
+    private DPosRegionMapper posRegionMapper;
 
     @PostConstruct
     public void init(){
@@ -311,7 +312,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         //业务区域
         String[] split = new String[1];
         if(StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
-            split = agentBusInfo.getBusRegion().split(",");
+            if(agentBusInfo.getBusRegion().equals("0")){
+                List<String> dPosRegions = posRegionMapper.queryNationwide();
+                split = dPosRegions.toArray(new String[]{});
+            }else{
+                split = agentBusInfo.getBusRegion().split(",");
+            }
         }
         //通知对象
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
@@ -597,7 +603,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
         if(StringUtils.isNotBlank( agentBusInfo.getBusRegion())) {
-            String[] split = agentBusInfo.getBusRegion().split(",");
+            String[] split = null;
+            if(agentBusInfo.getBusRegion().equals("0")){
+                List<String> dPosRegions = posRegionMapper.queryNationwide();
+                split = dPosRegions.toArray(new String[]{});
+            }else{
+                split = agentBusInfo.getBusRegion().split(",");
+            }
             agentNotifyVo.setBusiAreas(split);
         }
 
@@ -900,7 +912,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         if(null!=agentPlatFormSyn.getAgentId()){
             map.put("agentId",agentPlatFormSyn.getAgentId());
         }
-        List<Map<String, Object>> list = agentPlatFormSynMapper.queryList(map, page);
+        List<AgentPlatFormSyn> list = agentPlatFormSynMapper.queryList(map, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(list);
         pageInfo.setTotal(agentPlatFormSynMapper.queryCount(map));
