@@ -172,7 +172,9 @@
         where
         PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
         AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
-        AND PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
+      <if test="parentAgentId != null">
+        AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+      </if>
     </select>
 
 

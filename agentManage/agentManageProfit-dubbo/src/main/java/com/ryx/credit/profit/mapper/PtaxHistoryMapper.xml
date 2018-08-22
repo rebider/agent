@@ -119,9 +119,19 @@
     </if>
   </select>
 
-  <select id="getHistoryAmt" parameterType="com.ryx.credit.profit.pojo.PtaxHistory" resultType="java.math.BigDecimal">
+  <select id="getHistoryAmtByPid" parameterType="com.ryx.credit.profit.pojo.PtaxHistory" resultType="java.math.BigDecimal">
     select TAX_AMOUNT from P_TAX_HISTORY where AGENT_PID = #{agentPid,jdbcType=VARCHAR}
     AND TAX_MONTH = #{taxMonth,jdbcType=VARCHAR}
+  </select>
+
+  <select id="getHistoryAmtByDoubleId" parameterType="com.ryx.credit.profit.pojo.PtaxHistory" resultType="java.math.BigDecimal">
+    select TAX_AMOUNT
+    from P_TAX_HISTORY
+    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    AND TAX_MONTH = #{taxMonth,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
   </select>
 
   <sql id="OracleDialectPrefix">

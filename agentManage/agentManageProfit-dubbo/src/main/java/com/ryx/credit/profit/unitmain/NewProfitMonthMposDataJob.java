@@ -139,9 +139,16 @@ public class NewProfitMonthMposDataJob {
 
     public void insertTransProfit(List<JSONObject> transProfit,String transDate){
         for(JSONObject json:transProfit){
+            String parentAgentId = null;
             TransProfitDetail detail = new TransProfitDetail();
-            AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString(""),json.getString(""));
-            AgentBusInfo parent = businfoService.getByBusidAndCode(json.getString(""),json.getString(""));
+            AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"),json.getString("AGENCYID"));
+            AgentBusInfo parent = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"),json.getString("AGENCYID"));
+            if(null==parent || "6000".equals(json.getString(""))){
+                //直发一代或者上级为空，则无上级
+                parentAgentId = null;
+            }else{
+                parentAgentId = parent.getAgentId();
+            }
             ProfitDay day = new ProfitDay();
             day.setAgentId(Busime.getAgentId());
             day.setTransDate(transDate);
@@ -164,18 +171,25 @@ public class NewProfitMonthMposDataJob {
                 }
             }
 
+            /*String platFormNum = json.getString("platFormNum")==null?"":json.getString("platFormNum");
+            if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
+                    && !"1111".equals(platFormNum) && !"3000".equals(platFormNum) && !"6000".equals(platFormNum)
+                    && !"4000".equals(platFormNum)){
+                platFormNum = "1001";
+            }*/
+
             detail.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));//主键
             detail.setProfitDate(transDate);//月份
-            detail.setBusNum(json.getString(""));//机构号
-            detail.setParentBusNum(json.getString(""));//上级机构号
-            detail.setBusCode(json.getString(""));//平台号
-            detail.setParentAgentId(parent.getAgentId());//上级AG码
+            detail.setBusNum(json.getString("AGENCYID"));//机构号
+            detail.setParentBusNum(json.getString("ONLINEAGENCYID"));//上级机构号
+            detail.setBusCode(json.getString("PLATFORMNUM"));//平台号
+            detail.setParentAgentId(parentAgentId);//上级AG码
             detail.setAgentId(Busime.getAgentId());//AG码
-            detail.setAgentName(json.getString(""));//代理商名称
-            detail.setInTransAmt(json.getBigDecimal(""));//付款交易额
-            detail.setTransFee(json.getBigDecimal(""));//交易手续费
-            detail.setUnicode(json.getString(""));//财务自编码
-            detail.setProfitAmt(json.getBigDecimal(""));//分润金额
+            detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
+            detail.setInTransAmt(json.getBigDecimal("SAMOUNT"));//付款交易额
+            detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
+            detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
+            detail.setProfitAmt(json.getBigDecimal("PROFIT"));//分润金额
             detail.setPayCompany(Busime.getCloPayCompany());//打款公司
             detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
             detail.setSourceInfo("MPOS");

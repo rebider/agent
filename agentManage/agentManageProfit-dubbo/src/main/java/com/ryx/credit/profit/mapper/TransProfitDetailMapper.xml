@@ -81,12 +81,42 @@
   </select>
 
   <select id="selectListByDate" parameterType="java.lang.String" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
     select
     <include refid="Base_Column_List" />
     from TRANS_PROFIT_DETAIL
     WHERE SOURCE_INFO='MPOS' and PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     ORDER BY AGENT_ID
+  </select>
+
+  <select id="selectCompanyByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND PAY_COMPANY='6'
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <select id="selectListByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <select id="selectSumTotalDay" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
+    <include refid="OracleDialectPrefix" />
+    select
+    SUM(NOTAX_AMT)
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
   </select>
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample">

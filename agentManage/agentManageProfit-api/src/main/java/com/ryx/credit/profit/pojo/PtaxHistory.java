@@ -15,6 +15,14 @@ public class PtaxHistory implements Serializable{
     private String agentId;
     private String parentAgentId;
 
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId;
+    }
+
     public String getAgentId() {
         return agentId;
     }

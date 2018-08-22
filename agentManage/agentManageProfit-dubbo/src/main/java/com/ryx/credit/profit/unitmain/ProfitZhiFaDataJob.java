@@ -6,9 +6,11 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.dao.BuckleRunMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 import jdk.nashorn.internal.objects.annotations.Where;
 import org.apache.log4j.LogManager;
@@ -39,7 +41,7 @@ public class ProfitZhiFaDataJob {
     @Autowired
     private ProfitDeductionService profitDeductionService;
     @Autowired
-    private ProfitSupplyService profitSupplyService;
+    private AgentBusinfoService businfoService;
 
     private String month = "";
     private int index = 1;
@@ -135,6 +137,7 @@ public class ProfitZhiFaDataJob {
             where.setDeductionType("01");
             where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -1)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
+            AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("6000"),json.getString("FRISTAGENTID"));
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
             profitDirect.setAgentName(json.getString("AGENTNAME"));//代理商名称
@@ -143,7 +146,8 @@ public class ProfitZhiFaDataJob {
             profitDirect.setParentAgentName(json.getString("PARENTAGENTNAME"));//上级代理商名称
             profitDirect.setFristAgentId(json.getString("FRISTAGENTNAME"));//一级代理商编号
             profitDirect.setFristAgentName(json.getString("FRISTAGENTID"));//一级代理商名称
-            profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
+            //profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
+            profitDirect.setFristAgentPid(Busime.getAgentId());//一级代理商唯一码
             profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
             profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
             profitDirect.setTransFee(json.getBigDecimal("TRANSFEE"));//直发交易手续费
