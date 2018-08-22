@@ -109,12 +109,12 @@ public class NewProfitMonthMposDataJob {
     public void synchroProfitMonth(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
         month=transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate;
-        map.put("transDate",month);
+        map.put("frMonth",month);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.detail"),params);
+                (AppConfig.getProperty("profit.newmonth"),params);
         System.out.println(res);
         JSONObject json = JSONObject.parseObject(res);
         if(!json.get("respCode").equals("000000")){

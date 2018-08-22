@@ -521,7 +521,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         //如果没有基础分润金额，则查询是否有历史欠税。如果没有历史欠税则反null
         if(profitA.compareTo(BigDecimal.ZERO)<=0){
             logger.info("基础分润金额不足，无需计算税点税额！");
-            BigDecimal history = historyMapper.getHistoryAmt(where);
+            BigDecimal history = historyMapper.getHistoryAmtByPid(where);
             detail.setDeductionTaxMonthAmt(BigDecimal.ZERO);
             detail.setSupplyTaxAmt(BigDecimal.ZERO);
             detail.setRealProfitAmt(BigDecimal.ZERO);
