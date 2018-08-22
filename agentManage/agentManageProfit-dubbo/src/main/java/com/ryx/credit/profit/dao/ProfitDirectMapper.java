@@ -42,7 +42,7 @@ public interface ProfitDirectMapper {
 
 
     //直发分润导出
-    /*List<ProfitDirect> selectByWhere(ProfitDirect record);*/
+    List<ProfitDirect> selectByWhere(ProfitDirect record);
 
     void updateFristAgentStatus(String agentPid);
 

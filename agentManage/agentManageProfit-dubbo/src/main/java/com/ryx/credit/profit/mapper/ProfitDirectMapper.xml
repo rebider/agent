@@ -482,4 +482,19 @@
     </set>
     where FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR}
   </update>
+
+  <select id="selectByWhere" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DIRECT
+    <where>
+      1=1
+      <if test='null!= agentName and agentName !="" '>
+        AND AGENT_NAME = #{agentName}
+      </if>
+      <if test='null!= agentId and agentId !="" '>
+        AND AGENT_ID = #{agentId}
+      </if>
+    </where>
+  </select>
 </mapper>

@@ -113,10 +113,10 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     }
 
     //直发分润导出
-    /*@Override
+    @Override
     public List<ProfitDirect> exportProfitDirect(ProfitDirect record) {
         return directMapper.selectByWhere(record);
-    }*/
+    }
 
     /*@Override
     public void updateByAgentId(ProfitDirect profitDirect) {
