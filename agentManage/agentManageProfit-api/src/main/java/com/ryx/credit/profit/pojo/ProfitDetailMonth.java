@@ -127,6 +127,9 @@ public class ProfitDetailMonth implements Serializable{
     private String parentAgentId;
     //新增 20180822
     private String status;
+    //新增 20180822
+    private String profitDateStart;
+    private String profitDateEnd;
 
     public String getStatus() {
         return status;
@@ -611,5 +614,21 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setProfitDate(String profitDate) {
         this.profitDate = profitDate;
+    }
+
+    public String getProfitDateStart() {
+        return profitDateStart;
+    }
+
+    public void setProfitDateStart(String profitDateStart) {
+        this.profitDateStart = profitDateStart;
+    }
+
+    public String getProfitDateEnd() {
+        return profitDateEnd;
+    }
+
+    public void setProfitDateEnd(String profitDateEnd) {
+        this.profitDateEnd = profitDateEnd;
     }
 }
