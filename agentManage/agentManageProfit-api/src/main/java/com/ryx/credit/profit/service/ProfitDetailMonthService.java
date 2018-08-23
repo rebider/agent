@@ -6,6 +6,7 @@ package com.ryx.credit.profit.service;/**
 
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
+import com.ryx.credit.profit.pojo.TransProfitDetail;
 
 import java.util.List;
 
@@ -18,12 +19,12 @@ import java.util.List;
  */
 public interface ProfitDetailMonthService {
 
-    /*** 
+    /***
     * @Description: 新增分润明细
     * @Param:  分润明细对象
     * @Author: zhaodw
-    * @Date: 2018/8/6 
-    */ 
+    * @Date: 2018/8/6
+    */
     void insert(ProfitDetailMonth profitDetailMonth);
 
     /***
@@ -49,4 +50,13 @@ public interface ProfitDetailMonthService {
     int updateByPrimaryKeySelective(ProfitDetailMonth record);
 
     int updateByPrimaryKey(ProfitDetailMonth record);
+
+    /**
+     * 根据业务编码、AG编码、月份查询明细
+     * @param agentId
+     * @param agentPid
+     * @param profitDate
+     * @return
+     */
+    List<TransProfitDetail> getTransProfitDetailList(String agentId, String agentPid, String profitDate);
 }
