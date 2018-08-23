@@ -185,7 +185,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
         }
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentPid())){
-            criteria.andParentAgentPidEqualTo(profitDeduction.getParentAgentPid());
+                criteria.andParentAgentPidEqualTo(profitDeduction.getParentAgentPid());
+        }else {
+            criteria.andParentAgentPidIsNull();
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
@@ -499,6 +501,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         ProfitDeduction deduction = new ProfitDeduction();
         BeanUtils.copy(profitDeductionTemp, deduction);
         deduction.setId(idService.genId(TabId.P_DEDUCTION));
+        deduction.setStagingStatus("5");
         profitDeductionMapper.insert(deduction);
     }
 

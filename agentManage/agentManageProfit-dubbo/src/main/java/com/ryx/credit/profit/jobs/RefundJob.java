@@ -228,6 +228,7 @@ public class RefundJob {
         deduction.setMustDeductionAmt(addAmt);
         deduction.setSourceId(bussType);
         deduction.setDeductionDate(deductionDate);
+        deduction.setCreateDateTime(new Date());
         profitDeductionService.insert(deduction);
     }
 
@@ -242,6 +243,7 @@ public class RefundJob {
         query.setDeductionDate(deduction.getDeductionDate());
         query.setAgentPid(deduction.getAgentPid());
         query.setDeductionType(DeductionType.SETTLE_ERR.getType());
+        query.setParentAgentPid(deduction.getParentAgentPid());
         List<ProfitDeduction> profitDeductions = profitDeductionService.getProfitDeduction(query);
         if (profitDeductions != null && profitDeductions.size() > 0) {
             return profitDeductions.stream().map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).get();

@@ -24,9 +24,9 @@ import java.util.List;
 
 /**
  * @author zhaodw
- * @Title: CheckTranJob
+ * @Title: TranDataJob
  * @ProjectName agentManage
- * @Description: huoq
+ * @Description: 获取交易数据，对数据进行差异核对
  * @date 2018/7/2911:34
  */
 @Service("tranDataJob")
