@@ -92,4 +92,10 @@ public class PlatFormServiceImpl implements PlatFormService{
         return platFormMapper.updateByPrimaryKey(record);
     }
 
+
+    @Override
+    public PlatForm selectByPlatformNum(String platformNum){
+        return platFormMapper.selectByPlatformNum(platformNum);
+    }
+
 }

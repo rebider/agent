@@ -12,6 +12,8 @@
     <result column="SURPLUS_AMT" jdbcType="DECIMAL" property="surplusAmt" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="FACTOR_DATE" jdbcType="TIMESTAMP" property="factorDate" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -44,7 +46,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_ID, AGENT_PID, AGENT_NAME, FACTOR_MONTH, TATOL_AMT, BUCKLE_AMT, SURPLUS_AMT, 
-    REMARK, FACTOR_DATE
+    REMARK, FACTOR_DATE, PARENT_AGENT_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PProfitFactorExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -78,11 +80,11 @@
     insert into P_PROFIT_FACTOR (ID, AGENT_ID, AGENT_PID, 
       AGENT_NAME, FACTOR_MONTH, TATOL_AMT, 
       BUCKLE_AMT, SURPLUS_AMT, REMARK, 
-      FACTOR_DATE)
+      FACTOR_DATE, PARENT_AGENT_ID)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{factorMonth,jdbcType=VARCHAR}, #{tatolAmt,jdbcType=DECIMAL}, 
       #{buckleAmt,jdbcType=DECIMAL}, #{surplusAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
-      #{factorDate,jdbcType=TIMESTAMP})
+      #{factorDate,jdbcType=TIMESTAMP}, #{parentAgentId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
     insert into P_PROFIT_FACTOR
@@ -117,6 +119,9 @@
       <if test="factorDate != null">
         FACTOR_DATE,
       </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -148,6 +153,9 @@
       </if>
       <if test="factorDate != null">
         #{factorDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -196,6 +204,9 @@
       <if test="factorDate != null">
         FACTOR_DATE = #{factorDate,jdbcType=TIMESTAMP},
       </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -209,7 +220,8 @@
       BUCKLE_AMT = #{buckleAmt,jdbcType=DECIMAL},
       SURPLUS_AMT = #{surplusAmt,jdbcType=DECIMAL},
       REMARK = #{remark,jdbcType=VARCHAR},
-      FACTOR_DATE = #{factorDate,jdbcType=TIMESTAMP}
+      FACTOR_DATE = #{factorDate,jdbcType=TIMESTAMP},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -235,7 +247,7 @@
   <select id="getProfitFactorList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT ID,AGENT_ID,AGENT_PID,AGENT_NAME,FACTOR_MONTH,
-    TATOL_AMT,BUCKLE_AMT,SURPLUS_AMT,REMARK,FACTOR_DATE
+    TATOL_AMT,BUCKLE_AMT,SURPLUS_AMT,REMARK,FACTOR_DATE,PARENT_AGENT_ID
     FROM P_PROFIT_FACTOR
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>

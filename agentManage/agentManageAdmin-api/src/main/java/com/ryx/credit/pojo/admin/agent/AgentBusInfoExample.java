@@ -2257,6 +2257,66 @@ public class AgentBusInfoExample {
             addCriterion("BUS_SCOPE not between", value1, value2, "busScope");
             return (Criteria) this;
         }
+
+        public Criteria andDredgeS0IsNull() {
+            addCriterion("DREDGE_S0 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0IsNotNull() {
+            addCriterion("DREDGE_S0 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0EqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 =", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0NotEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 <>", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0GreaterThan(BigDecimal value) {
+            addCriterion("DREDGE_S0 >", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0GreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 >=", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0LessThan(BigDecimal value) {
+            addCriterion("DREDGE_S0 <", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0LessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 <=", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0In(List<BigDecimal> values) {
+            addCriterion("DREDGE_S0 in", values, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0NotIn(List<BigDecimal> values) {
+            addCriterion("DREDGE_S0 not in", values, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0Between(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DREDGE_S0 between", value1, value2, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0NotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DREDGE_S0 not between", value1, value2, "dredgeS0");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -6,11 +6,15 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.profit.dao.ProfitDayMapper;
+import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.ProfitDay;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.service.IProfitDService;
+import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitComputerService;
-import com.ryx.credit.profit.service.ProfitDetailMonthService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -28,12 +32,16 @@ import java.util.List;
  */
 @Service
 @Transactional(rollbackFor=RuntimeException.class)
-public class ProfitMonthMposDataJob {
+public class NewProfitMonthMposDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
-    private ProfitDetailMonthService profitDetailMonthService;
+    private TransProfitDetailMapper transProfitDetailMapper;
     @Autowired
-    private ProfitComputerService computerService;
+    private ProfitDayMapper dayMapper;
+    @Autowired
+    private AgentBusinfoService businfoService;
+    @Autowired
+    private AgentService agentService;
     @Autowired
     private IdService idService;
 
@@ -101,12 +109,12 @@ public class ProfitMonthMposDataJob {
     public void synchroProfitMonth(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
         month=transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate;
-        map.put("transDate",month);
+        map.put("frMonth",month);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.month"),params);
+                (AppConfig.getProperty("profit.newmonth"),params);
         System.out.println(res);
         JSONObject json = JSONObject.parseObject(res);
         if(!json.get("respCode").equals("000000")){
@@ -115,15 +123,11 @@ public class ProfitMonthMposDataJob {
             return;
         }
 
-        //BigDecimal fxAmount = json.getBigDecimal("fxAmount")==null?BigDecimal.ZERO:json.getBigDecimal("fxAmount");//分销系统交易汇总
-        //BigDecimal wjrAmount = json.getBigDecimal("wjrAmount")==null?BigDecimal.ZERO:json.getBigDecimal("wjrAmount");//未计入分润汇总
-        //BigDecimal wtbAmount = json.getBigDecimal("wtbAmount")==null?BigDecimal.ZERO:json.getBigDecimal("wtbAmount");//未同步到分润
-
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
             if(list.size()>0){
-                insertProfitMonth(list,transDate);
+                insertTransProfit(list,transDate);
             }
         } catch (Exception e) {
             logger.error("同步月分润数据失败！");
@@ -133,46 +137,63 @@ public class ProfitMonthMposDataJob {
 
     }
 
-    public void insertProfitMonth(List<JSONObject> profitMonths,String transDate){
-        for(JSONObject json:profitMonths){
-            allAmount = allAmount.add(json.getBigDecimal("TRANAMT"));//付款交易额-汇总所有
-            ProfitDetailMonth where = new ProfitDetailMonth();
-            where.setAgentPid(json.getString("UNIQUECODE"));//代理商唯一编号
-            where.setProfitDate(month);
-            ProfitDetailMonth detailMonth = profitDetailMonthService.selectByPIdAndMonth(where);
-            BigDecimal totalDay = computerService.totalP_day_RHB(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//瑞和宝日结分润汇总
-            //BigDecimal factor = computerService.total_factor(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//商业保理扣款
-            //BigDecimal otherSupply = computerService.total_supply(json.getString("UNIQUECODE"),json.getString("PROFITDATE"));//其他补款汇总
-            if(null!=detailMonth){//已存在该分润
-                BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
-                detailMonth.setProfitDate(month);
-                detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
-                detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
-                detailMonth.setTpProfitAmt(json.getBigDecimal("TPPROFITAMT"));//贴牌分润
-                detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
-                detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
-                detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
-                BigDecimal tranAmt = detailMonth.getTranAmt()==null?BigDecimal.ZERO:detailMonth.getTranAmt();
-                detailMonth.setTranAmt(json.getBigDecimal("TRANAMT").add(tranAmt));
-                detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润=瑞和宝分润-日结分润
-                profitDetailMonthService.updateByPrimaryKeySelective(detailMonth);
+    public void insertTransProfit(List<JSONObject> transProfit,String transDate){
+        for(JSONObject json:transProfit){
+            String parentAgentId = null;
+            TransProfitDetail detail = new TransProfitDetail();
+            AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"),json.getString("AGENCYID"));
+            AgentBusInfo parent = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"),json.getString("AGENCYID"));
+            if(null==parent || "6000".equals(json.getString(""))){
+                //直发一代或者上级为空，则无上级
+                parentAgentId = null;
             }else{
-                detailMonth = new ProfitDetailMonth();
-                detailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
-                detailMonth.setProfitDate(month);
-                detailMonth.setAgentPid(json.getString("UNIQUECODE"));
-                //detailMonth.setAgentName(json.getString("AGENTNAME"));
-                BigDecimal rhbProfit = json.getBigDecimal("RHBPROFITAMT");//瑞和宝分润
-                detailMonth.setRyxProfitAmt(json.getBigDecimal("RYXPROFITAMT"));//瑞银信分润
-                detailMonth.setRyxHdProfitAmt(json.getBigDecimal("RYXHDPROFITAMT"));//瑞银信活动分润
-                detailMonth.setTpProfitAmt(json.getBigDecimal("TPPROFITAMT"));//贴牌分润
-                detailMonth.setRsProfitAmt(json.getBigDecimal("RSPROFITAMT"));//瑞刷分润
-                detailMonth.setRsHdProfitAmt(json.getBigDecimal("RSHDPROFITAMT"));//瑞刷活动分润
-                detailMonth.setZfProfitAmt(json.getBigDecimal("ZFPROFITAMT"));//直发分润
-                detailMonth.setTranAmt(json.getBigDecimal("TRANAMT"));
-                detailMonth.setRhbProfitAmt(rhbProfit.subtract(totalDay));//瑞和宝分润得减去日结分润
-                profitDetailMonthService.insertSelective(detailMonth);
+                parentAgentId = parent.getAgentId();
             }
+            ProfitDay day = new ProfitDay();
+            day.setAgentId(Busime.getAgentId());
+            day.setTransDate(transDate);
+            BigDecimal totalDay = dayMapper.totalProfitAndReturnById(day);
+
+            List<AgentBusInfo> parents = businfoService.queryParenFourLevelBusNum(null,json.getString(""),json.getString(""));//父类
+            if(parents.size()>0){
+                AgentBusInfo first = parents.get(parents.size()-1);
+                Agent agent = agentService.getAgentById(first.getAgentId());
+                if(agent.getAgUniqNum().equals("JS00001159")||agent.getAgUniqNum().equals("JS00001160")) {//捷步、银点只算日结
+                    totalDay = dayMapper.totalRPByAgentId(day);
+                    logger.info("所属捷步、银点");
+                    logger.info("日结分润："+totalDay);
+                }
+            }else{
+                if(Busime.getAgentId().equals("JS00001159")||Busime.getAgentId().equals("JS00001160")) {//捷步、银点只算日结
+                    totalDay = dayMapper.totalRPByAgentId(day);
+                    logger.info("所属捷步、银点");
+                    logger.info("日结分润："+totalDay);
+                }
+            }
+
+            /*String platFormNum = json.getString("platFormNum")==null?"":json.getString("platFormNum");
+            if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
+                    && !"1111".equals(platFormNum) && !"3000".equals(platFormNum) && !"6000".equals(platFormNum)
+                    && !"4000".equals(platFormNum)){
+                platFormNum = "1001";
+            }*/
+
+            detail.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));//主键
+            detail.setProfitDate(transDate);//月份
+            detail.setBusNum(json.getString("AGENCYID"));//机构号
+            detail.setParentBusNum(json.getString("ONLINEAGENCYID"));//上级机构号
+            detail.setBusCode(json.getString("PLATFORMNUM"));//平台号
+            detail.setParentAgentId(parentAgentId);//上级AG码
+            detail.setAgentId(Busime.getAgentId());//AG码
+            detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
+            detail.setInTransAmt(json.getBigDecimal("SAMOUNT"));//付款交易额
+            detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
+            detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
+            detail.setProfitAmt(json.getBigDecimal("PROFIT"));//分润金额
+            detail.setPayCompany(Busime.getCloPayCompany());//打款公司
+            detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
+            detail.setSourceInfo("MPOS");
+            transProfitDetailMapper.insertSelective(detail);
         }
         synchroProfitMonth(transDate);
     }

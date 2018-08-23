@@ -56,6 +56,8 @@
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />
     <dubbo:reference interface="com.ryx.credit.profit.service.ProfitMonthService" id="profitMonthService"  timeout="1200000" registry="${zk.group}" check="false" />
+    <dubbo:reference interface="com.ryx.credit.profit.service.IProfitDirectService" id="profitDirectService"  timeout="1200000" registry="${zk.group}" check="false" />
+   <!--<dubbo:reference interface="com.ryx.credit.profit.service.ProfitComputerService" id="profitComputerService"  timeout="1200000" registry="${zk.group}" check="false" />-->
 
     <dubbo:service interface="com.ryx.credit.service.bank.EtbSyscardinfoService" ref="etbSyscardinfoService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}"/>

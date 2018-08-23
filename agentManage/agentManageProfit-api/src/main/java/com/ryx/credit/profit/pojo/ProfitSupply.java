@@ -17,6 +17,16 @@ public class ProfitSupply implements Serializable {
     private BigDecimal supplyAmt;
 
     private String supplyDate;
+    //新增 20180821
+    private String parentAgentId;
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId;
+    }
 
     public String getSupplyCode() {
         return supplyCode;

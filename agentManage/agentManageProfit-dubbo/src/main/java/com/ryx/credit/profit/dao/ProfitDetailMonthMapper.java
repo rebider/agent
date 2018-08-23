@@ -25,6 +25,7 @@ public interface ProfitDetailMonthMapper {
      */
     List<ProfitDetailMonth> selectByDate(String profitDate);
 
+
     /**
      * 根据所属下级id集合汇总他们的实际分润（税前计算时为基础分润汇总）
      * @param ids
@@ -38,6 +39,7 @@ public interface ProfitDetailMonthMapper {
 
     ProfitDetailMonth selectByPIdAndMonth(ProfitDetailMonth record);
 
+    ProfitDetailMonth selectByIdAndParent(ProfitDetailMonth record);
     int updateByPrimaryKeySelective(ProfitDetailMonth record);
 
     int updateByPrimaryKey(ProfitDetailMonth record);
