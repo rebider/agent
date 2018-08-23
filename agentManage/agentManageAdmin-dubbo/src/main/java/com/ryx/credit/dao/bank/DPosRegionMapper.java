@@ -4,6 +4,7 @@ import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
 
 import java.util.List;
+import java.util.Set;
 
 public interface DPosRegionMapper {
     long countByExample(DPosRegionExample example);
@@ -24,7 +25,7 @@ public interface DPosRegionMapper {
 
     int findCountByCode(String pCode);
 
-    List<String> queryNationwide();
+    Set<String> queryNationwide();
 
-    List<DPosRegion> queryCityByCode(String code);
+    Set<DPosRegion> queryCityByCode(String code);
 }

@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by RYX on 2018/7/17.
@@ -167,15 +165,15 @@ public class PosRegionServiceImpl implements PosRegionService {
 
 
     @Override
-    public List<String> queryCityByCode(String codes){
+    public Set<String> queryCityByCode(String codes){
         if(StringUtils.isBlank(codes)){
             return null;
         }
         String[] split = codes.split(",");
-        List<String> resultList = new ArrayList<>();
+        Set<String> resultList = new HashSet<>();
         for(int i=0;i<split.length;i++){
-            List<DPosRegion> dPosRegionList = posRegionMapper.queryCityByCode(split[i]);
-            String codeLevel = dPosRegionList.get(0).getCodeLevel();
+            Set<DPosRegion> dPosRegionList = posRegionMapper.queryCityByCode(split[i]);
+            String codeLevel = dPosRegionList.iterator().next().getCodeLevel();
             if(codeLevel.equals("1")){
                 List<DPosRegion> dPosRegions = queryByParentCode(split[i]);
                 dPosRegions.forEach(row->{
