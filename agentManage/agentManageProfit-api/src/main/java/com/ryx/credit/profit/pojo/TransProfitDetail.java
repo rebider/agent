@@ -56,6 +56,8 @@ public class TransProfitDetail implements Serializable{
     private String unicode;
     //新增 20180821
     private String sourceInfo;
+    //新增 20180822
+    private String agentType;
 
     public String getSourceInfo() {
         return sourceInfo;
@@ -247,5 +249,13 @@ public class TransProfitDetail implements Serializable{
 
     public void setUnicode(String unicode) {
         this.unicode = unicode == null ? null : unicode.trim();
+    }
+
+    public String getAgentType() {
+        return agentType;
+    }
+
+    public void setAgentType(String agentType) {
+        this.agentType = agentType;
     }
 }
