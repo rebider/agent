@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.bank;
 
-import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
@@ -128,7 +127,7 @@ public class PosRegionServiceImpl implements PosRegionService {
             tree.setPid(Long.valueOf(dPosRegion.getParentCode()) + "");
             tree.setText(dPosRegion.getName());
             tree.setState("2".equals(level)?1:0);
-            tree.settType(new BigDecimal(dPosRegion.getCodeType()));
+            tree.settType(new BigDecimal(dPosRegion.getCodeLevel()));
             trees.add(tree);
         }
         return trees;
@@ -153,5 +152,40 @@ public class PosRegionServiceImpl implements PosRegionService {
         return res;
     }
 
+    @Override
+    public List<DPosRegion> queryByParentCode(String parentCode){
+        if(StringUtils.isBlank(parentCode)){
+            return null;
+        }
+        DPosRegionExample dPosRegionExample = new DPosRegionExample();
+        DPosRegionExample.Criteria criteria = dPosRegionExample.createCriteria();
+        criteria.andParentCodeEqualTo(parentCode);
+        criteria.andCodeLevelEqualTo("2");
+        List<DPosRegion> dPosRegions = posRegionMapper.selectByExample(dPosRegionExample);
+        return dPosRegions;
+    }
+
+
+    @Override
+    public List<String> queryCityByCode(String codes){
+        if(StringUtils.isBlank(codes)){
+            return null;
+        }
+        String[] split = codes.split(",");
+        List<String> resultList = new ArrayList<>();
+        for(int i=0;i<split.length;i++){
+            List<DPosRegion> dPosRegionList = posRegionMapper.queryCityByCode(split[i]);
+            String codeLevel = dPosRegionList.get(0).getCodeLevel();
+            if(codeLevel.equals("1")){
+                List<DPosRegion> dPosRegions = queryByParentCode(split[i]);
+                dPosRegions.forEach(row->{
+                    resultList.add(row.getCode());
+                });
+            }else{
+                resultList.add(split[i]);
+            }
+        }
+        return resultList;
+    }
 }
 

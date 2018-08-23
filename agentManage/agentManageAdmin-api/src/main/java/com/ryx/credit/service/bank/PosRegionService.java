@@ -18,7 +18,9 @@ public interface PosRegionService {
 
     List<Tree> queryPosRegion(String code,String level);
 
-
     List<DPosRegion> queryByCodes(String codes);
 
+    List<DPosRegion> queryByParentCode(String parentCode);
+
+    List<String> queryCityByCode(String codes);
 }

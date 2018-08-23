@@ -25,4 +25,6 @@ public interface DPosRegionMapper {
     int findCountByCode(String pCode);
 
     List<String> queryNationwide();
+
+    List<DPosRegion> queryCityByCode(String code);
 }

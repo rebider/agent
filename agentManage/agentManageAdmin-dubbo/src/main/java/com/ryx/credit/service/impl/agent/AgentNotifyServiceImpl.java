@@ -316,7 +316,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 List<String> dPosRegions = posRegionMapper.queryNationwide();
                 split = dPosRegions.toArray(new String[]{});
             }else{
-                split = agentBusInfo.getBusRegion().split(",");
+                List<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                split = dPosRegions.toArray(new String[]{});
             }
         }
         //通知对象
@@ -608,7 +609,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 List<String> dPosRegions = posRegionMapper.queryNationwide();
                 split = dPosRegions.toArray(new String[]{});
             }else{
-                split = agentBusInfo.getBusRegion().split(",");
+                List<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                split = dPosRegions.toArray(new String[]{});
             }
             agentNotifyVo.setBusiAreas(split);
         }

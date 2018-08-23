@@ -174,8 +174,19 @@
     <select id="queryNationwide" resultMap="BaseResultMapString">
         select code from d_pos_region t
         <where>
-            (code_level='1' or code_level='2')
+            code_level='2'
             and code!='0'
         </where>
+    </select>
+
+    <select id="queryCityByCode" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from d_pos_region t
+        <where>
+            code_level in('1','2')
+            and code = #{code}
+        </where>
+        order by code_level desc
     </select>
 </mapper>
