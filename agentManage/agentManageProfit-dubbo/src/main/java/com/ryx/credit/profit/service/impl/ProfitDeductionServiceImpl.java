@@ -119,7 +119,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
         if(deductionist != null && deductionist.size() > 0 ) {
-            deductionist.stream().filter(list->list.get(0) != null && list.get(4) != null).forEach(list->{
+            deductionist.stream().filter(list->list.get(0) != null && list.get(1) != null && list.get(4) != null).forEach(list->{
                 insertDeduction(list, userId);
             });
 
@@ -144,6 +144,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) );
         deduction.setAgentPid(list.get(0).toString());
+        deduction.setParentAgentPid(list.get(1).toString());
         deduction.setAgentName(list.get(2).toString());
         deduction.setRemark(list.get(3).toString());
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
@@ -183,6 +184,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
             criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getParentAgentPid())){
+            criteria.andParentAgentPidEqualTo(profitDeduction.getParentAgentPid());
+        }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
@@ -216,10 +220,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal otherDeductionByType(BigDecimal profitAmt, String agentPid, String type) throws DeductionException {
+    public BigDecimal otherDeductionByType(Map<String, Object> param) throws DeductionException {
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         try {
-            return otherDeduction(profitAmt, agentPid, deductionDate, type);
+            param.put("deductionDate", deductionDate);
+            return otherDeduction(param);
         }catch ( Exception e) {
             e.printStackTrace();
             throw new DeductionException("扣款失败。");
@@ -227,12 +232,15 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentPid) throws DeductionException {
+    public BigDecimal settleErrDeduction(Map<String, Object> param) throws DeductionException {
         // 获取退单扣款
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.SETTLE_ERR.getType(), bussType, null);
+        param.put("deductionDate", deductionDate);
+        param.put("type", DeductionType.SETTLE_ERR.getType());
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
         if (deductionList != null && deductionList.size() > 0) {
-           if ("pos".equals(bussType)) {
+            BigDecimal profitAmt = (BigDecimal)param.get("profitAmt");
+           if ("02".equals((String)param.get("sourceId"))) {
               return getDeductionAmt(deductionList, profitAmt);
            }else{
               return getMposDeductionAmt(deductionList, profitAmt);
@@ -266,13 +274,21 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return  result;
     }
 
-    private List<ProfitDeduction> getProfitDeductionListByType(String agentPid, String deductionDate, String type, String sourceId, String remark) {
+    /*** 
+    * @Description: 获取扣款列表
+    * @Param:  param 扣款查询参数
+    * @return: 扣款列表
+    * @Author: zhaodw 
+    * @Date: 2018/8/21 
+    */ 
+    private List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentPid(agentPid);
-        profitDeduction.setDeductionType(type);
-        profitDeduction.setDeductionDate(deductionDate);
-        profitDeduction.setSourceId(sourceId);
-        profitDeduction.setRemark(remark);
+        profitDeduction.setAgentPid((String)param.get("agentPid"));
+        profitDeduction.setDeductionType((String)param.get("type"));
+        profitDeduction.setDeductionDate((String)param.get("deductionDate"));
+        profitDeduction.setSourceId((String)param.get("sourceId"));
+        profitDeduction.setRemark((String)param.get("remark"));
+        profitDeduction.setParentAgentPid((String)param.get("parentAgentPid"));
         return this.getProfitDeduction(profitDeduction);
     }
 
@@ -285,10 +301,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/8
     */
-    private  BigDecimal otherDeduction(BigDecimal profitAmt, String agentPid, String deductionDate, String type) {
+    private  BigDecimal otherDeduction(Map<String, Object> param) {
         // 获取代理商所有其它扣款信息
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(agentPid, deductionDate, DeductionType.OTHER.getType(), null, type);
-        return getDeductionAmt(deductionList, profitAmt);
+        param.put("type", DeductionType.OTHER.getType());
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
+        return getDeductionAmt(deductionList, (BigDecimal) param.get("profitAmt"));
     }
 
     /***
@@ -352,7 +369,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     */
     private void stagingDeal(BigDecimal profitAmt,BigDecimal resultAmt, ProfitDeduction profitDeductionTemp) {
         // 扣足
-        profitDeductionTemp.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+        profitDeductionTemp.setDeductionStatus("1");//已扣款
         if (resultAmt.doubleValue() >= 0 && profitAmt.doubleValue() > 0) {
             profitDeductionTemp.setActualDeductionAmt(profitDeductionTemp.getMustDeductionAmt());
             profitDeductionTemp.setNotDeductionAmt(BigDecimal.ZERO);
@@ -382,7 +399,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);// 实扣清0
             profitDeductionTemp.setAddDeductionAmt(BigDecimal.ZERO);
             profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);
-            profitDeductionTemp.setStagingStatus("3");
+            profitDeductionTemp.setDeductionStatus("0");//未扣款
             profitDeductionTemp.setCreateDateTime(new Date());
             updateStagingDetail(profitAmt, profitDeductionTemp);
         }
@@ -441,7 +458,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Date: 2018/8/8
     */
     private void generalDeal(BigDecimal profitAmt,BigDecimal resultAmt, ProfitDeduction profitDeductionTemp) {
-        profitDeductionTemp.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+        profitDeductionTemp.setDeductionStatus("1");//已扣款
         if (resultAmt.doubleValue() >= 0 && profitAmt.doubleValue() > 0) {
             profitDeductionTemp.setActualDeductionAmt(profitDeductionTemp.getMustDeductionAmt());
             profitDeductionTemp.setNotDeductionAmt(BigDecimal.ZERO);
@@ -465,6 +482,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);// 实扣清0
                 profitDeductionTemp.setAddDeductionAmt(BigDecimal.ZERO);
                 profitDeductionTemp.setCreateDateTime(new Date());
+                profitDeductionTemp.setDeductionStatus("0");//未扣款
             }
         }
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionTemp);

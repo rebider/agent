@@ -43,10 +43,10 @@ public class ToolsDeductJobTest {
     @Test
     public void computeToolsDeduct() throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(10);
-        map.put("agentPid", "AG20180816000000000006084"); //AG20180813000000000006020
+        map.put("agentPid", "AG20180817000000000006101"); //AG20180813000000000006020
         map.put("paltformNo", "2000");        //平台编号
         map.put("deductDate", "2018-09");       //扣款月份
-        map.put("agentProfitAmt", "777777");        //代理商分润
+        map.put("agentProfitAmt", "1166.66");        //代理商分润
         map = profitToolsDeductService.execut(map);
         System.out.println("应扣："+map.get("mustDeductionAmtSum"));//返回应扣金额
         System.out.println("实扣："+map.get("actualDeductionAmtSum"));//实扣金额

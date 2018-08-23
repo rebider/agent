@@ -336,21 +336,34 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 }else{
                     profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
                 }
-                // 机具扣款-
-                sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt);
                 //退单扣款-
                 if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
                     sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt);
                 }
+                // 机具扣款-
+                sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt);
+                Map<String, Object> param = new HashMap<>(5);
+                param.put("profitAmt", sumAmt);
+                param.put("agentPid",  profitDetailMonthTemp.getAgentPid());
+//               param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentPid());
+                param.put("remark", "POS考核扣款（新国都、瑞易送）");
                 //POS考核扣款（新国都、瑞易送）-
-                profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(sumAmt, profitDetailMonthTemp.getAgentPid(),"POS考核扣款（新国都、瑞易送）"));
+                profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());
+
+                param.put("profitAmt", sumAmt);
+                param.put("remark", "手刷考核扣款（小蓝牙、MPOS）");
                 //手刷考核扣款（小蓝牙、MPOS）-
-                profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(sumAmt, profitDetailMonthTemp.getAgentPid(),"手刷考核扣款（小蓝牙、MPOS）"));
+                profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
                 //保理扣款-
                 profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentPid(), null));
                 sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
+
+                param.put("profitAmt", sumAmt);
+                param.put("remark", "1");
                 //其他扣款-
-                profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(sumAmt, profitDetailMonthTemp.getAgentPid(),"1"));
+                profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
                 sumAmt = sumAmt.subtract(profitDetailMonthTemp.getOtherDeductionAmt());
                 // 实发分润
                 profitDetailMonthTemp.setRealProfitAmt(sumAmt);
@@ -475,10 +488,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         BigDecimal posMustDeductionAmt = profitDeductionServiceImpl.getSettleErrDeductionAmt(profitDeduction);
         posMustDeductionAmt = posMustDeductionAmt==null? BigDecimal.ZERO: posMustDeductionAmt;
         profitDetailMonthTemp.setPosTdMustDeductionAmt(posMustDeductionAmt);
-
+        Map<String, Object> param = new HashMap<>(5);
+        param.put("profitAmt", sumAmt);
+        param.put("sourceId", "02");
+        param.put("agentPid",  profitDetailMonthTemp.getAgentPid());
+//        param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentPid());
         BigDecimal realDeductionAmt = BigDecimal.ZERO;
         if (posMustDeductionAmt.doubleValue() > 0) {
-            realDeductionAmt = profitDeductionServiceImpl.settleErrDeduction(sumAmt, "02" , profitDetailMonthTemp.getAgentPid());
+            realDeductionAmt = profitDeductionServiceImpl.settleErrDeduction(param);
             profitDetailMonthTemp.setPosTdRealDeductionAmt(realDeductionAmt);
             sumAmt=sumAmt.subtract(realDeductionAmt);
         }
@@ -489,7 +506,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthTemp.setMposTdMustDeductionAmt(mposMustDeductionAmt);
 
         if (posMustDeductionAmt.doubleValue() > 0) {
-            realDeductionAmt = profitDeductionServiceImpl.settleErrDeduction(sumAmt, "01" , profitDetailMonthTemp.getAgentPid());
+            param.put("profitAmt", sumAmt);
+            param.put("sourceId", "01");
+            realDeductionAmt = profitDeductionServiceImpl.settleErrDeduction(param);
             profitDetailMonthTemp.setMposTdRealDeductionAmt(realDeductionAmt);
             sumAmt=sumAmt.subtract(realDeductionAmt);
         }

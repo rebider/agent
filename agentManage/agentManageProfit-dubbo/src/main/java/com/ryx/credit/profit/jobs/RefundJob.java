@@ -18,6 +18,7 @@ import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.profit.service.ProfitSettleErrLsService;
 import com.ryx.credit.profit.service.ProfitSupplyService;
 import com.ryx.credit.profit.service.StagingService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
@@ -71,6 +72,9 @@ public class RefundJob {
 
     @Autowired
     private StagingService stagingServiceImpl;
+
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
 
@@ -136,6 +140,7 @@ public class RefundJob {
         if (agentMap !=null){
             profitSupply.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
             profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
+//            profitSupply.set
         }
         profitSupply.setAgentId(jsonObject.getString("instId"));
         profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));
@@ -200,6 +205,8 @@ public class RefundJob {
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         if (agentMap!=null) {
             deduction.setAgentPid((String) agentMap.get("AG_UNIQ_NUM"));
+            deduction.setParentAgentPid((String) agentMap.get("parentAgentPid"));
+            deduction.setParentAgentId((String) agentMap.get("parentAgentId"));
             deduction.setAgentName((String) agentMap.get("AG_NAME"));
         }else{
             deduction.setAgentPid(agentId);
@@ -317,8 +324,29 @@ public class RefundJob {
         agentBusInfo.setBusNum(orgId);
         PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null);
         if (pageInfo != null && pageInfo.getTotal() > 0) {
-            return (Map<String, Object>) pageInfo.getRows().get(0);
+            Map<String, Object> agentMap = (Map<String, Object>) pageInfo.getRows().get(0);
+            try {
+                getParentAgentId(agentMap);
+                return agentMap;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return  null;
+    }
+
+    /*** 
+    * @Description: 获取上级代理商信息
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/8/21 
+    */ 
+    private void getParentAgentId(Map<String, Object> posMap) throws Exception{
+        List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), (String)posMap.get("BUS_PLATFORM"), (String)posMap.get("BUS_NUM"));
+        if(agentBusInfo != null && !agentBusInfo.isEmpty()){
+            posMap.put("parentAgentId", agentBusInfo.get(0).getBusNum());
+            posMap.put("parentAgentPid", agentBusInfo.get(0).getAgentId());
+        }
     }
 }
