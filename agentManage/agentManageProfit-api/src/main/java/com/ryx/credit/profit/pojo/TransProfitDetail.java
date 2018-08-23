@@ -1,8 +1,14 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class TransProfitDetail {
+/**
+ * @author RYX
+ */
+public class TransProfitDetail implements Serializable{
+
+    private static final long serialVersionUID = -7093600723570940396L;
     private String id;
 
     private String busNum;
