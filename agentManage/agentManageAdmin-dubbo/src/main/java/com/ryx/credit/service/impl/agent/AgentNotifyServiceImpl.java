@@ -313,10 +313,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         String[] split = new String[1];
         if(StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
             if(agentBusInfo.getBusRegion().equals("0")){
-                List<String> dPosRegions = posRegionMapper.queryNationwide();
+                Set<String> dPosRegions = posRegionMapper.queryNationwide();
                 split = dPosRegions.toArray(new String[]{});
             }else{
-                split = agentBusInfo.getBusRegion().split(",");
+                Set<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                split = dPosRegions.toArray(new String[]{});
             }
         }
         //通知对象
@@ -605,10 +606,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         if(StringUtils.isNotBlank( agentBusInfo.getBusRegion())) {
             String[] split = null;
             if(agentBusInfo.getBusRegion().equals("0")){
-                List<String> dPosRegions = posRegionMapper.queryNationwide();
+                Set<String> dPosRegions = posRegionMapper.queryNationwide();
                 split = dPosRegions.toArray(new String[]{});
             }else{
-                split = agentBusInfo.getBusRegion().split(",");
+                Set<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                split = dPosRegions.toArray(new String[]{});
             }
             agentNotifyVo.setBusiAreas(split);
         }

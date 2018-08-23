@@ -1616,6 +1616,11 @@ public class TransProfitDetailExample {
             addCriterion("UNICODE not between", value1, value2, "unicode");
             return (Criteria) this;
         }
+
+        public Criteria andAgentTypeEqualTo(String value) {
+            addCriterion("AGENT_TYPE =", value, "agentType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

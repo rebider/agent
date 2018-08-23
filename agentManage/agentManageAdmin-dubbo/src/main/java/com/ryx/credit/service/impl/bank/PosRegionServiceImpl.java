@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.bank;
 
-import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
@@ -13,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by RYX on 2018/7/17.
@@ -128,7 +125,7 @@ public class PosRegionServiceImpl implements PosRegionService {
             tree.setPid(Long.valueOf(dPosRegion.getParentCode()) + "");
             tree.setText(dPosRegion.getName());
             tree.setState("2".equals(level)?1:0);
-            tree.settType(new BigDecimal(dPosRegion.getCodeType()));
+            tree.settType(new BigDecimal(dPosRegion.getCodeLevel()));
             trees.add(tree);
         }
         return trees;
@@ -153,5 +150,40 @@ public class PosRegionServiceImpl implements PosRegionService {
         return res;
     }
 
+    @Override
+    public List<DPosRegion> queryByParentCode(String parentCode){
+        if(StringUtils.isBlank(parentCode)){
+            return null;
+        }
+        DPosRegionExample dPosRegionExample = new DPosRegionExample();
+        DPosRegionExample.Criteria criteria = dPosRegionExample.createCriteria();
+        criteria.andParentCodeEqualTo(parentCode);
+        criteria.andCodeLevelEqualTo("2");
+        List<DPosRegion> dPosRegions = posRegionMapper.selectByExample(dPosRegionExample);
+        return dPosRegions;
+    }
+
+
+    @Override
+    public Set<String> queryCityByCode(String codes){
+        if(StringUtils.isBlank(codes)){
+            return null;
+        }
+        String[] split = codes.split(",");
+        Set<String> resultList = new HashSet<>();
+        for(int i=0;i<split.length;i++){
+            Set<DPosRegion> dPosRegionList = posRegionMapper.queryCityByCode(split[i]);
+            String codeLevel = dPosRegionList.iterator().next().getCodeLevel();
+            if(codeLevel.equals("1")){
+                List<DPosRegion> dPosRegions = queryByParentCode(split[i]);
+                dPosRegions.forEach(row->{
+                    resultList.add(row.getCode());
+                });
+            }else{
+                resultList.add(split[i]);
+            }
+        }
+        return resultList;
+    }
 }
 
