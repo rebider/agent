@@ -189,6 +189,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }else {
             criteria.andParentAgentPidIsNull();
         }
+        if (StringUtils.isNotBlank(profitDeduction.getDeductionStatus())){
+            criteria.andDeductionStatusEqualTo(profitDeduction.getDeductionStatus());
+        }else {
+            criteria.andDeductionStatusIsNull();
+        }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
@@ -291,6 +296,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         profitDeduction.setSourceId((String)param.get("sourceId"));
         profitDeduction.setRemark((String)param.get("remark"));
         profitDeduction.setParentAgentPid((String)param.get("parentAgentPid"));
+        profitDeduction.setDeductionStatus((String)param.get("deductionStatus"));
         return this.getProfitDeduction(profitDeduction);
     }
 

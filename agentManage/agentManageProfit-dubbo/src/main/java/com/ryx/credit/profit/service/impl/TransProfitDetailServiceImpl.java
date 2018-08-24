@@ -40,6 +40,9 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
         if (StringUtils.isNotBlank(transProfitDetail.getAgentId())) {
             criteria.andAgentIdEqualTo(transProfitDetail.getAgentId());
         }
+        if (StringUtils.isNotBlank(transProfitDetail.getBusCode())) {
+            criteria.andBusCodeEqualTo(transProfitDetail.getBusCode());
+        }
         if (StringUtils.isNotBlank(transProfitDetail.getParentAgentId())) {
             criteria.andParentAgentIdEqualTo(transProfitDetail.getParentAgentId());
         }else{

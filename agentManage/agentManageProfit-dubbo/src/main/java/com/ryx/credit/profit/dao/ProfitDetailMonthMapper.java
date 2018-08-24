@@ -43,4 +43,6 @@ public interface ProfitDetailMonthMapper {
     int updateByPrimaryKeySelective(ProfitDetailMonth record);
 
     int updateByPrimaryKey(ProfitDetailMonth record);
+
+    void payMoney(String profitDate);
 }

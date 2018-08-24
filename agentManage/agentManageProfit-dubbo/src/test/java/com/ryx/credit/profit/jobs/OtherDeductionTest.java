@@ -1,10 +1,9 @@
-package junit.profit;/**
+package com.ryx.credit.profit.jobs;/**
  * @Auther: zhaodw
  * @Date: 2018/7/30 14:59
  * @Description:
  */
 
-import com.ryx.credit.profit.jobs.ProfitDataJob;
 import com.ryx.credit.profit.service.ProfitDeductionService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +14,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 退单任务测试
@@ -41,7 +42,12 @@ public class OtherDeductionTest {
     */
     @Test
     public void testDeduction() {
-//        profitDeductionService.settleErrDeduction(new BigDecimal("0"),"02","OO20180815000000000000615");
+        Map<String, Object> deductionMap = new HashMap<>(5);
+        deductionMap.put("profitAmt", new BigDecimal("100"));
+        deductionMap.put("bussType","02");
+        deductionMap.put("agentPid", "JS00000116-Z00000201");
+        deductionMap.put("parentAgentPid", "AG20180726000000000002759");
+        profitDeductionService.settleErrDeduction(deductionMap);
 //        profitDeductionService.settleErrDeduction(new BigDecimal("0.5"),"02","AG20180809000000000005966");
 //        profitDeductionService.settleErrDeduction(new BigDecimal("4"),"02","AG201808090000000000059661");
 //        profitDeductionService.settleErrDeduction(new BigDecimal("20"),"02","AG20180813000000000006020");

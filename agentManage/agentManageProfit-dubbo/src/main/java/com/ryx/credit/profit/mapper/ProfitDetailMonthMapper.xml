@@ -602,6 +602,9 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  <update id="payMoney">
+      update P_PROFIT_DETAIL_M set status='4' where status='3' and   PROFIT_DATE = #{profitDate}
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     update P_PROFIT_DETAIL_M
     <set >

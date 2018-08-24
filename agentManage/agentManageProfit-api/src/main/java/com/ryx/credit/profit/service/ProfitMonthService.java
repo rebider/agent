@@ -131,4 +131,11 @@ public interface ProfitMonthService {
     * @Date: 2018/8/12
     */
     void computeProfitAmt();
+
+    /***
+    * @Description: 出款
+    * @Author: zhaodw
+    * @Date: 2018/8/24
+    */
+    void payMoney();
 }

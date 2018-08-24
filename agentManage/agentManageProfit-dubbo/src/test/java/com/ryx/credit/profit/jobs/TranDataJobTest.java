@@ -1,10 +1,5 @@
-package junit.profit;/**
- * @Auther: zhaodw
- * @Date: 2018/7/30 14:59
- * @Description:
- */
+package com.ryx.credit.profit.jobs;
 
-import com.ryx.credit.profit.jobs.ProfitDataJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -14,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 退单任务测试
+ * 交易金额汇总任务测试
  * @author zhaodw
  * @create 2018/7/30
  * @since 1.0.0
@@ -22,15 +17,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class ProfitDataJobTest {
+public class TranDataJobTest {
 
-    private Logger logger = LoggerFactory.getLogger(ProfitDataJobTest.class);
+    private Logger logger = LoggerFactory.getLogger(TranDataJobTest.class);
 
     @Autowired
-    private ProfitDataJob profitDataJob;
+    private TranDataJob tranDataJob;
 
+    /*** 
+    * @Description: 测试任务处理
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/7/30 
+    */
     @Test
     public void testDeal() {
-        profitDataJob.deal();
+        tranDataJob.deal();
     }
 }
