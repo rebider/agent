@@ -118,17 +118,13 @@ public class CompensateServiceImpl implements CompensateService {
 
     @Override
     public List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException{
-        String proCom = "";
-        String proModel = "";
         String snBegin = "";
         String snEnd = "";
         String count = "";
         try {
-            proCom =  String.valueOf(excelList.get(0));
-            proModel =  String.valueOf(excelList.get(1));
-            snBegin =  String.valueOf(excelList.get(2));
-            snEnd =  String.valueOf(excelList.get(3));
-            count =  String.valueOf(excelList.get(4));
+            snBegin =  String.valueOf(excelList.get(0));
+            snEnd =  String.valueOf(excelList.get(1));
+            count =  String.valueOf(excelList.get(2));
         } catch (Exception e) {
             throw new ProcessException("导入解析文件失败");
         }
@@ -140,9 +136,6 @@ public class CompensateServiceImpl implements CompensateService {
         ArrayList<Object> recordStatusList = new ArrayList<>();
         recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
         reqParam.put("recordStatusList",recordStatusList);
-        Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
-        reqParam.put("proCom",dictByName.getdItemvalue());
-        reqParam.put("proModel",proModel);
         List<Map<String,Object>> compensateLList = logisticsDetailMapper.queryCompensateLList(reqParam);
         if(null==compensateLList){
             throw new ProcessException("导入解析文件失败");

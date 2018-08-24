@@ -4,6 +4,7 @@ import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by RYX on 2018/8/6.
@@ -18,7 +19,9 @@ public interface PosRegionService {
 
     List<Tree> queryPosRegion(String code,String level);
 
-
     List<DPosRegion> queryByCodes(String codes);
 
+    List<DPosRegion> queryByParentCode(String parentCode);
+
+    Set<String> queryCityByCode(String codes);
 }

@@ -31,7 +31,7 @@ public interface AgentPlatFormSynMapper {
 
     int updateByPrimaryKey(AgentPlatFormSyn record);
 
-    List<Map<String,Object>> queryList(@Param("map") Map<String, Object> map, @Param("page") Page page);
+    List<AgentPlatFormSyn> queryList(@Param("map") Map<String, Object> map, @Param("page") Page page);
 
     int queryCount(@Param("map")Map<String, Object> map);
 

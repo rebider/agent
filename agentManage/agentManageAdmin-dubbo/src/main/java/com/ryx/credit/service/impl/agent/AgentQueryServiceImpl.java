@@ -17,6 +17,7 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.service.agent.AgentQueryService;
+import com.ryx.credit.service.agent.PlatFormService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private ORefundPriceDiffMapper refundPriceDiffMapper;
     @Autowired
     private OReturnOrderMapper returnOrderMapper;
+    @Autowired
+    private PlatFormService platFormService;
 
 
     @Override
@@ -129,6 +132,10 @@ public class AgentQueryServiceImpl implements AgentQueryService {
 //            }
 //        }
         for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if(null!=platForm){
+                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
             agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
         }
         return agentBusInfos;
