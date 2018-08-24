@@ -81,7 +81,7 @@ public interface ProfitDeductionService {
 
     /***
      * @Description:退单扣款计算
-     * @Param: param profitAmt 分润金额  bussType 业务类型 pos mpos agentPid 机构id  parentAgentPid 机构id
+     * @Param: param profitAmt 分润金额  bussType 业务类型 02 01 agentPid 机构id  parentAgentPid 机构id
      * @return: 应扣余额 扣足返回已扣款金额
      * @Author: zhaodw
      * @Date: 2018/8/7

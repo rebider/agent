@@ -4,11 +4,17 @@ package com.ryx.credit.profit.service.impl;/**
  * @Description:
  */
 
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.pojo.TransProfitDetailExample;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 分润交易接口实现
@@ -25,5 +31,21 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
     @Override
     public void insert(TransProfitDetail transProfitDetail) {
         transProfitDetailMapper.insert(transProfitDetail);
+    }
+
+    @Override
+    public List<TransProfitDetail> getTransProfitDetailList(TransProfitDetail transProfitDetail) {
+        TransProfitDetailExample example = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(transProfitDetail.getAgentId())) {
+            criteria.andAgentIdEqualTo(transProfitDetail.getAgentId());
+        }
+        if (StringUtils.isNotBlank(transProfitDetail.getParentAgentId())) {
+            criteria.andParentAgentIdEqualTo(transProfitDetail.getParentAgentId());
+        }else{
+            criteria.andParentAgentIdIsNull();
+        }
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(example);
+        return transProfitDetails==null?Collections.EMPTY_LIST:transProfitDetails;
     }
 }

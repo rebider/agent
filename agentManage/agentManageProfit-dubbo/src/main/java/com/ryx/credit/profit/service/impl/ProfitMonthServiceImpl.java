@@ -59,12 +59,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private DeductService posProfitComputeServiceImpl;
 
     @Autowired
-    private OrganTranMonthDetailService organTranMonthDetailService;
-
-    @Autowired
     private ProfitComputerService profitComputerService;
     @Autowired
     private ProfitDirectMapper directMapper;
+
+    @Autowired
+    private TransProfitDetailService transProfitDetailService;
 
 
     @Override
@@ -135,6 +135,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
         if(StringUtils.isNotBlank(profitDetailMonth.getAgentId())){
             criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
+        }
+        if(StringUtils.isNotBlank(profitDetailMonth.getAgentPid())){
+            criteria.andAgentPidEqualTo(profitDetailMonth.getAgentPid());
         }
         if(StringUtils.isNotBlank(profitDetailMonth.getProfitId())){
             criteria.andProfitIdEqualTo(profitDetailMonth.getProfitId());
@@ -319,6 +322,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         // 获取所有代理商月度分润明细
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
+        profitDetailMonth.setAgentPid("AG20180817000000000006101");// 验证使用
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
         Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
@@ -382,18 +386,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @Date: 2018/8/14
      */
     private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, Map<String, BigDecimal> parentPosReward) {
-        OrganTranMonthDetail detail = new OrganTranMonthDetail();
-        detail.setProfitId(profitDetailMonthTemp.getId());
-        List<OrganTranMonthDetail> organTranMonthDetails = organTranMonthDetailService.getOrganTranMonthDetailList(detail);
-
-        if (organTranMonthDetails != null && organTranMonthDetails.size() > 0) {
-            detail = organTranMonthDetails.get(0);
+        TransProfitDetail detail = new TransProfitDetail();
+        detail.setAgentId(profitDetailMonthTemp.getAgentPid());
+        List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
+        if (transProfitDetails.size() > 0) {
+            detail = transProfitDetails.get(0);
             Map<String, Object> map = new HashMap<>(10);
             map.put("agentType", detail.getAgentType());
             map.put("agentId", profitDetailMonthTemp.getAgentId());
             map.put("agentPid", profitDetailMonthTemp.getAgentPid());
-            map.put("posTranAmt", detail.getPosTranAmt());
-            map.put("posJlTranAmt", detail.getPosJlTranAmt());
+            map.put("posTranAmt", detail.getPosCreditAmt());
+            map.put("posJlTranAmt", detail.getPosRewardAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
                 BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
@@ -505,7 +508,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         mposMustDeductionAmt = mposMustDeductionAmt==null? BigDecimal.ZERO: mposMustDeductionAmt;
         profitDetailMonthTemp.setMposTdMustDeductionAmt(mposMustDeductionAmt);
 
-        if (posMustDeductionAmt.doubleValue() > 0) {
+        if (mposMustDeductionAmt.doubleValue() > 0) {
             param.put("profitAmt", sumAmt);
             param.put("sourceId", "01");
             realDeductionAmt = profitDeductionServiceImpl.settleErrDeduction(param);

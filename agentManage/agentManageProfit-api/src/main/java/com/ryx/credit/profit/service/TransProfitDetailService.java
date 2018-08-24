@@ -6,6 +6,8 @@ package com.ryx.credit.profit.service;/**
 
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 
+import java.util.List;
+
 /**
  * 分润交易明细接口
  *
@@ -22,4 +24,14 @@ public interface TransProfitDetailService {
     * @Date: 2018/8/23 
     */ 
     void insert(TransProfitDetail transProfitDetail);
+    
+    /*** 
+    * @Description:  
+    * @Param:  transProfitDetail 交易分润数据对象
+    * @return:  交易分润数据列表
+    * @Author: zhaodw 
+    * @Date: 2018/8/24 
+    */ 
+    List<TransProfitDetail> getTransProfitDetailList(TransProfitDetail transProfitDetail);
+
 }

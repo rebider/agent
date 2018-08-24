@@ -9,13 +9,9 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
-import com.ryx.credit.profit.service.OrganTranMonthDetailService;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
-import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
@@ -63,6 +59,12 @@ public class NewProfitDataJob {
     @Autowired
     private IdService idService;
 
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+
+    @Autowired
+    private ProfitDetailMonthService profitDetailMonthServiceImpl;
+
 
 //    @Scheduled(cron = "0 0 11 10 * ?")
     public void deal() {
@@ -82,7 +84,7 @@ public class NewProfitDataJob {
                                 Map<String, Object> agentMap = getAgentId(profitData.getString("ORG_ID"));
                                 if (agentMap != null) {
                                     LOG.info("新增月分润明细数据");
-                                    insertProfitMonthDetail(agentMap, profitData, settleMonth);
+                                    insertTransProfitDetail(agentMap, profitData, settleMonth);
                                 }
                             });
                         }
@@ -108,7 +110,7 @@ public class NewProfitDataJob {
     * @Author: zhaodw
     * @Date: 2018/8/6
     */
-    private void insertProfitMonthDetail( Map<String, Object> agentMap, JSONObject profitData, String settleMonth) {
+    private void insertTransProfitDetail( Map<String, Object> agentMap, JSONObject profitData, String settleMonth) {
         TransProfitDetail transProfitDetail = new TransProfitDetail();
         transProfitDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
         transProfitDetail.setBusNum(profitData.getString("ORG_ID"));
@@ -129,9 +131,46 @@ public class NewProfitDataJob {
         transProfitDetail.setIposCreditAmt(profitData.getBigDecimal("POS_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_02_AMT"));
         transProfitDetail.setPosCreditAmt(profitData.getBigDecimal("POS_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_01_AMT"));
         transProfitDetail.setId(idService.genId(TabId.TPD));
+        transProfitDetail.setAgentType((String)agentMap.get("BUS_TYPE"));
         transProfitDetailService.insert(transProfitDetail);
         transProfitDetail = null;
     }
+
+    /***
+     * @Description: 插入分润汇总
+     * @Author: zhaodw
+     * @Date: 2018/8/6
+     */
+    private void insertProfitMonthDetail( TransProfitDetail transProfitDetail) {
+        ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
+        profitDetailMonthTemp.setAgentPid(transProfitDetail.getAgentId());
+        profitDetailMonthTemp.setAgentId(transProfitDetail.getBusNum());
+        profitDetailMonthTemp.setProfitDate(transProfitDetail.getProfitDate());
+        profitDetailMonthTemp.setAgentName(transProfitDetail.getAgentName());
+        profitDetailMonthTemp.setTranAmt(transProfitDetail.getInTransAmt());
+        profitDetailMonthTemp.setPayAmt(transProfitDetail.getOutTransAmt());
+        profitDetailMonthTemp.setTranProfitScale(transProfitDetail.getInProfitScale().toString());
+        profitDetailMonthTemp.setPayProfitScale(transProfitDetail.getOutProfitScale().toString());
+        profitDetailMonthTemp.setTranProfitAmt(transProfitDetail.getInProfitAmt());
+        profitDetailMonthTemp.setPayProfitAmt(transProfitDetail.getOutProfitAmt());
+        profitDetailMonthTemp.setBusPlatForm(transProfitDetail.getBusCode());
+        profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
+        // 获取账户信息
+        List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService(transProfitDetail.getBusNum(), null,AgStatus.Approved.status);
+
+        if (agentColinfos != null && agentColinfos.size() > 0) {
+            AgentColinfo agentColinfo = agentColinfos.get(0);
+            profitDetailMonthTemp.setAccountId(agentColinfo.getCloBankAccount());
+            profitDetailMonthTemp.setAccountName(agentColinfo.getCloRealname());
+            profitDetailMonthTemp.setOpenBankName(agentColinfo.getCloBankBranch());
+            profitDetailMonthTemp.setBankCode(agentColinfo.getBranchLineNum());
+            profitDetailMonthTemp.setTax(agentColinfo.getCloTaxPoint());
+        }
+
+        profitDetailMonthServiceImpl.insert(profitDetailMonthTemp);
+        profitDetailMonthTemp = null;
+    }
+
 
     /***
      * @Description: 获取代理商信息
