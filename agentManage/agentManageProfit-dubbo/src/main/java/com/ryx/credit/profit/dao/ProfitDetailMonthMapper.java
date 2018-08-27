@@ -25,7 +25,19 @@ public interface ProfitDetailMonthMapper {
      */
     List<ProfitDetailMonth> selectByDate(String profitDate);
 
+    /**
+     * 根据月份获取该月分润明细列表（小于0.06税点）
+     * @param profitDate
+     * @return
+     */
+    List<ProfitDetailMonth> selectByLessDate(String profitDate);
 
+    /**
+     * 根据月份获取该月分润明细列表（大于等于0.06税点）
+     * @param profitDate
+     * @return
+     */
+    List<ProfitDetailMonth> selectByGreaDate(String profitDate);
     /**
      * 根据所属下级id集合汇总他们的实际分润（税前计算时为基础分润汇总）
      * @param ids

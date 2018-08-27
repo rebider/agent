@@ -138,6 +138,20 @@
     where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByLessDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND 0.06 > TAX
+  </select>
+
+  <select id="selectByGreaDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND (TAX >= 0.06 OR TAX IS NULL)
+  </select>
+
   <select id="selectByAgentPid" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
@@ -177,6 +191,7 @@
       </if>
     </select>
 
+  
 
     <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
     delete from P_PROFIT_DETAIL_M
