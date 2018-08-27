@@ -132,7 +132,7 @@ public class ProfitDataJob {
         profitMonth.setTransProfitPos(posTranProFitAmt.add(posPayProFitAmt));
         profitMonth.setTransSupplyProfitPos(profitData.getBigDecimal("PFT_DIFF_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("PFT_DIFF_AMT"));
         profitMonth.setPayProfit(profitMonth.getTransProfitPos().add(profitMonth.getTransSupplyProfitPos()));
-//        profitMonthServiceImpl.insertProfitMonth(profitMonth);
+        profitMonthServiceImpl.insertProfitMonth(profitMonth);
 
         return  profitMonth.getId();
     }
