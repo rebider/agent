@@ -172,7 +172,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
         transProfitDetailExample.setPage(page);
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
-        criteria.andBusNumEqualTo(transProfitDetail.getBusNum());
         criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
         criteria.andAgentIdEqualTo(transProfitDetail.getAgentId());
         return transProfitDetailMapper.selectByExample(transProfitDetailExample);
@@ -184,7 +183,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
         criteria.andAgentIdEqualTo(transProfitDetail.getAgentId());
         criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
-        criteria.andBusNumEqualTo(transProfitDetail.getBusNum());
         return transProfitDetailMapper.countByExample(transProfitDetailExample);
     }
 
