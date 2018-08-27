@@ -8,9 +8,11 @@ import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.profit.dao.PAgentPidLinkMapper;
+import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.PAgentPidLink;
+import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.service.agent.AgentService;
@@ -39,24 +41,9 @@ public class ProfitSummaryDataJob {
     private IdService idService;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private ProfitDayMapper dayMapper;
     private int index = 1;
-
-
-    public static void main(String agrs[]){
-        HashMap<String,String> map = new HashMap<String,String>();
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.link"),params);
-        System.out.println(res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            //logger.error("请求同步失败！");
-            AppConfig.sendEmails("日分润同步失败","日分润同步失败");
-            return;
-        }
-        String data = JSONObject.parseObject(res).get("data").toString();
-        List<JSONObject> list = JSONObject.parseObject(data,List.class);
-        System.out.println(data);
-    }
 
     public void excute(){
         MPos_Summary(null);
@@ -86,7 +73,10 @@ public class ProfitSummaryDataJob {
             }else if(detail.getBusCode().equals("4000")){//瑞众通
                 //detailMonth
             }else if(detail.getBusCode().equals("5000")){//瑞和宝
-                BigDecimal rhbDay = null;//瑞和宝日结分润
+                ProfitDay day = new ProfitDay();
+                day.setAgentId(detail.getBusNum());
+                day.setTransDate(transDate);
+                BigDecimal rhbDay = dayMapper.totalProfitAndReturnById(day);//瑞和宝日结分润-
                 rhbDay = rhbDay==null?BigDecimal.ZERO:rhbDay;
                 detailMonth.setRhbProfitAmt(detail.getProfitAmt().subtract(rhbDay));
             }else if(detail.getBusCode().equals("6000")){//直发

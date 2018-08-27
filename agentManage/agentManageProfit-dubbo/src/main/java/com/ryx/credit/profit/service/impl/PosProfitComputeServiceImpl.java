@@ -87,7 +87,6 @@ public class PosProfitComputeServiceImpl implements DeductService {
         map.put("posRewardAmt", posMap.get("posRewardAmt"));
         map.put("posAssDeductAmt", posMap.get("posAssDeductAmt"));
         map.put("parentDeductPosRewardAmt", posMap.get("parentDeductPosRewardAmt"));
-        map.put("parentAgentPid", posMap.get("parentAgentPid"));
         map.put("parentAgentId", posMap.get("parentAgentId"));
         LOG.info("POS奖励计算，响应参数：{}", map);
         return map;
@@ -228,9 +227,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
     }
 
     private void executcompute(String deductDate, PosRewardTemplate posRewardTemplate, Map<String, Object> map, String agentType) {
-        BigDecimal tranPosRewardAmt = this.queryTranContrastMonthAmt(deductDate, posRewardTemplate.getTranContrastMonth().replace("-", ""), map, agentType);
+        BigDecimal tranPosRewardAmt = this.queryTranContrastMonthAmt(deductDate.replace("-",""), posRewardTemplate.getTranContrastMonth().replace("-", ""), map, agentType);
         if(tranCountThreshold(tranPosRewardAmt, posRewardTemplate, map)){
-            BigDecimal creditposRewardAmt = this.queryCreditContrastMonthAmt(deductDate, posRewardTemplate.getCreditTranContrastMonth().replace("-", ""), map, agentType);
+            BigDecimal creditposRewardAmt = this.queryCreditContrastMonthAmt(deductDate.replace("-",""), posRewardTemplate.getCreditTranContrastMonth().replace("-", ""), map, agentType);
             if(creditposRewardAmt.compareTo(BigDecimal.ZERO) > 0){
                 BigDecimal posRewardAmt = creditposRewardAmt.multiply(posRewardTemplate.getProportion()).setScale(2,BigDecimal.ROUND_HALF_UP);
                 LOG.info("代理商ID：{}，POS奖励金额：{}，奖励比例：{}", map.get("agentId"), posRewardAmt, posRewardTemplate.getProportion());
@@ -317,7 +316,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param map
      */
     private BigDecimal queryCreditContrastMonthAmt(String deductDate, String creditTranContrastMonth, Map<String, Object> map, String agentType) {
-        LOG.info("查询对比月交易金额，代理商ID：{}，贷记交易对比月：{}", map.get("agentId"), creditTranContrastMonth);
+        LOG.info("查询对比月贷记交易金额，代理商ID：{}，贷记交易对比月：{}", map.get("agentId"), creditTranContrastMonth);
         TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(map.get("agentId").toString(),
                 creditTranContrastMonth, map.get("agentType").toString());
         if(transProfitDetail == null){
@@ -386,8 +385,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private void obtainParentAgentId(Map<String, Object> posMap) throws Exception{
         List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), PLATFORM_CODE, posMap.get("agentId").toString());
         if(agentBusInfo != null && !agentBusInfo.isEmpty()){
-            posMap.put("parentAgentId", agentBusInfo.get(0).getBusNum());
-            LOG.info("代理商ID：{}，上级代理商ID：{}", posMap.get("agentId"), agentBusInfo.get(0).getBusNum());
+            posMap.put("parentAgentId", agentBusInfo.get(0).getAgentId());
+            LOG.info("代理商ID：{}，上级代理商ID：{}", posMap.get("agentId"), agentBusInfo.get(0).getAgentId());
         }
     }
 
@@ -417,7 +416,6 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 profitDetailMonthServiceImpl.updateByPrimaryKeySelective(update);
             } else {
                 posMap.put("parentDeductPosRewardAmt", posRewardAmt);
-                posMap.put("parentAgentPid", profitDetailMonth.getAgentPid());
                 posMap.put("parentAgentId", profitDetailMonth.getAgentId());
             }
         } else {
@@ -442,10 +440,11 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 month.add(spl[i].replace("-",""));
             }
         } else {
-            month.add(posReward1.getTotalConsMonth());
+            month.add(posReward1.getTotalConsMonth().replace("-",""));
         }
         //1、根据活动奖励月份，查询这个代理商活动月份交易总金额
         posTranAmt = posTranAmt.add(quarterAssessmentTranOrCreditAmt(assMap, month));
+        LOG.info("代理商ID：{}，代理商季度考核活动总交易量：{}", assMap.get("agentId"), posTranAmt);
 
         //2、交易总金额与特殊奖励活动模板的总金额比较,累计交易量不满足奖励条件，按照通用POS奖励模板重新计算奖励
         if(posTranAmt.compareTo(posReward1.getGrowAmt().multiply(new BigDecimal("10000"))) >= 0){
@@ -469,11 +468,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
         LOG.info("代理商ID：{}，之前活动期间奖励的POS金额：：{}", assMap.get("agentId"), beforePosRewardAmt);
         //6.核算POS奖励：之前按特殊奖励发放的POS奖励-本次按通用模板计算的POS奖励-下属代理商发放的奖励=考核季度实际扣款奖励
         BigDecimal posAssDeductAmt = beforePosRewardAmt.subtract(posRewardAmt).subtract(beforeChildPosRewardAmt);
+        LOG.info("代理商ID：{}，最后扣减奖励：{}", assMap.get("agentId"), posAssDeductAmt);
         map.put("posAssDeductAmt", posAssDeductAmt);
     }
 
     /**
-     * 重新计算POS奖励
+     * 按照通用奖励模板，重新计算代理活动月份奖励金额
      * @param posReward1
      * @param assMap
      */
@@ -485,7 +485,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(assMap.get("agentId").toString(),
                         spl[i].replace("-", ""), assMap.get("agentType").toString());
                 if(transProfitDetail != null){
-                    Map<String, Object> map = this.refurtComputePosReward(assMap, spl[i].replace("-", ""), transProfitDetail);
+                    Map<String, Object> map = this.refurtComputePosReward(assMap, spl[i], transProfitDetail);
                     BigDecimal refposRewardAmt = map.get("posRewardAmt") == null ? BigDecimal.ZERO : new BigDecimal(map.get("posRewardAmt").toString());
                     posRewardAmt = posRewardAmt.add(refposRewardAmt);
                     LOG.info("代理商ID：{}，月份：{}，采用通用模板计算的POS奖励：{}", assMap.get("agentId"), spl[i], posRewardAmt);
@@ -495,7 +495,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
             TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(assMap.get("agentId").toString(),
                     posReward1.getTotalConsMonth().replace("-",""), assMap.get("agentType").toString());
             if(transProfitDetail != null){
-                Map<String, Object> map = this.refurtComputePosReward(assMap, posReward1.getTotalConsMonth().replace("-", ""), transProfitDetail);
+                Map<String, Object> map = this.refurtComputePosReward(assMap, posReward1.getTotalConsMonth(), transProfitDetail);
                 BigDecimal refposRewardAmt = map.get("posRewardAmt") == null ? BigDecimal.ZERO : new BigDecimal(map.get("posRewardAmt").toString());
                 posRewardAmt = posRewardAmt.add(refposRewardAmt);
                 LOG.info("代理商ID：{}，月份：{}，采用通用模板计算的POS奖励：{}", assMap.get("agentId"), posReward1.getTotalConsMonth(), posRewardAmt);
@@ -512,10 +512,19 @@ public class PosProfitComputeServiceImpl implements DeductService {
         map.put("agentPid", assMap.get("agentPid"));
         map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
         map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
+        map.put("posRewardAmt", BigDecimal.ZERO);
+        map.put("posAssDeductAmt", BigDecimal.ZERO);
         this.obtainRewardTemp(profitDate, map);
         return map;
     }
 
+    /**
+     * 查询这个代理商所有下属代理商的POS奖励金额
+     * @param month
+     * @param assMap
+     * @param agentIdList
+     * @return
+     */
     private BigDecimal getBeforePosRewardAmt(List<String> month, Map<String, Object> assMap, List<String> agentIdList) {
         BigDecimal beforePosRewardAmt = BigDecimal.ZERO;
         ProfitDetailMonthExample example = new ProfitDetailMonthExample();
@@ -535,6 +544,13 @@ public class PosProfitComputeServiceImpl implements DeductService {
         return beforePosRewardAmt;
     }
 
+    /**
+     * 根据活动奖励月份，查询这个代理商活动月份交易总金额
+     * 包含所有下级的总交易
+     * @param map
+     * @param monthList
+     * @return
+     */
     private BigDecimal quarterAssessmentTranOrCreditAmt(Map<String, Object> map, List<String> monthList) {
         List<TransProfitDetail> transProfitDetail = profitDetailMonthServiceImpl.getChildTransProfitDetailList(map.get("agentId").toString(), monthList, map.get("agentType").toString());
         BigDecimal posTranAmt = BigDecimal.ZERO;
