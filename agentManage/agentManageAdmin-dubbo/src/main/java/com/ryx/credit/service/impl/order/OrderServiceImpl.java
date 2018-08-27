@@ -317,6 +317,9 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
                 }
+                if (StringUtils.isBlank(payment.getDownPaymentUser())) {
+                    throw new MessageException("打款人不能为空");
+                }
                 AgentResult SF1_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF1_checkDownPaymentDateres.isOK()) {
                     throw new MessageException(SF1_checkDownPaymentDateres.getMsg());
@@ -334,6 +337,9 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
+                }
+                if (payment.getDownPaymentUser() == null ) {
+                    throw new MessageException("打款人不能为空");
                 }
                 AgentResult SF2_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF2_checkDownPaymentDateres.isOK()) {
@@ -363,6 +369,9 @@ public class OrderServiceImpl implements OrderService {
             case "XXDK"://线下打款
                 if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
+                }
+                if (payment.getDownPaymentUser() == null ) {
+                    throw new MessageException("打款人不能为空");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setDownPaymentDate(null);

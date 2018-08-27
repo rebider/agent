@@ -61,6 +61,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         if(StringUtils.isEmpty(ac.getAgentId())){
             throw new ProcessException("代理商ID不能为空");
         }
+        if(null!=ac.getCloTaxPoint() && ac.getCloTaxPoint().compareTo(new BigDecimal(1))>=0){
+            throw new ProcessException("税点不能大于1");
+        }
 //        if(StringUtils.isEmpty(ac.getCloBank())){
 //            throw new ProcessException("收款开户行不能为空");
 //        }
@@ -173,6 +176,12 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         try {
             if(agent==null)throw new ProcessException("代理商信息不能为空");
             for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+
+
+                if(null!=agentColinfoVo.getCloTaxPoint() && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(1))>=0){
+                    throw new ProcessException("税点不能大于1");
+                }
+
                 agentColinfoVo.setcUser(agent.getcUser());
                 agentColinfoVo.setAgentId(agent.getId());
                 if(org.apache.commons.lang.StringUtils.isEmpty(agentColinfoVo.getId())) {
