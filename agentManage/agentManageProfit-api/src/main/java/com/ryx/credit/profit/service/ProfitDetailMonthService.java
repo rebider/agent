@@ -59,4 +59,40 @@ public interface ProfitDetailMonthService {
      * @return
      */
     List<TransProfitDetail> getTransProfitDetailList(String agentId, String agentPid, String profitDate);
+
+    /**
+     * 根据业务编码、月份,机构类型查询明细
+     * @param busNum
+     * @param profitDate
+     * @param agentType
+     * @return
+     */
+    TransProfitDetail getTransProfitDetail(String busNum, String profitDate, String agentType);
+
+    /**
+     * 根据业务编码、月份集合,机构类型查询明细
+     * @param busNum
+     * @param profitDate
+     * @param agentType
+     * @return
+     */
+    List<TransProfitDetail> getChildTransProfitDetailList(String busNum, List<String> profitDate, String agentType);
+
+    /**
+     * 根据业务编码集合、月份,机构类型查询明细
+     * @param busNum
+     * @param profitDate
+     * @param agentType
+     * @return
+     */
+    List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, String profitDate, String agentType);
+
+    /**
+     * 根据业务编码集合、月份,机构类型查询明细
+     * @param busNum
+     * @param profitDate
+     * @param agentType
+     * @return
+     */
+    List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, List<String> profitDate, String agentType);
 }

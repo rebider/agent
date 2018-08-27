@@ -204,6 +204,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 criteria.andRemarkEqualTo(profitDeduction.getRemark());
             }
         }
+        if (StringUtils.isNotBlank(profitDeduction.getDeductionDesc())){
+            criteria.andDeductionDescEqualTo(profitDeduction.getDeductionDesc());
+        }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         if(profitDeductions != null && !profitDeductions.isEmpty()){
             return profitDeductions;

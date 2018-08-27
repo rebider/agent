@@ -222,9 +222,9 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         ProfitDeductionExample profitDeductionExample = new ProfitDeductionExample();
                         ProfitDeductionExample.Criteria criteria = profitDeductionExample.createCriteria();
                         criteria.andSourceIdEqualTo(map.get("ORDER_ID").toString());
-                        criteria.andAgentIdEqualTo(map.get("AGENT_ID").toString());
+                        criteria.andAgentPidEqualTo(map.get("AGENT_ID").toString());
                         criteria.andDeductionDateEqualTo(deductionDate);
-                        criteria.andParentAgentIdEqualTo(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
+                        criteria.andParentAgentPidEqualTo(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
                         int count = profitDeductionMapper.countByExample(profitDeductionExample);
                         if(count == 0){
                             ProfitDeduction profitDeduction = new ProfitDeduction();
