@@ -27,7 +27,7 @@
     <result column="UNICODE" jdbcType="VARCHAR" property="unicode" />
     <result column="SOURCE_INFO" jdbcType="VARCHAR" property="sourceInfo" />
     <result column="AGENT_TYPE" jdbcType="VARCHAR" property="agentType" />
-
+    <result column="UNLINE_AMT" jdbcType="DECIMAL" property="unlineAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -62,7 +62,7 @@
     ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE, 
     IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, OUT_PROFIT_SCALE, 
     IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY, 
-    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE
+    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -142,8 +142,8 @@
       PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, 
       OUT_PROFIT_SCALE, IN_PROFIT_AMT, OUT_PROFIT_AMT, 
       POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, 
-      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT, 
-      TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE)
+      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT, TRANS_FEE,
+      UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT)
     values (#{id,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
       #{profitDate,jdbcType=VARCHAR}, #{inTransAmt,jdbcType=DECIMAL}, #{outTransAmt,jdbcType=DECIMAL}, 
@@ -152,7 +152,7 @@
       #{posCreditAmt,jdbcType=DECIMAL}, #{iposCreditAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL}, 
       #{payCompany,jdbcType=VARCHAR}, #{notaxAmt,jdbcType=DECIMAL}, #{supplyAmt,jdbcType=DECIMAL}, 
       #{transFee,jdbcType=DECIMAL}, #{unicode,jdbcType=VARCHAR}, #{sourceInfo,jdbcType=VARCHAR},
-      #{agentType,jdbcType=VARCHAR})
+      #{agentType,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
     insert into TRANS_PROFIT_DETAIL
@@ -232,6 +232,9 @@
       <if test="agentType != null">
         AGENT_TYPE,
       </if>
+      <if test="unlineAmt != null">
+        UNLINE_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -308,6 +311,9 @@
       </if>
       <if test="agentType != null">
         #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="unlineAmt != null">
+        #{unlineAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
