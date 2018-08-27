@@ -34,4 +34,13 @@ public interface TransProfitDetailService {
     */ 
     List<TransProfitDetail> getTransProfitDetailList(TransProfitDetail transProfitDetail);
 
+     /*** 
+     * @Description: 汇总交易分润明细
+     * @Param:  prfitDate 分润日期
+     * @return:  交易分润明细
+     * @Author: zhaodw 
+     * @Date: 2018/8/27 
+     */ 
+     List<TransProfitDetail> getPosTransProfitDetailSumList(String prfitDate);
+
 }

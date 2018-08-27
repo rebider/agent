@@ -212,11 +212,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public BigDecimal getSupplyAmt(String agentPid, String bussType) {
+    public BigDecimal getSupplyAmt(String agentPid, String bussType, String parentAgentId) {
         Map<String, Object> param = new HashMap<>(3);
+        String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         param.put("AGENT_PID", agentPid);
         param.put("SUPPLY_TYPE", RefundJob.SUPPLY_DESC);
-        param.put("SUPPLY_DATE", "");
+        param.put("SUPPLY_DATE", supplyDate);
+        param.put("PARENT_AGENT_ID", parentAgentId);
         PageInfo pageInfo = new PageInfo();
         pageInfo = profitSupplyServiceImpl.getProfitSupplyList(param, pageInfo);
         if (pageInfo != null && pageInfo.getTotal() > 0) {

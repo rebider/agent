@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,9 @@ import java.util.*;
 @Service("profitMonthService")
 public class ProfitMonthServiceImpl implements ProfitMonthService {
     Logger LOG = LoggerFactory.getLogger(ProfitMonthServiceImpl.class);
+
+    private static Runtime RUN = Runtime.getRuntime();
+
     @Autowired
     private ProfitMonthMapper profitMonthMapper;
     @Autowired
@@ -322,7 +326,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         // 获取所有代理商月度分润明细
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
-//        profitDetailMonth.setAgentPid("AG20180817000000000006101");// 验证使用
+//        profitDetailMonth.setAgentId("AG20180817000000000006101");// 验证使用
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
         Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
@@ -380,6 +384,23 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthMapper.payMoney(profitDate);
     }
 
+    /**
+     * 执行liunx命令
+     * @author : zhaodw
+     * @datetime : 2017年5月10日 上午11:03:34
+     */
+    private static void doLiunxCommand(String command) {
+        try {
+            Process process  = RUN.exec(command);
+            process.waitFor();
+            process.destroy();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     /*** 
      * @Description: 获取pos奖励
      * @Param:
@@ -389,15 +410,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      */
     private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, Map<String, BigDecimal> parentPosReward) {
         TransProfitDetail detail = new TransProfitDetail();
-        detail.setAgentId(profitDetailMonthTemp.getAgentPid());
+        detail.setAgentId(profitDetailMonthTemp.getAgentId());
         detail.setBusCode("100003");
         List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
         if (transProfitDetails.size() > 0) {
             detail = transProfitDetails.get(0);
             Map<String, Object> map = new HashMap<>(10);
             map.put("agentType", detail.getAgentType());
-            map.put("agentId", profitDetailMonthTemp.getAgentId());
-            map.put("agentPid", profitDetailMonthTemp.getAgentPid());
+            map.put("agentId", detail.getBusNum());
+            map.put("agentPid", detail.getAgentId());
             map.put("posTranAmt", detail.getPosCreditAmt());
             map.put("posJlTranAmt", detail.getPosRewardAmt());
             try {
@@ -432,7 +453,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      */
     private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt) {
         Map<String, Object> map = new HashMap<>(10);
-        map.put("agentPid", profitDetailMonthTemp.getAgentPid()); //业务平台编号
+        map.put("agentPid", profitDetailMonthTemp.getAgentId()); //业务平台编号
         map.put("paltformNo", "5000");      //瑞和宝
         map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0,7));   //扣款月份
         map.put("agentProfitAmt", agentProfitAmt);     //代理商分润
@@ -472,10 +493,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      */
     private BigDecimal getTdSupplyAmt(ProfitDetailMonth profitDetailMonthTemp) {
         // pos退单补款
-        BigDecimal posSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentPid(),"02");
+        BigDecimal posSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentId(),"02", profitDetailMonthTemp.getParentAgentId());
         profitDetailMonthTemp.setPosTdSupplyAmt(posSupply);
         // mpos退单补款
-        BigDecimal mposSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentPid(),"01");
+        BigDecimal mposSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentId(),"01", profitDetailMonthTemp.getParentAgentId());
         profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply);
         return posSupply.add(mposSupply);
     }
@@ -489,7 +510,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      */
     private BigDecimal doTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentPid());
+        profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentId());
         profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitDeduction.setSourceId("02");
         // pos退单应扣款
@@ -499,7 +520,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "02");
-        param.put("agentPid",  profitDetailMonthTemp.getAgentPid());
+        param.put("agentPid",  profitDetailMonthTemp.getAgentId());
 //        param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentPid());
         BigDecimal realDeductionAmt = BigDecimal.ZERO;
         if (posMustDeductionAmt.doubleValue() > 0) {
@@ -526,4 +547,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
         return sumAmt;
     }
+
+
 }

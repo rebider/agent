@@ -140,7 +140,7 @@ public class RefundJob {
         if (agentMap !=null){
             profitSupply.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
             profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
-//            profitSupply.set
+            profitSupply.setParentAgentId((String)agentMap.get("parentAgentPid"));
         }
         profitSupply.setAgentId(jsonObject.getString("instId"));
         profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));

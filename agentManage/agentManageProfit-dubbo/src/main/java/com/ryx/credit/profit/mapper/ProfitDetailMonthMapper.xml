@@ -225,7 +225,7 @@
       #{accountId,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{openBankName,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR}, 
       #{remark,jdbcType=VARCHAR}, #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL}, #{tax,jdbcType=DECIMAL},
-      #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL}), #{basicsProfitAmt,jdbcType=DECIMAL}), #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR})
+      #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL}, #{basicsProfitAmt,jdbcType=DECIMAL}, #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     insert into P_PROFIT_DETAIL_M

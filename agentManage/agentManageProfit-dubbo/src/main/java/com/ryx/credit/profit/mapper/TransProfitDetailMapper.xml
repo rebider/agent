@@ -89,6 +89,15 @@
     ORDER BY AGENT_ID
   </select>
 
+  <select id="getPosTransProfitDetailSumList" parameterType="java.lang.String" resultMap="BaseResultMap">
+  SELECT AGENT_ID,PARENT_AGENT_ID, PROFIT_DATE,SUM(IN_TRANS_AMT)IN_TRANS_AMT,
+  SUM(OUT_TRANS_AMT)OUT_TRANS_AMT,SUM(IN_PROFIT_SCALE)IN_PROFIT_SCALE,
+  SUM(OUT_PROFIT_SCALE)OUT_PROFIT_SCALE, SUM(IN_PROFIT_AMT)IN_PROFIT_AMT,
+  SUM(OUT_PROFIT_AMT)OUT_PROFIT_AMT, SUM(SUPPLY_AMT)SUPPLY_AMT
+  FROM TRANS_PROFIT_DETAIL WHERE SOURCE_INFO ='POS' AND PROFIT_DATE = #{profitDate}
+  GROUP BY AGENT_ID, PARENT_AGENT_ID,PROFIT_DATE
+  </select>
+
   <select id="selectCompanyByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

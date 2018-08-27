@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
@@ -57,6 +58,9 @@ public class NewProfitDataJob {
     private AgentBusinfoService agentBusinfoService;
 
     @Autowired
+    private ProfitDetailMonthMapper profitDetailMonthMapper;
+
+    @Autowired
     private IdService idService;
 
     @Autowired
@@ -68,11 +72,11 @@ public class NewProfitDataJob {
 
 //    @Scheduled(cron = "0 0 11 10 * ?")
     public void deal() {
-        String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
-        LOG.info("分润月份"+settleMonth);
+        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        LOG.info("分润月份"+profitDate);
         LOG.info("获取分润数据");
         try {
-            AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
+            AgentResult agentResult = posProfitDataService.getPosProfitDate(profitDate);
             if (agentResult != null && agentResult.getData() != null) {
                 JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
                 if (json != null && json.size() > 0) {
@@ -83,14 +87,14 @@ public class NewProfitDataJob {
                                 JSONObject profitData = (JSONObject) object;
                                 Map<String, Object> agentMap = getAgentId(profitData.getString("ORG_ID"));
                                 if (agentMap != null) {
-                                    LOG.info("新增月分润明细数据");
-                                    insertTransProfitDetail(agentMap, profitData, settleMonth);
+                                    insertTransProfitDetail(agentMap, profitData, profitDate);
                                 }
                             });
                         }
                     }
+                    doSum(profitDate);
                 }else{
-                    LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
+                    LOG.error("月份："+profitDate+"，二维码提供的没有获取到数据");
                 }
             }
         }catch (Exception e) {
@@ -137,14 +141,36 @@ public class NewProfitDataJob {
     }
 
     /***
+    * @Description: 执行汇总
+    * @Param:  profitDate 分润日期
+    * @Author: zhaodw
+    * @Date: 2018/8/27
+    */
+    private void doSum(String profitDate) {
+        // 汇总到月分润明细中
+        List<TransProfitDetail> transProfitDetails = transProfitDetailService.getPosTransProfitDetailSumList(profitDate);
+        if (transProfitDetails != null && transProfitDetails.size() > 0) {
+            transProfitDetails.forEach(transProfitDetail -> {
+                ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
+                profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
+                profitDetailMonthTemp.setAgentId(transProfitDetail.getAgentId());
+                transProfitDetail.setProfitDate(profitDate);
+                profitDetailMonthTemp= profitDetailMonthMapper.selectByIdAndParent(profitDetailMonthTemp);
+                if (profitDetailMonthTemp==null) {
+                    profitDetailMonthTemp = new ProfitDetailMonth();
+                }
+                insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
+            });
+        }
+    }
+
+    /***
      * @Description: 插入分润汇总
      * @Author: zhaodw
      * @Date: 2018/8/6
      */
-    private void insertProfitMonthDetail( TransProfitDetail transProfitDetail) {
-        ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
-        profitDetailMonthTemp.setAgentPid(transProfitDetail.getAgentId());
-        profitDetailMonthTemp.setAgentId(transProfitDetail.getBusNum());
+    private void insertProfitMonthDetail( ProfitDetailMonth profitDetailMonthTemp, TransProfitDetail transProfitDetail) {
+        profitDetailMonthTemp.setAgentId(transProfitDetail.getAgentId());
         profitDetailMonthTemp.setProfitDate(transProfitDetail.getProfitDate());
         profitDetailMonthTemp.setAgentName(transProfitDetail.getAgentName());
         profitDetailMonthTemp.setTranAmt(transProfitDetail.getInTransAmt());
@@ -153,10 +179,11 @@ public class NewProfitDataJob {
         profitDetailMonthTemp.setPayProfitScale(transProfitDetail.getOutProfitScale().toString());
         profitDetailMonthTemp.setTranProfitAmt(transProfitDetail.getInProfitAmt());
         profitDetailMonthTemp.setPayProfitAmt(transProfitDetail.getOutProfitAmt());
-        profitDetailMonthTemp.setBusPlatForm(transProfitDetail.getBusCode());
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
+        profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
+        profitDetailMonthTemp.setStatus("3");
         // 获取账户信息
-        List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService(transProfitDetail.getBusNum(), null,AgStatus.Approved.status);
+        List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService(transProfitDetail.getAgentId(), null,AgStatus.Approved.status);
 
         if (agentColinfos != null && agentColinfos.size() > 0) {
             AgentColinfo agentColinfo = agentColinfos.get(0);
