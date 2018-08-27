@@ -53,11 +53,12 @@ public class DailyProfitMposDataJob {
      * 同步日结分润数据
      * @param frDate 分润月份（空则为当前日期上2天）yyyymmdd
      */
-    public void synchroProfitD(String frDate){
+    public void synchroProfitDay(String frDate){
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("frDate", frDate==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):frDate);
         map.put("pageNumber", index++ +"");
-        map.put("pageSize", "2");
+        //map.put("pageNumber", "3");
+        map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.day"), params);
         System.out.println("输出================================" + res);
@@ -97,13 +98,13 @@ public class DailyProfitMposDataJob {
             profitD.setPlatformNum(json.getString("PLATFORMNUM "));       //平台编号
             profitDService.insertSelective(profitD);
         }
-        synchroProfitD(frDate);
+        synchroProfitDay(frDate);
     }
 
     @Test
     public void DailyProfitTest(){
-        String frDate = "20180623";
-        synchroProfitD(frDate);
+        String frDate = "20180625";
+        synchroProfitDay(frDate);
     }
 
 }

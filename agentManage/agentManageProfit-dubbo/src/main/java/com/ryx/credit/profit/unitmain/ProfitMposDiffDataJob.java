@@ -51,6 +51,10 @@ public class ProfitMposDiffDataJob {
         System.out.println(data);
     }
 
+    public void excute(){
+        synchroProfitDiff(null);
+    }
+
     public void synchroProfitDiff(String month){
         HashMap<String,String> map = new HashMap<String,String>();
         month = month==null? DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):month;

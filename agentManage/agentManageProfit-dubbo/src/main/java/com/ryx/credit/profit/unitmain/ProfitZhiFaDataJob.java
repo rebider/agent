@@ -7,16 +7,16 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.profit.dao.BuckleRunMapper;
-import com.ryx.credit.profit.pojo.*;
-import com.ryx.credit.profit.service.*;
+import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDirect;
+import com.ryx.credit.profit.service.IProfitDirectService;
+import com.ryx.credit.profit.service.ProfitComputerService;
+import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
-import jdk.nashorn.internal.objects.annotations.Where;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.omg.CosNaming.BindingHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -79,9 +79,8 @@ public class ProfitZhiFaDataJob {
         System.out.println(data);
     }
 
-    @Test
-    public void synchroProfitTest(){
-        synchroProfitDirect(DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6));
+    public void excute(){
+        synchroProfitDirect(null);
     }
     /**
      * 同步直发分润数据

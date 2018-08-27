@@ -49,58 +49,9 @@ public class NewProfitMonthMposDataJob {
     private int index=1;
     private static BigDecimal allAmount= BigDecimal.ZERO;
 
-    public static void main(String agrs[]){
-        String transDate = null;
-        HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
-        map.put("pageNumber","1");
-        map.put("pageSize","50");
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                ("http://12.3.10.161:8003/qtfr/agentInterface/queryfrbymonth.do",params);
-        System.out.println(res);
-        JSONObject json = JSONObject.parseObject(res);
-        if(!json.get("respCode").equals("000000")){
-            System.out.println("请求同步失败！");
-            AppConfig.sendEmails("月分润同步失败","月分润同步失败");
-            return;
-        }
-        BigDecimal fxAmount = json.getBigDecimal("fxAmount");//分销系统交易汇总
-        BigDecimal wjrAmount = json.getBigDecimal("wjrAmount");//未计入分润汇总
-        BigDecimal wtbAmount = json.getBigDecimal("wtbAmount");//未同步到分润
-        System.out.println(fxAmount);
-        System.out.println(wjrAmount);
-        System.out.println(wtbAmount);
-
-        String data = JSONObject.parseObject(res).get("data").toString();
-        List<JSONObject> list = JSONObject.parseObject(data,List.class);
-        try {
-            //testList(list);
-        } catch (Exception e) {
-            System.out.println("同步月分润数据失败！");
-            e.printStackTrace();
-        }
-        System.out.println(allAmount);
-        System.out.println(data);
-
-    }
-
-    public static void testList(List<JSONObject> profitMonths){
-        for(JSONObject json:profitMonths){
-            allAmount = allAmount.add(json.getBigDecimal("TRANAMT"));
-            System.out.print("唯一码:"+json.getString("UNIQUECODE"));
-            System.out.print("||名称:"+json.getString("AGENTNAME"));
-            System.out.print("||瑞和宝分润:"+json.getBigDecimal("RHBPROFITAMT"));
-            System.out.print("||瑞银信分润:"+json.getBigDecimal("RYXPROFITAMT"));
-            System.out.print("||瑞银信活动:"+json.getBigDecimal("RYXHDPROFITAMT"));
-            System.out.print("||贴牌:"+json.getBigDecimal("TPPROFITAMT"));
-            System.out.print("||瑞刷:"+json.getBigDecimal("RSPROFITAMT"));
-            System.out.print("||瑞刷活动:"+json.getBigDecimal("RSHDPROFITAMT"));
-            System.out.print("||直发:"+json.getBigDecimal("ZFPROFITAMT"));
-            System.out.print("||交易额:"+json.getBigDecimal("TRANAMT"));
-            System.out.println();
-        }
-    }
+   public void excute(){
+       synchroProfitMonth(null);
+   }
 
     /**
      * 同步手刷月分润明细数据
@@ -143,14 +94,14 @@ public class NewProfitMonthMposDataJob {
             TransProfitDetail detail = new TransProfitDetail();
             AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"),json.getString("AGENCYID"));
             AgentBusInfo parent = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"),json.getString("AGENCYID"));
-            if(null==parent || "6000".equals(json.getString(""))){
+            if(null==parent || "6000".equals(json.getString("PLATFORMNUM"))){
                 //直发一代或者上级为空，则无上级
                 parentAgentId = null;
             }else{
                 parentAgentId = parent.getAgentId();
             }
             ProfitDay day = new ProfitDay();
-            day.setAgentId(Busime.getAgentId());
+            day.setAgentId(json.getString("AGENCYID"));
             day.setTransDate(transDate);
             BigDecimal totalDay = dayMapper.totalProfitAndReturnById(day);
 
@@ -171,18 +122,18 @@ public class NewProfitMonthMposDataJob {
                 }
             }
 
-            /*String platFormNum = json.getString("platFormNum")==null?"":json.getString("platFormNum");
+            String platFormNum = json.getString("PLATFORMNUM")==null?"":json.getString("PLATFORMNUM");
             if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
                     && !"1111".equals(platFormNum) && !"3000".equals(platFormNum) && !"6000".equals(platFormNum)
                     && !"4000".equals(platFormNum)){
                 platFormNum = "1001";
-            }*/
+            }
 
             detail.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));//主键
             detail.setProfitDate(transDate);//月份
             detail.setBusNum(json.getString("AGENCYID"));//机构号
             detail.setParentBusNum(json.getString("ONLINEAGENCYID"));//上级机构号
-            detail.setBusCode(json.getString("PLATFORMNUM"));//平台号
+            detail.setBusCode(platFormNum);//平台号
             detail.setParentAgentId(parentAgentId);//上级AG码
             detail.setAgentId(Busime.getAgentId());//AG码
             detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
