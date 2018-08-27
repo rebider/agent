@@ -1,9 +1,8 @@
 package com.ryx.credit.profit.jobs;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.profit.dao.OrganTranMonthDetailMapper;
-import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
-import com.ryx.credit.profit.pojo.OrganTranMonthDetailExample;
+import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.impl.PosProfitComputeServiceImpl;
 import com.ryx.credit.profit.service.impl.ProfitToolsDeductServiceImpl;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +31,7 @@ public class ToolsDeductJobTest {
     @Autowired
     PosProfitComputeServiceImpl posProfitComputeServiceImpl;
     @Autowired
-    private OrganTranMonthDetailMapper organTranMonthDetailMapper;
+    private ProfitDetailMonthService profitDetailMonthServiceImpl;
 
     @Test
     public void execut() throws Exception {
@@ -44,9 +42,9 @@ public class ToolsDeductJobTest {
     public void computeToolsDeduct() throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(10);
         map.put("agentPid", "AG20180817000000000006101"); //AG20180813000000000006020
-        map.put("paltformNo", "2000");        //平台编号
-        map.put("deductDate", "2018-09");       //扣款月份
-        map.put("agentProfitAmt", "1166.66");        //代理商分润
+        map.put("paltformNo", "100003");        //平台编号
+        map.put("deductDate", "2018-07");       //扣款月份
+        map.put("agentProfitAmt", "111111");        //代理商分润
         map = profitToolsDeductService.execut(map);
         System.out.println("应扣："+map.get("mustDeductionAmtSum"));//返回应扣金额
         System.out.println("实扣："+map.get("actualDeductionAmtSum"));//实扣金额
@@ -54,20 +52,20 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computePosreWard() throws Exception {
-        OrganTranMonthDetailExample example = new OrganTranMonthDetailExample();
-        OrganTranMonthDetailExample.Criteria criteria = example.createCriteria();
-        criteria.andProfitDateEqualTo("201807");
-        criteria.andAgentTypeEqualTo("3");
-        criteria.andAllchildJlTranAmtEqualTo(new BigDecimal("11111111111111"));
-        List<OrganTranMonthDetail> list = organTranMonthDetailMapper.selectByExample(example);
+        List<String> busNum = new ArrayList<String>();
+        busNum.add("O00000000000221");
+        busNum.add("O00000000000718");
+        String profitDate = "201807";
+        String agentType = "2";
+        List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getChildTransProfitDetailList(busNum, profitDate, agentType);
         List<Object> listadd = new ArrayList<Object>();
-        list.stream().forEach(organTranMonthDetail1 -> {
+        transProfitDetails.stream().forEach(transProfitDetail -> {
             Map<String, Object> map = new HashMap<String, Object>(10);
-            map.put("agentType", organTranMonthDetail1.getAgentType());//机构一代
-            map.put("agentId", organTranMonthDetail1.getAgentId());
-            map.put("agentPid", organTranMonthDetail1.getAgentPid());
-            map.put("posTranAmt", organTranMonthDetail1.getPosTranAmt());
-            map.put("posJlTranAmt", organTranMonthDetail1.getPosJlTranAmt());
+            map.put("agentType", transProfitDetail.getAgentType());//机构一代
+            map.put("agentId", transProfitDetail.getBusNum());
+            map.put("agentPid", transProfitDetail.getAgentId());
+            map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
+            map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
                 System.out.println(map.toString());
@@ -81,20 +79,28 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computeJGPosreWard() throws Exception {
-        OrganTranMonthDetailExample example = new OrganTranMonthDetailExample();
-        OrganTranMonthDetailExample.Criteria criteria = example.createCriteria();
-        criteria.andProfitDateEqualTo("201807");
-        criteria.andAgentTypeEqualTo("2");
-        criteria.andAllchildJlTranAmtEqualTo(new BigDecimal("777777"));
-        List<OrganTranMonthDetail> list = organTranMonthDetailMapper.selectByExample(example);
+        List<String> busNum = new ArrayList<String>();
+//        busNum.add("O00000000110370");
+//        busNum.add("O00000000145380");
+//        busNum.add("O00000000218951");
+//        busNum.add("O00000000166351");
+//        busNum.add("O00000000216760");
+//        busNum.add("O00000000112234");
+//        busNum.add("O00000000213428");
+//        busNum.add("O00000000148391");
+//        busNum.add("O00000000118283");
+        busNum.add("O00000000160468");
+        String profitDate = "201807";
+        String agentType = "3";
+        List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getChildTransProfitDetailList(busNum, profitDate, agentType);
         List<Object> listadd = new ArrayList<Object>();
-        list.stream().forEach(organTranMonthDetail1 -> {
+        transProfitDetails.stream().forEach(transProfitDetail -> {
             Map<String, Object> map = new HashMap<String, Object>(10);
-            map.put("agentType", organTranMonthDetail1.getAgentType());//机构
-            map.put("agentId", organTranMonthDetail1.getAgentId());
-            map.put("agentPid", organTranMonthDetail1.getAgentPid());
-            map.put("posTranAmt", organTranMonthDetail1.getPosTranAmt());
-            map.put("posJlTranAmt", organTranMonthDetail1.getPosJlTranAmt());
+            map.put("agentType", transProfitDetail.getAgentType());//机构一代
+            map.put("agentId", transProfitDetail.getBusNum());
+            map.put("agentPid", transProfitDetail.getAgentId());
+            map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
+            map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
                 System.out.println(map.toString());

@@ -5,10 +5,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
-import com.ryx.credit.profit.dao.ProfitDirectMapper;
-import com.ryx.credit.profit.dao.ProfitMonthMapper;
-import com.ryx.credit.profit.dao.ProfitUnfreezeMapper;
+import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
@@ -62,6 +59,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitComputerService profitComputerService;
     @Autowired
     private ProfitDirectMapper directMapper;
+    @Autowired
+    private TransProfitDetailMapper transProfitDetailMapper;
 
     @Autowired
     private TransProfitDetailService transProfitDetailService;
@@ -102,13 +101,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         } else {
             criteria.andStatusNotEqualTo("0");
         }
-        if(StringUtils.isNotBlank(profitMonth.getProfitDateStart())&& StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
-            criteria.andProfitDateBetween(profitMonth.getProfitDateStart(),profitMonth.getProfitDateEnd());
-        } else if(StringUtils.isNotBlank(profitMonth.getProfitDateStart())){
-            criteria.andProfitDateEqualTo(profitMonth.getProfitDateStart());
-        } else if(StringUtils.isNotBlank(profitMonth.getProfitDateEnd())){
-            criteria.andProfitDateEqualTo(profitMonth.getProfitDateEnd());
-        }
         return profitMonthExample;
     }
 
@@ -136,15 +128,31 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(profitDetailMonth.getAgentId())){
             criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
         }
+        if(StringUtils.isNotBlank(profitDetailMonth.getAgentName())){
+            criteria.andAgentNameLike("%"+profitDetailMonth.getAgentName()+"%");
+        }
         if(StringUtils.isNotBlank(profitDetailMonth.getAgentPid())){
             criteria.andAgentPidEqualTo(profitDetailMonth.getAgentPid());
         }
         if(StringUtils.isNotBlank(profitDetailMonth.getProfitId())){
             criteria.andProfitIdEqualTo(profitDetailMonth.getProfitId());
         }
-
         if(StringUtils.isNotBlank(profitDetailMonth.getProfitDate())){
             criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDate());
+        }
+        if(StringUtils.isNotBlank(profitDetailMonth.getStatus())){
+            criteria.andStatusEqualTo(profitDetailMonth.getStatus());
+        } else {
+            criteria.andStatusEqualTo("1");
+        }
+        if (StringUtils.isNotBlank(profitDetailMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitDetailMonth.getProfitDateEnd()))
+        {
+            criteria.andProfitDateBetween(profitDetailMonth.getProfitDateStart(),
+                    profitDetailMonth.getProfitDateEnd());
+        }else if (StringUtils.isNotBlank(profitDetailMonth.getProfitDateStart())){
+            criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDateStart());
+        }else if (StringUtils.isNotBlank(profitDetailMonth.getProfitDateEnd())){
+            criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDateEnd());
         }
         return profitDetailMonthExample;
     }
@@ -156,9 +164,30 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public ProfitMonth getProfitMonth(String id) {
+    public List<TransProfitDetail> getTransProfitDetail(Page page, TransProfitDetail transProfitDetail) {
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        transProfitDetailExample.setPage(page);
+        TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
+        criteria.andBusNumEqualTo(transProfitDetail.getBusNum());
+        criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
+        criteria.andAgentIdEqualTo(transProfitDetail.getAgentId());
+        return transProfitDetailMapper.selectByExample(transProfitDetailExample);
+    }
+
+    @Override
+    public long getTransProfitDetailCount(TransProfitDetail transProfitDetail) {
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
+        criteria.andAgentIdEqualTo(transProfitDetail.getAgentId());
+        criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
+        criteria.andBusNumEqualTo(transProfitDetail.getBusNum());
+        return transProfitDetailMapper.countByExample(transProfitDetailExample);
+    }
+
+    @Override
+    public ProfitDetailMonth getProfitDetailMonth(String id) {
         if(StringUtils.isNotBlank(id)){
-            return profitMonthMapper.selectByPrimaryKey(id);
+            return profitDetailMonthMapper.selectByPrimaryKey(id);
         }
         return null;
     }
@@ -236,11 +265,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             throw new ProcessException("月分润解冻申请审批流启动失败!");
         }
 
-        ProfitMonth profitMonth = new ProfitMonth();
-        profitMonth.setId(profitUnfreeze.getProfitId());
-        profitMonth.setStatus(ProfitStatus.STATUS_2.status.toString());
-        profitMonth.setRemark(profitUnfreeze.getRemark());
-        profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+        ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
+        profitDetailMonth.setId(profitUnfreeze.getProfitId());
+        profitDetailMonth.setStatus(ProfitStatus.STATUS_2.status.toString());
+        profitDetailMonth.setRemark(profitUnfreeze.getRemark());
+        profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonth);
     }
 
     @Override
@@ -282,10 +311,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     String thawStatus = "1";
                     rel.setStatus(Status.STATUS_2.status);
                     LOG.info("1.更新分润状态为未分润");
-                    ProfitMonth profitMonth = new ProfitMonth();
-                    profitMonth.setId(profitUnfreeze.getProfitId());
-                    profitMonth.setStatus(profitStatus);
-                    profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+                    ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
+                    profitDetailMonth.setId(profitUnfreeze.getProfitId());
+                    profitDetailMonth.setStatus(profitStatus);
+                    profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonth);
                     LOG.info("2.更新解冻审批对象解冻成功");
                     profitUnfreeze.setUpdateTime(new Date());
                     profitUnfreeze.setFreezeStatus(thawStatus);
@@ -380,7 +409,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthMapper.payMoney(profitDate);
     }
 
-    /*** 
+    /***
      * @Description: 获取pos奖励
      * @Param:
      * @return:

@@ -5,6 +5,7 @@ package com.ryx.credit.profit.service.impl;/**
  */
 
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
@@ -101,6 +102,59 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
         criteria.andBusNumEqualTo(agentId);
         criteria.andAgentIdEqualTo(agentPid);
         return transProfitDetailMapper.selectByExample(transProfitDetailExample);
+    }
+
+    @Override
+    public TransProfitDetail getTransProfitDetail(String busNum, String profitDate, String agentType) {
+        if(StringUtils.isBlank(busNum)){
+            return null;
+        }
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
+        criteria.andProfitDateEqualTo(profitDate);
+        criteria.andBusNumEqualTo(busNum);
+        criteria.andAgentTypeEqualTo(agentType);
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
+        if(transProfitDetails != null && !transProfitDetails.isEmpty()){
+            return transProfitDetails.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public List<TransProfitDetail> getChildTransProfitDetailList(String busNum, List<String> profitDate, String agentType) {
+        if(StringUtils.isBlank(busNum)){
+            return null;
+        }
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
+        criteria.andProfitDateIn(profitDate);
+        criteria.andBusNumEqualTo(busNum);
+        criteria.andAgentTypeEqualTo(agentType);
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
+        return transProfitDetails;
+    }
+
+    @Override
+    public List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, String profitDate, String agentType) {
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
+        criteria.andProfitDateEqualTo(profitDate);
+        criteria.andBusNumIn(busNum);
+        criteria.andAgentTypeEqualTo(agentType);
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
+        return transProfitDetails;
+    }
+
+    @Override
+    public List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, List<String> profitDate, String agentType) {
+        TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
+        criteria.andProfitDateIn(profitDate);
+        criteria.andBusNumIn(busNum);
+        criteria.andAgentTypeEqualTo(agentType);
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
+        return transProfitDetails;
     }
 
 

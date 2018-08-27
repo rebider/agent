@@ -35,6 +35,7 @@ public class ToolsDeductJob {
     @Autowired
     private ProfitDeductionService profitDeductionService;
 
+    @Scheduled(cron = "50 * * * * ?")
 //    @Scheduled(cron = "0 0 10 20 * ?")
     public void execut(){
 //        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
@@ -48,7 +49,7 @@ public class ToolsDeductJob {
                 List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
                 LOG.info("机具扣款分期入库成功：{} 条", successList.size());
                 try {
-                    //通知结果
+                    //通知订单系统分期结清
                     iPaymentDetailService.uploadStatus(successList);
                 } catch (Exception e) {
                     e.printStackTrace();
