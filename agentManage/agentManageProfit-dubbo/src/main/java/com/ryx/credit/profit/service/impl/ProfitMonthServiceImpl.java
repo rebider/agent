@@ -399,7 +399,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
                 sumAmt = sumAmt.subtract(profitDetailMonthTemp.getOtherDeductionAmt());
                 // 实发分润
-                profitDetailMonthTemp.setRealProfitAmt(sumAmt);
+                profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
                 profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
             });
         }else{
@@ -411,23 +411,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public void payMoney() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.payMoney(profitDate);
-    }
-
-    /**
-     * 执行liunx命令
-     * @author : zhaodw
-     * @datetime : 2017年5月10日 上午11:03:34
-     */
-    private static void doLiunxCommand(String command) {
-        try {
-            Process process  = RUN.exec(command);
-            process.waitFor();
-            process.destroy();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     /***
