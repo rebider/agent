@@ -117,7 +117,7 @@ public class NewProfitDataJob {
     */
     private void insertTransProfitDetail( Map<String, Object> agentMap, JSONObject profitData, String settleMonth) {
         TransProfitDetail transProfitDetail = new TransProfitDetail();
-        transProfitDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        transProfitDetail.setAgentId((String)agentMap.get("AGENT_ID"));
         transProfitDetail.setBusNum(profitData.getString("ORG_ID"));
         transProfitDetail.setAgentName((String)agentMap.get("AG_NAME"));
         transProfitDetail.setParentAgentId((String)agentMap.get("parentAgentPid"));
