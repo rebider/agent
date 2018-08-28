@@ -712,7 +712,14 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
         //三、抵税计算
-
+        //1、获取cx提供的代理商线下打款信息列表
+        //2、遍历打款信息，根据信息中的busnum和上级busnum关联出agid和上级agid，然后获取需要抵税的ProfitDetailMonth
+        //3、抵扣税额，重新计算并更新税额、实际分润
+        //PS:抵用金额税不能大于税额本身、抵用了多少金额需要交给cx更新、
+        ProfitDetailMonth deduction = detailMonthMapper.selectByIdAndParent(null);
+        deduction.getDeductionTaxMonthAmt();//税额
+        deduction.getRealProfitAmt();//实际分润
+        deduction.getTax();//税点
     }
 
     /**
