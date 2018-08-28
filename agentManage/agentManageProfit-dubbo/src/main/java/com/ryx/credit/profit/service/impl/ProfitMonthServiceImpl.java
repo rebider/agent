@@ -146,8 +146,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
         if(StringUtils.isNotBlank(profitDetailMonth.getStatus())){
             criteria.andStatusEqualTo(profitDetailMonth.getStatus());
-        } else {
-            criteria.andStatusEqualTo("1");
         }
         if (StringUtils.isNotBlank(profitDetailMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitDetailMonth.getProfitDateEnd()))
         {
