@@ -3,6 +3,7 @@ package com.ryx.credit.profit.jobs;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -18,6 +19,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +49,10 @@ public class ProfitAmtSumJob {
     @Autowired
     private ProfitMonthService profitMonthServiceImpl;
 
-//    @Scheduled(cron = "0 0 12 10 * ?")
+    @Autowired
+    public  RedisService redisService;
+
+    @Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+settleMonth);
@@ -84,6 +89,8 @@ public class ProfitAmtSumJob {
                     posZqSupplyProfitAmt = null;
                     mposZqSupplyProfitAmt = null;
                 });
+                redisService.delete("commitFinal");
+                redisService.delete("payStatus");
             }
         }catch (Exception e) {
             e.printStackTrace();

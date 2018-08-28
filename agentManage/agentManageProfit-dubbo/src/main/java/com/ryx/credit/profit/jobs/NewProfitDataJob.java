@@ -21,6 +21,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +71,7 @@ public class NewProfitDataJob {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
 
 
-//    @Scheduled(cron = "0 0 11 10 * ?")
+    @Scheduled(cron = "0 0 11 10 * ?")
     public void deal() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+profitDate);
