@@ -190,9 +190,10 @@ public class NewProfitDataJob {
             AgentColinfo agentColinfo = agentColinfos.get(0);
             profitDetailMonthTemp.setAccountId(agentColinfo.getCloBankAccount());
             profitDetailMonthTemp.setAccountName(agentColinfo.getCloRealname());
-            profitDetailMonthTemp.setOpenBankName(agentColinfo.getCloBankBranch());
+            profitDetailMonthTemp.setOpenBankName(agentColinfo.getCloBank());
             profitDetailMonthTemp.setBankCode(agentColinfo.getBranchLineNum());
             profitDetailMonthTemp.setTax(agentColinfo.getCloTaxPoint());
+            profitDetailMonthTemp.setPayStatus(agentColinfo.getCloType().toString());
         }
 
         profitDetailMonthServiceImpl.insert(profitDetailMonthTemp);
