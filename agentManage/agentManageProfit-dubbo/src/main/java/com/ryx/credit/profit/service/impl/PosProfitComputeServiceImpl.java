@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.pojo.*;
@@ -11,6 +12,7 @@ import com.ryx.credit.service.agent.AgentBusinfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -32,6 +34,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    protected RedisTemplate<String, String> redisTemplate;
 
     /**
      *  2:机构 3:机构一代 6:标准一代
@@ -194,7 +198,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param map
      */
     private void obtainRewardTemp(String deductDate, Map<String, Object> map) {
-        List<PosRewardTemplate> posRewardTemplates = posRewardTemplateService.getPosRewardTemplateList();
+        List<PosRewardTemplate> posRewardTemplates =  this.getPosRewardTemplateList();
         if(posRewardTemplates == null || posRewardTemplates.isEmpty()){
             LOG.info("业务部门未配置通用奖励模板");
             return;
@@ -223,6 +227,26 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
                 }
             }
+        }
+    }
+
+    /**
+     * 缓存中获取通用奖励模板
+     * @return
+     */
+    private List<PosRewardTemplate> getPosRewardTemplateList() {
+        String tmep = redisTemplate.opsForValue().get("POS_REWARD_TEMP");
+        List list = JSONObject.parseObject(tmep, List.class);
+        if(list != null && !list.isEmpty()){
+            List<PosRewardTemplate> posRewardTemplates = new ArrayList<PosRewardTemplate>(list.size());
+            list.forEach(lists -> {
+                JSON json = (JSON) JSONObject.parse(lists.toString());
+                PosRewardTemplate posRewardTemplate = JSONObject.toJavaObject(json, PosRewardTemplate.class);
+                posRewardTemplates.add(posRewardTemplate);
+            });
+            return posRewardTemplates;
+        } else {
+           return  posRewardTemplateService.getPosRewardTemplateList();
         }
     }
 
