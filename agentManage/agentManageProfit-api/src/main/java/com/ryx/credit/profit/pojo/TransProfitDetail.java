@@ -59,6 +59,16 @@ public class TransProfitDetail implements Serializable{
     //新增 20180822
     private String agentType;
 
+    private BigDecimal unlineAmt;
+
+    public BigDecimal getUnlineAmt() {
+        return unlineAmt;
+    }
+
+    public void setUnlineAmt(BigDecimal unlineAmt) {
+        this.unlineAmt = unlineAmt;
+    }
+
     public String getSourceInfo() {
         return sourceInfo;
     }

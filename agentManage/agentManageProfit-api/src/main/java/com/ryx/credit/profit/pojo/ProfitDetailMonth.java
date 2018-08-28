@@ -131,6 +131,16 @@ public class ProfitDetailMonth implements Serializable{
     private String profitDateStart;
     private String profitDateEnd;
 
+    private BigDecimal unlineAmt;
+
+    public BigDecimal getUnlineAmt() {
+        return unlineAmt;
+    }
+
+    public void setUnlineAmt(BigDecimal unlineAmt) {
+        this.unlineAmt = unlineAmt;
+    }
+
     public String getStatus() {
         return status;
     }
