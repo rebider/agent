@@ -182,7 +182,7 @@ public class NewProfitDataJob {
         profitDetailMonthTemp.setPayProfitAmt(transProfitDetail.getOutProfitAmt());
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
         profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
-        profitDetailMonthTemp.setStatus("3");
+        profitDetailMonthTemp.setStatus("4");
         // 获取账户信息
         List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService(transProfitDetail.getAgentId(), null,AgStatus.Approved.status);
 
