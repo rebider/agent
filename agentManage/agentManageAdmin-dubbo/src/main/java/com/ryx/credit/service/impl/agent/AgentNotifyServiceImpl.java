@@ -422,6 +422,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateBusInfo.setId(agentBusInfo.getId());
                 if(agentBusInfo.getBusNum()!=null){
                     updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
                     log.info("已有编号进行入网修改：更新orgId到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
                 }else{
                     log.info("已有编号进行入网修改：更新orgId到库,已存在不更新到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
