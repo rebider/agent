@@ -93,8 +93,8 @@ public class BalanceSerialDealJob {
         String payDate = LocalDate.now().plusDays(-1).format(DateTimeFormatter.BASIC_ISO_DATE);
         LOG.info("出款日期"+payDate);
         JSONObject param = new JSONObject();
-        param.put("bussType", payDate);
-
+        param.put("tranDate", payDate);
+        param.put("flag", "12");
         String result = HttpClientUtil.doPostJson(URL, param.toJSONString());
         if (StringUtils.isNotBlank(result)) {
             return  JSONObject.parseObject(result);
