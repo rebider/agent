@@ -32,6 +32,16 @@ public class ProfitDay implements Serializable {
 
     private BigDecimal totalProfit1;//新增
 
+    private String platformNum;
+
+    public String getPlatformNum() {
+        return platformNum;
+    }
+
+    public void setPlatformNum(String platformNum) {
+        this.platformNum = platformNum;
+    }
+
     public BigDecimal getTotalProfit1() {
         return totalProfit1;
     }

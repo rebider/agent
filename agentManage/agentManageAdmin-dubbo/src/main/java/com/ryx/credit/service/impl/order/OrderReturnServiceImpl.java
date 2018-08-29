@@ -94,6 +94,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     OLogisticsService oLogisticService;
     @Autowired
     OAccountAdjustMapper accountAdjustMapper;
+    @Autowired
+    OReceiptProMapper receiptProMapper;
 
     /**
      * @Author: Zhang Lei
@@ -423,6 +425,21 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
         for (ReceiptPlan receiptPlan : receiptPlans) {
             String receiptPlanId = receiptPlan.getId();
+
+            //更新收货单商品表已排单数量
+            String receiptProId = receiptPlan.getProId();
+            OReceiptProExample receiptProExample = new OReceiptProExample();
+            receiptProExample.or().andIdEqualTo(receiptProId);
+            List<OReceiptPro> receiptPros = receiptProMapper.selectByExample(receiptProExample);
+            if (receiptPros != null && receiptPros.size() > 0) {
+                OReceiptPro receiptPro = receiptPros.get(0);
+                receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getSendProNum()));
+                int cts = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
+                if(cts<=0){
+                    throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");
+                }
+            }
+
             //删除物流及物流明细
             OLogisticsExample logisticsExample = new OLogisticsExample();
             logisticsExample.or().andReceiptPlanIdEqualTo(receiptPlanId);
@@ -720,7 +737,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     return AgentResult.fail("您还未执行退款方案");
                 }
 
-                if(returnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO)>0 && agentVo.getAttachments().length<=0){
+                if (returnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO) > 0 && agentVo.getAttachments().length <= 0) {
                     return AgentResult.fail("有线下退款金额时，必须上传打款凭证");
                 }
 

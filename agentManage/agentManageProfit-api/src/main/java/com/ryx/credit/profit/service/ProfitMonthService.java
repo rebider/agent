@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitMonth;
 import com.ryx.credit.profit.pojo.ProfitUnfreeze;
+import com.ryx.credit.profit.pojo.TransProfitDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -46,11 +47,26 @@ public interface ProfitMonthService {
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth);
 
     /**
+     * 获取月度交易明细
+     * @param transProfitDetail
+     * @return
+     */
+    public List<TransProfitDetail> getTransProfitDetail(Page page, TransProfitDetail transProfitDetail);
+
+    /**
+     * 获取月度交易明细
+     * @param transProfitDetail
+     * @return
+     */
+    public long getTransProfitDetailCount(TransProfitDetail transProfitDetail);
+
+    /**
      * 查询一条数据
      * @param id
      * @return
      */
-    public ProfitMonth getProfitMonth(String id);
+//    public ProfitMonth getProfitMonth(String id);
+    public ProfitDetailMonth getProfitDetailMonth(String id);
 
     /**
      * 修改月分润数据
@@ -131,4 +147,11 @@ public interface ProfitMonthService {
     * @Date: 2018/8/12
     */
     void computeProfitAmt();
+
+    /***
+    * @Description: 出款
+    * @Author: zhaodw
+    * @Date: 2018/8/24
+    */
+    void payMoney();
 }

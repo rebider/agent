@@ -52,6 +52,8 @@ public class ProfitDeduction implements Serializable {
 
     private Date createDateTime;
 
+    private String deductionStatus;
+
     public String getId() {
         return id;
     }
@@ -234,5 +236,13 @@ public class ProfitDeduction implements Serializable {
 
     public void setDeductionDateEnd(String deductionDateEnd) {
         this.deductionDateEnd = deductionDateEnd;
+    }
+
+    public String getDeductionStatus() {
+        return deductionStatus;
+    }
+
+    public void setDeductionStatus(String deductionStatus) {
+        this.deductionStatus = deductionStatus;
     }
 }

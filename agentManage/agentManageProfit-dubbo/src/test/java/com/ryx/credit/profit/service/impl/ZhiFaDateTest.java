@@ -1,4 +1,4 @@
-package com.ryx.credit.profit.unitmain;
+package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
@@ -6,89 +6,61 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.profit.dao.ProfitDayMapper;
+import com.ryx.credit.profit.dao.ProfitDirectMapper;
+import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDirect;
-import com.ryx.credit.profit.service.IProfitDirectService;
-import com.ryx.credit.profit.service.ProfitComputerService;
-import com.ryx.credit.profit.service.ProfitDeductionService;
-import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.profit.service.*;
+import com.ryx.credit.profit.unitmain.ProfitDayMposDataJob;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * 直发分润数据同步、定时
+ * @author yangmx
+ * @desc
  */
-@Service
-public class ProfitZhiFaDataJob {
-    Logger logger = LogManager.getLogger(this.getClass());
-    @Autowired
-    private IProfitDirectService profitDirectService;
-    @Autowired
-    private ProfitComputerService computerService;
-    @Autowired
-    private IdService idService;
-    @Autowired
-    private ProfitDeductionService profitDeductionService;
-    @Autowired
-    private AgentBusinfoService businfoService;
+@RunWith(SpringJUnit4ClassRunner.class)
+// 加载配置文件
+@ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
+public class ZhiFaDateTest {
 
-    private String month = "";
-    private int index = 1;
-    private static int c = 1;
-    public static void main(String agrs[]){
-        List a = new ArrayList();
-        a.add("aaaa");
-        a.add("bbbb");
-        a.add("cccc");
-        System.out.println(a.size());
-        System.out.println(a.get(a.size()-1));
-        //test();
+    @Autowired
+    IdService idService;
+    @Autowired
+    IProfitDService profitDService;
+    @Autowired
+    ProfitComputerServiceImpl computerService;
+    @Autowired
+    ProfitDetailMonthService profitDetailMonthService;
+    @Autowired
+    IProfitDirectService profitDirectService;
+    @Autowired
+    ProfitDeductionService profitDeductionService;
+    private int index=1;
+
+    @Test
+    public void testX(){
+        computer();
     }
 
-    public static void test(){
-        String transDate = null;
-        HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
-        map.put("pageNumber",c++ +"");
-        map.put("pageSize","50");
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                ("http://12.3.10.161:8003/qtfr/agentInterface/agencyZfMoney.do",params);
-        System.out.println(res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            //logger.error("请求同步失败！");
-            AppConfig.sendEmails("日分润同步失败","日分润同步失败");
-            return;
-        }
-        String data = JSONObject.parseObject(res).get("data").toString();
-        List<HashMap> list = JSONObject.parseObject(data,List.class);
-        if(list.size()>0){
-            test();
-        }
-        System.out.println(data);
-    }
-
-    public void excute(){
-        synchroProfitDirect(null);
-    }
     /**
      * 同步直发分润数据
      * @param transDate 交易月份（空则为上一月）
      */
     public void synchroProfitDirect(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6);
+        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6);
         map.put("transDate",transDate==null?month:transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
@@ -97,7 +69,7 @@ public class ProfitZhiFaDataJob {
                 (AppConfig.getProperty("profit.zhifa"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            logger.error("请求同步失败！");
+            System.out.println("请求同步失败！");
             AppConfig.sendEmails("日分润同步失败","日分润同步失败");
             return;
         }
@@ -107,12 +79,10 @@ public class ProfitZhiFaDataJob {
             try {
                 insertProfitDirect(list,transDate);
             } catch (Exception e) {
-                logger.error("同步插入数据失败！");
+                System.out.println("同步插入数据失败！");
                 e.printStackTrace();
-                throw new RuntimeException("分润数据处理失败");
             }
         }
-
     }
 
     public void computer(){
@@ -124,7 +94,7 @@ public class ProfitZhiFaDataJob {
             //计算直发实际分润
             computerService.computer_ZhiFa();
         } catch (Exception e) {
-            logger.error("直发分润计算出错！");
+            System.out.println("直发分润计算出错！");
             e.printStackTrace();
         }
     }
@@ -132,11 +102,10 @@ public class ProfitZhiFaDataJob {
     public void insertProfitDirect(List<JSONObject> profitDirects,String transDate){
         for(JSONObject json:profitDirects){
             ProfitDeduction where = new ProfitDeduction();
-            where.setAgentPid(json.getString("AGENTID"));
+            where.setAgentId(json.getString("AGENTID"));
             where.setDeductionType("01");
             where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -1)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
-            AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("6000"),json.getString("FRISTAGENTID"));
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
             profitDirect.setAgentName(json.getString("AGENTNAME"));//代理商名称
@@ -145,8 +114,7 @@ public class ProfitZhiFaDataJob {
             profitDirect.setParentAgentName(json.getString("PARENTAGENTNAME"));//上级代理商名称
             profitDirect.setFristAgentId(json.getString("FRISTAGENTNAME"));//一级代理商编号
             profitDirect.setFristAgentName(json.getString("FRISTAGENTID"));//一级代理商名称
-            //profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
-            profitDirect.setFristAgentPid(Busime.getAgentId());//一级代理商唯一码
+            profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
             profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
             profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
             profitDirect.setTransFee(json.getBigDecimal("TRANSFEE"));//直发交易手续费
@@ -157,12 +125,14 @@ public class ProfitZhiFaDataJob {
             profitDirect.setAccountName(json.getString("ACCOUNTNAME"));//户名
             profitDirect.setBankOpen(json.getString("BANKOPEN"));//开户行
             profitDirect.setBankCode(json.getString("BANKCODE"));//银行号
+            //profitDirect.setBossCode(json.getString("BOSSCODE"));//总行行号
             profitDirect.setSupplyAmt(BigDecimal.ZERO);//补款
-            profitDirect.setParentBuckle(BigDecimal.ZERO);//代下级扣款
             profitDirect.setBuckleAmt(buckle==null?BigDecimal.ZERO:buckle);//退单扣款
+            profitDirect.setParentBuckle(BigDecimal.ZERO);//代下级扣款
             //退单补款、应发分润、应找上级扣款需计算赋值
             profitDirectService.insertSelective(profitDirect);
         }
         synchroProfitDirect(transDate);
     }
+
 }

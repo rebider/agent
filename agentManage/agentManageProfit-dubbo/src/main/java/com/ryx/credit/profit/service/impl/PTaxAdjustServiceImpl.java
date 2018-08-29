@@ -82,6 +82,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Override
     public PageInfo PTaxAdjustList(PTaxAdjust record, Page page) {
         PTaxAdjustExample example = adjustEqualsTo(record);
+        example.setOrderByClause("VALID_DATE "+Page.ORDER_DIRECTION_DESC);
         List<PTaxAdjust> profitD = adjustMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);
@@ -133,7 +134,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
             if (rel != null) {
                 PTaxAdjust taxAdjust = adjustMapper.selectByPrimaryKey(rel.getBusId());
                 taxAdjust.setTaxStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
-                taxAdjust.setValidDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")));
+                taxAdjust.setValidDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
                 logger.info("1.更新税点调整申请状态为通过，有效");
                 logger.info("审批通过，原税点：{},现税点：{}",taxAdjust.getTaxOld(),taxAdjust.getTaxIng());
                 adjustMapper.updateByPrimaryKeySelective(taxAdjust);

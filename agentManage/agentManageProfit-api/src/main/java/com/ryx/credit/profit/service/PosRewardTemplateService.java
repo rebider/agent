@@ -33,13 +33,6 @@ public interface PosRewardTemplateService {
     public void updatePosRewardTemplate(PosRewardTemplate posRewardTemplate);
 
     /**
-     * 计算POS分润奖励
-     * @param tranTotal 交易总额
-     * @return POS奖励比例
-     */
-    public BigDecimal computePosReward(BigDecimal tranTotal);
-
-    /**
      * 新增POS奖励通用模板
      * @param posRewardTemplate
      */

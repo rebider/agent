@@ -72,24 +72,21 @@ public interface ProfitDeductionService {
 
     /***
     * @Description:其他扣款计算
-    * @Param: profitAmt 分润金额
-    * @Param: agentId 机构id
+    * @Param: param profitAmt 分润金额 agentId 机构id  parentAgentPid 机构id  type 扣款类型
     * @return: 应扣余额 扣足返回已扣款金额
     * @Author: zhaodw
     * @Date: 2018/8/7
     */
-    BigDecimal otherDeductionByType(BigDecimal profitAmt, String agentId, String type) throws DeductionException;
+    BigDecimal otherDeductionByType(Map<String, Object> param) throws DeductionException;
 
     /***
      * @Description:退单扣款计算
-     * @Param: profitAmt 分润金额
-     * @Param: bussType 业务类型 pos mpos
-     * @Param: agentId 机构id
+     * @Param: param profitAmt 分润金额  bussType 业务类型 02 01 agentPid 机构id  parentAgentPid 机构id
      * @return: 应扣余额 扣足返回已扣款金额
      * @Author: zhaodw
      * @Date: 2018/8/7
      */
-    BigDecimal settleErrDeduction(BigDecimal profitAmt, String bussType, String agentId) throws DeductionException;
+    BigDecimal settleErrDeduction(Map<String, Object> param) throws DeductionException;
 
     /*** 
     * @Description: 获取退单扣款总金额
@@ -111,11 +108,12 @@ public interface ProfitDeductionService {
     * @Description: 获取代理商补分润
     * @Param:  agentId 代理商
     * @Param:  bussType 业务类型
+    * @Param:  parentAgentId 上级agentId
     * @return:  补款总金额
     * @Author: zhaodw
     * @Date: 2018/8/9
     */
-    BigDecimal  getSupplyAmt(String agentId, String bussType);
+    BigDecimal  getSupplyAmt(String agentId, String bussType , String parentAgentId);
 
     BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
 }

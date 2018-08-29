@@ -392,6 +392,7 @@
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.50</version>
         </dependency>
+
     </dependencies>
     <profiles>
         <!-- 1. 操作系统环境 start -->
