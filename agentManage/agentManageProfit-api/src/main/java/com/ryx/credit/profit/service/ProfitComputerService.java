@@ -49,6 +49,14 @@ public interface ProfitComputerService {
     BigDecimal total_factor(String agentPid,String month);
 
     /**
+     * 商业保理扣款汇总（新）
+     * @param agentId AG码
+     * @param parentId 上级AG码
+     * @param month 月份
+     * @return
+     */
+    BigDecimal new_total_factor(String agentId,String parentId,String month);
+    /**
      * 其他补款汇总
      * @param agentPid
      * @param month
@@ -56,6 +64,14 @@ public interface ProfitComputerService {
      */
     BigDecimal total_supply(String agentPid,String month);
 
+    /**
+     * 其他补款汇总(新)
+     * @param agentId  AG码
+     * @param parentId 上级AG码
+     * @param month 月份
+     * @return
+     */
+    BigDecimal new_total_supply(String agentId,String parentId,String month);
     /**
      * 日结返现+返现奖励+其他补款月汇总
      * @param agentPid

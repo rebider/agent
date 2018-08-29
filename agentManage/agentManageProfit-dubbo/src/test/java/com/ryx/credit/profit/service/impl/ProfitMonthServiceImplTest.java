@@ -1,32 +1,30 @@
-package junit.profit;/**
- * @Auther: zhaodw
- * @Date: 2018/8/8 20:47
- * @Description:
- */
+package com.ryx.credit.profit.service.impl;
 
-import com.ryx.credit.profit.jobs.ProfitAmtSumJob;
+import com.ryx.credit.profit.service.PosRewardTemplateService;
+import com.ryx.credit.profit.service.ProfitMonthService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.math.BigDecimal;
+
 /**
- *
- * @author zhaodw
- * @create 2018/8/8
- * @since 1.0.0
+ * @author yangmx
+ * @desc
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class ProfitAmtSumJobTest {
+public class ProfitMonthServiceImplTest {
 
     @Autowired
-    private ProfitAmtSumJob profitAmtSumJob;
+    ProfitMonthService profitMonthService;
 
     @Test
-    public void testSum() {
-        profitAmtSumJob.deal();
+    public void testCompute() throws Exception {
+        profitMonthService.computeProfitAmt();
     }
+
 }

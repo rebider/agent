@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 手刷补差数据同步
  */
-@Service("profitMposDiffDataJob")
+@Service
 @Transactional(rollbackFor=RuntimeException.class)
 public class ProfitMposDiffDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
@@ -51,6 +51,10 @@ public class ProfitMposDiffDataJob {
         System.out.println(data);
     }
 
+    public void excute(){
+        synchroProfitDiff(null);
+    }
+
     public void synchroProfitDiff(String month){
         HashMap<String,String> map = new HashMap<String,String>();
         month = month==null? DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):month;
@@ -75,6 +79,7 @@ public class ProfitMposDiffDataJob {
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
             e.printStackTrace();
+            throw new RuntimeException("分润数据处理失败");
         }
     }
 

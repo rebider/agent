@@ -35,12 +35,10 @@ public class ToolsDeductJob {
     @Autowired
     private ProfitDeductionService profitDeductionService;
 
-//    @Scheduled(cron = "0 0 10 20 * ?")
+    @Scheduled(cron = "0 0 10 20 * ?")
     public void execut(){
-//        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String deductDate = "2018-09";
-//        String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
-        String beforeDeductDate = "2018-08";
+        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             if(list!= null && !list.isEmpty()){
@@ -48,7 +46,7 @@ public class ToolsDeductJob {
                 List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
                 LOG.info("机具扣款分期入库成功：{} 条", successList.size());
                 try {
-                    //通知结果
+                    //通知订单系统分期结清
                     iPaymentDetailService.uploadStatus(successList);
                 } catch (Exception e) {
                     e.printStackTrace();

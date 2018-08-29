@@ -17,5 +17,7 @@ public interface PtaxHistoryMapper {
 
     List<PtaxHistory> selectByExample(PtaxHistoryExample example);
 
-    BigDecimal getHistoryAmt(PtaxHistory record);
+    BigDecimal getHistoryAmtByPid(PtaxHistory record);
+
+    BigDecimal getHistoryAmtByDoubleId(PtaxHistory record);
 }

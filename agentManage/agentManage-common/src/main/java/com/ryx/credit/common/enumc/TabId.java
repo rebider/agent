@@ -68,8 +68,8 @@ public enum TabId {
     p_profit_supply("PPS%s%015d"),
     P_DEDUCTION_DETAIL("PDD%s%015d"),
     P_AGENT_PID_LINK("PAPL%s%015d"),
-    P_PROFIT_SUPPLU_DIFF("PPSD%s%015d");
-
+    P_PROFIT_SUPPLU_DIFF("PPSD%s%015d"),
+    TPD("TPD%s%015d");
     TabId(String thePatt){
            this.patt = thePatt;
     }

@@ -14,6 +14,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * 手刷唯一码和业务平台编号关系同步
  */
+@Service
 public class ProfitMposLinkDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
@@ -35,7 +37,7 @@ public class ProfitMposLinkDataJob {
         HashMap<String,String> map = new HashMap<String,String>();
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.bucha"),params);
+                (AppConfig.getProperty("profit.link"),params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             //logger.error("请求同步失败！");
@@ -49,8 +51,6 @@ public class ProfitMposLinkDataJob {
 
     public void synchroProfitLink(){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("pageNumber",index++ +"");
-        map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.link"),params);
@@ -63,16 +63,16 @@ public class ProfitMposLinkDataJob {
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data,List.class);
         try {
-            if(list.size()>0){
-                insertProfitD(list);
-            }
+            insertProfitLink(list);
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
             e.printStackTrace();
+            throw new RuntimeException("分润数据处理失败");
         }
     }
 
-    public void insertProfitD(List<JSONObject> profitDays){
+    public void insertProfitLink(List<JSONObject> profitDays){
+        pidLinkMapper.deleteAll();
         for(JSONObject json:profitDays){
             String platFormNum = json.getString("platFormNum")==null?"":json.getString("platFormNum");
             if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
@@ -87,6 +87,5 @@ public class ProfitMposLinkDataJob {
             link.setAgentPid(json.getString("uniqueCode"));
             pidLinkMapper.insert(link);
         }
-        synchroProfitLink();
     }
 }

@@ -336,6 +336,9 @@ public class StagingServiceImpl implements StagingService {
                 detail.setStagId(profitStaging.getId());
                 detail.setSourceId(profitStaging.getSourceId());
                 detail.setStatus(StagingDetailStatus.N.getStatus());
+                if (i==stagCount) {
+                    detail.setMustAmt(mustAmt.add(profitStaging.getSumAmt().subtract(mustAmt.multiply(profitStaging.getStagCount()))));
+                }
                 profitStagingDetailMapper.insert(detail);
             }
         }catch (Exception e) {

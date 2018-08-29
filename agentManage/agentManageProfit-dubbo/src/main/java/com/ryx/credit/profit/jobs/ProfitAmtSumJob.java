@@ -55,6 +55,7 @@ public class ProfitAmtSumJob {
         try {
             ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
             profitDetailMonth.setProfitDate(settleMonth);
+//            profitDetailMonth.setAgentPid("AG20180817000000000006101"); //验证使用
             // 获取分润明细数据对分润汇总进行求和赋值
             List<ProfitDetailMonth> profitDetailMonthList = profitMonthServiceImpl.getProfitDetailMonthList(null, profitDetailMonth);
             if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {

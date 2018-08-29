@@ -23,6 +23,16 @@ public class PProfitFactor {
     private String remark;
 
     private Date factorDate;
+    //新增  20180821
+    private String parentAgentId;
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId;
+    }
 
     public String getId() {
         return id;

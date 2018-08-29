@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 手刷日结分润数据同步、定时
  */
-@Service("profitDayMposDataJob")
+@Service
 @Transactional(rollbackFor=RuntimeException.class)
 public class ProfitDayMposDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
@@ -85,6 +85,7 @@ public class ProfitDayMposDataJob {
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
             e.printStackTrace();
+            throw new RuntimeException("分润数据处理失败");
         }
     }
 

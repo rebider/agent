@@ -1537,6 +1537,17 @@ public class ProfitDeductionExample {
             addCriterion("CREATE_DATE_TIME not between", value1, value2, "createDateTime");
             return (Criteria) this;
         }
+
+        public Criteria andDeductionStatusEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS =", value, "userId");
+            return (Criteria) this;
+        }
+
+
+        public Criteria andDeductionStatusIsNull() {
+            addCriterion("DEDUCTION_STATUS is  null");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
