@@ -31,6 +31,7 @@
     <result column="ACTUAL_RECEIPT" jdbcType="DECIMAL" property="actualReceipt" />
     <result column="ACTUAL_RECEIPT_DATE" jdbcType="TIMESTAMP" property="actualReceiptDate" />
     <result column="PROFIT_TAX_AMT" jdbcType="DECIMAL" property="profitTaxAmt" />
+    <result column="DOWN_PAYMENT_USER" jdbcType="VARCHAR" property="downPaymentUser" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,7 +67,7 @@
     PAY_COMPLET_TIME, PAY_STATUS, PLAN_SUC_TIME, PAY_RULE, GUARANTEE_AGENT, SETTLEMENT_PRICE,
     SHARE_TEMPLET, IS_CLO_INVOICE, DEDUCTION_TYPE, DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT,
     DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK, STATUS, VERSION, ACTUAL_RECEIPT, ACTUAL_RECEIPT_DATE,
-    PROFIT_TAX_AMT
+    PROFIT_TAX_AMT, DOWN_PAYMENT_USER
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OPaymentExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -106,7 +107,8 @@
     DEDUCTION_AMOUNT, DOWN_PAYMENT, DOWN_PAYMENT_COUNT,
     DOWN_PAYMENT_DATE, COLLECT_COMPANY, REMARK,
     STATUS, VERSION, ACTUAL_RECEIPT,
-    ACTUAL_RECEIPT_DATE, PROFIT_TAX_AMT)
+    ACTUAL_RECEIPT_DATE, PROFIT_TAX_AMT, DOWN_PAYMENT_USER
+    )
     values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR},
     #{agentId,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
     #{payAmount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL}, #{outstandingAmount,jdbcType=DECIMAL},
@@ -116,7 +118,8 @@
     #{deductionAmount,jdbcType=DECIMAL}, #{downPayment,jdbcType=DECIMAL}, #{downPaymentCount,jdbcType=DECIMAL},
     #{downPaymentDate,jdbcType=TIMESTAMP}, #{collectCompany,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{actualReceipt,jdbcType=DECIMAL},
-    #{actualReceiptDate,jdbcType=TIMESTAMP}, #{profitTaxAmt,jdbcType=DECIMAL})
+    #{actualReceiptDate,jdbcType=TIMESTAMP}, #{profitTaxAmt,jdbcType=DECIMAL}, #{downPaymentUser,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPayment">
     insert into O_PAYMENT
@@ -208,6 +211,9 @@
       <if test="profitTaxAmt != null">
         PROFIT_TAX_AMT,
       </if>
+      <if test="downPaymentUser != null">
+        DOWN_PAYMENT_USER,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -296,6 +302,9 @@
       </if>
       <if test="profitTaxAmt != null">
         #{profitTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="downPaymentUser != null">
+        #{downPaymentUser,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -392,6 +401,9 @@
       <if test="profitTaxAmt != null">
         PROFIT_TAX_AMT = #{profitTaxAmt,jdbcType=DECIMAL},
       </if>
+      <if test="downPaymentUser != null">
+        DOWN_PAYMENT_USER = #{downPaymentUser,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -424,7 +436,8 @@
     VERSION = #{version,jdbcType=DECIMAL},
     ACTUAL_RECEIPT = #{actualReceipt,jdbcType=DECIMAL},
     ACTUAL_RECEIPT_DATE = #{actualReceiptDate,jdbcType=TIMESTAMP},
-    PROFIT_TAX_AMT = #{profitTaxAmt,jdbcType=DECIMAL}
+    PROFIT_TAX_AMT = #{profitTaxAmt,jdbcType=DECIMAL},
+    DOWN_PAYMENT_USER = #{downPaymentUser,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

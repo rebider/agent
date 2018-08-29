@@ -9,8 +9,11 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
+import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -37,6 +40,8 @@ public class AimportServiceImpl implements AimportService {
 
     public static List<String> yesorno = Arrays.asList("否","是");
     public static  List<String> gs = Arrays.asList("无","对公","对私");
+
+    public static  Map<String,String> BUS_SCOP = FastMap.fastMap("市代","city").putKeyV("国代","nation").putKeyV("省代","province");
 
     @Autowired
     private ImportAgentMapper importAgentMapper;
@@ -72,6 +77,8 @@ public class AimportServiceImpl implements AimportService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private CapitalMapper capitalMapper;
+    @Autowired
+    private DPosRegionMapper dPosRegionMapper;
 
 
 
@@ -549,6 +556,8 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setCloReceipt(busItem.getCloReceipt());
                             db_agentBusInfo.setCloPayCompany(busItem.getCloPayCompany());
                             db_agentBusInfo.setAgZbh(busItem.getAgZbh());
+                            db_agentBusInfo.setBusRegion(busItem.getBusRegion());
+                            db_agentBusInfo.setBusScope(busItem.getBusScope());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             break;
                         }
@@ -966,6 +975,26 @@ public class AimportServiceImpl implements AimportService {
             ab.setCloInvoice(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(19))));
             if(bus_json_array.size()>20 && StringUtils.isNotBlank(bus_json_array.getString(20)))
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
+
+
+            //业务区域
+            if(bus_json_array.size()>6 && StringUtils.isNotBlank(bus_json_array.getString(6))){
+               String busregion =  bus_json_array.getString(6);
+                String codeName[] = busregion.split(",");
+                DPosRegionExample example = new DPosRegionExample();
+                example.or().andNameIn(Arrays.asList(codeName));
+                List<DPosRegion> regions =  dPosRegionMapper.selectByExample(example);
+                StringBuffer sb = new StringBuffer();
+                for (int i = 0; i < regions.size(); i++) {
+                    sb.append(regions.get(i).getCode()).append( (i==regions.size()-1)?"":"," );
+                }
+                ab.setBusRegion(sb.toString());
+            }
+
+            //业务范围
+            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28))){
+                ab.setBusScope(BUS_SCOP.get(bus_json_array.getString(28)));
+            }
 
             //打款公司
             if(bus_json_array.size()>21 && StringUtils.isNotBlank(bus_json_array.getString(21)))
