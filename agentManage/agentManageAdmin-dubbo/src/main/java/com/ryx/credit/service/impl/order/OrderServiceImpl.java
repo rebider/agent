@@ -2578,7 +2578,7 @@ public class OrderServiceImpl implements OrderService {
     public AgentResult queryPaymentXXDK(String agentId){
         AgentResult result = new AgentResult(500,"参数错误","");
         Map<String,Object> params = new HashMap<>();
-        params.put("agentId","AG20180709000000000000505");
+        params.put("agentId",agentId);
         params.put("reviewStatus",AgStatus.Approved.getValue());
         params.put("payMethod",SettlementType.XXDK.code);
         List<Map<String,Object>> resultListMap = oPaymentMapper.queryPaymentXXDK(params);
