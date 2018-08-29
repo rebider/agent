@@ -473,7 +473,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     Map req_data =  platformSynService.agencyLevelUpdateChangeData(
                             FastMap.fastSuccessMap()
                             .putKeyV("agentBusinfoId",agentBusInfo.getId())
-                            .putKeyV("processingId",importAgent.getBatchcode()));
+                            .putKeyV("processingId",importAgent.getBatchcode()));//存储审批流ID
 
                     log.info("升级开户接口{}平台编号不为空走升级接口,请求参数{},审批流{}",agentBusInfo.getBusNum(),req_data,importAgent.getBatchcode());
                     try {
@@ -541,7 +541,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         }
 
                         //执行修改操作
-                        notifyPlatformUpadteByBusId(agentBusInfo.getId(),impId);
+                        notifyPlatformUpadteByBusId(agentBusInfo.getId(),agentBusInfo.getcUser());
 
                     }else{
 
