@@ -78,8 +78,7 @@ public class RefundJob {
 
 
 
-//    @Scheduled(cron = "0 0 12 * * ?")
-    @Transactional
+    @Scheduled(cron = "0 0 12 * * ?")
     public void deal() {
         // 上月的开始及结束日期
         JSONObject param = new JSONObject();

@@ -21,6 +21,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +71,7 @@ public class NewProfitDataJob {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
 
 
-//    @Scheduled(cron = "0 0 11 10 * ?")
+    @Scheduled(cron = "0 0 11 10 * ?")
     public void deal() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+profitDate);
@@ -116,7 +117,7 @@ public class NewProfitDataJob {
     */
     private void insertTransProfitDetail( Map<String, Object> agentMap, JSONObject profitData, String settleMonth) {
         TransProfitDetail transProfitDetail = new TransProfitDetail();
-        transProfitDetail.setAgentId((String)agentMap.get("AG_UNIQ_NUM"));
+        transProfitDetail.setAgentId((String)agentMap.get("AGENT_ID"));
         transProfitDetail.setBusNum(profitData.getString("ORG_ID"));
         transProfitDetail.setAgentName((String)agentMap.get("AG_NAME"));
         transProfitDetail.setParentAgentId((String)agentMap.get("parentAgentPid"));
@@ -181,7 +182,7 @@ public class NewProfitDataJob {
         profitDetailMonthTemp.setPayProfitAmt(transProfitDetail.getOutProfitAmt());
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
         profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
-        profitDetailMonthTemp.setStatus("3");
+        profitDetailMonthTemp.setStatus("4");
         // 获取账户信息
         List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService(transProfitDetail.getAgentId(), null,AgStatus.Approved.status);
 
@@ -189,9 +190,10 @@ public class NewProfitDataJob {
             AgentColinfo agentColinfo = agentColinfos.get(0);
             profitDetailMonthTemp.setAccountId(agentColinfo.getCloBankAccount());
             profitDetailMonthTemp.setAccountName(agentColinfo.getCloRealname());
-            profitDetailMonthTemp.setOpenBankName(agentColinfo.getCloBankBranch());
+            profitDetailMonthTemp.setOpenBankName(agentColinfo.getCloBank());
             profitDetailMonthTemp.setBankCode(agentColinfo.getBranchLineNum());
             profitDetailMonthTemp.setTax(agentColinfo.getCloTaxPoint());
+            profitDetailMonthTemp.setPayStatus(agentColinfo.getCloType().toString());
         }
 
         profitDetailMonthServiceImpl.insert(profitDetailMonthTemp);
