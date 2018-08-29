@@ -23,8 +23,8 @@ public class ProfitMonthServiceImplTest {
     ProfitMonthService profitMonthService;
 
     @Test
-    public void testCompute() throws Exception {
-        profitMonthService.computeProfitAmt();
+    public void testPayMoney() throws Exception {
+        profitMonthService.payMoney();
     }
 
 }
