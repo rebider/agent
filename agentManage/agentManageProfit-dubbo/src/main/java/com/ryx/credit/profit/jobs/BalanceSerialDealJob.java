@@ -67,7 +67,7 @@ public class BalanceSerialDealJob {
     private void updateBalanceSerail(JSONArray array) {
         array.forEach(json->{
                  ProfitBalanceSerial serial = new ProfitBalanceSerial();
-                 serial.setBalanceId( ((JSONObject)json).getString("balanceLs"));
+                 serial.setBalanceId( ((JSONObject)json).getString("id"));
                 serial = profitBalanceSerialServiceImpl.getProfitBalanceSerialById(serial.getBalanceId());
                 if (serial != null) {
                     serial.setStatus("1");//出款失败
