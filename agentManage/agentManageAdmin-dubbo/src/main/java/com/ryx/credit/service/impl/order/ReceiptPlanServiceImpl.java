@@ -48,7 +48,7 @@ public class ReceiptPlanServiceImpl implements ReceiptPlanService {
 
     @Override
     public PageInfo getReceiptPlanList(Map<String, Object> param, PageInfo pageInfo) {
-        param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
+//        param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         List<Map<String, Object>> list = receiptPlanMapper.getReceipPlanList(param);
         for (Map<String, Object> maps : list) {
