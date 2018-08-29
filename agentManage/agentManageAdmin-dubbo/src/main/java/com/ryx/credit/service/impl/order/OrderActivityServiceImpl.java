@@ -148,34 +148,34 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     public List<OActivity> productActivity(String product, String angetId) {
         //TODO 检查代理商销售额
 //        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
-        BigDecimal transAmt = new BigDecimal(800000000);
+//        BigDecimal transAmt = new BigDecimal(800000000);
         OProduct productObj = oProductMapper.selectByPrimaryKey(product);
         OActivityExample example = new OActivityExample();
         example.or().andProductIdEqualTo(productObj.getId())
                 .andBeginTimeLessThanOrEqualTo(new Date())
                 .andEndTimeGreaterThanOrEqualTo(new Date());
         List<OActivity> activitys = activityMapper.selectByExample(example);
-        List<OActivity> newActivitys = new ArrayList<>();
-        for (OActivity activity : activitys) {
-            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
-            if(activity.getActivityCondition().equals(">")){
-                if(transAmt.compareTo(activityRule) > 0) {
-                    newActivitys.add(activity);
-                }
-            }else if(activity.getActivityCondition().equals(">=")){
-                if(transAmt.compareTo(activityRule) >= 0) {
-                    newActivitys.add(activity);
-                }
-            }else if(activity.getActivityCondition().equals("<=")){
-                if(transAmt.compareTo(activityRule) <= 0) {
-                    newActivitys.add(activity);
-                }
-            }else if(activity.getActivityCondition().equals("<")){
-                if(transAmt.compareTo(activityRule) < 0) {
-                    newActivitys.add(activity);
-                }
-            }
-        }
-        return newActivitys;
+//        List<OActivity> newActivitys = new ArrayList<>();
+//        for (OActivity activity : activitys) {
+//            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
+//            if(activity.getActivityCondition().equals(">")){
+//                if(transAmt.compareTo(activityRule) > 0) {
+//                    newActivitys.add(activity);
+//                }
+//            }else if(activity.getActivityCondition().equals(">=")){
+//                if(transAmt.compareTo(activityRule) >= 0) {
+//                    newActivitys.add(activity);
+//                }
+//            }else if(activity.getActivityCondition().equals("<=")){
+//                if(transAmt.compareTo(activityRule) <= 0) {
+//                    newActivitys.add(activity);
+//                }
+//            }else if(activity.getActivityCondition().equals("<")){
+//                if(transAmt.compareTo(activityRule) < 0) {
+//                    newActivitys.add(activity);
+//                }
+//            }
+//        }
+        return activitys;
     }
 }

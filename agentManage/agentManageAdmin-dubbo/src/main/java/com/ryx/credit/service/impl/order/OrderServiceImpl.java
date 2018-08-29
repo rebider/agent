@@ -91,6 +91,8 @@ public class OrderServiceImpl implements OrderService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     /**
      * 根据ID查询订单
@@ -2576,7 +2578,7 @@ public class OrderServiceImpl implements OrderService {
     public AgentResult queryPaymentXXDK(String agentId){
         AgentResult result = new AgentResult(500,"参数错误","");
         Map<String,Object> params = new HashMap<>();
-        params.put("agentId",agentId);
+        params.put("agentId","AG20180709000000000000505");
         params.put("reviewStatus",AgStatus.Approved.getValue());
         params.put("payMethod",SettlementType.XXDK.code);
         List<Map<String,Object>> resultListMap = oPaymentMapper.queryPaymentXXDK(params);
@@ -2587,6 +2589,18 @@ public class OrderServiceImpl implements OrderService {
         if(resultListMap.size()==0){
             result.setMsg("暂无数据");
             return result;
+        }
+        for (Map<String, Object> stringObjectMap : resultListMap) {
+            String busId = String.valueOf(stringObjectMap.get("BUS_ID"));
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+            stringObjectMap.put("BUS_NUM",agentBusInfo.getBusNum());
+            if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+                AgentBusInfo agentBusInfoParet = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                stringObjectMap.put("PARENT_BUS_NUM",agentBusInfoParet.getBusNum());
+            }else{
+                stringObjectMap.put("PARENT_BUS_NUM","");
+            }
+            stringObjectMap.remove("BUS_ID");
         }
         result.setStatus(200);
         result.setMsg("查询成功");
