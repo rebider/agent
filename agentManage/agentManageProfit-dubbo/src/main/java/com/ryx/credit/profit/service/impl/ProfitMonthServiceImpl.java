@@ -74,14 +74,23 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitBalanceSerialService profitBalanceSerialServiceImpl;
 
 
+//分润展示
     @Override
-    public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
+   /* public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
         if(page != null){
             profitMonthExample.setPage(page);
         }
         return profitMonthMapper.selectByExample(profitMonthExample);
+    }*/
+    public List<ProfitDetailMonth> getProfitMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
+        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
+        if(page != null){
+            profitDetailMonthExample.setPage(page);
+        }
+        return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
     }
+
 
     private ProfitMonthExample profitMonthEqualsTo(ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample = new ProfitMonthExample();
@@ -111,13 +120,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
         return profitMonthExample;
     }
-
-    @Override
+//分润展示
+    /*@Override
     public int getProfitMonthCount(ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
         return profitMonthMapper.countByExample(profitMonthExample);
+    }*/
+    public int getProfitMonthCount(ProfitDetailMonth profitDetailMonth) {
+        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
+        return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
     }
-
+//月分润
     @Override
     public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
@@ -162,7 +175,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
         return profitDetailMonthExample;
     }
-
+//月分润
     @Override
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
@@ -197,9 +210,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public void updateProfitMonth(ProfitMonth profitMonth) {
+    public void updateProfitMonth(ProfitDetailMonth profitMonth) {
         if(profitMonth != null){
-            profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+            profitDetailMonthMapper.updateByPrimaryKeySelective(profitMonth);
         }
     }
 
@@ -211,13 +224,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public ProfitMonth selectByPrimaryKey(String id) {
-        return profitMonthMapper.selectByPrimaryKey(id);
+    public ProfitDetailMonth selectByPrimaryKey(String id) {
+        return profitDetailMonthMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public int updateByPrimaryKeySelective(ProfitMonth record) {
-        return profitMonthMapper.updateByPrimaryKeySelective(record);
+    public int updateByPrimaryKeySelective(ProfitDetailMonth record) {
+        return profitDetailMonthMapper.updateByPrimaryKeySelective(record);
     }
 
     @Override

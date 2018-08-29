@@ -102,6 +102,8 @@ public class OPayment implements Serializable{
 
     private BigDecimal profitTaxAmt;
 
+    private String downPaymentUser;
+
     public String getId() {
         return id;
     }
@@ -332,5 +334,13 @@ public class OPayment implements Serializable{
 
     public void setProfitTaxAmt(BigDecimal profitTaxAmt) {
         this.profitTaxAmt = profitTaxAmt;
+    }
+
+    public String getDownPaymentUser() {
+        return downPaymentUser;
+    }
+
+    public void setDownPaymentUser(String downPaymentUser) {
+        this.downPaymentUser = downPaymentUser == null ? null : downPaymentUser.trim();
     }
 }

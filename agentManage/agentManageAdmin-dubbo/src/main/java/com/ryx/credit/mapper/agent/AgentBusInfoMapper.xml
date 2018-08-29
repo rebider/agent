@@ -638,7 +638,7 @@
   <select id="queryTreeByBusInfo" parameterType="map" resultType="map">
     select
     A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
-    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'（机构编码:'||A.BUS_NUM||')') as FIELDSHOW
     from
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id

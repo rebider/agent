@@ -422,6 +422,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateBusInfo.setId(agentBusInfo.getId());
                 if(agentBusInfo.getBusNum()!=null){
                     updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
                     log.info("已有编号进行入网修改：更新orgId到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
                 }else{
                     log.info("已有编号进行入网修改：更新orgId到库,已存在不更新到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
@@ -473,7 +474,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     Map req_data =  platformSynService.agencyLevelUpdateChangeData(
                             FastMap.fastSuccessMap()
                             .putKeyV("agentBusinfoId",agentBusInfo.getId())
-                            .putKeyV("processingId",importAgent.getBatchcode()));
+                            .putKeyV("processingId",importAgent.getBatchcode()));//存储审批流ID
 
                     log.info("升级开户接口{}平台编号不为空走升级接口,请求参数{},审批流{}",agentBusInfo.getBusNum(),req_data,importAgent.getBatchcode());
                     try {
@@ -541,7 +542,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         }
 
                         //执行修改操作
-                        notifyPlatformUpadteByBusId(agentBusInfo.getId(),impId);
+                        notifyPlatformUpadteByBusId(agentBusInfo.getId(),agentBusInfo.getcUser());
 
                     }else{
 
@@ -695,6 +696,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             updateBusInfo.setVersion(agentBusInfo.getVersion());
             updateBusInfo.setId(agentBusInfo.getId());
             updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+            updateBusInfo.setBusStatus(Status.STATUS_1.status);
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
             if(upResult1!=1 || upResult2!=1){

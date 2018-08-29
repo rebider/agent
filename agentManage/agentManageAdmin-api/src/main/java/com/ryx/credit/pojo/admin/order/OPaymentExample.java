@@ -1987,6 +1987,76 @@ public class OPaymentExample {
             addCriterion("PROFIT_TAX_AMT not between", value1, value2, "profitTaxAmt");
             return (Criteria) this;
         }
+
+        public Criteria andDownPaymentUserIsNull() {
+            addCriterion("DOWN_PAYMENT_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserIsNotNull() {
+            addCriterion("DOWN_PAYMENT_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER =", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER <>", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserGreaterThan(String value) {
+            addCriterion("DOWN_PAYMENT_USER >", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserGreaterThanOrEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER >=", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserLessThan(String value) {
+            addCriterion("DOWN_PAYMENT_USER <", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserLessThanOrEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER <=", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserLike(String value) {
+            addCriterion("DOWN_PAYMENT_USER like", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotLike(String value) {
+            addCriterion("DOWN_PAYMENT_USER not like", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserIn(List<String> values) {
+            addCriterion("DOWN_PAYMENT_USER in", values, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotIn(List<String> values) {
+            addCriterion("DOWN_PAYMENT_USER not in", values, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserBetween(String value1, String value2) {
+            addCriterion("DOWN_PAYMENT_USER between", value1, value2, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotBetween(String value1, String value2) {
+            addCriterion("DOWN_PAYMENT_USER not between", value1, value2, "downPaymentUser");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

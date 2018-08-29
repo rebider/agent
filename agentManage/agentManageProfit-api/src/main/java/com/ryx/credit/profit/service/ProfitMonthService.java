@@ -22,15 +22,15 @@ public interface ProfitMonthService {
      * @param profitMonth
      * @return
      */
-    public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth);
-
+   // public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth);
+    public List<ProfitDetailMonth> getProfitMonthList(Page page, ProfitDetailMonth ProfitDetailMonth);
     /**
      * 获取月分润总条数
      * @param profitMonth
      * @return
      */
-    public int getProfitMonthCount(ProfitMonth profitMonth);
-
+    //public int getProfitMonthCount(ProfitMonth profitMonth);
+    public int getProfitMonthCount(ProfitDetailMonth profitDetailMonth);
     /**
      * 查询月分润明细
      * @param page
@@ -72,7 +72,7 @@ public interface ProfitMonthService {
      * 修改月分润数据
      * @param profitMonth
      */
-    public void updateProfitMonth(ProfitMonth profitMonth);
+    public void updateProfitMonth(ProfitDetailMonth profitMonth);
 
     /**
      * 新增月分润数据
@@ -86,14 +86,14 @@ public interface ProfitMonthService {
      * @param id
      * @return
      */
-    ProfitMonth selectByPrimaryKey(String id);
+    ProfitDetailMonth selectByPrimaryKey(String id);
 
     /**
      *更新
      * @param record
      * @return
      */
-    int updateByPrimaryKeySelective(ProfitMonth record);
+    int updateByPrimaryKeySelective(ProfitDetailMonth record);
 
     /**
      * 新增解冻记录
