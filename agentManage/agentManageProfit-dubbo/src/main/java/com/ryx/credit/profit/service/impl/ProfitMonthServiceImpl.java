@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -68,6 +69,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Autowired
     private TransProfitDetailService transProfitDetailService;
+
+    @Autowired
+    private ProfitBalanceSerialService profitBalanceSerialServiceImpl;
 
 
     @Override
@@ -403,10 +407,46 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
     }
 
+
     @Override
     public void payMoney() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.payMoney(profitDate);
+
+        ProfitDetailMonth detailMonth = new ProfitDetailMonth();
+        detailMonth.setStatus("5");
+        detailMonth.setProfitDate(profitDate);
+        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, detailMonth);
+        if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
+            String paytDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+            profitDetailMonthList.forEach(profitDetailMonth -> {
+                insertBalaceSerial(profitDetailMonth, paytDate);
+            });
+        }
+
+    }
+
+    /***
+    * @Description: 插入出款流水表
+    * @Author: zhaodw
+    * @Date: 2018/8/29
+    */
+    private void insertBalaceSerial(ProfitDetailMonth profitDetailMonth, String paytDate) {
+        ProfitBalanceSerial profitBalanceSerial = new ProfitBalanceSerial();
+        profitBalanceSerial.setBalanceId(idService.genId(TabId.PBSL));
+        profitBalanceSerial.setPayDate(paytDate);
+        profitBalanceSerial.setProfitAmt(profitDetailMonth.getRealProfitAmt());
+        profitBalanceSerial.setCardNo(profitDetailMonth.getAccountId());
+        profitBalanceSerial.setAccountName(profitDetailMonth.getAccountName());
+        profitBalanceSerial.setChildBankCode(profitDetailMonth.getBankCode());
+        profitBalanceSerial.setChildBankName(profitDetailMonth.getOpenBankName());
+        profitBalanceSerial.setBalanceRcvType("1".equals(profitDetailMonth.getPayStatus())?"2":"0");
+        profitBalanceSerial.setAgentId(profitDetailMonth.getAgentId());
+        profitBalanceSerial.setParentAgentId(profitDetailMonth.getParentAgentId());
+        profitBalanceSerial.setProfitId(profitDetailMonth.getId());
+        profitBalanceSerial.setInputTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        profitBalanceSerial.setStatus("0");//默认出款成功
+        profitBalanceSerialServiceImpl.insert(profitBalanceSerial);
     }
 
     /***
