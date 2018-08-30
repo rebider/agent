@@ -126,6 +126,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
         return profitMonthMapper.countByExample(profitMonthExample);
     }*/
+    @Override
     public int getProfitMonthCount(ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
         return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
@@ -337,7 +338,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     profitUnfreeze.setFreezeStatus(thawStatus);
                     profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
                     //解冻下级所有代理商
-                    directMapper.updateFristAgentStatus(profitUnfreeze.getAgentPid());
+                    directMapper.updateFristAgentStatus(profitUnfreeze.getAgentId());
                     LOG.info("3更新审批流与业务对象");
                     taskApprovalService.updateABusActRel(rel);
                 }
