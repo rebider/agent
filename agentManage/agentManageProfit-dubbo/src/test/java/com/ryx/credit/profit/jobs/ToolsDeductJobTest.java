@@ -1,6 +1,9 @@
 package com.ryx.credit.profit.jobs;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.profit.dao.PosRewardTemplateMapper;
+import com.ryx.credit.profit.pojo.PosRewardTemplate;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.impl.PosProfitComputeServiceImpl;
@@ -8,6 +11,7 @@ import com.ryx.credit.profit.service.impl.ProfitToolsDeductServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -32,6 +36,10 @@ public class ToolsDeductJobTest {
     PosProfitComputeServiceImpl posProfitComputeServiceImpl;
     @Autowired
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
+    @Autowired
+    protected RedisTemplate<String, String> redisTemplate;
+    @Autowired
+    private PosRewardTemplateMapper posRewardTemplateMapper;
 
     @Test
     public void execut() throws Exception {
@@ -110,5 +118,21 @@ public class ToolsDeductJobTest {
             listadd.add(map);
         });
         System.out.println("+====="+ JSONObject.toJSONString(listadd));
+    }
+
+    @Test
+    public void redisTest(){
+        List<PosRewardTemplate> posRewardTemplates = posRewardTemplateMapper.selectByExample(null);
+        redisTemplate.opsForValue().set("POS_REWARD_TEMP", JSONObject.toJSONString(null));
+        String list = redisTemplate.opsForValue().get("POS_REWARD_TEMP");
+        System.out.println(list);
+        List json = JSONObject.parseObject(list, List.class);
+        if(json != null && !json.isEmpty()){
+            json.forEach(lists -> {
+                JSON sss=(JSON) JSONObject.parse(lists.toString());
+                PosRewardTemplate posRewardTemplate = JSONObject.toJavaObject(sss, PosRewardTemplate.class);
+                System.out.println(posRewardTemplate.getId());
+            });
+        }
     }
 }
