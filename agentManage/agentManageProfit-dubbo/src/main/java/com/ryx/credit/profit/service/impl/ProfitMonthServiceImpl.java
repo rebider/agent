@@ -449,18 +449,20 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitBalanceSerial.setBalanceId(idService.genId(TabId.PBSL));
         profitBalanceSerial.setPayDate(paytDate);
         profitBalanceSerial.setProfitAmt(profitDetailMonth.getRealProfitAmt());
-        profitBalanceSerial.setCardNo(profitDetailMonth.getAccountId());
-        profitBalanceSerial.setAccountName(profitDetailMonth.getAccountName());
-        profitBalanceSerial.setChildBankCode(profitDetailMonth.getBankCode());
-        profitBalanceSerial.setChildBankName(profitDetailMonth.getOpenBankName());
+        profitBalanceSerial.setCardNo(profitDetailMonth.getAccountId());//卡号
+        profitBalanceSerial.setAccountName(profitDetailMonth.getAccountName());//户名
+        profitBalanceSerial.setChildBankCode(profitDetailMonth.getBankCode());//支行号
+        profitBalanceSerial.setChildBankName(profitDetailMonth.getOpenBankName());//支行名
         profitBalanceSerial.setBalanceRcvType("1".equals(profitDetailMonth.getPayStatus())?"2":"0");
         profitBalanceSerial.setAgentId(profitDetailMonth.getAgentId());
         profitBalanceSerial.setParentAgentId(profitDetailMonth.getParentAgentId());
         profitBalanceSerial.setProfitId(profitDetailMonth.getId());
         profitBalanceSerial.setInputTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
         profitBalanceSerial.setStatus("0");//默认出款成功
+        profitBalanceSerial.setPayCompany(profitDetailMonth.getPayCompany());//打款公司
         profitBalanceSerialServiceImpl.insert(profitBalanceSerial);
     }
+
 
     /***
     /***
