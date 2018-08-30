@@ -2577,6 +2577,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public AgentResult queryPaymentXXDK(String agentId){
         AgentResult result = new AgentResult(500,"参数错误","");
+        if(StringUtils.isBlank(agentId)){
+            return result;
+        }
         Map<String,Object> params = new HashMap<>();
         params.put("agentId",agentId);
         params.put("reviewStatus",AgStatus.Approved.getValue());
