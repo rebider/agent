@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgImportType;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -15,8 +12,12 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.bank.PosRegionService;
+import com.ryx.credit.service.dict.DictOptionsService;
+import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -61,6 +63,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AimportService aimportService;
     @Autowired
     private AgentNotifyService agentNotifyService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private PosRegionService posRegionService;
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private RegionService regionService;
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
 
@@ -329,6 +339,91 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             agentNotifyService.asynNotifyPlatform();
         }
         return i;
+    }
+
+    @Override
+    public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
+        map.put("agStatus", AgStatus.Approved.name());
+        map.put("status", Status.STATUS_1.status);
+        List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
+        if (null != agentoutVos && agentoutVos.size() > 0)
+            for (BusinessOutVo agentoutVo : agentoutVos) {
+                if (null != agentoutVo.getBusType()) {
+                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
+                    if (null != value)
+                        agentoutVo.setBusType(value.getdItemname());
+                }
+                if (null != agentoutVo.getBusIndeAss()) {
+                    if (agentoutVo.getBusIndeAss().equals("1")) {
+                        agentoutVo.setBusIndeAss("是");
+                    } else
+                        agentoutVo.setBusIndeAss("否");
+                }
+                if (null != agentoutVo.getBusPlatform()) {
+                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
+                    if (null != platForm)
+                        agentoutVo.setBusPlatform(platForm.getPlatformName());
+                }
+                if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
+
+
+                    List<DPosRegion> regions = posRegionService.queryByCodes(agentoutVo.getBusRegion());
+                    if (null!=regions  && regions.size()>0){
+                        String deptNameRel="";
+                        for (DPosRegion region : regions) {
+                            String name = region.getName();
+                            String sign=",";
+                            String deptName=name+sign;
+                             deptNameRel += deptName;
+                        }
+                        agentoutVo.setBusRegion(deptNameRel);
+                    }
+                }
+
+
+
+
+
+             /*   if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
+
+                    String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
+                    if (StringUtils.isNotBlank(regionName))
+                        agentoutVo.setBusRegion(regionName);
+                }*/
+
+                if (null != agentoutVo.getBusScope()) {
+                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
+                    if (null != value)
+                        agentoutVo.setBusScope(value.getdItemname());
+                }
+                if (null != agentoutVo.getBusParent()) {
+                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusParent());
+                    if (null != agentBusInfo) {
+                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                        if (null != agentById)
+                            agentoutVo.setBusParent(agentById.getAgName());
+                    }
+                }
+                if (null != agentoutVo.getBusRiskParent()) {
+                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
+                    if (null != agentBusInfo) {
+                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                        if (null != agentById)
+                            agentoutVo.setBusRiskParent(agentById.getAgName());
+                    }
+
+                }
+                if (null != agentoutVo.getBusActivationParent()) {
+                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
+                    if (null != agentBusInfo) {
+                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
+                        if (null != agentById)
+                            agentoutVo.setBusActivationParent(agentById.getAgName());
+                    }
+
+                }
+            }
+        return agentoutVos;
     }
 
 }

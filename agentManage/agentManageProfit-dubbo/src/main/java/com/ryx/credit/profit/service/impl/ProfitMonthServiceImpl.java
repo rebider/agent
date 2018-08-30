@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -69,15 +70,27 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Autowired
     private TransProfitDetailService transProfitDetailService;
 
+    @Autowired
+    private ProfitBalanceSerialService profitBalanceSerialServiceImpl;
 
+
+//分润展示
     @Override
-    public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
+   /* public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
         if(page != null){
             profitMonthExample.setPage(page);
         }
         return profitMonthMapper.selectByExample(profitMonthExample);
+    }*/
+    public List<ProfitDetailMonth> getProfitMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
+        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
+        if(page != null){
+            profitDetailMonthExample.setPage(page);
+        }
+        return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
     }
+
 
     private ProfitMonthExample profitMonthEqualsTo(ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample = new ProfitMonthExample();
@@ -107,13 +120,18 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
         return profitMonthExample;
     }
-
-    @Override
+//分润展示
+    /*@Override
     public int getProfitMonthCount(ProfitMonth profitMonth) {
         ProfitMonthExample profitMonthExample= this.profitMonthEqualsTo(profitMonth);
         return profitMonthMapper.countByExample(profitMonthExample);
+    }*/
+    @Override
+    public int getProfitMonthCount(ProfitDetailMonth profitDetailMonth) {
+        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
+        return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
     }
-
+//月分润
     @Override
     public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
@@ -158,7 +176,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
         return profitDetailMonthExample;
     }
-
+//月分润
     @Override
     public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
@@ -193,9 +211,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public void updateProfitMonth(ProfitMonth profitMonth) {
+    public void updateProfitMonth(ProfitDetailMonth profitMonth) {
         if(profitMonth != null){
-            profitMonthMapper.updateByPrimaryKeySelective(profitMonth);
+            profitDetailMonthMapper.updateByPrimaryKeySelective(profitMonth);
         }
     }
 
@@ -207,13 +225,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public ProfitMonth selectByPrimaryKey(String id) {
-        return profitMonthMapper.selectByPrimaryKey(id);
+    public ProfitDetailMonth selectByPrimaryKey(String id) {
+        return profitDetailMonthMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    public int updateByPrimaryKeySelective(ProfitMonth record) {
-        return profitMonthMapper.updateByPrimaryKeySelective(record);
+    public int updateByPrimaryKeySelective(ProfitDetailMonth record) {
+        return profitDetailMonthMapper.updateByPrimaryKeySelective(record);
     }
 
     @Override
@@ -320,7 +338,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     profitUnfreeze.setFreezeStatus(thawStatus);
                     profitUnfreezeMapper.updateByPrimaryKeySelective(profitUnfreeze);
                     //解冻下级所有代理商
-                    directMapper.updateFristAgentStatus(profitUnfreeze.getAgentPid());
+                    directMapper.updateFristAgentStatus(profitUnfreeze.getAgentId());
                     LOG.info("3更新审批流与业务对象");
                     taskApprovalService.updateABusActRel(rel);
                 }
@@ -403,11 +421,50 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
     }
 
+
     @Override
     public void payMoney() {
+
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        ProfitDetailMonth detailMonth = new ProfitDetailMonth();
+        detailMonth.setStatus("4");
+        detailMonth.setProfitDate(profitDate);
+        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, detailMonth);
+        if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
+            String paytDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+            profitDetailMonthList.forEach(profitDetailMonth -> {
+                insertBalaceSerial(profitDetailMonth, paytDate);
+            });
+        }
+
         profitDetailMonthMapper.payMoney(profitDate);
+
     }
+
+    /***
+    * @Description: 插入出款流水表
+    * @Author: zhaodw
+    * @Date: 2018/8/29
+    */
+    private void insertBalaceSerial(ProfitDetailMonth profitDetailMonth, String paytDate) {
+        ProfitBalanceSerial profitBalanceSerial = new ProfitBalanceSerial();
+        profitBalanceSerial.setBalanceId(idService.genId(TabId.PBSL));
+        profitBalanceSerial.setPayDate(paytDate);
+        profitBalanceSerial.setProfitAmt(profitDetailMonth.getRealProfitAmt());
+        profitBalanceSerial.setCardNo(profitDetailMonth.getAccountId());//卡号
+        profitBalanceSerial.setAccountName(profitDetailMonth.getAccountName());//户名
+        profitBalanceSerial.setChildBankCode(profitDetailMonth.getBankCode());//支行号
+        profitBalanceSerial.setChildBankName(profitDetailMonth.getOpenBankName());//支行名
+        profitBalanceSerial.setBalanceRcvType("1".equals(profitDetailMonth.getPayStatus())?"2":"0");
+        profitBalanceSerial.setAgentId(profitDetailMonth.getAgentId());
+        profitBalanceSerial.setParentAgentId(profitDetailMonth.getParentAgentId());
+        profitBalanceSerial.setProfitId(profitDetailMonth.getId());
+        profitBalanceSerial.setInputTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        profitBalanceSerial.setStatus("0");//默认出款成功
+        profitBalanceSerial.setPayCompany(profitDetailMonth.getPayCompany());//打款公司
+        profitBalanceSerialServiceImpl.insert(profitBalanceSerial);
+    }
+
 
     /***
     /***
