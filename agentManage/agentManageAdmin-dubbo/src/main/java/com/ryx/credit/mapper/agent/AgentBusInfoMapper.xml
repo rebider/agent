@@ -654,5 +654,59 @@
   </select>
 
 
+  <select id="excelAgent" parameterType="map" resultMap="BusinessOutVo">
+    select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
+    agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_parent
+    ,bus.bus_risk_parent,bus.bus_activation_parent,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email
+    from A_AGENT agent left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    <where>
+      1=1   and agent.ag_status = #{reqMap.agStatus}
+      <if test="reqMap.agName != null and reqMap.agName != '' " >
+        and agent.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+      </if>
+      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+        and agent.ag_uniq_num = #{reqMap.agUniqNum}
+      </if>
+      <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+        and bus.bus_num = #{reqMap.busNum}
+      </if>
+      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+        and bus.bus_platform = #{reqMap.busPlatform}
+      </if>
+      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+        and bus.clo_review_status = #{reqMap.cloReviewStatus}
+      </if>
+      <if test="reqMap.id != null and reqMap.id != '' " >
+        and bus.id = #{reqMap.id}
+      </if>
+      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
+        and bus.C_USER = #{reqMap.cUser}
+      </if>
+
+    </where>
+    and bus.status = #{reqMap.status}
+    order by agent.c_utime desc
+  </select>
+  <resultMap id="BusinessOutVo" type="com.ryx.credit.pojo.admin.vo.BusinessOutVo">
+    <id column="ID" property="id" jdbcType="VARCHAR"/>
+    <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR"/>
+    <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+    <result column="AG_HEAD" property="agHead" jdbcType="VARCHAR"/>
+    <result column="AG_HEAD_MOBILE" property="agHeadMobile" jdbcType="VARCHAR"/>
+    <result column="AG_REG_ADD" property="agRegAdd" jdbcType="VARCHAR"/>
+
+    <result column="BUS_NUM" property="busNum" jdbcType="VARCHAR"/>
+    <result column="BUS_PLATFORM" property="busPlatform" jdbcType="VARCHAR"/>
+    <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR"/>
+    <result column="BUS_PARENT" property="busParent" jdbcType="VARCHAR"/>
+    <result column="BUS_RISK_PARENT" property="busRiskParent" jdbcType="VARCHAR"/>
+    <result column="BUS_ACTIVATION_PARENT" property="busActivationParent" jdbcType="VARCHAR"/>
+    <result column="BUS_REGION" property="busRegion" jdbcType="VARCHAR"/>
+    <result column="BUS_INDE_ASS" property="busIndeAss" jdbcType="VARCHAR"/>
+    <result column="BUS_RISK_EMAIL" property="busRiskEmail" jdbcType="VARCHAR"/>
+    <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR"/>
+  </resultMap>
 
 </mapper>
