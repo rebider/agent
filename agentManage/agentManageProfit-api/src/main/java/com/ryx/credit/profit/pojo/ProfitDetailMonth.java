@@ -133,6 +133,9 @@ public class ProfitDetailMonth implements Serializable{
 
     private BigDecimal unlineAmt;
 
+    //打款公司
+    private String payCompany;
+
     public BigDecimal getUnlineAmt() {
         return unlineAmt;
     }
@@ -640,5 +643,13 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setProfitDateEnd(String profitDateEnd) {
         this.profitDateEnd = profitDateEnd;
+    }
+
+    public String getPayCompany() {
+        return payCompany;
+    }
+
+    public void setPayCompany(String payCompany) {
+        this.payCompany = payCompany;
     }
 }
