@@ -424,11 +424,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public void payMoney() {
-        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
-        profitDetailMonthMapper.payMoney(profitDate);
 
+        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitDetailMonth detailMonth = new ProfitDetailMonth();
-        detailMonth.setStatus("5");
+        detailMonth.setStatus("4");
         detailMonth.setProfitDate(profitDate);
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, detailMonth);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
@@ -437,6 +436,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 insertBalaceSerial(profitDetailMonth, paytDate);
             });
         }
+
+        profitDetailMonthMapper.payMoney(profitDate);
 
     }
 
