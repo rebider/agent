@@ -363,7 +363,7 @@
   <sql id="BASE_WHERE_SQL">
     <where>
       <trim prefixOverrides="and">
-        R.PLAN_ORDER_STATUS = #{planOrderStatus}
+        <if test="planOrderStatus != null and planOrderStatus !=''">AND R.PLAN_ORDER_STATUS = #{planOrderStatus}</if>
         <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
         <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
         <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS}</if>
