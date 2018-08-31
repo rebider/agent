@@ -65,6 +65,7 @@
     <result column="PARENT_AGENT_ID" property="parentAgentId" jdbcType="VARCHAR" />
     <result column="STATUS" property="status" jdbcType="VARCHAR" />
     <result column="UNLINE_AMT" property="unlineAmt" jdbcType="DECIMAL" />
+    <result column="PAY_COMPANY" property="payCompany" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -107,7 +108,7 @@
     POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT, 
     REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL, 
     BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
-    BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT
+    BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT,PAY_COMPANY
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
     <include refid="OracleDialectPrefix" />
@@ -221,7 +222,7 @@
       ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, 
       EMAIL, BANK_CODE, PAY_STATUS, 
       REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
-      BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT)
+      BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, 
       #{tranAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR}, 
@@ -243,7 +244,7 @@
       #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR}, 
       #{remark,jdbcType=VARCHAR}, #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL}, #{tax,jdbcType=DECIMAL},
       #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL}, #{basicsProfitAmt,jdbcType=DECIMAL},
-      #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL})
+      #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL}, #{payCompany,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     insert into P_PROFIT_DETAIL_M
@@ -433,6 +434,9 @@
       <if test="unlineAmt != null" >
         UNLINE_AMT,
       </if>
+      <if test="payCompany != null" >
+        PAY_COMPANY,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -617,6 +621,9 @@
       </if>
       <if test="unlineAmt != null" >
         #{unlineAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payCompany != null" >
+        #{payCompany,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -812,6 +819,9 @@
       <if test="unlineAmt != null" >
         UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
       </if>
+      <if test="payCompany != null" >
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -876,7 +886,8 @@
       BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
       PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=VARCHAR},
-      UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL}
+      UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
@@ -889,4 +900,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <!-- 获取大区代理商-->
+  <select id="getDistrictAgent" parameterType="String" resultType="java.lang.String">
+   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID WHERE COR.ID =#{id}
+  </select>
+
+  <!-- 获取省区代理商-->
+  <select id="getProAgent" parameterType="String" resultType="java.lang.String">
+   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID WHERE COR.ID =#{id}
+  </select>
 </mapper>

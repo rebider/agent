@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitBalanceSerial implements Serializable {
-    private static final long serialVersionUID = 8539587444657449964L;
+    private static final long serialVersionUID = 2838846502491505565L;
     private String balanceId;
 
     private String payDate;
@@ -33,7 +33,7 @@ public class ProfitBalanceSerial implements Serializable {
 
     private String errDesc;
 
-    private String accountId;
+    private String payCompany;
 
     private String agentId;
 
@@ -153,12 +153,12 @@ public class ProfitBalanceSerial implements Serializable {
         this.errDesc = errDesc == null ? null : errDesc.trim();
     }
 
-    public String getAccountId() {
-        return accountId;
+    public String getPayCompany() {
+        return payCompany;
     }
 
-    public void setAccountId(String accountId) {
-        this.accountId = accountId == null ? null : accountId.trim();
+    public void setPayCompany(String payCompany) {
+        this.payCompany = payCompany == null ? null : payCompany.trim();
     }
 
     public String getAgentId() {

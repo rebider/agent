@@ -16,7 +16,7 @@
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="STATUS" jdbcType="VARCHAR" property="status" />
     <result column="ERR_DESC" jdbcType="VARCHAR" property="errDesc" />
-    <result column="ACCOUNT_ID" jdbcType="VARCHAR" property="accountId" />
+    <result column="PAY_COMPANY" jdbcType="VARCHAR" property="payCompany" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
     <result column="PROFIT_ID" jdbcType="VARCHAR" property="profitId" />
@@ -52,7 +52,7 @@
   </sql>
   <sql id="Base_Column_List">
     BALANCE_ID, PAY_DATE, PROFIT_AMT, CARD_NO, ACCOUNT_NAME, BANK_NAME, BANK_CODE, CHILD_BANK_CODE, 
-    CHILD_BANK_NAME, BALANCE_RCV_TYPE, INPUT_TIME, REMARK, STATUS, ERR_DESC, ACCOUNT_ID, 
+    CHILD_BANK_NAME, BALANCE_RCV_TYPE, INPUT_TIME, REMARK, STATUS, ERR_DESC, PAY_COMPANY, 
     AGENT_ID, PARENT_AGENT_ID, PROFIT_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitBalanceSerialExample" resultMap="BaseResultMap">
@@ -88,14 +88,14 @@
       CARD_NO, ACCOUNT_NAME, BANK_NAME, 
       BANK_CODE, CHILD_BANK_CODE, CHILD_BANK_NAME, 
       BALANCE_RCV_TYPE, INPUT_TIME, REMARK, 
-      STATUS, ERR_DESC, ACCOUNT_ID, 
+      STATUS, ERR_DESC, PAY_COMPANY, 
       AGENT_ID, PARENT_AGENT_ID, PROFIT_ID
       )
     values (#{balanceId,jdbcType=VARCHAR}, #{payDate,jdbcType=VARCHAR}, #{profitAmt,jdbcType=DECIMAL}, 
       #{cardNo,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{bankName,jdbcType=VARCHAR}, 
       #{bankCode,jdbcType=VARCHAR}, #{childBankCode,jdbcType=VARCHAR}, #{childBankName,jdbcType=VARCHAR}, 
       #{balanceRcvType,jdbcType=VARCHAR}, #{inputTime,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
-      #{status,jdbcType=VARCHAR}, #{errDesc,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{errDesc,jdbcType=VARCHAR}, #{payCompany,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}
       )
   </insert>
@@ -144,8 +144,8 @@
       <if test="errDesc != null">
         ERR_DESC,
       </if>
-      <if test="accountId != null">
-        ACCOUNT_ID,
+      <if test="payCompany != null">
+        PAY_COMPANY,
       </if>
       <if test="agentId != null">
         AGENT_ID,
@@ -200,8 +200,8 @@
       <if test="errDesc != null">
         #{errDesc,jdbcType=VARCHAR},
       </if>
-      <if test="accountId != null">
-        #{accountId,jdbcType=VARCHAR},
+      <if test="payCompany != null">
+        #{payCompany,jdbcType=VARCHAR},
       </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
@@ -262,8 +262,8 @@
       <if test="errDesc != null">
         ERR_DESC = #{errDesc,jdbcType=VARCHAR},
       </if>
-      <if test="accountId != null">
-        ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+      <if test="payCompany != null">
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
       </if>
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
@@ -292,7 +292,7 @@
       REMARK = #{remark,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=VARCHAR},
       ERR_DESC = #{errDesc,jdbcType=VARCHAR},
-      ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
       PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
       PROFIT_ID = #{profitId,jdbcType=VARCHAR}

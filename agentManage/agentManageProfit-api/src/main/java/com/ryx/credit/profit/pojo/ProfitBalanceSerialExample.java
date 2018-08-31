@@ -1107,73 +1107,73 @@ public class ProfitBalanceSerialExample {
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdIsNull() {
-            addCriterion("ACCOUNT_ID is null");
+        public Criteria andPayCompanyIsNull() {
+            addCriterion("PAY_COMPANY is null");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdIsNotNull() {
-            addCriterion("ACCOUNT_ID is not null");
+        public Criteria andPayCompanyIsNotNull() {
+            addCriterion("PAY_COMPANY is not null");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdEqualTo(String value) {
-            addCriterion("ACCOUNT_ID =", value, "accountId");
+        public Criteria andPayCompanyEqualTo(String value) {
+            addCriterion("PAY_COMPANY =", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdNotEqualTo(String value) {
-            addCriterion("ACCOUNT_ID <>", value, "accountId");
+        public Criteria andPayCompanyNotEqualTo(String value) {
+            addCriterion("PAY_COMPANY <>", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdGreaterThan(String value) {
-            addCriterion("ACCOUNT_ID >", value, "accountId");
+        public Criteria andPayCompanyGreaterThan(String value) {
+            addCriterion("PAY_COMPANY >", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdGreaterThanOrEqualTo(String value) {
-            addCriterion("ACCOUNT_ID >=", value, "accountId");
+        public Criteria andPayCompanyGreaterThanOrEqualTo(String value) {
+            addCriterion("PAY_COMPANY >=", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdLessThan(String value) {
-            addCriterion("ACCOUNT_ID <", value, "accountId");
+        public Criteria andPayCompanyLessThan(String value) {
+            addCriterion("PAY_COMPANY <", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdLessThanOrEqualTo(String value) {
-            addCriterion("ACCOUNT_ID <=", value, "accountId");
+        public Criteria andPayCompanyLessThanOrEqualTo(String value) {
+            addCriterion("PAY_COMPANY <=", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdLike(String value) {
-            addCriterion("ACCOUNT_ID like", value, "accountId");
+        public Criteria andPayCompanyLike(String value) {
+            addCriterion("PAY_COMPANY like", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdNotLike(String value) {
-            addCriterion("ACCOUNT_ID not like", value, "accountId");
+        public Criteria andPayCompanyNotLike(String value) {
+            addCriterion("PAY_COMPANY not like", value, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdIn(List<String> values) {
-            addCriterion("ACCOUNT_ID in", values, "accountId");
+        public Criteria andPayCompanyIn(List<String> values) {
+            addCriterion("PAY_COMPANY in", values, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdNotIn(List<String> values) {
-            addCriterion("ACCOUNT_ID not in", values, "accountId");
+        public Criteria andPayCompanyNotIn(List<String> values) {
+            addCriterion("PAY_COMPANY not in", values, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdBetween(String value1, String value2) {
-            addCriterion("ACCOUNT_ID between", value1, value2, "accountId");
+        public Criteria andPayCompanyBetween(String value1, String value2) {
+            addCriterion("PAY_COMPANY between", value1, value2, "payCompany");
             return (Criteria) this;
         }
 
-        public Criteria andAccountIdNotBetween(String value1, String value2) {
-            addCriterion("ACCOUNT_ID not between", value1, value2, "accountId");
+        public Criteria andPayCompanyNotBetween(String value1, String value2) {
+            addCriterion("PAY_COMPANY not between", value1, value2, "payCompany");
             return (Criteria) this;
         }
 
