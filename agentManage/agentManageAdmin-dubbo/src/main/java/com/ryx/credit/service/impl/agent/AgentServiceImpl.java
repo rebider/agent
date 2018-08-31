@@ -136,21 +136,8 @@ public class AgentServiceImpl implements AgentService {
         }
         Map<String, Object> stringObjectMap = orgCodeRes.get(0);
         String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-
-        if(JURIS_DICTION.contains(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")))){
-            if(StringUtils.isNotBlank(orgId) && !orgId.equals("null")){
-                List<COrganization> cOrganizations = organizationMapper.selectByOrgPid(orgId);
-                List<String> userIdList = new ArrayList<>();
-                userIdList.add(String.valueOf(userId));
-                cOrganizations.forEach(cOrganization->{
-                    List<UserVo> userVos = cUserMapper.selectUserByOrgId(cOrganization.getId());
-                    userVos.forEach(userVo->{
-                        userIdList.add(String.valueOf(userVo.getId()));
-                    });
-                });
-                map.put("userIdList",userIdList);
-            }
-        }
+        map.put("orgId",orgId);
+        map.put("userId",userId);
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (StringUtils.isNotBlank(time)&&!time.equals("null")) {

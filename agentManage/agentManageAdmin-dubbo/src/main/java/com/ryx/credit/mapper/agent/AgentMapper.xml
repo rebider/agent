@@ -473,6 +473,31 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
     </select>
 
     <select id="excelAgent" parameterType="map" resultMap="AgentoutVo">
+        (select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,
+        bus.BUS_PLATFORM,bus.BUS_NUM,bus.BUS_TYPE,bus.BUS_PARENT,bus.BUS_RISK_PARENT,bus.BUS_ACTIVATION_PARENT,
+        DECODE(bus.BUS_SENT_DIRECTLY,'1','是','0','否') as bus_sent_directly,DECODE(bus.bus_Inde_ass,'1','是','0','否') as
+        bus_Inde_ass,bus.BUS_SCOPE,bus.BUS_REGION,bus.CLO_PAY_COMPANY,
+        col.CLO_TYPE,col.CLO_REALNAME,col.CLO_BANK_ACCOUNT,col.CLO_BANK,col.BANK_REGION,col.CLO_BANK_BRANCH,
+        col.ALL_LINE_NUM,col.BRANCH_LINE_NUM,col.CLO_TAX_POINT,col.CLO_INVOICE
+        from A_AGENT agent left join A_agent_businfo bus on (agent.id=bus.AGENT_ID )
+        left join A_AGENT_COLINFO col on(agent.id=col.AGENT_ID) left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
+        left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
+        <where>
+            1=1 and  agent.status=1
+            <if test="map.agUniqNum!=null and map.agUniqNum!=''">and agent.AG_UNIQ_NUM = #{map.agUniqNum}</if>
+            <if test="map.agName!=null and map.agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
+            <if test="map.agStatus!=null and map.agStatus!=''">and agent.AG_STATUS = #{map.agStatus}</if>
+            <if test="map.time!=null and map.time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}</if>
+            <if test="map.busNum!=null and map.busNum!=''">and bus.BUS_NUM=#{map.busNum}</if>
+            <if test="map.busPlatform!=null and map.busPlatform!=''">AND bus.BUS_PLATFORM=#{map.busPlatform}</if>
+            <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
+                and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
+            </if>
+            <if test="map.orgId!=null and map.orgId!=''">
+                and (agent.AG_DOC_PRO = #{map.orgId} or agent.AG_DOC_DISTRICT = #{map.orgId})
+            </if>
+        </where>
+        UNION
         select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,
         bus.BUS_PLATFORM,bus.BUS_NUM,bus.BUS_TYPE,bus.BUS_PARENT,bus.BUS_RISK_PARENT,bus.BUS_ACTIVATION_PARENT,
         DECODE(bus.BUS_SENT_DIRECTLY,'1','是','0','否') as bus_sent_directly,DECODE(bus.bus_Inde_ass,'1','是','0','否') as
@@ -493,14 +518,10 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
                 and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
             </if>
-            <if test="map.userIdList!=null and map.userIdList.size()>0">
-                and agent.C_USER in
-                <foreach collection="map.userIdList" item="user" open="(" close=")" separator="," >
-                    #{user}
-                </foreach>
+            <if test="map.userId!=null and map.userId!=''">
+                and agent.C_USER = #{map.userId}
             </if>
-        </where>
-        order by agent.c_utime desc
+        </where>)
     </select>
     <resultMap id="AgentoutVo" type="com.ryx.credit.pojo.admin.vo.AgentoutVo">
         <id column="ID" property="id" jdbcType="VARCHAR"/>
@@ -537,8 +558,8 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
 
 
     <select id="queryAgentListViewCount" parameterType="map" resultType="int">
-
-        select count(agent.id) from A_AGENT agent
+        select count(id) from(
+        select agent.id from A_AGENT agent
         left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
         left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
         where 1=1 and agent.status=1
@@ -552,23 +573,50 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
             and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
-        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select * from
+        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and
+            EXISTS(select * from
             A_AGENT_BUSINFO where status=1 and
             BUS_PLATFORM=#{map.busPlatform} and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
         <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
             and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
         </if>
-        <if test="map.userIdList!=null and map.userIdList.size()>0">
-            and agent.C_USER in
-            <foreach collection="map.userIdList" open="(" close=")" separator="," item="user">
-                #{user}
-            </foreach>
+        <if test="map.orgId!=null and map.orgId!=''">
+            and (agent.AG_DOC_PRO = #{map.orgId} or agent.AG_DOC_DISTRICT = #{map.orgId})
         </if>
+        UNION
+        select agent.id from A_AGENT agent
+        left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
+        left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
+        where 1=1 and agent.status=1
+        <if test="map.agUniqNum!=null and map.agUniqNum!=''">and agent.AG_UNIQ_NUM = #{map.agUniqNum}</if>
+        <if test="map.agName!=null and map.agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
+        <if test="map.agStatus!=null and map.agStatus!=''">and agent.AG_STATUS = #{map.agStatus}</if>
+        <if test="map.time!=null and map.time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}</if>
+        <if test="map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
+            and BUS_PLATFORM=#{map.busPlatform} and agent.id=agent_id)
+        </if>
+        <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select * from A_AGENT_BUSINFO where status=1
+            and BUS_NUM=#{map.busNum} and agent.id=agent_id)
+        </if>
+        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and
+            EXISTS(select * from
+            A_AGENT_BUSINFO where status=1 and
+            BUS_PLATFORM=#{map.busPlatform} and BUS_NUM=#{map.busNum} and agent.id=agent_id)
+        </if>
+        <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
+            and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
+        </if>
+
+        <if test="map.userId!=null and map.userId!=''">
+            and agent.C_USER = #{map.userId}
+        </if>
+        )
     </select>
 
     <select id="queryAgentListView" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
+        (
         select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
         agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
         agent.AG_STATUS ,agent.AG_REMARK ,agent.C_INCOM_STATUS,
@@ -583,14 +631,17 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="map.agName!=null and map.agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
         <if test="map.agStatus!=null and map.agStatus!=''">and agent.AG_STATUS = #{map.agStatus}</if>
         <if test="map.time!=null and map.time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}</if>
-        <if test="map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
+        <if test="map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from
+            A_AGENT_BUSINFO where
             status=1 and
             BUS_PLATFORM=#{map.busPlatform} and agent.id=agent_id)
         </if>
-        <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where status=1
+        <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
+            status=1
             and BUS_NUM=#{map.busNum} and agent.id=agent_id)
         </if>
-        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select
+        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and
+            EXISTS(select
             CLO_REVIEW_STATUS from
             A_AGENT_BUSINFO where status=1 and
             BUS_PLATFORM=#{map.busPlatform} and BUS_NUM=#{map.busNum} and agent.id=agent_id)
@@ -598,12 +649,49 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
             and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
         </if>
-            <if test="map.userIdList!=null and map.userIdList.size()>0">
-                and agent.C_USER in
-                <foreach collection="map.userIdList" item="user" open="(" close=")" separator="," >
-                    #{user}
-                </foreach>
-            </if>
+
+        <if test="map.orgId!=null and map.orgId!=''">
+            and (agent.AG_DOC_PRO = #{map.orgId} or agent.AG_DOC_DISTRICT = #{map.orgId})
+        </if>
+        UNION
+        select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
+        agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
+        agent.AG_STATUS ,agent.AG_REMARK ,agent.C_INCOM_STATUS,
+        agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO
+        from A_AGENT agent
+
+        left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
+        left join C_ORGANIZATION b on b.id=agent.AG_DOC_DISTRICT
+
+        where 1=1 and agent.status=1
+        <if test="map.agUniqNum!=null and map.agUniqNum!=''">and agent.AG_UNIQ_NUM = #{map.agUniqNum}</if>
+        <if test="map.agName!=null and map.agName!=''">and agent.AG_NAME LIKE CONCAT(CONCAT('%',#{map.agName}),'%')</if>
+        <if test="map.agStatus!=null and map.agStatus!=''">and agent.AG_STATUS = #{map.agStatus}</if>
+        <if test="map.time!=null and map.time!=''">and to_char(agent.C_INCOM_TIME,'YYYY-MM-dd')=#{map.time}</if>
+        <if test="map.busPlatform!=null and map.busPlatform!=''">and EXISTS(select CLO_REVIEW_STATUS from
+            A_AGENT_BUSINFO where
+            status=1 and
+            BUS_PLATFORM=#{map.busPlatform} and agent.id=agent_id)
+        </if>
+        <if test="map.busNum!=null and map.busNum!=''">and EXISTS(select CLO_REVIEW_STATUS from A_AGENT_BUSINFO where
+            status=1
+            and BUS_NUM=#{map.busNum} and agent.id=agent_id)
+        </if>
+        <if test="map.busNum!=null and map.busNum!='' and map.busPlatform!=null and map.busPlatform!=''">and
+            EXISTS(select
+            CLO_REVIEW_STATUS from
+            A_AGENT_BUSINFO where status=1 and
+            BUS_PLATFORM=#{map.busPlatform} and BUS_NUM=#{map.busNum} and agent.id=agent_id)
+        </if>
+        <if test="map.agDocDistrict!=null and map.agDocDistrict!=''">
+            and (agent.AG_DOC_PRO = #{map.agDocDistrict} or agent.AG_DOC_DISTRICT = #{map.agDocDistrict})
+        </if>
+
+        <if test="map.userId!=null and map.userId!=''">
+            and agent.C_USER = #{map.userId}
+        </if>
+        )
+
         order by c_time desc
         <include refid="OracleDialectSuffix"/>
     </select>
