@@ -190,6 +190,7 @@
     count(*)
     from D_REGION
     where P_CODE = #{pCode,jdbcType=VARCHAR}
+    and t_type in(1,2)
   </select>
 
   <select id="selectAll" resultMap="BaseResultMap">
