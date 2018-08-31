@@ -129,15 +129,17 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public PageInfo queryAgentAll(Page page, Map map ,Long userId) {
-
-        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-        if(orgCodeRes==null && orgCodeRes.size()!=1){
-            return null;
+        if (String.valueOf(map.get("flag")).equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            map.put("orgId",orgId);
+            map.put("userId",userId);
         }
-        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-        map.put("orgId",orgId);
-        map.put("userId",userId);
+
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (StringUtils.isNotBlank(time)&&!time.equals("null")) {

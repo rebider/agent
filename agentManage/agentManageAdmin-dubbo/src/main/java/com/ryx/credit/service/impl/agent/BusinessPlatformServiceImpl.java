@@ -14,6 +14,7 @@ import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -70,11 +71,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Autowired
     private AgentService agentService;
     @Autowired
-    private RegionService regionService;
+    private IUserService iUserService;
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
-
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag) {
         Map<String, Object> reqMap = new HashMap<>();
+
         reqMap.put("agStatus", AgStatus.Approved.name());
         if (!StringUtils.isBlank(agent.getId())) {
             reqMap.put("id", agent.getId());
@@ -94,8 +95,15 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getCloReviewStatus() != null) {
             reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
         }
-        if (StringUtils.isNotBlank(agentBusInfo.getcUser())) {
-            reqMap.put("cUser", agentBusInfo.getcUser());
+        if (StringUtils.isNotBlank(flag) && flag.equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            reqMap.put("orgId",orgId);
+            reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
@@ -343,28 +351,39 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     @Override
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
+        if (String.valueOf(map.get("flag")).equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            map.put("orgId",orgId);
+            map.put("userId",userId);
+        }
+
         map.put("agStatus", AgStatus.Approved.name());
         map.put("status", Status.STATUS_1.status);
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (BusinessOutVo agentoutVo : agentoutVos) {
-                if (null != agentoutVo.getBusType()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
                     if (null != value)
                         agentoutVo.setBusType(value.getdItemname());
                 }
-                if (null != agentoutVo.getBusIndeAss()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusIndeAss()) && !agentoutVo.getBusIndeAss().equals("null")) {
                     if (agentoutVo.getBusIndeAss().equals("1")) {
                         agentoutVo.setBusIndeAss("是");
                     } else
                         agentoutVo.setBusIndeAss("否");
                 }
-                if (null != agentoutVo.getBusPlatform()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusPlatform()) && !agentoutVo.getBusPlatform().equals("null")) {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
                     if (null != platForm)
                         agentoutVo.setBusPlatform(platForm.getPlatformName());
                 }
-                if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusRegion()) && !agentoutVo.getBusRegion().equals("null")) {
                     List<DPosRegion> regions = posRegionService.queryByCodes(agentoutVo.getBusRegion());
                     if (null!=regions  && regions.size()>0){
                         String deptNameRel="";
@@ -377,12 +396,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         agentoutVo.setBusRegion(deptNameRel.substring(0,deptNameRel.length() - 1));
                     }
                 }
-                if (null != agentoutVo.getBusScope()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
                     if (null != value)
                         agentoutVo.setBusScope(value.getdItemname());
                 }
-                if (null != agentoutVo.getBusParent()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusParent()) && !agentoutVo.getBusParent().equals("null")) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusParent());
                     if (null != agentBusInfo) {
                         Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -390,7 +409,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                             agentoutVo.setBusParent(agentById.getAgName());
                     }
                 }
-                if (null != agentoutVo.getBusRiskParent()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusRiskParent()) && !agentoutVo.getBusRiskParent().equals("null")) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
                     if (null != agentBusInfo) {
                         Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -399,7 +418,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     }
 
                 }
-                if (null != agentoutVo.getBusActivationParent()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusActivationParent()) && !agentoutVo.getBusActivationParent().equals("null")) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
                     if (null != agentBusInfo) {
                         Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
