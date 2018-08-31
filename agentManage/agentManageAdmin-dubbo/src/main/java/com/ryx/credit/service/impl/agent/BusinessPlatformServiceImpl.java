@@ -365,8 +365,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                         agentoutVo.setBusPlatform(platForm.getPlatformName());
                 }
                 if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
-
-
                     List<DPosRegion> regions = posRegionService.queryByCodes(agentoutVo.getBusRegion());
                     if (null!=regions  && regions.size()>0){
                         String deptNameRel="";
@@ -376,21 +374,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                             String deptName=name+sign;
                              deptNameRel += deptName;
                         }
-                        agentoutVo.setBusRegion(deptNameRel);
+                        agentoutVo.setBusRegion(deptNameRel.substring(0,deptNameRel.length() - 1));
                     }
                 }
-
-
-
-
-
-             /*   if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
-
-                    String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
-                    if (StringUtils.isNotBlank(regionName))
-                        agentoutVo.setBusRegion(regionName);
-                }*/
-
                 if (null != agentoutVo.getBusScope()) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
                     if (null != value)

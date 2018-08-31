@@ -331,7 +331,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
-
+        agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
+        }
         //如果是直签 就传02：直签机构  否则就传递 01：普通机构
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
@@ -354,7 +358,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyCount(new BigDecimal(1));
             record.setcUser(userId);
 
-            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
             if(platForm==null){
                 log.info("已有编号进行入网修改：通知pos手刷业务平台未知");
                 throw new MessageException("通知pos手刷业务平台未知");
@@ -623,6 +626,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
+        }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
@@ -644,7 +651,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
-            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
