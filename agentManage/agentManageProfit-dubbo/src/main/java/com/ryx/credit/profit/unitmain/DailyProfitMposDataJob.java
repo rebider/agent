@@ -60,7 +60,7 @@ public class DailyProfitMposDataJob {
         //map.put("pageNumber", "3");
         map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.day"), params);
+        String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newday"), params);
         System.out.println("输出================================" + res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
