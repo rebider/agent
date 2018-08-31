@@ -1,6 +1,8 @@
 package com.ryx.credit.pojo.admin.bank;
 
-public class BankLineNums {
+import java.io.Serializable;
+
+public class BankLineNums implements Serializable{
     private String banktype;
 
     private String provinceid;
