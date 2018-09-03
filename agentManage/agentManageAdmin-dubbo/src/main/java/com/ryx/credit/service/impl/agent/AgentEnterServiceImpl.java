@@ -726,27 +726,17 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     @Override
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
-        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-        if(orgCodeRes==null && orgCodeRes.size()!=1){
-            return null;
-        }
-        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
-
-        if(JURIS_DICTION.contains(String.valueOf(stringObjectMap.get("ORGANIZATIONCODE")))){
-            if(org.apache.commons.lang.StringUtils.isNotBlank(orgId) && !orgId.equals("null")){
-                List<COrganization> cOrganizations = organizationMapper.selectByOrgPid(orgId);
-                List<String> userIdList = new ArrayList<>();
-                userIdList.add(String.valueOf(userId));
-                cOrganizations.forEach(cOrganization->{
-                    List<UserVo> userVos = cUserMapper.selectUserByOrgId(cOrganization.getId());
-                    userVos.forEach(userVo->{
-                        userIdList.add(String.valueOf(userVo.getId()));
-                    });
-                });
-                map.put("userIdList",userIdList);
+        if (String.valueOf(map.get("flag")).equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
             }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            map.put("orgId",orgId);
+            map.put("userId",userId);
         }
+
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (org.apache.commons.lang.StringUtils.isNotBlank(time)&&!time.equals("null")) {
@@ -757,32 +747,32 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
-                if (null != agentoutVo.getBusType()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
                     if (null != value)
                         agentoutVo.setBusType(value.getdItemname());
                 }
-                if (null != agentoutVo.getBusPlatform()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusPlatform()) && !agentoutVo.getBusPlatform().equals("null")) {
                     PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
                     if (null != platForm)
                         agentoutVo.setBusPlatform(platForm.getPlatformName());
                 }
-                if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusRegion())  && !agentoutVo.getBusRegion().equals("null")) {
 
                     String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
                     if (StringUtils.isNotBlank(regionName))
                         agentoutVo.setBusRegion(regionName);
                 }
-                if (null != agentoutVo.getBusScope()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
                     Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
                     if (null != value)
                         agentoutVo.setBusScope(value.getdItemname());
                 }
-                if (null != agentoutVo.getBusParent() && null != agentoutVo.getAgentId() && null != agentoutVo.getBusPlatform()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusParent())&& StringUtils.isNotBlank(agentoutVo.getAgentId()) && StringUtils.isNotBlank(agentoutVo.getBusPlatform())) {
                     getBusParent(agentoutVo);
 
                 }
-                if (null != agentoutVo.getBusRiskParent()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusRiskParent()) && !agentoutVo.getBusRiskParent().equals("null")) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
                     if (null != agentBusInfo) {
                         Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -791,7 +781,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     }
 
                 }
-                if (null != agentoutVo.getBusActivationParent()) {
+                if (StringUtils.isNotBlank(agentoutVo.getBusActivationParent()) && !agentoutVo.getBusActivationParent().equals("null")) {
                     AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
                     if (null != agentBusInfo) {
                         Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -812,13 +802,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     if (null != value)
                         agentoutVo.setCloString(value.getdItemname());
                 }
-                if (null != agentoutVo.getBankRegion() && !"".equals(agentoutVo.getBankRegion())) {
+                if (StringUtils.isNotBlank(agentoutVo.getBankRegion()) && !agentoutVo.getBankRegion().equals("null")) {
                     String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
                     if (StringUtils.isNotBlank(regionName))
                         agentoutVo.setBankRegion(regionName);
                 }
 
-                if (null != agentoutVo.getCloPayCompany()) {
+                if (StringUtils.isNotBlank(agentoutVo.getCloPayCompany()) && !agentoutVo.getCloPayCompany().equals("null")) {
                     PayComp payComp = apaycompService.selectById(agentoutVo.getCloPayCompany());
                     if (null != payComp)
                         agentoutVo.setCloPayCompany(payComp.getComName());

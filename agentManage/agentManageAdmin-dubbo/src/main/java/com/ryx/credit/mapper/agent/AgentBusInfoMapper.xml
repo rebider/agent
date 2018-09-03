@@ -523,12 +523,106 @@
   </select>
 
   <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
-     <include refid="OracleDialectPrefix" />
-      select
-        b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-        a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
-      from A_agent a,A_agent_businfo b
-      where a.id=b.agent_id
+    <include refid="OracleDialectPrefix" />
+    (
+    select
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
+    from A_agent a,A_agent_businfo b
+    where a.id=b.agent_id
+    and ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and a.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and b.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and b.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.orgId!=null and reqMap.orgId!=''">
+      and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
+    </if>
+    and b.status = #{reqMap.status}
+    UNION
+    select
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
+    from A_agent a,A_agent_businfo b
+    <where> a.id=b.agent_id
+    and ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and a.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and b.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and b.id = #{reqMap.id}
+    </if>
+      <if test="reqMap.userId!=null and reqMap.userId!=''">
+        and a.C_USER = #{reqMap.userId}
+      </if>
+    and b.status = #{reqMap.status}
+    </where>
+    )
+    order by c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+
+  <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
+    select count(*) from(
+    select
+    b.id
+    from A_agent a,A_agent_businfo b
+    where a.id=b.agent_id
+    and ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and a.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and b.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and b.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.orgId!=null and reqMap.orgId!=''">
+      and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
+    </if>
+    and b.status = #{reqMap.status}
+    UNION
+    select
+    b.id
+    from A_agent a,A_agent_businfo b
+    <where> a.id=b.agent_id
       and ag_status = #{reqMap.agStatus}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
         and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
@@ -548,41 +642,14 @@
       <if test="reqMap.id != null and reqMap.id != '' " >
         and b.id = #{reqMap.id}
       </if>
-      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
-        and b.C_USER = #{reqMap.cUser}
+      <if test="reqMap.userId!=null and reqMap.userId!=''">
+        and a.C_USER = #{reqMap.userId}
       </if>
       and b.status = #{reqMap.status}
-      order by b.c_time desc
-    <include refid="OracleDialectSuffix" />
+    </where>
+    )
   </select>
 
-  <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
-      select
-         count(*)
-      from A_agent a,A_agent_businfo b
-      where a.id=b.agent_id
-      and ag_status = #{reqMap.agStatus}
-      <if test="reqMap.agName != null and reqMap.agName != '' " >
-        and a.ag_name = #{reqMap.agName}
-      </if>
-      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
-        and a.ag_uniq_num = #{reqMap.agUniqNum}
-      </if>
-      <if test="reqMap.busNum != null and reqMap.busNum != '' " >
-        and b.bus_num = #{reqMap.busNum}
-      </if>
-      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-        and b.bus_platform = #{reqMap.busPlatform}
-      </if>
-      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-        and b.clo_review_status = #{reqMap.cloReviewStatus}
-      </if>
-      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
-        and b.C_USER = #{reqMap.cUser}
-      </if>
-      and b.status = #{reqMap.status}
-      order by b.c_time desc
-  </select>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
     select
@@ -654,5 +721,89 @@
   </select>
 
 
+  <select id="excelAgent" parameterType="map" resultMap="BusinessOutVo">
+    (select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
+    agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_parent
+    ,bus.bus_risk_parent,bus.bus_activation_parent,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email
+    from A_AGENT agent left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    where 1=1 and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
+      CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+      <if
+              test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' ">and agent.ag_uniq_num = #{reqMap.agUniqNum}
+      </if>
+      <if
+              test="reqMap.busNum != null and reqMap.busNum != '' " >and bus.bus_num = #{reqMap.busNum}
+      </if>
+      <if test
+                  ="reqMap.busPlatform != null and reqMap.busPlatform != '' " >and bus.bus_platform =
+        #{reqMap.busPlatform}
+      </if>
+      <if test
+                  ="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >and bus.clo_review_status =
+        #{reqMap.cloReviewStatus}
+      </if>
+      <if test
+                  ="reqMap.id != null and reqMap.id != '' " >and bus.id = #{reqMap.id}
+      </if>
+      <if test
+                  ="reqMap.orgId!=null and reqMap.orgId!=''">
+      and (agent.AG_DOC_PRO = #{reqMap.orgId} or agent.AG_DOC_DISTRICT = #{reqMap.orgId})
+      </if>
+    and bus.status = #{reqMap.status}
+    UNION
+    select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
+    agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_parent
+    ,bus.bus_risk_parent,bus.bus_activation_parent,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email
+    from A_AGENT agent left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    where 1=1 and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and agent.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and agent.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and bus.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and bus.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and bus.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and bus.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.userId!=null and reqMap.userId!=''">
+      and agent.C_USER = #{reqMap.userId}
+    </if>
+    and bus.status = #{reqMap.status}
+   )
+  </select>
+  <resultMap id="BusinessOutVo" type="com.ryx.credit.pojo.admin.vo.BusinessOutVo">
+    <id column="ID" property="id" jdbcType="VARCHAR"/>
+    <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR"/>
+    <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+    <result column="AG_HEAD" property="agHead" jdbcType="VARCHAR"/>
+    <result column="AG_HEAD_MOBILE" property="agHeadMobile" jdbcType="VARCHAR"/>
+    <result column="AG_REG_ADD" property="agRegAdd" jdbcType="VARCHAR"/>
+
+    <result column="BUS_NUM" property="busNum" jdbcType="VARCHAR"/>
+    <result column="BUS_PLATFORM" property="busPlatform" jdbcType="VARCHAR"/>
+    <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR"/>
+    <result column="BUS_PARENT" property="busParent" jdbcType="VARCHAR"/>
+    <result column="BUS_RISK_PARENT" property="busRiskParent" jdbcType="VARCHAR"/>
+    <result column="BUS_ACTIVATION_PARENT" property="busActivationParent" jdbcType="VARCHAR"/>
+    <result column="BUS_REGION" property="busRegion" jdbcType="VARCHAR"/>
+    <result column="BUS_INDE_ASS" property="busIndeAss" jdbcType="VARCHAR"/>
+    <result column="BUS_RISK_EMAIL" property="busRiskEmail" jdbcType="VARCHAR"/>
+    <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR"/>
+  </resultMap>
 
 </mapper>

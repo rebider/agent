@@ -165,7 +165,7 @@ public class RegionServiceImpl implements RegionService {
         example.or().andRCodeEqualTo(code);
         List<Region> list = regionMapper.selectByExample(example);
         Region region = list.get(0);
-        if (region.gettType().equals(2)) {
+        if (region.gettType().compareTo(new BigDecimal(2))==0) {
             return true;
         }
         return false;

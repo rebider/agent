@@ -137,6 +137,7 @@ public class NewProfitDataJob {
         transProfitDetail.setPosCreditAmt(profitData.getBigDecimal("POS_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("POS_01_AMT"));
         transProfitDetail.setId(idService.genId(TabId.TPD));
         transProfitDetail.setAgentType((String)agentMap.get("BUS_TYPE"));
+        transProfitDetail.setPayCompany((String)agentMap.get("CLO_PAY_COMPANY"));
         transProfitDetailService.insert(transProfitDetail);
         transProfitDetail = null;
     }
@@ -183,6 +184,7 @@ public class NewProfitDataJob {
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
         profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
         profitDetailMonthTemp.setStatus("4");
+        profitDetailMonthTemp.setPayCompany(transProfitDetail.getPayCompany());
         // 获取账户信息
         List<AgentColinfo> agentColinfos= agentColinfoService.queryAgentColinfoService(transProfitDetail.getAgentId(), null,AgStatus.Approved.status);
 
@@ -212,7 +214,7 @@ public class NewProfitDataJob {
         // 获取代理商平台id
         AgentBusInfo agentBusInfo = new AgentBusInfo();
         agentBusInfo.setBusNum(orgId);
-        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null);
+        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null,null);
         if (pageInfo != null && pageInfo.getTotal() > 0) {
             Map<String, Object> agentMap = (Map<String, Object>) pageInfo.getRows().get(0);
             try {
