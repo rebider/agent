@@ -115,25 +115,58 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     /**
      * 根据代理商唯一编号检索
-     *
-     * @param agent
+     * @param agUniqNum
      * @return
      */
     @Override
-    public Agent verifyAgent(Agent agent) {
-        if (StringUtils.isBlank(agent.getAgUniqNum())) {
-            return null;
+    public AgentResult verifyAgent(String agUniqNum) {
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if (StringUtils.isBlank(agUniqNum)) {
+            return result;
         }
         AgentExample example = new AgentExample();
         AgentExample.Criteria criteria = example.createCriteria();
-        criteria.andAgUniqNumEqualTo(agent.getAgUniqNum());
+        criteria.andAgUniqNumEqualTo(agUniqNum);
         criteria.andAgStatusEqualTo(AgStatus.Approved.name());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> agents = agentMapper.selectByExample(example);
-        if (agents.size() != 1) {
-            return null;
+        if(agents.size()==1){
+            return AgentResult.ok(agents.get(0));
         }
-        return agents.get(0);
+        if (agents.size()>1) {
+            result.setMsg("代理商不唯一");
+            return result;
+        }
+        AgentExample exampleName = new AgentExample();
+        AgentExample.Criteria criteriaName = exampleName.createCriteria();
+        criteriaName.andAgNameEqualTo(agUniqNum);
+        criteriaName.andAgStatusEqualTo(AgStatus.Approved.name());
+        criteriaName.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> agentsName = agentMapper.selectByExample(exampleName);
+        if(agentsName.size()==1){
+            return AgentResult.ok(agentsName.get(0));
+        }
+        if (agentsName.size()>1) {
+            result.setMsg("代理商不唯一");
+            return result;
+        }
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
+        agentBusInfoCriteria.andBusNumEqualTo(agUniqNum);
+        agentBusInfoCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+        agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        if(agentBusInfos.size()==1){
+            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+            Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+            return AgentResult.ok(agent);
+        }
+        if (agentsName.size()>1) {
+            result.setMsg("代理商不唯一");
+            return result;
+        }
+        result.setMsg("代理商不存在或未通过审批");
+        return result;
     }
 
     @Override
