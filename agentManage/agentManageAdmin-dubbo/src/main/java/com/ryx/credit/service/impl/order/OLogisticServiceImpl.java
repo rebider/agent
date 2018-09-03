@@ -314,7 +314,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if(excel.get(i)==null || StringUtils.isBlank(excel.get(i).toString())){
                 return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
             }
-            if(!excel.get(i).equals(db.get(col[i]))){
+            if(!(excel.get(i)+"").equals((db.get(col[i])+""))){
                 return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
             }
         }
