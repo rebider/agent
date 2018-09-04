@@ -2317,6 +2317,76 @@ public class AgentBusInfoExample {
             addCriterion("DREDGE_S0 not between", value1, value2, "dredgeS0");
             return (Criteria) this;
         }
+
+        public Criteria andBusLoginNumIsNull() {
+            addCriterion("BUS_LOGIN_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumIsNotNull() {
+            addCriterion("BUS_LOGIN_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM =", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM <>", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumGreaterThan(String value) {
+            addCriterion("BUS_LOGIN_NUM >", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM >=", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumLessThan(String value) {
+            addCriterion("BUS_LOGIN_NUM <", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM <=", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumLike(String value) {
+            addCriterion("BUS_LOGIN_NUM like", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotLike(String value) {
+            addCriterion("BUS_LOGIN_NUM not like", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumIn(List<String> values) {
+            addCriterion("BUS_LOGIN_NUM in", values, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotIn(List<String> values) {
+            addCriterion("BUS_LOGIN_NUM not in", values, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumBetween(String value1, String value2) {
+            addCriterion("BUS_LOGIN_NUM between", value1, value2, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_LOGIN_NUM not between", value1, value2, "busLoginNum");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
