@@ -667,6 +667,76 @@ public class AttachmentExample {
             addCriterion("STATUS not between", value1, value2, "status");
             return (Criteria) this;
         }
+
+        public Criteria andAttDataTypeIsNull() {
+            addCriterion("ATT_DATA_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeIsNotNull() {
+            addCriterion("ATT_DATA_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeEqualTo(String value) {
+            addCriterion("ATT_DATA_TYPE =", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeNotEqualTo(String value) {
+            addCriterion("ATT_DATA_TYPE <>", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeGreaterThan(String value) {
+            addCriterion("ATT_DATA_TYPE >", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("ATT_DATA_TYPE >=", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeLessThan(String value) {
+            addCriterion("ATT_DATA_TYPE <", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeLessThanOrEqualTo(String value) {
+            addCriterion("ATT_DATA_TYPE <=", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeLike(String value) {
+            addCriterion("ATT_DATA_TYPE like", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeNotLike(String value) {
+            addCriterion("ATT_DATA_TYPE not like", value, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeIn(List<String> values) {
+            addCriterion("ATT_DATA_TYPE in", values, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeNotIn(List<String> values) {
+            addCriterion("ATT_DATA_TYPE not in", values, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeBetween(String value1, String value2) {
+            addCriterion("ATT_DATA_TYPE between", value1, value2, "attDataType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAttDataTypeNotBetween(String value1, String value2) {
+            addCriterion("ATT_DATA_TYPE not between", value1, value2, "attDataType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
