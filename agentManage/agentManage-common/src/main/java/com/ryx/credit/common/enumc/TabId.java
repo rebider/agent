@@ -22,6 +22,7 @@ public enum TabId {
     d_InterfaceRequest_Record("IR%s%015d"),
     a_agent_businfo("AB%s%015d"),
     a_import_agent("AI%s%015d"),
+    a_approval_flow_record("AFR%s%015d"),
     data_history("DH%s%015d"),
     o_address("OA%s%015d"),
     o_activity("OAC%s%014d"),
