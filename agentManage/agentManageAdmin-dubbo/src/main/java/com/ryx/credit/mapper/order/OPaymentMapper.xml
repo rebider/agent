@@ -454,10 +454,10 @@
   <select id="queryPaymentXXDK" parameterType="map" resultType="map">
     select p.id,p.Actual_Receipt,o.bus_id from O_order o
     inner join o_Payment p on o.id=p.order_id
+    inner join A_agent_businfo b on o.bus_id = b.id
     <where>
-      p.pay_method=#{params.payMethod}
-      and o.review_status=#{params.reviewStatus}
-      and o.agent_id=#{params.agentId}
+      and o.review_status = #{params.reviewStatus}
+      and b.bus_num = #{params.busNum}
     </where>
   </select>
 

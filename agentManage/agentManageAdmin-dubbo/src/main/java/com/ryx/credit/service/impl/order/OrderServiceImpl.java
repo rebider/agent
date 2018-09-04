@@ -2570,20 +2570,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
-     * 根据代理商id查询线下打款数据
-     * @param agentId
+     * 根据业务平台编号查询线下打款数据
+     * @param busNum
      * @return
      */
     @Override
-    public AgentResult queryPaymentXXDK(String agentId){
+    public AgentResult queryPaymentXXDK(String busNum){
         AgentResult result = new AgentResult(500,"参数错误","");
-        if(StringUtils.isBlank(agentId)){
+        if(StringUtils.isBlank(busNum)){
             return result;
         }
         Map<String,Object> params = new HashMap<>();
-        params.put("agentId",agentId);
+        params.put("busNum",busNum);
         params.put("reviewStatus",AgStatus.Approved.getValue());
-        params.put("payMethod",SettlementType.XXDK.code);
         List<Map<String,Object>> resultListMap = oPaymentMapper.queryPaymentXXDK(params);
         if(resultListMap==null){
             result.setMsg("查询异常");
@@ -2594,6 +2593,14 @@ public class OrderServiceImpl implements OrderService {
             return result;
         }
         for (Map<String, Object> stringObjectMap : resultListMap) {
+            Map<String, Object> reqMap = new HashMap<>();
+            BigDecimal actualReceipt = new BigDecimal(stringObjectMap.get("ACTUAL_RECEIPT").toString());
+            reqMap.put("reviewStatus",AgStatus.Approved.getValue());
+            reqMap.put("payMethod",PayMethod.OfflineMoney.getValue());
+            reqMap.put("paymentId",stringObjectMap.get("ID"));
+            BigDecimal suppleAmt = oPaymentDetailMapper.querySupplementXXDK(reqMap);
+            stringObjectMap.put("ACTUAL_RECEIPT",actualReceipt.add(suppleAmt));
+
             String busId = String.valueOf(stringObjectMap.get("BUS_ID"));
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
             stringObjectMap.put("BUS_NUM",agentBusInfo.getBusNum());
