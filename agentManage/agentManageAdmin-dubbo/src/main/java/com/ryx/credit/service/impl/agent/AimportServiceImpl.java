@@ -1072,11 +1072,64 @@ public class AimportServiceImpl implements AimportService {
     }
 
 
+    /**
+     * 更新业务信息单条
+     * @param user
+     * @param list
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
 
+        logger.info("用户{}更新业务信息{}",user,list);
+        String busNum = list.get(0)+"",busRegion=list.get(1)+"",isS0=list.get(2)+"";
 
+        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
+        if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
 
+        List<String> arr = new ArrayList<>();
 
+        if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
+            String[] regions = busRegion.split(",");
+            DPosRegionExample dPosRegionExample = new DPosRegionExample();
+            dPosRegionExample.or().andCodeIn(Arrays.asList(regions)).andCodeLevelIn(Arrays.asList("2"));
 
+            List<DPosRegion> dPosRegions = dPosRegionMapper.selectByExample(dPosRegionExample);
+            for (DPosRegion dPosRegion : dPosRegions) {
+                arr.add(dPosRegion.getCode());
+            }
+        }
 
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
+        List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
 
+        if(businfos.size()==0){
+            return ResultVO.fail("业务未找到");
+        }
+        for (AgentBusInfo businfo : businfos) {
+
+            if(arr.size()>0) {
+                logger.info("用户{}修改前{}业务区域{}", user, busNum, businfo.getBusRegion());
+                businfo.setBusRegion(String.join(",", arr));
+                logger.info("用户{}修改为{}业务区域{}",user,busNum,businfo.getBusRegion());
+            }
+
+            if(StringUtils.isNotBlank(isS0)){
+                if(yesorno.indexOf(isS0)!=-1) {
+                    logger.info("用户{}修改前{}是否开通s0：1是，0否 {}", user, busNum, businfo.getDredgeS0());
+                    businfo.setDredgeS0(new BigDecimal(yesorno.indexOf(isS0)));
+                    logger.info("用户{}修改前{}是否开通s0：1是，0否 {}", user, busNum, businfo.getDredgeS0());
+                }
+            }
+            if(agentBusInfoMapper.updateByPrimaryKeySelective(businfo)==1){
+                logger.info("用户{}修改为{}",user,busNum);
+            }else{
+                logger.info("用户{}修改失败{}",user,busNum);
+            }
+
+        }
+        return ResultVO.success("");
+    }
 }

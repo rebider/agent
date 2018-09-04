@@ -72,6 +72,8 @@ public class AgentBusInfo implements Serializable {
 
     private BigDecimal dredgeS0;
 
+    private String busLoginNum;
+
     private List<Attachment> attachmentList;
 
     private List<AgentColinfo> agentColinfoList;
@@ -364,5 +366,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setBusPlatformType(String busPlatformType) {
         this.busPlatformType = busPlatformType;
+    }
+
+    public String getBusLoginNum() {
+        return busLoginNum;
+    }
+
+    public void setBusLoginNum(String busLoginNum) {
+        this.busLoginNum = busLoginNum;
     }
 }
