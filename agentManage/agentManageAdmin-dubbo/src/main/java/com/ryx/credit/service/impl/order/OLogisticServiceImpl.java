@@ -38,6 +38,7 @@ import java.util.*;
 public class OLogisticServiceImpl implements OLogisticsService {
     private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
@@ -217,7 +218,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setcUser(user);                                      // 创建人
                 oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
                 oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
-                oLogistics.setSendDate(DateUtils.stringToDate(sendDate));       // 物流日期
+                try {
+                    oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                }catch (Exception e){
+                    try {
+                        oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
+                    }catch (Exception m){
+                        throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
+                    }
+                }
                 oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
                 oLogistics.setIsdeall(Status.STATUS_1.status);
 
