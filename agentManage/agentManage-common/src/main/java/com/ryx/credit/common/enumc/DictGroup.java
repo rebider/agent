@@ -8,6 +8,7 @@ public enum DictGroup {
 
     ALL("所有模块"),
     YESORNO("yesorno"),
+    YESORNOISYES("yesornoisyes"),
     AGENT("代理商模块"),
     ORDER("订单模块"),
     RELATION("关系模块"),
