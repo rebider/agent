@@ -2,6 +2,7 @@ package com.ryx.credit.dao.bank;
 
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Set;
@@ -28,4 +29,6 @@ public interface DPosRegionMapper {
     Set<String> queryNationwide();
 
     Set<DPosRegion> queryCityByCode(String code);
+
+    List<String> queryPosRegionProviceByCity(@Param("codes") List<String> codes);
 }

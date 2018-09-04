@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.bank;
 
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
@@ -121,11 +122,12 @@ public class PosRegionServiceImpl implements PosRegionService {
         List<Tree> trees = new ArrayList<Tree>();
         for (DPosRegion dPosRegion : list) {
             Tree tree = new Tree();
-            tree.setId(Long.valueOf(dPosRegion.getCode()) + "");
+            tree.setId(Long.valueOf(dPosRegion.getCode())+"");
             tree.setPid(Long.valueOf(dPosRegion.getParentCode()) + "");
             tree.setText(dPosRegion.getName());
             tree.setState("2".equals(level)?1:0);
             tree.settType(new BigDecimal(dPosRegion.getCodeLevel()));
+            tree.setAttributes(FastMap.fastMap("CodeLevel",dPosRegion.getCodeLevel()).putKeyV("CodeType",dPosRegion.getCodeType()));
             trees.add(tree);
         }
         return trees;
@@ -184,6 +186,18 @@ public class PosRegionServiceImpl implements PosRegionService {
             }
         }
         return resultList;
+    }
+
+
+    /**
+     * 根据给定的地区查询省份节点
+     * @param codes
+     * @return
+     */
+    @Override
+    public List<String> queryPosRegionProviceByCity(List<String> codes) {
+        if(codes==null || codes.size()==0)return new ArrayList<>();
+        return posRegionMapper.queryPosRegionProviceByCity(codes);
     }
 }
 
