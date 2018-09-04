@@ -109,20 +109,22 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String logCom = "";
             String wNumber = "";
             try {
-                planNum = String.valueOf(objectList.get(0));
-                orderId = String.valueOf(objectList.get(1));
-                proCode = String.valueOf(objectList.get(2));
-                proId = String.valueOf(objectList.get(3));
-                proName = String.valueOf(objectList.get(4));
 
-                sendDate = String.valueOf(objectList.get(19));
-                sendProNum = String.valueOf(objectList.get(20));
-                logCom = String.valueOf(objectList.get(21));
-                wNumber = String.valueOf(objectList.get(22));
-                beginSn = String.valueOf(objectList.get(23));
-                endSn = String.valueOf(objectList.get(24));
-                beginSnCount = String.valueOf(objectList.get(25));
-                endSnCount = String.valueOf(objectList.get(26));
+                List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+                planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
+                orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
+                proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
+                proId = String.valueOf(objectList.get(col.indexOf("PRO_ID")));
+                proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME")));
+
+                sendDate = String.valueOf(objectList.get(col.indexOf("h")));
+                sendProNum = String.valueOf(objectList.get(col.indexOf("g")));
+                logCom = String.valueOf(objectList.get(col.indexOf("a")));
+                wNumber = String.valueOf(objectList.get(col.indexOf("b")));
+                beginSn = String.valueOf(objectList.get(col.indexOf("c")));
+                endSn = String.valueOf(objectList.get(col.indexOf("d")));
+                beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
+                endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
 
                 if (StringUtils.isBlank(sendDate)) {
                     logger.info("发货日期不能为空");
