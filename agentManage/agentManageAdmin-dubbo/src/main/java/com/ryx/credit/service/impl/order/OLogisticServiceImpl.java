@@ -38,6 +38,7 @@ import java.util.*;
 public class OLogisticServiceImpl implements OLogisticsService {
     private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
@@ -109,20 +110,22 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String logCom = "";
             String wNumber = "";
             try {
-                planNum = String.valueOf(objectList.get(0));
-                orderId = String.valueOf(objectList.get(1));
-                proCode = String.valueOf(objectList.get(2));
-                proId = String.valueOf(objectList.get(3));
-                proName = String.valueOf(objectList.get(4));
 
-                sendDate = String.valueOf(objectList.get(19));
-                sendProNum = String.valueOf(objectList.get(20));
-                logCom = String.valueOf(objectList.get(21));
-                wNumber = String.valueOf(objectList.get(22));
-                beginSn = String.valueOf(objectList.get(23));
-                endSn = String.valueOf(objectList.get(24));
-                beginSnCount = String.valueOf(objectList.get(25));
-                endSnCount = String.valueOf(objectList.get(26));
+                List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+                planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
+                orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
+                proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
+                proId = String.valueOf(objectList.get(col.indexOf("PRO_ID")));
+                proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME")));
+
+                sendDate = String.valueOf(objectList.get(col.indexOf("h")));
+                sendProNum = String.valueOf(objectList.get(col.indexOf("g")));
+                logCom = String.valueOf(objectList.get(col.indexOf("a")));
+                wNumber = String.valueOf(objectList.get(col.indexOf("b")));
+                beginSn = String.valueOf(objectList.get(col.indexOf("c")));
+                endSn = String.valueOf(objectList.get(col.indexOf("d")));
+                beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
+                endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
 
                 if (StringUtils.isBlank(sendDate)) {
                     logger.info("发货日期不能为空");
@@ -215,7 +218,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setcUser(user);                                      // 创建人
                 oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
                 oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
-                oLogistics.setSendDate(DateUtils.stringToDate(sendDate));       // 物流日期
+                try {
+                    oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                }catch (Exception e){
+                    try {
+                        oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
+                    }catch (Exception m){
+                        throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
+                    }
+                }
                 oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
                 oLogistics.setIsdeall(Status.STATUS_1.status);
 

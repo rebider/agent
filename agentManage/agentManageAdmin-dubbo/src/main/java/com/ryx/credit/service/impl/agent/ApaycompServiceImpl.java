@@ -29,6 +29,7 @@ public class ApaycompServiceImpl implements com.ryx.credit.service.agent.Apaycom
     public List<PayComp> compList() {
         PayCompExample example = new PayCompExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status);
+        example.setOrderByClause("C_TIME desc");
         return payCompMapper.selectByExample(example);
     }
 
@@ -41,6 +42,7 @@ public class ApaycompServiceImpl implements com.ryx.credit.service.agent.Apaycom
     public List<PayComp> recCompList() {
         PayCompExample example = new PayCompExample();
         example.or().andStatusEqualTo(Status.STATUS_2.status);
+        example.setOrderByClause("C_TIME desc");
         return payCompMapper.selectByExample(example);
     }
 
