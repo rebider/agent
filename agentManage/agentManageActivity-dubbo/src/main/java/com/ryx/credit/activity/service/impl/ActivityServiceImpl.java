@@ -124,6 +124,11 @@ public class ActivityServiceImpl implements ActivityService {
     public Map completeTask(String taskId, Map<String,Object>  map) {
         Map<String,Object> rs = new HashMap<>(5);
         try {
+            TaskService taskService = processEngine.getTaskService();
+            taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
+            taskService.complete(taskId, map);
+            logger.info("完成任务" + taskId);
+
             String approvalResult = String.valueOf(map.get("rs"));
             String approvalOpinion = String.valueOf(map.get("approvalOpinion"));
             String approvalPerson = String.valueOf(map.get("approvalPerson"));
@@ -151,10 +156,6 @@ public class ActivityServiceImpl implements ActivityService {
             approvalFlowRecord.setApprovalResult(approvalResult);
             approvalFlowRecordService.insert(approvalFlowRecord);
 
-            TaskService taskService = processEngine.getTaskService();
-            taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
-            taskService.complete(taskId, map);
-            logger.info("完成任务" + taskId);
             rs.put("rs",true);
             rs.put("msg","success");
         } catch (Exception e) {
