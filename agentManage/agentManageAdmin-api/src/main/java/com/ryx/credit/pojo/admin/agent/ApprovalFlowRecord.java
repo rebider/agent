@@ -31,6 +31,8 @@ public class ApprovalFlowRecord implements Serializable{
 
     private BigDecimal version;
 
+    private String busTypeName;
+
     public String getId() {
         return id;
     }
@@ -133,5 +135,13 @@ public class ApprovalFlowRecord implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getBusTypeName() {
+        return busTypeName;
+    }
+
+    public void setBusTypeName(String busTypeName) {
+        this.busTypeName = busTypeName;
     }
 }
