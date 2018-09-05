@@ -10,6 +10,7 @@ import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
@@ -67,6 +68,8 @@ public class AgentServiceImpl implements AgentService {
     private CuserAgentMapper cuserAgentMapper;
     @Autowired
     private CUserMapper cUserMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
 
     /**
@@ -190,10 +193,24 @@ public class AgentServiceImpl implements AgentService {
         agent.setcTime(date);
         agent.setcUtime(date);
         agent.setId(idService.genId(TabId.a_agent));
+
+        boolean isHaveYYZZ = false;
+        boolean isHaveFRSFZ = false;
+
         if (1 == agentMapper.insertSelective(agent)) {
             if (attrId != null) {
                 for (String s : attrId) {
                     if (StringUtils.isEmpty(s)) continue;
+
+                    Attachment attachment = attachmentMapper.selectByPrimaryKey(s);
+                    if(attachment!=null){
+                        if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
+                            isHaveYYZZ = true;
+                        }
+                        if(AttDataTypeStatic.SFZZM.code.equals(attachment.getAttDataType()+"")){
+                            isHaveFRSFZ = true;
+                        }
+                    }
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(s);
                     record.setSrcId(agent.getId());
@@ -207,6 +224,13 @@ public class AgentServiceImpl implements AgentService {
                         throw new ProcessException("添加代理商附件关系失败");
                     }
                 }
+
+            }
+            if(!isHaveYYZZ){
+                throw new ProcessException("请添加营业执照附件");
+            }
+            if(!isHaveFRSFZ){
+                throw new ProcessException("请添加法人身份证附件");
             }
             logger.info("代理商添加:成功");
             return agent;
