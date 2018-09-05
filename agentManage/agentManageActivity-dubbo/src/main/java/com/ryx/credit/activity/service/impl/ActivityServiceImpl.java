@@ -130,7 +130,7 @@ public class ActivityServiceImpl implements ActivityService {
             String createTime = String.valueOf(map.get("createTime"));
             Date approvalTime = DateUtil.format(createTime, DateUtil.DATE_FORMAT_1);
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(approvalPerson));
-            String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGANIZATIONCODE"));
+            String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGID"));
             ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(taskId);
             String executionId = String.valueOf(actRuTask.getExecutionId());
             String taskName = String.valueOf(actRuTask.getName());
