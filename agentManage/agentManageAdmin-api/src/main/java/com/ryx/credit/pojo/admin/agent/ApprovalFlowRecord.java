@@ -33,6 +33,10 @@ public class ApprovalFlowRecord implements Serializable{
 
     private String busTypeName;
 
+    private String beginTime;
+
+    private String endTime;
+
     public String getId() {
         return id;
     }
@@ -143,5 +147,21 @@ public class ApprovalFlowRecord implements Serializable{
 
     public void setBusTypeName(String busTypeName) {
         this.busTypeName = busTypeName;
+    }
+
+    public String getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(String beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }
