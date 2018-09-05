@@ -2,20 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ryx.credit.dao.agent.AttachmentMapper">
     <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.Attachment">
-        <id column="ID" property="id" jdbcType="VARCHAR"/>
-        <result column="ATT_NAME" property="attName" jdbcType="VARCHAR"/>
-        <result column="ATT_SIZE" property="attSize" jdbcType="DECIMAL"/>
-        <result column="ATT_TYPE" property="attType" jdbcType="VARCHAR"/>
-        <result column="ATT_DBPATH" property="attDbpath" jdbcType="VARCHAR"/>
-        <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP"/>
-        <result column="C_USER" property="cUser" jdbcType="VARCHAR"/>
-        <result column="STATUS" property="status" jdbcType="DECIMAL"/>
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="ATT_NAME" jdbcType="VARCHAR" property="attName" />
+        <result column="ATT_SIZE" jdbcType="DECIMAL" property="attSize" />
+        <result column="ATT_TYPE" jdbcType="VARCHAR" property="attType" />
+        <result column="ATT_DBPATH" jdbcType="VARCHAR" property="attDbpath" />
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+        <result column="STATUS" jdbcType="DECIMAL" property="status" />
+        <result column="ATT_DATA_TYPE" jdbcType="VARCHAR" property="attDataType" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
                 <if test="criteria.valid">
-                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
                         <foreach collection="criteria.criteria" item="criterion">
                             <choose>
                                 <when test="criterion.noValue">
@@ -29,8 +30,7 @@
                                 </when>
                                 <when test="criterion.listValue">
                                     and ${criterion.condition}
-                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
-                                             separator=",">
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                                         #{listItem}
                                     </foreach>
                                 </when>
@@ -42,45 +42,46 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    ID, ATT_NAME, ATT_SIZE, ATT_TYPE, ATT_DBPATH, C_TIME, C_USER, STATUS
-  </sql>
-    <select id="selectByExample" resultMap="BaseResultMap"
-            parameterType="com.ryx.credit.pojo.admin.agent.AttachmentExample">
-        <include refid="OracleDialectPrefix"/>
+        ID, ATT_NAME, ATT_SIZE, ATT_TYPE, ATT_DBPATH, C_TIME, C_USER, STATUS, ATT_DATA_TYPE
+    </sql>
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AttachmentExample" resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix" />
         select
         <if test="distinct">
             distinct
         </if>
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from A_ATTACHMENT
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
         <if test="orderByClause != null">
             order by ${orderByClause}
         </if>
-        <include refid="OracleDialectSuffix"/>
+        <include refid="OracleDialectSuffix" />
     </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from A_ATTACHMENT
         where ID = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AttachmentExample">
         delete from A_ATTACHMENT
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
     </delete>
     <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.Attachment">
-    insert into A_ATTACHMENT (ID, ATT_NAME, ATT_SIZE, 
-      ATT_TYPE, ATT_DBPATH, C_TIME, 
-      C_USER, STATUS)
-    values (#{id,jdbcType=VARCHAR}, #{attName,jdbcType=VARCHAR}, #{attSize,jdbcType=DECIMAL}, 
-      #{attType,jdbcType=VARCHAR}, #{attDbpath,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL})
-  </insert>
+        insert into A_ATTACHMENT (ID, ATT_NAME, ATT_SIZE,
+        ATT_TYPE, ATT_DBPATH, C_TIME,
+        C_USER, STATUS, ATT_DATA_TYPE
+        )
+        values (#{id,jdbcType=VARCHAR}, #{attName,jdbcType=VARCHAR}, #{attSize,jdbcType=DECIMAL},
+        #{attType,jdbcType=VARCHAR}, #{attDbpath,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+        #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{attDataType,jdbcType=VARCHAR}
+        )
+    </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.Attachment">
         insert into A_ATTACHMENT
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -108,6 +109,9 @@
             <if test="status != null">
                 STATUS,
             </if>
+            <if test="attDataType != null">
+                ATT_DATA_TYPE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -134,13 +138,15 @@
             <if test="status != null">
                 #{status,jdbcType=DECIMAL},
             </if>
+            <if test="attDataType != null">
+                #{attDataType,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AttachmentExample"
-            resultType="java.lang.Integer">
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AttachmentExample" resultType="java.lang.Long">
         select count(*) from A_ATTACHMENT
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
     </select>
     <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.Attachment">
@@ -167,20 +173,24 @@
             <if test="status != null">
                 STATUS = #{status,jdbcType=DECIMAL},
             </if>
+            <if test="attDataType != null">
+                ATT_DATA_TYPE = #{attDataType,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.Attachment">
-    update A_ATTACHMENT
-    set ATT_NAME = #{attName,jdbcType=VARCHAR},
-      ATT_SIZE = #{attSize,jdbcType=DECIMAL},
-      ATT_TYPE = #{attType,jdbcType=VARCHAR},
-      ATT_DBPATH = #{attDbpath,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
+        update A_ATTACHMENT
+        set ATT_NAME = #{attName,jdbcType=VARCHAR},
+        ATT_SIZE = #{attSize,jdbcType=DECIMAL},
+        ATT_TYPE = #{attType,jdbcType=VARCHAR},
+        ATT_DBPATH = #{attDbpath,jdbcType=VARCHAR},
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+        C_USER = #{cUser,jdbcType=VARCHAR},
+        STATUS = #{status,jdbcType=DECIMAL},
+        ATT_DATA_TYPE = #{attDataType,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
     <sql id="OracleDialectPrefix">
         <if test="page != null">
             select * from ( select row_.*, rownum rownum_ from (

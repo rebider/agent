@@ -21,6 +21,8 @@ public class Attachment implements Serializable {
 
     private BigDecimal status;
 
+    private String attDataType;
+
     public String getId() {
         return id;
     }
@@ -83,5 +85,13 @@ public class Attachment implements Serializable {
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public String getAttDataType() {
+        return attDataType;
+    }
+
+    public void setAttDataType(String attDataType) {
+        this.attDataType = attDataType == null ? null : attDataType.trim();
     }
 }
