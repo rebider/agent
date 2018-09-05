@@ -617,10 +617,11 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
     <select id="queryAgentListView" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
         (
+        select * from(
         select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
         agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
         agent.AG_STATUS ,agent.AG_REMARK ,agent.C_INCOM_STATUS,
-        agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO
+        agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO,agent.C_UTIME
         from A_AGENT agent
 
         left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
@@ -657,7 +658,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
         select agent.ID ,agent.AG_NAME ,agent.AG_UNIQ_NUM ,agent.AG_HEAD ,
         agent.AG_HEAD_MOBILE ,agent.AG_REG_ADD ,
         agent.AG_STATUS ,agent.AG_REMARK ,agent.C_INCOM_STATUS,
-        agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO
+        agent.C_TIME,b.name as AG_DOC_DISTRICT,a.name as AG_DOC_PRO,agent.C_UTIME
         from A_AGENT agent
 
         left join C_ORGANIZATION a on a.id=agent.ag_doc_pro
@@ -691,8 +692,9 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             and agent.C_USER = #{map.userId}
         </if>
         )
+        a order by decode(AG_STATUS,'Create',1,'Approving',2,'Approved',3,'Refuse',4,'Reject',5),c_utime desc
+        )
 
-        order by c_time desc
         <include refid="OracleDialectSuffix"/>
     </select>
 
