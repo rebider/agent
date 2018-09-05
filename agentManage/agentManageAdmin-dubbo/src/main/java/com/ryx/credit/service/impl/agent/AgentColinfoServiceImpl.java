@@ -235,10 +235,25 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                         }
                     }
 
+                    //银行卡扫描件
+                    boolean isHaveYHKSMJ = false;
+                    //开户许可证
+                    boolean isHaveKHXUZ = false;
                     //添加新的附件
                     List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
                     if(fileIdList!=null) {
                         for (String fileId : fileIdList) {
+
+                            Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                            if(attachment!=null){
+                                if(AttDataTypeStatic.YHKSMJ.code.equals(attachment.getAttDataType()+"")){
+                                    isHaveYHKSMJ = true;
+                                }
+                                if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
+                                    isHaveKHXUZ = true;
+                                }
+                            }
+
                             AttachmentRel record = new AttachmentRel();
                             record.setAttId(fileId);
                             record.setSrcId(db_AgentColinfo.getId());
@@ -253,6 +268,12 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                                 throw new ProcessException("更新收款信息失败");
                             }
                         }
+                    }
+                    if(!isHaveYHKSMJ){
+                        throw new ProcessException("请添加银行卡扫描件");
+                    }
+                    if(!isHaveKHXUZ){
+                        throw new ProcessException("请添加开户许可证");
                     }
 
                 }

@@ -319,10 +319,23 @@ public class AgentServiceImpl implements AgentService {
                 throw new ProcessException("更新修改代理商失败");
             }
         }
-
+        //营业执照和法人身份证附件必须上传
+        boolean isHaveYYZZ = false;
+        boolean isHaveFRSFZ = false;
         //添加新的附件
         if (attrs != null) {
             for (String fileId : attrs) {
+
+                Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                if(attachment!=null){
+                    if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
+                        isHaveYYZZ = true;
+                    }
+                    if(AttDataTypeStatic.SFZZM.code.equals(attachment.getAttDataType()+"")){
+                        isHaveFRSFZ = true;
+                    }
+                }
+
                 AttachmentRel record = new AttachmentRel();
                 record.setAttId(fileId);
                 record.setSrcId(db_agent.getId());
@@ -338,7 +351,12 @@ public class AgentServiceImpl implements AgentService {
                 }
             }
         }
-
+        if(!isHaveYYZZ){
+            throw new ProcessException("请添加营业执照附件");
+        }
+        if(!isHaveFRSFZ){
+            throw new ProcessException("请添加法人身份证附件");
+        }
         return db_agent;
     }
 
