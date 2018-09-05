@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +98,35 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
         } catch (Exception e) {
             result.setMsg("服务器错误");
             logger.info("服务器错误");
+        }
+        return result;
+    }
+
+    @Override
+    public AgentResult saveDataHistory(Object object, String id, String dataType, String user, BigDecimal version) {
+        AgentResult result = new AgentResult(500, "参数错误", "");
+        try {
+
+            DataHistory dataHistory = new DataHistory();
+            String dataCotent = JsonUtil.objectToJson(object);
+            dataHistory.setDataId(id);
+            dataHistory.setcUser(user);
+            dataHistory.setDataVersion(version);
+            dataHistory.setId(idService.genId(TabId.data_history));
+            dataHistory.setDataType(dataType);
+            dataHistory.setDataCotent(dataCotent);
+            dataHistory.setcTime(new Date());
+            dataHistory.setStatus(Status.STATUS_1.status);
+            int insert = dataHistoryMapper.insert(dataHistory);
+            if (insert == 1) {
+                return AgentResult.ok();
+            }else{
+                return AgentResult.fail("历史数据插入错误");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setMsg("历史数据插入错误");
+            logger.info("历史数据插入错误");
         }
         return result;
     }
