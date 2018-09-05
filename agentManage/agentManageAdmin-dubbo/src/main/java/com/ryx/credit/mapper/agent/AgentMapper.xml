@@ -473,7 +473,8 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
     </select>
 
     <select id="excelAgent" parameterType="map" resultMap="AgentoutVo">
-        (select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,
+        select * from(
+        select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,agent.AG_STATUS,agent.c_utime,
         bus.BUS_PLATFORM,bus.BUS_NUM,bus.BUS_TYPE,bus.BUS_PARENT,bus.BUS_RISK_PARENT,bus.BUS_ACTIVATION_PARENT,
         DECODE(bus.BUS_SENT_DIRECTLY,'1','是','0','否') as bus_sent_directly,DECODE(bus.bus_Inde_ass,'1','是','0','否') as
         bus_Inde_ass,bus.BUS_SCOPE,bus.BUS_REGION,bus.CLO_PAY_COMPANY,
@@ -498,7 +499,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
             </if>
         </where>
         UNION
-        select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,
+        select agent.ID,agent.AG_NAME,agent.AG_UNIQ_NUM,agent.AG_HEAD,bus.AGENT_ID,agent.AG_STATUS,agent.c_utime,
         bus.BUS_PLATFORM,bus.BUS_NUM,bus.BUS_TYPE,bus.BUS_PARENT,bus.BUS_RISK_PARENT,bus.BUS_ACTIVATION_PARENT,
         DECODE(bus.BUS_SENT_DIRECTLY,'1','是','0','否') as bus_sent_directly,DECODE(bus.bus_Inde_ass,'1','是','0','否') as
         bus_Inde_ass,bus.BUS_SCOPE,bus.BUS_REGION,bus.CLO_PAY_COMPANY,
@@ -522,6 +523,7 @@ agent.C_INCOM_STATUS,agent.C_USER,agent.AG_ZBH,agent.STATUS,cor.NAME,cor.ADDRESS
                 and agent.C_USER = #{map.userId}
             </if>
         </where>)
+        a order by decode(AG_STATUS,'Create',1,'Approving',2,'Approved',3,'Refuse',4,'Reject',5),c_utime desc
     </select>
     <resultMap id="AgentoutVo" type="com.ryx.credit.pojo.admin.vo.AgentoutVo">
         <id column="ID" property="id" jdbcType="VARCHAR"/>
