@@ -9,6 +9,7 @@ import com.ryx.credit.profit.pojo.TransProfitDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yangmx
@@ -19,14 +20,14 @@ public interface ProfitMonthService {
     /**
      * 查询月分润数据
      * @param page
-     * @param profitMonth
+     * @param ProfitDetailMonth
      * @return
      */
    // public List<ProfitMonth> getProfitMonthList(Page page, ProfitMonth profitMonth);
     public List<ProfitDetailMonth> getProfitMonthList(Page page, ProfitDetailMonth ProfitDetailMonth);
     /**
      * 获取月分润总条数
-     * @param profitMonth
+     * @param profitDetailMonth
      * @return
      */
     //public int getProfitMonthCount(ProfitMonth profitMonth);
@@ -37,14 +38,14 @@ public interface ProfitMonthService {
      * @param profitDetailMonth
      * @return
      */
-    public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth);
+    public List<ProfitDetailMonth> getProfitDetailMonthList(Map<String, Object> department, Page page, ProfitDetailMonth profitDetailMonth);
 
     /**
      * 查询月分润明细总数
      * @param profitDetailMonth
      * @return
      */
-    public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth);
+    public int getProfitDetailMonthCount(Map<String, Object> department, ProfitDetailMonth profitDetailMonth);
 
     /**
      * 获取月度交易明细

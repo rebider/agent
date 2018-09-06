@@ -57,4 +57,8 @@ public interface ProfitDetailMonthMapper {
     int updateByPrimaryKey(ProfitDetailMonth record);
 
     void payMoney(String profitDate);
+
+    List<String> getDistrictAgent(String id);
+
+    List<String> getProAgent(String id);
 }
