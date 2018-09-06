@@ -83,6 +83,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private COrganizationMapper organizationMapper;
     @Autowired
     private CUserMapper cUserMapper;
+    @Autowired
+    private AgentQueryService agentQueryService;
     /**
      * 商户入网
      *
@@ -726,6 +728,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
     @Override
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
+        //加载缓存
         if (String.valueOf(map.get("flag")).equals("1")){
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
             if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -745,48 +748,30 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
         List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
+        if (null==agentoutVos && agentoutVos.size()>1)
+            return null;
+        List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
+
+
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
-                    if (null != value)
-                        agentoutVo.setBusType(value.getdItemname());
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusPlatform()) && !agentoutVo.getBusPlatform().equals("null")) {
-                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
-                    if (null != platForm)
-                        agentoutVo.setBusPlatform(platForm.getPlatformName());
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusRegion())  && !agentoutVo.getBusRegion().equals("null")) {
-
-                    String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
-                    if (StringUtils.isNotBlank(regionName))
-                        agentoutVo.setBusRegion(regionName);
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
-                    if (null != value)
-                        agentoutVo.setBusScope(value.getdItemname());
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusParent())&& StringUtils.isNotBlank(agentoutVo.getAgentId()) && StringUtils.isNotBlank(agentoutVo.getBusPlatform())) {
-                    getBusParent(agentoutVo);
-
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusRiskParent()) && !agentoutVo.getBusRiskParent().equals("null")) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusRiskParent(agentById.getAgName());
+                    for (Dict dict : BUS_TYPE) {
+                        if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){
+                              agentoutVo.setBusType(dict.getdItemname());
+                               break;
+                        }
                     }
-
                 }
-                if (StringUtils.isNotBlank(agentoutVo.getBusActivationParent()) && !agentoutVo.getBusActivationParent().equals("null")) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusActivationParent(agentById.getAgName());
+
+                if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
+                    for (Dict dict : BUS_SCOPE) {
+                        if (null!=dict  &&  agentoutVo.getBusScope().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusScope(dict.getdItemname());
+                            break;
+                        }
                     }
                 }
 
@@ -798,27 +783,46 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloType()) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name(), agentoutVo.getCloType().toString());
-                    if (null != value)
-                        agentoutVo.setCloString(value.getdItemname());
+                    for (Dict dict : COLINFO_TYPE) {
+                        if (null!=dict  &&  agentoutVo.getCloType().equals(dict.getdItemvalue())){
+                            agentoutVo.setCloString(dict.getdItemname());
+                            break;
+                        }
+                    }
                 }
-                if (StringUtils.isNotBlank(agentoutVo.getBankRegion()) && !agentoutVo.getBankRegion().equals("null")) {
-                    String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
-                    if (StringUtils.isNotBlank(regionName))
-                        agentoutVo.setBankRegion(regionName);
-                }
+//                if (StringUtils.isNotBlank(agentoutVo.getBankRegion()) && !agentoutVo.getBankRegion().equals("null")) {
+//                    String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
+//                    if (StringUtils.isNotBlank(regionName))
+//                        agentoutVo.setBankRegion(regionName);
+//                }
 
-                if (StringUtils.isNotBlank(agentoutVo.getCloPayCompany()) && !agentoutVo.getCloPayCompany().equals("null")) {
-                    PayComp payComp = apaycompService.selectById(agentoutVo.getCloPayCompany());
-                    if (null != payComp)
-                        agentoutVo.setCloPayCompany(payComp.getComName());
-                }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
                     NumberFormat numberFormat = NumberFormat.getPercentInstance();
                     Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
                     String point = numberFormat.format(parse);
                     agentoutVo.setPoint(point);
+                }
+
+                //业务区域
+                if (StringUtils.isNotBlank(agentoutVo.getBusRegion()) && !agentoutVo.getBusRegion().equals("null")){
+                    String busRegion = agentoutVo.getBusRegion();
+                    if (StringUtils.isNotBlank(busRegion) &&!busRegion.equals("null")){
+                        String[] arr = busRegion.split(",");
+                        String name = agentQueryService.dPosRegionNameFromDposIds(arr);
+                        if (StringUtils.isNotBlank(name) && !name.equals("null"))
+                            agentoutVo.setBusRegion(name);
+                    }
+                }
+                //银行地址
+                if (StringUtils.isNotBlank(agentoutVo.getBankRegion()) && !agentoutVo.getBankRegion().equals("null")){
+                    String bankRegion = agentoutVo.getBankRegion();
+                    if (StringUtils.isNotBlank(bankRegion)){
+                        String[] bank = bankRegion.split(",");
+                        String bankName = agentQueryService.dRegionNameFromIds(bank);
+                        if (StringUtils.isNotBlank(bankName))
+                            agentoutVo.setBankRegion(bankName);
+                    }
                 }
 
             }

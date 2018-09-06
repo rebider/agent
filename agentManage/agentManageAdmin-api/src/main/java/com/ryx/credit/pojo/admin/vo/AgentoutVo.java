@@ -17,6 +17,7 @@ public class AgentoutVo extends AgentExtends implements Serializable {
     private String busNum;
 
     private String busPlatform;
+    private String platformName;//平台名称
 
     private String busType;
     private String busParentId;//直属上级id
@@ -63,6 +64,7 @@ public class AgentoutVo extends AgentExtends implements Serializable {
     private BigDecimal cloInvoice;
 
     private String cloPayCompany;
+    private String comName;//打款公司名称
 
     private String yesOrNo;
 
@@ -341,5 +343,21 @@ public class AgentoutVo extends AgentExtends implements Serializable {
 
     public void setThreeParentName(String threeParentName) {
         this.threeParentName = threeParentName;
+    }
+
+    public String getPlatformName() {
+        return platformName;
+    }
+
+    public void setPlatformName(String platformName) {
+        this.platformName = platformName;
+    }
+
+    public String getComName() {
+        return comName;
+    }
+
+    public void setComName(String comName) {
+        this.comName = comName;
     }
 }
