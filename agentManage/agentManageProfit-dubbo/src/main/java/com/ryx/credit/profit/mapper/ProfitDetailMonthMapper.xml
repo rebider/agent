@@ -900,4 +900,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <!-- 获取大区代理商-->
+  <select id="getDistrictAgent" parameterType="String" resultType="java.lang.String">
+   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID WHERE COR.ID =#{id}
+  </select>
+
+  <!-- 获取省区代理商-->
+  <select id="getProAgent" parameterType="String" resultType="java.lang.String">
+   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID WHERE COR.ID =#{id}
+  </select>
 </mapper>

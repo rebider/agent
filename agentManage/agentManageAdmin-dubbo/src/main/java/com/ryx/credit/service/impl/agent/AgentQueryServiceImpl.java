@@ -1,17 +1,18 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.common.enumc.AttachmentRelType;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.ORefundPriceDiffMapper;
 import com.ryx.credit.dao.order.OReturnOrderMapper;
 import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
+import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
@@ -24,11 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service("agentQueryService")
 public class AgentQueryServiceImpl implements AgentQueryService {
+
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
 
     @Autowired
@@ -57,6 +60,12 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private OReturnOrderMapper returnOrderMapper;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private DPosRegionMapper dPosRegionMapper;
+    @Autowired
+    private RegionMapper regionMapper;
+    @Autowired
+    private RedisService redisService;
 
 
     @Override
@@ -188,5 +197,110 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
         }
         return null;
+    }
+
+
+    @Override
+    public String dPosRegionNameFromDposIds(String... ids) {
+        try {
+            if(ids==null || ids.length==0)
+                return "";
+            StringBuffer sb = new StringBuffer();
+            List list = redisService.multiGet(RedisCachKey.DPOSREGION.code,ids);
+            for (int i=0;i<list.size();i++) {
+                sb.append(list.get(i)).append((i!=list.size()-1)?",":"");
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+    @Override
+    public String dRegionNameFromIds(String... ids){
+        try {
+            if(ids==null || ids.length==0)
+                return "";
+            StringBuffer sb = new StringBuffer();
+            List list = redisService.multiGet(RedisCachKey.DREGIONS.code,ids);
+            for (int i=0;i<list.size();i++) {
+                sb.append(list.get(i)).append((i!=list.size()-1)?",":"");
+            }
+            return sb.toString();
+        }catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
+    @Override
+    public String getAgentNameByBusId(String busId) {
+        try {
+            return redisService.hGet(RedisCachKey.AGENT_BUSINFO.code+busId,"AG_NAME");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    @Override
+    public void loadCach() {
+
+        new Thread(() -> {
+
+            //agent
+            List<Map<String,Object>>  list = agentBusInfoMapper.queryAgentNameByBusId();
+            Map<String,String> agentBusInfoName = new HashMap();
+            for (Map<String, Object> stringObjectMap : list) {
+                try {
+                    redisService.hSet(RedisCachKey.AGENT_BUSINFO.code+stringObjectMap.get("ID"),stringObjectMap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                agentBusInfoName.put(stringObjectMap.get("ID")+"",stringObjectMap.get("AG_NAME")+"");
+            }
+            logger.info("代理商业务集合信息放入redis");
+            try {
+                redisService.hSet(RedisCachKey.AGENT_BUSINFO.code,agentBusInfoName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+            if(!redisService.haveKey(RedisCachKey.DPOSREGION.code)) {
+                //DPosRegion
+                DPosRegionExample dPosRegionExample = new DPosRegionExample();
+                List<DPosRegion> dPosRegions = dPosRegionMapper.selectByExample(dPosRegionExample);
+                Map<String, String> dPosRegionName = new HashMap();
+                for (DPosRegion dPosRegion : dPosRegions) {
+                    dPosRegionName.put(dPosRegion.getCode(), dPosRegion.getName());
+                }
+                logger.info("POSREGIONS 放入redis");
+                try {
+                    redisService.hSet(RedisCachKey.DPOSREGION.code, dPosRegionName);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if(!redisService.haveKey(RedisCachKey.DREGIONS.code)) {
+                List<Region> regions = regionMapper.selectAll();
+                Map<String, String> regionsName = new HashMap();
+                for (Region region : regions) {
+                    regionsName.put(region.getrCode(), region.getrName());
+                }
+                try {
+                    logger.info("REGION 放入redis");
+                    redisService.hSet(RedisCachKey.DREGIONS.code, regionsName);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }).run();
+
     }
 }

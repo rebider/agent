@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -70,6 +72,37 @@ public class ProductServiceImpl implements ProductService {
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oProducts);
         pageInfo.setTotal(productMapper.countByExample(example));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo productGroupByList(OProduct product, Page page) {
+        FastMap example = FastMap.fastFailMap();
+        if (StringUtils.isNotBlank(product.getProCode())) {
+            example.putKeyV("proCode",product.getProCode());
+        }
+        if (StringUtils.isNotBlank(product.getProName())) {
+            example.putKeyV("proName","%"+product.getProName()+"%");
+        }
+        if (StringUtils.isNotBlank(product.getProType())) {
+            String proTypeString = product.getProType();
+            if(proTypeString.contains(",")) {
+                String[] split = proTypeString.split(",");
+                List<String> proCodeList = new ArrayList<>();
+                for (int i = 0; i < split.length; i++) {
+                    proCodeList.add(split[i]);
+                }
+                example.putKeyV("proTypes", proCodeList);
+            }else {
+                example.putKeyV("proType", product.getProType());
+            }
+        }
+
+        example.putKeyV("page",page);
+        List<Map> oProducts = productMapper.queryGroupByProCodeList(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(oProducts);
+        pageInfo.setTotal(productMapper.queryGroupByProCodeListCount(example));
         return pageInfo;
     }
 

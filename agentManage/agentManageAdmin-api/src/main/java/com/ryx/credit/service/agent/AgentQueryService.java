@@ -65,4 +65,31 @@ public interface AgentQueryService {
     public List<Agent> queryAgentListByIds(List<String> ids);
 
 
+    /**
+     * 获取dPosRegionName 根据ids
+     * @param ids
+     * @return
+     */
+    public String dPosRegionNameFromDposIds(String...ids);
+
+    /**
+     * 获取dRegionName 根据ids
+     * @param ids
+     * @return
+     */
+    public String dRegionNameFromIds(String... ids);
+
+    /**
+     * 根据业务ID获取代理商名称
+     * @param busId
+     * @return
+     */
+    public String getAgentNameByBusId(String busId);
+
+    /**
+     * 加载缓存
+     */
+    public void loadCach();
+
+
 }

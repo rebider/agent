@@ -84,7 +84,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitMonthMapper.selectByExample(profitMonthExample);
     }*/
     public List<ProfitDetailMonth> getProfitMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
-        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
+        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(null, profitDetailMonth);
         if(page != null){
             profitDetailMonthExample.setPage(page);
         }
@@ -128,25 +128,45 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }*/
     @Override
     public int getProfitMonthCount(ProfitDetailMonth profitDetailMonth) {
-        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(profitDetailMonth);
+        ProfitDetailMonthExample profitDetailMonthExample= this.profitDetailMonthEqualsTo(null, profitDetailMonth);
         return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
     }
 //月分润
     @Override
-    public List<ProfitDetailMonth> getProfitDetailMonthList(Page page, ProfitDetailMonth profitDetailMonth) {
-        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
+    public List<ProfitDetailMonth> getProfitDetailMonthList(Map<String, Object>  department, Page page, ProfitDetailMonth profitDetailMonth) {
+        List<String> agentList = null;
+        if(department != null){
+            agentList = departmentAgentList(department);
+        }
+        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(agentList, profitDetailMonth);
         if(page != null){
             profitDetailMonthExample.setPage(page);
         }
         return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
     }
 
-    private ProfitDetailMonthExample profitDetailMonthEqualsTo(ProfitDetailMonth profitDetailMonth) {
+    /**
+     * 根据当前部门信息查询分润信息
+     * @param department
+     */
+    private List<String> departmentAgentList(Map<String, Object> department) {
+        if(Objects.equals("south", department.get("ORGANIZATIONCODE")) || Objects.equals("north", department.get("ORGANIZATIONCODE"))){
+            return profitDetailMonthMapper.getDistrictAgent(department.get("ORGID").toString());
+        } else if(department.get("ORGANIZATIONCODE").toString().contains("south") || department.get("ORGANIZATIONCODE").toString().contains("north")){
+            return profitDetailMonthMapper.getProAgent(department.get("ORGID").toString());
+        }
+        return null;
+    }
+
+    private ProfitDetailMonthExample profitDetailMonthEqualsTo(List<String> agentList, ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
         if(profitDetailMonth == null){
             return profitDetailMonthExample;
         }
         ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+        if(agentList != null && !agentList.isEmpty()){
+            criteria.andAgentIdIn(agentList);
+        }
         if(StringUtils.isNotBlank(profitDetailMonth.getAgentId())){
             criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
         }
@@ -178,8 +198,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 //月分润
     @Override
-    public int getProfitDetailMonthCount(ProfitDetailMonth profitDetailMonth) {
-        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(profitDetailMonth);
+    public int getProfitDetailMonthCount(Map<String, Object> department, ProfitDetailMonth profitDetailMonth) {
+        List<String> agentList = null;
+        if(department != null){
+            agentList = departmentAgentList(department);
+        }
+        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(agentList, profitDetailMonth);
         return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
     }
 
@@ -370,7 +394,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
 //        profitDetailMonth.setAgentId("AG20180817000000000006101");// 验证使用
-        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, profitDetailMonth);
+        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null,null, profitDetailMonth);
         Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
@@ -429,7 +453,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         ProfitDetailMonth detailMonth = new ProfitDetailMonth();
         detailMonth.setStatus("4");
         detailMonth.setProfitDate(profitDate);
-        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, detailMonth);
+        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null,null, detailMonth);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             String paytDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
             profitDetailMonthList.forEach(profitDetailMonth -> {
