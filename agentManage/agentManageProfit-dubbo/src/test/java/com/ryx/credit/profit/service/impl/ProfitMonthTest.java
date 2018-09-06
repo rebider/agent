@@ -1,4 +1,4 @@
-package com.ryx.credit.profit.unitmain;
+package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
@@ -14,7 +14,6 @@ import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
-import com.ryx.credit.profit.service.ProfitComputerService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
@@ -22,12 +21,11 @@ import com.ryx.credit.service.order.OrderService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,12 +33,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * 手刷月分润数据同步、定时
- */
-@Service
-@Transactional(rollbackFor=RuntimeException.class)
-public class NewProfitMonthMposDataJob {
+@RunWith(SpringJUnit4ClassRunner.class)
+// 加载配置文件
+@ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
+public class ProfitMonthTest {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
     private TransProfitDetailMapper transProfitDetailMapper;
@@ -55,33 +51,30 @@ public class NewProfitMonthMposDataJob {
     @Autowired
     OrderService orderService;
 
-    private String transDate = "";
+    private String month = "";
     private int index = 1;
-    private static BigDecimal allAmount= BigDecimal.ZERO;
 
-   public void excute(){
-       synchroProfitMonth();
-   }
-
-//    @Test
-//    public void test() throws Exception {
+    @Test
+    public void test() throws Exception {
 //        String transDate = "201807";
 //        synchroProfitMonth(transDate);
-//        synchroProfitMonth();
-//    }
+        synchroProfitMonth();
+    }
 
     /**
-     * 同步手刷月分润明细数据
-     * transDate 交易日期（空则为上一月）
+     * 每一个小时执行一次：@Scheduled(cron = "0 0 * * * ?")
      * 每月10号凌晨20点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
+     * @throws Exception
      */
-    @Scheduled(cron = "0 0 10 20 * ?")
+    @Test
+    @Scheduled(cron = "0 0 * * * ?")
     public void synchroProfitMonth(){
-        String transDate = null;
-        HashMap<String,String> map = new HashMap<String,String>();
+        String transDate = "201807";
+//        String transDate = null;
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
+        HashMap<String,String> map = new HashMap<String,String>();
         map.put("frMonth", transDate);
-        map.put("pageNumber", index++ +"");
+        map.put("pageNumber", "1");
         map.put("pageSize", "2");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
@@ -156,10 +149,10 @@ public class NewProfitMonthMposDataJob {
             detail.setParentAgentId(parentAgentId);//上级AG码
             detail.setAgentId(Busime.getAgentId());//AG码
             detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
-            detail.setInTransAmt(json.getBigDecimal("SAMOUNT"));//付款交易额
+            detail.setInTransAmt(json.getBigDecimal("SAMOUNT")==null?BigDecimal.ZERO:json.getBigDecimal("SAMOUNT"));//付款交易额
             detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
             detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
-            detail.setProfitAmt(json.getBigDecimal("PROFIT"));//分润金额
+            detail.setProfitAmt(json.getBigDecimal("PROFIT")==null?BigDecimal.ZERO:json.getBigDecimal("PROFIT"));//分润金额
             detail.setPayCompany(Busime.getCloPayCompany());//打款公司
             detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
             detail.setSourceInfo("MPOS");
@@ -182,7 +175,7 @@ public class NewProfitMonthMposDataJob {
                 detail.setUnlineAmt(actualAmt);//线下打款金额
                 OPayment oPayment = new OPayment();
                 oPayment.setId((String) map.get("ID"));
-                oPayment.setProfitTaxAmt(actualAmt);//已打款
+                oPayment.setProfitTaxAmt(actualAmt);//已用金额
                 paymentList.add(oPayment);
             }
             transProfitDetailMapper.insertSelective(detail);
@@ -191,7 +184,7 @@ public class NewProfitMonthMposDataJob {
                 orderService.updateProfitTaxAmt(paymentList);//批量更新分润税点抵扣金额
             }
         }
-        synchroProfitMonth();
+//        synchroProfitMonth(transDate);
     }
 
 }

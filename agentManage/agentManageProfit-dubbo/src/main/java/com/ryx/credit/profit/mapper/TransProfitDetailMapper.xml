@@ -81,6 +81,15 @@
     <include refid="OracleDialectSuffix" />
   </select>
 
+  <select id="selectByIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM TRANS_PROFIT_DETAIL
+    WHERE
+    BUS_NUM = #{busNum,jdbcType=VARCHAR}
+    AND PARENT_BUS_NUM = #{parentBusNum,jdbcType=VARCHAR}
+  </select>
+
   <select id="selectListByDate" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
@@ -121,9 +130,8 @@
   </select>
 
   <select id="selectSumTotalDay" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
-    <include refid="OracleDialectPrefix" />
     select
-    SUM(NOTAX_AMT)
+    SUM(NOTAX_AMT-UNLINE_AMT)
     from TRANS_PROFIT_DETAIL
     WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     <if test="parentAgentId != null">

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
@@ -9,6 +10,7 @@ import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
+import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitComputerService;
@@ -17,10 +19,16 @@ import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OrderService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -70,6 +78,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     TransProfitDetailMapper transProfitDetailMapper;
     @Autowired
     AgentColinfoService colinfoService;
+    @Autowired
+    OrderService orderService;
 
     private int index = 1;
     private BigDecimal tranAmount = BigDecimal.ZERO;
@@ -448,6 +458,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
 
     }
+
     public void addTransAmt(List<JSONObject> profitMonths,String transDate){
         for(JSONObject json:profitMonths){
             BigDecimal transAmt = isDecimalNull(json.getBigDecimal("TRANAMT"));
@@ -509,7 +520,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                     isJieYin = true;
                 }
             }
-            ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt(),detailMonth.getAgentPid(),isDecimalNull(subAmt),detailMonth.getTax(),profitDate,isJieYin,isRYX);
+            ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt()==null?BigDecimal.ZERO:detailMonth.getRealProfitAmt()
+                    ,detailMonth.getAgentPid(),isDecimalNull(subAmt),detailMonth.getTax(),profitDate,isJieYin,isRYX);
             updateDetail.setId(detailMonth.getId());
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
@@ -648,14 +660,28 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return value==null?BigDecimal.ZERO:value;
     }
 
+//    @Scheduled(cron = "0 0 10 20 * ?")
+//    @Test
+//    public void test() throws Exception {
+//        String profitDate = "201807";
+//        new_computerTax(profitDate);
+//        new_computerTax();
+//    }
 
-    public void new_computerTax(String profitDate){
-        profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):profitDate;
+    /**
+     * 每月10号凌晨20点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
+     * @throws Exception
+     */
+    @Scheduled(cron = "0 0 10 20 * ?")
+    public void new_computerTax() throws Exception {
+        String profitDate = null;
+        profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;
         List<ProfitDetailMonth> detailMonths1 = detailMonthMapper.selectByGreaDate(profitDate);
         List<ProfitDetailMonth> detailMonths2 = detailMonthMapper.selectByLessDate(profitDate);
         boolean isSupply = false;//是否补税
         boolean isRYX = false;//是否瑞银信打款
-        for(ProfitDetailMonth detailMonth:detailMonths1){//一、不需要补下级税点的先计算
+        //一、不需要补下级税点的先计算
+        for(ProfitDetailMonth detailMonth : detailMonths1){
             TransProfitDetail where = new TransProfitDetail();
             where.setAgentId(detailMonth.getAgentId());
             where.setParentAgentId(detailMonth.getParentAgentId().equals("")?null:detailMonth.getParentAgentId());
@@ -666,7 +692,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
         BigDecimal subAmt = BigDecimal.ZERO;//所有下级的基础分润汇总
-        for(ProfitDetailMonth detailMonth:detailMonths2){//二、需要补税点的后计算
+        //二、需要补税点的后计算
+        for(ProfitDetailMonth detailMonth : detailMonths2){
             isSupply = true;
             TransProfitDetail where = new TransProfitDetail();
             where.setAgentId(detailMonth.getAgentId());
@@ -681,7 +708,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
             List<TransProfitDetail> allSubs = new ArrayList<TransProfitDetail>();//代理商该业务平台的下级agentid
             List<TransProfitDetail> links = transProfitDetailMapper.selectListByDoubleId(where);//获取代理商所有业务平台编码
-            for(TransProfitDetail link:links){
+            for(TransProfitDetail link : links){
                 List<AgentBusInfo> subs = businfoService.queryChildLevelByBusNum(null,link.getBusCode(),link.getBusNum());//子类
                 for(AgentBusInfo sub:subs){
                     if(sub.getBusParent()==null){
@@ -694,7 +721,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                     allSubs.add(map);
                 }
             }
-            for(TransProfitDetail sub:allSubs){
+            for(TransProfitDetail sub : allSubs){
                 if(sub.getAgentId().equals(detailMonth.getAgentId())
                         &&sub.getParentAgentId().equals(detailMonth.getParentAgentId())){
                     continue;//本级金额不能累加
@@ -706,8 +733,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 ProfitDetailMonth real = detailMonthMapper.selectByIdAndParent(realWhere);
                 subAmt = subAmt.add(real.getRealProfitAmt());
             }
-
-
             ProfitDetailMonth updateDetail = getNewTaxAndProfit(detailMonth,subAmt,profitDate,dayTotal,isRYX,isSupply);
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
@@ -715,11 +740,60 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         //1、获取cx提供的代理商线下打款信息列表
         //2、遍历打款信息，根据信息中的busnum和上级busnum关联出agid和上级agid，然后获取需要抵税的ProfitDetailMonth
         //3、抵扣税额，重新计算并更新税额、实际分润
-        //PS:抵用金额税不能大于税额本身、抵用了多少金额需要交给cx更新、
-        ProfitDetailMonth deduction = detailMonthMapper.selectByIdAndParent(null);
-        deduction.getDeductionTaxMonthAmt();//税额
-        deduction.getRealProfitAmt();//实际分润
-        deduction.getTax();//税点
+        //PS:抵用金额税不能大于税额本身、抵用了多少金额需要交给cx更新
+        List<TransProfitDetail> list = transProfitDetailMapper.selectListByDate(profitDate);
+        for(TransProfitDetail tranDetail : list){
+            AgentResult agentResult = orderService.queryPaymentXXDK(tranDetail.getBusNum());//查询线下打款数据信息
+            if(null == agentResult){
+                continue;
+            }
+            List<HashMap> maps = (List<HashMap>) agentResult.getData();
+            if(maps.size() == 0){
+                continue;
+            }
+
+            ProfitDetailMonth where = new ProfitDetailMonth();
+            where.setAgentId(tranDetail.getAgentId());//代理商AG码
+            where.setParentAgentId(tranDetail.getParentAgentId());//上级代理商AG码
+            where.setProfitDate(profitDate);//月份
+            ProfitDetailMonth profitDetail = detailMonthMapper.selectByIdAndParent(where);
+            BigDecimal deductionTax = profitDetail.getDeductionTaxMonthAmt();//本月税额
+            BigDecimal realAmt = profitDetail.getRealProfitAmt()==null?BigDecimal.ZERO:profitDetail.getRealProfitAmt();//实际分润
+            BigDecimal tax = profitDetail.getTax();//税点(0.06)
+            BigDecimal smalTax = profitDetail.getSmalTaxAmt()==null?BigDecimal.ZERO:profitDetail.getSmalTaxAmt();;//已抵税金额
+
+            List<OPayment> paymentList = new ArrayList<>();
+            for(HashMap map : maps){
+                BigDecimal acAmt = (BigDecimal) map.get("ACTUAL_RECEIPT");//剩余可抵用打款金额
+                BigDecimal taxAmt = acAmt.multiply(tax);//可抵税额
+
+                //可抵金额若大于本月税额直接等于更新即可
+                if(deductionTax.subtract(taxAmt).compareTo(BigDecimal.ZERO) < 0){
+                    taxAmt = deductionTax;
+                }
+                //若已抵用税额跟本月税额持平则跳出不继续执行
+                if(smalTax.subtract(deductionTax).compareTo(BigDecimal.ZERO) == 0){
+                    break;
+                }
+                realAmt = realAmt.add(taxAmt);//实际分润+可抵税额
+                smalTax = smalTax.add(taxAmt);//可抵税额+已抵税金额
+
+                //打款
+                OPayment oPayment = new OPayment();
+                oPayment.setId((String) map.get("ID"));//主键ID
+                oPayment.setProfitTaxAmt(taxAmt.divide(new BigDecimal("0.06")).setScale(2,4));//已用金额
+                paymentList.add(oPayment);
+            }
+            //更新月分润明细
+            profitDetail.setSmalTaxAmt(smalTax); //已抵用税额
+            profitDetail.setRealProfitAmt(realAmt);//实际分润
+            detailMonthMapper.updateByPrimaryKeySelective(profitDetail);
+
+            //更新打款信息
+            if(paymentList.size() > 0){
+                orderService.updateProfitTaxAmt(paymentList);//批量更新分润税点抵扣金额
+            }
+        }
     }
 
     /**
@@ -731,7 +805,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * @return
      */
     public ProfitDetailMonth getNewTaxAndProfit(ProfitDetailMonth detailMonth,BigDecimal subAmt,String transDate,BigDecimal dayTotal,boolean isRYX,boolean isSupply){
-        BigDecimal profitAmt = detailMonth.getBasicsProfitAmt();//基础分润（扣补款之后、税前）
+        BigDecimal profitAmt = detailMonth.getBasicsProfitAmt()==null?BigDecimal.ZERO:detailMonth.getBasicsProfitAmt();//基础分润（扣补款之后、税前）
         ProfitDetailMonth detail = new ProfitDetailMonth();
         PtaxHistory where  = new PtaxHistory();//
         where.setAgentId(detailMonth.getAgentId());

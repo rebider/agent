@@ -2,6 +2,7 @@ package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
@@ -17,6 +18,7 @@ import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OrderService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class ProfitSummaryDataJob {
     private AgentService agentService;
     @Autowired
     private ProfitDayMapper dayMapper;
+    @Autowired
+    OrderService orderService;
+
     private int index = 1;
 
     public void excute(){
@@ -100,6 +105,9 @@ public class ProfitSummaryDataJob {
             }else{//更新汇总
                 detailMonthMapper.updateByPrimaryKeySelective(detailMonth);
             }
+
+            //
+
         }
     }
 

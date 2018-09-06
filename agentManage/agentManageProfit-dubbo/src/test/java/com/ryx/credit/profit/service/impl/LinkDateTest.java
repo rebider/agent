@@ -1,97 +1,113 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.profit.dao.PAgentPidLinkMapper;
-import com.ryx.credit.profit.pojo.PAgentPidLink;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDirect;
-import com.ryx.credit.profit.service.IProfitDService;
-import com.ryx.credit.profit.service.IProfitDirectService;
-import com.ryx.credit.profit.service.ProfitDeductionService;
-import com.ryx.credit.profit.service.ProfitDetailMonthService;
-import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.pojo.admin.order.OPayment;
+import com.ryx.credit.profit.dao.*;
+import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.service.order.OrderService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-/**
- * @author yangmx
- * @desc
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
 public class LinkDateTest {
+    @Autowired
+    ProfitDetailMonthMapper detailMonthMapper;
+    @Autowired
+    TransProfitDetailMapper transProfitDetailMapper;
+    @Autowired
+    OrderService orderService;
 
-    @Autowired
-    IdService idService;
-    @Autowired
-    IProfitDService profitDService;
-    @Autowired
-    ProfitComputerServiceImpl computerService;
-    @Autowired
-    ProfitDetailMonthService profitDetailMonthService;
-    @Autowired
-    IProfitDirectService profitDirectService;
-    @Autowired
-    ProfitDeductionService profitDeductionService;
-    @Autowired
-    PAgentPidLinkMapper pidLinkMapper;
-    private int index=1;
+    private int index = 1;
+    private BigDecimal tranAmount = BigDecimal.ZERO;
 
     @Test
-    public void testX(){
-        computerService.computerTax("201806");
+    public void test() throws Exception {
+//        String profitDate = "201808";
+//        new_computerTax(profitDate);
+        new_computerTax();
     }
 
-    public void synchroProfitLink(){
-        HashMap<String,String> map = new HashMap<String,String>();
-        String params = JsonUtil.objectToJson(map);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.link"),params);
-        System.out.println(res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
-            AppConfig.sendEmails("日分润同步失败","日分润同步失败");
-            return;
-        }
-        String data = JSONObject.parseObject(res).get("data").toString();
-        List<JSONObject> list = JSONObject.parseObject(data,List.class);
-        try {
-            insertProfitLink(list);
-        } catch (Exception e) {
-            System.out.println("同步插入数据失败！");
-            e.printStackTrace();
-        }
-    }
-
-    public void insertProfitLink(List<JSONObject> profitDays){
-        pidLinkMapper.deleteAll();
-        System.out.println("先删除所有");
-        for(JSONObject json:profitDays){
-            String platFormNum = json.getString("platFormNum")==null?"":json.getString("platFormNum");
-            if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
-                    && !"1111".equals(platFormNum) && !"3000".equals(platFormNum) && !"6000".equals(platFormNum)
-                    && !"4000".equals(platFormNum)){
-                platFormNum = "1001";
+    /**
+     * 每一个小时执行一次：@Scheduled(cron = "0 0 * * * ?")
+     * 每月10号凌晨20点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
+     * @throws Exception
+     */
+    @Test
+    @Scheduled(cron = "0 0 * * * ?")
+    public void new_computerTax() throws Exception {
+//        String profitDate = "201808";
+        String profitDate = null;
+        profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;
+        //三、抵税计算
+        //1、获取cx提供的代理商线下打款信息列表
+        //2、遍历打款信息，根据信息中的busnum和上级busnum关联出agid和上级agid，然后获取需要抵税的ProfitDetailMonth
+        //3、抵扣税额，重新计算并更新税额、实际分润
+        //PS:抵用金额税不能大于税额本身、抵用了多少金额需要交给cx更新
+        List<TransProfitDetail> list = transProfitDetailMapper.selectListByDate(profitDate);
+        for(TransProfitDetail tranDetail : list){
+            AgentResult agentResult = orderService.queryPaymentXXDK(tranDetail.getBusNum());//查询线下打款数据信息
+            if(null == agentResult){
+                continue;
             }
-            PAgentPidLink link = new PAgentPidLink();
-            link.setId(idService.genId(TabId.P_AGENT_PID_LINK));
-            link.setDeptCode(platFormNum);
-            link.setAgentId(json.getString("agencyId"));
-            link.setAgentPid(json.getString("uniqueCode"));
-            pidLinkMapper.insert(link);
+            List<HashMap> maps = (List<HashMap>) agentResult.getData();
+            if(maps.size() == 0){
+                continue;
+            }
+
+            ProfitDetailMonth where = new ProfitDetailMonth();
+            where.setAgentId(tranDetail.getAgentId());//代理商AG码
+            where.setParentAgentId(tranDetail.getParentAgentId());//上级代理商AG码
+            where.setProfitDate(profitDate);//月份
+            ProfitDetailMonth profitDetail = detailMonthMapper.selectByIdAndParent(where);
+            BigDecimal deductionTax = profitDetail.getDeductionTaxMonthAmt();//本月税额
+            BigDecimal realAmt = profitDetail.getRealProfitAmt()==null?BigDecimal.ZERO:profitDetail.getRealProfitAmt();//实际分润
+            BigDecimal tax = profitDetail.getTax();//税点(0.06)
+            BigDecimal smalTax = profitDetail.getSmalTaxAmt()==null?BigDecimal.ZERO:profitDetail.getSmalTaxAmt();;//已抵税金额
+
+            List<OPayment> paymentList = new ArrayList<>();
+            for(HashMap map : maps){
+                BigDecimal acAmt = (BigDecimal) map.get("ACTUAL_RECEIPT");//剩余可抵用打款金额
+                BigDecimal taxAmt = acAmt.multiply(tax);//可抵税额
+
+                //可抵金额若大于本月税额直接等于更新即可
+                if(deductionTax.subtract(taxAmt).compareTo(BigDecimal.ZERO) < 0){
+                    taxAmt = deductionTax;
+                }
+                //若已抵用税额跟本月税额持平则跳出不继续执行
+                if(smalTax.subtract(deductionTax).compareTo(BigDecimal.ZERO) == 0){
+                    break;
+                }
+                realAmt = realAmt.add(taxAmt);//实际分润+可抵税额
+                smalTax = smalTax.add(taxAmt);//可抵税额+已抵税金额
+
+                //打款
+                OPayment oPayment = new OPayment();
+                oPayment.setId((String) map.get("ID"));//主键ID
+                oPayment.setProfitTaxAmt(taxAmt.divide(new BigDecimal("0.06")).setScale(2,4));//已用金额
+                paymentList.add(oPayment);
+            }
+            //更新月分润明细
+            profitDetail.setSmalTaxAmt(smalTax); //已抵用税额
+            profitDetail.setRealProfitAmt(realAmt);//实际分润
+            detailMonthMapper.updateByPrimaryKeySelective(profitDetail);
+
+            //更新打款信息
+            if(paymentList.size() > 0){
+                orderService.updateProfitTaxAmt(paymentList);//批量更新分润税点抵扣金额
+            }
         }
     }
 
