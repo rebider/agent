@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -18,9 +19,11 @@ import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
+ * 已审批待办任务
  * Created by RYX on 2018/9/4.
  */
 @Service("approvalFlowRecordService")
@@ -57,6 +60,29 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalDep())){
             criteria.andApprovalDepEqualTo(approvalFlowRecord.getApprovalDep());
         }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalResult())){
+            criteria.andApprovalResultEqualTo(approvalFlowRecord.getApprovalResult());
+        }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getBusId())){
+            criteria.andBusIdEqualTo(approvalFlowRecord.getBusId());
+        }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getBusType())){
+            criteria.andBusTypeEqualTo(approvalFlowRecord.getBusType());
+        }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())){
+            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
+            criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
+        }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
+            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime());
+            criteria.andApprovalTimeLessThanOrEqualTo(endTime);
+        }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getBeginTime()) && StringUtils.isNotBlank(approvalFlowRecord.getEndTime())){
+            Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
+            Date endTime = DateUtil.format(approvalFlowRecord.getEndTime());
+            criteria.andApprovalTimeBetween(beginTime,endTime);
+        }
+
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setPage(page);
         example.setOrderByClause("APPROVAL_TIME desc");
