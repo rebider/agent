@@ -114,15 +114,15 @@ public class ProductServiceImpl implements ProductService {
             throw new ProcessException("商品编号为空");
         }
         //去查找商品编号是否已经存在
-        OProductExample oProductExam = new OProductExample();
-        OProductExample.Criteria criter = oProductExam.createCriteria();
-        criter.andStatusEqualTo(Status.STATUS_1.status);
-        criter.andProCodeEqualTo(product.getProCode());
-        List<OProduct> products = productMapper.selectByExample(oProductExam);
-        if (null != products && products.size() > 0) {
-            logger.info("商品添加:{}", "商品添加信息编号已存在");
-            return AgentResult.fail("商品编号已存在");
-        }
+//        OProductExample oProductExam = new OProductExample();
+//        OProductExample.Criteria criter = oProductExam.createCriteria();
+//        criter.andStatusEqualTo(Status.STATUS_1.status);
+//        criter.andProCodeEqualTo(product.getProCode());
+//        List<OProduct> products = productMapper.selectByExample(oProductExam);
+//        if (null != products && products.size() > 0) {
+//            logger.info("商品添加:{}", "商品添加信息编号已存在");
+//            return AgentResult.fail("商品编号已存在");
+//        }
 
         if (StringUtils.isBlank(product.getProName())) {
             logger.info("商品添加:{}", "商品添加信息名称为空");
@@ -261,4 +261,20 @@ public class ProductServiceImpl implements ProductService {
         }
         return oProducts;
     }
+
+    @Override
+    public List<OProduct> findListByProCode(String proCode){
+        if (StringUtils.isBlank(proCode)) {
+            return null;
+        }
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria();
+        criteria.andProCodeEqualTo(proCode);
+        List<OProduct> products = productMapper.selectByExample(oProductExample);
+        if (products == null) {
+            return null;
+        }
+        return products;
+    }
+
 }
