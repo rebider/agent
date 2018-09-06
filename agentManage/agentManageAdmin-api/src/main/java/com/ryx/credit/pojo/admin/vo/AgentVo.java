@@ -54,6 +54,7 @@ public class AgentVo implements Serializable {
     private String[] attachments;
     private List<Map<String,Object>> reqListMap;
     private ReceiptPlan receiptPlan;
+    private List<ReceiptPlan> receiptPlanList;
 
     private String payMethod;
 
@@ -319,5 +320,13 @@ public class AgentVo implements Serializable {
 
     public void setReceiptPlan(ReceiptPlan receiptPlan) {
         this.receiptPlan = receiptPlan;
+    }
+
+    public List<ReceiptPlan> getReceiptPlanList() {
+        return receiptPlanList;
+    }
+
+    public void setReceiptPlanList(List<ReceiptPlan> receiptPlanList) {
+        this.receiptPlanList = receiptPlanList;
     }
 }

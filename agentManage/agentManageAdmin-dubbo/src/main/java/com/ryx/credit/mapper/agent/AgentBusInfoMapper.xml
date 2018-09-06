@@ -817,4 +817,12 @@
     <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR"/>
   </resultMap>
 
+  <!--查询业务编号和代理商信息-->
+  <select id="queryAgentNameByBusId" resultType="map">
+    select a.id,a.agent_id,a.bus_num,b.ag_name,b.ag_uniq_num
+    from a_agent_businfo a
+      left join a_agent b on b.id=a.agent_id
+    where a.status=1 and b.status=1
+  </select>
+
 </mapper>

@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -74,6 +76,37 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PageInfo productGroupByList(OProduct product, Page page) {
+        FastMap example = FastMap.fastFailMap();
+        if (StringUtils.isNotBlank(product.getProCode())) {
+            example.putKeyV("proCode",product.getProCode());
+        }
+        if (StringUtils.isNotBlank(product.getProName())) {
+            example.putKeyV("proName","%"+product.getProName()+"%");
+        }
+        if (StringUtils.isNotBlank(product.getProType())) {
+            String proTypeString = product.getProType();
+            if(proTypeString.contains(",")) {
+                String[] split = proTypeString.split(",");
+                List<String> proCodeList = new ArrayList<>();
+                for (int i = 0; i < split.length; i++) {
+                    proCodeList.add(split[i]);
+                }
+                example.putKeyV("proTypes", proCodeList);
+            }else {
+                example.putKeyV("proType", product.getProType());
+            }
+        }
+
+        example.putKeyV("page",page);
+        List<Map> oProducts = productMapper.queryGroupByProCodeList(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(oProducts);
+        pageInfo.setTotal(productMapper.queryGroupByProCodeListCount(example));
+        return pageInfo;
+    }
+
+    @Override
     public AgentResult saveProduct(OProduct product) {
         AgentResult result = new AgentResult(500, "系统异常", "");
         if (StringUtils.isBlank(product.getProCode())) {
@@ -81,15 +114,15 @@ public class ProductServiceImpl implements ProductService {
             throw new ProcessException("商品编号为空");
         }
         //去查找商品编号是否已经存在
-        OProductExample oProductExam = new OProductExample();
-        OProductExample.Criteria criter = oProductExam.createCriteria();
-        criter.andStatusEqualTo(Status.STATUS_1.status);
-        criter.andProCodeEqualTo(product.getProCode());
-        List<OProduct> products = productMapper.selectByExample(oProductExam);
-        if (null != products && products.size() > 0) {
-            logger.info("商品添加:{}", "商品添加信息编号已存在");
-            return AgentResult.fail("商品编号已存在");
-        }
+//        OProductExample oProductExam = new OProductExample();
+//        OProductExample.Criteria criter = oProductExam.createCriteria();
+//        criter.andStatusEqualTo(Status.STATUS_1.status);
+//        criter.andProCodeEqualTo(product.getProCode());
+//        List<OProduct> products = productMapper.selectByExample(oProductExam);
+//        if (null != products && products.size() > 0) {
+//            logger.info("商品添加:{}", "商品添加信息编号已存在");
+//            return AgentResult.fail("商品编号已存在");
+//        }
 
         if (StringUtils.isBlank(product.getProName())) {
             logger.info("商品添加:{}", "商品添加信息名称为空");
@@ -228,4 +261,20 @@ public class ProductServiceImpl implements ProductService {
         }
         return oProducts;
     }
+
+    @Override
+    public List<OProduct> findListByProCode(String proCode){
+        if (StringUtils.isBlank(proCode)) {
+            return null;
+        }
+        OProductExample oProductExample = new OProductExample();
+        OProductExample.Criteria criteria = oProductExample.createCriteria();
+        criteria.andProCodeEqualTo(proCode);
+        List<OProduct> products = productMapper.selectByExample(oProductExample);
+        if (products == null) {
+            return null;
+        }
+        return products;
+    }
+
 }
