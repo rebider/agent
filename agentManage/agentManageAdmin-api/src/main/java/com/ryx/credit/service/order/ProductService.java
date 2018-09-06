@@ -15,6 +15,8 @@ public interface ProductService {
 
     PageInfo productList(OProduct product, Page page);
 
+    PageInfo productGroupByList(OProduct product, Page page);
+
     AgentResult saveProduct(OProduct product);
 
     AgentResult updateProduct(OProduct product);
