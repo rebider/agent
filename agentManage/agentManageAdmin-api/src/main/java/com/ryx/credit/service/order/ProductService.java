@@ -28,4 +28,6 @@ public interface ProductService {
     List<OProduct> allProductList(OProduct product);
 
     String findNameById(String id);
+
+    List<OProduct> findListByProCode(String proCode);
 }
