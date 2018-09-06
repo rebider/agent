@@ -65,4 +65,12 @@ public interface AgentQueryService {
     public List<Agent> queryAgentListByIds(List<String> ids);
 
 
+    public String dPosRegionNameFromDposIds(String...ids);
+
+    public String dRegionNameFromIds(String... ids);
+
+    public String getAgentNameByBusId(String busId);
+
+    public void loadCach();
+
 }

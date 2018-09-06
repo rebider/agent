@@ -33,6 +33,11 @@ public class RedisService {
         this.redisTemplate = redisTemplate;
     }
 
+
+    public boolean haveKey(String key){
+        return redisTemplate.hasKey(key);
+    }
+
     /**
 	 * 放置key value 失效时间
 	 * @param key
@@ -165,7 +170,7 @@ public class RedisService {
     /**  
      * 删除模糊匹配上的所有缓存
      * 比如redisKey是由时间加随机数生成，deleteByCondition("session")则删除所有包含session信息的缓存
-     * @param key 
+     * @param condition
      */  
     public void deleteByCondition(String condition) {  
     	Set<String> keys = redisTemplate.keys(condition + "*");
@@ -315,6 +320,15 @@ public class RedisService {
     }
 
     /**
+     * 放入map集合
+     * @param key
+     * @param m
+     */
+    public void hSet(String key, Map m) {
+        redisTemplate.opsForHash().putAll(key, m);
+    }
+
+    /**
      * 实现命令：HGET key field，返回哈希表 key中给定域 field的值
      *
      * @param key
@@ -323,6 +337,16 @@ public class RedisService {
      */
     public String hGet(String key, String field) {
         return (String) redisTemplate.opsForHash().get(key, field);
+    }
+
+    /**
+     * 获取多个key
+     * @param key
+     * @param field
+     * @return
+     */
+    public List multiGet(String key, String ...field) {
+        return  redisTemplate.opsForHash().multiGet(key, Arrays.asList(field));
     }
 
     /**

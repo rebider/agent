@@ -61,4 +61,6 @@ public interface AgentBusInfoMapper {
     List<Map<String,Object>> queryTreeByBusInfo(Map<String,Object> reqMap);
 
     List<BusinessOutVo> excelAgent(@Param("reqMap")Map<String,Object> reqMap);
+
+    List<Map<String,Object>> queryAgentNameByBusId();
 }
