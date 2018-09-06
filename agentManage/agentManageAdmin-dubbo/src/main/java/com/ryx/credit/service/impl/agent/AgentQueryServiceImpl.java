@@ -300,7 +300,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 }
             }
 
-        }).run();
+        }).start();
 
     }
 }
