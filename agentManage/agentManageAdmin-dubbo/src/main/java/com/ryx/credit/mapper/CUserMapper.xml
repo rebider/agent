@@ -121,4 +121,10 @@
         </where>
     </select>
 
+    <select id="selectListByName" resultMap="userVoResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List" />
+        from C_USER where name like #{name}
+    </select>
+
 </mapper>

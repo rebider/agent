@@ -19,6 +19,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -54,9 +55,16 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
 
         ApprovalFlowRecordExample example = new ApprovalFlowRecordExample();
         ApprovalFlowRecordExample.Criteria criteria = example.createCriteria();
+
         if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalPerson())){
-            criteria.andApprovalPersonEqualTo(approvalFlowRecord.getApprovalPerson());
+            String[] split = approvalFlowRecord.getApprovalPerson().split(",");
+            List<String> personList = new ArrayList<>();
+            for(int i=0;i<split.length;i++){
+                personList.add(split[i]);
+            }
+            criteria.andApprovalPersonIn(personList);
         }
+
         if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalDep())){
             criteria.andApprovalDepEqualTo(approvalFlowRecord.getApprovalDep());
         }

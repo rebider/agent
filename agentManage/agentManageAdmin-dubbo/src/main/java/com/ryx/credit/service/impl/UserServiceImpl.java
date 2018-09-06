@@ -123,6 +123,11 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
 		return userMapper.selectbyName(name);
 	}
 
+    @Override
+    public List<UserVo> selectListByName(String name) {
+        // TODO Auto-generated method stub
+        return userMapper.selectListByName(name);
+    }
 
     @Override
     public List<Map<String, Object>> orgCode(Long userID) {

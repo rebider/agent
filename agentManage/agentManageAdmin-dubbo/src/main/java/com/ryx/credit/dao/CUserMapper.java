@@ -28,4 +28,6 @@ public interface CUserMapper extends BaseMapper<CUser> {
 
     List<UserVo> selectUserByOrgId(Long orgId);
 
+    List<UserVo>  selectListByName(String name);
+
 }
