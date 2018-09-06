@@ -189,4 +189,21 @@
         </where>
         order by code_level desc
     </select>
+
+
+    <select id="queryPosRegionProviceByCity" resultType="string">
+        select
+        t.parent_code as code
+        from d_pos_region t
+        <where>
+            t.code_level = 2
+            <if test="codes!=null">
+                and t.code in
+                <foreach collection="codes" item="codeItem" open="("  separator="," close=")" >
+                      '${codeItem}'
+                </foreach>
+            </if>
+        </where>
+      group by t.parent_code
+    </select>
 </mapper>

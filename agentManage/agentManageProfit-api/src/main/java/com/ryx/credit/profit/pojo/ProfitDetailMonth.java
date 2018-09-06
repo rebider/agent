@@ -136,6 +136,17 @@ public class ProfitDetailMonth implements Serializable{
     //打款公司
     private String payCompany;
 
+    //已抵税金额
+    private BigDecimal smalTaxAmt;
+
+    public BigDecimal getSmalTaxAmt() {
+        return smalTaxAmt;
+    }
+
+    public void setSmalTaxAmt(BigDecimal smalTaxAmt) {
+        this.smalTaxAmt = smalTaxAmt;
+    }
+
     public BigDecimal getUnlineAmt() {
         return unlineAmt;
     }

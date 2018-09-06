@@ -29,4 +29,6 @@ public interface AimportService {
     public ResultVO analysisBus(List<ImportAgent>  data,String userid)throws Exception;
 
     public ResultVO parseParent()throws Exception;
+
+    public ResultVO importAgentBusInfoBusInfoFromExcel(String user,List<Object> list) throws Exception;
 }

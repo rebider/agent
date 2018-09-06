@@ -4,6 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtils;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.order.*;
@@ -13,6 +16,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,7 @@ import java.util.*;
 public class OLogisticServiceImpl implements OLogisticsService {
     private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
@@ -90,11 +95,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public List<String> addList(List<List<Object>> data, String user) throws Exception {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
+
             String planNum = "";
             String orderId = "";
             String proCode = "";
             String proId = "";
             String proName = "";
+            String sendDate = "";
             String sendProNum = "";
             String beginSn = "";
             String endSn = "";
@@ -103,66 +110,85 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String logCom = "";
             String wNumber = "";
             try {
-                planNum = String.valueOf(objectList.get(0));
-                orderId = String.valueOf(objectList.get(1));
-                proCode = String.valueOf(objectList.get(2));
-                proId = String.valueOf(objectList.get(3));
-                proName = String.valueOf(objectList.get(4));
-                sendProNum = String.valueOf(objectList.get(19));
-                beginSn = String.valueOf(objectList.get(22));
-                endSn = String.valueOf(objectList.get(23));
-                beginSnCount = String.valueOf(objectList.get(24));
-                endSnCount = String.valueOf(objectList.get(25));
-                logCom = String.valueOf(objectList.get(20));
-                wNumber = String.valueOf(objectList.get(21));
-            } catch (Exception e) {
-                throw new MessageException("Excel参数错误");
-            }
-            if (StringUtils.isBlank(planNum)) {
-                logger.info("排单编号为空");
-                throw new MessageException("排单编号为空");
-            }
-            if (StringUtils.isBlank(orderId)){
-                logger.info("订单编号为空");
-                throw new MessageException("订单编号为空");
-            }
-            if (StringUtils.isBlank(proCode)) {
-                logger.info("商品编号为空");
-                throw new MessageException("商品编号为空");
-            }
-            if (StringUtils.isBlank(proId)) {
-                logger.info("商品ID为空");
-                throw new MessageException("商品ID为空");
-            }
-            if (StringUtils.isBlank(sendProNum)) {
-                logger.info("请填写发货数量");
-                throw new MessageException("请填写发货数量");
-            }
-            if (StringUtils.isBlank(beginSn)) {
-                logger.info("请填写起始SN序列号");
-                throw new MessageException("请填写起始SN序列号");
-            }
-            if (StringUtils.isBlank(endSn)){
-                logger.info("请填写结束SN序列号");
-                throw new MessageException("请填写结束SN序列号");
-            }
-            if (StringUtils.isBlank(beginSnCount)) {
-                logger.info("请填写起始SN位数");
-                throw new MessageException("请填写起始SN位数");
-            }
-            if (StringUtils.isBlank(endSnCount)) {
-                logger.info("请填写结束SN位数");
-                throw new MessageException("请填写结束SN位数");
-            }
-            if (StringUtils.isBlank(logCom)) {
-                logger.info("请填写物流公司");
-                throw new MessageException("请填写物流公司");
-            }
-            if (StringUtils.isBlank(wNumber)) {
-                logger.info("请填写物流单号");
-                throw new MessageException("请填写物流单号");
-            }
-            try {
+
+                List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+                planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
+                orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
+                proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
+                proId = String.valueOf(objectList.get(col.indexOf("PRO_ID")));
+                proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME")));
+
+                sendDate = String.valueOf(objectList.get(col.indexOf("h")));
+                sendProNum = String.valueOf(objectList.get(col.indexOf("g")));
+                logCom = String.valueOf(objectList.get(col.indexOf("a")));
+                wNumber = String.valueOf(objectList.get(col.indexOf("b")));
+                beginSn = String.valueOf(objectList.get(col.indexOf("c")));
+                endSn = String.valueOf(objectList.get(col.indexOf("d")));
+                beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
+                endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
+
+                if (StringUtils.isBlank(sendDate)) {
+                    logger.info("发货日期不能为空");
+                    throw new MessageException("发货日期不能为空");
+                }
+                if (StringUtils.isBlank(planNum)) {
+                    logger.info("排单编号为空");
+                    throw new MessageException("排单编号为空");
+                }
+                if (StringUtils.isBlank(orderId)){
+                    logger.info("订单编号为空");
+                    throw new MessageException("订单编号为空");
+                }
+                if (StringUtils.isBlank(proCode)) {
+                    logger.info("商品编号为空");
+                    throw new MessageException("商品编号为空");
+                }
+                if (StringUtils.isBlank(proId)) {
+                    logger.info("商品ID为空");
+                    throw new MessageException("商品ID为空");
+                }
+                if (StringUtils.isBlank(sendProNum)) {
+                    logger.info("请填写发货数量");
+                    throw new MessageException("请填写发货数量");
+                }
+                if (StringUtils.isBlank(beginSn)) {
+                    logger.info("请填写起始SN序列号");
+                    throw new MessageException("请填写起始SN序列号");
+                }
+                if (StringUtils.isBlank(endSn)){
+                    logger.info("请填写结束SN序列号");
+                    throw new MessageException("请填写结束SN序列号");
+                }
+                if (StringUtils.isBlank(beginSnCount)) {
+                    logger.info("请填写起始SN位数");
+                    throw new MessageException("请填写起始SN位数");
+                }
+                if (StringUtils.isBlank(endSnCount)) {
+                    logger.info("请填写结束SN位数");
+                    throw new MessageException("请填写结束SN位数");
+                }
+                if (StringUtils.isBlank(logCom)) {
+                    logger.info("请填写物流公司");
+                    throw new MessageException("请填写物流公司");
+                }
+                if (StringUtils.isBlank(wNumber)) {
+                    logger.info("请填写物流单号");
+                    throw new MessageException("请填写物流单号");
+                }
+
+                //校验文档不能更改
+                List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
+                if(listItem.size()>0){
+                       //检查列是否有更改
+                       AgentResult agentResult = checkRecordPlan(objectList,listItem.get(0));
+                        if(!agentResult.isOK()){
+                            logger.info("校验Excel文档失败：[],[]",planNum,agentResult.getMsg());
+                            throw new MessageException(agentResult.getMsg());
+                        }
+                }else{
+                    throw new MessageException("排单信息未找到");
+                }
+
                 OLogisticsExample oLogisticsExample = new OLogisticsExample();
                 OLogisticsExample.Criteria criteria1 = oLogisticsExample.createCriteria();
                 criteria1.andSnBeginNumEqualTo(beginSn);
@@ -178,6 +204,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("该商品已发货请勿重复提交2");
                     throw new MessageException("该商品已发货请勿重复提交");
                 }
+
                 //IDlist检查
                 List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
                 if (Integer.valueOf(sendProNum) != stringList.size()) {
@@ -191,7 +218,15 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setcUser(user);                                      // 创建人
                 oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
                 oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
-                oLogistics.setSendDate(Calendar.getInstance().getTime());       // 物流日期
+                try {
+                    oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                }catch (Exception e){
+                    try {
+                        oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
+                    }catch (Exception m){
+                        throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
+                    }
+                }
                 oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
                 oLogistics.setIsdeall(Status.STATUS_1.status);
 
@@ -218,7 +253,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
                 logger.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
                 if (1 != insertImportData(oLogistics)) {
-                    throw new MessageException("插入失败！");
+                    throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败");
                 }
                 list.add(oLogistics.getId());
                 //调用明细接口之前需要先去数据库进行查询是否已有数据
@@ -233,8 +268,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                         if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
                             //说明已经存在数据
-                            logger.info("此物流已经存在,正在发货中!!!");
-                            throw new MessageException("此物流已经存在,正在发货中!!!");
+                            logger.info(snNum+"此物流已经存在,正在发货中!!!");
+                            throw new MessageException(snNum+"此物流已经存在,正在发货中!!!");
                         }
                     }
                 }
@@ -262,11 +297,39 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
                     }
                 }
-            } catch (Exception e) {
-                throw new MessageException("导入物流失败");
+            } catch (MessageException e) {
+                e.printStackTrace();
+                throw e;
+            }catch (Exception e) {
+                e.printStackTrace();
+                throw e;
             }
         }
         return list;
+    }
+
+    /**
+     * 检查上传物流excel列是否修改过
+     * @param excel
+     * @param db
+     * @return
+     */
+    private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
+        Object PLAN_NUM = db.get("PLAN_NUM");
+        String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
+        String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
+        for (int i=0;i<18;i++){
+            if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
+               continue;
+            }
+            if(excel.get(i)==null || StringUtils.isBlank(excel.get(i).toString())){
+                return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+            }
+            if(!(excel.get(i)+"").equals((db.get(col[i])+""))){
+                return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+            }
+        }
+        return AgentResult.ok();
     }
 
 

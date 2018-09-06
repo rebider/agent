@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class DailyProfitMposDataJob {
         HashMap<String,String> map = new HashMap<String,String>();
         //map.put("frDate", "20180625");
         String frDate = null;
-        map.put("frDate", frDate==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):frDate);
+        map.put("frDate", frDate==null?DateUtil.getAfterDayDate("-2", DateUtil.sdfDays):frDate);
         map.put("pageNumber", "1");
         map.put("pageSize", "2");
         String params = JsonUtil.objectToJson(map);
@@ -84,18 +85,18 @@ public class DailyProfitMposDataJob {
         for(JSONObject json:profitDays){
             ProfitDay profitD = new ProfitDay();
             profitD.setId(idService.genId(TabId.P_PROFIT_D));
-            profitD.setAgentId(json.getString("AGENCYID"));      //代理商编号
-            profitD.setAgentName(json.getString("COMPANYNAME")); //代理商名称
-            profitD.setTransDate(json.getString("TRANDATE"));    //交易时间
-            profitD.setRemitDate(json.getString("BACKDATE"));    //打款时间
-            profitD.setRedoMoney(json.getBigDecimal("REDOMONEY "));       //补款
-            profitD.setTotalProfit(json.getBigDecimal("TOTALPROFIT"));    //应发金额
-            profitD.setRealMoney(json.getBigDecimal("REALMONEY "));       //实发金额
-            profitD.setFrozenMoney(json.getBigDecimal("FROZENMONEY "));   //冻结金额
-            profitD.setSuccessMoney(json.getBigDecimal("SUCCESSMONEY ")); //成功金额
-            profitD.setFailMoney(json.getBigDecimal("FAILMONEY "));       //失败金额
-            profitD.setReturnMoney(json.getBigDecimal("RETURNMONEY "));   //返现金额
-            profitD.setPlatformNum(json.getString("PLATFORMNUM "));       //平台编号
+            profitD.setAgentId(json.getString("AGENCYID"));//代理商编号
+            profitD.setAgentName(json.getString("COMPANYNAME"));//代理商名称
+            profitD.setTransDate(json.getString("TRANDATE"));//交易时间
+            profitD.setRemitDate(json.getString("BACKDATE"));//打款时间
+            profitD.setRedoMoney(json.getBigDecimal("REDOMONEY"));//补款
+            profitD.setTotalProfit(json.getBigDecimal("TOTALPROFIT")==null?BigDecimal.ZERO:json.getBigDecimal("TOTALPROFIT"));//应发金额
+            profitD.setRealMoney(json.getBigDecimal("REALMONEY")==null?BigDecimal.ZERO:json.getBigDecimal("REALMONEY"));//实发金额
+            profitD.setFrozenMoney(json.getBigDecimal("FROZENMONEY")==null?BigDecimal.ZERO:json.getBigDecimal("FROZENMONEY"));//冻结金额
+            profitD.setSuccessMoney(json.getBigDecimal("SUCCESSMONEY")==null?BigDecimal.ZERO:json.getBigDecimal("SUCCESSMONEY"));//成功金额
+            profitD.setFailMoney(json.getBigDecimal("FAILMONEY")==null?BigDecimal.ZERO:json.getBigDecimal("FAILMONEY"));//失败金额
+            profitD.setReturnMoney(json.getBigDecimal("RETURNMONEY")==null?BigDecimal.ZERO:json.getBigDecimal("RETURNMONEY"));//返现金额
+            profitD.setPlatformNum(json.getString("PLATFORMNUM"));//平台编号
             profitDService.insertSelective(profitD);
         }
         synchroProfitDay(frDate);

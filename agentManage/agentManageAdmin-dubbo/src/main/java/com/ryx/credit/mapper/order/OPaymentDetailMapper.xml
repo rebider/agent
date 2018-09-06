@@ -371,4 +371,16 @@
         ORDER BY detail.C_DATE DESC
     </select>
 
+    <select id="querySupplementXXDK" parameterType="map" resultType="java.math.BigDecimal">
+        select
+          NVL(SUM(s.pay_amount) ,0)
+        from o_Payment_detail pd,o_Supplement s
+        <where>
+            pd.id = s.src_id
+            and s.review_status = #{map.reviewStatus}
+            and s.pay_method = #{map.payMethod}
+            and pd.payment_id= #{map.paymentId}
+        </where>
+    </select>
+
 </mapper>

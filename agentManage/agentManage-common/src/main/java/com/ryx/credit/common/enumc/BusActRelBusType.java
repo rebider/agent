@@ -1,5 +1,8 @@
 package com.ryx.credit.common.enumc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by cx on 2018/5/29.
  */
@@ -39,6 +42,15 @@ public enum BusActRelBusType {
             }
         }
         return null;
+    }
+
+    public static Map<String,Object> getItemMap(){
+        BusActRelBusType[] valus = BusActRelBusType.values();
+        Map<String,Object> resultMap = new HashMap<>();
+        for (BusActRelBusType busActRelBusType : valus) {
+            resultMap.put(busActRelBusType.name(),busActRelBusType.msg);
+        }
+        return resultMap;
     }
 
 }

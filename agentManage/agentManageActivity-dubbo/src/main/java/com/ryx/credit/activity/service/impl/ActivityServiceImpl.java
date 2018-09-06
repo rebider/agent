@@ -1,9 +1,15 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.ApprovalFlowRecordService;
+import com.ryx.credit.service.agent.BusActRelService;
 import net.sf.json.JSONObject;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.*;
@@ -28,7 +34,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * ActivityServiceImpl
@@ -46,6 +51,12 @@ public class ActivityServiceImpl implements ActivityService {
     private StandaloneProcessEngineConfiguration processEngineConfiguration;
     @Autowired
     private ActRuTaskService actRuTaskService;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private BusActRelService busActRelService;
+    @Autowired
+    private ApprovalFlowRecordService approvalFlowRecordService;
 
     public static ProcessEngine processEngine;
 
@@ -108,7 +119,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
-    
+
     @Override
     public Map completeTask(String taskId, Map<String,Object>  map) {
         Map<String,Object> rs = new HashMap<>(5);
@@ -117,6 +128,34 @@ public class ActivityServiceImpl implements ActivityService {
             taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
             taskService.complete(taskId, map);
             logger.info("完成任务" + taskId);
+
+            String approvalResult = String.valueOf(map.get("rs"));
+            String approvalOpinion = String.valueOf(map.get("approvalOpinion"));
+            String approvalPerson = String.valueOf(map.get("approvalPerson"));
+            String createTime = String.valueOf(map.get("createTime"));
+            Date approvalTime = DateUtil.format(createTime, DateUtil.DATE_FORMAT_1);
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(approvalPerson));
+            String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGID"));
+            ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(taskId);
+            String executionId = String.valueOf(actRuTask.getExecutionId());
+            String taskName = String.valueOf(actRuTask.getName());
+            BusActRel busActRel = busActRelService.findById(executionId);
+            String busId = busActRel.getBusId();
+            String busType = busActRel.getBusType();
+
+            ApprovalFlowRecord approvalFlowRecord = new ApprovalFlowRecord();
+            approvalFlowRecord.setBusId(busId);
+            approvalFlowRecord.setBusType(busType);
+            approvalFlowRecord.setTaskName(taskName);
+            approvalFlowRecord.setApprovalDep(approvalDep);
+            approvalFlowRecord.setApprovalTime(approvalTime);
+            approvalFlowRecord.setExecutionId(executionId);
+            approvalFlowRecord.setTaskId(taskId);
+            approvalFlowRecord.setApprovalOpinion(approvalOpinion);
+            approvalFlowRecord.setApprovalPerson(approvalPerson);
+            approvalFlowRecord.setApprovalResult(approvalResult);
+            approvalFlowRecordService.insert(approvalFlowRecord);
+
             rs.put("rs",true);
             rs.put("msg","success");
         } catch (Exception e) {

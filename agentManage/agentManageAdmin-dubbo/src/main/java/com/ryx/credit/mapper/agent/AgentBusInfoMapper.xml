@@ -35,6 +35,7 @@
     <result column="BUS_USE_ORGAN" jdbcType="VARCHAR" property="busUseOrgan" />
     <result column="BUS_SCOPE" jdbcType="VARCHAR" property="busScope" />
     <result column="DREDGE_S0" jdbcType="DECIMAL" property="dredgeS0" />
+    <result column="BUS_LOGIN_NUM" jdbcType="VARCHAR" property="busLoginNum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +71,7 @@
     BUS_REGION, BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE,
     BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
-    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0
+    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -111,8 +112,8 @@
     CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS,
     C_TIME, C_UTIME, C_USER,
     STATUS, VERSION, AG_ZBH,
-    BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0
-    )
+    BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0,
+    BUS_LOGIN_NUM)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -123,8 +124,8 @@
     #{cloAgentColinfo,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR},
-    #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL}
-    )
+    #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL},
+    #{busLoginNum,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
@@ -228,6 +229,9 @@
       <if test="dredgeS0 != null">
         DREDGE_S0,
       </if>
+      <if test="busLoginNum != null">
+        BUS_LOGIN_NUM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -328,6 +332,9 @@
       </if>
       <if test="dredgeS0 != null">
         #{dredgeS0,jdbcType=DECIMAL},
+      </if>
+      <if test="busLoginNum != null">
+        #{busLoginNum,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -436,6 +443,9 @@
       <if test="dredgeS0 != null">
         DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
       </if>
+      <if test="busLoginNum != null">
+        BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
@@ -472,7 +482,8 @@
     AG_ZBH = #{agZbh,jdbcType=VARCHAR},
     BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
     BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
-    DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL}
+    DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
+    BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">

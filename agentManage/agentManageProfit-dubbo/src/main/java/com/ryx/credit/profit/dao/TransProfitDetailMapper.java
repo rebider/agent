@@ -34,4 +34,7 @@ public interface TransProfitDetailMapper {
      */
     List<TransProfitDetail> getPosTransProfitDetailSumList(String prfitDate);
 
+    List<TransProfitDetail> selectByIdAndMonth(TransProfitDetail record);
+
+    int updateByPrimaryKeySelective(TransProfitDetail record);
 }

@@ -52,6 +52,7 @@ public interface ProfitDetailMonthMapper {
     ProfitDetailMonth selectByPIdAndMonth(ProfitDetailMonth record);
 
     ProfitDetailMonth selectByIdAndParent(ProfitDetailMonth record);
+
     int updateByPrimaryKeySelective(ProfitDetailMonth record);
 
     int updateByPrimaryKey(ProfitDetailMonth record);
