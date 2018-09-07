@@ -114,11 +114,15 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
 
 
-        if(!isHaveYHKSMJ){
-            throw new ProcessException("请添加银行卡扫描件");
+        if("2".equals(ac.getCloType())) {//对私
+            if (!isHaveYHKSMJ) {
+                throw new ProcessException("请添加银行卡扫描件");
+            }
         }
-        if(!isHaveKHXUZ){
-            throw new ProcessException("请添加开户许可证");
+        if("1".equals(ac.getCloType())) {//对公
+            if (!isHaveKHXUZ) {
+                throw new ProcessException("请添加开户许可证");
+            }
         }
 
 
@@ -280,11 +284,15 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             }
                         }
                     }
-                    if(!isHaveYHKSMJ){
-                        throw new ProcessException("请添加银行卡扫描件");
+                    if("2".equals(agentColinfoVo.getCloType())) {//对私
+                        if (!isHaveYHKSMJ) {
+                            throw new ProcessException("请添加银行卡扫描件");
+                        }
                     }
-                    if(!isHaveKHXUZ){
-                        throw new ProcessException("请添加开户许可证");
+                    if("1".equals(agentColinfoVo.getCloType())) {//对公
+                        if (!isHaveKHXUZ) {
+                            throw new ProcessException("请添加开户许可证");
+                        }
                     }
 
                 }
