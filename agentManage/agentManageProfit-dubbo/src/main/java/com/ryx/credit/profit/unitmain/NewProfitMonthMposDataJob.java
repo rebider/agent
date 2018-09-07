@@ -66,10 +66,10 @@ public class NewProfitMonthMposDataJob {
     /**
      * 同步手刷月分润明细数据
      * transDate 交易日期（空则为上一月）
-     * 每月12号上午10点：@Scheduled(cron = "0 0 12 10 * ?")
-     * 2018.9.7 17:45："0 45 17 7 * ?"
+     * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
+     * 2018.9.7 17:45：@Scheduled(cron = "0 45 17 7 * ?")
      */
-    @Scheduled(cron = "0 45 17 7 * ?")
+    @Scheduled(cron = "0 0 5 12 * ?")
     public void synchroProfitMonth(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();

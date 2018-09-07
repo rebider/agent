@@ -88,9 +88,9 @@ public class ProfitZhiFaDataJob {
      * 同步直发分润数据
      * 交易月份（空则为上一月）
      * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
-     * 2018.9.7 17:20："0 20 17 7 * ?"
+     * 2018.9.7 17:20：@Scheduled(cron = "0 20 17 7 * ?")
     */
-    @Scheduled(cron = "0 20 17 7 * ?")
+    @Scheduled(cron = "0 0 5 10 * ?")
     public void synchroProfitDirect(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();

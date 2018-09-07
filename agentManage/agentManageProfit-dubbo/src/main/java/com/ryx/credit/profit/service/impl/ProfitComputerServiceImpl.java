@@ -670,10 +670,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     /**
      * @throws Exception
-     * 每月12号下午2点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
-     * 2018.9.7 18:00："0 0 18 7 * ?"
+     * 每月12号下午14点执行一次：@Scheduled(cron = "0 0 12 14 * ?")
+     * 2018.9.7 18:00：@Scheduled(cron = "0 0 18 7 * ?")
      */
-    @Scheduled(cron = "0 0 18 7 * ?")
+    @Scheduled(cron = "0 0 12 14 * ?")
     public void new_computerTax() throws Exception {
         String profitDate = null;
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;

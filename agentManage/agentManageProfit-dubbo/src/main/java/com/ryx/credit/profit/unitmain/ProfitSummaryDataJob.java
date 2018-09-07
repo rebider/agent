@@ -60,10 +60,10 @@ public class ProfitSummaryDataJob {
 
     /**
      * 交易月份（空则为上一月）
-     * 每月12号上午11点：@Scheduled(cron = "0 0 12 11 * ?")
-     * 2018.9.7 17:55："0 55 17 7 * ?"
+     * 每月12号上午12点：@Scheduled(cron = "0 0 12 12 * ?")
+     * 2018.9.7 17:55：@Scheduled(cron = "0 55 17 7 * ?")
      */
-    @Scheduled(cron = "0 55 17 7 * ?")
+    @Scheduled(cron = "0 0 12 12 * ?")
     public void MPos_Summary(){
         String transDate = null;
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
