@@ -365,6 +365,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
             //调用POST接口
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                //智能POS代理商名加N区分
+                if(platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                    agentNotifyVo.setOrgName("N"+agentNotifyVo.getOrgName());
+                }
                 //POS传递的唯一ID是业务平台记录ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
                 log.info("已有编号进行入网修改：接收入网请求开始POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
@@ -655,7 +659,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-
+                //智能POS代理商名加N区分
+                if(platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                    agentNotifyVo.setOrgName("N"+agentNotifyVo.getOrgName());
+                }
                 //POS传递业务ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
