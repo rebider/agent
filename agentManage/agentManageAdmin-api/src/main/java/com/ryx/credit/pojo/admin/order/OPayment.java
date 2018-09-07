@@ -104,6 +104,8 @@ public class OPayment implements Serializable{
 
     private String downPaymentUser;
 
+    private String settlementPriceStr;
+
     public String getId() {
         return id;
     }
@@ -342,5 +344,13 @@ public class OPayment implements Serializable{
 
     public void setDownPaymentUser(String downPaymentUser) {
         this.downPaymentUser = downPaymentUser == null ? null : downPaymentUser.trim();
+    }
+
+    public String getSettlementPriceStr() {
+        return settlementPriceStr;
+    }
+
+    public void setSettlementPriceStr(String settlementPriceStr) {
+        this.settlementPriceStr = settlementPriceStr == null ? null : settlementPriceStr.trim();
     }
 }

@@ -2057,6 +2057,76 @@ public class OPaymentExample {
             addCriterion("DOWN_PAYMENT_USER not between", value1, value2, "downPaymentUser");
             return (Criteria) this;
         }
+
+        public Criteria andSettlementPriceStrIsNull() {
+            addCriterion("SETTLEMENT_PRICE_STR is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrIsNotNull() {
+            addCriterion("SETTLEMENT_PRICE_STR is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR =", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR <>", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrGreaterThan(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR >", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrGreaterThanOrEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR >=", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrLessThan(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR <", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrLessThanOrEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR <=", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrLike(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR like", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotLike(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR not like", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrIn(List<String> values) {
+            addCriterion("SETTLEMENT_PRICE_STR in", values, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotIn(List<String> values) {
+            addCriterion("SETTLEMENT_PRICE_STR not in", values, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrBetween(String value1, String value2) {
+            addCriterion("SETTLEMENT_PRICE_STR between", value1, value2, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotBetween(String value1, String value2) {
+            addCriterion("SETTLEMENT_PRICE_STR not between", value1, value2, "settlementPriceStr");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
