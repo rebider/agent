@@ -1017,6 +1017,136 @@ public class ApprovalFlowRecordExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andActivityStatusIsNull() {
+            addCriterion("ACTIVITY_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusIsNotNull() {
+            addCriterion("ACTIVITY_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusEqualTo(BigDecimal value) {
+            addCriterion("ACTIVITY_STATUS =", value, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusNotEqualTo(BigDecimal value) {
+            addCriterion("ACTIVITY_STATUS <>", value, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusGreaterThan(BigDecimal value) {
+            addCriterion("ACTIVITY_STATUS >", value, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTIVITY_STATUS >=", value, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusLessThan(BigDecimal value) {
+            addCriterion("ACTIVITY_STATUS <", value, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTIVITY_STATUS <=", value, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusIn(List<BigDecimal> values) {
+            addCriterion("ACTIVITY_STATUS in", values, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusNotIn(List<BigDecimal> values) {
+            addCriterion("ACTIVITY_STATUS not in", values, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTIVITY_STATUS between", value1, value2, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andActivityStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTIVITY_STATUS not between", value1, value2, "activityStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgIsNull() {
+            addCriterion("ERROR_MSG is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgIsNotNull() {
+            addCriterion("ERROR_MSG is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgEqualTo(String value) {
+            addCriterion("ERROR_MSG =", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgNotEqualTo(String value) {
+            addCriterion("ERROR_MSG <>", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgGreaterThan(String value) {
+            addCriterion("ERROR_MSG >", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgGreaterThanOrEqualTo(String value) {
+            addCriterion("ERROR_MSG >=", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgLessThan(String value) {
+            addCriterion("ERROR_MSG <", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgLessThanOrEqualTo(String value) {
+            addCriterion("ERROR_MSG <=", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgLike(String value) {
+            addCriterion("ERROR_MSG like", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgNotLike(String value) {
+            addCriterion("ERROR_MSG not like", value, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgIn(List<String> values) {
+            addCriterion("ERROR_MSG in", values, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgNotIn(List<String> values) {
+            addCriterion("ERROR_MSG not in", values, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgBetween(String value1, String value2) {
+            addCriterion("ERROR_MSG between", value1, value2, "errorMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andErrorMsgNotBetween(String value1, String value2) {
+            addCriterion("ERROR_MSG not between", value1, value2, "errorMsg");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

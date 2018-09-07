@@ -9,7 +9,9 @@ import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
  */
 public interface ApprovalFlowRecordService {
 
-    int insert(ApprovalFlowRecord record)throws Exception;
+    String insert(ApprovalFlowRecord record)throws Exception;
+
+    int update(ApprovalFlowRecord record);
 
     PageInfo approvalFlowList(ApprovalFlowRecord approvalFlowRecord, Page page);
 }

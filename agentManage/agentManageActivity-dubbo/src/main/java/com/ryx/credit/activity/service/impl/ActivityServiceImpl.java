@@ -1,6 +1,8 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
+import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
@@ -121,14 +123,10 @@ public class ActivityServiceImpl implements ActivityService {
 
 
     @Override
-    public Map completeTask(String taskId, Map<String,Object>  map) {
+    public Map completeTask(String taskId, Map<String,Object>  map) throws ProcessException {
         Map<String,Object> rs = new HashMap<>(5);
+        ApprovalFlowRecord upFlowRecord = new ApprovalFlowRecord();
         try {
-            TaskService taskService = processEngine.getTaskService();
-            taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
-            taskService.complete(taskId, map);
-            logger.info("完成任务" + taskId);
-
             String approvalResult = String.valueOf(map.get("rs"));
             String approvalOpinion = String.valueOf(map.get("approvalOpinion"));
             String approvalPerson = String.valueOf(map.get("approvalPerson"));
@@ -154,16 +152,24 @@ public class ActivityServiceImpl implements ActivityService {
             approvalFlowRecord.setApprovalOpinion(approvalOpinion);
             approvalFlowRecord.setApprovalPerson(approvalPerson);
             approvalFlowRecord.setApprovalResult(approvalResult);
-            approvalFlowRecordService.insert(approvalFlowRecord);
-
+            String insert = approvalFlowRecordService.insert(approvalFlowRecord);
+            upFlowRecord.setId(insert);
+            TaskService taskService = processEngine.getTaskService();
+            taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
+            taskService.complete(taskId, map);
+            logger.info("完成任务" + taskId);
             rs.put("rs",true);
             rs.put("msg","success");
+            upFlowRecord.setActivityStatus(Status.STATUS_1.status);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());
+            upFlowRecord.setStatus(Status.STATUS_0.status);
+            upFlowRecord.setActivityStatus(Status.STATUS_1.status);
+            upFlowRecord.setErrorMsg(e.getMessage());
         }
+        approvalFlowRecordService.update(upFlowRecord);
         return rs;
     }
 

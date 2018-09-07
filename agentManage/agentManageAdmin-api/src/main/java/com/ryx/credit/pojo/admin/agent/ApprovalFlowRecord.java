@@ -31,6 +31,10 @@ public class ApprovalFlowRecord implements Serializable{
 
     private BigDecimal version;
 
+    private BigDecimal activityStatus;
+
+    private String errorMsg;
+
     private String busTypeName;
 
     private String beginTime;
@@ -163,5 +167,22 @@ public class ApprovalFlowRecord implements Serializable{
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+
+    public BigDecimal getActivityStatus() {
+        return activityStatus;
+    }
+
+    public void setActivityStatus(BigDecimal activityStatus) {
+        this.activityStatus = activityStatus;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 }
