@@ -669,10 +669,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 //    }
 
     /**
-     * 每月10号凌晨20点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
      * @throws Exception
+     * 每月12号下午2点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
+     * 2018.9.7 18:00："0 0 18 7 * ?"
      */
-    @Scheduled(cron = "0 0 10 20 * ?")
+    @Scheduled(cron = "0 0 18 7 * ?")
     public void new_computerTax() throws Exception {
         String profitDate = null;
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;
@@ -894,6 +895,5 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         logger.info("@实发分润:"+actual);
         return detail;
     }
-
 
 }

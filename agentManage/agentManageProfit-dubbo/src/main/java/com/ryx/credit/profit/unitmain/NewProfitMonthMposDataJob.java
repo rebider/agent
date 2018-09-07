@@ -63,23 +63,17 @@ public class NewProfitMonthMposDataJob {
        synchroProfitMonth();
    }
 
-//    @Test
-//    public void test() throws Exception {
-//        String transDate = "201807";
-//        synchroProfitMonth(transDate);
-//        synchroProfitMonth();
-//    }
-
     /**
      * 同步手刷月分润明细数据
      * transDate 交易日期（空则为上一月）
-     * 每月10号凌晨20点执行一次：@Scheduled(cron = "0 0 10 20 * ?")
+     * 每月12号上午10点：@Scheduled(cron = "0 0 12 10 * ?")
+     * 2018.9.7 17:45："0 45 17 7 * ?"
      */
-    @Scheduled(cron = "0 0 10 20 * ?")
+    @Scheduled(cron = "0 45 17 7 * ?")
     public void synchroProfitMonth(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
-        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
+        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate;
         map.put("frMonth", transDate);
         map.put("pageNumber", index++ +"");
         map.put("pageSize", "2");

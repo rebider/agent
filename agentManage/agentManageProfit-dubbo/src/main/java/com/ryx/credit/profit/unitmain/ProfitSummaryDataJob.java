@@ -16,12 +16,14 @@ import com.ryx.credit.profit.pojo.PAgentPidLink;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.service.ProfitComputerService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -46,26 +48,34 @@ public class ProfitSummaryDataJob {
     @Autowired
     private ProfitDayMapper dayMapper;
     @Autowired
-    OrderService orderService;
+    private OrderService orderService;
+    @Autowired
+    private ProfitComputerService computerService;
 
     private int index = 1;
 
     public void excute(){
-        MPos_Summary(null);
+        MPos_Summary();
     }
 
-
-    public void MPos_Summary(String transDate){
-        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate;
+    /**
+     * 交易月份（空则为上一月）
+     * 每月12号上午11点：@Scheduled(cron = "0 0 12 11 * ?")
+     * 2018.9.7 17:55："0 55 17 7 * ?"
+     */
+    @Scheduled(cron = "0 55 17 7 * ?")
+    public void MPos_Summary(){
+        String transDate = null;
+        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
         List<TransProfitDetail> details = transProfitDetailMapper.selectListByDate(transDate);//手刷同步过来的小汇数据
-        for(TransProfitDetail detail:details){
+        for(TransProfitDetail detail : details){
             Agent agent = agentService.getAgentById(detail.getAgentId());
             ProfitDetailMonth where = new ProfitDetailMonth();
             where.setAgentId(detail.getAgentId());
             where.setParentAgentId(detail.getParentAgentId());
             where.setProfitDate(transDate);
             ProfitDetailMonth detailMonth = detailMonthMapper.selectByIdAndParent(where);
-            if(null==detailMonth){
+            if(null == detailMonth){
                 detailMonth = new ProfitDetailMonth();
             }
             detailMonth.setProfitDate(transDate);
@@ -94,7 +104,7 @@ public class ProfitSummaryDataJob {
                 detailMonth.setTpProfitAmt(detail.getProfitAmt());
             }
 
-            if(null==detailMonth){//新增汇总
+            if(null == detailMonth){//新增汇总
                 detailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
                 detailMonth.setAgentName(agent.getAgName());
                 detailMonth.setAgentId(detail.getAgentId());
@@ -107,7 +117,6 @@ public class ProfitSummaryDataJob {
             }
 
             //
-
         }
     }
 

@@ -14,6 +14,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,18 +53,26 @@ public class ProfitMposDiffDataJob {
     }
 
     public void excute(){
-        synchroProfitDiff(null);
+        synchroProfitDiff();
     }
 
-    public void synchroProfitDiff(String month){
+    /**
+     * 同步手刷月分润明细数据
+     * transDate 交易日期（空则为上一月）
+     * 每月5号上午8点：@Scheduled(cron = "0 0 5 8 * ?")
+     * 2018.9.7 17:40："0 40 17 7 * ?"
+     */
+    @Scheduled(cron = "0 40 17 7 * ?")
+    public void synchroProfitDiff(){
+        String month = null;
         HashMap<String,String> map = new HashMap<String,String>();
-        month = month==null? DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):month;
-        map.put("frMonth",month);
-        map.put("pageNumber",index++ +"");
-        map.put("pageSize","50");
+        month = month==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):month;
+        map.put("frMonth", month);
+        map.put("pageNumber", index++ +"");
+        map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.bucha"),params);
+                (AppConfig.getProperty("profit.bucha"), params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
@@ -71,10 +80,10 @@ public class ProfitMposDiffDataJob {
             return;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<JSONObject> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data, List.class);
         try {
-            if(list.size()>0){
-                insertProfitDiff(list,month);
+            if(list.size() > 0){
+                insertProfitDiff(list, month);
             }
         } catch (Exception e) {
             logger.error("同步插入数据失败！");
@@ -83,8 +92,8 @@ public class ProfitMposDiffDataJob {
         }
     }
 
-    public void insertProfitDiff(List<JSONObject> profitDays,String date){
-        for(JSONObject json:profitDays){
+    public void insertProfitDiff(List<JSONObject> profitDays, String date){
+        for(JSONObject json : profitDays){
             ProfitSupplyDiff profitDiff = new ProfitSupplyDiff();
             profitDiff.setId(idService.genId(TabId.P_PROFIT_SUPPLU_DIFF));
             profitDiff.setAgentId(json.getString("AGENTID"));
@@ -99,6 +108,7 @@ public class ProfitMposDiffDataJob {
             supplyDiffMapper.insert(profitDiff);
 
         }
-        synchroProfitDiff(date);
+        synchroProfitDiff();
     }
+
 }

@@ -13,10 +13,12 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,7 +34,6 @@ public class DailyProfitMposDataJob {
 
     public static void main(String agrs[]){
         HashMap<String,String> map = new HashMap<String,String>();
-        //map.put("frDate", "20180625");
         String frDate = null;
         map.put("frDate", frDate==null?DateUtil.getAfterDayDate("-2", DateUtil.sdfDays):frDate);
         map.put("pageNumber", "1");
@@ -51,14 +52,58 @@ public class DailyProfitMposDataJob {
     }
 
     /**
-     * 同步日结分润数据
-     * @param frDate 分润月份（空则为当前日期上2天）yyyymmdd
+     * 2018.9.7 17:30："0 30 17 7 * ?"
      */
+    @Scheduled(cron = "0 30 17 7 * ?")
+    public void excute(){
+        List<String> dates = new ArrayList<String>();
+        dates.add("20180701");
+        dates.add("20180702");
+        dates.add("20180703");
+        dates.add("20180704");
+        dates.add("20180705");
+        dates.add("20180706");
+        dates.add("20180707");
+        dates.add("20180708");
+        dates.add("20180709");
+        dates.add("20180710");
+        dates.add("20180711");
+        dates.add("20180712");
+        dates.add("20180713");
+        dates.add("20180714");
+        dates.add("20180715");
+        dates.add("20180716");
+        dates.add("20180717");
+        dates.add("20180718");
+        dates.add("20180719");
+        dates.add("20180720");
+        dates.add("20180721");
+        dates.add("20180722");
+        dates.add("20180723");
+        dates.add("20180724");
+        dates.add("20180725");
+        dates.add("20180726");
+        dates.add("20180727");
+        dates.add("20180728");
+        dates.add("20180729");
+        dates.add("20180730");
+        dates.add("20180731");
+        for(int i=0;i<dates.size();i++){
+            synchroProfitDay(dates.get(i));
+        }
+    }
+
+    /**
+     * 同步日结分润数据
+     * 分润月份（空则为当前日期上2天）yyyymmdd
+     * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
+     */
+    //@Scheduled(cron = "0 0 5 * * ?")
     public void synchroProfitDay(String frDate){
+        //String frDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("frDate", frDate==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):frDate);
         map.put("pageNumber", index++ +"");
-        //map.put("pageNumber", "3");
         map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newday"), params);
@@ -99,12 +144,6 @@ public class DailyProfitMposDataJob {
             profitD.setPlatformNum(json.getString("PLATFORMNUM"));//平台编号
             profitDService.insertSelective(profitD);
         }
-        synchroProfitDay(frDate);
-    }
-
-    @Test
-    public void DailyProfitTest(){
-        String frDate = "20180625";
         synchroProfitDay(frDate);
     }
 
