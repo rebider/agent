@@ -702,6 +702,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             updateBusInfo.setVersion(agentBusInfo.getVersion());
             updateBusInfo.setId(agentBusInfo.getId());
             updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+            if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
+            }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
+            }
             updateBusInfo.setBusStatus(Status.STATUS_1.status);
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);

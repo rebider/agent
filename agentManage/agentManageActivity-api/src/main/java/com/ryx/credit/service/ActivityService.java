@@ -1,5 +1,6 @@
 package com.ryx.credit.service;
 
+import com.ryx.credit.common.exception.ProcessException;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 
@@ -23,7 +24,7 @@ public interface ActivityService {
 
     List<Task> findMyPersonTask(String assignee,String group);
 
-    Map completeTask(String taskId, Map<String, Object> map);
+    Map completeTask(String taskId, Map<String, Object> map)throws ProcessException;
 
     List<ProcessDefinition> findProcessDefinition();
 
