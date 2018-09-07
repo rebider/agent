@@ -166,7 +166,7 @@ public class ActivityServiceImpl implements ActivityService {
             rs.put("rs",false);
             rs.put("msg",e.getMessage());
             upFlowRecord.setStatus(Status.STATUS_0.status);
-            upFlowRecord.setActivityStatus(Status.STATUS_1.status);
+            upFlowRecord.setActivityStatus(Status.STATUS_0.status);
             upFlowRecord.setErrorMsg(e.getMessage());
         }
         approvalFlowRecordService.update(upFlowRecord);
