@@ -112,12 +112,16 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
             }
         }
+
+
         if(!isHaveYHKSMJ){
             throw new ProcessException("请添加银行卡扫描件");
         }
         if(!isHaveKHXUZ){
             throw new ProcessException("请添加开户许可证");
         }
+
+
         if(1!=agentColinfoMapper.insertSelective(ac)){
             logger.info("收款账号添加:{}", "收款账号添加失败");
             throw new ProcessException("收款账号添加失败");
