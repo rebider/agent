@@ -68,36 +68,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             throw new ProcessException("税点不能大于1");
         }
 
-        /**
-         * cxinfo 系统对开票和税点进行系统控制
-         * 2、如果前面是对私户进行打款，那么是否开票默认为否且不可修改
-         3、如果代理商前面是对私户进行打款，那么扣税点在代理商填写时默认为6%且不可修改
-         4、如果代理商前面是对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为6%，且不可修改
-         5、如果代理商前面是对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%
-         */
-        if(ac.getCloType().compareTo(new BigDecimal(2))==0){ //对私
-            //税点检查
-            if(ac.getCloTaxPoint().compareTo(new BigDecimal(0.06))!=0){ //对私
-                throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.06且不可修改");
-            }
-            //是否开票检查
-            if(ac.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //对私
-                throw new ProcessException("对私户进行打款，那么是否开票默认为否且不可修改");
-            }
-        }else if(ac.getCloType().compareTo(new BigDecimal(1))==0){//对公
-            //是否开票检查
-            if(ac.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //不开票
-                //税点检查
-                if(ac.getCloTaxPoint().compareTo(new BigDecimal(0.06))!=0){ //对私
-                    throw new ProcessException("对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为0.06，且不可修改");
-                }
-            }else  if(ac.getCloInvoice().compareTo(new BigDecimal(1))!=0){ //开票
-                //税点检查
-                if(ac.getCloTaxPoint().compareTo(new BigDecimal(0.06))!=0 || ac.getCloTaxPoint().compareTo(new BigDecimal(0.03))!=0){ //对私
-                    throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%");
-                }
-            }
-        }
+        //检查属性
+        checkColInfo(ac);
+
         Date d = Calendar.getInstance().getTime();
         ac.setcTime(d);
         ac.setcUtime(d);
@@ -139,12 +112,16 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
             }
         }
+
+
         if(!isHaveYHKSMJ){
             throw new ProcessException("请添加银行卡扫描件");
         }
         if(!isHaveKHXUZ){
             throw new ProcessException("请添加开户许可证");
         }
+
+
         if(1!=agentColinfoMapper.insertSelective(ac)){
             logger.info("收款账号添加:{}", "收款账号添加失败");
             throw new ProcessException("收款账号添加失败");
@@ -227,37 +204,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     throw new ProcessException("税点不能大于1");
                 }
 
-                /**
-                 * cxinfo 系统对开票和税点进行系统控制
-                 * 2、如果前面是对私户进行打款，那么是否开票默认为否且不可修改
-                 3、如果代理商前面是对私户进行打款，那么扣税点在代理商填写时默认为6%且不可修改
-                 4、如果代理商前面是对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为6%，且不可修改
-                 5、如果代理商前面是对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%
-                 */
-                if(agentColinfoVo.getCloType().compareTo(new BigDecimal(2))==0){ //对私
-                    //税点检查
-                    if(agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(0.06))!=0){ //对私
-                        throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.06且不可修改");
-                    }
-                    //是否开票检查
-                    if(agentColinfoVo.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //对私
-                        throw new ProcessException("对私户进行打款，那么是否开票默认为否且不可修改");
-                    }
-                }else if(agentColinfoVo.getCloType().compareTo(new BigDecimal(1))==0){//对公
-                    //是否开票检查
-                    if(agentColinfoVo.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //不开票
-                        //税点检查
-                        if(agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(0.06))!=0){ //对私
-                            throw new ProcessException("对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为0.06，且不可修改");
-                        }
-                    }else  if(agentColinfoVo.getCloInvoice().compareTo(new BigDecimal(1))!=0){ //开票
-                        //税点检查
-                        if(agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(0.06))!=0 || agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(0.03))!=0){ //对私
-                            throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%");
-                        }
-                    }
-                }
 
+
+                checkColInfo(agentColinfoVo);
 
                 agentColinfoVo.setcUser(agent.getcUser());
                 agentColinfoVo.setAgentId(agent.getId());
@@ -374,5 +323,40 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     @Override
     public int updateByPrimaryKeySelective(AgentColinfo record) {
         return agentColinfoMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public AgentResult checkColInfo(AgentColinfo agentColinfo) {
+        /**
+         * cxinfo 系统对开票和税点进行系统控制
+         * 2、如果前面是对私户进行打款，那么是否开票默认为否且不可修改
+         3、如果代理商前面是对私户进行打款，那么扣税点在代理商填写时默认为6%且不可修改
+         4、如果代理商前面是对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为6%，且不可修改
+         5、如果代理商前面是对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%
+         */
+        if(agentColinfo.getCloType().compareTo(new BigDecimal(2))==0){ //对私
+            //税点检查
+            if(agentColinfo.getCloTaxPoint()==null || !"0.06".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
+                throw new ProcessException("对私户进行打款，那么扣税点在代理商填写时默认为0.06且不可修改");
+            }
+            //是否开票检查
+            if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(0))!=0){ //对私
+                throw new ProcessException("对私户进行打款，那么是否开票默认为否且不可修改");
+            }
+        }else if(agentColinfo.getCloType().compareTo(new BigDecimal(1))==0){//对公
+            //是否开票检查
+            if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(0))==0){ //不开票
+                //税点检查
+                if(agentColinfo.getCloTaxPoint()==null || !"0.06".equals(agentColinfo.getCloTaxPoint().toString())){ //对私
+                    throw new ProcessException("对公户进行打款，且代理商是否开票为否，那么扣税点在代理商填写时默认为0.06，且不可修改");
+                }
+            }else  if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(1))==0){ //开票
+                //税点检查
+                if(!"0.06".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString()) ){ //对私
+                    throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%");
+                }
+            }
+        }
+        return AgentResult.ok();
     }
 }

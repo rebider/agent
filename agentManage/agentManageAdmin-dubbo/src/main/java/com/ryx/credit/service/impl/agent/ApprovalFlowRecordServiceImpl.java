@@ -40,15 +40,19 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     private IUserService userService;
 
     @Override
-    public int insert(ApprovalFlowRecord record)throws Exception{
-
+    public String insert(ApprovalFlowRecord record)throws Exception{
         record.setId(idService.genId(TabId.a_approval_flow_record));
         record.setStatus(Status.STATUS_1.status);
         record.setVersion(Status.STATUS_1.status);
-        int insert = approvalFlowRecordMapper.insert(record);
-        return insert;
+        approvalFlowRecordMapper.insert(record);
+        return record.getId();
     }
 
+    @Override
+    public int update(ApprovalFlowRecord record){
+        int i = approvalFlowRecordMapper.updateByPrimaryKeySelective(record);
+        return i;
+    }
 
     @Override
     public PageInfo approvalFlowList(ApprovalFlowRecord approvalFlowRecord, Page page) {

@@ -133,6 +133,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	public AgentBusInfo getById(String id){
 		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+		if(agentBusInfo!=null)
 		//查询业务关联账户
 		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
 		return agentBusInfo;

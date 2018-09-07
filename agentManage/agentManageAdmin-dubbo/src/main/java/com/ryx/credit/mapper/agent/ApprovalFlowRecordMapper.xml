@@ -15,6 +15,8 @@
     <result column="APPROVAL_OPINION" jdbcType="VARCHAR" property="approvalOpinion" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ACTIVITY_STATUS" jdbcType="DECIMAL" property="activityStatus" />
+    <result column="ERROR_MSG" jdbcType="VARCHAR" property="errorMsg" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -46,8 +48,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, TASK_ID, EXECUTION_ID, TASK_NAME, BUS_ID, BUS_TYPE, APPROVAL_PERSON, APPROVAL_DEP, 
-    APPROVAL_TIME, APPROVAL_RESULT, APPROVAL_OPINION, STATUS, VERSION
+    ID, TASK_ID, EXECUTION_ID, TASK_NAME, BUS_ID, BUS_TYPE, APPROVAL_PERSON, APPROVAL_DEP,
+    APPROVAL_TIME, APPROVAL_RESULT, APPROVAL_OPINION, STATUS, VERSION, ACTIVITY_STATUS,
+    ERROR_MSG
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -66,7 +69,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_APPROVAL_FLOW_RECORD
     where ID = #{id,jdbcType=VARCHAR}
@@ -78,16 +81,18 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
-    insert into A_APPROVAL_FLOW_RECORD (ID, TASK_ID, EXECUTION_ID, 
-      TASK_NAME, BUS_ID, BUS_TYPE, 
-      APPROVAL_PERSON, APPROVAL_DEP, APPROVAL_TIME, 
-      APPROVAL_RESULT, APPROVAL_OPINION, STATUS, 
-      VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{executionId,jdbcType=VARCHAR}, 
-      #{taskName,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, 
-      #{approvalPerson,jdbcType=VARCHAR}, #{approvalDep,jdbcType=VARCHAR}, #{approvalTime,jdbcType=TIMESTAMP}, 
-      #{approvalResult,jdbcType=VARCHAR}, #{approvalOpinion,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+    insert into A_APPROVAL_FLOW_RECORD (ID, TASK_ID, EXECUTION_ID,
+    TASK_NAME, BUS_ID, BUS_TYPE,
+    APPROVAL_PERSON, APPROVAL_DEP, APPROVAL_TIME,
+    APPROVAL_RESULT, APPROVAL_OPINION, STATUS,
+    VERSION, ACTIVITY_STATUS, ERROR_MSG
+    )
+    values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{executionId,jdbcType=VARCHAR},
+    #{taskName,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR},
+    #{approvalPerson,jdbcType=VARCHAR}, #{approvalDep,jdbcType=VARCHAR}, #{approvalTime,jdbcType=TIMESTAMP},
+    #{approvalResult,jdbcType=VARCHAR}, #{approvalOpinion,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{activityStatus,jdbcType=DECIMAL}, #{errorMsg,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
     insert into A_APPROVAL_FLOW_RECORD
@@ -131,6 +136,12 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="activityStatus != null">
+        ACTIVITY_STATUS,
+      </if>
+      <if test="errorMsg != null">
+        ERROR_MSG,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -171,6 +182,12 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="activityStatus != null">
+        #{activityStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="errorMsg != null">
+        #{errorMsg,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -219,6 +236,12 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="activityStatus != null">
+        ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="errorMsg != null">
+        ERROR_MSG = #{errorMsg,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -235,12 +258,14 @@
       APPROVAL_RESULT = #{approvalResult,jdbcType=VARCHAR},
       APPROVAL_OPINION = #{approvalOpinion,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
+      ERROR_MSG = #{errorMsg,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
