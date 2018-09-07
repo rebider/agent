@@ -165,27 +165,38 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             BusActRel rel = busr.get(0);
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.Agent.name())){
                 Agent agent =  agentMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("agent",agent).putKeyV("rel",rel);
+                return FastMap.fastSuccessMap().putKeyV("agent",agent).putKeyV("rel",rel)
+                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.Business.name())){
                 AgentBusInfo angetBusInfo = agentBusInfoMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("angetBusInfo",angetBusInfo).putKeyV("rel",rel);
+                Agent agent =  agentMapper.selectByPrimaryKey(angetBusInfo.getAgentId());
+                return FastMap.fastSuccessMap().putKeyV("angetBusInfo",angetBusInfo).putKeyV("rel",rel)
+                        .putKeyV("agentId",angetBusInfo.getAgentId()).putKeyV("agName",agent.getAgName());
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Agent.name())){
                 DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel);
+                Agent agent =  agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel)
+                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Colinfo.name())){
                 DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel);
+                Agent agent =  agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+                return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel)
+                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.PkType.name())){
                 OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("OSupplement",oSupplement).putKeyV("rel",rel);
+                Agent agent =  agentMapper.selectByPrimaryKey(oSupplement.getAgentId());
+                return FastMap.fastSuccessMap().putKeyV("OSupplement",oSupplement).putKeyV("rel",rel)
+                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.ORDER.name())){
                 OOrder order = oOrderMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("OOrder",order).putKeyV("rel",rel);
+                Agent agent =  agentMapper.selectByPrimaryKey(order.getAgentId());
+                return FastMap.fastSuccessMap().putKeyV("OOrder",order).putKeyV("rel",rel)
+                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.COMPENSATE.name())){
                 ORefundPriceDiff refundrPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(rel.getBusId());
@@ -193,7 +204,9 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.refund.name())){
                 OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("oReturnOrder",oReturnOrder).putKeyV("rel",rel);
+                Agent agent =  agentMapper.selectByPrimaryKey(oReturnOrder.getAgentId());
+                return FastMap.fastSuccessMap().putKeyV("oReturnOrder",oReturnOrder).putKeyV("rel",rel)
+                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
             }
         }
         return null;
