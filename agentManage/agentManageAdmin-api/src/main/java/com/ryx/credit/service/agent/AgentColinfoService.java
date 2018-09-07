@@ -36,4 +36,6 @@ public interface AgentColinfoService {
     public AgentColinfo queryPoint(AgentColinfo agentColinfo);
 
     int updateByPrimaryKeySelective(AgentColinfo record);
+
+    public AgentResult checkColInfo(AgentColinfo agentColinfo);
 }
