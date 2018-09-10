@@ -170,33 +170,33 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.Business.name())){
                 AgentBusInfo angetBusInfo = agentBusInfoMapper.selectByPrimaryKey(rel.getBusId());
-                Agent agent =  agentMapper.selectByPrimaryKey(angetBusInfo.getAgentId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,angetBusInfo.getAgentId());
                 return FastMap.fastSuccessMap().putKeyV("angetBusInfo",angetBusInfo).putKeyV("rel",rel)
-                        .putKeyV("agentId",angetBusInfo.getAgentId()).putKeyV("agName",agent.getAgName());
+                        .putKeyV("agentId",angetBusInfo.getAgentId()).putKeyV("agName",agName);
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Agent.name())){
                 DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
-                Agent agent =  agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,dateChangeRequest.getDataId());
                 return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel)
-                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
+                        .putKeyV("agentId",dateChangeRequest.getDataId()).putKeyV("agName",agName);
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.DC_Colinfo.name())){
                 DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(rel.getBusId());
-                Agent agent =  agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,dateChangeRequest.getDataId());
                 return FastMap.fastSuccessMap().putKeyV("DateChangeRequest",dateChangeRequest).putKeyV("rel",rel)
-                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
+                        .putKeyV("agentId",dateChangeRequest.getDataId()).putKeyV("agName",agName);
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.PkType.name())){
                 OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(rel.getBusId());
-                Agent agent =  agentMapper.selectByPrimaryKey(oSupplement.getAgentId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,oSupplement.getAgentId());
                 return FastMap.fastSuccessMap().putKeyV("OSupplement",oSupplement).putKeyV("rel",rel)
-                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
+                        .putKeyV("agentId",oSupplement.getAgentId()).putKeyV("agName",agName);
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.ORDER.name())){
                 OOrder order = oOrderMapper.selectByPrimaryKey(rel.getBusId());
-                Agent agent =  agentMapper.selectByPrimaryKey(order.getAgentId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,order.getAgentId());
                 return FastMap.fastSuccessMap().putKeyV("OOrder",order).putKeyV("rel",rel)
-                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
+                        .putKeyV("agentId",order.getAgentId()).putKeyV("agName",agName);
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.COMPENSATE.name())){
                 ORefundPriceDiff refundrPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(rel.getBusId());
@@ -204,9 +204,9 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.refund.name())){
                 OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(rel.getBusId());
-                Agent agent =  agentMapper.selectByPrimaryKey(oReturnOrder.getAgentId());
+                String agName = redisService.hGet(RedisCachKey.AGENTINFO.code,oReturnOrder.getAgentId());
                 return FastMap.fastSuccessMap().putKeyV("oReturnOrder",oReturnOrder).putKeyV("rel",rel)
-                        .putKeyV("agentId",agent.getId()).putKeyV("agName",agent.getAgName());
+                        .putKeyV("agentId",oReturnOrder.getAgentId()).putKeyV("agName",agName);
             }
         }
         return null;
@@ -270,14 +270,14 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             for (Map<String, Object> stringObjectMap : list) {
                 try {
                     redisService.hSet(RedisCachKey.AGENT_BUSINFO.code+stringObjectMap.get("ID"),stringObjectMap);
+                    agentBusInfoName.put(stringObjectMap.get("AGENT_ID")+"",stringObjectMap.get("AG_NAME")+"");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                agentBusInfoName.put(stringObjectMap.get("ID")+"",stringObjectMap.get("AG_NAME")+"");
             }
             logger.info("代理商业务集合信息放入redis");
             try {
-                redisService.hSet(RedisCachKey.AGENT_BUSINFO.code,agentBusInfoName);
+                redisService.hSet(RedisCachKey.AGENTINFO.code,agentBusInfoName);
             } catch (Exception e) {
                 e.printStackTrace();
             }

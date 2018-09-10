@@ -735,43 +735,55 @@
   <select id="excelAgent" parameterType="map" resultMap="BusinessOutVo">
     (select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
     agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
-    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_parent
-    ,bus.bus_risk_parent,bus.bus_activation_parent,bus.bus_Inde_ass,
-    bus.bus_scope,bus.bus_region,bus.bus_risk_email
-    from A_AGENT agent left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email,platform.PLATFORM_NAME,
+    a1.AG_NAME||businfo_1.id as busParent,
+    busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent
+    from A_AGENT agent
+    left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    left join A_PLATFORM  platform on platform.PLATFORM_NUM=bus.BUS_PLATFORM
+    left join a_agent_businfo businfo_1     on businfo_1.id=bus.bus_parent
+    left join a_agent a1 on a1.id=businfo_1.agent_id
+    left join A_agent_businfo busRiskParentbus on bus.BUS_RISK_PARENT = busRiskParentbus.id
+    left join A_AGENT busRiskParentbusAgent on busRiskParentbusAgent.id = busRiskParentbus.AGENT_ID
+    left join A_agent_businfo busActivationParentbus on bus.BUS_ACTIVATION_PARENT = busActivationParentbus.id
+    left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
     where 1=1 and agent.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
       CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
-      <if
-              test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' ">and agent.ag_uniq_num = #{reqMap.agUniqNum}
+      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' ">and agent.ag_uniq_num = #{reqMap.agUniqNum}
       </if>
-      <if
-              test="reqMap.busNum != null and reqMap.busNum != '' " >and bus.bus_num = #{reqMap.busNum}
+      <if test="reqMap.busNum != null and reqMap.busNum != '' " >and bus.bus_num = #{reqMap.busNum}
       </if>
-      <if test
-                  ="reqMap.busPlatform != null and reqMap.busPlatform != '' " >and bus.bus_platform =
+      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >and bus.bus_platform =
         #{reqMap.busPlatform}
       </if>
-      <if test
-                  ="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >and bus.clo_review_status =
+      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >and bus.clo_review_status =
         #{reqMap.cloReviewStatus}
       </if>
-      <if test
-                  ="reqMap.id != null and reqMap.id != '' " >and bus.id = #{reqMap.id}
+      <if test="reqMap.id != null and reqMap.id != '' " >and bus.id = #{reqMap.id}
       </if>
-      <if test
-                  ="reqMap.orgId!=null and reqMap.orgId!=''">
+      <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (agent.AG_DOC_PRO = #{reqMap.orgId} or agent.AG_DOC_DISTRICT = #{reqMap.orgId})
       </if>
     and bus.status = #{reqMap.status}
     UNION
     select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
     agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
-    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_parent
-    ,bus.bus_risk_parent,bus.bus_activation_parent,bus.bus_Inde_ass,
-    bus.bus_scope,bus.bus_region,bus.bus_risk_email
-    from A_AGENT agent left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email,platform.PLATFORM_NAME,
+    a1.AG_NAME||businfo_1.id as busParent,
+    busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent
+    from A_AGENT agent
+    left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    left join A_PLATFORM  platform on platform.PLATFORM_NUM=bus.BUS_PLATFORM
+    left join a_agent_businfo businfo_1     on businfo_1.id=bus.bus_parent
+    left join a_agent a1 on a1.id=businfo_1.agent_id
+    left join A_agent_businfo busRiskParentbus on bus.BUS_RISK_PARENT = busRiskParentbus.id
+    left join A_AGENT busRiskParentbusAgent on busRiskParentbusAgent.id = busRiskParentbus.AGENT_ID
+    left join A_agent_businfo busActivationParentbus on bus.BUS_ACTIVATION_PARENT = busActivationParentbus.id
+    left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
     where 1=1 and agent.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and agent.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
@@ -807,6 +819,7 @@
 
     <result column="BUS_NUM" property="busNum" jdbcType="VARCHAR"/>
     <result column="BUS_PLATFORM" property="busPlatform" jdbcType="VARCHAR"/>
+    <result column="PLATFORM_NAME" property="platformName" jdbcType="VARCHAR"/>
     <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR"/>
     <result column="BUS_PARENT" property="busParent" jdbcType="VARCHAR"/>
     <result column="BUS_RISK_PARENT" property="busRiskParent" jdbcType="VARCHAR"/>
