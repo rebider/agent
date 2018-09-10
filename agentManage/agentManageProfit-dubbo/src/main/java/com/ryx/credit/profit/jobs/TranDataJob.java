@@ -14,6 +14,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +25,9 @@ import java.util.List;
 
 /**
  * @author zhaodw
- * @Title: CheckTranJob
+ * @Title: TranDataJob
  * @ProjectName agentManage
- * @Description: huoq
+ * @Description: 获取交易数据，对数据进行差异核对
  * @date 2018/7/2911:34
  */
 @Service("tranDataJob")
@@ -49,7 +50,7 @@ public class TranDataJob {
     @Autowired
     private IdService idService;
 
-//    @Scheduled(cron = "0 0 12 10 * ?")
+    @Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+settleMonth);

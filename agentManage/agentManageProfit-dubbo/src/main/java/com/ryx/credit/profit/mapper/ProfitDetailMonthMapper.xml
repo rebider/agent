@@ -61,7 +61,12 @@
     <result column="TAX" property="tax" jdbcType="DECIMAL" />
     <result column="POS_REWARD_DEDUCTION_AMT" property="posRewardDeductionAmt" jdbcType="DECIMAL" />
     <result column="BUS_PLATFORM" property="busPlatForm" jdbcType="VARCHAR" />
-
+    <result column="BASICS_PROFIT_AMT" property="basicsProfitAmt" jdbcType="DECIMAL" />
+    <result column="PARENT_AGENT_ID" property="parentAgentId" jdbcType="VARCHAR" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    <result column="UNLINE_AMT" property="unlineAmt" jdbcType="DECIMAL" />
+    <result column="PAY_COMPANY" property="payCompany" jdbcType="VARCHAR" />
+    <result column="SMAL_TAX_AMT" property="smalTaxAmt" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -103,7 +108,8 @@
     BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT, 
     POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT, 
     REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL, 
-    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY,TAX,BUS_PLATFORM
+    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
+    BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
     <include refid="OracleDialectPrefix" />
@@ -135,6 +141,20 @@
     where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
   </select>
 
+  <select id="selectByLessDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND 0.06 > TAX
+  </select>
+
+  <select id="selectByGreaDate" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND (TAX >= 0.06 OR TAX IS NULL)
+  </select>
+
   <select id="selectByAgentPid" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
@@ -148,8 +168,7 @@
     SUM(REAL_PROFIT_AMT)
     from P_PROFIT_DETAIL_M
     where AGENT_PID IN
-    <foreach item="item" index="index" collection="list"
-             open="(" separator="," close=")">
+    <foreach collection="list" item="ids" index="index" open="(" close=")" separator=",">
       #{ids}
     </foreach>
   </select>
@@ -162,6 +181,19 @@
     PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectByIdAndParent" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+      select
+      <include refid="Base_Column_List" />
+      from P_PROFIT_DETAIL_M
+      where
+      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+      AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
     delete from P_PROFIT_DETAIL_M
@@ -189,7 +221,8 @@
       SUPPLY_TAX_AMT, REAL_PROFIT_AMT, PROFIT_MONTH_AMT, 
       ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, 
       EMAIL, BANK_CODE, PAY_STATUS, 
-      REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT)
+      REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
+      BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, 
       #{tranAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR}, 
@@ -210,7 +243,9 @@
       #{accountId,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{openBankName,jdbcType=VARCHAR}, 
       #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR}, 
       #{remark,jdbcType=VARCHAR}, #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL}, #{tax,jdbcType=DECIMAL},
-      #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL})
+      #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL}, #{basicsProfitAmt,jdbcType=DECIMAL},
+      #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL},
+      #{payCompany,jdbcType=VARCHAR}, #{smalTaxAmt,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     insert into P_PROFIT_DETAIL_M
@@ -388,8 +423,24 @@
       <if test="posRewardDeductionAmt != null" >
         POS_REWARD_DEDUCTION_AMT,
       </if>
-
-
+      <if test="basicsProfitAmt != null" >
+        BASICS_PROFIT_AMT,
+      </if>
+      <if test="parentAgentId != null" >
+        PARENT_AGENT_ID,
+      </if>
+      <if test="status != null" >
+        STATUS,
+      </if>
+      <if test="unlineAmt != null" >
+        UNLINE_AMT,
+      </if>
+      <if test="payCompany != null" >
+        PAY_COMPANY,
+      </if>
+      <if test="smalTaxAmt != null" >
+        SMAL_TAX_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -563,6 +614,24 @@
       <if test="posRewardDeductionAmt != null" >
         #{posRewardDeductionAmt,jdbcType=DECIMAL},
       </if>
+      <if test="basicsProfitAmt != null" >
+        #{basicsProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parentAgentId != null" >
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="unlineAmt != null" >
+        #{unlineAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payCompany != null" >
+        #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="smalTaxAmt != null" >
+        #{smalTaxAmt,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer" >
@@ -571,6 +640,9 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  <update id="payMoney">
+      update P_PROFIT_DETAIL_M set status='5' where status='4' and   PROFIT_DATE = #{profitDate}
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     update P_PROFIT_DETAIL_M
     <set >
@@ -742,6 +814,24 @@
       <if test="posRewardDeductionAmt != null" >
         POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL},
       </if>
+      <if test="basicsProfitAmt != null" >
+        BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parentAgentId != null" >
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="unlineAmt != null" >
+        UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payCompany != null" >
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="smalTaxAmt != null" >
+        SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -802,7 +892,13 @@
       ZHIFA_SUPPLY = #{zhifaBuckle,jdbcType=DECIMAL},
       TAX = #{tax,jdbcType=DECIMAL},
       BUS_PLATFORM = #{busPlatForm,jdbcType=VARCHAR},
-      POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL}
+      POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL},
+      BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
@@ -815,4 +911,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <!-- 获取大区代理商-->
+  <select id="getDistrictAgent" parameterType="String" resultType="java.lang.String">
+   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID WHERE COR.ID =#{id}
+  </select>
+
+  <!-- 获取省区代理商-->
+  <select id="getProAgent" parameterType="String" resultType="java.lang.String">
+   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID WHERE COR.ID =#{id}
+  </select>
 </mapper>

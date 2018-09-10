@@ -9,7 +9,9 @@ import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.AgentService;
@@ -73,14 +75,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private RegionService regionService;
     @Autowired
     private PosRegionService posRegionService;
-
     @Resource(name="platformSynServicePos")
     private  PlatformSynService  platformSynServicePos;
     @Resource(name="platformSynServiceMpos")
     private  PlatformSynService  platformSynServiceMpos;
-
     private List<PlatformSynService> platformSynServiceList ;
-
+    @Autowired
+    private DPosRegionMapper posRegionMapper;
 
     @PostConstruct
     public void init(){
@@ -311,7 +312,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         //业务区域
         String[] split = new String[1];
         if(StringUtils.isNotBlank(agentBusInfo.getBusRegion())){
-            split = agentBusInfo.getBusRegion().split(",");
+            if(agentBusInfo.getBusRegion().equals("0")){
+                Set<String> dPosRegions = posRegionMapper.queryNationwide();
+                split = dPosRegions.toArray(new String[]{});
+            }else{
+                Set<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                split = dPosRegions.toArray(new String[]{});
+            }
         }
         //通知对象
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
@@ -324,7 +331,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
-
+        agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
+        }
         //如果是直签 就传02：直签机构  否则就传递 01：普通机构
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
@@ -337,8 +348,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentResult result = null;
         try {
             record.setId(id);
-            String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-            record.setSendJson(sendJson);
             record.setNotifyTime(new Date());
             record.setAgentId(agentBusInfo.getAgentId());
             record.setBusId(agentBusInfo.getId());
@@ -348,8 +357,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(new BigDecimal(1));
             record.setcUser(userId);
-
-            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+            record.setNotifyType(NotifyType.NetInEdit.getValue());
             if(platForm==null){
                 log.info("已有编号进行入网修改：通知pos手刷业务平台未知");
                 throw new MessageException("通知pos手刷业务平台未知");
@@ -357,18 +365,26 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
             //调用POST接口
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-                log.info("已有编号进行入网修改：接收入网请求开始POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
+                //智能POS代理商名加N区分
+                if(platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                    agentNotifyVo.setOrgName("N"+agentNotifyVo.getOrgName());
+                }
                 //POS传递的唯一ID是业务平台记录ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
+                log.info("已有编号进行入网修改：接收入网请求开始POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
                 result = httpRequestForPos(agentNotifyVo);
                 log.info("已有编号进行入网修改：接收入网请求结束POS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
 
             //调用首刷接口
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-                log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
                 //MPOS传递的唯一id为代理商唯一ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
+                log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
                 result = httpRequestForMPOS(agentNotifyVo);
                 log.info("已有编号进行入网修改：接收入网请求结束MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
             }
@@ -379,6 +395,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             log.info("已有编号进行入网修改：通知pos手刷http请求异常:{}",e.getMessage());
             record.setNotifyJson(e.getLocalizedMessage());
             record.setNotifyCount(BigDecimal.ONE);
+            result = AgentResult.fail(e.getLocalizedMessage());
         }
         //接口请求成功
         if(null!=result && !"".equals(result) && result.isOK()){
@@ -412,6 +429,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateBusInfo.setId(agentBusInfo.getId());
                 if(agentBusInfo.getBusNum()!=null){
                     updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
                     log.info("已有编号进行入网修改：更新orgId到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
                 }else{
                     log.info("已有编号进行入网修改：更新orgId到库,已存在不更新到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
@@ -463,7 +481,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     Map req_data =  platformSynService.agencyLevelUpdateChangeData(
                             FastMap.fastSuccessMap()
                             .putKeyV("agentBusinfoId",agentBusInfo.getId())
-                            .putKeyV("processingId",importAgent.getBatchcode()));
+                            .putKeyV("processingId",importAgent.getBatchcode()));//存储审批流ID
 
                     log.info("升级开户接口{}平台编号不为空走升级接口,请求参数{},审批流{}",agentBusInfo.getBusNum(),req_data,importAgent.getBatchcode());
                     try {
@@ -492,6 +510,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     record.setNotifyStatus(Status.STATUS_0.status);
                     record.setNotifyCount(new BigDecimal(1));
                     record.setcUser(agentBusInfo.getcUser());
+                    record.setNotifyType(NotifyType.NetInUpgrade.getValue());
                     log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{},记录数据：{}",agentBusInfo.getBusNum(),res.getMsg(),JSONObject.toJSONString(record));
                     if(null!=res &&  res.isOK()){
                         //更新入网状态
@@ -531,7 +550,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         }
 
                         //执行修改操作
-                        notifyPlatformUpadteByBusId(agentBusInfo.getId(),impId);
+                        notifyPlatformUpadteByBusId(agentBusInfo.getId(),agentBusInfo.getcUser());
 
                     }else{
 
@@ -594,7 +613,14 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
         if(StringUtils.isNotBlank( agentBusInfo.getBusRegion())) {
-            String[] split = agentBusInfo.getBusRegion().split(",");
+            String[] split = null;
+            if(agentBusInfo.getBusRegion().equals("0")){
+                Set<String> dPosRegions = posRegionMapper.queryNationwide();
+                split = dPosRegions.toArray(new String[]{});
+            }else{
+                Set<String> dPosRegions = posRegionService.queryCityByCode(agentBusInfo.getBusRegion());
+                split = dPosRegions.toArray(new String[]{});
+            }
             agentNotifyVo.setBusiAreas(split);
         }
 
@@ -604,6 +630,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
+        agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+            agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
+        }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
@@ -615,8 +646,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentResult result = null;
         try {
             record.setId(id);
-            String sendJson = JsonUtil.objectToJson(agentNotifyVo);
-            record.setSendJson(sendJson);
             record.setNotifyTime(new Date());
             record.setAgentId(agentBusInfo.getAgentId());
             record.setBusId(agentBusInfo.getId());
@@ -626,20 +655,27 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
-            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+            record.setNotifyType(NotifyType.NetInAdd.getValue());
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-
+                //智能POS代理商名加N区分
+                if(platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                    agentNotifyVo.setOrgName("N"+agentNotifyVo.getOrgName());
+                }
                 //POS传递业务ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
                 result = httpRequestForPos(agentNotifyVo);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
 
                 //首刷传递代理商ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
+                String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                record.setSendJson(sendJson);
                 result = httpRequestForMPOS(agentNotifyVo);
             }
             log.info("入网开户修改操作: ,业务id：{},返回结果:{}",busId,result);
@@ -647,6 +683,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         } catch (Exception e) {
             log.info("入网开户修改操作: 通知pos手刷http请求异常:{}",e.getMessage());
             record.setNotifyCount(new BigDecimal(1));
+            result = AgentResult.fail(e.getLocalizedMessage());
         }
         if(null!=result && !"".equals(result) && result.isOK()){
             record.setSuccesTime(new Date());
@@ -673,6 +710,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             updateBusInfo.setVersion(agentBusInfo.getVersion());
             updateBusInfo.setId(agentBusInfo.getId());
             updateBusInfo.setBusNum(jsonObject.getString("orgId"));
+            if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
+                updateBusInfo.setBusLoginNum(jsonObject.getString("loginName"));
+            }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
+            }
+            updateBusInfo.setBusStatus(Status.STATUS_1.status);
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
             if(upResult1!=1 || upResult2!=1){
@@ -754,6 +797,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             data.put("orgName",agentNotifyVo.getOrgName());
             data.put("busiAreas",agentNotifyVo.getBusiAreas());
+            data.put("hasS0",agentNotifyVo.getHasS0());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
             }
@@ -823,7 +867,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
-            throw new Exception("http请求超时");
+            throw e;
         }
     }
 
@@ -832,15 +876,14 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         try {
             Map<String,Object> jsonParams = new HashMap<>();
             jsonParams.put("uniqueId",agentNotifyVo.getUniqueId());
+            if(StringUtils.isNotBlank(agentNotifyVo.getOrgId()))
+                jsonParams.put("orgId",agentNotifyVo.getOrgId());
             jsonParams.put("useOrgan",agentNotifyVo.getUseOrgan()); //使用范围
             jsonParams.put("orgName",agentNotifyVo.getOrgName());
             jsonParams.put("busPlatform",agentNotifyVo.getBusPlatform());
             jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
             jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
             jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
-
-            if(StringUtils.isNotBlank(agentNotifyVo.getOrgId()))
-                jsonParams.put("orgId",agentNotifyVo.getOrgId());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 jsonParams.put("province",agentNotifyVo.getProvince());
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
@@ -892,7 +935,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         if(null!=agentPlatFormSyn.getAgentId()){
             map.put("agentId",agentPlatFormSyn.getAgentId());
         }
-        List<Map<String, Object>> list = agentPlatFormSynMapper.queryList(map, page);
+        List<AgentPlatFormSyn> list = agentPlatFormSynMapper.queryList(map, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(list);
         pageInfo.setTotal(agentPlatFormSynMapper.queryCount(map));

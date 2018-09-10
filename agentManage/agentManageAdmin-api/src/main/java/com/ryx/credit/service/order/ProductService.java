@@ -15,6 +15,8 @@ public interface ProductService {
 
     PageInfo productList(OProduct product, Page page);
 
+    PageInfo productGroupByList(OProduct product, Page page);
+
     AgentResult saveProduct(OProduct product);
 
     AgentResult updateProduct(OProduct product);
@@ -26,4 +28,6 @@ public interface ProductService {
     List<OProduct> allProductList(OProduct product);
 
     String findNameById(String id);
+
+    List<OProduct> findListByProCode(String proCode);
 }

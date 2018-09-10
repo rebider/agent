@@ -1,6 +1,5 @@
-package junit.profit;
+package com.ryx.credit.profit.jobs;
 
-import com.ryx.credit.profit.jobs.TranDataJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

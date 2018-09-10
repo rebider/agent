@@ -25,6 +25,8 @@ public class AgentNotifyVo {
     private Agent baseMessage;
     private AgentBusInfo busMessage;
     private String[] busiAreas;
+    private String hasS0;
+    private String busiType;
 
     public String getUniqueId() {
         return uniqueId;
@@ -136,5 +138,21 @@ public class AgentNotifyVo {
 
     public void setBusiAreas(String[] busiAreas) {
         this.busiAreas = busiAreas;
+    }
+
+    public String getHasS0() {
+        return hasS0;
+    }
+
+    public void setHasS0(String hasS0) {
+        this.hasS0 = hasS0;
+    }
+
+    public String getBusiType() {
+        return busiType;
+    }
+
+    public void setBusiType(String busiType) {
+        this.busiType = busiType;
     }
 }

@@ -39,6 +39,26 @@ public class OProduct implements Serializable {
 
     private String name;
 
+    private String proTypeName;
+
+    private String proComName;
+
+    public String getProComName() {
+        return proComName;
+    }
+
+    public void setProComName(String proComName) {
+        this.proComName = proComName;
+    }
+
+    public String getProTypeName() {
+        return proTypeName;
+    }
+
+    public void setProTypeName(String proTypeName) {
+        this.proTypeName = proTypeName;
+    }
+
     public String getName() {
         return name;
     }

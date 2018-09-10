@@ -51,5 +51,10 @@ public interface IProfitDirectService {
     //void updateByAgentId(ProfitDirect profitDirect);
 
     //直发分润页面导出
-    /*public List<ProfitDirect> exportProfitDirect(ProfitDirect record);*/
+    public List<ProfitDirect> exportProfitDirect(ProfitDirect record);
+
+    //直发分润查询
+    List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect);
+    //直发分润修改状态
+    void updateByStatus(ProfitDirect profitDirectSingleList);
 }

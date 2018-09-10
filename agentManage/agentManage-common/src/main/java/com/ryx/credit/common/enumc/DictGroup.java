@@ -8,6 +8,7 @@ public enum DictGroup {
 
     ALL("所有模块"),
     YESORNO("yesorno"),
+    YESORNOISYES("yesornoisyes"),
     AGENT("代理商模块"),
     ORDER("订单模块"),
     RELATION("关系模块"),
@@ -46,6 +47,7 @@ public enum DictGroup {
     ORDER_STATUS("订单状态"),
     AGREE_TYPE("协议类型"),
     ACTIVITY_DIS_TYPE("活动优惠方式"),
+    ACTIVITY_CONDITION("活动参与条件"),
     C_TYPE("扣款款项资金类型"),
     ACT_ORDER_RETURN("退货审批流名称"),
     TOOLS("机具押金扣款调整"),
@@ -53,8 +55,8 @@ public enum DictGroup {
     TOOLS_APR_MARKET("扣款调整审批市场部参数"),
     TOOLS_APR_BOSS("扣款调整审批总经办参数"),
     TOOLS_APR_EXPAND("扣款调整审批客户拓展部门参数"),
-    PAYMENT_SRC_TYPE("付款明细表源类型");
-
+    PAYMENT_SRC_TYPE("付款明细表源类型"),
+    SETTLEMENT_PRICESTR("结算价类型");
     public String  msg;
 
     DictGroup(String s){

@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.DataHistory;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -17,6 +18,8 @@ import java.util.List;
 public interface AgentDataHistoryService {
 
     AgentResult saveDataHistory(Object object,String dataType);
+
+    AgentResult saveDataHistory(Object object, String id, String dataType, String user, BigDecimal version);
 
     /**
      *查询所有的历史数据

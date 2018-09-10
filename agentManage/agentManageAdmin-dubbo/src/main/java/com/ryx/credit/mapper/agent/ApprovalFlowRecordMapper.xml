@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.ApprovalFlowRecordMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="TASK_ID" jdbcType="VARCHAR" property="taskId" />
+    <result column="EXECUTION_ID" jdbcType="VARCHAR" property="executionId" />
+    <result column="TASK_NAME" jdbcType="VARCHAR" property="taskName" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+    <result column="APPROVAL_PERSON" jdbcType="VARCHAR" property="approvalPerson" />
+    <result column="APPROVAL_DEP" jdbcType="VARCHAR" property="approvalDep" />
+    <result column="APPROVAL_TIME" jdbcType="TIMESTAMP" property="approvalTime" />
+    <result column="APPROVAL_RESULT" jdbcType="VARCHAR" property="approvalResult" />
+    <result column="APPROVAL_OPINION" jdbcType="VARCHAR" property="approvalOpinion" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="ACTIVITY_STATUS" jdbcType="DECIMAL" property="activityStatus" />
+    <result column="ERROR_MSG" jdbcType="VARCHAR" property="errorMsg" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, TASK_ID, EXECUTION_ID, TASK_NAME, BUS_ID, BUS_TYPE, APPROVAL_PERSON, APPROVAL_DEP,
+    APPROVAL_TIME, APPROVAL_RESULT, APPROVAL_OPINION, STATUS, VERSION, ACTIVITY_STATUS,
+    ERROR_MSG
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_APPROVAL_FLOW_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from A_APPROVAL_FLOW_RECORD
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample">
+    delete from A_APPROVAL_FLOW_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
+    insert into A_APPROVAL_FLOW_RECORD (ID, TASK_ID, EXECUTION_ID,
+    TASK_NAME, BUS_ID, BUS_TYPE,
+    APPROVAL_PERSON, APPROVAL_DEP, APPROVAL_TIME,
+    APPROVAL_RESULT, APPROVAL_OPINION, STATUS,
+    VERSION, ACTIVITY_STATUS, ERROR_MSG
+    )
+    values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{executionId,jdbcType=VARCHAR},
+    #{taskName,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR},
+    #{approvalPerson,jdbcType=VARCHAR}, #{approvalDep,jdbcType=VARCHAR}, #{approvalTime,jdbcType=TIMESTAMP},
+    #{approvalResult,jdbcType=VARCHAR}, #{approvalOpinion,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{activityStatus,jdbcType=DECIMAL}, #{errorMsg,jdbcType=VARCHAR}
+    )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
+    insert into A_APPROVAL_FLOW_RECORD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="taskId != null">
+        TASK_ID,
+      </if>
+      <if test="executionId != null">
+        EXECUTION_ID,
+      </if>
+      <if test="taskName != null">
+        TASK_NAME,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
+      <if test="busType != null">
+        BUS_TYPE,
+      </if>
+      <if test="approvalPerson != null">
+        APPROVAL_PERSON,
+      </if>
+      <if test="approvalDep != null">
+        APPROVAL_DEP,
+      </if>
+      <if test="approvalTime != null">
+        APPROVAL_TIME,
+      </if>
+      <if test="approvalResult != null">
+        APPROVAL_RESULT,
+      </if>
+      <if test="approvalOpinion != null">
+        APPROVAL_OPINION,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="activityStatus != null">
+        ACTIVITY_STATUS,
+      </if>
+      <if test="errorMsg != null">
+        ERROR_MSG,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null">
+        #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="executionId != null">
+        #{executionId,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null">
+        #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null">
+        #{busType,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalPerson != null">
+        #{approvalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDep != null">
+        #{approvalDep,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalTime != null">
+        #{approvalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalResult != null">
+        #{approvalResult,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalOpinion != null">
+        #{approvalOpinion,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="activityStatus != null">
+        #{activityStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="errorMsg != null">
+        #{errorMsg,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample" resultType="java.lang.Long">
+    select count(*) from A_APPROVAL_FLOW_RECORD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
+    update A_APPROVAL_FLOW_RECORD
+    <set>
+      <if test="taskId != null">
+        TASK_ID = #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="executionId != null">
+        EXECUTION_ID = #{executionId,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null">
+        TASK_NAME = #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null">
+        BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalPerson != null">
+        APPROVAL_PERSON = #{approvalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalDep != null">
+        APPROVAL_DEP = #{approvalDep,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalTime != null">
+        APPROVAL_TIME = #{approvalTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="approvalResult != null">
+        APPROVAL_RESULT = #{approvalResult,jdbcType=VARCHAR},
+      </if>
+      <if test="approvalOpinion != null">
+        APPROVAL_OPINION = #{approvalOpinion,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="activityStatus != null">
+        ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="errorMsg != null">
+        ERROR_MSG = #{errorMsg,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
+    update A_APPROVAL_FLOW_RECORD
+    set TASK_ID = #{taskId,jdbcType=VARCHAR},
+      EXECUTION_ID = #{executionId,jdbcType=VARCHAR},
+      TASK_NAME = #{taskName,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      APPROVAL_PERSON = #{approvalPerson,jdbcType=VARCHAR},
+      APPROVAL_DEP = #{approvalDep,jdbcType=VARCHAR},
+      APPROVAL_TIME = #{approvalTime,jdbcType=TIMESTAMP},
+      APPROVAL_RESULT = #{approvalResult,jdbcType=VARCHAR},
+      APPROVAL_OPINION = #{approvalOpinion,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
+      ERROR_MSG = #{errorMsg,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

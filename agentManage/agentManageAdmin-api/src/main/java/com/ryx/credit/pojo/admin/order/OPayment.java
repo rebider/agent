@@ -100,6 +100,12 @@ public class OPayment implements Serializable{
     )
     private Date actualReceiptDate;
 
+    private BigDecimal profitTaxAmt;
+
+    private String downPaymentUser;
+
+    private String settlementPriceStr;
+
     public String getId() {
         return id;
     }
@@ -322,5 +328,29 @@ public class OPayment implements Serializable{
 
     public void setActualReceiptDate(Date actualReceiptDate) {
         this.actualReceiptDate = actualReceiptDate;
+    }
+
+    public BigDecimal getProfitTaxAmt() {
+        return profitTaxAmt;
+    }
+
+    public void setProfitTaxAmt(BigDecimal profitTaxAmt) {
+        this.profitTaxAmt = profitTaxAmt;
+    }
+
+    public String getDownPaymentUser() {
+        return downPaymentUser;
+    }
+
+    public void setDownPaymentUser(String downPaymentUser) {
+        this.downPaymentUser = downPaymentUser == null ? null : downPaymentUser.trim();
+    }
+
+    public String getSettlementPriceStr() {
+        return settlementPriceStr;
+    }
+
+    public void setSettlementPriceStr(String settlementPriceStr) {
+        this.settlementPriceStr = settlementPriceStr == null ? null : settlementPriceStr.trim();
     }
 }

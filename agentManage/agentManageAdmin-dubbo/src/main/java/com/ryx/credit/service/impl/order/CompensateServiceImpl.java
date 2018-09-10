@@ -118,17 +118,13 @@ public class CompensateServiceImpl implements CompensateService {
 
     @Override
     public List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException{
-        String proCom = "";
-        String proModel = "";
         String snBegin = "";
         String snEnd = "";
         String count = "";
         try {
-            proCom =  String.valueOf(excelList.get(0));
-            proModel =  String.valueOf(excelList.get(1));
-            snBegin =  String.valueOf(excelList.get(2));
-            snEnd =  String.valueOf(excelList.get(3));
-            count =  String.valueOf(excelList.get(4));
+            snBegin =  String.valueOf(excelList.get(0));
+            snEnd =  String.valueOf(excelList.get(1));
+            count =  String.valueOf(excelList.get(2));
         } catch (Exception e) {
             throw new ProcessException("导入解析文件失败");
         }
@@ -140,9 +136,6 @@ public class CompensateServiceImpl implements CompensateService {
         ArrayList<Object> recordStatusList = new ArrayList<>();
         recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
         reqParam.put("recordStatusList",recordStatusList);
-        Dict dictByName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), proCom);
-        reqParam.put("proCom",dictByName.getdItemvalue());
-        reqParam.put("proModel",proModel);
         List<Map<String,Object>> compensateLList = logisticsDetailMapper.queryCompensateLList(reqParam);
         if(null==compensateLList){
             throw new ProcessException("导入解析文件失败");
@@ -194,33 +187,27 @@ public class CompensateServiceImpl implements CompensateService {
     @Override
     public BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum){
         BigDecimal resultPrice = new BigDecimal(0);
-        //之前参加过活动
-        if(StringUtils.isNotBlank(oldActivityId) && !oldActivityId.equals("undefined")){
-            Map<String, Object> reqParam = new HashMap<>();
-            reqParam.put("snBegin",beginSn);
-            reqParam.put("snEnd",endSn);
-            reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-            ArrayList<Object> recordStatusList = new ArrayList<>();
-            recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-            reqParam.put("recordStatusList",recordStatusList);
-            reqParam.put("activityId",oldActivityId);
-            List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
-            if(null==oLogisticsDetails){
-                log.info("calculatePriceDiff数据有误异常返回1");
-                return null;
-            }
-            if(oLogisticsDetails.size()!=1){
-                log.info("calculatePriceDiff数据有误异常返回2");
-                return null;
-            }
-            Map<String, Object> logisticsDetail = oLogisticsDetails.get(0);
-            BigDecimal oldPrice = new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()).multiply(proNum);
-            BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
-            resultPrice = oldPrice.subtract(newPrice);
-        }else{
-            BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
-            resultPrice = newPrice;
+
+        Map<String, Object> reqParam = new HashMap<>();
+        reqParam.put("snBegin",beginSn);
+        reqParam.put("snEnd",endSn);
+        reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+        ArrayList<Object> recordStatusList = new ArrayList<>();
+        recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+        reqParam.put("recordStatusList",recordStatusList);
+        List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+        if(null==oLogisticsDetails){
+            log.info("calculatePriceDiff数据有误异常返回1");
+            return null;
         }
+        if(oLogisticsDetails.size()!=1){
+            log.info("calculatePriceDiff数据有误异常返回2");
+            return null;
+        }
+        Map<String, Object> logisticsDetail = oLogisticsDetails.get(0);
+        BigDecimal oldPrice = new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()).multiply(proNum);
+        BigDecimal newPrice = calculateTotalPrice(activityId, proNum);
+        resultPrice = oldPrice.subtract(newPrice);
         return resultPrice;
     }
 
@@ -655,32 +642,6 @@ public class CompensateServiceImpl implements CompensateService {
         for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
-            if(StringUtils.isNotBlank(oRefundPriceDiffDetail.getActivityFrontId()) && !oRefundPriceDiffDetail.getActivityFrontId().equals("undefined")){
-                List<Map<String, Object>> oLogisticsDetails = null;
-                Map<String, Object> reqParam = new HashMap<>();
-                reqParam.put("snBegin",oRefundPriceDiffDetail.getBeginSn());
-                reqParam.put("snEnd",oRefundPriceDiffDetail.getEndSn());
-                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-                reqParam.put("activityId",oRefundPriceDiffDetail.getActivityFrontId());
-                if(oRefundPriceDiff.getReviewStatus().equals(AgStatus.Create.getValue())){
-                    ArrayList<Object> recordStatusList = new ArrayList<>();
-                    recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                    reqParam.put("recordStatusList",recordStatusList);
-                }else{
-                    reqParam.put("optId",oRefundPriceDiffDetail.getId());
-                }
-                oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
-                if(null==oLogisticsDetails){
-                    log.info("calculatePriceDiff数据有误异常返回1");
-                    throw new ProcessException("查询活动异常");
-                }
-                if(oLogisticsDetails.size()!=1){
-                    log.info("calculatePriceDiff数据有误异常返回2");
-                    throw new ProcessException("查询活动异常");
-                }
-                Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
-                oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
-            }
 
             List<Map<String, Object>> oLogisticsDetails = null;
             Map<String, Object> reqParam = new HashMap<>();

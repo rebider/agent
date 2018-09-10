@@ -22,6 +22,7 @@ public enum TabId {
     d_InterfaceRequest_Record("IR%s%015d"),
     a_agent_businfo("AB%s%015d"),
     a_import_agent("AI%s%015d"),
+    a_approval_flow_record("AFR%s%015d"),
     data_history("DH%s%015d"),
     o_address("OA%s%015d"),
     o_activity("OAC%s%014d"),
@@ -68,8 +69,9 @@ public enum TabId {
     p_profit_supply("PPS%s%015d"),
     P_DEDUCTION_DETAIL("PDD%s%015d"),
     P_AGENT_PID_LINK("PAPL%s%015d"),
-    P_PROFIT_SUPPLU_DIFF("PPSD%s%015d");
-
+    P_PROFIT_SUPPLU_DIFF("PPSD%s%015d"),
+    PBSL("PBSL%s%015d"),
+    TPD("TPD%s%015d");
     TabId(String thePatt){
            this.patt = thePatt;
     }

@@ -1,12 +1,9 @@
-package junit.profit;/**
+package com.ryx.credit.profit.jobs;/**
  * @Auther: zhaodw
  * @Date: 2018/7/30 14:59
  * @Description:
  */
 
-import com.ryx.credit.profit.jobs.ProfitDataJob;
-import com.ryx.credit.profit.jobs.RefundJob;
-import com.ryx.credit.profit.service.StagingService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

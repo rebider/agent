@@ -122,6 +122,62 @@ public class ProfitDetailMonth implements Serializable{
 
     private BigDecimal posRewardDeductionAmt;
 
+    //新增 20180821
+    private BigDecimal basicsProfitAmt;
+    private String parentAgentId;
+    //新增 20180822
+    private String status;
+    //新增 20180822
+    private String profitDateStart;
+    private String profitDateEnd;
+
+    private BigDecimal unlineAmt;
+
+    //打款公司
+    private String payCompany;
+
+    //已抵税金额
+    private BigDecimal smalTaxAmt;
+
+    public BigDecimal getSmalTaxAmt() {
+        return smalTaxAmt;
+    }
+
+    public void setSmalTaxAmt(BigDecimal smalTaxAmt) {
+        this.smalTaxAmt = smalTaxAmt;
+    }
+
+    public BigDecimal getUnlineAmt() {
+        return unlineAmt;
+    }
+
+    public void setUnlineAmt(BigDecimal unlineAmt) {
+        this.unlineAmt = unlineAmt;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId;
+    }
+
+    public BigDecimal getBasicsProfitAmt() {
+        return basicsProfitAmt;
+    }
+
+    public void setBasicsProfitAmt(BigDecimal basicsProfitAmt) {
+        this.basicsProfitAmt = basicsProfitAmt;
+    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -582,5 +638,29 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setProfitDate(String profitDate) {
         this.profitDate = profitDate;
+    }
+
+    public String getProfitDateStart() {
+        return profitDateStart;
+    }
+
+    public void setProfitDateStart(String profitDateStart) {
+        this.profitDateStart = profitDateStart;
+    }
+
+    public String getProfitDateEnd() {
+        return profitDateEnd;
+    }
+
+    public void setProfitDateEnd(String profitDateEnd) {
+        this.profitDateEnd = profitDateEnd;
+    }
+
+    public String getPayCompany() {
+        return payCompany;
+    }
+
+    public void setPayCompany(String payCompany) {
+        this.payCompany = payCompany;
     }
 }

@@ -1,13 +1,17 @@
 package com.ryx.credit.activity.service.impl;
 
 import com.ryx.credit.activity.entity.ActRuTask;
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.ApprovalFlowRecordService;
+import com.ryx.credit.service.agent.BusActRelService;
 import net.sf.json.JSONObject;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.*;
@@ -23,6 +27,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.activiti.image.ProcessDiagramGenerator;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +36,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * ActivityServiceImpl
@@ -49,6 +53,12 @@ public class ActivityServiceImpl implements ActivityService {
     private StandaloneProcessEngineConfiguration processEngineConfiguration;
     @Autowired
     private ActRuTaskService actRuTaskService;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private BusActRelService busActRelService;
+    @Autowired
+    private ApprovalFlowRecordService approvalFlowRecordService;
 
     public static ProcessEngine processEngine;
 
@@ -111,23 +121,55 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
-    
+
     @Override
-    public Map completeTask(String taskId, Map<String,Object>  map) {
+    public Map completeTask(String taskId, Map<String,Object>  map) throws ProcessException {
         Map<String,Object> rs = new HashMap<>(5);
+        ApprovalFlowRecord upFlowRecord = new ApprovalFlowRecord();
         try {
+            String approvalResult = String.valueOf(map.get("rs"));
+            String approvalOpinion = String.valueOf(map.get("approvalOpinion"));
+            String approvalPerson = String.valueOf(map.get("approvalPerson"));
+            String createTime = String.valueOf(map.get("createTime"));
+            Date approvalTime = DateUtil.format(createTime, DateUtil.DATE_FORMAT_1);
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(approvalPerson));
+            String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGID"));
+            ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(taskId);
+            String executionId = String.valueOf(actRuTask.getExecutionId());
+            String taskName = String.valueOf(actRuTask.getName());
+            BusActRel busActRel = busActRelService.findById(executionId);
+            String busId = busActRel.getBusId();
+            String busType = busActRel.getBusType();
+
+            ApprovalFlowRecord approvalFlowRecord = new ApprovalFlowRecord();
+            approvalFlowRecord.setBusId(busId);
+            approvalFlowRecord.setBusType(busType);
+            approvalFlowRecord.setTaskName(taskName);
+            approvalFlowRecord.setApprovalDep(approvalDep);
+            approvalFlowRecord.setApprovalTime(approvalTime);
+            approvalFlowRecord.setExecutionId(executionId);
+            approvalFlowRecord.setTaskId(taskId);
+            approvalFlowRecord.setApprovalOpinion(approvalOpinion);
+            approvalFlowRecord.setApprovalPerson(approvalPerson);
+            approvalFlowRecord.setApprovalResult(approvalResult);
+            String insert = approvalFlowRecordService.insert(approvalFlowRecord);
+            upFlowRecord.setId(insert);
             TaskService taskService = processEngine.getTaskService();
             taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
             taskService.complete(taskId, map);
             logger.info("完成任务" + taskId);
             rs.put("rs",true);
             rs.put("msg","success");
+            upFlowRecord.setActivityStatus(Status.STATUS_1.status);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("completeTask error", e);
             rs.put("rs",false);
             rs.put("msg",e.getMessage());
+            upFlowRecord.setStatus(Status.STATUS_0.status);
+            upFlowRecord.setActivityStatus(Status.STATUS_0.status);
+            upFlowRecord.setErrorMsg(e.getMessage());
         }
+        approvalFlowRecordService.update(upFlowRecord);
         return rs;
     }
 

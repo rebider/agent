@@ -1,19 +1,16 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.DigestUtils;
+import com.ryx.credit.dao.COrganizationMapper;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.AttachmentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.pojo.admin.COrganization;
@@ -37,10 +34,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * 代理商基础信息管理服务类
@@ -50,6 +45,8 @@ import java.util.Map;
 public class AgentServiceImpl implements AgentService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
+
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
 
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
@@ -69,6 +66,11 @@ public class AgentServiceImpl implements AgentService {
     private ICuserAgentService iCuserAgentService;
     @Autowired
     private CuserAgentMapper cuserAgentMapper;
+    @Autowired
+    private CUserMapper cUserMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+
 
     /**
      * 查询代理商信息
@@ -125,8 +127,22 @@ public class AgentServiceImpl implements AgentService {
         return page;
     }
 
+    @Autowired
+    private COrganizationMapper organizationMapper;
+
     @Override
-    public PageInfo queryAgentAll(Page page, Map map) {
+    public PageInfo queryAgentAll(Page page, Map map ,Long userId) {
+        if (String.valueOf(map.get("flag")).equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            map.put("orgId",orgId);
+            map.put("userId",userId);
+        }
+
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (StringUtils.isNotBlank(time)&&!time.equals("null")) {
@@ -135,8 +151,7 @@ public class AgentServiceImpl implements AgentService {
             }
         }
         PageInfo pageInfo = new PageInfo();
-        map.put("page", page);
-        pageInfo.setRows(agentMapper.queryAgentListView(map));
+        pageInfo.setRows(agentMapper.queryAgentListView(map,page));
         pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));
 
         return pageInfo;
@@ -178,10 +193,24 @@ public class AgentServiceImpl implements AgentService {
         agent.setcTime(date);
         agent.setcUtime(date);
         agent.setId(idService.genId(TabId.a_agent));
+
+        boolean isHaveYYZZ = false;
+        boolean isHaveFRSFZ = false;
+
         if (1 == agentMapper.insertSelective(agent)) {
             if (attrId != null) {
                 for (String s : attrId) {
                     if (StringUtils.isEmpty(s)) continue;
+
+                    Attachment attachment = attachmentMapper.selectByPrimaryKey(s);
+                    if(attachment!=null){
+                        if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
+                            isHaveYYZZ = true;
+                        }
+                        if(AttDataTypeStatic.SFZZM.code.equals(attachment.getAttDataType()+"")){
+                            isHaveFRSFZ = true;
+                        }
+                    }
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(s);
                     record.setSrcId(agent.getId());
@@ -195,6 +224,13 @@ public class AgentServiceImpl implements AgentService {
                         throw new ProcessException("添加代理商附件关系失败");
                     }
                 }
+
+            }
+            if(!isHaveYYZZ){
+                throw new ProcessException("请添加营业执照附件");
+            }
+            if(!isHaveFRSFZ){
+                throw new ProcessException("请添加法人身份证附件");
             }
             logger.info("代理商添加:成功");
             return agent;
@@ -283,10 +319,23 @@ public class AgentServiceImpl implements AgentService {
                 throw new ProcessException("更新修改代理商失败");
             }
         }
-
+        //营业执照和法人身份证附件必须上传
+        boolean isHaveYYZZ = false;
+        boolean isHaveFRSFZ = false;
         //添加新的附件
         if (attrs != null) {
             for (String fileId : attrs) {
+
+                Attachment attachment = attachmentMapper.selectByPrimaryKey(fileId);
+                if(attachment!=null){
+                    if(AttDataTypeStatic.YYZZ.code.equals(attachment.getAttDataType()+"")){
+                        isHaveYYZZ = true;
+                    }
+                    if(AttDataTypeStatic.SFZZM.code.equals(attachment.getAttDataType()+"")){
+                        isHaveFRSFZ = true;
+                    }
+                }
+
                 AttachmentRel record = new AttachmentRel();
                 record.setAttId(fileId);
                 record.setSrcId(db_agent.getId());
@@ -302,7 +351,12 @@ public class AgentServiceImpl implements AgentService {
                 }
             }
         }
-
+        if(!isHaveYYZZ){
+            throw new ProcessException("请添加营业执照附件");
+        }
+        if(!isHaveFRSFZ){
+            throw new ProcessException("请添加法人身份证附件");
+        }
         return db_agent;
     }
 

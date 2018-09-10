@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.AimportService;
 import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -40,6 +41,8 @@ public class DictServiceTest extends BaseSpringTest {
 
     @Autowired
     private AimportService aimportService;
+    @Autowired
+    private AgentQueryService agentQueryService;
     
     @Test
     public void testId(){
@@ -87,6 +90,16 @@ public class DictServiceTest extends BaseSpringTest {
             e.printStackTrace();
         }
         logger.info("=======testImPortAgent=====");
+    }
+
+    @Test
+    public void loadCach(){
+        agentQueryService.loadCach();
+        try {
+            Thread.currentThread().sleep(30000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 }

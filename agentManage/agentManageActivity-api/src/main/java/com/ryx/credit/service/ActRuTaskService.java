@@ -2,8 +2,11 @@ package com.ryx.credit.service;
 
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * ActRuTaskService
@@ -28,4 +31,8 @@ public interface ActRuTaskService {
     int updateByPrimaryKey(ActRuTask record);
 
     HashMap<String, Object> configExample(Page page, ActRuTask actRuTask);
+
+    List<Map<String, Object>> queryMyTask(Map<String,Object> param);
+
+    PageInfo queryMyTaskPage(Page page, Map<String,Object> param);
 }

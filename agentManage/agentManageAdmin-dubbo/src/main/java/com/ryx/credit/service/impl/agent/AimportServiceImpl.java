@@ -9,8 +9,11 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
+import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -37,6 +40,8 @@ public class AimportServiceImpl implements AimportService {
 
     public static List<String> yesorno = Arrays.asList("否","是");
     public static  List<String> gs = Arrays.asList("无","对公","对私");
+
+    public static  Map<String,String> BUS_SCOP = FastMap.fastMap("市代","city").putKeyV("国代","nation").putKeyV("省代","province");
 
     @Autowired
     private ImportAgentMapper importAgentMapper;
@@ -72,6 +77,8 @@ public class AimportServiceImpl implements AimportService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private CapitalMapper capitalMapper;
+    @Autowired
+    private DPosRegionMapper dPosRegionMapper;
 
 
 
@@ -549,6 +556,8 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setCloReceipt(busItem.getCloReceipt());
                             db_agentBusInfo.setCloPayCompany(busItem.getCloPayCompany());
                             db_agentBusInfo.setAgZbh(busItem.getAgZbh());
+                            db_agentBusInfo.setBusRegion(busItem.getBusRegion());
+                            db_agentBusInfo.setBusScope(busItem.getBusScope());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             break;
                         }
@@ -967,6 +976,26 @@ public class AimportServiceImpl implements AimportService {
             if(bus_json_array.size()>20 && StringUtils.isNotBlank(bus_json_array.getString(20)))
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
 
+
+            //业务区域
+            if(bus_json_array.size()>6 && StringUtils.isNotBlank(bus_json_array.getString(6))){
+               String busregion =  bus_json_array.getString(6);
+                String codeName[] = busregion.split(",");
+                DPosRegionExample example = new DPosRegionExample();
+                example.or().andNameIn(Arrays.asList(codeName));
+                List<DPosRegion> regions =  dPosRegionMapper.selectByExample(example);
+                StringBuffer sb = new StringBuffer();
+                for (int i = 0; i < regions.size(); i++) {
+                    sb.append(regions.get(i).getCode()).append( (i==regions.size()-1)?"":"," );
+                }
+                ab.setBusRegion(sb.toString());
+            }
+
+            //业务范围
+            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28))){
+                ab.setBusScope(BUS_SCOP.get(bus_json_array.getString(28)));
+            }
+
             //打款公司
             if(bus_json_array.size()>21 && StringUtils.isNotBlank(bus_json_array.getString(21)))
             for (PayComp payComp : payCompList) {
@@ -1043,11 +1072,64 @@ public class AimportServiceImpl implements AimportService {
     }
 
 
+    /**
+     * 更新业务信息单条
+     * @param user
+     * @param list
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public ResultVO importAgentBusInfoBusInfoFromExcel(String user, List<Object> list) throws Exception{
 
+        logger.info("用户{}更新业务信息{}",user,list);
+        String busNum = list.get(0)+"",busRegion=list.get(1)+"",isS0=list.get(2)+"";
 
+        if(StringUtils.isBlank(busNum))return ResultVO.fail("busNum为空");
+        if(StringUtils.isBlank(isS0))return ResultVO.fail("isS0为空");
 
+        List<String> arr = new ArrayList<>();
 
+        if(busRegion!=null && StringUtils.isNotBlank(busRegion) && !"null".equals(busRegion)) {
+            String[] regions = busRegion.split(",");
+            DPosRegionExample dPosRegionExample = new DPosRegionExample();
+            dPosRegionExample.or().andCodeIn(Arrays.asList(regions)).andCodeLevelIn(Arrays.asList("2"));
 
+            List<DPosRegion> dPosRegions = dPosRegionMapper.selectByExample(dPosRegionExample);
+            for (DPosRegion dPosRegion : dPosRegions) {
+                arr.add(dPosRegion.getCode());
+            }
+        }
 
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status).andBusNumEqualTo(String.valueOf(busNum));
+        List<AgentBusInfo> businfos = agentBusInfoMapper.selectByExample(example);
 
+        if(businfos.size()==0){
+            return ResultVO.fail("业务未找到");
+        }
+        for (AgentBusInfo businfo : businfos) {
+
+            if(arr.size()>0) {
+                logger.info("用户{}修改前{}业务区域{}", user, busNum, businfo.getBusRegion());
+                businfo.setBusRegion(String.join(",", arr));
+                logger.info("用户{}修改为{}业务区域{}",user,busNum,businfo.getBusRegion());
+            }
+
+            if(StringUtils.isNotBlank(isS0)){
+                if(yesorno.indexOf(isS0)!=-1) {
+                    logger.info("用户{}修改前{}是否开通s0：1是，0否 {}", user, busNum, businfo.getDredgeS0());
+                    businfo.setDredgeS0(new BigDecimal(yesorno.indexOf(isS0)));
+                    logger.info("用户{}修改前{}是否开通s0：1是，0否 {}", user, busNum, businfo.getDredgeS0());
+                }
+            }
+            if(agentBusInfoMapper.updateByPrimaryKeySelective(businfo)==1){
+                logger.info("用户{}修改为{}",user,busNum);
+            }else{
+                logger.info("用户{}修改失败{}",user,busNum);
+            }
+
+        }
+        return ResultVO.success("");
+    }
 }

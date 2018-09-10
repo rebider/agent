@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgImportType;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -15,8 +12,13 @@ import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.*;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
+import com.ryx.credit.service.bank.PosRegionService;
+import com.ryx.credit.service.dict.DictOptionsService;
+import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -61,10 +64,20 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AimportService aimportService;
     @Autowired
     private AgentNotifyService agentNotifyService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private PosRegionService posRegionService;
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private IUserService iUserService;
+    @Autowired
+    private AgentQueryService agentQueryService;
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page) {
-
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag) {
         Map<String, Object> reqMap = new HashMap<>();
+
         reqMap.put("agStatus", AgStatus.Approved.name());
         if (!StringUtils.isBlank(agent.getId())) {
             reqMap.put("id", agent.getId());
@@ -84,8 +97,15 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getCloReviewStatus() != null) {
             reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
         }
-        if (StringUtils.isNotBlank(agentBusInfo.getcUser())) {
-            reqMap.put("cUser", agentBusInfo.getcUser());
+        if (StringUtils.isNotBlank(flag) && flag.equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            reqMap.put("orgId",orgId);
+            reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
         }
         reqMap.put("status", Status.STATUS_1.status);
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
@@ -97,25 +117,58 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
     /**
      * 根据代理商唯一编号检索
-     *
-     * @param agent
+     * @param agUniqNum
      * @return
      */
     @Override
-    public Agent verifyAgent(Agent agent) {
-        if (StringUtils.isBlank(agent.getAgUniqNum())) {
-            return null;
+    public AgentResult verifyAgent(String agUniqNum) {
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if (StringUtils.isBlank(agUniqNum)) {
+            return result;
         }
         AgentExample example = new AgentExample();
         AgentExample.Criteria criteria = example.createCriteria();
-        criteria.andAgUniqNumEqualTo(agent.getAgUniqNum());
+        criteria.andAgUniqNumEqualTo(agUniqNum);
         criteria.andAgStatusEqualTo(AgStatus.Approved.name());
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> agents = agentMapper.selectByExample(example);
-        if (agents.size() != 1) {
-            return null;
+        if(agents.size()==1){
+            return AgentResult.ok(agents.get(0));
         }
-        return agents.get(0);
+        if (agents.size()>1) {
+            result.setMsg("代理商不唯一");
+            return result;
+        }
+        AgentExample exampleName = new AgentExample();
+        AgentExample.Criteria criteriaName = exampleName.createCriteria();
+        criteriaName.andAgNameEqualTo(agUniqNum);
+        criteriaName.andAgStatusEqualTo(AgStatus.Approved.name());
+        criteriaName.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> agentsName = agentMapper.selectByExample(exampleName);
+        if(agentsName.size()==1){
+            return AgentResult.ok(agentsName.get(0));
+        }
+        if (agentsName.size()>1) {
+            result.setMsg("代理商不唯一");
+            return result;
+        }
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
+        agentBusInfoCriteria.andBusNumEqualTo(agUniqNum);
+        agentBusInfoCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+        agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        if(agentBusInfos.size()==1){
+            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+            Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+            return AgentResult.ok(agent);
+        }
+        if (agentsName.size()>1) {
+            result.setMsg("代理商不唯一");
+            return result;
+        }
+        result.setMsg("代理商不存在或未通过审批");
+        return result;
     }
 
     @Override
@@ -329,6 +382,63 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             agentNotifyService.asynNotifyPlatform();
         }
         return i;
+    }
+
+    @Override
+    public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException {
+        if (String.valueOf(map.get("flag")).equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            map.put("orgId",orgId);
+            map.put("userId",userId);
+        }
+
+        map.put("agStatus", AgStatus.Approved.name());
+        map.put("status", Status.STATUS_1.status);
+        List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
+        List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        if (null != agentoutVos && agentoutVos.size() > 0)
+            for (BusinessOutVo agentoutVo : agentoutVos) {//类型
+                if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
+                    for (Dict dict : BUS_TYPE) {
+                        if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusType(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(agentoutVo.getBusIndeAss()) && !agentoutVo.getBusIndeAss().equals("null")) {
+                    if (agentoutVo.getBusIndeAss().equals("1")) {
+                        agentoutVo.setBusIndeAss("是");
+                    } else
+                        agentoutVo.setBusIndeAss("否");
+                }
+                //业务区域
+               if (StringUtils.isNotBlank(agentoutVo.getBusRegion()) && !agentoutVo.getBusRegion().equals("null")){
+                    String busRegion = agentoutVo.getBusRegion();
+                    if (StringUtils.isNotBlank(busRegion) &&!busRegion.equals("null")){
+                        String[] arr = busRegion.split(",");
+                        String name = agentQueryService.dPosRegionNameFromDposIds(arr);
+                        if (StringUtils.isNotBlank(name) && !name.equals("null"))
+                            agentoutVo.setBusRegion(name);
+                    }
+                }
+
+                if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
+                    for (Dict dict : BUS_SCOPE) {//业务范围
+                        if (null!=dict  &&  agentoutVo.getBusScope().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusScope(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+            }
+        return agentoutVos;
     }
 
 }

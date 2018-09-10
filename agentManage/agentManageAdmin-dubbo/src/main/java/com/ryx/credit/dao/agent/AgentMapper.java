@@ -1,6 +1,7 @@
 package com.ryx.credit.dao.agent;
 
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
@@ -30,9 +31,9 @@ public interface AgentMapper {
 
     List<Map<String,Object>> queryDeptNameDis(String agDocDistrict);
 
-    List<AgentoutVo> excelAgent(Map<String,Object> map);
+    List<AgentoutVo> excelAgent(@Param("map")Map<String,Object> map);
 
-    int queryAgentListViewCount(Map<String,Object> map);
+    int queryAgentListViewCount(@Param("map") Map<String,Object> map);
 
-    List<Map<String,Object>> queryAgentListView(Map<String,Object> map);
+    List<Map<String,Object>> queryAgentListView(@Param("map") Map<String,Object> map,@Param("page") Page page);
 }

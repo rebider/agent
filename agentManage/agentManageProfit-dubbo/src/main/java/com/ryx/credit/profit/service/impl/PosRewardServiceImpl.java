@@ -30,6 +30,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -75,6 +78,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public PageInfo posRewardList(PosReward record, Page page) {
         PosRewardExample example = rewardEqualsTo(record);
+        example.setOrderByClause("TOTAL_END_MONTH "+Page.ORDER_DIRECTION_DESC);
         List<PosReward> profitD = rewardMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);

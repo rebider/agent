@@ -2,13 +2,12 @@ package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class OPaymentExample implements Serializable {
+public class OPaymentExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -1926,6 +1925,206 @@ public class OPaymentExample implements Serializable {
 
         public Criteria andActualReceiptDateNotBetween(Date value1, Date value2) {
             addCriterion("ACTUAL_RECEIPT_DATE not between", value1, value2, "actualReceiptDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtIsNull() {
+            addCriterion("PROFIT_TAX_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtIsNotNull() {
+            addCriterion("PROFIT_TAX_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT =", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtNotEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT <>", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtGreaterThan(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT >", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT >=", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtLessThan(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT <", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PROFIT_TAX_AMT <=", value, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_TAX_AMT in", values, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtNotIn(List<BigDecimal> values) {
+            addCriterion("PROFIT_TAX_AMT not in", values, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_TAX_AMT between", value1, value2, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitTaxAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PROFIT_TAX_AMT not between", value1, value2, "profitTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserIsNull() {
+            addCriterion("DOWN_PAYMENT_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserIsNotNull() {
+            addCriterion("DOWN_PAYMENT_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER =", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER <>", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserGreaterThan(String value) {
+            addCriterion("DOWN_PAYMENT_USER >", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserGreaterThanOrEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER >=", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserLessThan(String value) {
+            addCriterion("DOWN_PAYMENT_USER <", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserLessThanOrEqualTo(String value) {
+            addCriterion("DOWN_PAYMENT_USER <=", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserLike(String value) {
+            addCriterion("DOWN_PAYMENT_USER like", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotLike(String value) {
+            addCriterion("DOWN_PAYMENT_USER not like", value, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserIn(List<String> values) {
+            addCriterion("DOWN_PAYMENT_USER in", values, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotIn(List<String> values) {
+            addCriterion("DOWN_PAYMENT_USER not in", values, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserBetween(String value1, String value2) {
+            addCriterion("DOWN_PAYMENT_USER between", value1, value2, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andDownPaymentUserNotBetween(String value1, String value2) {
+            addCriterion("DOWN_PAYMENT_USER not between", value1, value2, "downPaymentUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrIsNull() {
+            addCriterion("SETTLEMENT_PRICE_STR is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrIsNotNull() {
+            addCriterion("SETTLEMENT_PRICE_STR is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR =", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR <>", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrGreaterThan(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR >", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrGreaterThanOrEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR >=", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrLessThan(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR <", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrLessThanOrEqualTo(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR <=", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrLike(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR like", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotLike(String value) {
+            addCriterion("SETTLEMENT_PRICE_STR not like", value, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrIn(List<String> values) {
+            addCriterion("SETTLEMENT_PRICE_STR in", values, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotIn(List<String> values) {
+            addCriterion("SETTLEMENT_PRICE_STR not in", values, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrBetween(String value1, String value2) {
+            addCriterion("SETTLEMENT_PRICE_STR between", value1, value2, "settlementPriceStr");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettlementPriceStrNotBetween(String value1, String value2) {
+            addCriterion("SETTLEMENT_PRICE_STR not between", value1, value2, "settlementPriceStr");
             return (Criteria) this;
         }
     }

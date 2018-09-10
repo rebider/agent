@@ -1,59 +1,61 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.agent.AgentBusInfoMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
-    <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
-    <result column="BUS_NUM" property="busNum" jdbcType="VARCHAR" />
-    <result column="BUS_PLATFORM" property="busPlatform" jdbcType="VARCHAR" />
-    <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR" />
-    <result column="BUS_PARENT" property="busParent" jdbcType="VARCHAR" />
-    <result column="BUS_RISK_PARENT" property="busRiskParent" jdbcType="VARCHAR" />
-    <result column="BUS_ACTIVATION_PARENT" property="busActivationParent" jdbcType="VARCHAR" />
-    <result column="BUS_REGION" property="busRegion" jdbcType="VARCHAR" />
-    <result column="BUS_SENT_DIRECTLY" property="busSentDirectly" jdbcType="DECIMAL" />
-    <result column="BUS_DIRECT_CASHBACK" property="busDirectCashback" jdbcType="DECIMAL" />
-    <result column="BUS_INDE_ASS" property="busIndeAss" jdbcType="DECIMAL" />
-    <result column="BUS_CONTACT" property="busContact" jdbcType="VARCHAR" />
-    <result column="BUS_CONTACT_MOBILE" property="busContactMobile" jdbcType="VARCHAR" />
-    <result column="BUS_CONTACT_EMAIL" property="busContactEmail" jdbcType="VARCHAR" />
-    <result column="BUS_CONTACT_PERSON" property="busContactPerson" jdbcType="VARCHAR" />
-    <result column="BUS_RISK_EMAIL" property="busRiskEmail" jdbcType="VARCHAR" />
-    <result column="CLO_TAX_POINT" property="cloTaxPoint" jdbcType="DECIMAL" />
-    <result column="CLO_INVOICE" property="cloInvoice" jdbcType="DECIMAL" />
-    <result column="CLO_RECEIPT" property="cloReceipt" jdbcType="DECIMAL" />
-    <result column="CLO_PAY_COMPANY" property="cloPayCompany" jdbcType="VARCHAR" />
-    <result column="CLO_AGENT_COLINFO" property="cloAgentColinfo" jdbcType="VARCHAR" />
-    <result column="BUS_STATUS" property="busStatus" jdbcType="DECIMAL" />
-    <result column="CLO_REVIEW_STATUS" property="cloReviewStatus" jdbcType="DECIMAL" />
-    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
-    <result column="C_UTIME" property="cUtime" jdbcType="TIMESTAMP" />
-    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
-    <result column="STATUS" property="status" jdbcType="DECIMAL" />
-    <result column="VERSION" property="version" jdbcType="DECIMAL" />
-    <result column="AG_ZBH" property="agZbh" jdbcType="VARCHAR" />
-    <result column="BUS_USE_ORGAN" property="busUseOrgan" jdbcType="VARCHAR" />
-    <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentBusInfoMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+    <result column="BUS_PARENT" jdbcType="VARCHAR" property="busParent" />
+    <result column="BUS_RISK_PARENT" jdbcType="VARCHAR" property="busRiskParent" />
+    <result column="BUS_ACTIVATION_PARENT" jdbcType="VARCHAR" property="busActivationParent" />
+    <result column="BUS_REGION" jdbcType="VARCHAR" property="busRegion" />
+    <result column="BUS_SENT_DIRECTLY" jdbcType="DECIMAL" property="busSentDirectly" />
+    <result column="BUS_DIRECT_CASHBACK" jdbcType="DECIMAL" property="busDirectCashback" />
+    <result column="BUS_INDE_ASS" jdbcType="DECIMAL" property="busIndeAss" />
+    <result column="BUS_CONTACT" jdbcType="VARCHAR" property="busContact" />
+    <result column="BUS_CONTACT_MOBILE" jdbcType="VARCHAR" property="busContactMobile" />
+    <result column="BUS_CONTACT_EMAIL" jdbcType="VARCHAR" property="busContactEmail" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
+    <result column="BUS_RISK_EMAIL" jdbcType="VARCHAR" property="busRiskEmail" />
+    <result column="CLO_TAX_POINT" jdbcType="DECIMAL" property="cloTaxPoint" />
+    <result column="CLO_INVOICE" jdbcType="DECIMAL" property="cloInvoice" />
+    <result column="CLO_RECEIPT" jdbcType="DECIMAL" property="cloReceipt" />
+    <result column="CLO_PAY_COMPANY" jdbcType="VARCHAR" property="cloPayCompany" />
+    <result column="CLO_AGENT_COLINFO" jdbcType="VARCHAR" property="cloAgentColinfo" />
+    <result column="BUS_STATUS" jdbcType="DECIMAL" property="busStatus" />
+    <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="C_UTIME" jdbcType="TIMESTAMP" property="cUtime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="AG_ZBH" jdbcType="VARCHAR" property="agZbh" />
+    <result column="BUS_USE_ORGAN" jdbcType="VARCHAR" property="busUseOrgan" />
+    <result column="BUS_SCOPE" jdbcType="VARCHAR" property="busScope" />
+    <result column="DREDGE_S0" jdbcType="DECIMAL" property="dredgeS0" />
+    <result column="BUS_LOGIN_NUM" jdbcType="VARCHAR" property="busLoginNum" />
   </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
                   and ${criterion.condition}
                 </when>
-                <when test="criterion.singleValue" >
+                <when test="criterion.singleValue">
                   and ${criterion.condition} #{criterion.value}
                 </when>
-                <when test="criterion.betweenValue" >
+                <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                 </when>
-                <when test="criterion.listValue" >
+                <when test="criterion.listValue">
                   and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                     #{listItem}
                   </foreach>
                 </when>
@@ -64,42 +66,42 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     ID, AGENT_ID, BUS_NUM, BUS_PLATFORM, BUS_TYPE, BUS_PARENT, BUS_RISK_PARENT, BUS_ACTIVATION_PARENT,
     BUS_REGION, BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE,
     BUS_CONTACT_EMAIL, BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE,
     CLO_RECEIPT, CLO_PAY_COMPANY, CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS, C_TIME,
-    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE
+    C_UTIME, C_USER, STATUS, VERSION, AG_ZBH, BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
     from A_AGENT_BUSINFO
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from A_AGENT_BUSINFO
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample">
     delete from A_AGENT_BUSINFO
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO (ID, AGENT_ID, BUS_NUM,
     BUS_PLATFORM, BUS_TYPE, BUS_PARENT,
     BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION,
@@ -110,7 +112,8 @@
     CLO_AGENT_COLINFO, BUS_STATUS, CLO_REVIEW_STATUS,
     C_TIME, C_UTIME, C_USER,
     STATUS, VERSION, AG_ZBH,
-    BUS_USE_ORGAN, BUS_SCOPE)
+    BUS_USE_ORGAN, BUS_SCOPE, DREDGE_S0,
+    BUS_LOGIN_NUM)
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR},
     #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR},
     #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR},
@@ -121,313 +124,332 @@
     #{cloAgentColinfo,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{agZbh,jdbcType=VARCHAR},
-    #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR})
+    #{busUseOrgan,jdbcType=VARCHAR}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL},
+    #{busLoginNum,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     insert into A_AGENT_BUSINFO
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         ID,
       </if>
-      <if test="agentId != null" >
+      <if test="agentId != null">
         AGENT_ID,
       </if>
-      <if test="busNum != null" >
+      <if test="busNum != null">
         BUS_NUM,
       </if>
-      <if test="busPlatform != null" >
+      <if test="busPlatform != null">
         BUS_PLATFORM,
       </if>
-      <if test="busType != null" >
+      <if test="busType != null">
         BUS_TYPE,
       </if>
-      <if test="busParent != null" >
+      <if test="busParent != null">
         BUS_PARENT,
       </if>
-      <if test="busRiskParent != null" >
+      <if test="busRiskParent != null">
         BUS_RISK_PARENT,
       </if>
-      <if test="busActivationParent != null" >
+      <if test="busActivationParent != null">
         BUS_ACTIVATION_PARENT,
       </if>
-      <if test="busRegion != null" >
+      <if test="busRegion != null">
         BUS_REGION,
       </if>
-      <if test="busSentDirectly != null" >
+      <if test="busSentDirectly != null">
         BUS_SENT_DIRECTLY,
       </if>
-      <if test="busDirectCashback != null" >
+      <if test="busDirectCashback != null">
         BUS_DIRECT_CASHBACK,
       </if>
-      <if test="busIndeAss != null" >
+      <if test="busIndeAss != null">
         BUS_INDE_ASS,
       </if>
-      <if test="busContact != null" >
+      <if test="busContact != null">
         BUS_CONTACT,
       </if>
-      <if test="busContactMobile != null" >
+      <if test="busContactMobile != null">
         BUS_CONTACT_MOBILE,
       </if>
-      <if test="busContactEmail != null" >
+      <if test="busContactEmail != null">
         BUS_CONTACT_EMAIL,
       </if>
-      <if test="busContactPerson != null" >
+      <if test="busContactPerson != null">
         BUS_CONTACT_PERSON,
       </if>
-      <if test="busRiskEmail != null" >
+      <if test="busRiskEmail != null">
         BUS_RISK_EMAIL,
       </if>
-      <if test="cloTaxPoint != null" >
+      <if test="cloTaxPoint != null">
         CLO_TAX_POINT,
       </if>
-      <if test="cloInvoice != null" >
+      <if test="cloInvoice != null">
         CLO_INVOICE,
       </if>
-      <if test="cloReceipt != null" >
+      <if test="cloReceipt != null">
         CLO_RECEIPT,
       </if>
-      <if test="cloPayCompany != null" >
+      <if test="cloPayCompany != null">
         CLO_PAY_COMPANY,
       </if>
-      <if test="cloAgentColinfo != null" >
+      <if test="cloAgentColinfo != null">
         CLO_AGENT_COLINFO,
       </if>
-      <if test="busStatus != null" >
+      <if test="busStatus != null">
         BUS_STATUS,
       </if>
-      <if test="cloReviewStatus != null" >
+      <if test="cloReviewStatus != null">
         CLO_REVIEW_STATUS,
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         C_TIME,
       </if>
-      <if test="cUtime != null" >
+      <if test="cUtime != null">
         C_UTIME,
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         C_USER,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS,
       </if>
-      <if test="version != null" >
+      <if test="version != null">
         VERSION,
       </if>
-      <if test="agZbh != null" >
+      <if test="agZbh != null">
         AG_ZBH,
       </if>
-      <if test="busUseOrgan != null" >
+      <if test="busUseOrgan != null">
         BUS_USE_ORGAN,
       </if>
-      <if test="busScope != null" >
+      <if test="busScope != null">
         BUS_SCOPE,
       </if>
+      <if test="dredgeS0 != null">
+        DREDGE_S0,
+      </if>
+      <if test="busLoginNum != null">
+        BUS_LOGIN_NUM,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=VARCHAR},
       </if>
-      <if test="agentId != null" >
+      <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
       </if>
-      <if test="busNum != null" >
+      <if test="busNum != null">
         #{busNum,jdbcType=VARCHAR},
       </if>
-      <if test="busPlatform != null" >
+      <if test="busPlatform != null">
         #{busPlatform,jdbcType=VARCHAR},
       </if>
-      <if test="busType != null" >
+      <if test="busType != null">
         #{busType,jdbcType=VARCHAR},
       </if>
-      <if test="busParent != null" >
+      <if test="busParent != null">
         #{busParent,jdbcType=VARCHAR},
       </if>
-      <if test="busRiskParent != null" >
+      <if test="busRiskParent != null">
         #{busRiskParent,jdbcType=VARCHAR},
       </if>
-      <if test="busActivationParent != null" >
+      <if test="busActivationParent != null">
         #{busActivationParent,jdbcType=VARCHAR},
       </if>
-      <if test="busRegion != null" >
+      <if test="busRegion != null">
         #{busRegion,jdbcType=VARCHAR},
       </if>
-      <if test="busSentDirectly != null" >
+      <if test="busSentDirectly != null">
         #{busSentDirectly,jdbcType=DECIMAL},
       </if>
-      <if test="busDirectCashback != null" >
+      <if test="busDirectCashback != null">
         #{busDirectCashback,jdbcType=DECIMAL},
       </if>
-      <if test="busIndeAss != null" >
+      <if test="busIndeAss != null">
         #{busIndeAss,jdbcType=DECIMAL},
       </if>
-      <if test="busContact != null" >
+      <if test="busContact != null">
         #{busContact,jdbcType=VARCHAR},
       </if>
-      <if test="busContactMobile != null" >
+      <if test="busContactMobile != null">
         #{busContactMobile,jdbcType=VARCHAR},
       </if>
-      <if test="busContactEmail != null" >
+      <if test="busContactEmail != null">
         #{busContactEmail,jdbcType=VARCHAR},
       </if>
-      <if test="busContactPerson != null" >
+      <if test="busContactPerson != null">
         #{busContactPerson,jdbcType=VARCHAR},
       </if>
-      <if test="busRiskEmail != null" >
+      <if test="busRiskEmail != null">
         #{busRiskEmail,jdbcType=VARCHAR},
       </if>
-      <if test="cloTaxPoint != null" >
+      <if test="cloTaxPoint != null">
         #{cloTaxPoint,jdbcType=DECIMAL},
       </if>
-      <if test="cloInvoice != null" >
+      <if test="cloInvoice != null">
         #{cloInvoice,jdbcType=DECIMAL},
       </if>
-      <if test="cloReceipt != null" >
+      <if test="cloReceipt != null">
         #{cloReceipt,jdbcType=DECIMAL},
       </if>
-      <if test="cloPayCompany != null" >
+      <if test="cloPayCompany != null">
         #{cloPayCompany,jdbcType=VARCHAR},
       </if>
-      <if test="cloAgentColinfo != null" >
+      <if test="cloAgentColinfo != null">
         #{cloAgentColinfo,jdbcType=VARCHAR},
       </if>
-      <if test="busStatus != null" >
+      <if test="busStatus != null">
         #{busStatus,jdbcType=DECIMAL},
       </if>
-      <if test="cloReviewStatus != null" >
+      <if test="cloReviewStatus != null">
         #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUtime != null" >
+      <if test="cUtime != null">
         #{cUtime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         #{cUser,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=DECIMAL},
       </if>
-      <if test="version != null" >
+      <if test="version != null">
         #{version,jdbcType=DECIMAL},
       </if>
-      <if test="agZbh != null" >
+      <if test="agZbh != null">
         #{agZbh,jdbcType=VARCHAR},
       </if>
-      <if test="busUseOrgan != null" >
+      <if test="busUseOrgan != null">
         #{busUseOrgan,jdbcType=VARCHAR},
       </if>
-      <if test="busScope != null" >
+      <if test="busScope != null">
         #{busScope,jdbcType=VARCHAR},
+      </if>
+      <if test="dredgeS0 != null">
+        #{dredgeS0,jdbcType=DECIMAL},
+      </if>
+      <if test="busLoginNum != null">
+        #{busLoginNum,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfoExample" resultType="java.lang.Long">
     select count(*) from A_AGENT_BUSINFO
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     update A_AGENT_BUSINFO
-    <set >
-      <if test="agentId != null" >
+    <set>
+      <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
-      <if test="busNum != null" >
+      <if test="busNum != null">
         BUS_NUM = #{busNum,jdbcType=VARCHAR},
       </if>
-      <if test="busPlatform != null" >
+      <if test="busPlatform != null">
         BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
       </if>
-      <if test="busType != null" >
+      <if test="busType != null">
         BUS_TYPE = #{busType,jdbcType=VARCHAR},
       </if>
-      <if test="busParent != null" >
+      <if test="busParent != null">
         BUS_PARENT = #{busParent,jdbcType=VARCHAR},
       </if>
-      <if test="busRiskParent != null" >
+      <if test="busRiskParent != null">
         BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
       </if>
-      <if test="busActivationParent != null" >
+      <if test="busActivationParent != null">
         BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
       </if>
-      <if test="busRegion != null" >
+      <if test="busRegion != null">
         BUS_REGION = #{busRegion,jdbcType=VARCHAR},
       </if>
-      <if test="busSentDirectly != null" >
+      <if test="busSentDirectly != null">
         BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
       </if>
-      <if test="busDirectCashback != null" >
+      <if test="busDirectCashback != null">
         BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
       </if>
-      <if test="busIndeAss != null" >
+      <if test="busIndeAss != null">
         BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
       </if>
-      <if test="busContact != null" >
+      <if test="busContact != null">
         BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
       </if>
-      <if test="busContactMobile != null" >
+      <if test="busContactMobile != null">
         BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
       </if>
-      <if test="busContactEmail != null" >
+      <if test="busContactEmail != null">
         BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
       </if>
-      <if test="busContactPerson != null" >
+      <if test="busContactPerson != null">
         BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
       </if>
-      <if test="busRiskEmail != null" >
+      <if test="busRiskEmail != null">
         BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
       </if>
-      <if test="cloTaxPoint != null" >
+      <if test="cloTaxPoint != null">
         CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
       </if>
-      <if test="cloInvoice != null" >
+      <if test="cloInvoice != null">
         CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
       </if>
-      <if test="cloReceipt != null" >
+      <if test="cloReceipt != null">
         CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
       </if>
-      <if test="cloPayCompany != null" >
+      <if test="cloPayCompany != null">
         CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
       </if>
-      <if test="cloAgentColinfo != null" >
+      <if test="cloAgentColinfo != null">
         CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
       </if>
-      <if test="busStatus != null" >
+      <if test="busStatus != null">
         BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
       </if>
-      <if test="cloReviewStatus != null" >
+      <if test="cloReviewStatus != null">
         CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUtime != null" >
+      <if test="cUtime != null">
         C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
-      <if test="version != null" >
+      <if test="version != null">
         VERSION = VERSION + 1,
       </if>
-      <if test="agZbh != null" >
+      <if test="agZbh != null">
         AG_ZBH = #{agZbh,jdbcType=VARCHAR},
       </if>
-      <if test="busUseOrgan != null" >
+      <if test="busUseOrgan != null">
         BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
       </if>
-      <if test="busScope != null" >
+      <if test="busScope != null">
         BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
+      </if>
+      <if test="dredgeS0 != null">
+        DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
+      </if>
+      <if test="busLoginNum != null">
+        BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo" >
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
     update A_AGENT_BUSINFO
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
     BUS_NUM = #{busNum,jdbcType=VARCHAR},
@@ -459,16 +481,18 @@
     VERSION = VERSION + 1,
     AG_ZBH = #{agZbh,jdbcType=VARCHAR},
     BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
-    BUS_SCOPE = #{busScope,jdbcType=VARCHAR}
+    BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
+    DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
+    BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
-  <sql id="OracleDialectPrefix" >
-    <if test="page != null" >
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
       select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
-  <sql id="OracleDialectSuffix" >
-    <if test="page != null" >
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
@@ -510,14 +534,107 @@
   </select>
 
   <select id="queryBusinessPlatformList" parameterType="map" resultType="map">
-     <include refid="OracleDialectPrefix" />
-      select
-        b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-        a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time
-      from A_agent a,A_agent_businfo b
-      where a.id=b.agent_id
+    <include refid="OracleDialectPrefix" />
+    (
+    select
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
+    from A_agent a,A_agent_businfo b
+    where a.id=b.agent_id
+    and ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and a.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and b.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and b.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.orgId!=null and reqMap.orgId!=''">
+      and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
+    </if>
+    and b.status = #{reqMap.status}
+    UNION
+    select
+    b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
+    from A_agent a,A_agent_businfo b
+    <where> a.id=b.agent_id
+    and ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and a.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and b.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and b.id = #{reqMap.id}
+    </if>
+      <if test="reqMap.userId!=null and reqMap.userId!=''">
+        and a.C_USER = #{reqMap.userId}
+      </if>
+    and b.status = #{reqMap.status}
+    </where>
+    )
+    order by c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+
+  <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
+    select count(*) from(
+    select
+    b.id
+    from A_agent a,A_agent_businfo b
+    where a.id=b.agent_id
+    and ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and a.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and b.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and b.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and b.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and b.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.orgId!=null and reqMap.orgId!=''">
+      and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
+    </if>
+    and b.status = #{reqMap.status}
+    UNION
+    select
+    b.id
+    from A_agent a,A_agent_businfo b
+    <where> a.id=b.agent_id
       and ag_status = #{reqMap.agStatus}
-      and b.c_user = #{reqMap.cUser}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
         and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
@@ -536,41 +653,14 @@
       <if test="reqMap.id != null and reqMap.id != '' " >
         and b.id = #{reqMap.id}
       </if>
-      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
-        and b.C_USER = #{reqMap.cUser}
+      <if test="reqMap.userId!=null and reqMap.userId!=''">
+        and a.C_USER = #{reqMap.userId}
       </if>
       and b.status = #{reqMap.status}
-      order by b.c_time desc
-    <include refid="OracleDialectSuffix" />
+    </where>
+    )
   </select>
 
-  <select id="queryBusinessPlatformCount" parameterType="map" resultType="int">
-      select
-         count(*)
-      from A_agent a,A_agent_businfo b
-      where a.id=b.agent_id
-      and ag_status = #{reqMap.agStatus}
-      <if test="reqMap.agName != null and reqMap.agName != '' " >
-        and a.ag_name = #{reqMap.agName}
-      </if>
-      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
-        and a.ag_uniq_num = #{reqMap.agUniqNum}
-      </if>
-      <if test="reqMap.busNum != null and reqMap.busNum != '' " >
-        and b.bus_num = #{reqMap.busNum}
-      </if>
-      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
-        and b.bus_platform = #{reqMap.busPlatform}
-      </if>
-      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
-        and b.clo_review_status = #{reqMap.cloReviewStatus}
-      </if>
-      <if test="reqMap.cUser != null and reqMap.cUser != '' " >
-        and b.C_USER = #{reqMap.cUser}
-      </if>
-      and b.status = #{reqMap.status}
-      order by b.c_time desc
-  </select>
 
   <select id="businessQuery" parameterType="string" resultMap="BaseResultMap">
     select
@@ -626,14 +716,14 @@
   <select id="queryTreeByBusInfo" parameterType="map" resultType="map">
     select
     A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
-    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'（机构编码:'||A.BUS_NUM||')') as FIELDSHOW
     from
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id
     left join a_platform c on c.platform_num = a.bus_platform
     left join d_dict d on d.d_group='AGENT' AND d.d_artifact = 'BUS_TYPE' and d.d_itemvalue = a.bus_type
       <where>
-         a.status=1 and b.status=1
+         a.status=1 and b.status=1 and a.bus_status=1
         <if test="id!=null and id!=''"> and a.id=#{id}</if>
         <if test="busPlatform!=null and busPlatform!=''">and a.bus_platform =#{busPlatform}</if>
         <if test="agentId!=null and agentId!=''">and a.agent_id = #{agentId}</if>
@@ -642,5 +732,110 @@
   </select>
 
 
+  <select id="excelAgent" parameterType="map" resultMap="BusinessOutVo">
+    (select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
+    agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email,platform.PLATFORM_NAME,
+    a1.AG_NAME||businfo_1.id as busParent,
+    busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent
+    from A_AGENT agent
+    left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    left join A_PLATFORM  platform on platform.PLATFORM_NUM=bus.BUS_PLATFORM
+    left join a_agent_businfo businfo_1     on businfo_1.id=bus.bus_parent
+    left join a_agent a1 on a1.id=businfo_1.agent_id
+    left join A_agent_businfo busRiskParentbus on bus.BUS_RISK_PARENT = busRiskParentbus.id
+    left join A_AGENT busRiskParentbusAgent on busRiskParentbusAgent.id = busRiskParentbus.AGENT_ID
+    left join A_agent_businfo busActivationParentbus on bus.BUS_ACTIVATION_PARENT = busActivationParentbus.id
+    left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
+    where 1=1 and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' ">and agent.ag_name like
+      CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+      <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' ">and agent.ag_uniq_num = #{reqMap.agUniqNum}
+      </if>
+      <if test="reqMap.busNum != null and reqMap.busNum != '' " >and bus.bus_num = #{reqMap.busNum}
+      </if>
+      <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >and bus.bus_platform =
+        #{reqMap.busPlatform}
+      </if>
+      <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >and bus.clo_review_status =
+        #{reqMap.cloReviewStatus}
+      </if>
+      <if test="reqMap.id != null and reqMap.id != '' " >and bus.id = #{reqMap.id}
+      </if>
+      <if test="reqMap.orgId!=null and reqMap.orgId!=''">
+      and (agent.AG_DOC_PRO = #{reqMap.orgId} or agent.AG_DOC_DISTRICT = #{reqMap.orgId})
+      </if>
+    and bus.status = #{reqMap.status}
+    UNION
+    select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
+    agent.AG_HEAD_MOBILE, agent.AG_REG_ADD
+    ,bus.bus_platform,bus.bus_num,bus.bus_type,bus.bus_Inde_ass,
+    bus.bus_scope,bus.bus_region,bus.bus_risk_email,platform.PLATFORM_NAME,
+    a1.AG_NAME||businfo_1.id as busParent,
+    busRiskParentbusAgent.ag_name as busRiskParent,busActivationParentbusAgent.ag_name as busActivationParent
+    from A_AGENT agent
+    left join A_agent_businfo bus on agent.id=bus.AGENT_ID
+    left join A_PLATFORM  platform on platform.PLATFORM_NUM=bus.BUS_PLATFORM
+    left join a_agent_businfo businfo_1     on businfo_1.id=bus.bus_parent
+    left join a_agent a1 on a1.id=businfo_1.agent_id
+    left join A_agent_businfo busRiskParentbus on bus.BUS_RISK_PARENT = busRiskParentbus.id
+    left join A_AGENT busRiskParentbusAgent on busRiskParentbusAgent.id = busRiskParentbus.AGENT_ID
+    left join A_agent_businfo busActivationParentbus on bus.BUS_ACTIVATION_PARENT = busActivationParentbus.id
+    left join A_AGENT busActivationParentbusAgent on busActivationParentbusAgent.id = busActivationParentbus.AGENT_ID
+    where 1=1 and agent.ag_status = #{reqMap.agStatus}
+    <if test="reqMap.agName != null and reqMap.agName != '' " >
+      and agent.ag_name like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
+    </if>
+    <if test="reqMap.agUniqNum != null and reqMap.agUniqNum != '' " >
+      and agent.ag_uniq_num = #{reqMap.agUniqNum}
+    </if>
+    <if test="reqMap.busNum != null and reqMap.busNum != '' " >
+      and bus.bus_num = #{reqMap.busNum}
+    </if>
+    <if test="reqMap.busPlatform != null and reqMap.busPlatform != '' " >
+      and bus.bus_platform = #{reqMap.busPlatform}
+    </if>
+    <if test="reqMap.cloReviewStatus != null and reqMap.cloReviewStatus != '' " >
+      and bus.clo_review_status = #{reqMap.cloReviewStatus}
+    </if>
+    <if test="reqMap.id != null and reqMap.id != '' " >
+      and bus.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.userId!=null and reqMap.userId!=''">
+      and agent.C_USER = #{reqMap.userId}
+    </if>
+    and bus.status = #{reqMap.status}
+   )
+  </select>
+  <resultMap id="BusinessOutVo" type="com.ryx.credit.pojo.admin.vo.BusinessOutVo">
+    <id column="ID" property="id" jdbcType="VARCHAR"/>
+    <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR"/>
+    <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+    <result column="AG_HEAD" property="agHead" jdbcType="VARCHAR"/>
+    <result column="AG_HEAD_MOBILE" property="agHeadMobile" jdbcType="VARCHAR"/>
+    <result column="AG_REG_ADD" property="agRegAdd" jdbcType="VARCHAR"/>
+
+    <result column="BUS_NUM" property="busNum" jdbcType="VARCHAR"/>
+    <result column="BUS_PLATFORM" property="busPlatform" jdbcType="VARCHAR"/>
+    <result column="PLATFORM_NAME" property="platformName" jdbcType="VARCHAR"/>
+    <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR"/>
+    <result column="BUS_PARENT" property="busParent" jdbcType="VARCHAR"/>
+    <result column="BUS_RISK_PARENT" property="busRiskParent" jdbcType="VARCHAR"/>
+    <result column="BUS_ACTIVATION_PARENT" property="busActivationParent" jdbcType="VARCHAR"/>
+    <result column="BUS_REGION" property="busRegion" jdbcType="VARCHAR"/>
+    <result column="BUS_INDE_ASS" property="busIndeAss" jdbcType="VARCHAR"/>
+    <result column="BUS_RISK_EMAIL" property="busRiskEmail" jdbcType="VARCHAR"/>
+    <result column="BUS_SCOPE" property="busScope" jdbcType="VARCHAR"/>
+  </resultMap>
+
+  <!--查询业务编号和代理商信息-->
+  <select id="queryAgentNameByBusId" resultType="map">
+    select a.id,a.agent_id,a.bus_num,b.ag_name,b.ag_uniq_num
+    from a_agent_businfo a
+      left join a_agent b on b.id=a.agent_id
+    where a.status=1 and b.status=1
+  </select>
 
 </mapper>

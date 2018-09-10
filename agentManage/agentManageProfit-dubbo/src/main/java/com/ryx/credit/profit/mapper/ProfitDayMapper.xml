@@ -16,6 +16,7 @@
     <result column="REAL_MONEY" jdbcType="DECIMAL" property="realMoney" />
     <result column="REDO_MONEY" jdbcType="DECIMAL" property="redoMoney" />
     <result column="RETURN_MONEY" jdbcType="DECIMAL" property="returnMoney" />
+    <result column="PLATFORMNUM" jdbcType="VARCHAR" property="platformNum" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -48,7 +49,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, TRANS_DATE, REMIT_DATE, TOTAL_PROFIT,TOTAL_PROFIT1, FROZEN_MONEY,
-    SUCCESS_MONEY, FAIL_MONEY, REAL_MONEY, REDO_MONEY, RETURN_MONEY
+    SUCCESS_MONEY, FAIL_MONEY, REAL_MONEY, REDO_MONEY, RETURN_MONEY, PLATFORMNUM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -106,12 +107,12 @@
     AGENT_NAME, TRANS_DATE, REMIT_DATE,
     TOTAL_PROFIT,TOTAL_PROFIT1, FROZEN_MONEY, SUCCESS_MONEY,
     FAIL_MONEY, REAL_MONEY, REDO_MONEY,
-    RETURN_MONEY)
+    RETURN_MONEY, PLATFORMNUM)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{agentName,jdbcType=VARCHAR}, #{transDate,jdbcType=VARCHAR}, #{remitDate,jdbcType=VARCHAR},
     #{totalProfit,jdbcType=DECIMAL}, #{frozenMoney,jdbcType=DECIMAL}, #{successMoney,jdbcType=DECIMAL},
     #{failMoney,jdbcType=DECIMAL}, #{realMoney,jdbcType=DECIMAL}, #{redoMoney,jdbcType=DECIMAL},
-    #{returnMoney,jdbcType=DECIMAL})
+    #{returnMoney,jdbcType=DECIMAL}, #{platformNum,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
     insert into P_PROFIT_D
@@ -158,6 +159,9 @@
       <if test="returnMoney != null">
         RETURN_MONEY,
       </if>
+      <if test="platformNum != null">
+        PLATFORMNUM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -199,6 +203,9 @@
       <if test="returnMoney != null">
         #{returnMoney,jdbcType=DECIMAL},
       </if>
+      <if test="platformNum != null">
+        #{platformNum,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultType="java.lang.Integer">
@@ -224,6 +231,14 @@
         AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
     </select>
 
+  <select id="totalRPByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
+    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1)
+    FROM P_PROFIT_D
+    where
+    to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+  </select>
+
   <select id="totalReturnByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
     SELECT SUM(RETURN_MONEY)
     FROM P_PROFIT_D
@@ -246,6 +261,14 @@
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="totalProfitAndReturnById" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
+    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1+RETURN_MONEY)
+    FROM P_PROFIT_D
+    where
+    to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
@@ -290,6 +313,9 @@
       <if test="returnMoney != null">
         RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL},
       </if>
+      <if test="platformNum != null">
+        PLATFORMNUM = #{platformNum,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -307,7 +333,8 @@
     FAIL_MONEY = #{failMoney,jdbcType=DECIMAL},
     REAL_MONEY = #{realMoney,jdbcType=DECIMAL},
     REDO_MONEY = #{redoMoney,jdbcType=DECIMAL},
-    RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL}
+    RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL},
+    PLATFORMNUM = #{platformNum,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

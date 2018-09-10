@@ -283,4 +283,42 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <!--分组查询-->
+  <select id="queryGroupByProCodeList" parameterType="map" resultType="map">
+      <include refid="OracleDialectPrefix" />
+        select max(O_product.Id) as "id" ,
+        Pro_Code as "proCode",Pro_Name  as "proName",Pro_Type  as "proType",Pro_Price  as "proPrice"
+        from O_product
+        <where>
+          O_product.Pro_Status=1
+         <if test="proType!=null and proType!=''"> and O_product.Pro_Type=#{proType}</if>
+         <if test="proCode!=null and proCode!=''"> and O_product.Pro_Code=#{proCode}</if>
+         <if test="proName!=null and proName!=''"> and O_product.Pro_Name like '${proName}'</if>
+          <if test="proTypes!=null"> and O_product.Pro_Type IN
+            <foreach collection="proTypes" item="proTypeitem" open="(" separator="," close=")">
+                '${proTypeitem}'
+            </foreach>
+          </if>
+        </where>
+        group by Pro_Code,Pro_Name,Pro_Type,Pro_Price
+      <include refid="OracleDialectSuffix" />
+  </select>
+
+  <!--分组查询数量统计-->
+  <select id="queryGroupByProCodeListCount" parameterType="map" resultType="int">
+      select count(a.id) from (
+        select max(O_product.Id) as id, Pro_Code,Pro_Name,Pro_Type,Pro_Price  from O_product
+        <where>
+          O_product.Pro_Status=1 and O_product.Status=1
+          <if test="proType!=null and proType!=''"> and O_product.Pro_Type=#{proType}</if>
+          <if test="proCode!=null and proCode!=''"> and O_product.Pro_Code=#{proCode}</if>
+          <if test="proName!=null and proName!=''"> and O_product.Pro_Name like '${proName}'</if>
+        </where>
+        group by Pro_Code,Pro_Name,Pro_Type,Pro_Price
+      ) a
+  </select>
+
+
 </mapper>

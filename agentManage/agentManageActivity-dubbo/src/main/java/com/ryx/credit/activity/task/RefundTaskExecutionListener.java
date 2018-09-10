@@ -40,18 +40,15 @@ public class RefundTaskExecutionListener implements TaskListener, ExecutionListe
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            DataChangeActivityService dataChange = (DataChangeActivityService) MySpringContextHandler.applicationContext.getBean("dataChangeActivityService");
             IOrderReturnService orderReturnService = (IOrderReturnService) MySpringContextHandler.applicationContext.getBean("orderReturnService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.name());
-                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
                 orderReturnService.approvalReject(delegateExecution.getProcessInstanceId(),activityName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                ResultVO res = dataChange.compressColInfoDataChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.name());
-                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getResInfo());
+                logger.info("=========RefundTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName);
                 orderReturnService.approvalFinish(delegateExecution.getProcessInstanceId(),activityName);
             }
         } else if ("take".equals(eventName)) {

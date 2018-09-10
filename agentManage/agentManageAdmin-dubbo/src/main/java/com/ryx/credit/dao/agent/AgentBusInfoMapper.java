@@ -4,6 +4,7 @@ package com.ryx.credit.dao.agent;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
+import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -58,4 +59,8 @@ public interface AgentBusInfoMapper {
 
 
     List<Map<String,Object>> queryTreeByBusInfo(Map<String,Object> reqMap);
+
+    List<BusinessOutVo> excelAgent(@Param("reqMap")Map<String,Object> reqMap);
+
+    List<Map<String,Object>> queryAgentNameByBusId();
 }

@@ -6,10 +6,12 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
@@ -41,7 +43,7 @@ import static com.ryx.credit.common.enumc.AgStatus.getAgStatusByValue;
 public class AgentEnterServiceImpl implements AgentEnterService {
 
     private static Logger logger = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
-
+    private final String JURIS_DICTION = AppConfig.getProperty("region_jurisdiction");
 
     @Autowired
     private AgentService agentService;
@@ -77,7 +79,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private RegionService regionService;
     @Autowired
     private ApaycompService apaycompService;
-
+    @Autowired
+    private COrganizationMapper organizationMapper;
+    @Autowired
+    private CUserMapper cUserMapper;
+    @Autowired
+    private AgentQueryService agentQueryService;
     /**
      * 商户入网
      *
@@ -720,7 +727,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public static BusinessPlatformService businessPlatformService;
 
     @Override
-    public List<AgentoutVo> exportAgent(Map map) throws ParseException {
+    public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException {
+        //加载缓存
+        if (String.valueOf(map.get("flag")).equals("1")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            map.put("orgId",orgId);
+            map.put("userId",userId);
+        }
+
         if (null != map) {
             String time = String.valueOf(map.get("time"));
             if (org.apache.commons.lang.StringUtils.isNotBlank(time)&&!time.equals("null")) {
@@ -729,48 +748,30 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
         List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
+        if (null==agentoutVos && agentoutVos.size()>1)
+            return null;
+        List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
+        List<Dict> COLINFO_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name());
+
+
         if (null != agentoutVos && agentoutVos.size() > 0)
             for (AgentoutVo agentoutVo : agentoutVos) {
-                if (null != agentoutVo.getBusType()) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
-                    if (null != value)
-                        agentoutVo.setBusType(value.getdItemname());
-                }
-                if (null != agentoutVo.getBusPlatform()) {
-                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
-                    if (null != platForm)
-                        agentoutVo.setBusPlatform(platForm.getPlatformName());
-                }
-                if (null != agentoutVo.getBusRegion() && !"".equals(agentoutVo.getBusRegion())) {
-
-                    String regionName = regionService.getRegionsName(agentoutVo.getBusRegion());
-                    if (StringUtils.isNotBlank(regionName))
-                        agentoutVo.setBusRegion(regionName);
-                }
-                if (null != agentoutVo.getBusScope()) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
-                    if (null != value)
-                        agentoutVo.setBusScope(value.getdItemname());
-                }
-                if (null != agentoutVo.getBusParent() && null != agentoutVo.getAgentId() && null != agentoutVo.getBusPlatform()) {
-                    getBusParent(agentoutVo);
-
-                }
-                if (null != agentoutVo.getBusRiskParent()) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusRiskParent(agentById.getAgName());
+                if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
+                    for (Dict dict : BUS_TYPE) {
+                        if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){
+                              agentoutVo.setBusType(dict.getdItemname());
+                               break;
+                        }
                     }
-
                 }
-                if (null != agentoutVo.getBusActivationParent()) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusActivationParent(agentById.getAgName());
+
+                if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
+                    for (Dict dict : BUS_SCOPE) {
+                        if (null!=dict  &&  agentoutVo.getBusScope().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusScope(dict.getdItemname());
+                            break;
+                        }
                     }
                 }
 
@@ -782,20 +783,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
 
                 if (null != agentoutVo.getCloType()) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.COLINFO_TYPE.name(), agentoutVo.getCloType().toString());
-                    if (null != value)
-                        agentoutVo.setCloString(value.getdItemname());
-                }
-                if (null != agentoutVo.getBankRegion() && !"".equals(agentoutVo.getBankRegion())) {
-                    String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
-                    if (StringUtils.isNotBlank(regionName))
-                        agentoutVo.setBankRegion(regionName);
-                }
-
-                if (null != agentoutVo.getCloPayCompany()) {
-                    PayComp payComp = apaycompService.selectById(agentoutVo.getCloPayCompany());
-                    if (null != payComp)
-                        agentoutVo.setCloPayCompany(payComp.getComName());
+                    for (Dict dict : COLINFO_TYPE) {
+                        if (null!=dict  &&  agentoutVo.getCloType().equals(dict.getdItemvalue())){
+                            agentoutVo.setCloString(dict.getdItemname());
+                            break;
+                        }
+                    }
                 }
 
                 if (null != agentoutVo.getCloTaxPoint()) {
@@ -803,6 +796,27 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     Number parse = numberFormat.parse(agentoutVo.getCloTaxPoint().toString() + "%");
                     String point = numberFormat.format(parse);
                     agentoutVo.setPoint(point);
+                }
+
+                //业务区域
+                if (StringUtils.isNotBlank(agentoutVo.getBusRegion()) && !agentoutVo.getBusRegion().equals("null")){
+                    String busRegion = agentoutVo.getBusRegion();
+                    if (StringUtils.isNotBlank(busRegion) &&!busRegion.equals("null")){
+                        String[] arr = busRegion.split(",");
+                        String name = agentQueryService.dPosRegionNameFromDposIds(arr);
+                        if (StringUtils.isNotBlank(name) && !name.equals("null"))
+                            agentoutVo.setBusRegion(name);
+                    }
+                }
+                //银行地址
+                if (StringUtils.isNotBlank(agentoutVo.getBankRegion()) && !agentoutVo.getBankRegion().equals("null")){
+                    String bankRegion = agentoutVo.getBankRegion();
+                    if (StringUtils.isNotBlank(bankRegion)){
+                        String[] bank = bankRegion.split(",");
+                        String bankName = agentQueryService.dRegionNameFromIds(bank);
+                        if (StringUtils.isNotBlank(bankName))
+                            agentoutVo.setBankRegion(bankName);
+                    }
                 }
 
             }

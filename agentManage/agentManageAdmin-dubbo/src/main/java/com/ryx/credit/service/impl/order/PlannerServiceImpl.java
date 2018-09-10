@@ -165,25 +165,15 @@ public class PlannerServiceImpl implements PlannerService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult batchPlanner(List<Map<String, Object>> reqListMap,ReceiptPlan receiptPlan,String userId) throws Exception {
+    public AgentResult batchPlanner(List<ReceiptPlan> receiptPlanList,String userId) throws Exception {
         AgentResult result = new AgentResult(500, "系统异常", "");
         int i = 0;
-        for (Map<String, Object> stringObjectMap : reqListMap) {
+        for (ReceiptPlan receiptPlan : receiptPlanList) {
             i++;
             try {
-                String receiptProId = String.valueOf(stringObjectMap.get("RECEIPT_PRO_ID"));
-                String orderId = String.valueOf(stringObjectMap.get("ORDER_ID"));
-                String receiptId = String.valueOf(stringObjectMap.get("ID"));
-                ReceiptPlan saveReceiptPlan = new ReceiptPlan();
-                saveReceiptPlan.setOrderId(orderId);
-                saveReceiptPlan.setReceiptId(receiptId);
-                saveReceiptPlan.setProCom(receiptPlan.getProCom());
-                saveReceiptPlan.setPlanProNum(receiptPlan.getPlanProNum());
-                saveReceiptPlan.setModel(receiptPlan.getModel());
-                saveReceiptPlan.setUserId(userId);
-                saveReceiptPlan.setcUser(userId);
-                saveReceiptPlan.setProId(receiptProId);
-                result = savePlanner(saveReceiptPlan, receiptProId);
+                receiptPlan.setUserId(userId);
+                receiptPlan.setcUser(userId);
+                result = savePlanner(receiptPlan, receiptPlan.getProId());
             } catch (MessageException e) {
                 result.setMsg("第"+i+"条"+e.getMsg());
                 throw new MessageException("第"+i+"条"+e.getMsg()+",请核对发货数量");

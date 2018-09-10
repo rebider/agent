@@ -39,7 +39,7 @@ public interface AgentBusinfoService {
 
     public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception;
 
-
+    public List<Map> agentBus(String agentId);
     public List<Map> agentBusChild(String platformCode,String angetId);
 
     public List<Map> agentBusChild(String busId);
@@ -65,7 +65,26 @@ public interface AgentBusinfoService {
      */
     public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
 
+
+    /**
+     * 查询给定的代理商机构编号上级
+     * @param list
+     * @param platformCode
+     * @param busNum
+     * @return
+     */
+    public List<AgentBusInfo> queryParenFourLevelBusNum(List<AgentBusInfo> list, String platformCode, String busNum);
+
     public List<AgentBusInfo> queryChildLevel(List<AgentBusInfo> list ,String platformCode,String agentId);
+
+    /**
+     * 根据平台号，机构号，查询给定平台机构号的上下级
+     * @param list
+     * @param platformCode
+     * @param busNum
+     * @return
+     */
+    public List<AgentBusInfo> queryChildLevelByBusNum(List<AgentBusInfo> list,String platformCode, String busNum);
 
 
 }

@@ -7,8 +7,12 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
+import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
 
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 业务平台管理
@@ -19,9 +23,9 @@ import java.util.List;
  */
 public interface BusinessPlatformService {
 
-    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page);
+    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag);
 
-    Agent verifyAgent(Agent agent);
+    AgentResult verifyAgent(String agUniqNum);
 
     AgentBusInfo findById(String id);
 
@@ -41,4 +45,10 @@ public interface BusinessPlatformService {
     public List<String> addList(List<List<Object>> list, String userid) throws Exception;
 
     int updateBusPlatDkgsBySelective(AgentBusInfo agentBusInfo,String userId);
+
+    /**
+     * 业务部的导出数据
+     *
+     */
+    public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException;
 }

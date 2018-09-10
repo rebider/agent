@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.bank.BankLineNumsMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.bank.BankLineNums">
+    <result column="BANKTYPE" jdbcType="VARCHAR" property="banktype" />
+    <result column="PROVINCEID" jdbcType="VARCHAR" property="provinceid" />
+    <result column="PROVINCENAME" jdbcType="VARCHAR" property="provincename" />
+    <result column="CITYID" jdbcType="VARCHAR" property="cityid" />
+    <result column="CITYNAME" jdbcType="VARCHAR" property="cityname" />
+    <result column="BANKID" jdbcType="VARCHAR" property="bankid" />
+    <result column="BANKNAME" jdbcType="VARCHAR" property="bankname" />
+    <result column="BANKNAMESHORT" jdbcType="VARCHAR" property="banknameshort" />
+    <result column="BANKBRANCHID" jdbcType="VARCHAR" property="bankbranchid" />
+    <result column="BANKBRANCHNAME" jdbcType="VARCHAR" property="bankbranchname" />
+    <result column="BANKADDRESS" jdbcType="VARCHAR" property="bankaddress" />
+    <result column="LIQBANKID" jdbcType="VARCHAR" property="liqbankid" />
+    <result column="LIQBANKCITYID" jdbcType="VARCHAR" property="liqbankcityid" />
+    <result column="FLAG" jdbcType="VARCHAR" property="flag" />
+    <result column="BANKCITYID" jdbcType="VARCHAR" property="bankcityid" />
+    <result column="BANKPOSTCODE" jdbcType="VARCHAR" property="bankpostcode" />
+    <result column="TELNUM" jdbcType="VARCHAR" property="telnum" />
+    <result column="SETUPDATE" jdbcType="VARCHAR" property="setupdate" />
+    <result column="UPBANKID" jdbcType="VARCHAR" property="upbankid" />
+    <result column="HEADBANKID" jdbcType="VARCHAR" property="headbankid" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    BANKTYPE, PROVINCEID, PROVINCENAME, CITYID, CITYNAME, BANKID, BANKNAME, BANKNAMESHORT, 
+    BANKBRANCHID, BANKBRANCHNAME, BANKADDRESS, LIQBANKID, LIQBANKCITYID, FLAG, BANKCITYID, 
+    BANKPOSTCODE, TELNUM, SETUPDATE, UPBANKID, HEADBANKID
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.bank.BankLineNumsExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from D_BANK_LINE_NUMS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.bank.BankLineNumsExample">
+    delete from D_BANK_LINE_NUMS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.bank.BankLineNums">
+    insert into D_BANK_LINE_NUMS (BANKTYPE, PROVINCEID, PROVINCENAME, 
+      CITYID, CITYNAME, BANKID, 
+      BANKNAME, BANKNAMESHORT, BANKBRANCHID, 
+      BANKBRANCHNAME, BANKADDRESS, LIQBANKID, 
+      LIQBANKCITYID, FLAG, BANKCITYID, 
+      BANKPOSTCODE, TELNUM, SETUPDATE, 
+      UPBANKID, HEADBANKID)
+    values (#{banktype,jdbcType=VARCHAR}, #{provinceid,jdbcType=VARCHAR}, #{provincename,jdbcType=VARCHAR}, 
+      #{cityid,jdbcType=VARCHAR}, #{cityname,jdbcType=VARCHAR}, #{bankid,jdbcType=VARCHAR}, 
+      #{bankname,jdbcType=VARCHAR}, #{banknameshort,jdbcType=VARCHAR}, #{bankbranchid,jdbcType=VARCHAR}, 
+      #{bankbranchname,jdbcType=VARCHAR}, #{bankaddress,jdbcType=VARCHAR}, #{liqbankid,jdbcType=VARCHAR}, 
+      #{liqbankcityid,jdbcType=VARCHAR}, #{flag,jdbcType=VARCHAR}, #{bankcityid,jdbcType=VARCHAR}, 
+      #{bankpostcode,jdbcType=VARCHAR}, #{telnum,jdbcType=VARCHAR}, #{setupdate,jdbcType=VARCHAR}, 
+      #{upbankid,jdbcType=VARCHAR}, #{headbankid,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.bank.BankLineNums">
+    insert into D_BANK_LINE_NUMS
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="banktype != null">
+        BANKTYPE,
+      </if>
+      <if test="provinceid != null">
+        PROVINCEID,
+      </if>
+      <if test="provincename != null">
+        PROVINCENAME,
+      </if>
+      <if test="cityid != null">
+        CITYID,
+      </if>
+      <if test="cityname != null">
+        CITYNAME,
+      </if>
+      <if test="bankid != null">
+        BANKID,
+      </if>
+      <if test="bankname != null">
+        BANKNAME,
+      </if>
+      <if test="banknameshort != null">
+        BANKNAMESHORT,
+      </if>
+      <if test="bankbranchid != null">
+        BANKBRANCHID,
+      </if>
+      <if test="bankbranchname != null">
+        BANKBRANCHNAME,
+      </if>
+      <if test="bankaddress != null">
+        BANKADDRESS,
+      </if>
+      <if test="liqbankid != null">
+        LIQBANKID,
+      </if>
+      <if test="liqbankcityid != null">
+        LIQBANKCITYID,
+      </if>
+      <if test="flag != null">
+        FLAG,
+      </if>
+      <if test="bankcityid != null">
+        BANKCITYID,
+      </if>
+      <if test="bankpostcode != null">
+        BANKPOSTCODE,
+      </if>
+      <if test="telnum != null">
+        TELNUM,
+      </if>
+      <if test="setupdate != null">
+        SETUPDATE,
+      </if>
+      <if test="upbankid != null">
+        UPBANKID,
+      </if>
+      <if test="headbankid != null">
+        HEADBANKID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="banktype != null">
+        #{banktype,jdbcType=VARCHAR},
+      </if>
+      <if test="provinceid != null">
+        #{provinceid,jdbcType=VARCHAR},
+      </if>
+      <if test="provincename != null">
+        #{provincename,jdbcType=VARCHAR},
+      </if>
+      <if test="cityid != null">
+        #{cityid,jdbcType=VARCHAR},
+      </if>
+      <if test="cityname != null">
+        #{cityname,jdbcType=VARCHAR},
+      </if>
+      <if test="bankid != null">
+        #{bankid,jdbcType=VARCHAR},
+      </if>
+      <if test="bankname != null">
+        #{bankname,jdbcType=VARCHAR},
+      </if>
+      <if test="banknameshort != null">
+        #{banknameshort,jdbcType=VARCHAR},
+      </if>
+      <if test="bankbranchid != null">
+        #{bankbranchid,jdbcType=VARCHAR},
+      </if>
+      <if test="bankbranchname != null">
+        #{bankbranchname,jdbcType=VARCHAR},
+      </if>
+      <if test="bankaddress != null">
+        #{bankaddress,jdbcType=VARCHAR},
+      </if>
+      <if test="liqbankid != null">
+        #{liqbankid,jdbcType=VARCHAR},
+      </if>
+      <if test="liqbankcityid != null">
+        #{liqbankcityid,jdbcType=VARCHAR},
+      </if>
+      <if test="flag != null">
+        #{flag,jdbcType=VARCHAR},
+      </if>
+      <if test="bankcityid != null">
+        #{bankcityid,jdbcType=VARCHAR},
+      </if>
+      <if test="bankpostcode != null">
+        #{bankpostcode,jdbcType=VARCHAR},
+      </if>
+      <if test="telnum != null">
+        #{telnum,jdbcType=VARCHAR},
+      </if>
+      <if test="setupdate != null">
+        #{setupdate,jdbcType=VARCHAR},
+      </if>
+      <if test="upbankid != null">
+        #{upbankid,jdbcType=VARCHAR},
+      </if>
+      <if test="headbankid != null">
+        #{headbankid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.bank.BankLineNumsExample" resultType="java.lang.Long">
+    select count(*) from D_BANK_LINE_NUMS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

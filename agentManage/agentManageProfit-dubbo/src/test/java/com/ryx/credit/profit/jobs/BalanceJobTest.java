@@ -1,10 +1,9 @@
-package junit.profit;/**
+package com.ryx.credit.profit.jobs;/**
  * @Auther: zhaodw
  * @Date: 2018/7/30 14:59
  * @Description:
  */
 
-import com.ryx.credit.profit.jobs.ProfitDataJob;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -22,15 +21,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class ProfitDataJobTest {
+public class BalanceJobTest {
 
-    private Logger logger = LoggerFactory.getLogger(ProfitDataJobTest.class);
+    private Logger logger = LoggerFactory.getLogger(BalanceJobTest.class);
 
     @Autowired
-    private ProfitDataJob profitDataJob;
+    private BalanceSerialDealJob balanceSerialDealJob;
 
+    /*** 
+    * @Description: 测试任务处理
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/7/30 
+    */
     @Test
     public void testDeal() {
-        profitDataJob.deal();
+        balanceSerialDealJob.deal();
     }
 }

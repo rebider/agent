@@ -2257,6 +2257,136 @@ public class AgentBusInfoExample {
             addCriterion("BUS_SCOPE not between", value1, value2, "busScope");
             return (Criteria) this;
         }
+
+        public Criteria andDredgeS0IsNull() {
+            addCriterion("DREDGE_S0 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0IsNotNull() {
+            addCriterion("DREDGE_S0 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0EqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 =", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0NotEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 <>", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0GreaterThan(BigDecimal value) {
+            addCriterion("DREDGE_S0 >", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0GreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 >=", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0LessThan(BigDecimal value) {
+            addCriterion("DREDGE_S0 <", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0LessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DREDGE_S0 <=", value, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0In(List<BigDecimal> values) {
+            addCriterion("DREDGE_S0 in", values, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0NotIn(List<BigDecimal> values) {
+            addCriterion("DREDGE_S0 not in", values, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0Between(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DREDGE_S0 between", value1, value2, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andDredgeS0NotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DREDGE_S0 not between", value1, value2, "dredgeS0");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumIsNull() {
+            addCriterion("BUS_LOGIN_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumIsNotNull() {
+            addCriterion("BUS_LOGIN_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM =", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM <>", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumGreaterThan(String value) {
+            addCriterion("BUS_LOGIN_NUM >", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM >=", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumLessThan(String value) {
+            addCriterion("BUS_LOGIN_NUM <", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_LOGIN_NUM <=", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumLike(String value) {
+            addCriterion("BUS_LOGIN_NUM like", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotLike(String value) {
+            addCriterion("BUS_LOGIN_NUM not like", value, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumIn(List<String> values) {
+            addCriterion("BUS_LOGIN_NUM in", values, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotIn(List<String> values) {
+            addCriterion("BUS_LOGIN_NUM not in", values, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumBetween(String value1, String value2) {
+            addCriterion("BUS_LOGIN_NUM between", value1, value2, "busLoginNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusLoginNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_LOGIN_NUM not between", value1, value2, "busLoginNum");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

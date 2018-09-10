@@ -47,6 +47,8 @@ public class OOrder implements Serializable {
 
     private BigDecimal version;
 
+    private String busId;
+
     public String getId() {
         return id;
     }
@@ -213,5 +215,13 @@ public class OOrder implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId == null ? null : busId.trim();
     }
 }
