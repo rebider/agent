@@ -419,6 +419,7 @@
     b.ag_name,
     b.ag_doc_pro ,
     b.ag_doc_district,
+    b.AG_UNIQ_NUM,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -443,6 +444,13 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
     </where>
     UNION
     select
@@ -466,6 +474,7 @@
     b.ag_name,
     b.ag_doc_pro ,
     b.ag_doc_district,
+    b.AG_UNIQ_NUM,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -491,6 +500,13 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
     </where>
     )
     order by c_time desc
@@ -534,6 +550,7 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+
     </where>
     )
   </select>
