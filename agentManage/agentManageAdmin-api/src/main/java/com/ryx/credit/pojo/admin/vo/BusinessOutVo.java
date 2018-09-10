@@ -26,6 +26,7 @@ public class BusinessOutVo extends AgentExtends implements Serializable {
     private String busNum;
 
     private String busPlatform;
+    private String platformName;//平台名称
 
     private String busType;
 
@@ -170,5 +171,13 @@ public class BusinessOutVo extends AgentExtends implements Serializable {
 
     public void setBusScope(String busScope) {
         this.busScope = busScope;
+    }
+
+    public String getPlatformName() {
+        return platformName;
+    }
+
+    public void setPlatformName(String platformName) {
+        this.platformName = platformName;
     }
 }
