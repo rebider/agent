@@ -31,6 +31,8 @@ public class AgentPlatFormSyn implements Serializable{
 
     private String sendJson;
 
+    private String notifyType;
+
     public String getId() {
         return id;
     }
@@ -133,5 +135,13 @@ public class AgentPlatFormSyn implements Serializable{
 
     public void setSendJson(String sendJson) {
         this.sendJson = sendJson == null ? null : sendJson.trim();
+    }
+
+    public String getNotifyType() {
+        return notifyType;
+    }
+
+    public void setNotifyType(String notifyType) {
+        this.notifyType = notifyType;
     }
 }

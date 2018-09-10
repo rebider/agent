@@ -917,6 +917,76 @@ public class AgentPlatFormSynExample {
             addCriterion("NOTIFY_COUNT not between", value1, value2, "notifyCount");
             return (Criteria) this;
         }
+
+        public Criteria andNotifyTypeIsNull() {
+            addCriterion("NOTIFY_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeIsNotNull() {
+            addCriterion("NOTIFY_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeEqualTo(String value) {
+            addCriterion("NOTIFY_TYPE =", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeNotEqualTo(String value) {
+            addCriterion("NOTIFY_TYPE <>", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeGreaterThan(String value) {
+            addCriterion("NOTIFY_TYPE >", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("NOTIFY_TYPE >=", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeLessThan(String value) {
+            addCriterion("NOTIFY_TYPE <", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeLessThanOrEqualTo(String value) {
+            addCriterion("NOTIFY_TYPE <=", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeLike(String value) {
+            addCriterion("NOTIFY_TYPE like", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeNotLike(String value) {
+            addCriterion("NOTIFY_TYPE not like", value, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeIn(List<String> values) {
+            addCriterion("NOTIFY_TYPE in", values, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeNotIn(List<String> values) {
+            addCriterion("NOTIFY_TYPE not in", values, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeBetween(String value1, String value2) {
+            addCriterion("NOTIFY_TYPE between", value1, value2, "notifyType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotifyTypeNotBetween(String value1, String value2) {
+            addCriterion("NOTIFY_TYPE not between", value1, value2, "notifyType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

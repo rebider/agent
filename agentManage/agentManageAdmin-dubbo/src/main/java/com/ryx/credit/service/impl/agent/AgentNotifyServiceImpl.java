@@ -357,7 +357,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(new BigDecimal(1));
             record.setcUser(userId);
-
+            record.setNotifyType(NotifyType.NetInEdit.getValue());
             if(platForm==null){
                 log.info("已有编号进行入网修改：通知pos手刷业务平台未知");
                 throw new MessageException("通知pos手刷业务平台未知");
@@ -510,6 +510,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     record.setNotifyStatus(Status.STATUS_0.status);
                     record.setNotifyCount(new BigDecimal(1));
                     record.setcUser(agentBusInfo.getcUser());
+                    record.setNotifyType(NotifyType.NetInUpgrade.getValue());
                     log.info("升级开户接口{}平台编号不为空走升级接口,请求结果{},记录数据：{}",agentBusInfo.getBusNum(),res.getMsg(),JSONObject.toJSONString(record));
                     if(null!=res &&  res.isOK()){
                         //更新入网状态
@@ -645,7 +646,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentResult result = null;
         try {
             record.setId(id);
-
             record.setNotifyTime(new Date());
             record.setAgentId(agentBusInfo.getAgentId());
             record.setBusId(agentBusInfo.getId());
@@ -655,6 +655,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
+            record.setNotifyType(NotifyType.NetInAdd.getValue());
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
