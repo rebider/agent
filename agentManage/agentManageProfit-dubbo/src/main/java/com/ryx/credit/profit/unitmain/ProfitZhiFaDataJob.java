@@ -18,6 +18,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -80,21 +81,26 @@ public class ProfitZhiFaDataJob {
     }
 
     public void excute(){
-        synchroProfitDirect(null);
+        synchroProfitDirect();
     }
+
     /**
      * 同步直发分润数据
-     * @param transDate 交易月份（空则为上一月）
-     */
-    public void synchroProfitDirect(String transDate){
+     * 交易月份（空则为上一月）
+     * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
+     * 2018.9.7 17:20：@Scheduled(cron = "0 20 17 7 * ?")
+    */
+    @Scheduled(cron = "0 0 5 10 * ?")
+    public void synchroProfitDirect(){
+        String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
-        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6);
-        map.put("transDate",transDate==null?month:transDate);
-        map.put("pageNumber",index++ +"");
-        map.put("pageSize","50");
+        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6);
+        map.put("transDate", transDate==null?month:transDate);
+        map.put("pageNumber", index++ +"");
+        map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.zhifa"),params);
+                (AppConfig.getProperty("profit.zhifa"), params);
         System.out.println(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
@@ -102,21 +108,24 @@ public class ProfitZhiFaDataJob {
             return;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
-        List<JSONObject> list = JSONObject.parseObject(data,List.class);
+        List<JSONObject> list = JSONObject.parseObject(data, List.class);
         if(list.size()>0){
             try {
-                insertProfitDirect(list,transDate);
+                insertProfitDirect(list, transDate);
             } catch (Exception e) {
                 logger.error("同步插入数据失败！");
                 e.printStackTrace();
                 throw new RuntimeException("分润数据处理失败");
             }
+        }else{
+            computer();
         }
 
     }
 
     public void computer(){
         try {
+            Thread.sleep(1000);
             //计算直发补款
             computerService.computer_Supply_ZhiFa();
             //计算不足扣款找上级代扣，并记录
@@ -129,14 +138,14 @@ public class ProfitZhiFaDataJob {
         }
     }
 
-    public void insertProfitDirect(List<JSONObject> profitDirects,String transDate){
+    public void insertProfitDirect(List<JSONObject> profitDirects, String transDate){
         for(JSONObject json:profitDirects){
             ProfitDeduction where = new ProfitDeduction();
             where.setAgentPid(json.getString("AGENTID"));
             where.setDeductionType("01");
-            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -1)).substring(0,7));
+            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date(),-1)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
-            AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("6000"),json.getString("FRISTAGENTID"));
+            AgentBusInfo fristAgent = businfoService.getByBusidAndCode(json.getString("6000"),json.getString("FRISTAGENTID"));
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
             profitDirect.setAgentName(json.getString("AGENTNAME"));//代理商名称
@@ -146,7 +155,7 @@ public class ProfitZhiFaDataJob {
             profitDirect.setFristAgentId(json.getString("FRISTAGENTNAME"));//一级代理商编号
             profitDirect.setFristAgentName(json.getString("FRISTAGENTID"));//一级代理商名称
             //profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
-            profitDirect.setFristAgentPid(Busime.getAgentId());//一级代理商唯一码
+            profitDirect.setFristAgentPid(fristAgent.getAgentId());//一级代理商唯一码
             profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
             profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
             profitDirect.setTransFee(json.getBigDecimal("TRANSFEE"));//直发交易手续费
@@ -163,6 +172,6 @@ public class ProfitZhiFaDataJob {
             //退单补款、应发分润、应找上级扣款需计算赋值
             profitDirectService.insertSelective(profitDirect);
         }
-        synchroProfitDirect(transDate);
+        synchroProfitDirect();
     }
 }

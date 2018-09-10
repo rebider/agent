@@ -72,6 +72,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private AgentService agentService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private AgentQueryService agentQueryService;
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag) {
         Map<String, Object> reqMap = new HashMap<>();
@@ -398,12 +400,17 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         map.put("agStatus", AgStatus.Approved.name());
         map.put("status", Status.STATUS_1.status);
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
+        List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
+        List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
         if (null != agentoutVos && agentoutVos.size() > 0)
-            for (BusinessOutVo agentoutVo : agentoutVos) {
+            for (BusinessOutVo agentoutVo : agentoutVos) {//类型
                 if (StringUtils.isNotBlank(agentoutVo.getBusType()) && !agentoutVo.getBusType().equals("null")) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentoutVo.getBusType());
-                    if (null != value)
-                        agentoutVo.setBusType(value.getdItemname());
+                    for (Dict dict : BUS_TYPE) {
+                        if (null!=dict  &&  agentoutVo.getBusType().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusType(dict.getdItemname());
+                            break;
+                        }
+                    }
                 }
                 if (StringUtils.isNotBlank(agentoutVo.getBusIndeAss()) && !agentoutVo.getBusIndeAss().equals("null")) {
                     if (agentoutVo.getBusIndeAss().equals("1")) {
@@ -411,54 +418,24 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     } else
                         agentoutVo.setBusIndeAss("否");
                 }
-                if (StringUtils.isNotBlank(agentoutVo.getBusPlatform()) && !agentoutVo.getBusPlatform().equals("null")) {
-                    PlatForm platForm = platFormMapper.selectByPlatFormNum(agentoutVo.getBusPlatform());
-                    if (null != platForm)
-                        agentoutVo.setBusPlatform(platForm.getPlatformName());
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusRegion()) && !agentoutVo.getBusRegion().equals("null")) {
-                    List<DPosRegion> regions = posRegionService.queryByCodes(agentoutVo.getBusRegion());
-                    if (null!=regions  && regions.size()>0){
-                        String deptNameRel="";
-                        for (DPosRegion region : regions) {
-                            String name = region.getName();
-                            String sign=",";
-                            String deptName=name+sign;
-                             deptNameRel += deptName;
-                        }
-                        agentoutVo.setBusRegion(deptNameRel.substring(0,deptNameRel.length() - 1));
+                //业务区域
+               if (StringUtils.isNotBlank(agentoutVo.getBusRegion()) && !agentoutVo.getBusRegion().equals("null")){
+                    String busRegion = agentoutVo.getBusRegion();
+                    if (StringUtils.isNotBlank(busRegion) &&!busRegion.equals("null")){
+                        String[] arr = busRegion.split(",");
+                        String name = agentQueryService.dPosRegionNameFromDposIds(arr);
+                        if (StringUtils.isNotBlank(name) && !name.equals("null"))
+                            agentoutVo.setBusRegion(name);
                     }
                 }
+
                 if (StringUtils.isNotBlank(agentoutVo.getBusScope()) && !agentoutVo.getBusScope().equals("null")) {
-                    Dict value = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name(), agentoutVo.getBusScope());
-                    if (null != value)
-                        agentoutVo.setBusScope(value.getdItemname());
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusParent()) && !agentoutVo.getBusParent().equals("null")) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusParent(agentById.getAgName());
+                    for (Dict dict : BUS_SCOPE) {//业务范围
+                        if (null!=dict  &&  agentoutVo.getBusScope().equals(dict.getdItemvalue())){
+                            agentoutVo.setBusScope(dict.getdItemname());
+                            break;
+                        }
                     }
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusRiskParent()) && !agentoutVo.getBusRiskParent().equals("null")) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusRiskParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusRiskParent(agentById.getAgName());
-                    }
-
-                }
-                if (StringUtils.isNotBlank(agentoutVo.getBusActivationParent()) && !agentoutVo.getBusActivationParent().equals("null")) {
-                    AgentBusInfo agentBusInfo = agentBusinfoService.getById(agentoutVo.getBusActivationParent());
-                    if (null != agentBusInfo) {
-                        Agent agentById = agentService.getAgentById(agentBusInfo.getAgentId());
-                        if (null != agentById)
-                            agentoutVo.setBusActivationParent(agentById.getAgName());
-                    }
-
                 }
             }
         return agentoutVos;

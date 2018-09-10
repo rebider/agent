@@ -790,12 +790,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         }
                     }
                 }
-//                if (StringUtils.isNotBlank(agentoutVo.getBankRegion()) && !agentoutVo.getBankRegion().equals("null")) {
-//                    String regionName = regionService.getRegionsName(agentoutVo.getBankRegion());
-//                    if (StringUtils.isNotBlank(regionName))
-//                        agentoutVo.setBankRegion(regionName);
-//                }
-
 
                 if (null != agentoutVo.getCloTaxPoint()) {
                     NumberFormat numberFormat = NumberFormat.getPercentInstance();
