@@ -322,6 +322,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return list;
 	}
 
+	/**
+	 * 业务编码可为空
+	 * @param list
+	 * @param busId
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId) {
 		if(list==null) {
@@ -347,6 +353,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 	}
 
+	/**
+	 * 业务编码不为空
+	 * @param list
+	 * @param platformCode
+	 * @param agentId
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
 		if(list==null) {
@@ -357,14 +370,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId)
-                .andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+                .andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0)
 			return list;
 		AgentBusInfo platInfo = plats.get(0);
 		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
 			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
-			if(parent!=null){
+			if(parent!=null && StringUtils.isNotEmpty(parent.getBusNum())){
 				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
 					list.add(parent);
 					if (StringUtils.isNotEmpty(parent.getAgentId())) {
@@ -385,6 +401,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
+	/**
+	 * 业务编码不为空
+	 * @param list
+	 * @param platformCode
+	 * @param busNum
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryParenFourLevelBusNum(List<AgentBusInfo> list, String platformCode, String busNum) {
 		if(list==null) {
@@ -398,14 +421,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andBusNumEqualTo(busNum)
-				.andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+				.andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0)
 			return list;
 		AgentBusInfo platInfo = plats.get(0);
 		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
 			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
-			if(parent!=null){
+			if(parent!=null && StringUtils.isNotEmpty(parent.getBusNum())){
 				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
 					list.add(parent);
 					if (StringUtils.isNotEmpty(parent.getAgentId())) {
@@ -425,7 +451,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	/**
-	 * 把给定的代理商指定的平台的下级节点全部放回
+	 * 把给定的代理商指定的平台的下级节点全部放回 业务编码不为空
 	 * @param list
 	 * @param platformCode
 	 * @param agentId
@@ -442,7 +468,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId)
-				.andBusPlatformEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status);
+				.andBusPlatformEqualTo(platformCode)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 
 		if(plats.size()==0) {
@@ -455,7 +484,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
 				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status);
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
         //没有下级别就返回
 		if(child_plat.size()==0) {
@@ -472,6 +502,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
+	/**
+	 * 业务编码不为空
+	 * @param list
+	 * @param platformCode
+	 * @param busNum
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryChildLevelByBusNum(List<AgentBusInfo> list, String platformCode, String busNum) {
 		if(list==null) {
@@ -489,7 +526,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode)
 				.andStatusEqualTo(Status.STATUS_1.status)
-				.andBusStatusEqualTo(Status.STATUS_1.status);
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0) {
 			return list;
@@ -501,7 +539,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
 				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status);
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
 		//没有下级别就返回
 		if(child_plat.size()==0) {
