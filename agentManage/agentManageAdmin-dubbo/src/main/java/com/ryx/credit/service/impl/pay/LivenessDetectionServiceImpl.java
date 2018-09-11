@@ -11,6 +11,7 @@ import com.ryx.credit.dao.agent.AgentPlatFormSynMapper;
 import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
+import com.ryx.credit.util.EnvironmentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
 
     private static final Logger log = LoggerFactory.getLogger(LivenessDetectionServiceImpl.class);
 
-    private final String LIVENESS_DETECTION_URL = AppConfig.getProperty("liveness_detection_url");
-    private final String LIVENESS_DETECTION_SYTERMID = AppConfig.getProperty("liveness_detection_sytermId");
+    private static final String LIVENESS_DETECTION_URL = AppConfig.getProperty("liveness_detection_url");
+    private static final String LIVENESS_DETECTION_SYTERMID = AppConfig.getProperty("liveness_detection_sytermId");
 
     @Autowired
     private IdService idService;
@@ -106,7 +107,12 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         map.put("ReturnPic", "1");
         String paramsJson = JSONObject.toJSONString(map);
         log.info("--------身份证认证请求参数:{}------",paramsJson);
-        String result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
+        String result = "";
+        if(EnvironmentUtil.isProduction()){
+            result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
+        }else{
+            result = "{'ExecMsg':'认证成功','ValidateStatus':'00'}";
+        }
         log.info("--------身份证认证返回参数:{}------", result);
         Map resultMap = JsonUtils.parseJSON2Map(result);
         return resultMap;
