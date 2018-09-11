@@ -309,6 +309,12 @@
         <if test="map.agentId !=null and map.agentId!=''">
             and AGENT_ID = #{map.agentId}
         </if>
+        <if test="map.busId !=null and map.busId!=''">
+            and bus_Id = #{map.busId}
+        </if>
+        <if test="map.notifyType !=null and map.notifyType!=''">
+            and NOTIFY_TYPE = #{map.notifyType}
+        </if>
         order by NOTIFY_TIME desc
         <include refid="OracleDialectSuffix" />
     </select>
@@ -320,6 +326,12 @@
         WHERE 1=1
         <if test="map.agentId !=null and map.agentId!=''">
             and AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.busId !=null and map.busId!=''">
+            and bus_Id = #{map.busId}
+        </if>
+        <if test="map.notifyType !=null and map.notifyType!=''">
+            and NOTIFY_TYPE = #{map.notifyType}
         </if>
         order by notify_time desc
     </select>

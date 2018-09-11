@@ -935,6 +935,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         if(null!=agentPlatFormSyn.getAgentId()){
             map.put("agentId",agentPlatFormSyn.getAgentId());
         }
+        if(StringUtils.isNotBlank(agentPlatFormSyn.getBusId())){
+            map.put("busId",agentPlatFormSyn.getBusId());
+        }
+        if(StringUtils.isNotBlank(agentPlatFormSyn.getNotifyType())){
+            map.put("notifyType",agentPlatFormSyn.getNotifyType());
+        }
         List<AgentPlatFormSyn> list = agentPlatFormSynMapper.queryList(map, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(list);
