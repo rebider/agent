@@ -67,27 +67,25 @@ public class NewProfitMonthMposDataJob {
      * 同步手刷月分润明细数据
      * transDate 交易日期（空则为上一月）
      * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
-     * 2018.9.7 17:45：@Scheduled(cron = "0 45 17 7 * ?")
      */
-    @Scheduled(cron = "0 0 5 12 * ?")
+    @Scheduled(cron = "0 15 14 11 * ?")
     public void synchroProfitMonth(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate;
         map.put("frMonth", transDate);
         map.put("pageNumber", index++ +"");
-        map.put("pageSize", "2");
+        map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.newmonth"), params);
-        System.out.println("输出====================================" + res);
+        System.out.println("yfr" + res);
         JSONObject json = JSONObject.parseObject(res);
         if(!json.get("respCode").equals("000000")){
             logger.error("请求同步失败！");
             AppConfig.sendEmails("月分润同步失败","月分润同步失败");
             return;
         }
-
         String data = JSONObject.parseObject(res).get("data").toString();
         List<JSONObject> list = JSONObject.parseObject(data, List.class);
         try {
@@ -106,6 +104,10 @@ public class NewProfitMonthMposDataJob {
             String parentAgentId = null;
             TransProfitDetail detail = new TransProfitDetail();
             AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"), json.getString("AGENCYID"));
+            if(null==Busime){
+                logger.info(json.getString("PLATFORMNUM")+"------"+json.getString("AGENCYID"));
+                continue;
+            }
             AgentBusInfo parent = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"), json.getString("ONLINEAGENCYID"));
             if(null == parent || "6000".equals(json.getString("PLATFORMNUM"))){
                 //直发一代或者上级为空，则无上级
@@ -150,17 +152,20 @@ public class NewProfitMonthMposDataJob {
             detail.setParentAgentId(parentAgentId);//上级AG码
             detail.setAgentId(Busime.getAgentId());//AG码
             detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
-            detail.setInTransAmt(json.getBigDecimal("SAMOUNT"));//付款交易额
+            detail.setInTransAmt(json.getBigDecimal("SAMOUNT")==null?BigDecimal.ZERO:json.getBigDecimal("SAMOUNT"));//付款交易额
             detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
             detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
-            detail.setProfitAmt(json.getBigDecimal("PROFIT"));//分润金额
+            detail.setProfitAmt(json.getBigDecimal("PROFIT")==null?BigDecimal.ZERO:json.getBigDecimal("PROFIT"));//分润金额
             detail.setPayCompany(Busime.getCloPayCompany());//打款公司
             detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
             detail.setSourceInfo("MPOS");
 
             //计算
             AgentResult agentResult = orderService.queryPaymentXXDK(json.getString("AGENCYID"));//查询线下打款数据信息
-            List<HashMap> maps = (List<HashMap>) agentResult.getData();
+            List<HashMap> maps = new ArrayList<HashMap>();
+            if(!"".equals(agentResult.getData().toString())){
+                maps = (List<HashMap>) agentResult.getData();
+            }
             List<OPayment> paymentList = new ArrayList<>();
             BigDecimal notaxAmt = detail.getNotaxAmt();//本月未计税打款金额
             BigDecimal actualAmt = BigDecimal.ZERO;

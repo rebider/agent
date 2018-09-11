@@ -58,22 +58,21 @@ public class ProfitMposDiffDataJob {
 
     /**
      * 同步手刷月分润明细数据
-     * transDate 交易日期（空则为上一月）
+     * month 交易日期（空则为上一月）
      * 每月5号上午8点：@Scheduled(cron = "0 0 5 8 * ?")
-     * 2018.9.7 17:40：@Scheduled(cron = "0 40 17 7 * ?")
      */
-    @Scheduled(cron = "0 0 5 8 * ?")
+    @Scheduled(cron = "0 5 14 11 * ?")
     public void synchroProfitDiff(){
         String month = null;
         HashMap<String,String> map = new HashMap<String,String>();
         month = month==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):month;
-        map.put("frMonth", month);
+        map.put("frmonth", month);
         map.put("pageNumber", index++ +"");
         map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.bucha"), params);
-        System.out.println(res);
+        System.out.println("bc" + res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
             AppConfig.sendEmails("日分润同步失败","日分润同步失败");

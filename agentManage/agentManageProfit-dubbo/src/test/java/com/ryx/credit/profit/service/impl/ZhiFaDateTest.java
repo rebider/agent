@@ -60,7 +60,7 @@ public class ZhiFaDateTest {
      */
     public void synchroProfitDirect(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6);
+        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -2)).substring(0,6);
         map.put("transDate",transDate==null?month:transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
@@ -104,7 +104,7 @@ public class ZhiFaDateTest {
             ProfitDeduction where = new ProfitDeduction();
             where.setAgentId(json.getString("AGENTID"));
             where.setDeductionType("01");
-            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -1)).substring(0,7));
+            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -2)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
