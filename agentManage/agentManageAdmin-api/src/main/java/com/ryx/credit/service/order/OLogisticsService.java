@@ -32,5 +32,5 @@ public interface OLogisticsService {
 
     Map<String, Object> getLogisticsBySn(String sn, String agentId) throws ProcessException;
 
-    List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException;
+//    List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException;
 }

@@ -74,6 +74,7 @@
     <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.CompensateService" ref="compensateService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsService" ref="oLogisticService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailService" ref="oLogisticsDetailService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IOrderReturnService" ref="orderReturnService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IAccountAdjustService" ref="accountAdjustService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.bank.PosRegionService" ref="posRegionService"  timeout="1200000" registry="${zk.group}"/>
