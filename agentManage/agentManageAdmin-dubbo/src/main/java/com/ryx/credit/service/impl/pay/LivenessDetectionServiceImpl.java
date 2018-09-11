@@ -5,10 +5,7 @@ import com.ryx.credit.common.enumc.NotifyType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateKit;
-import com.ryx.credit.common.util.HttpPostUtil;
-import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.common.util.JsonUtils;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentPlatFormSynMapper;
 import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
@@ -32,6 +29,9 @@ import java.util.Map;
 public class LivenessDetectionServiceImpl implements LivenessDetectionService {
 
     private static final Logger log = LoggerFactory.getLogger(LivenessDetectionServiceImpl.class);
+
+    private final String LIVENESS_DETECTION_URL = AppConfig.getProperty("liveness_detection_url");
+    private final String LIVENESS_DETECTION_SYTERMID = AppConfig.getProperty("liveness_detection_sytermId");
 
     @Autowired
     private IdService idService;
@@ -92,11 +92,10 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
     }
 
 
-
-    private static Map<String, Object> requestForLiveness(String serialNo,String trueName,String certNo)throws Exception{
+    private Map<String, Object> requestForLiveness(String serialNo,String trueName,String certNo)throws Exception{
         Map<String, Object> map = new HashMap<>();
         map.put("Transcode", "000020");
-        map.put("SytermId", "00010017");
+        map.put("SytermId", LIVENESS_DETECTION_SYTERMID);
         map.put("SerialNo", serialNo);
         Date now = DateKit.getNow(true);
         map.put("TransDate", DateKit.getCompactDateString(now));
@@ -107,7 +106,7 @@ public class LivenessDetectionServiceImpl implements LivenessDetectionService {
         map.put("ReturnPic", "1");
         String paramsJson = JSONObject.toJSONString(map);
         log.info("--------身份证认证请求参数:{}------",paramsJson);
-        String result = HttpPostUtil.postForJSON("http://10.3.30.52:30100/cmbc/0030", paramsJson);
+        String result = HttpPostUtil.postForJSON(LIVENESS_DETECTION_URL, paramsJson);
         log.info("--------身份证认证返回参数:{}------", result);
         Map resultMap = JsonUtils.parseJSON2Map(result);
         return resultMap;
