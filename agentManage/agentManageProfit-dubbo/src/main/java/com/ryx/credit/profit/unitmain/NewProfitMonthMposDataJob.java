@@ -68,7 +68,7 @@ public class NewProfitMonthMposDataJob {
      * transDate 交易日期（空则为上一月）
      * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
      */
-    @Scheduled(cron = "0 15 14 11 * ?")
+    @Scheduled(cron = "0 15 15 11 * ?")
     public void synchroProfitMonth(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();

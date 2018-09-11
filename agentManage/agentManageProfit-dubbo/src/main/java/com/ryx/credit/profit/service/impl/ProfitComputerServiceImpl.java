@@ -673,7 +673,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * profitDate 交易日期（空则为上一月）
      * 每月12号下午14点执行一次：@Scheduled(cron = "0 0 12 14 * ?")
      */
-    @Scheduled(cron = "0 35 14 11 * ?")
+    @Scheduled(cron = "0 35 15 11 * ?")
     public void new_computerTax() throws Exception {
         String profitDate = null;
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):profitDate;
@@ -748,7 +748,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             if(null == agentResult){
                 continue;
             }
-            List<HashMap> maps = (List<HashMap>) agentResult.getData();
+            List<HashMap> maps = new ArrayList<HashMap>();
+            if(!"".equals(agentResult.getData().toString())){
+                maps = (List<HashMap>) agentResult.getData();
+            }
+//            List<HashMap> maps = (List<HashMap>) agentResult.getData();
             if(maps.size() == 0){
                 continue;
             }

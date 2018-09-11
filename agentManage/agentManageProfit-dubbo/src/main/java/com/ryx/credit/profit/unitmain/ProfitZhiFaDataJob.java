@@ -83,7 +83,7 @@ public class ProfitZhiFaDataJob {
      * 交易月份（空则为上一月）
      * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
     */
-    @Scheduled(cron = "0 45 13 11 * ?")
+    @Scheduled(cron = "0 45 14 11 * ?")
     public void synchroProfitDirect(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
