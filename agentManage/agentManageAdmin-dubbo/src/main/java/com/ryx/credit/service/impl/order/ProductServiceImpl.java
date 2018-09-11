@@ -175,16 +175,16 @@ public class ProductServiceImpl implements ProductService {
         if (StringUtils.isBlank(product.getId())) {
             return result;
         }
-        if (StringUtils.isNotBlank(product.getProCode())) {
-            List<OProduct> oProducts = selectById(product);
-            for (OProduct oProduct : oProducts) {
-                String proCode = oProduct.getProCode();
-                if (product.getProCode().equals(proCode)) {
-                    logger.info("商品修改:{}", "商品编号不可重复");
-                    return AgentResult.fail("商品编号不可重复");
-                }
-            }
-        }
+//        if (StringUtils.isNotBlank(product.getProCode())) {
+//            List<OProduct> oProducts = selectById(product);
+//            for (OProduct oProduct : oProducts) {
+//                String proCode = oProduct.getProCode();
+//                if (product.getProCode().equals(proCode)) {
+//                    logger.info("商品修改:{}", "商品编号不可重复");
+//                    return AgentResult.fail("商品编号不可重复");
+//                }
+//            }
+//        }
         if (StringUtils.isNotBlank(product.getProName()) && StringUtils.isNotBlank(product.getProType()) && StringUtils.isNotBlank(product.getProCom()) && StringUtils.isNotBlank(product.getProModel())) {
             //进行判断商品名称,机具类型,厂商，型号是否一致
             List<OProduct> oProducts = selectById(product);
