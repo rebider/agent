@@ -212,7 +212,7 @@ public class ProfitDataJob {
         // 获取代理商平台id
         AgentBusInfo agentBusInfo = new AgentBusInfo();
         agentBusInfo.setBusNum(orgId);
-        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null,null);
+        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null,null,"");
         if (pageInfo != null && pageInfo.getTotal() > 0) {
             return (Map<String, Object>) pageInfo.getRows().get(0);
         }
