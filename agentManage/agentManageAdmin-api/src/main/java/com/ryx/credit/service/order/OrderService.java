@@ -7,9 +7,12 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.pojo.admin.vo.OrderFormVo;
+import com.ryx.credit.pojo.admin.vo.OrderoutVo;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -201,5 +204,11 @@ public interface OrderService {
 
 
     AgentResult updateProfitTaxAmt(List<OPayment> taxAmtList)throws Exception;
+
+    /**
+     * 订单发货的导出
+     */
+    public List<OrderoutVo> exportOrder(Map map)  ;
+
 
 }
