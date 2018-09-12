@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public interface BusinessPlatformService {
 
-    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag);
+    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos);
 
     AgentResult verifyAgent(String agUniqNum);
 
