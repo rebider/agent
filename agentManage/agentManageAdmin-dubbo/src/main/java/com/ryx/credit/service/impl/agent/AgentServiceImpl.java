@@ -154,10 +154,8 @@ public class AgentServiceImpl implements AgentService {
             }
         }
         String isZpos = String.valueOf(map.get("isZpos"));
-        if (StringUtils.isNotBlank(isZpos) && !isZpos.equals("null")) {
-            map.put("isZpos", isZpos);
-            map.put("platForm", Platform.ZPOS.getValue());
-        }
+        map.put("isZpos", isZpos);
+        map.put("platForm", Platform.ZPOS.getValue());
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMapper.queryAgentListView(map,page));
         pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));
