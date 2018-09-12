@@ -153,6 +153,9 @@ public class AgentServiceImpl implements AgentService {
                 map.put("time", reltime);
             }
         }
+        String isZpos = String.valueOf(map.get("isZpos"));
+        map.put("isZpos", isZpos);
+        map.put("platForm", Platform.ZPOS.getValue());
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMapper.queryAgentListView(map,page));
         pageInfo.setTotal(agentMapper.queryAgentListViewCount(map));

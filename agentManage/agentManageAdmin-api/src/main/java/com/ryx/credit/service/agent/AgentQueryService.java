@@ -92,4 +92,5 @@ public interface AgentQueryService {
     public void loadCach();
 
 
+    List<AgentBusInfo> businessQuery(String agentId,String isZpos);
 }

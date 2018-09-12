@@ -75,7 +75,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Autowired
     private AgentQueryService agentQueryService;
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag) {
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -108,6 +108,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
         }
         reqMap.put("status", Status.STATUS_1.status);
+        reqMap.put("isZpos",isZpos);
+        reqMap.put("platForm", Platform.ZPOS.getValue());
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
