@@ -151,6 +151,29 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     }
 
     @Override
+    public List<AgentBusInfo> businessQuery(String agentId,String isZpos) {
+
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+        criteria.andAgentIdEqualTo(agentId);
+        if(StringUtils.isBlank(isZpos)){
+            criteria.andBusPlatformNotEqualTo(Platform.ZPOS.getValue());
+        }else if(isZpos.equals("true")){
+            criteria.andBusPlatformEqualTo(Platform.ZPOS.getValue());
+        }
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+
+        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+            if(null!=platForm){
+                agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
+            agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+        }
+        return agentBusInfos;
+    }
+
+    @Override
     public List<Attachment> accessoryQuery(String id, String busType) {
         return attachmentMapper.accessoryQuery(id, busType);
     }

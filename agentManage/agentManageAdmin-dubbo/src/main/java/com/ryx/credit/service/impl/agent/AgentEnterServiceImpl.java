@@ -740,6 +740,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 map.put("time", reltime);
             }
         }
+        String isZpos = String.valueOf(map.get("isZpos"));
+        if (org.apache.commons.lang.StringUtils.isNotBlank(isZpos) && !isZpos.equals("null")) {
+            map.put("isZpos", isZpos);
+            map.put("platForm", Platform.ZPOS.getValue());
+        }
         List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
         if (null==agentoutVos && agentoutVos.size()>1)
             return null;
