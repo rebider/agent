@@ -22,6 +22,7 @@ import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
+import com.ryx.credit.service.order.OLogisticsDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import org.apache.commons.lang.StringUtils;
@@ -59,17 +60,17 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
     @Autowired
-    OReturnOrderMapper returnOrderMapper;
+    private OReturnOrderMapper returnOrderMapper;
     @Resource
-    IdService idService;
+    private IdService idService;
     @Autowired
-    OReturnOrderDetailMapper returnOrderDetailMapper;
+    private OReturnOrderDetailMapper returnOrderDetailMapper;
     @Autowired
-    OReturnOrderRelMapper returnOrderRelMapper;
+    private OReturnOrderRelMapper returnOrderRelMapper;
     @Autowired
-    ODeductCapitalMapper deductCapitalMapper;
+    private ODeductCapitalMapper deductCapitalMapper;
     @Resource
-    PlannerService plannerService;
+    private PlannerService plannerService;
     @Autowired
     private BusActRelMapper busActRelMapper;
     @Autowired
@@ -81,21 +82,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
     @Resource
-    OLogisticsService oLogisticsService;
+    private OLogisticsService oLogisticsService;
     @Autowired
-    ReceiptPlanMapper receiptPlanMapper;
+    private ReceiptPlanMapper receiptPlanMapper;
     @Autowired
-    OLogisticsMapper logisticsMapper;
+    private OLogisticsMapper logisticsMapper;
     @Autowired
     private BusActRelService busActRelService;
     @Autowired
-    OLogisticsDetailMapper logisticsDetailMapper;
+    private OLogisticsDetailMapper logisticsDetailMapper;
     @Resource
-    OLogisticsService oLogisticService;
+    private OLogisticsService oLogisticService;
     @Autowired
-    OAccountAdjustMapper accountAdjustMapper;
+    private OAccountAdjustMapper accountAdjustMapper;
     @Autowired
-    OReceiptProMapper receiptProMapper;
+    private OReceiptProMapper receiptProMapper;
+    @Autowired
+    private OLogisticsDetailService logisticsDetailService;
 
     /**
      * @Author: Zhang Lei
@@ -467,15 +470,18 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 String endSn = (String) map.get("endSn");
                 Integer begins = (Integer) map.get("begins");
                 Integer finish = (Integer) map.get("finish");
-                List<String> sns = oLogisticsService.idList(startSn, endSn, begins, finish);
+//                List<String> sns = oLogisticsService.idList(startSn, endSn, begins, finish);
+                List<String> sns = logisticsDetailService.querySnLList(startSn, endSn);
                 for (String sn : sns) {
                     //根据sn查询物流信息
                     Map<String, Object> snmap = oLogisticService.getLogisticsBySn(sn, agentId);
                 }
             }
-        } catch (MessageException e) {
+        }
+       /* catch (MessageException e) {
             throw new ProcessException(e.getMessage());
-        } catch (ProcessException e) {
+        } */
+        catch (ProcessException e) {
             throw e;
         }
     }

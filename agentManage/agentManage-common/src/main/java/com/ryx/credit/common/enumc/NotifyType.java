@@ -1,6 +1,13 @@
 package com.ryx.credit.common.enumc;
 
 
+import com.ryx.credit.common.util.JsonUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 接口通知类型
  * @version V1.0
@@ -16,7 +23,7 @@ public enum NotifyType {
     NetInAdd("netInAdd","新增入网"),
     NetInEdit("netInEdit","入网修改"),
     NetInUpgrade("netInUpgrade","入网升级"),
-    IdentityAuth("identityAuth","身份证认证");
+    IdentityAuth("identityAuth","身份认证");
 
     public String code;
 
@@ -57,4 +64,33 @@ public enum NotifyType {
         return "";
     }
 
+    /**
+     * 获取key、Value map
+     * @return
+     */
+    public static Map<String,Object> getKeyValueMap(){
+        Map<String,Object> resultMap = new HashMap<>();
+        NotifyType[] notifyType = NotifyType.values();
+        for(NotifyType cc : notifyType){
+            resultMap.put(cc.code,cc.msg);
+        }
+        return resultMap;
+    }
+
+    /**
+     * 获取key、Value json
+     * @return
+     */
+    public static String getKeyValueJson(){
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        NotifyType[] notifyType = NotifyType.values();
+        for(NotifyType cc : notifyType){
+            Map<String,Object> resultMap = new HashMap<>();
+            resultMap.put("key",cc.code);
+            resultMap.put("value",cc.msg);
+            resultList.add(resultMap);
+        }
+        String resultJson = JsonUtil.objectToJson(resultList);
+        return resultJson;
+    }
 }

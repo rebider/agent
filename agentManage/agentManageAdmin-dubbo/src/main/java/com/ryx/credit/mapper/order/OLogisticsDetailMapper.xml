@@ -388,4 +388,23 @@
       and RECORD_STATUS = #{recordStatus}
       and STATUS = #{status}
   </update>
+
+  <select id="querySnLList" parameterType="java.util.Map" resultType="java.lang.String">
+      select
+        sn_num
+      from o_logistics_detail
+      where
+      sn_num between #{snBegin} and #{snEnd}
+      and status = #{status}
+  </select>
+
+  <select id="querySnCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+      select
+        count(*)
+      from o_logistics_detail
+      where
+      sn_num between #{snBegin} and #{snEnd}
+      and status = #{status}
+  </select>
+
 </mapper>
