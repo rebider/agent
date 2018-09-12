@@ -399,6 +399,8 @@
     <include refid="OracleDialectPrefix" />
     (
     select
+    d.PAY_METHOD,
+    o.O_INURETIME,
     o.id,
     o.o_num,
     o.order_platform,
@@ -429,6 +431,7 @@
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
+    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
     from o_order o
     left join a_agent b on o.agent_id = b.id
@@ -451,9 +454,17 @@
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
     </where>
     UNION
     select
+    d.PAY_METHOD,
+    o.O_INURETIME,
     o.id,
     o.o_num,
     o.order_platform,
@@ -484,8 +495,9 @@
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
+    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
-    from o_order o
+    from  o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
@@ -507,6 +519,12 @@
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
     </where>
     )
     order by c_time desc
@@ -530,7 +548,20 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
-      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
     </where>
     UNION
     select
@@ -550,7 +581,19 @@
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
-
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
     </where>
     )
   </select>

@@ -303,6 +303,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             log.info("已有编号进行入网修改：BusNum为空");
             return;
         }
+        //直签不直发不通知
+        if(agentBusInfo.getBusType().equals("8")){
+            log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
+            return;
+        }
         Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
         AgentBusInfo agentParent = null;
         if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
@@ -463,6 +468,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         //业务平台
         ImportAgent importAgent = importAgentMapper.selectByPrimaryKey(impId);
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        //直签不直发不通知
+        if(agentBusInfo.getBusType().equals("8")){
+            log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
+            return;
+        }
         //业务平台编号已存在
         if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
             log.info("升级开户接口{}平台编号不为空走升级接口",agentBusInfo.getBusNum());
@@ -603,6 +613,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(impId!=null){
                 updateImportAgent(impId,Status.STATUS_1.status,"记录不存在");
             }
+            return;
+        }
+        //直签不直发不通知
+        if(agentBusInfo.getBusType().equals("8")){
+            log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
             return;
         }
         Agent agent = agentService.getAgentById(agentBusInfo.getAgentId());
@@ -934,6 +949,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         Map<String, Object> map = new HashMap<>();
         if(null!=agentPlatFormSyn.getAgentId()){
             map.put("agentId",agentPlatFormSyn.getAgentId());
+        }
+        if(StringUtils.isNotBlank(agentPlatFormSyn.getBusId())){
+            map.put("busId",agentPlatFormSyn.getBusId());
+        }
+        if(StringUtils.isNotBlank(agentPlatFormSyn.getNotifyType())){
+            map.put("notifyType",agentPlatFormSyn.getNotifyType());
         }
         List<AgentPlatFormSyn> list = agentPlatFormSynMapper.queryList(map, page);
         PageInfo pageInfo = new PageInfo();
