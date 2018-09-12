@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.agent.DataHistory;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version V1.0
@@ -26,4 +27,12 @@ public interface AgentDataHistoryService {
      * @return
      */
     PageInfo selectAll(Page page, DataHistory dataHistory,String time);
+
+    /**
+     * 查询数据历史
+     * @param dataId
+     * @param dataType
+     * @return
+     */
+    List<Map> selectHistory(String dataId,String dataType);
 }

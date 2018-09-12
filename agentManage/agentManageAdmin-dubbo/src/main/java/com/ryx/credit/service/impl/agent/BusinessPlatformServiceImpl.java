@@ -75,7 +75,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Autowired
     private AgentQueryService agentQueryService;
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag) {
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -108,6 +108,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
         }
         reqMap.put("status", Status.STATUS_1.status);
+        reqMap.put("isZpos",isZpos);
+        reqMap.put("platForm", Platform.ZPOS.getValue());
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
@@ -226,8 +228,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
                     item.setAgentId(agent.getId());
-                    agentContractService.insertAgentContract(item, item.getContractTableFile());
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                    agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
@@ -238,7 +239,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (!result.isOK()) {
                         throw new ProcessException("缴纳款项信息录入失败");
                     }
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
                 }
             }
             if (null != agentVo.getColinfoVoList()) {
@@ -246,7 +246,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     item.setAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
                     agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
                 }
             }
             List<AgentBusInfo> agentBusInfoList = new ArrayList<>();
@@ -255,7 +254,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 item.setAgentId(agent.getId());
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 agentBusInfoList.add(agentBusInfo);
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
             return AgentResult.ok(agentBusInfoList);
         } catch (Exception e) {

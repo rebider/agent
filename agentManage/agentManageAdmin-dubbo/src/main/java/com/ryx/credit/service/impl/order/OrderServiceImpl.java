@@ -1293,6 +1293,7 @@ public class OrderServiceImpl implements OrderService {
             //更新订单状态 审批状态，结算状态 订单生效时间
             order.setOrderStatus(OrderStatus.ENABLE.status);
             order.setReviewStatus(AgStatus.Approved.status);
+            order.setoInuretime(d.getTime());
             //付款单设置
             switch (order.getPaymentMethod()) {
                 case "FKFQ":

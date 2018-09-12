@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.DataHistoryType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -104,7 +105,6 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
 
     @Override
     public AgentResult saveDataHistory(Object object, String id, String dataType, String user, BigDecimal version) {
-        AgentResult result = new AgentResult(500, "参数错误", "");
         try {
 
             DataHistory dataHistory = new DataHistory();
@@ -125,21 +125,23 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            result.setMsg("历史数据插入错误");
             logger.info("历史数据插入错误");
+            return AgentResult.fail("历史数据插入错误");
         }
-        return result;
     }
 
     @Override
     public PageInfo selectAll(Page page, DataHistory dataHistory, String time) {
         Map<String, Object> map = new HashMap<>();
-        if (null != dataHistory.getDataType()) {
+        if (null != dataHistory.getDataType() && StringUtils.isNotBlank(dataHistory.getDataType())) {
             map.put("dataType", dataHistory.getDataType());
         }
         if (null != time && !time.equals("")) {
             String reltime = time.substring(0, 10);
             map.put("time", reltime);
+        }
+        if (null != dataHistory.getDataId() && !dataHistory.getDataId().equals("")) {
+            map.put("dataId", dataHistory.getDataId());
         }
         List<Map<String, Object>> dataList = dataHistoryMapper.selectAll(map, page);
         if (null != dataList && dataList.size() > 0) {
@@ -151,5 +153,10 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
         pageInfo.setRows(dataList);
         pageInfo.setTotal(dataHistoryMapper.getCount(map));
         return pageInfo;
+    }
+
+    @Override
+    public List<Map> selectHistory(String dataId, String dataType) {
+       return dataHistoryMapper.selectAll(FastMap.fastMap("dataId",dataId).putKeyV("dataType",dataType), null);
     }
 }
