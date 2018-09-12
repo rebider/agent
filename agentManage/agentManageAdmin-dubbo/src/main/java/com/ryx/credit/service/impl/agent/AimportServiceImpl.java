@@ -307,7 +307,7 @@ public class AimportServiceImpl implements AimportService {
                     //添加
                     }else{
                         ag.setcUser(userid);
-                        Agent ag_db = agentService.insertAgent(ag, Arrays.asList());
+                        Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid);
                         //todo 生成后台用户
                         agentService.createBackUserbyAgent(ag_db.getId());
                         ImportAgent agent =  importAgentMapper.selectByPrimaryKey(datum.getId());
@@ -450,7 +450,7 @@ public class AimportServiceImpl implements AimportService {
 
                     if(agentContractDb.size()==0){
                         logger.info("导入代理商合同信息{}",datum.getId());
-                        AgentContract ac =  agentContractService.insertAgentContract(agentContract,Arrays.asList());
+                        AgentContract ac =  agentContractService.insertAgentContract(agentContract,Arrays.asList(),userid);
                         logger.info("导入代理商合同信息{}成功",ac.getId());
                         con.setDealmsg("添加成功");
                     }else{

@@ -226,8 +226,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
                     item.setAgentId(agent.getId());
-                    agentContractService.insertAgentContract(item, item.getContractTableFile());
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                    agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
@@ -238,7 +237,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (!result.isOK()) {
                         throw new ProcessException("缴纳款项信息录入失败");
                     }
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
                 }
             }
             if (null != agentVo.getColinfoVoList()) {
@@ -246,7 +244,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     item.setAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
                     agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
                 }
             }
             List<AgentBusInfo> agentBusInfoList = new ArrayList<>();
@@ -255,7 +252,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 item.setAgentId(agent.getId());
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 agentBusInfoList.add(agentBusInfo);
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
             return AgentResult.ok(agentBusInfoList);
         } catch (Exception e) {

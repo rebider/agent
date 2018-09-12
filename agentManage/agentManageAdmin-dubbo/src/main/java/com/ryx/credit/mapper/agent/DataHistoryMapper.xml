@@ -237,6 +237,9 @@
         <if test="map.time != null and map.time != '' ">
             and to_char(C_TIME,'YYYY-MM-dd')=#{map.time}
         </if>
+        <if test="map.dataId != null and map.dataId != '' ">
+            and DATA_ID = #{map.dataId}
+        </if>
         order by C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>

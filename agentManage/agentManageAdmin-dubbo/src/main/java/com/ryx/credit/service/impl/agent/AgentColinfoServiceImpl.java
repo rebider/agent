@@ -124,10 +124,13 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                 throw new ProcessException("请添加开户许可证");
             }
         }
-
-
         if(1!=agentColinfoMapper.insertSelective(ac)){
             logger.info("收款账号添加:{}", "收款账号添加失败");
+            throw new ProcessException("收款账号添加失败");
+        }
+        //记录历史收款账户信息
+        if(!agentDataHistoryService.saveDataHistory(ac, DataHistoryType.GATHER.getValue()).isOK()){
+            logger.info("收款账号添加:{}", "收款账号添加失败,历史记录保存失败");
             throw new ProcessException("收款账号添加失败");
         }
         return ac;
@@ -198,7 +201,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent) {
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId) {
         try {
             if(agent==null)throw new ProcessException("代理商信息不能为空");
             for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
@@ -236,6 +239,10 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
                         throw new ProcessException("更新收款信息失败");
+                    }else{
+                        if(!agentDataHistoryService.saveDataHistory(db_AgentColinfo,db_AgentColinfo.getId(), DataHistoryType.GATHER.getValue(),userId,db_AgentColinfo.getVarsion()).isOK()){
+                            throw new ProcessException("更新收款信息失败");
+                        }
                     }
                     //删除老的附件
                     AttachmentRelExample example = new AttachmentRelExample();
@@ -296,7 +303,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     }
 
                 }
-                agentDataHistoryService.saveDataHistory(agentColinfoVo, DataHistoryType.GATHER.getValue());
+
             }
 
             return ResultVO.success(null);

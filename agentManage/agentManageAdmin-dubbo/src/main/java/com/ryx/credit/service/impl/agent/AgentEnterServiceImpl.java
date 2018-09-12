@@ -95,15 +95,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
-            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile());
-            agentDataHistoryService.saveDataHistory(agent, DataHistoryType.BASICS.getValue());
+            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                agentContractService.insertAgentContract(item, item.getContractTableFile());
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
+
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
@@ -112,17 +111,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if (!res.isOK()) {
                     throw new ProcessException("添加交款项异常");
                 }
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
+
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                 item.setAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
                 item.setCloReviewStatus(AgStatus.Create.status);
                 agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
             }
             //判断平台是否重复
-
             List hav = new ArrayList();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if (hav.contains(item.getBusPlatform())) {
@@ -144,7 +141,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("业务分管协议添加失败");
                     }
                 }
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
+
             }
 
             return ResultVO.success(agentVo);
@@ -664,35 +661,31 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
         try {
 
-            agent.getAgent().setcUser(userId);
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = null;
-            {
-                if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                    ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile());
-                    agentDataHistoryService.saveDataHistory(agent.getAgent(), DataHistoryType.BASICS.getValue());
-                }
+            if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
+                ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile(),userId);
             }
             logger.info("用户{}{}修改代理商信息结果{}", userId, agent.getAgent().getId(), "成功");
 
             if (agent.getCapitalVoList() != null && agent.getCapitalVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getCapitalVoList()));
-                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent());
+                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAccountPaidUpdateRes.getResInfo());
             }
             if (agent.getContractVoList() != null && agent.getContractVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商合同信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getContractVoList()));
-                ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(agent.getContractVoList(), agent.getAgent());
+                ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(agent.getContractVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商合同信息结果{}", userId, agent.getAgent().getId(), updateAgentContractVoRes.getResInfo());
             }
             if (agent.getColinfoVoList() != null && agent.getColinfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getColinfoVoList()));
-                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent());
+                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAgentColinfoVoRes.getResInfo());
             }
             if (agent.getBusInfoVoList() != null && agent.getBusInfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent());
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
             }
 

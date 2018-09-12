@@ -21,6 +21,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.ICuserAgentService;
 import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.IdService;
@@ -70,6 +71,8 @@ public class AgentServiceImpl implements AgentService {
     private CUserMapper cUserMapper;
     @Autowired
     private AttachmentMapper attachmentMapper;
+    @Autowired
+    private AgentDataHistoryService agentDataHistoryService;
 
 
     /**
@@ -168,7 +171,7 @@ public class AgentServiceImpl implements AgentService {
      */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public Agent insertAgent(Agent agent, List<String> attrId) throws ProcessException {
+    public Agent insertAgent(Agent agent, List<String> attrId,String userId) throws ProcessException {
         if (agent == null) {
             logger.info("代理商添加:{}", "代理商信息为空");
             throw new ProcessException("代理商信息为空");
@@ -232,6 +235,10 @@ public class AgentServiceImpl implements AgentService {
             if(!isHaveFRSFZ){
                 throw new ProcessException("请添加法人身份证附件");
             }
+            //保存数据历史
+            if(!agentDataHistoryService.saveDataHistory(agent,agent.getId(), DataHistoryType.BASICS.code,userId,agent.getVersion()).isOK()){
+                throw new ProcessException("添加是失败！请重试");
+            }
             logger.info("代理商添加:成功");
             return agent;
         }
@@ -277,8 +284,7 @@ public class AgentServiceImpl implements AgentService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public Agent updateAgentVo(Agent agent, List<String> attrs) throws Exception {
-
+    public Agent updateAgentVo(Agent agent, List<String> attrs,String userId) throws Exception {
         if (null == agent || StringUtils.isEmpty(agent.getId())) {
             throw new ProcessException("代理商信息错误");
         }
@@ -304,8 +310,12 @@ public class AgentServiceImpl implements AgentService {
         db_agent.setStatus(agent.getStatus());
         if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
             throw new ProcessException("代理商信息更新失败");
+        }else{
+            //保存数据历史
+            if(!agentDataHistoryService.saveDataHistory(db_agent,db_agent.getId(), DataHistoryType.BASICS.code,userId,agent.getVersion()).isOK()){
+                throw new ProcessException("代理商信息更新失败！请重试");
+            }
         }
-
 
         //删除老的附件
         AttachmentRelExample example = new AttachmentRelExample();

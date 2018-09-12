@@ -104,6 +104,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
+			//记录历史业务平台
+			if(!agentDataHistoryService.saveDataHistory(agentBusInfo, DataHistoryType.BUSINESS.getValue()).isOK()){
+				throw new ProcessException("业务添加失败,历史保存失败");
+			}
             return agentBusInfo;
 
 
@@ -152,7 +156,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 
@@ -215,6 +219,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new MessageException("更新业务信息失败");
+					}else{
+						agentDataHistoryService.saveDataHistory(db_AgentBusInfo,db_AgentBusInfo.getId(), DataHistoryType.BUSINESS.getValue(),userId,db_AgentBusInfo.getVersion());
 					}
                     //更新分管协议
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
@@ -252,7 +258,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 					}
 				}
-				agentDataHistoryService.saveDataHistory(agentBusInfoVo, DataHistoryType.BUSINESS.getValue());
+
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {

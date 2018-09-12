@@ -219,10 +219,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
                 oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
                 try {
-                    oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                    oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
                 }catch (Exception e){
                     try {
-                        oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
+                        oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
                     }catch (Exception m){
                         throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
                     }

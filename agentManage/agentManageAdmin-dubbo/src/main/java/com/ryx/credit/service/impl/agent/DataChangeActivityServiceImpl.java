@@ -153,7 +153,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     if(DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType())) {
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
-                        ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent());
+                        ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser());
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){
