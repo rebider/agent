@@ -439,4 +439,13 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return agentoutVos;
     }
 
+
+    @Override
+    public List<Map<String, Object>> queryByBusNum(String busNum){
+        if(StringUtils.isBlank(busNum)){
+            return null;
+        }
+        return agentBusInfoMapper.queryByBusNum(busNum);
+    }
+
 }
