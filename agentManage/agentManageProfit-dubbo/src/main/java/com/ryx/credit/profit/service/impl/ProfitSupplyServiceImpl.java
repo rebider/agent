@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.dao.ProfitSupplyMapper;
 import com.ryx.credit.profit.pojo.ProfitSupply;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -113,7 +115,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         for (List<Object> supply : data) {
             ProfitSupply profitSupply = new ProfitSupply();
             profitSupply.setId(idService.genId(TabId.p_profit_supply));   // ID序列号
-            profitSupply.setSourceId(DateUtil.getDays());                 // 录入日期
+            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));                 // 录入日期
             try {
                 profitSupply.setAgentPid(null != supply.get(0) ? String.valueOf(supply.get(0)) : "");      // 代理商唯一码
                 profitSupply.setAgentName(null != supply.get(1) ? String.valueOf(supply.get(1)) : "");     // 代理商名称
