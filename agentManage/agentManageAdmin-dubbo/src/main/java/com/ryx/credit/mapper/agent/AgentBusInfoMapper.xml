@@ -791,6 +791,12 @@
       <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (agent.AG_DOC_PRO = #{reqMap.orgId} or agent.AG_DOC_DISTRICT = #{reqMap.orgId})
       </if>
+      <if test="reqMap.isZpos != 'null'" >
+        and bus.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == 'null'" >
+        and bus.bus_platform != #{reqMap.platForm}
+      </if>
     and bus.status = #{reqMap.status}
     UNION
     select agent.AG_UNIQ_NUM, agent.AG_NAME, agent.AG_HEAD,
@@ -829,6 +835,12 @@
     </if>
     <if test="reqMap.userId!=null and reqMap.userId!=''">
       and agent.C_USER = #{reqMap.userId}
+    </if>
+    <if test="reqMap.isZpos != 'null'" >
+      and bus.bus_platform = #{reqMap.platForm}
+    </if>
+    <if test="reqMap.isZpos == 'null'" >
+      and bus.bus_platform != #{reqMap.platForm}
     </if>
     and bus.status = #{reqMap.status}
    )
