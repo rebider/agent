@@ -862,4 +862,14 @@
     where a.status=1 and b.status=1
   </select>
 
+
+  <select id="queryByBusNum" parameterType="java.lang.String" resultType="map">
+      select
+        <include refid="Base_Column_List" />
+      from a_agent_businfo
+      <where>
+         bus_num = #{busNum}
+      </where>
+  </select>
+
 </mapper>

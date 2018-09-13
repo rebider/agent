@@ -51,4 +51,7 @@ public interface BusinessPlatformService {
      *
      */
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException;
+
+
+    List<Map<String, Object>> queryByBusNum(String busNum);
 }

@@ -740,6 +740,110 @@
     order by O_Receipt_order.Address_Id asc, o_receipt_pro.c_time desc
   </select>
 
+<!--   订单发货的导出-->
+  <select id="excelOrder" parameterType="map" resultMap="OrderoutVo">
+    (
+    select
+    d.REAL_AMOUNT,
+    d.OUTSTANDING_AMOUNT,
+    d.DEDUCTION_TYPE,d.DEDUCTION_AMOUNT,
+    d.ACTUAL_RECEIPT,
+    to_char(d.ACTUAL_RECEIPT_DATE,'YYYY-MM-DD') as actualTime,
+    d.DOWN_PAYMENT_USER,
+    comp.COM_NAME,
+    d.PAY_METHOD,
+    to_char(o.O_INURETIME,'YYYY-MM-DD') as oinuretime,
+    o.id,
+    o.o_num as num,
+    o.order_platform,
+    o.payment_method,
+    o.o_amo,
+    o.pay_amo,
+    d.pay_amount,
+    d.real_amount,
+    d.outstanding_amount,
+    d.pay_status,
+    o.clear_status,
+    o.review_status,
+    o.order_status,
+    o.o_apytime,
+    o.c_time,
+    o.remark,
+    b.id as agentId,
+    b.ag_name,
+    b.ag_doc_pro ,
+    b.ag_doc_district,
+    b.AG_UNIQ_NUM,
+    nvl((select sum(o_payment_detail.pay_amount)
+    from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') ),0) as money,
+
+    nvl((select COUNT(o_payment_detail.plan_num)
+    from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') ),0) as planNum,
+    nvl((select sum(o_payment_detail.pay_amount)
+    from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+    and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    (
+    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
+    -
+    nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
+    )as dpd,
+    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
+    c.platform_name
+    from o_order o
+    left join a_agent b on o.agent_id = b.id
+    left join a_platform c on c.platform_num = o.order_platform
+    left join o_payment d on d.order_id = o.id
+    left join a_pay_comp comp on comp.id=d.COLLECT_COMPANY
+    <where>
+      <if test="1==1"> and  o.status = 1 </if>
+      <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
+      <if test="id!=null and id!=''"> and  o.id = #{id} </if>
+      <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
+      <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
+    </where>
+    )
+    order by c_time desc
+  </select>
+  <resultMap id="OrderoutVo" type="com.ryx.credit.pojo.admin.vo.OrderoutVo">
+    <result column="AG_UNIQ_NUM" property="agUniqNum" jdbcType="VARCHAR"/>
+    <result column="AG_NAME" property="agName" jdbcType="VARCHAR"/>
+    <result column="O_NUM" property="num" jdbcType="VARCHAR"/>
+    <result column="PAY_AMO" property="payAmo" jdbcType="DECIMAL"/>
+    <result column="O_INURETIME" jdbcType="TIMESTAMP" property="inuretime" />
+    <result column="PLATFORM_NAME" property="platformName" jdbcType="VARCHAR"/>
+    <result column="PRO_NUM" property="proNum" jdbcType="DECIMAL"/>
+    <result column="PAY_METHOD" property="payMethod" jdbcType="VARCHAR"/>
+    <result column="DOWN_PAYMENT_USER" property="downPaymentUser" jdbcType="VARCHAR"/>
+    <result column="COM_NAME" property="comName" jdbcType="VARCHAR"/>
+    <result column="ACTUAL_RECEIPT" property="actualReceipt" jdbcType="DECIMAL"/>
+    <result column="ACTUAL_RECEIPT_DATE" property="actualReceiptDate" jdbcType="TIMESTAMP"/>
 
 
+    <result column="DEDUCTION_TYPE" property="deductionType" jdbcType="VARCHAR"/>
+    <result column="DEDUCTION_AMOUNT" property="deductionAmount" jdbcType="DECIMAL"/>
+    <result column="PAY_AMOUNT" property="money" jdbcType="DECIMAL"/>
+    <result column="PLAN_NUM" property="planNum" jdbcType="DECIMAL"/>
+
+  </resultMap>
 </mapper>

@@ -212,11 +212,9 @@ public class NewProfitDataJob {
      */
     private Map<String, Object> getAgentId(String orgId) {
         // 获取代理商平台id
-        AgentBusInfo agentBusInfo = new AgentBusInfo();
-        agentBusInfo.setBusNum(orgId);
-        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null,null,"");
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
-            Map<String, Object> agentMap = (Map<String, Object>) pageInfo.getRows().get(0);
+        List<Map<String, Object>> agentList = businessPlatformService.queryByBusNum(orgId);
+        if (agentList != null && agentList.size() > 0) {
+            Map<String, Object> agentMap = agentList.get(0);
             try {
                 getParentAgentId(agentMap);
                 return agentMap;

@@ -321,11 +321,9 @@ public class RefundJob {
      */
     private Map<String, Object> getAgentId(String orgId) {
         // 获取代理商平台id
-        AgentBusInfo agentBusInfo = new AgentBusInfo();
-        agentBusInfo.setBusNum(orgId);
-        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null,null,"");
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
-            Map<String, Object> agentMap = (Map<String, Object>) pageInfo.getRows().get(0);
+        List<Map<String, Object>> resultList = businessPlatformService.queryByBusNum(orgId);
+        if (resultList != null && resultList.size() > 0) {
+            Map<String, Object> agentMap = resultList.get(0);
             try {
                 getParentAgentId(agentMap);
                 return agentMap;

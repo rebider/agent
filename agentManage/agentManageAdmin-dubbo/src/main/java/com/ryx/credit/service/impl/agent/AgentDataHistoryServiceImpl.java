@@ -146,7 +146,7 @@ public class AgentDataHistoryServiceImpl implements AgentDataHistoryService {
         List<Map<String, Object>> dataList = dataHistoryMapper.selectAll(map, page);
         if (null != dataList && dataList.size() > 0) {
             for (Map<String, Object> maps : dataList) {
-                maps.put("DATA_TYPE", DataHistoryType.getContentByValue(String.valueOf(maps.get("DATA_TYPE"))));
+                maps.put("DATA_TYPE_STRING", DataHistoryType.getContentByValue(String.valueOf(maps.get("DATA_TYPE"))));
             }
         }
         PageInfo pageInfo = new PageInfo();
