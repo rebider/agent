@@ -72,6 +72,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if(dict!=null){
                 stringObjectMap.put("PRO_COM",dict.getdItemname());
             }
+            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
+            if (null!=modelType){
+                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
+            }
+
         }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
