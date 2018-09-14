@@ -48,19 +48,13 @@ public class ProfitZhiFaDataJob {
     private int index = 1;
     private static int c = 1;
     public static void main(String agrs[]){
-        List a = new ArrayList();
-        a.add("aaaa");
-        a.add("bbbb");
-        a.add("cccc");
-        System.out.println(a.size());
-        System.out.println(a.get(a.size()-1));
-        //test();
+        test();
     }
 
     public static void test(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):transDate);
+        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
         map.put("pageNumber",c++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
@@ -88,20 +82,19 @@ public class ProfitZhiFaDataJob {
      * 同步直发分润数据
      * 交易月份（空则为上一月）
      * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
-     * 2018.9.7 17:20：@Scheduled(cron = "0 20 17 7 * ?")
     */
-    @Scheduled(cron = "0 0 5 10 * ?")
+    @Scheduled(cron = "0 45 14 11 * ?")
     public void synchroProfitDirect(){
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6);
-        map.put("transDate", transDate==null?month:transDate);
+        map.put("frmonth", transDate==null?month:transDate);
         map.put("pageNumber", index++ +"");
         map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("profit.zhifa"), params);
-        System.out.println(res);
+        System.out.println("zf" + res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
             AppConfig.sendEmails("日分润同步失败","日分润同步失败");
@@ -141,11 +134,11 @@ public class ProfitZhiFaDataJob {
     public void insertProfitDirect(List<JSONObject> profitDirects, String transDate){
         for(JSONObject json:profitDirects){
             ProfitDeduction where = new ProfitDeduction();
-            where.setAgentPid(json.getString("AGENTID"));
+            where.setAgentId(json.getString("AGENTID"));
             where.setDeductionType("01");
-            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date(),-1)).substring(0,7));
+            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date(),-2)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
-            AgentBusInfo fristAgent = businfoService.getByBusidAndCode(json.getString("6000"),json.getString("FRISTAGENTID"));
+            AgentBusInfo fristAgent = businfoService.getByBusidAndCode("6000",json.getString("FRISTAGENTID"));
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));
             profitDirect.setAgentName(json.getString("AGENTNAME"));//代理商名称

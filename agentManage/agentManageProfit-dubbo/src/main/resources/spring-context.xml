@@ -17,7 +17,7 @@
     <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>
     <task:scheduler id="qbScheduler" pool-size="10"/>
     <!--自动扫描含有@Service将其注入为bean -->
-    <context:component-scan base-package="com.ryx.**.service,com.ryx.**.service.impl,com.ryx.**.jobs" />
+    <context:component-scan base-package="com.ryx.**.service,com.ryx.**.service.impl,com.ryx.**.jobs,com.ryx.**.unitmain" />
     <bean id="logService" class="com.ryx.credit.common.log.LogServiceImpl"></bean>
     <aop:config>
         <!-- 切入点 -->

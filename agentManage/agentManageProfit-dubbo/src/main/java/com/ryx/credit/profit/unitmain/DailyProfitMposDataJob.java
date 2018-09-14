@@ -52,9 +52,9 @@ public class DailyProfitMposDataJob {
     }
 
     /**
-     * 2018.9.7 17:30："0 30 17 7 * ?"
+     * 2018.9.10 11:10："0 10 11 10 * ?"
      */
-//    @Scheduled(cron = "0 30 17 7 * ?")
+//    @Scheduled(cron = "0 54 14 10 * ?")
 //    public void excute(){
 //        List<String> dates = new ArrayList<String>();
 //        dates.add("20180701");
@@ -98,16 +98,16 @@ public class DailyProfitMposDataJob {
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
-    @Scheduled(cron = "0 0 5 * * ?")
+    @Scheduled(cron = "0 55 14 11 * ?")
     public void synchroProfitDay(){
-        String frDate = null;
+        String frDate = "20180705";
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("frDate", frDate==null?DateUtil.getAfterDayDate("-2",DateUtil.sdfDays):frDate);
+        map.put("frDate", frDate==null?frDate:frDate);
         map.put("pageNumber", index++ +"");
         map.put("pageSize", "50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newday"), params);
-        System.out.println("输出================================" + res);
+        System.out.println("rj" + res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             logger.error("请求同步失败！");
             AppConfig.sendEmails("日分润同步失败！","日分润同步失败！");

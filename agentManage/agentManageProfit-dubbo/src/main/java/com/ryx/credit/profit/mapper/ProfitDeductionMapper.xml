@@ -372,7 +372,7 @@
   <select id="totalBuckleByMonth" parameterType="com.ryx.credit.profit.pojo.ProfitDeduction" resultType="java.math.BigDecimal">
     SELECT SUM(MUST_DEDUCTION_AMT)
     FROM P_DEDUCTION
-    WHERE DEDUCTION_DATE = #{deductionDate} AND  AGENT_ID = #{agentId} AND DEDUCTION_TYPE = #{deductionType}
+    WHERE DEDUCTION_DATE = #{deductionDate} AND AGENT_ID = #{agentId} AND DEDUCTION_TYPE = #{deductionType}
   </select>
 
   <select id="getSettleErrDeductionAmt" parameterType="com.ryx.credit.profit.pojo.ProfitDeduction" resultType="java.math.BigDecimal">

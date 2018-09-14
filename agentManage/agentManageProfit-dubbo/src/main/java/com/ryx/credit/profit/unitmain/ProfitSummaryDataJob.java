@@ -59,14 +59,14 @@ public class ProfitSummaryDataJob {
     }
 
     /**
-     * 交易月份（空则为上一月）
+     * 汇总数据
+     * transDate 交易月份（空则为上一月）
      * 每月12号上午12点：@Scheduled(cron = "0 0 12 12 * ?")
-     * 2018.9.7 17:55：@Scheduled(cron = "0 55 17 7 * ?")
      */
-    @Scheduled(cron = "0 0 12 12 * ?")
+    @Scheduled(cron = "0 25 15 11 * ?")
     public void MPos_Summary(){
         String transDate = null;
-        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
+        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate;
         List<TransProfitDetail> details = transProfitDetailMapper.selectListByDate(transDate);//手刷同步过来的小汇数据
         for(TransProfitDetail detail : details){
             Agent agent = agentService.getAgentById(detail.getAgentId());
@@ -111,7 +111,6 @@ public class ProfitSummaryDataJob {
                 detailMonth.setParentAgentId(detail.getParentAgentId());
                 detailMonth.setAgentPid(detail.getAgentId());
                 detailMonthMapper.insertSelective(detailMonth);
-
             }else{//更新汇总
                 detailMonthMapper.updateByPrimaryKeySelective(detailMonth);
             }
