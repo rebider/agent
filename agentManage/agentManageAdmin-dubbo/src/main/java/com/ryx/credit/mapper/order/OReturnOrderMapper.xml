@@ -343,4 +343,71 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="getOrderReturnCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    select  count(1)
+    from  o_return_order ro left join a_agent agent on agent.id=agent_id
+    left join o_return_order_detail odetail on odetail.return_id =ro.id
+    left join o_sub_order os on os.pro_id=odetail.pro_id and os.order_id=odetail.order_id and os.status=1
+    left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
+    left join o_order oorder on oorder.id =odetail.order_id
+    left join a_platform c on c.platform_num = oorder.order_platform
+    left join o_payment d on d.order_id = odetail.order_id
+
+
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
+
+  <select id="getOrderReturnList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select   to_char(ro.c_time,'YYYY-MM-DD') as rotime,
+    to_char(odetail.return_time,'YYYY-MM-DD') as returntime,
+    c.PLATFORM_NAME ,
+    ro.id ,odetail.return_count , odetail.return_count * odetail.return_price as return_price,
+    odetail.begin_sn  ,odetail.end_sn ,
+    agent.AG_UNIQ_NUM ,agent.AG_NAME ,os.pro_type,
+    oso.activity_name , oso.pro_model , oso.vender
+    from  o_return_order ro left join a_agent agent on agent.id=agent_id
+    left join o_return_order_detail odetail on odetail.return_id =ro.id
+    left join o_sub_order os on os.pro_id=odetail.pro_id and os.order_id=odetail.order_id and os.status=1
+    left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
+    left join o_order oorder on oorder.id =odetail.order_id
+    left join a_platform c on c.platform_num = oorder.order_platform
+    left join o_payment d on d.order_id = odetail.order_id
+    <include refid="BASE_WHERE_SQL"></include>
+    <include refid="SORTING"></include>
+    <include refid="PAGING_END" />
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      1=1
+      <if test="id!=null and id!=''"> and ro.ID=#{id} </if>
+      <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
+      <if test="platform!=null and platform!=''"> and c.PLATFORM_NUM=#{platform} </if>
+      <if test="proModel!=null and proModel!=''"> and oso.PRO_MODEL=#{proModel} </if>
+      <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
+      <if test="vender != null and vender != '' "> and oso.vender=#{vender}</if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="beginTime!=null and endTime!=''"> and (to_char(odetail.return_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+    </where>
+  </sql>
+
+  <sql id='SORTING'>
+    ORDER BY ro.C_TIME DESC
+  </sql>
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
 </mapper>

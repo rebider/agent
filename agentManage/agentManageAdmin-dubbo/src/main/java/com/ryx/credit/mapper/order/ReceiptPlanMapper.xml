@@ -333,12 +333,13 @@
 
   <select id="getReceipPlanList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    SELECT R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
+    SELECT
+    agent.AG_UNIQ_NUM,agent.AG_NAME,c.PLATFORM_NAME,os.pro_type,oso.activity_name,(P.PRO_NUM-P.SEND_NUM )AS residue,
+    R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
     R.PRO_COM,
-    DI.D_ITEMNAME AS PRO_COM_STRING,
     R.PLAN_PRO_NUM,R.SEND_PRO_NUM,R.MODEL,R.RETURN_ORDER_DETAIL_ID,
     O.ADDR_REALNAME,O.ADDR_MOBILE,O.ADDR_PROVINCE,O.ADDR_CITY,O.ADDR_DISTRICT,O.ADDR_DETAIL,
-    O.REMARK,O.ZIP_CODE,O.EXPRESS_REMARK,R.C_DATE,
+    O.REMARK,O.ZIP_CODE,O.EXPRESS_REMARK,to_char(R.C_DATE,'YYYY-MM-DD') as C_DATE,
     O.RECEIPT_STATUS,D.R_NAME as NAME,C.R_NAME as CITY,E.R_NAME as DISTRICT,R.ID
     FROM O_RECEIPT_PLAN R
     LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID
@@ -346,7 +347,13 @@
     LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
     LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
     LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
-    LEFT JOIN D_DICT DI ON DI.D_GROUP='ORDER' AND DI.D_ARTIFACT='MANUFACTURER' AND DI.D_ITEMVALUE=R.PRO_COM
+
+    LEFT JOIN  o_order orders  on R.order_id=orders.id
+    left join a_agent agent on agent.id=orders.agent_id
+    left join a_platform c on c.platform_num = orders.order_platform
+    left join o_sub_order os on os.order_id =orders.id and os.status=1
+    left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
+    left join o_payment d on d.order_id = R.order_id
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />
@@ -354,12 +361,19 @@
 
   <select id="getReceipPlanCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
-      FROM O_RECEIPT_PLAN R
+    FROM O_RECEIPT_PLAN R
     LEFT JOIN O_RECEIPT_ORDER O ON R.RECEIPT_ID = O.ID
     LEFT JOIN D_REGION D ON O.ADDR_PROVINCE = D.R_CODE
     LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
     LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
     LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
+
+    LEFT JOIN  o_order orders  on R.order_id=orders.id
+    left join a_agent agent on agent.id=orders.agent_id
+    left join a_platform c on c.platform_num = orders.order_platform
+    left join o_sub_order os on os.order_id =orders.id and os.status=1
+    left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
+    left join o_payment d on d.order_id = R.order_id
     <include refid="BASE_WHERE_SQL"></include>
   </select>
 
@@ -370,12 +384,19 @@
         <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
         <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
         <if test="PLAN_ORDER_STATUS != null and PLAN_ORDER_STATUS != ''">AND R.PLAN_ORDER_STATUS = #{PLAN_ORDER_STATUS}</if>
-        <if test="PRO_COM != null and PRO_COM != ''">AND R.PRO_COM = #{PRO_COM}</if>
+        <if test="proCom != null and proCom != ''">AND R.PRO_COM = #{proCom}</if>
         <if test="C_DATE_START != null and C_DATE_START != ''">R.C_DATE >= TO_DATE(#{C_DATE},'yyyy-MM-dd') </if>
         <if test="C_DATE_END != null and C_DATE_END != ''">R.C_DATE &lt;= TO_DATE(#{C_DATE},'yyyy-MM-dd')</if>
         <if test="returnId != null and returnId!=''" >
           and R.return_order_detail_id = #{returnId}
         </if>
+        <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
+        <if test="platform!=null and platform!=''"> and c.PLATFORM_NUM=#{platform} </if>
+        <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
+        <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
+        <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+        <if test="model!=null and model!=''"> and R.MODEL=#{model} </if>
+        <if test="beginTime!=null and endTime!=''"> and (to_char(R.c_date,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       </trim>
     </where>
   </sql>

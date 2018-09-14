@@ -992,4 +992,24 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     }
 
 
+    @Override
+    public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = returnOrderMapper.getOrderReturnCount(param);
+        List<Map<String, Object>> list = returnOrderMapper.getOrderReturnList(param);
+        for (Map<String, Object> stringObjectMap : list) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),String.valueOf(stringObjectMap.get("VENDER")));
+            if(dict!=null){
+                stringObjectMap.put("VENDER",dict.getdItemname());
+            }
+            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
+            if (null!=modelType){
+                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
+            }
+
+        }
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
+
 }
