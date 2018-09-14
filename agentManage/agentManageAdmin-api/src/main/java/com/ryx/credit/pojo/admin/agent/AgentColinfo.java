@@ -44,6 +44,10 @@ public class AgentColinfo implements Serializable {
 
     private BigDecimal cloInvoice;
 
+    private String cloBankCode;
+
+    private BigDecimal payStatus;
+
     private List<Attachment> attachmentList;
 
     public List<Attachment> getAttachmentList() {
@@ -204,5 +208,21 @@ public class AgentColinfo implements Serializable {
 
     public void setCloInvoice(BigDecimal cloInvoice) {
         this.cloInvoice = cloInvoice;
+    }
+
+    public String getCloBankCode() {
+        return cloBankCode;
+    }
+
+    public void setCloBankCode(String cloBankCode) {
+        this.cloBankCode = cloBankCode;
+    }
+
+    public BigDecimal getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(BigDecimal payStatus) {
+        this.payStatus = payStatus;
     }
 }
