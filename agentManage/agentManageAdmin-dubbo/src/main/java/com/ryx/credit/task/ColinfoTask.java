@@ -22,6 +22,7 @@ import com.ryx.credit.service.agent.AgentColinfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -126,7 +127,7 @@ public class ColinfoTask {
     }
 
 
-//    @Scheduled(cron = "0/30 * * * * ?")
+    @Scheduled(cron = "0 10 * * * ?")
     public void synColinfoToQueryPayment() {
         try {
             AColinfoPaymentExample aColinfoPaymentExample = new AColinfoPaymentExample();
@@ -146,12 +147,16 @@ public class ColinfoTask {
                 Map<String, Object> resultMap = JsonUtil.jsonToMap(httpResult);
                 String code = String.valueOf(resultMap.get("code"));
                 if(!code.equals("01")){
-                    log.info("synColinfoToQueryPayment,清结算平台未对账暂不处理,balanceLs：{},resultMap:{}",aColinfoPayment.getBalanceLs(),resultMap);
+                    log.info("synColinfoToQueryPayment,查询交易接口不成功,balanceLs：{},resultMap:{}",aColinfoPayment.getBalanceLs(),resultMap);
+                    continue;
+                }
+                String info = String.valueOf(resultMap.get("info"));
+                if(StringUtils.isBlank(info) || info.equals("null")){
+                    log.info("synColinfoToQueryPayment,查询info为空,balanceLs：{},info:{}",aColinfoPayment.getBalanceLs(),info);
                     continue;
                 }
                 JSONArray jsonArray = JSONObject.parseArray(String.valueOf(resultMap.get("info")));
                 Map<String, Object> resultInfoMap = JsonUtil.jsonToMap(JsonUtil.objectToJson(jsonArray.get(0)));
-                resultInfoMap.put("flag",11);
                 if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.A.getValue())){
                     agentColinfoService.updateByPaymentResult(aColinfoPayment,resultInfoMap);
                 }else{
@@ -169,9 +174,9 @@ public class ColinfoTask {
         Map<String, String> map = new HashMap<>();
         map.put("balanceLs", colinfoPayment.getBalanceLs());
         String params = JsonUtil.objectToJson(map);
-        log.info("收款账户出款请求参数：{}",params);
+        log.info("balanceLs:{},收款账户出款请求参数：{}",colinfoPayment.getBalanceLs(),params);
         String httpResult = HttpClientUtil.doPostJson(COLINFO_URL, params);
-        log.info("收款账户出款返回参数：{}",httpResult);
+        log.info("balanceLs:{},收款账户出款返回参数：{}",colinfoPayment.getBalanceLs(),httpResult);
         if(StringUtils.isBlank(httpResult)){
             throw new Exception("返回参数为空");
         }
