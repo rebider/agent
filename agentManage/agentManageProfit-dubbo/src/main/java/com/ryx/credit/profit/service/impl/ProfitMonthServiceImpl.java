@@ -183,7 +183,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDate());
         }
         if(StringUtils.isNotBlank(profitDetailMonth.getStatus())){
-            criteria.andStatusEqualTo(profitDetailMonth.getStatus());
+             if (profitDetailMonth.getStatus().contains(",")) {
+                 criteria.andPayStatusIn(Arrays.asList(profitDetailMonth.getStatus().split(",")));
+             }else {
+                 criteria.andStatusEqualTo(profitDetailMonth.getStatus());
+             }
         }
         if (StringUtils.isNotBlank(profitDetailMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitDetailMonth.getProfitDateEnd()))
         {
@@ -451,7 +455,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitDetailMonth detailMonth = new ProfitDetailMonth();
-        detailMonth.setStatus("4");
+        detailMonth.setStatus("4,6");
         detailMonth.setProfitDate(profitDate);
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null,null, detailMonth);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
