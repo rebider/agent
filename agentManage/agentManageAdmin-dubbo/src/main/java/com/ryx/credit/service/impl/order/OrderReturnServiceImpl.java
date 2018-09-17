@@ -559,8 +559,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setReturnCount(MapUtil.getBigDecimal(map, "count"));
                 returnOrderDetail.setReturnAmt(MapUtil.getBigDecimal(map, "totalPrice"));
                 returnOrderDetail.setReturnTime(new Date());
+                returnOrderDetail.setIsDeposit(Status.STATUS_0.status);
                 returnOrderDetail.setcTime(new Date());
+                returnOrderDetail.setuTime(new Date());
                 returnOrderDetail.setcUser(agentId);
+                returnOrderDetail.setuUser(agentId);
+                returnOrderDetail.setStatus(Status.STATUS_1.status);
+                returnOrderDetail.setVersion(Status.STATUS_1.status);
                 returnOrderDetailMapper.insertSelective(returnOrderDetail);
             } catch (Exception e) {
                 log.error("生成退货明细失败", e);
@@ -991,5 +996,25 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
     }
 
+
+    @Override
+    public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = returnOrderMapper.getOrderReturnCount(param);
+        List<Map<String, Object>> list = returnOrderMapper.getOrderReturnList(param);
+        for (Map<String, Object> stringObjectMap : list) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),String.valueOf(stringObjectMap.get("VENDER")));
+            if(dict!=null){
+                stringObjectMap.put("VENDER",dict.getdItemname());
+            }
+            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
+            if (null!=modelType){
+                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
+            }
+
+        }
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
 
 }

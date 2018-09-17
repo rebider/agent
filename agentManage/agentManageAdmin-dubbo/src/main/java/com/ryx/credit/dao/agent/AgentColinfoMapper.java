@@ -3,8 +3,10 @@ package com.ryx.credit.dao.agent;
 
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AgentColinfoMapper {
     int countByExample(AgentColinfoExample example);
@@ -26,4 +28,6 @@ public interface AgentColinfoMapper {
     List<AgentColinfo> proceedsQuery(String id);
 
     List<AgentColinfo> queryBusConinfoList(String busId);
+
+    List<Map<String,Object>> synConinfo(@Param("params") Map<String,Object> params);
 }

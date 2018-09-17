@@ -350,18 +350,27 @@
 
     <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
         <include refid="PAGING_START" />
-        SELECT R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,
+        SELECT  L.SEND_NUM as sendnum,
+        L.SEND_NUM * L.PRO_PRICE as proPrice,
+        R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,
         R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
         P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
         O.ADDR_REALNAME,O.RECEIPT_STATUS,
         L.LOG_COM,L.LOG_TYPE,L.W_NUMBER,L.SN_BEGIN_NUM,L.SN_END_NUM,TO_CHAR(L.SEND_DATE, 'YYYY-MM-DD') AS O_LOGISTICS_SEND_DATE,
-        AGENT.ID,AGENT.AG_NAME
+        AGENT.ID,AGENT.AG_NAME,AGENT.AG_UNIQ_NUM,
+        c.PLATFORM_NAME,O.addr_mobile,O.addr_detail,
+        to_char(ORDERS.O_INURETIME,'YYYY-MM-DD') as TIME,
+        to_char(L.send_date,'YYYY-MM-DD') as SENDTIME,oso.ACTIVITY_NAME,os.PRO_TYPE
         FROM O_LOGISTICS L
         LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
         LEFT JOIN O_RECEIPT_ORDER O ON O.ID = R.RECEIPT_ID
         LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
         LEFT JOIN O_ORDER ORDERS ON L.ORDER_ID=ORDERS.ID
         LEFT JOIN A_AGENT AGENT ON ORDERS.AGENT_ID=AGENT.ID
+        left join a_platform c on c.platform_num = ORDERS.order_platform
+        left join o_payment d on d.order_id = o.id
+        left join o_sub_order os on os.order_id=L.order_id and os.pro_id=L.pro_id and os.status=1
+        left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
         <include refid="BASE_WHERE_SQL"></include>
         <include refid="SORTING"></include>
         <include refid="PAGING_END" />
@@ -373,17 +382,30 @@
         LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
         LEFT JOIN O_RECEIPT_ORDER O ON O.ID = R.RECEIPT_ID
         LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
+        LEFT JOIN O_ORDER ORDERS ON L.ORDER_ID=ORDERS.ID
+        LEFT JOIN A_AGENT AGENT ON ORDERS.AGENT_ID=AGENT.ID
+        left join a_platform c on c.platform_num = ORDERS.order_platform
+        left join o_payment d on d.order_id = o.id
+        left join o_sub_order os on os.order_id=L.order_id and os.pro_id=L.pro_id and os.status=1
+        left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
         <include refid="BASE_WHERE_SQL"></include>
     </select>
 
     <sql id="BASE_WHERE_SQL">
         <where>
-            <trim prefixOverrides="and">
+             1=1
                 <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
                 <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
                 <if test="AGENT_ID != null and AGENT_ID != ''">AND O.AGENT_ID = #{AGENT_ID}</if>
                 <if test="returnId != null and returnId != ''">AND R.return_order_detail_id = #{returnId}</if>
-            </trim>
+                <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+                <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+                <if test="platform!=null and platform!=''"> and c.PLATFORM_NUM=#{platform} </if>
+                <if test="proCom!=null and proCom!=''"> and R.PRO_COM=#{proCom}</if>
+                <if test="model!=null and model!=''"> and R.MODEL=#{model} </if>
+                <if test="agUniqNum!=null and agUniqNum!=''"> and AGENT.AG_UNIQ_NUM=#{agUniqNum} </if>
+                <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
+                <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
         </where>
     </sql>
 

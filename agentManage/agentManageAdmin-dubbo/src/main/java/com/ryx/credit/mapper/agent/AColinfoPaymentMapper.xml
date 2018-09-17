@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AColinfoPaymentMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="COLINFO_ID" jdbcType="VARCHAR" property="colinfoId" />
+    <result column="MERCH_ID" jdbcType="VARCHAR" property="merchId" />
+    <result column="MERCH_NAME" jdbcType="VARCHAR" property="merchName" />
+    <result column="TRAN_DATE" jdbcType="VARCHAR" property="tranDate" />
+    <result column="BALANCE_AMT" jdbcType="DECIMAL" property="balanceAmt" />
+    <result column="BALANCE_RCV_ACC" jdbcType="VARCHAR" property="balanceRcvAcc" />
+    <result column="BALANCE_RCV_BANK" jdbcType="VARCHAR" property="balanceRcvBank" />
+    <result column="BALANCE_RCV_NAME" jdbcType="VARCHAR" property="balanceRcvName" />
+    <result column="BALANCE_RCV_CODE" jdbcType="VARCHAR" property="balanceRcvCode" />
+    <result column="BALANCE_RCV_TYPE" jdbcType="VARCHAR" property="balanceRcvType" />
+    <result column="INPUT_TIME" jdbcType="VARCHAR" property="inputTime" />
+    <result column="CHANNEL_ID" jdbcType="VARCHAR" property="channelId" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="BALANCE_LS" jdbcType="VARCHAR" property="balanceLs" />
+    <result column="CREATE_BATCH_TIME" jdbcType="VARCHAR" property="createBatchTime" />
+    <result column="BATCH_CODE" jdbcType="VARCHAR" property="batchCode" />
+    <result column="FLAG" jdbcType="VARCHAR" property="flag" />
+    <result column="ERR_DESC" jdbcType="VARCHAR" property="errDesc" />
+    <result column="DATASOURCE" jdbcType="VARCHAR" property="datasource" />
+    <result column="ACCOUNT_ID" jdbcType="VARCHAR" property="accountId" />
+    <result column="PAY_DATE" jdbcType="VARCHAR" property="payDate" />
+    <result column="ORG_ACCOUNT_ID" jdbcType="VARCHAR" property="orgAccountId" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="RESERVE" jdbcType="VARCHAR" property="reserve" />
+    <result column="MEMO" jdbcType="VARCHAR" property="memo" />
+    <result column="SYSFLOWSOURCE" jdbcType="VARCHAR" property="sysflowsource" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, COLINFO_ID, MERCH_ID, MERCH_NAME, TRAN_DATE, BALANCE_AMT, BALANCE_RCV_ACC, BALANCE_RCV_BANK, 
+    BALANCE_RCV_NAME, BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME, CHANNEL_ID, REMARK, 
+    BALANCE_LS, CREATE_BATCH_TIME, BATCH_CODE, FLAG, ERR_DESC, DATASOURCE, ACCOUNT_ID, 
+    PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME, UPDATE_TIME, RESERVE, MEMO, SYSFLOWSOURCE, 
+    C_USER, U_USER, STATUS, VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPaymentExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_COLINFO_PAYMENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_COLINFO_PAYMENT
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPaymentExample">
+    delete from A_COLINFO_PAYMENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
+    insert into A_COLINFO_PAYMENT (ID, COLINFO_ID, MERCH_ID, 
+      MERCH_NAME, TRAN_DATE, BALANCE_AMT, 
+      BALANCE_RCV_ACC, BALANCE_RCV_BANK, BALANCE_RCV_NAME, 
+      BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME, 
+      CHANNEL_ID, REMARK, BALANCE_LS, 
+      CREATE_BATCH_TIME, BATCH_CODE, FLAG, 
+      ERR_DESC, DATASOURCE, ACCOUNT_ID, 
+      PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME, 
+      UPDATE_TIME, RESERVE, MEMO, 
+      SYSFLOWSOURCE, C_USER, U_USER, 
+      STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{colinfoId,jdbcType=VARCHAR}, #{merchId,jdbcType=VARCHAR}, 
+      #{merchName,jdbcType=VARCHAR}, #{tranDate,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL}, 
+      #{balanceRcvAcc,jdbcType=VARCHAR}, #{balanceRcvBank,jdbcType=VARCHAR}, #{balanceRcvName,jdbcType=VARCHAR}, 
+      #{balanceRcvCode,jdbcType=VARCHAR}, #{balanceRcvType,jdbcType=VARCHAR}, #{inputTime,jdbcType=VARCHAR}, 
+      #{channelId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{balanceLs,jdbcType=VARCHAR}, 
+      #{createBatchTime,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{flag,jdbcType=VARCHAR}, 
+      #{errDesc,jdbcType=VARCHAR}, #{datasource,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR}, 
+      #{payDate,jdbcType=VARCHAR}, #{orgAccountId,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=VARCHAR}, #{reserve,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR}, 
+      #{sysflowsource,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
+    insert into A_COLINFO_PAYMENT
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="colinfoId != null">
+        COLINFO_ID,
+      </if>
+      <if test="merchId != null">
+        MERCH_ID,
+      </if>
+      <if test="merchName != null">
+        MERCH_NAME,
+      </if>
+      <if test="tranDate != null">
+        TRAN_DATE,
+      </if>
+      <if test="balanceAmt != null">
+        BALANCE_AMT,
+      </if>
+      <if test="balanceRcvAcc != null">
+        BALANCE_RCV_ACC,
+      </if>
+      <if test="balanceRcvBank != null">
+        BALANCE_RCV_BANK,
+      </if>
+      <if test="balanceRcvName != null">
+        BALANCE_RCV_NAME,
+      </if>
+      <if test="balanceRcvCode != null">
+        BALANCE_RCV_CODE,
+      </if>
+      <if test="balanceRcvType != null">
+        BALANCE_RCV_TYPE,
+      </if>
+      <if test="inputTime != null">
+        INPUT_TIME,
+      </if>
+      <if test="channelId != null">
+        CHANNEL_ID,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="balanceLs != null">
+        BALANCE_LS,
+      </if>
+      <if test="createBatchTime != null">
+        CREATE_BATCH_TIME,
+      </if>
+      <if test="batchCode != null">
+        BATCH_CODE,
+      </if>
+      <if test="flag != null">
+        FLAG,
+      </if>
+      <if test="errDesc != null">
+        ERR_DESC,
+      </if>
+      <if test="datasource != null">
+        DATASOURCE,
+      </if>
+      <if test="accountId != null">
+        ACCOUNT_ID,
+      </if>
+      <if test="payDate != null">
+        PAY_DATE,
+      </if>
+      <if test="orgAccountId != null">
+        ORG_ACCOUNT_ID,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="reserve != null">
+        RESERVE,
+      </if>
+      <if test="memo != null">
+        MEMO,
+      </if>
+      <if test="sysflowsource != null">
+        SYSFLOWSOURCE,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="colinfoId != null">
+        #{colinfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchId != null">
+        #{merchId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchName != null">
+        #{merchName,jdbcType=VARCHAR},
+      </if>
+      <if test="tranDate != null">
+        #{tranDate,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAmt != null">
+        #{balanceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="balanceRcvAcc != null">
+        #{balanceRcvAcc,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvBank != null">
+        #{balanceRcvBank,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvName != null">
+        #{balanceRcvName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvCode != null">
+        #{balanceRcvCode,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvType != null">
+        #{balanceRcvType,jdbcType=VARCHAR},
+      </if>
+      <if test="inputTime != null">
+        #{inputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null">
+        #{channelId,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceLs != null">
+        #{balanceLs,jdbcType=VARCHAR},
+      </if>
+      <if test="createBatchTime != null">
+        #{createBatchTime,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="flag != null">
+        #{flag,jdbcType=VARCHAR},
+      </if>
+      <if test="errDesc != null">
+        #{errDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="datasource != null">
+        #{datasource,jdbcType=VARCHAR},
+      </if>
+      <if test="accountId != null">
+        #{accountId,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null">
+        #{payDate,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAccountId != null">
+        #{orgAccountId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="reserve != null">
+        #{reserve,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null">
+        #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="sysflowsource != null">
+        #{sysflowsource,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPaymentExample" resultType="java.lang.Long">
+    select count(*) from A_COLINFO_PAYMENT
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
+    update A_COLINFO_PAYMENT
+    <set>
+      <if test="colinfoId != null">
+        COLINFO_ID = #{colinfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchId != null">
+        MERCH_ID = #{merchId,jdbcType=VARCHAR},
+      </if>
+      <if test="merchName != null">
+        MERCH_NAME = #{merchName,jdbcType=VARCHAR},
+      </if>
+      <if test="tranDate != null">
+        TRAN_DATE = #{tranDate,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceAmt != null">
+        BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="balanceRcvAcc != null">
+        BALANCE_RCV_ACC = #{balanceRcvAcc,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvBank != null">
+        BALANCE_RCV_BANK = #{balanceRcvBank,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvName != null">
+        BALANCE_RCV_NAME = #{balanceRcvName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvCode != null">
+        BALANCE_RCV_CODE = #{balanceRcvCode,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvType != null">
+        BALANCE_RCV_TYPE = #{balanceRcvType,jdbcType=VARCHAR},
+      </if>
+      <if test="inputTime != null">
+        INPUT_TIME = #{inputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="channelId != null">
+        CHANNEL_ID = #{channelId,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceLs != null">
+        BALANCE_LS = #{balanceLs,jdbcType=VARCHAR},
+      </if>
+      <if test="createBatchTime != null">
+        CREATE_BATCH_TIME = #{createBatchTime,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null">
+        BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="flag != null">
+        FLAG = #{flag,jdbcType=VARCHAR},
+      </if>
+      <if test="errDesc != null">
+        ERR_DESC = #{errDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="datasource != null">
+        DATASOURCE = #{datasource,jdbcType=VARCHAR},
+      </if>
+      <if test="accountId != null">
+        ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null">
+        PAY_DATE = #{payDate,jdbcType=VARCHAR},
+      </if>
+      <if test="orgAccountId != null">
+        ORG_ACCOUNT_ID = #{orgAccountId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="reserve != null">
+        RESERVE = #{reserve,jdbcType=VARCHAR},
+      </if>
+      <if test="memo != null">
+        MEMO = #{memo,jdbcType=VARCHAR},
+      </if>
+      <if test="sysflowsource != null">
+        SYSFLOWSOURCE = #{sysflowsource,jdbcType=VARCHAR},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
+    update A_COLINFO_PAYMENT
+    set COLINFO_ID = #{colinfoId,jdbcType=VARCHAR},
+      MERCH_ID = #{merchId,jdbcType=VARCHAR},
+      MERCH_NAME = #{merchName,jdbcType=VARCHAR},
+      TRAN_DATE = #{tranDate,jdbcType=VARCHAR},
+      BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
+      BALANCE_RCV_ACC = #{balanceRcvAcc,jdbcType=VARCHAR},
+      BALANCE_RCV_BANK = #{balanceRcvBank,jdbcType=VARCHAR},
+      BALANCE_RCV_NAME = #{balanceRcvName,jdbcType=VARCHAR},
+      BALANCE_RCV_CODE = #{balanceRcvCode,jdbcType=VARCHAR},
+      BALANCE_RCV_TYPE = #{balanceRcvType,jdbcType=VARCHAR},
+      INPUT_TIME = #{inputTime,jdbcType=VARCHAR},
+      CHANNEL_ID = #{channelId,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      BALANCE_LS = #{balanceLs,jdbcType=VARCHAR},
+      CREATE_BATCH_TIME = #{createBatchTime,jdbcType=VARCHAR},
+      BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+      FLAG = #{flag,jdbcType=VARCHAR},
+      ERR_DESC = #{errDesc,jdbcType=VARCHAR},
+      DATASOURCE = #{datasource,jdbcType=VARCHAR},
+      ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+      PAY_DATE = #{payDate,jdbcType=VARCHAR},
+      ORG_ACCOUNT_ID = #{orgAccountId,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      RESERVE = #{reserve,jdbcType=VARCHAR},
+      MEMO = #{memo,jdbcType=VARCHAR},
+      SYSFLOWSOURCE = #{sysflowsource,jdbcType=VARCHAR},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

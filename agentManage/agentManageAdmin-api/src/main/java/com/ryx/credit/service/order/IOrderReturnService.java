@@ -40,4 +40,12 @@ public interface IOrderReturnService {
     void approvalReject(String processInstanceId, String activityName);
 
     void approvalFinish(String processInstanceId, String activityName);
+
+    /**
+     * 退货列表及导出
+     * @param param
+     * @param pageInfo
+     * @return
+     */
+    PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo);
 }

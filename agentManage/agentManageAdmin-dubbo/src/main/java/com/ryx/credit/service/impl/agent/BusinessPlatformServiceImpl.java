@@ -397,6 +397,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
         map.put("agStatus", AgStatus.Approved.name());
         map.put("status", Status.STATUS_1.status);
+        map.put("isZpos",String.valueOf(map.get("isZpos")));
+        map.put("platForm", Platform.ZPOS.getValue());
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
