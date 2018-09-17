@@ -5,13 +5,9 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.dao.agent.AgentColinfoRelMapper;
-import com.ryx.credit.dao.agent.AttachmentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
-import com.ryx.credit.pojo.admin.vo.AgentContractVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
@@ -27,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -48,6 +45,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
     private AgentDataHistoryService agentDataHistoryService;
     @Autowired
     private AttachmentMapper attachmentMapper;
+    @Autowired
+    private AColinfoPaymentMapper colinfoPaymentMapper;
+
 
     /**
      * 代理商入网添加代理商交款项
@@ -376,4 +376,69 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
         return AgentResult.ok();
     }
+
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void insertByPayment(AColinfoPayment colinfoPayment) throws Exception{
+        String id = idService.genId(TabId.A_COLINFO_PAYMENT);
+        colinfoPayment.setId(id);
+        colinfoPayment.setBalanceLs(id);  //流水号
+        int insert = colinfoPaymentMapper.insert(colinfoPayment);
+        AgentColinfo agentColinfo = new AgentColinfo();
+        agentColinfo.setId(colinfoPayment.getColinfoId());
+        agentColinfo.setPayStatus(ColinfoPayStatus.B.getValue());
+        int update = agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo);
+        if(insert!=1 || update!=1){
+            logger.info("insertByPayment,insert：{},update：{}",insert,update);
+            throw new Exception("更新返回结果异常");
+        }
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public void updateByPaymentResult(AColinfoPayment aColinfoPayment, Map<String, Object> resultMap) throws Exception{
+        AColinfoPayment upPayment = new AColinfoPayment();
+        upPayment.setId(aColinfoPayment.getId());
+        upPayment.setFlag(String.valueOf(resultMap.get("flag")));
+        if(String.valueOf(resultMap.get("errDesc"))!="null")
+        upPayment.setErrDesc(String.valueOf(resultMap.get("errDesc")));
+        if(String.valueOf(resultMap.get("channelId"))!="null")
+        upPayment.setChannelId(String.valueOf(resultMap.get("channelId")));
+        if(String.valueOf(resultMap.get("createBatchTime"))!="null")
+        upPayment.setCreateBatchTime(String.valueOf(resultMap.get("createBatchTime")));
+        if(String.valueOf(resultMap.get("batchCode"))!="null")
+        upPayment.setBatchCode(String.valueOf(resultMap.get("batchCode")));
+        if(String.valueOf(resultMap.get("dataSource"))!="null")
+        upPayment.setDatasource(String.valueOf(resultMap.get("dataSource")));
+        if(String.valueOf(resultMap.get("payDate"))!="null")
+        upPayment.setPayDate(String.valueOf(resultMap.get("payDate")));
+        if(String.valueOf(resultMap.get("orgAccountId"))!="null")
+        upPayment.setOrgAccountId(String.valueOf(resultMap.get("orgAccountId")));
+        if(String.valueOf(resultMap.get("reserve"))!="null")
+        upPayment.setReserve(String.valueOf(resultMap.get("reserve")));
+        if(String.valueOf(resultMap.get("memo"))!="null")
+        upPayment.setMemo(String.valueOf(resultMap.get("memo")));
+        if(String.valueOf(resultMap.get("sysflowsource"))!="null")
+        upPayment.setSysflowsource(String.valueOf(resultMap.get("sysflowsource")));
+        if(String.valueOf(resultMap.get("remark"))!="null")
+        upPayment.setRemark(String.valueOf(resultMap.get("remark")));
+        int upPay = colinfoPaymentMapper.updateByPrimaryKeySelective(upPayment);
+
+        AgentColinfo upColinfo = new AgentColinfo();
+        upColinfo.setId(aColinfoPayment.getColinfoId());
+        if(String.valueOf(resultMap.get("flag")).equals(TransFlag.B.getValue())){
+            upColinfo.setPayStatus(ColinfoPayStatus.C.getValue());
+        }else if(String.valueOf(resultMap.get("flag")).equals(TransFlag.C.getValue())){
+            upColinfo.setPayStatus(ColinfoPayStatus.D.getValue());
+        }else {
+            upColinfo.setPayStatus(ColinfoPayStatus.E.getValue());
+        }
+        int upCol = agentColinfoMapper.updateByPrimaryKeySelective(upColinfo);
+        if(upPay!=1 || upCol!=1){
+            logger.info("updateByPaymentResult,upPay：{},upCol：{}",upPay,upCol);
+            throw new Exception("更新返回结果异常");
+        }
+    }
+
+
 }

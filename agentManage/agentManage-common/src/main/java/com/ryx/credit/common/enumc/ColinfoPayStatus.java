@@ -16,7 +16,8 @@ public enum ColinfoPayStatus {
     A(1, "未处理"),
     B(2, "待验证"),
     C(3, "验证成功"),
-    D(4, "验证失败");
+    D(4, "验证失败"),
+    E(5, "结果未知");
 
     public BigDecimal code;
 
