@@ -52,8 +52,8 @@ public class ColinfoTask {
     /**
      * 21:50
      */
-//    @Scheduled(cron = "0 50 21 * * ? *")
 //    @Scheduled(cron = "0/30 * * * * ?")
+    @Scheduled(cron = "0 50 21 * * ? *")
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动");
         Map<String,Object> params = new HashMap<>();
@@ -128,6 +128,7 @@ public class ColinfoTask {
 
 
     @Scheduled(cron = "0 10 * * * ?")
+//    @Scheduled(cron = "0/30 * * * * ?")
     public void synColinfoToQueryPayment() {
         try {
             AColinfoPaymentExample aColinfoPaymentExample = new AColinfoPaymentExample();
@@ -172,7 +173,7 @@ public class ColinfoTask {
 
     private String httpForColinfo(AColinfoPayment colinfoPayment) throws Exception{
         Map<String, String> map = new HashMap<>();
-        map.put("balanceLs", colinfoPayment.getBalanceLs());
+        map.put("id", colinfoPayment.getBalanceLs());
         String params = JsonUtil.objectToJson(map);
         log.info("balanceLs:{},收款账户出款请求参数：{}",colinfoPayment.getBalanceLs(),params);
         String httpResult = HttpClientUtil.doPostJson(COLINFO_URL, params);
