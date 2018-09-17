@@ -77,7 +77,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         ac.setStatus(Status.STATUS_1.status);
         ac.setVarsion(Status.STATUS_1.status);
         ac.setId(idService.genId(TabId.a_agent_colinfo));
-
+        ac.setPayStatus(ColinfoPayStatus.A.getValue());
         //银行卡扫描件
         boolean isHaveYHKSMJ = false;
         //开户许可证
@@ -237,6 +237,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setBankRegion(agentColinfoVo.getBankRegion());
                     db_AgentColinfo.setCloInvoice(agentColinfoVo.getCloInvoice());
                     db_AgentColinfo.setCloTaxPoint(agentColinfoVo.getCloTaxPoint());
+                    db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
+                    db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
                         throw new ProcessException("更新收款信息失败");
                     }else{

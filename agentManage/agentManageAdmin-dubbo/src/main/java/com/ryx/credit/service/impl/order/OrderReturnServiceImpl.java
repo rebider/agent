@@ -559,8 +559,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setReturnCount(MapUtil.getBigDecimal(map, "count"));
                 returnOrderDetail.setReturnAmt(MapUtil.getBigDecimal(map, "totalPrice"));
                 returnOrderDetail.setReturnTime(new Date());
+                returnOrderDetail.setIsDeposit(Status.STATUS_0.status);
                 returnOrderDetail.setcTime(new Date());
+                returnOrderDetail.setuTime(new Date());
                 returnOrderDetail.setcUser(agentId);
+                returnOrderDetail.setuUser(agentId);
+                returnOrderDetail.setStatus(Status.STATUS_1.status);
+                returnOrderDetail.setVersion(Status.STATUS_1.status);
                 returnOrderDetailMapper.insertSelective(returnOrderDetail);
             } catch (Exception e) {
                 log.error("生成退货明细失败", e);

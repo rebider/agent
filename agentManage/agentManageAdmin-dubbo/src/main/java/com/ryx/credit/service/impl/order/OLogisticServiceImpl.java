@@ -180,7 +180,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("请填写物流单号");
                     throw new MessageException("请填写物流单号");
                 }
-
+                OSubOrderExample example = new OSubOrderExample();
+                example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
+                List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
+                if(subOrders.size()!=1){
+                    logger.info("请填写物流单号");
+                    throw new MessageException("订单["+orderId+"]的商品["+proId+"]数量大于1");
+                }
+                OSubOrder subOrderItem = subOrders.get(0);
                 //校验文档不能更改
                 List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
                 if(listItem.size()>0){
@@ -240,7 +247,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setOrderId(orderId);       // 订单编号
                 oLogistics.setProId(proId);         // 商品ID
                 oLogistics.setProName(proName);       // 商品名称
-
+                oLogistics.setProPrice(subOrderItem.getProRelPrice());//商品单价
                 //排单信息
                 ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
                 if(planVo==null)throw new MessageException("排单信息未找到");
