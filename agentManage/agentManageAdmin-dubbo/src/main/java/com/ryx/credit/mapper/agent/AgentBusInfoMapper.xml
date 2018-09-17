@@ -877,9 +877,15 @@
 
   <select id="queryByBusNum" parameterType="java.lang.String" resultType="map">
       select
-        <include refid="Base_Column_List" />
-      from a_agent_businfo
+        a.ID, a.AGENT_ID,a.BUS_NUM, a.BUS_PLATFORM, a.BUS_TYPE, a.BUS_PARENT, a.BUS_RISK_PARENT, a.BUS_ACTIVATION_PARENT,
+        a.BUS_REGION, a.BUS_SENT_DIRECTLY, a.BUS_DIRECT_CASHBACK, a.BUS_INDE_ASS, a.BUS_CONTACT, a.BUS_CONTACT_MOBILE,
+        a.BUS_CONTACT_EMAIL, a.BUS_CONTACT_PERSON, a.BUS_RISK_EMAIL, a.CLO_TAX_POINT, a.CLO_INVOICE,
+        a.CLO_RECEIPT, a.CLO_PAY_COMPANY, a.CLO_AGENT_COLINFO, a.BUS_STATUS, a.CLO_REVIEW_STATUS, a.C_TIME,
+        a.C_UTIME, a.C_USER, a.STATUS, a.VERSION, a.AG_ZBH, a.BUS_USE_ORGAN, a.BUS_SCOPE, a.DREDGE_S0, a.BUS_LOGIN_NUM,
+        b.AG_NAME
+      from  a_agent b,a_agent_businfo a
       <where>
+         b.id = a.agent_id
          bus_num = #{busNum}
       </where>
   </select>
