@@ -53,7 +53,7 @@ public class ColinfoTask {
      * 21:50
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
-    @Scheduled(cron = "0 50 21 * * ? *")
+    @Scheduled(cron = "0 50 21 * * ?")
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动");
         Map<String,Object> params = new HashMap<>();
