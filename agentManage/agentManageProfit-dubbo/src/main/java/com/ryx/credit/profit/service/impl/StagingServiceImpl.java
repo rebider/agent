@@ -257,6 +257,9 @@ public class StagingServiceImpl implements StagingService {
 
     @Override
     public void insetStagingDetail(ProfitStagingDetail stagingDetail) {
+        if (stagingDetail.getId() ==null) {
+            stagingDetail.setId(idService.genId(TabId.P_STAGING_DETAIL));
+        }
         profitStagingDetailMapper.insert(stagingDetail);
     }
 
