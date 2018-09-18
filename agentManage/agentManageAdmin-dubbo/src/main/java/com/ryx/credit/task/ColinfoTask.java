@@ -54,7 +54,7 @@ public class ColinfoTask {
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
 //    @Scheduled(cron = "0 50 21 * * ?")
-    @Scheduled(cron = "0 30 11 * * ?")
+    @Scheduled(cron = "0 30 13 * * ?")
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动:{}",new Date());
         Map<String,Object> params = new HashMap<>();
@@ -69,13 +69,14 @@ public class ColinfoTask {
             log.info("synColinfoToPayment,synList为空暂不同步size：0");
             return;
         }
-
+        String merchId = "";
         try {
-            synList.forEach(row->{
+            for (Map<String, Object> row : synList) {
                 AColinfoPayment payment = new AColinfoPayment();
                 Date nowDate = new Date();
-                payment.setColinfoId(String.valueOf(row.get("ID")));
                 payment.setMerchId(String.valueOf(row.get("AG_UNIQ_NUM")));
+                merchId = payment.getMerchId();
+                payment.setColinfoId(String.valueOf(row.get("ID")));
                 payment.setMerchName(String.valueOf(row.get("AG_NAME")));
                 payment.setBalanceRcvAcc(String.valueOf(row.get("CLO_BANK_ACCOUNT")));
                 payment.setBalanceRcvBank(String.valueOf(row.get("CLO_REALNAME")));
@@ -86,8 +87,8 @@ public class ColinfoTask {
                 payment.setcUser(String.valueOf(row.get("C_USER")));
                 payment.setuUser(String.valueOf(row.get("C_USER")));
                 payment.setCreateTime(nowDate);
-                payment.setTranDate(DateUtil.format(nowDate,DateUtil.DATE_FORMAT_3));
-                payment.setInputTime(DateUtil.format(nowDate,DateUtil.DATE_FORMAT_2));
+                payment.setTranDate(DateUtil.format(nowDate, DateUtil.DATE_FORMAT_3));
+                payment.setInputTime(DateUtil.format(nowDate, DateUtil.DATE_FORMAT_2));
                 payment.setBalanceAmt(getRandomAmt());
                 payment.setStatus(Status.STATUS_1.status);
                 payment.setVersion(Status.STATUS_0.status);
@@ -99,12 +100,12 @@ public class ColinfoTask {
                 try {
                     agentColinfoService.insertByPayment(payment);
                 } catch (Exception e) {
-                    log.info("synColinfoToPayment同步insert异常:{}",e.getMessage());
+                    log.info("synColinfoToPayment同步insert,merchId:{},异常:{}", payment.getMerchId(), e.getMessage());
                     e.printStackTrace();
                 }
-            });
+            }
         } catch (Exception e) {
-            log.info("synColinfoToPayment同步出现异常:{}",e.getMessage());
+            log.info("synColinfoToPayment同步出现异常:{},代理商ID:{}",e.getMessage(),merchId);
             e.printStackTrace();
         }
     }
