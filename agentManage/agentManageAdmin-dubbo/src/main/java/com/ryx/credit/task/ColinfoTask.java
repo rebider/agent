@@ -53,8 +53,8 @@ public class ColinfoTask {
      * 21:50
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
-//    @Scheduled(cron = "0 50 21 * * ?")
-    @Scheduled(cron = "0 30 13 * * ?")
+//    @Scheduled(cron = "0 30 13 * * ?")
+    @Scheduled(cron = "0 0/30 9-22 * * ? ")
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动:{}",new Date());
         Map<String,Object> params = new HashMap<>();
@@ -130,9 +130,8 @@ public class ColinfoTask {
         return bigDecimal;
     }
 
-
+//  @Scheduled(cron = "0/30 * * * * ?")
     @Scheduled(cron = "0 0/10 * * * ?")
-//    @Scheduled(cron = "0/30 * * * * ?")
     public void synColinfoToQueryPayment() {
         try {
             log.info("synColinfoToQueryPayment定时查询启动:{}",new Date());
@@ -157,7 +156,7 @@ public class ColinfoTask {
                     continue;
                 }
                 String info = String.valueOf(resultMap.get("info"));
-                if(StringUtils.isBlank(info) || info.equals("null")){
+                if(StringUtils.isBlank(info) || info.equals("null") || info.equals("[]")){
                     log.info("synColinfoToQueryPayment,查询info为空,balanceLs：{},info:{}",aColinfoPayment.getBalanceLs(),info);
                     continue;
                 }
