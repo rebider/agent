@@ -1,6 +1,9 @@
 package com.ryx.credit.common.enumc;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 分润出款状态
  * @version V1.0
@@ -51,6 +54,19 @@ public enum TransFlag {
             }
         }
         return "";
+    }
+
+    /**
+     * 返回map
+     * @return
+     */
+    public static Map<String,Object> getItemMap(){
+        TransFlag[] valus = TransFlag.values();
+        Map<String,Object> resultMap = new HashMap<>();
+        for (TransFlag transFlag : valus) {
+            resultMap.put(transFlag.getValue(),transFlag.getContent());
+        }
+        return resultMap;
     }
 
 }
