@@ -121,4 +121,7 @@ public interface ProfitComputerService {
      * @param profitDate 计算月份
      */
     void computerTax(String profitDate);
+    
+    void new_computerTax() throws Exception;
+
 }
