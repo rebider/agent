@@ -444,6 +444,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
                 profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
             });
+//            profitComputerService.new_computerTax
         }else{
             LOG.error("没有分润数据。");
         }
@@ -520,7 +521,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
                 profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
                 profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
-                if (!"0".equals(map.get("parentDeductPosRewardAmt").toString())) {
+                if (map.get("parentDeductPosRewardAmt") != null && !"0".equals(map.get("parentDeductPosRewardAmt").toString())) {
                     parentPosReward.put(map.get("parentAgentPid").toString(), (BigDecimal) map.get("parentDeductPosRewardAmt"));
                 }
                 // 判断是否存在奖励
@@ -534,6 +535,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             }
         }else{
             profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
+            profitDetailMonthTemp.setPosRewardDeductionAmt(BigDecimal.ZERO);
         }
     }
 
