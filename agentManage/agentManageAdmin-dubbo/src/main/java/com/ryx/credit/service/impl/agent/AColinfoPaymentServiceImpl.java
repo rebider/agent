@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -37,6 +38,16 @@ public class AColinfoPaymentServiceImpl implements AColinfoPaymentService {
         if(StringUtils.isNotBlank(colinfoPayment.getMerchName())){
             criteria.andMerchNameEqualTo(colinfoPayment.getMerchName());
         }
+        if(StringUtils.isNotBlank(colinfoPayment.getBalanceLs())){
+            criteria.andBalanceLsEqualTo(colinfoPayment.getBalanceLs());
+        }
+        if(StringUtils.isNotBlank(colinfoPayment.getColinfoId())){
+            criteria.andColinfoIdEqualTo(colinfoPayment.getColinfoId());
+        }
+        if(StringUtils.isNotBlank(colinfoPayment.getFlag())){
+            criteria.andFlagEqualTo( colinfoPayment.getFlag());
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         aColinfoPaymentExample.setPage(page);
         aColinfoPaymentExample.setOrderByClause(" create_time desc");
         List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
