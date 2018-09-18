@@ -54,7 +54,7 @@ public class ColinfoTask {
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
 //    @Scheduled(cron = "0 50 21 * * ?")
-    @Scheduled(cron = "0 50 10 * * ?")
+    @Scheduled(cron = "0 30 11 * * ?")
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动:{}",new Date());
         Map<String,Object> params = new HashMap<>();
@@ -85,7 +85,7 @@ public class ColinfoTask {
                 payment.setFlag(TransFlag.A.getValue());   //待处理
                 payment.setcUser(String.valueOf(row.get("C_USER")));
                 payment.setuUser(String.valueOf(row.get("C_USER")));
-                payment.setCreateTime(DateUtil.format(nowDate,DateUtil.DATE_FORMAT_2));
+                payment.setCreateTime(nowDate);
                 payment.setTranDate(DateUtil.format(nowDate,DateUtil.DATE_FORMAT_3));
                 payment.setInputTime(DateUtil.format(nowDate,DateUtil.DATE_FORMAT_2));
                 payment.setBalanceAmt(getRandomAmt());
@@ -100,10 +100,12 @@ public class ColinfoTask {
                     agentColinfoService.insertByPayment(payment);
                 } catch (Exception e) {
                     log.info("synColinfoToPayment同步insert异常:{}",e.getMessage());
+                    e.printStackTrace();
                 }
             });
         } catch (Exception e) {
             log.info("synColinfoToPayment同步出现异常:{}",e.getMessage());
+            e.printStackTrace();
         }
     }
 
