@@ -25,7 +25,7 @@
     <result column="ACCOUNT_ID" jdbcType="VARCHAR" property="accountId" />
     <result column="PAY_DATE" jdbcType="VARCHAR" property="payDate" />
     <result column="ORG_ACCOUNT_ID" jdbcType="VARCHAR" property="orgAccountId" />
-    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
     <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
     <result column="RESERVE" jdbcType="VARCHAR" property="reserve" />
     <result column="MEMO" jdbcType="VARCHAR" property="memo" />
@@ -65,10 +65,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, COLINFO_ID, MERCH_ID, MERCH_NAME, TRAN_DATE, BALANCE_AMT, BALANCE_RCV_ACC, BALANCE_RCV_BANK, 
-    BALANCE_RCV_NAME, BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME, CHANNEL_ID, REMARK, 
-    BALANCE_LS, CREATE_BATCH_TIME, BATCH_CODE, FLAG, ERR_DESC, DATASOURCE, ACCOUNT_ID, 
-    PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME, UPDATE_TIME, RESERVE, MEMO, SYSFLOWSOURCE, 
+    ID, COLINFO_ID, MERCH_ID, MERCH_NAME, TRAN_DATE, BALANCE_AMT, BALANCE_RCV_ACC, BALANCE_RCV_BANK,
+    BALANCE_RCV_NAME, BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME, CHANNEL_ID, REMARK,
+    BALANCE_LS, CREATE_BATCH_TIME, BATCH_CODE, FLAG, ERR_DESC, DATASOURCE, ACCOUNT_ID,
+    PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME, UPDATE_TIME, RESERVE, MEMO, SYSFLOWSOURCE,
     C_USER, U_USER, STATUS, VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPaymentExample" resultMap="BaseResultMap">
@@ -88,7 +88,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_COLINFO_PAYMENT
     where ID = #{id,jdbcType=VARCHAR}
@@ -100,28 +100,28 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
-    insert into A_COLINFO_PAYMENT (ID, COLINFO_ID, MERCH_ID, 
-      MERCH_NAME, TRAN_DATE, BALANCE_AMT, 
-      BALANCE_RCV_ACC, BALANCE_RCV_BANK, BALANCE_RCV_NAME, 
-      BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME, 
-      CHANNEL_ID, REMARK, BALANCE_LS, 
-      CREATE_BATCH_TIME, BATCH_CODE, FLAG, 
-      ERR_DESC, DATASOURCE, ACCOUNT_ID, 
-      PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME, 
-      UPDATE_TIME, RESERVE, MEMO, 
-      SYSFLOWSOURCE, C_USER, U_USER, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{colinfoId,jdbcType=VARCHAR}, #{merchId,jdbcType=VARCHAR}, 
-      #{merchName,jdbcType=VARCHAR}, #{tranDate,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL}, 
-      #{balanceRcvAcc,jdbcType=VARCHAR}, #{balanceRcvBank,jdbcType=VARCHAR}, #{balanceRcvName,jdbcType=VARCHAR}, 
-      #{balanceRcvCode,jdbcType=VARCHAR}, #{balanceRcvType,jdbcType=VARCHAR}, #{inputTime,jdbcType=VARCHAR}, 
-      #{channelId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{balanceLs,jdbcType=VARCHAR}, 
-      #{createBatchTime,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{flag,jdbcType=VARCHAR}, 
-      #{errDesc,jdbcType=VARCHAR}, #{datasource,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR}, 
-      #{payDate,jdbcType=VARCHAR}, #{orgAccountId,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, 
-      #{updateTime,jdbcType=VARCHAR}, #{reserve,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR}, 
-      #{sysflowsource,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into A_COLINFO_PAYMENT (ID, COLINFO_ID, MERCH_ID,
+    MERCH_NAME, TRAN_DATE, BALANCE_AMT,
+    BALANCE_RCV_ACC, BALANCE_RCV_BANK, BALANCE_RCV_NAME,
+    BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME,
+    CHANNEL_ID, REMARK, BALANCE_LS,
+    CREATE_BATCH_TIME, BATCH_CODE, FLAG,
+    ERR_DESC, DATASOURCE, ACCOUNT_ID,
+    PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME,
+    UPDATE_TIME, RESERVE, MEMO,
+    SYSFLOWSOURCE, C_USER, U_USER,
+    STATUS, VERSION)
+    values (#{id,jdbcType=VARCHAR}, #{colinfoId,jdbcType=VARCHAR}, #{merchId,jdbcType=VARCHAR},
+    #{merchName,jdbcType=VARCHAR}, #{tranDate,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL},
+    #{balanceRcvAcc,jdbcType=VARCHAR}, #{balanceRcvBank,jdbcType=VARCHAR}, #{balanceRcvName,jdbcType=VARCHAR},
+    #{balanceRcvCode,jdbcType=VARCHAR}, #{balanceRcvType,jdbcType=VARCHAR}, #{inputTime,jdbcType=VARCHAR},
+    #{channelId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{balanceLs,jdbcType=VARCHAR},
+    #{createBatchTime,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{flag,jdbcType=VARCHAR},
+    #{errDesc,jdbcType=VARCHAR}, #{datasource,jdbcType=VARCHAR}, #{accountId,jdbcType=VARCHAR},
+    #{payDate,jdbcType=VARCHAR}, #{orgAccountId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+    #{updateTime,jdbcType=VARCHAR}, #{reserve,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR},
+    #{sysflowsource,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
     insert into A_COLINFO_PAYMENT
@@ -294,7 +294,7 @@
         #{orgAccountId,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
-        #{createTime,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=VARCHAR},
@@ -398,7 +398,7 @@
         ORG_ACCOUNT_ID = #{orgAccountId,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null">
-        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+        CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
         UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
@@ -451,7 +451,7 @@
       ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
       PAY_DATE = #{payDate,jdbcType=VARCHAR},
       ORG_ACCOUNT_ID = #{orgAccountId,jdbcType=VARCHAR},
-      CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
       UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
       RESERVE = #{reserve,jdbcType=VARCHAR},
       MEMO = #{memo,jdbcType=VARCHAR},
@@ -464,7 +464,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

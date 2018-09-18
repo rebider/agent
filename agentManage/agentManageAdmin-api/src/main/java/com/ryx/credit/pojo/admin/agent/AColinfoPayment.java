@@ -2,6 +2,7 @@ package com.ryx.credit.pojo.admin.agent;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class AColinfoPayment implements Serializable {
     private String id;
@@ -50,7 +51,7 @@ public class AColinfoPayment implements Serializable {
 
     private String orgAccountId;
 
-    private String createTime;
+    private Date createTime;
 
     private String updateTime;
 
@@ -252,12 +253,12 @@ public class AColinfoPayment implements Serializable {
         this.orgAccountId = orgAccountId == null ? null : orgAccountId.trim();
     }
 
-    public String getCreateTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime == null ? null : createTime.trim();
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public String getUpdateTime() {
