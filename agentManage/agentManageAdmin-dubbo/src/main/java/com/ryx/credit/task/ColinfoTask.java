@@ -56,7 +56,7 @@ public class ColinfoTask {
 //    @Scheduled(cron = "0 50 21 * * ?")
     @Scheduled(cron = "0 50 10 * * ?")
     public void synColinfoToPayment() {
-        log.info("synColinfoToPayment定时任务启动");
+        log.info("synColinfoToPayment定时任务启动:{}",new Date());
         Map<String,Object> params = new HashMap<>();
         params.put("payStatus", ColinfoPayStatus.A.getValue());
         params.put("agStatus",AgStatus.Approved.name());
@@ -128,10 +128,11 @@ public class ColinfoTask {
     }
 
 
-    @Scheduled(cron = "0 10 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
 //    @Scheduled(cron = "0/30 * * * * ?")
     public void synColinfoToQueryPayment() {
         try {
+            log.info("synColinfoToQueryPayment定时查询启动:{}",new Date());
             AColinfoPaymentExample aColinfoPaymentExample = new AColinfoPaymentExample();
             AColinfoPaymentExample.Criteria criteria = aColinfoPaymentExample.createCriteria();
             criteria.andFlagEqualTo(TransFlag.A.getValue());
