@@ -5,6 +5,7 @@ import com.ryx.credit.profit.pojo.ProfitStagingExample;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ProfitStagingMapper {
     int countByExample(ProfitStagingExample example);
@@ -23,5 +24,5 @@ public interface ProfitStagingMapper {
 
     int updateByPrimaryKey(ProfitStaging record);
 
-    ProfitStaging getNotDeductionAmt(String agentId);
+    ProfitStaging getNotDeductionAmt(Map<String, Object> param);
 }
