@@ -15,7 +15,7 @@ public interface DataChangeActivityService {
      * @param dataChangeId
      * @return
      */
-    public ResultVO startDataChangeActivity(String dataChangeId,String userId);
+    ResultVO startDataChangeActivity(String dataChangeId,String userId)throws Exception;
 
     /**
      * 收款账户修改 审批完成处理
@@ -23,7 +23,7 @@ public interface DataChangeActivityService {
      * @param agStatus
      * @return
      */
-    public ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus)throws Exception;
+    ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus)throws Exception;
 
 
 
