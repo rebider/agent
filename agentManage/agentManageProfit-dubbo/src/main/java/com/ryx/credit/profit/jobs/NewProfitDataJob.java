@@ -160,8 +160,17 @@ public class NewProfitDataJob {
                 profitDetailMonthTemp= profitDetailMonthMapper.selectByIdAndParent(profitDetailMonthTemp);
                 if (profitDetailMonthTemp==null) {
                     profitDetailMonthTemp = new ProfitDetailMonth();
+                    insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
+                }else{
+                    profitDetailMonthTemp.setTranAmt(transProfitDetail.getInTransAmt());
+                    profitDetailMonthTemp.setPayAmt(transProfitDetail.getOutTransAmt());
+                    profitDetailMonthTemp.setTranProfitScale(transProfitDetail.getInProfitScale().toString());
+                    profitDetailMonthTemp.setPayProfitScale(transProfitDetail.getOutProfitScale().toString());
+                    profitDetailMonthTemp.setTranProfitAmt(transProfitDetail.getInProfitAmt());
+                    profitDetailMonthTemp.setPayProfitAmt(transProfitDetail.getOutProfitAmt());
+                    profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
+                    profitDetailMonthServiceImpl.update(profitDetailMonthTemp);
                 }
-                insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
             });
         }
     }
