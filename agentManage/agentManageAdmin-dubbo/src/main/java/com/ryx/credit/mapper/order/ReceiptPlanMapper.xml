@@ -334,9 +334,9 @@
   <select id="getReceipPlanList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT
-    agent.AG_UNIQ_NUM,agent.AG_NAME,c.PLATFORM_NAME,os.pro_type,oso.activity_name,(P.PRO_NUM-P.SEND_NUM )AS residue,
+    agent.AG_UNIQ_NUM,agent.AG_NAME,c.PLATFORM_NAME,oso.activity_name,(P.PRO_NUM-P.SEND_NUM )AS residue,
     R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
-    R.PRO_COM,
+    R.PRO_COM,DI.D_ITEMNAME AS PRO_COM_STRING,DICT.D_ITEMNAME AS pro_type,
     R.PLAN_PRO_NUM,R.SEND_PRO_NUM,R.MODEL,R.RETURN_ORDER_DETAIL_ID,
     O.ADDR_REALNAME,O.ADDR_MOBILE,O.ADDR_PROVINCE,O.ADDR_CITY,O.ADDR_DISTRICT,O.ADDR_DETAIL,
     O.REMARK,O.ZIP_CODE,O.EXPRESS_REMARK,to_char(R.C_DATE,'YYYY-MM-DD') as C_DATE,
@@ -347,11 +347,12 @@
     LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
     LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
     LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
-
+    LEFT JOIN D_DICT DI ON DI.D_GROUP='ORDER' AND DI.D_ARTIFACT='MANUFACTURER' AND DI.D_ITEMVALUE=R.PRO_COM
     LEFT JOIN  o_order orders  on R.order_id=orders.id
     left join a_agent agent on agent.id=orders.agent_id
     left join a_platform c on c.platform_num = orders.order_platform
     left join o_sub_order os on os.order_id =orders.id and os.status=1
+    LEFT JOIN D_DICT DICT ON DICT.D_GROUP='ORDER' AND DICT.D_ARTIFACT='MODEL_TYPE' AND DICT.D_ITEMVALUE=os.pro_type
     left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
     left join o_payment d on d.order_id = R.order_id
     <include refid="BASE_WHERE_SQL"></include>
@@ -367,11 +368,12 @@
     LEFT JOIN D_REGION C ON O.ADDR_CITY = C.R_CODE
     LEFT JOIN D_REGION E ON O.ADDR_DISTRICT = E.R_CODE
     LEFT JOIN O_RECEIPT_PRO P ON R.PRO_ID = P.ID
-
+    LEFT JOIN D_DICT DI ON DI.D_GROUP='ORDER' AND DI.D_ARTIFACT='MANUFACTURER' AND DI.D_ITEMVALUE=R.PRO_COM
     LEFT JOIN  o_order orders  on R.order_id=orders.id
     left join a_agent agent on agent.id=orders.agent_id
     left join a_platform c on c.platform_num = orders.order_platform
     left join o_sub_order os on os.order_id =orders.id and os.status=1
+    LEFT JOIN D_DICT DICT ON DICT.D_GROUP='ORDER' AND DICT.D_ARTIFACT='MODEL_TYPE' AND DICT.D_ITEMVALUE=os.pro_type
     left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
     left join o_payment d on d.order_id = R.order_id
     <include refid="BASE_WHERE_SQL"></include>
