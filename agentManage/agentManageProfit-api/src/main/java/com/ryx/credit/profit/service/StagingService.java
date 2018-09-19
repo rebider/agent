@@ -7,6 +7,7 @@ import com.ryx.credit.profit.pojo.ProfitStaging;
 import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @author zhaodw
@@ -89,11 +90,10 @@ public interface StagingService {
 
      /***
      * @Description: 获取代理商分期未扣完金额
-     * @Param:agentId 业务平台机构id
      * @return: 未分期总金额
      * @Author: zhaodw
      * @Date: 2018/8/9
      */
-     BigDecimal getNotDeductionAmt(String agentId);
+     BigDecimal getNotDeductionAmt(Map<String, Object> param);
 
 }
