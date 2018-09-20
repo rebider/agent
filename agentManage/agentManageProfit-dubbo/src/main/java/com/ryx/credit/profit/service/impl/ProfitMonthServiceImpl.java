@@ -406,7 +406,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 // 退单补款+
                 sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
                 // 其他补款+
-                profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.total_supply(profitDetailMonthTemp.getAgentPid(), null));
+                profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
                 sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
                 // POS考核奖励
                  getPosReward(profitDetailMonthTemp, parentPosReward);
@@ -444,7 +444,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
                 profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
             });
-//            profitComputerService.new_computerTax
+            try {
+                profitComputerService.new_computerTax();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else{
             LOG.error("没有分润数据。");
         }
@@ -607,6 +611,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private BigDecimal doTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentId());
+        profitDeduction.setParentAgentPid(profitDetailMonthTemp.getParentAgentId());
         profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitDeduction.setSourceId("02");
         // pos退单应扣款
