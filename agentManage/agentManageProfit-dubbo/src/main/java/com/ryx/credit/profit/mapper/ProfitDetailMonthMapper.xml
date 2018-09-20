@@ -192,6 +192,9 @@
     <if test="parentAgentId != null">
       AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
     </if>
+    <if test="parentAgentId == null">
+      AND PARENT_AGENT_ID is null
+    </if>
   </select>
 
 
