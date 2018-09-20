@@ -56,4 +56,18 @@ public class AColinfoPaymentServiceImpl implements AColinfoPaymentService {
         pageInfo.setTotal((int)colinfoPaymentMapper.countByExample(aColinfoPaymentExample));
         return pageInfo;
     }
+
+
+    @Override
+    public List<AColinfoPayment> queryConlifoPaymentList(String agentId,String cloBankAccount){
+
+        AColinfoPaymentExample aColinfoPaymentExample = new AColinfoPaymentExample();
+        AColinfoPaymentExample.Criteria criteria = aColinfoPaymentExample.createCriteria();
+        criteria.andMerchIdEqualTo(agentId);
+        criteria.andBalanceRcvAccEqualTo(cloBankAccount);
+        List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
+
+        return aColinfoPayments;
+    }
+
 }

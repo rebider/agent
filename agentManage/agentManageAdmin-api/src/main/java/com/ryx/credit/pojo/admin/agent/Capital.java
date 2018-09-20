@@ -54,6 +54,20 @@ public class Capital implements Serializable{
 
     private String cUser;
 
+    private String cPayuser;
+
+    private BigDecimal cFqCount;
+
+    private String cPayType;
+
+    private String cInCom;
+
+    private BigDecimal cFqInAmount;
+
+    private Date cFqDate;
+
+    private BigDecimal cloReviewStatus;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -61,7 +75,6 @@ public class Capital implements Serializable{
     public void setAttachmentList(List<Attachment> attachmentList) {
         this.attachmentList = attachmentList;
     }
-
     public String getId() {
         return id;
     }
@@ -195,6 +208,62 @@ public class Capital implements Serializable{
     }
 
     public void setcUser(String cUser) {
-        this.cUser = cUser;
+        this.cUser = cUser == null ? null : cUser.trim();
+    }
+
+    public String getcPayuser() {
+        return cPayuser;
+    }
+
+    public void setcPayuser(String cPayuser) {
+        this.cPayuser = cPayuser == null ? null : cPayuser.trim();
+    }
+
+    public BigDecimal getcFqCount() {
+        return cFqCount;
+    }
+
+    public void setcFqCount(BigDecimal cFqCount) {
+        this.cFqCount = cFqCount;
+    }
+
+    public String getcPayType() {
+        return cPayType;
+    }
+
+    public void setcPayType(String cPayType) {
+        this.cPayType = cPayType == null ? null : cPayType.trim();
+    }
+
+    public String getcInCom() {
+        return cInCom;
+    }
+
+    public void setcInCom(String cInCom) {
+        this.cInCom = cInCom == null ? null : cInCom.trim();
+    }
+
+    public BigDecimal getcFqInAmount() {
+        return cFqInAmount;
+    }
+
+    public void setcFqInAmount(BigDecimal cFqInAmount) {
+        this.cFqInAmount = cFqInAmount;
+    }
+
+    public Date getcFqDate() {
+        return cFqDate;
+    }
+
+    public void setcFqDate(Date cFqDate) {
+        this.cFqDate = cFqDate;
+    }
+
+    public BigDecimal getCloReviewStatus() {
+        return cloReviewStatus;
+    }
+
+    public void setCloReviewStatus(BigDecimal cloReviewStatus) {
+        this.cloReviewStatus = cloReviewStatus;
     }
 }
