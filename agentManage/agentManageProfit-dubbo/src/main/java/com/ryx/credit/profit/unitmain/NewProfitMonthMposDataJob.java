@@ -11,8 +11,10 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
+import com.ryx.credit.profit.dao.ProfitSupplyDiffMapper;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.ProfitDay;
+import com.ryx.credit.profit.pojo.ProfitSupplyDiff;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitComputerService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
@@ -44,6 +46,8 @@ public class NewProfitMonthMposDataJob {
     Logger logger = LogManager.getLogger(this.getClass());
     @Autowired
     private TransProfitDetailMapper transProfitDetailMapper;
+    @Autowired
+    private ProfitSupplyDiffMapper diffMapper;
     @Autowired
     private ProfitDayMapper dayMapper;
     @Autowired
@@ -160,6 +164,12 @@ public class NewProfitMonthMposDataJob {
             detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
             detail.setSourceInfo("MPOS");
 
+            ProfitSupplyDiff where = new ProfitSupplyDiff();
+            where.setDiffDate(transDate);
+            where.setAgentId(json.getString("AGENCYID"));
+            where.setParentAgentid(json.getString("ONLINEAGENCYID"));
+            BigDecimal supplyAmt = diffMapper.selectAmtByWhere(where);
+            detail.setSupplyAmt(supplyAmt==null?BigDecimal.ZERO:supplyAmt);//补差金额
             //计算
             AgentResult agentResult = orderService.queryPaymentXXDK(json.getString("AGENCYID"));//查询线下打款数据信息
             List<HashMap> maps = new ArrayList<HashMap>();

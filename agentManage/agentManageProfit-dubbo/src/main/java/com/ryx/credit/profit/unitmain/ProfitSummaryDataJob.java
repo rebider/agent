@@ -112,6 +112,9 @@ public class ProfitSummaryDataJob {
                 detailMonth.setTpProfitAmt(detail.getProfitAmt());
             }
 
+            if(detail.getSupplyAmt()!=null && detail.getSupplyAmt().compareTo(BigDecimal.ZERO)>0){
+                detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt()==null?detail.getSupplyAmt():detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
+            }
             //获取账户信息
             List<AgentColinfo> agentColinfos = agentColinfoService.queryAgentColinfoService(detail.getAgentId(),null, AgStatus.Approved.status);
             if (agentColinfos != null && agentColinfos.size() > 0) {
