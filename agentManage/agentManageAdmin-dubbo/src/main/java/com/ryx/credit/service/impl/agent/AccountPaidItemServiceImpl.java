@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -70,6 +67,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         Date nowDate = new Date();
         capital.setcTime(nowDate);
         capital.setcUtime(nowDate);
+        capital.setCloReviewStatus(AgStatus.Create.status);
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
             if(fileIdList!=null) {
