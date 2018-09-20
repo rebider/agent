@@ -45,4 +45,7 @@ public interface AgentColinfoService {
 
     void updateByPaymentResult(AColinfoPayment aColinfoPayment, Map<String, Object> resultMap) throws Exception;
 
+    AgentColinfo selectByPrimaryKey(String id);
+
+    AgentColinfo selectByAgentId(String agentId);
 }
