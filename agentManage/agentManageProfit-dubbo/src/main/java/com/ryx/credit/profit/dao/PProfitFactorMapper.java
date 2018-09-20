@@ -32,4 +32,6 @@ public interface PProfitFactorMapper {
     Long getProfitFactorCount(Map <String, Object> param);
 
     PProfitFactor selectByData(PProfitFactor profitFactor);
+
+    int resetDataFactor();
 }

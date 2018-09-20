@@ -72,9 +72,9 @@ public class NewProfitMonthMposDataJob {
      * transDate 交易日期（空则为上一月）
      * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
      */
-//    @Scheduled(cron = "0 10 10 20 * ?")
+//    @Scheduled(cron = "0 0 5 12 * ?")
     public void synchroProfitMonth(){
-        String transDate = "201808";
+        String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
         map.put("frMonth", transDate);

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.DateUtil;
@@ -135,26 +136,26 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         List<String> list = new ArrayList<>();
         for (List<Object> supply : data) {
             ProfitSupply profitSupply = new ProfitSupply();
-            profitSupply.setId(idService.genId(TabId.p_profit_supply));   // ID序列号
-            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));                 // 录入日期
+            profitSupply.setId(idService.genId(TabId.p_profit_supply));// ID序列号
+            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));// 录入日期
             try {
-                profitSupply.setAgentId(null != supply.get(0) ? String.valueOf(supply.get(0)) : "");      // 代理商编号
-                profitSupply.setAgentName(null != supply.get(1) ? String.valueOf(supply.get(1)) : "");     // 代理商名称
-                profitSupply.setParentAgentId(null != supply.get(2) ? String.valueOf(supply.get(2)) : "");      // 上级代理商编号
-                profitSupply.setParentAgentName(null != supply.get(3) ? String.valueOf(supply.get(3)) : "");     // 上级代理商名称
-                profitSupply.setSupplyDate(null != supply.get(4) ? String.valueOf(supply.get(4)) : "");    // 月份
-                profitSupply.setSupplyType(null != supply.get(5) ? String.valueOf(supply.get(5)) : "");    // 补款类型
-                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(6))));                  // 补款金额
-                profitSupply.setSupplyCode(null != supply.get(7) ? String.valueOf(supply.get(7)) : "");    // 补款码
+                profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
+                profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
+                profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
+                profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
+                profitSupply.setSupplyDate(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//月份
+                profitSupply.setSupplyType(null!=supply.get(5)?String.valueOf(supply.get(5)):"");//补款类型
+                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(6))));//补款金额
+                profitSupply.setSupplyCode(null!=supply.get(7)?String.valueOf(supply.get(7)):"");//补款码
             } catch (Exception e) {
-                logger.info("Excel参数错误！");
-                throw new ProcessException("Excel参数错误！");
+                e.printStackTrace();
+                throw e;
             }
 
-            logger.info("导入补款数据============================================{}" , JSONObject.toJSON(supply));
+            logger.info("补款数据信息-------------------------------------" , JSONObject.toJSON(supply));
             if (1 != insertSelective(profitSupply)) {
                 logger.info("插入失败！");
-                throw new ProcessException("插入失败！");
+                throw new MessageException("代理商编号为:"+profitSupply.getAgentId()+"插入补款数据失败");
             }
             list.add(profitSupply.getId());
         }

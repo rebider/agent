@@ -673,9 +673,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * profitDate 交易日期（空则为上一月）
      * 每月12号下午14点执行一次：@Scheduled(cron = "0 0 12 14 * ?")
      */
-//    @Scheduled(cron = "0 0 10 20 * ?")
+//    @Scheduled(cron = "0 0 12 14 * ?")
     public void new_computerTax() throws Exception {
-        String profitDate = "201808";
+        String profitDate = null;
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;
         List<ProfitDetailMonth> detailMonths1 = detailMonthMapper.selectByGreaDate(profitDate);
         List<ProfitDetailMonth> detailMonths2 = detailMonthMapper.selectByLessDate(profitDate);
@@ -762,6 +762,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             where.setParentAgentId(tranDetail.getParentAgentId());//上级代理商AG码
             where.setProfitDate(profitDate);//月份
             ProfitDetailMonth profitDetail = detailMonthMapper.selectByIdAndParent(where);
+            System.out.println("......"+profitDetail);
 //            if(null == profitDetail){
 //                System.out.println("......"+profitDetail);
 //            }
