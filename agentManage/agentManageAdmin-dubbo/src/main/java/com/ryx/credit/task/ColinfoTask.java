@@ -131,7 +131,7 @@ public class ColinfoTask {
     }
 
 //  @Scheduled(cron = "0/30 * * * * ?")
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 0/30 * * * ?")
     public void synColinfoToQueryPayment() {
         try {
             log.info("synColinfoToQueryPayment定时查询启动:{}",new Date());

@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -70,6 +67,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         Date nowDate = new Date();
         capital.setcTime(nowDate);
         capital.setcUtime(nowDate);
+        capital.setCloReviewStatus(AgStatus.Create.status);
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
             if(fileIdList!=null) {
@@ -133,6 +131,15 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         db_capital.setcUser(capitalVo.getcUser());
                         db_capital.setRemark(capitalVo.getRemark());
                         db_capital.setStatus(capitalVo.getStatus());
+
+                        db_capital.setcFqCount(capitalVo.getcFqCount());
+                        db_capital.setcPayuser(capitalVo.getcPayuser());
+                        db_capital.setcPaytime(capitalVo.getcPaytime());
+                        db_capital.setcInCom(capitalVo.getcInCom());
+                        db_capital.setcPayType(capitalVo.getcPayType());
+
+
+
                         if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){
                             throw new ProcessException("更新收款信息失败");
                         }else{

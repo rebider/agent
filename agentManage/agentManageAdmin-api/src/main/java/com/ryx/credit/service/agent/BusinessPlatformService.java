@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
@@ -54,4 +55,10 @@ public interface BusinessPlatformService {
 
 
     List<Map<String, Object>> queryByBusNum(String busNum);
+
+
+    Map<String,Object> queryIsBZYD(String agBusLic,List<AgentBusInfoVo> busInfoVoList);
+
+
+    List<Map<String,Object>> queryIsBZYDList(String agBusLic,List<AgentBusInfo> busInfoVoList);
 }
