@@ -68,9 +68,9 @@ public class ProfitSummaryDataJob {
      * transDate 交易月份（空则为上一月）
      * 每月12号上午12点：@Scheduled(cron = "0 0 12 12 * ?")
      */
-    @Scheduled(cron = "0 23 11 20 * ?")
+//    @Scheduled(cron = "0 0 12 12 * ?")
     public void MPos_Summary(){
-        String transDate = "201808";
+        String transDate = null;
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
 
         List<TransProfitDetail> details = transProfitDetailMapper.selectListByDate(transDate);//手刷同步过来的小汇数据
@@ -112,6 +112,9 @@ public class ProfitSummaryDataJob {
                 detailMonth.setTpProfitAmt(detail.getProfitAmt());
             }
 
+            if(detail.getSupplyAmt()!=null && detail.getSupplyAmt().compareTo(BigDecimal.ZERO)>0){
+                detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt()==null?detail.getSupplyAmt():detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
+            }
             //获取账户信息
             List<AgentColinfo> agentColinfos = agentColinfoService.queryAgentColinfoService(detail.getAgentId(),null, AgStatus.Approved.status);
             if (agentColinfos != null && agentColinfos.size() > 0) {

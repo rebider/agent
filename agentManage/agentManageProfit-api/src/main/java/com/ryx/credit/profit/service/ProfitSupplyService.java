@@ -38,5 +38,7 @@ public interface ProfitSupplyService {
 
     int updateByPrimaryKey(ProfitSupply record);
 
+    int resetData();
+
     List<String> importSupplyList(List<List<Object>> data) throws Exception;
 }

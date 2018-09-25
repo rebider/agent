@@ -2,8 +2,11 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PProfitFactorMapper;
 import com.ryx.credit.profit.pojo.PProfitFactor;
 import com.ryx.credit.profit.service.ProfitFactorService;
@@ -36,6 +39,8 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
     private PProfitFactorMapper pProfitFactorMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private RedisService redisService;
 
     /**
      * 商业保理:
@@ -56,6 +61,22 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
         return pProfitFactorMapper.selectByData(profitFactor);
     }
 
+    /**
+     * 清除本月导入数据
+     */
+    @Override
+    public int resetDataFactor() {
+        //终审后数据不能清除
+        String finalStatus = redisService.getValue("commitFinal");
+        if (StringUtils.isBlank(finalStatus)) {
+            if("1".equals(finalStatus)){
+                logger.info("终审状态不能清除！");
+                throw new ProcessException("终审状态不能清除！");
+            }
+        }
+        return pProfitFactorMapper.resetDataFactor();
+    }
+
     @Override
     public int insertImportData(PProfitFactor pProfitFactor) {
         return pProfitFactorMapper.insertSelective(pProfitFactor);
@@ -67,37 +88,36 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public List<String> addList(List<List<Object>> data) throws Exception {
+    public List<String> addList(List<List<Object>> data, String userId) throws Exception {
         List<String> list = new ArrayList<>();
-        for (List<Object> objectList : data) {
+        for (List<Object> factor : data) {
             PProfitFactor profitFactor = new PProfitFactor();
-            profitFactor.setFactorDate(Calendar.getInstance().getTime());       // 导入时间
-            profitFactor.setId(idService.genId(TabId.p_profit_factor));      // ID序列号
+            profitFactor.setFactorDate(Calendar.getInstance().getTime());//导入时间
+            profitFactor.setId(idService.genId(TabId.p_profit_factor));//ID序列号
             try {
-                profitFactor.setFactorMonth(null != objectList.get(0) ? String.valueOf(objectList.get(0)) : "");   // 月份
-                profitFactor.setAgentPid(null != objectList.get(1) ? String.valueOf(objectList.get(1)) : "");      // 代理商唯一码
-                profitFactor.setAgentName(null != objectList.get(2) ? String.valueOf(objectList.get(2)) : "");     // 代理商名称
-                profitFactor.setAgentId(null != objectList.get(3) ? String.valueOf(objectList.get(3)) : "");   // 代理商编号
-                profitFactor.setTatolAmt(new BigDecimal(String.valueOf(objectList.get(4))));    // 应还款
-                profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(objectList.get(5))));   // 已扣款
-                profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(objectList.get(6))));  // 未扣足
-                profitFactor.setRemark(null != objectList.get(7) ? String.valueOf(objectList.get(7)) : "");   // 备注
+                profitFactor.setFactorMonth(null!=factor.get(0)?String.valueOf(factor.get(0)):"");//月份
+                profitFactor.setAgentPid(null!=factor.get(1)?String.valueOf(factor.get(1)):"");//代理商唯一码
+                profitFactor.setAgentName(null!=factor.get(2)?String.valueOf(factor.get(2)):"");//代理商名称
+                profitFactor.setAgentId(null!=factor.get(3)?String.valueOf(factor.get(3)):"");//代理商编号
+                profitFactor.setTatolAmt(new BigDecimal(String.valueOf(factor.get(4))));//应还款
+                profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(factor.get(5))));//已扣款
+                profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(factor.get(6))));//未扣足
+                profitFactor.setRemark(null!=factor.get(7)?String.valueOf(factor.get(7)):"");//备注
             } catch (Exception e) {
-                logger.info("Excel参数错误！");
-                throw new ProcessException("Excel参数错误！");
+                e.printStackTrace();
+                throw e;
             }
 
-            PProfitFactor profit = selectByData(profitFactor);
-            System.out.println("selectByData============================================" + profit);
+            PProfitFactor profit = selectByData(profitFactor);//查询列表中是否有重复数据
             if (profit != null) {
-                logger.info("此条数据已存在！");
-                continue;
+                logger.info(profitFactor.getAgentId()+"此条数据已存在！！");
+                throw new MessageException(profitFactor.getAgentId()+"此条数据已存在！！");
             } else {
                 if (1 != insertImportData(profitFactor)) {
                     logger.info("插入失败！");
-                    throw new ProcessException("插入失败！");
+                    throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
                 }
-                System.out.println("导入保理数据============================================" + JSONObject.toJSON(profitFactor));
+                logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
             }
             list.add(profitFactor.getId());
         }
