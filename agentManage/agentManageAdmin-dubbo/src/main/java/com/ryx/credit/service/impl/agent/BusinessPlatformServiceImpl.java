@@ -450,4 +450,41 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return agentBusInfoMapper.queryByBusNum(busNum);
     }
 
+
+    /**
+     * 查询代理商是否有标准一代的
+     * @param agBusLic
+     * @param busInfoVoList
+     * @return
+     */
+    @Override
+    public Map<String,Object> queryIsBZYD(String agBusLic,List<AgentBusInfoVo> busInfoVoList){
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("code","200");
+        resultMap.put("msg","成功");
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria = agentExample.createCriteria();
+        criteria.andAgBusLicEqualTo(agBusLic);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+        for (Agent agent : agents) {
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria busCriteria = agentBusInfoExample.createCriteria();
+            busCriteria.andAgentIdEqualTo(agent.getId());
+            busCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                    if(agentBusInfo.getBusPlatform().equals(agentBusInfoVo.getBusPlatform())){
+                        if(agentBusInfo.getBusType().equals(BusType.BZYD.key)){
+                            resultMap.put("code","500");
+                            resultMap.put("msg","唯一编号："+agentBusInfo.getAgentId()+",已有标准一代");
+                            return resultMap;
+                        }
+                    }
+                }
+            }
+        }
+        return resultMap;
+    }
 }
