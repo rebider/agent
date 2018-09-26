@@ -382,4 +382,11 @@
   <select id="paymentQuery" parameterType="string" resultMap="BaseResultMap">
     select <include refid="Base_Column_List" /> from A_CAPITAL where C_AGENT_ID=#{id} and STATUS = 1
   </select>
+
+
+  <select id="selectAmount" parameterType="string" resultMap="BaseResultMap">
+    select cap.*
+    from A_CAPITAL cap left join o_Payment_detail detail on cap.id=detail.payment_id
+    where 1=1 and cap.status=1 and cap.id=#{paymentId}
+  </select>
 </mapper>
