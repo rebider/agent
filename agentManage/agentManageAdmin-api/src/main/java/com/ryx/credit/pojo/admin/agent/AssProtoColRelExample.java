@@ -537,6 +537,146 @@ public class AssProtoColRelExample {
             addCriterion("STATUS not between", value1, value2, "status");
             return (Criteria) this;
         }
+
+        public Criteria andProtocolRuleIsNull() {
+            addCriterion("PROTOCOL_RULE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleIsNotNull() {
+            addCriterion("PROTOCOL_RULE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE =", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleNotEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE <>", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleGreaterThan(String value) {
+            addCriterion("PROTOCOL_RULE >", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleGreaterThanOrEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE >=", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleLessThan(String value) {
+            addCriterion("PROTOCOL_RULE <", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleLessThanOrEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE <=", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleLike(String value) {
+            addCriterion("PROTOCOL_RULE like", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleNotLike(String value) {
+            addCriterion("PROTOCOL_RULE not like", value, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleIn(List<String> values) {
+            addCriterion("PROTOCOL_RULE in", values, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleNotIn(List<String> values) {
+            addCriterion("PROTOCOL_RULE not in", values, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleBetween(String value1, String value2) {
+            addCriterion("PROTOCOL_RULE between", value1, value2, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleNotBetween(String value1, String value2) {
+            addCriterion("PROTOCOL_RULE not between", value1, value2, "protocolRule");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueIsNull() {
+            addCriterion("PROTOCOL_RULE_VALUE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueIsNotNull() {
+            addCriterion("PROTOCOL_RULE_VALUE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE =", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueNotEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE <>", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueGreaterThan(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE >", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueGreaterThanOrEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE >=", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueLessThan(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE <", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueLessThanOrEqualTo(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE <=", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueLike(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE like", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueNotLike(String value) {
+            addCriterion("PROTOCOL_RULE_VALUE not like", value, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueIn(List<String> values) {
+            addCriterion("PROTOCOL_RULE_VALUE in", values, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueNotIn(List<String> values) {
+            addCriterion("PROTOCOL_RULE_VALUE not in", values, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueBetween(String value1, String value2) {
+            addCriterion("PROTOCOL_RULE_VALUE between", value1, value2, "protocolRuleValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andProtocolRuleValueNotBetween(String value1, String value2) {
+            addCriterion("PROTOCOL_RULE_VALUE not between", value1, value2, "protocolRuleValue");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
