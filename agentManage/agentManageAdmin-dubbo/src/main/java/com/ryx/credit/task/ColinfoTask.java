@@ -50,7 +50,7 @@ public class ColinfoTask {
     private AgentColinfoService agentColinfoService;
 
     /**
-     * 21:50
+     * 9:00 - 21:30
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
 //    @Scheduled(cron = "0 30 13 * * ?")
@@ -130,6 +130,10 @@ public class ColinfoTask {
         return bigDecimal;
     }
 
+    /**
+     * 定时查询交易
+     * 30分钟执行一次
+     */
 //  @Scheduled(cron = "0/30 * * * * ?")
     @Scheduled(cron = "0 0/30 * * * ?")
     public void synColinfoToQueryPayment() {
