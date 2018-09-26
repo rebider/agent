@@ -225,15 +225,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}else{
 						agentDataHistoryService.saveDataHistory(db_AgentBusInfo,db_AgentBusInfo.getId(), DataHistoryType.BUSINESS.getValue(),userId,db_AgentBusInfo.getVersion());
 					}
+					boolean is_in = false;
                     //更新分管协议
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
 						List<AssProtoCol> assProtoCol_list = agentAssProtocolService.queryProtoColByBusId(db_AgentBusInfo.getId());
 						for (AssProtoCol assProtoCol : assProtoCol_list) {
 							if(assProtoCol.getId().equals(agentBusInfoVo.getAgentAssProtocol())){
-							 break outer;
+								is_in = true;
+							    break;
 							}
 						}
-
+						if(is_in)continue;
 
 						List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentBusInfo.getId()));
 						for (AssProtoColRel rel : rels) {
