@@ -1,8 +1,10 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class PAgentExitApplyfor {
+public class PAgentExitApplyfor implements Serializable{
+    private static final long serialVersionUID = 3587825133059793912L;
     private String id;
 
     private String applyPlat;

@@ -32,6 +32,7 @@
     <dubbo:service interface="com.ryx.credit.profit.service.IProfitDirectService" ref="profitDirectService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitComputerService" ref="profitComputerService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitOrganTranMonthService" ref="profitOrganTranMonthServiceImpl"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.PAgentExitApplyforService" ref="pAgentExitApplyforService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:reference interface="com.ryx.credit.service.agent.BusActRelService" id="busActRelService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.BusinessPlatformService" id="businessPlatformService"  timeout="1200000" registry="${zk.group}" check="false"/>
