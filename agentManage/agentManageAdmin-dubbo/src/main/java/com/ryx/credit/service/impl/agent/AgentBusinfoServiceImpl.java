@@ -224,6 +224,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}else{
 						agentDataHistoryService.saveDataHistory(db_AgentBusInfo,db_AgentBusInfo.getId(), DataHistoryType.BUSINESS.getValue(),userId,db_AgentBusInfo.getVersion());
 					}
+
+					//是否已经存在
 					boolean is_in = false;
                     //更新分管协议
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
@@ -234,6 +236,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 							    break;
 							}
 						}
+						//如果存在就处理下一个业务
 						if(is_in)continue;
 
 						List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentBusInfo.getId()));
