@@ -173,6 +173,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentBusInfoVo.getAgentAssProtocol());
+						if(StringUtils.isNotBlank(agentBusInfoVo.getProtocolRuleValue())){
+							String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentBusInfoVo.getProtocolRuleValue());
+							rel.setProtocolRule(ruleReplace);
+						}else{
+							rel.setProtocolRule(assProtoCol.getProtocolRule());
+						}
+						rel.setProtocolRuleValue(agentBusInfoVo.getProtocolRuleValue());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
 							throw new MessageException("业务分管协议添加失败");
 						}
