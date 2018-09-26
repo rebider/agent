@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.agent.AssProtoCol;
 import com.ryx.credit.pojo.admin.agent.AssProtoColExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AssProtoColMapper {
     int countByExample(AssProtoColExample example);
@@ -22,4 +23,6 @@ public interface AssProtoColMapper {
     int updateByPrimaryKeySelective(AssProtoCol record);
 
     int updateByPrimaryKey(AssProtoCol record);
+
+    List<Map<String,Object>> selectByBusInfoId(String agentBusinfoId);
 }

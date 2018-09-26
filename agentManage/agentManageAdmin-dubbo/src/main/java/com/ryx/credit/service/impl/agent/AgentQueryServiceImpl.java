@@ -66,6 +66,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private RegionMapper regionMapper;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private AssProtoColMapper assProtoColMapper;
 
 
     @Override
@@ -146,6 +148,12 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 agentBusInfo.setBusPlatformType(platForm.getPlatformType());
             }
             agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+            List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentBusInfo.getId());
+            if(null==maps && maps.size()==0){
+                continue;
+            }else{
+                agentBusInfo.setAssProtocolMap(maps.get(0));
+            }
         }
         return agentBusInfos;
     }
@@ -162,13 +170,18 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             criteria.andBusPlatformEqualTo(Platform.ZPOS.getValue());
         }
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-
         for (AgentBusInfo agentBusInfo : agentBusInfos) {
             PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
             if(null!=platForm){
                 agentBusInfo.setBusPlatformType(platForm.getPlatformType());
             }
             agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
+            List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentBusInfo.getId());
+            if(null==maps && maps.size()==0){
+                continue;
+            }else{
+                agentBusInfo.setAssProtocolMap(maps.get(0));
+            }
         }
         return agentBusInfos;
     }

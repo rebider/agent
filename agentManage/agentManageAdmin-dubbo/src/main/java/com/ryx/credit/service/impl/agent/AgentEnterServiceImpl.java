@@ -142,8 +142,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     rel.setAgentBusinfoId(db_AgentBusInfo.getId());
                     rel.setAssProtocolId(item.getAgentAssProtocol());
                     AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(item.getAgentAssProtocol());
-                    String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
-                    rel.setProtocolRule(ruleReplace);
+                    if(org.apache.commons.lang.StringUtils.isNotBlank(item.getProtocolRuleValue())){
+                        String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
+                        rel.setProtocolRule(ruleReplace);
+                    }else{
+                        rel.setProtocolRule(assProtoCol.getProtocolRule());
+                    }
                     rel.setProtocolRuleValue(item.getProtocolRuleValue());
                     if (1 != agentAssProtocolService.addProtocolRel(rel, agent.getcUser())) {
                         throw new ProcessException("业务分管协议添加失败");
