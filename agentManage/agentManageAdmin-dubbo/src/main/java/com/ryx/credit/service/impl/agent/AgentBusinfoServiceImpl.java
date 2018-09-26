@@ -163,7 +163,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 
-			outer:
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				agentBusInfoVo.setcUser(agent.getcUser());
 				agentBusInfoVo.setAgentId(agent.getId());
