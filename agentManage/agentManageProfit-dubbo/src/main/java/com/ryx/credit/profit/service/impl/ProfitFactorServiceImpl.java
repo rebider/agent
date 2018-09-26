@@ -108,17 +108,23 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
                 throw e;
             }
 
-//            PProfitFactor profit = selectByData(profitFactor);//查询列表中是否有重复数据
-//            if (profit != null) {
-//                logger.info(profitFactor.getAgentId()+"此条数据已存在！！");
-//                throw new MessageException(profitFactor.getAgentId()+"此条数据已存在！！");
-//            } else {
-//                if (1 != insertImportData(profitFactor)) {
-//                    logger.info("插入失败！");
-//                    throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
-//                }
-//                logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
+//            logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
+//            if (1 != insertImportData(profitFactor)) {
+//                logger.info("插入失败！");
+//                throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
 //            }
+
+            PProfitFactor profit = selectByData(profitFactor);//查询列表中是否有重复数据
+            if (profit != null) {
+                logger.info(profitFactor.getAgentId()+"此条数据已存在！！");
+                throw new MessageException(profitFactor.getAgentId()+"此条数据已存在！！");
+            } else {
+                if (1 != insertImportData(profitFactor)) {
+                    logger.info("插入失败！");
+                    throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
+                }
+                logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
+            }
             list.add(profitFactor.getId());
         }
         return list;
