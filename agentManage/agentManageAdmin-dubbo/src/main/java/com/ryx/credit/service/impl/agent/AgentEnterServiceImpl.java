@@ -4,14 +4,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.*;
+import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.DateUtils;
+import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
-import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
@@ -19,7 +22,6 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.RegionService;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import static com.ryx.credit.common.enumc.AgStatus.getAgStatusByValue;
 
 /**
  * Created by cx on 2018/5/28.
@@ -85,6 +85,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private CUserMapper cUserMapper;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private AssProtoColMapper assProtoColMapper;
+
+
     /**
      * 商户入网
      *
@@ -137,6 +141,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     AssProtoColRel rel = new AssProtoColRel();
                     rel.setAgentBusinfoId(db_AgentBusInfo.getId());
                     rel.setAssProtocolId(item.getAgentAssProtocol());
+                    AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(item.getAgentAssProtocol());
+                    String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
+                    rel.setProtocolRule(ruleReplace);
+                    rel.setProtocolRuleValue(item.getProtocolRuleValue());
                     if (1 != agentAssProtocolService.addProtocolRel(rel, agent.getcUser())) {
                         throw new ProcessException("业务分管协议添加失败");
                     }
