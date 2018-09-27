@@ -52,7 +52,7 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
         List<Map<String, Object>> list = pProfitFactorMapper.getProfitFactorList(param);
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
-        System.out.println("查询============================================" + JSONObject.toJSON(list));
+//        System.out.println("查询============================================" + JSONObject.toJSON(list));
         return pageInfo;
     }
 
@@ -107,6 +107,12 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
                 e.printStackTrace();
                 throw e;
             }
+
+//            logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
+//            if (1 != insertImportData(profitFactor)) {
+//                logger.info("插入失败！");
+//                throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
+//            }
 
             PProfitFactor profit = selectByData(profitFactor);//查询列表中是否有重复数据
             if (profit != null) {
