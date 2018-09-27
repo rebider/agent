@@ -77,6 +77,7 @@ public class BalanceSerialDealJob {
                     ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
                     profitDetailMonth.setId(serial.getProfitId());
                     profitDetailMonth.setStatus("6");
+                    profitDetailMonth.setRemark(((JSONObject)json).getString("errDesc"));
                     profitDetailMonthServiceImpl.update(profitDetailMonth);
                 }
            }

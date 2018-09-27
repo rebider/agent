@@ -28,9 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author zhaodw
@@ -257,6 +255,9 @@ public class StagingServiceImpl implements StagingService {
 
     @Override
     public void insetStagingDetail(ProfitStagingDetail stagingDetail) {
+        if (stagingDetail.getId() ==null) {
+            stagingDetail.setId(idService.genId(TabId.P_STAGING_DETAIL));
+        }
         profitStagingDetailMapper.insert(stagingDetail);
     }
 
@@ -279,8 +280,8 @@ public class StagingServiceImpl implements StagingService {
     }
 
     @Override
-    public BigDecimal getNotDeductionAmt(String agentId){
-        ProfitStaging profitStaging = profitStagingMapper.getNotDeductionAmt(agentId);
+    public BigDecimal getNotDeductionAmt(Map<String, Object> param){
+        ProfitStaging profitStaging = profitStagingMapper.getNotDeductionAmt(param);
 
         if (profitStaging != null) {
             return profitStaging.getStagAmt();

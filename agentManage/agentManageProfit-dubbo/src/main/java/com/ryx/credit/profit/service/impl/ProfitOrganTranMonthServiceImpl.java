@@ -71,6 +71,7 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         {
             criteria.andProductTypeEqualTo(profitOrganTranMonth.getProductType());
         }
+        example.setOrderByClause(" PROFIT_DATE DESC ");
         List<ProfitOrganTranMonth> settleErrs = profitOrganTranMonthMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(settleErrs);
