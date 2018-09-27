@@ -13,6 +13,7 @@
     <result column="SOURCE_ID" property="sourceId" jdbcType="VARCHAR" />
     <result column="SUPPLY_CODE" property="supplyCode" jdbcType="VARCHAR" />
     <result column="PARENT_AGENT_ID" property="parentAgentId" jdbcType="VARCHAR" />
+    <result column="PARENT_AGENT_NAME" property="parentAgentName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -45,7 +46,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, SUPPLY_DATE, REMERK, 
-    SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID
+    SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID,PARENT_AGENT_NAME
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
     <include refid="OracleDialectPrefix" />
@@ -85,14 +86,21 @@
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
+
+  <delete id="resetData" >
+    delete from P_PROFIT_SUPPLY
+    where SUPPLY_DATE = to_char(sysdate-30 ,'yyyymm')
+  </delete>
+
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
     insert into P_PROFIT_SUPPLY (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, 
-      SUPPLY_DATE, REMERK, SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID
+      SUPPLY_DATE, REMERK, SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID,PARENT_AGENT_NAME
       )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{supplyType,jdbcType=CHAR}, #{supplyAmt,jdbcType=DECIMAL}, 
-      #{supplyDate,jdbcType=VARCHAR}, #{remerk,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR}
+      #{supplyDate,jdbcType=VARCHAR}, #{remerk,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR},
+      #{supplyCode,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
@@ -131,6 +139,9 @@
       <if test="parentAgentId != null" >
         PARENT_AGENT_ID,
       </if>
+      <if test="parentAgentName != null" >
+        PARENT_AGENT_NAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -165,6 +176,9 @@
       </if>
       <if test="parentAgentId != null" >
         #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null" >
+        #{parentAgentName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -204,6 +218,9 @@
       <if test="parentAgentId != null" >
         PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
       </if>
+      <if test="parentAgentName != null" >
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -218,6 +235,7 @@
       REMERK = #{remerk,jdbcType=VARCHAR},
       SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
       SUPPLY_CODE = #{supplyCode,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
       PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -237,7 +255,7 @@
     FROM P_PROFIT_SUPPLY
     where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_CODE != '0'
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
-    <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
+    <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
   </select>
 
   <select id="getBuckleByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
@@ -291,4 +309,5 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
     </if>
   </sql>
+
 </mapper>

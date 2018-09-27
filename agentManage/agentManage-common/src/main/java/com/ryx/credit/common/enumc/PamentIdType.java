@@ -6,8 +6,8 @@ package com.ryx.credit.common.enumc;
  */
 public enum  PamentIdType {
 
-    ORDER_FKD("ORDER_FKD","订单付款单");
-
+    ORDER_FKD("ORDER_FKD","订单付款单"),
+   ORDER_BZJ("ORDER_BZJ","订单保证金分期");
     public String code;
 
     public String msg;

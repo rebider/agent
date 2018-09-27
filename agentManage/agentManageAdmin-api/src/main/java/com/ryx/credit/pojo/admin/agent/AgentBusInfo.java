@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class AgentBusInfo implements Serializable {
     private String id;
@@ -79,6 +80,8 @@ public class AgentBusInfo implements Serializable {
     private List<AgentColinfo> agentColinfoList;
 
     private String busPlatformType;
+
+    private Map<String,Object> assProtocolMap;
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;
@@ -374,5 +377,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setBusLoginNum(String busLoginNum) {
         this.busLoginNum = busLoginNum;
+    }
+
+    public Map<String, Object> getAssProtocolMap() {
+        return assProtocolMap;
+    }
+
+    public void setAssProtocolMap(Map<String, Object> assProtocolMap) {
+        this.assProtocolMap = assProtocolMap;
     }
 }

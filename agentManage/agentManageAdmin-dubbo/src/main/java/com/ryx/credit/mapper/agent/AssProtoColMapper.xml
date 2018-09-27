@@ -213,4 +213,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="selectByBusInfoId" parameterType="java.lang.String" resultType="map">
+    select
+      ap.ID, ap.PLATFORM, ap.PROTOCOL_DES, ap.PROTOCOL_RULE, ap.C_TIME, ap.C_START, ap.C_END, ap.C_USER, ap.C_SORT,
+      ap.PROTOCOL_STATUS,
+      ar.ASS_PROTOCOL_ID, ar.AGENT_BUSINFO_ID, ar.REMARK, ar.C_USER, ar.C_TIME, ar.STATUS, ar.PROTOCOL_RULE as PROTOCOL_RULE_REL,
+      ar.PROTOCOL_RULE_VALUE
+    from A_ass_protocol ap,A_ass_protocol_rel ar
+    where ap.id = ar.ass_protocol_id
+    and agent_businfo_id = #{agentBusinfoId}
+  </select>
 </mapper>

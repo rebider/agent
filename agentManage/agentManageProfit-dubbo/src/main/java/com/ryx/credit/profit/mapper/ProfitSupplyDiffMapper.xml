@@ -68,6 +68,19 @@
     from P_PROFIT_SUPPLY_DIFF
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectAmtByWhere" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyDiff" resultType="java.math.BigDecimal">
+    select
+    SUM(DIFF_AMT)
+    from P_PROFIT_SUPPLY_DIFF
+    where
+    DIFF_DATE = #{diffDate,jdbcType=VARCHAR}
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENTID=#{parentAgentid,jdbcType=VARCHAR}
+    </if>
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyDiffExample">
     delete from P_PROFIT_SUPPLY_DIFF
     <if test="_parameter != null">

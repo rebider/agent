@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
+import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
@@ -46,6 +47,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     private AgentColinfoMapper agentColinfoMapper;
 	@Autowired
 	private AgentDataHistoryService agentDataHistoryService;
+	@Autowired
+	private AssProtoColMapper assProtoColMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -160,7 +163,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 
-			outer:
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				agentBusInfoVo.setcUser(agent.getcUser());
 				agentBusInfoVo.setAgentId(agent.getId());
@@ -171,6 +173,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentBusInfoVo.getAgentAssProtocol());
+						if(StringUtils.isNotBlank(agentBusInfoVo.getProtocolRuleValue())){
+							String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentBusInfoVo.getProtocolRuleValue());
+							rel.setProtocolRule(ruleReplace);
+						}else{
+							rel.setProtocolRule(assProtoCol.getProtocolRule());
+						}
+						rel.setProtocolRuleValue(agentBusInfoVo.getProtocolRuleValue());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
 							throw new MessageException("业务分管协议添加失败");
 						}
@@ -222,15 +232,20 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}else{
 						agentDataHistoryService.saveDataHistory(db_AgentBusInfo,db_AgentBusInfo.getId(), DataHistoryType.BUSINESS.getValue(),userId,db_AgentBusInfo.getVersion());
 					}
+
+					//是否已经存在
+					boolean is_in = false;
                     //更新分管协议
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
 						List<AssProtoCol> assProtoCol_list = agentAssProtocolService.queryProtoColByBusId(db_AgentBusInfo.getId());
 						for (AssProtoCol assProtoCol : assProtoCol_list) {
 							if(assProtoCol.getId().equals(agentBusInfoVo.getAgentAssProtocol())){
-							 break outer;
+								is_in = true;
+							    break;
 							}
 						}
-
+						//如果存在就处理下一个业务
+						if(is_in)continue;
 
 						List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentBusInfo.getId()));
 						for (AssProtoColRel rel : rels) {
@@ -243,6 +258,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentBusInfoVo.getAgentAssProtocol());
+						if(StringUtils.isNotBlank(agentBusInfoVo.getProtocolRuleValue())){
+							String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentBusInfoVo.getProtocolRuleValue());
+							rel.setProtocolRule(ruleReplace);
+						}else{
+							rel.setProtocolRule(assProtoCol.getProtocolRule());
+						}
+						rel.setProtocolRuleValue(agentBusInfoVo.getProtocolRuleValue());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
 							throw new MessageException("业务分管协议添加失败");
 						}
