@@ -92,15 +92,17 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             throw new MessageException("修改申请提交审批失败！");
         }
         List<AgentColinfoVo> colinfoVoList = agentVo.getColinfoVoList();
-        for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
-            List<AColinfoPayment> aColinfoPayments = colinfoPaymentService.queryConlifoPaymentList(dateChangeRequest.getDataId(), agentColinfoVo.getCloBankAccount());
-            if(null==aColinfoPayments){
-                logger.info("数据修改申请:{}", "收款账号查询失败");
-                throw new MessageException("收款账号查询失败");
-            }
-            if(aColinfoPayments.size()>2){
-                logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
-                throw new MessageException("收款账号已验证超过2次请更换银行卡！");
+        if(colinfoVoList!=null) {
+            for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+                List<AColinfoPayment> aColinfoPayments = colinfoPaymentService.queryConlifoPaymentList(dateChangeRequest.getDataId(), agentColinfoVo.getCloBankAccount());
+                if (null == aColinfoPayments) {
+                    logger.info("数据修改申请:{}", "收款账号查询失败");
+                    throw new MessageException("收款账号查询失败");
+                }
+                if (aColinfoPayments.size() > 2) {
+                    logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
+                    throw new MessageException("收款账号已验证超过2次请更换银行卡！");
+                }
             }
         }
         BusActRelExample example = new BusActRelExample();
