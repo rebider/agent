@@ -4,9 +4,11 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
+import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     OPaymentMapper oPaymentMapper;
     @Autowired
     OOrderMapper oOrderMapper;
+    @Autowired
+    CapitalMapper capitalMapper;
 
     /**
      * @Author: Zhang Lei
@@ -174,6 +178,21 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
             oPaymentDetail.setSrcId(srcId);
             oPaymentDetail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
+
+            //判断源类型   如果是付款单则更新付款金额   如果是保证金则更新资金表的抵扣金额
+            if (PamentIdType.ORDER_BZJ.code.equals(oPaymentDetail.getPaymentType())){
+                 List<Capital> capitalList=capitalMapper.selectAmount(oPaymentDetail.getPaymentId());
+                    if (1 != capitalList.size())
+                        throw new ProcessException("没有查找到相关数据");
+                Capital capital = capitalList.get(0);
+                Capital capitalUp = new Capital();
+                capitalUp.setcFqInAmount(capital.getcAmount());
+                capitalUp.setId(oPaymentDetail.getPaymentId());
+                    if (1!=capitalMapper.updateByPrimaryKeySelective(capitalUp)){
+                        logger.info("资金记录抵扣金额更新失败");
+                        throw new ProcessException("资金记录抵扣金额更新失败");
+                    }
+            }
             if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                 logger.info("付款明细更新数据失败");
                 throw new ProcessException("付款明细更新数据失败");

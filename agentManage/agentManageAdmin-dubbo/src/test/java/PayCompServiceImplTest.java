@@ -52,8 +52,8 @@ public class PayCompServiceImplTest extends BaseSpringTest {
     @Test
     public void update() {
         Map map = new HashMap<String, String>();
-        map.put("detailId", "OPD2018073100000000000154");
-        map.put("srcId", "OPA2018072500000000000055");
+        map.put("detailId", "OPD2018081300000000001455");
+        map.put("srcId", "OS2018081700000000000444");
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         list.add(map);
         ResultVO resultVO = paymentDetailService.uploadStatus(list);
