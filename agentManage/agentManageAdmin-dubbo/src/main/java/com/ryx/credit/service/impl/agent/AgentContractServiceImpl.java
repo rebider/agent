@@ -62,7 +62,7 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentContract insertAgentContract(AgentContract contract, List<String> attr) throws ProcessException {
+    public AgentContract insertAgentContract(AgentContract contract, List<String> attr,String userId) throws ProcessException {
         if (contract == null) {
             logger.info("代理商合同添加:{}", "合同信息为空");
             throw new ProcessException("合同信息为空");
@@ -93,6 +93,7 @@ public class AgentContractServiceImpl implements AgentContractService {
 //        }
 
         Date date = Calendar.getInstance().getTime();
+        contract.setcUser(userId);
         contract.setStatus(Status.STATUS_1.status);
         contract.setVersion(Status.STATUS_1.status);
         contract.setCloReviewStatus(AgStatus.Create.status);
@@ -118,6 +119,11 @@ public class AgentContractServiceImpl implements AgentContractService {
                 }
             }
             logger.info("代理商合同添加:成功");
+
+            //记录合同历史
+            if(!agentDataHistoryService.saveDataHistory(contract,DataHistoryType.CONTRACT.getValue()).isOK()){
+                throw new ProcessException("添加代理商合同失败,请重试");
+            }
             return contract;
         }
         logger.info("代理商合同添加:{}", "添加代理商合同失败");
@@ -160,7 +166,7 @@ public class AgentContractServiceImpl implements AgentContractService {
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentContractVo(List<AgentContractVo> volist, Agent agent) {
+    public ResultVO updateAgentContractVo(List<AgentContractVo> volist, Agent agent,String userId) {
         try {
             if (agent == null) throw new ProcessException("代理商信息不能为空");
             for (AgentContractVo agentContractVo : volist) {
@@ -169,7 +175,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                 if (StringUtils.isEmpty(agentContractVo.getId())) {
                     //直接新曾
 
-                    AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile());
+                    AgentContract result = insertAgentContract(agentContractVo, agentContractVo.getContractTableFile(),userId);
                     logger.info("代理商合同添加:{}{}", "添加代理商合同成功", result.getId());
                 } else {
 
@@ -186,6 +192,11 @@ public class AgentContractServiceImpl implements AgentContractService {
                     db_AgentContract.setAppendAgree(agentContractVo.getAppendAgree());
                     if (1 != agentContractMapper.updateByPrimaryKeySelective(db_AgentContract)) {
                         throw new ProcessException("更新收款信息失败");
+                    }else{
+                        //记录历史
+                        if(!agentDataHistoryService.saveDataHistory(db_AgentContract,db_AgentContract.getId(), DataHistoryType.CONTRACT.getValue(),userId,db_AgentContract.getVersion()).isOK()){
+                            throw new ProcessException("更新收款信息失败");
+                        }
                     }
 
                     //删除老的附件
@@ -222,7 +233,7 @@ public class AgentContractServiceImpl implements AgentContractService {
                     }
 
                 }
-                agentDataHistoryService.saveDataHistory(agentContractVo, DataHistoryType.CONTRACT.getValue());
+
             }
             return ResultVO.success(null);
         } catch (Exception e) {

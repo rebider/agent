@@ -2,9 +2,13 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitSupplyMapper;
 import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.pojo.ProfitSupplyExample;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,6 +40,8 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
 
     @Autowired
     private ProfitSupplyMapper pProfitSupplyMapper;
+    @Autowired
+    private RedisService redisService;
     @Autowired
     private IdService idService;
 
@@ -103,6 +110,23 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
     }
 
     /**
+     * 清除本月导入
+     * @return
+     */
+    @Override
+    public int resetData() {
+        // 终审后不能清除
+        String finalStatus = redisService.getValue("commitFinal");
+        if (StringUtils.isBlank(finalStatus)) {
+            if("1".equals(finalStatus)){
+                logger.info("终审状态不能清除！");
+                throw new ProcessException("终审状态不能清除！");
+            }
+        }
+        return pProfitSupplyMapper.resetData();
+    }
+
+    /**
      * 补款数据维护:
      * 1、导入补款数据
      */
@@ -112,24 +136,26 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         List<String> list = new ArrayList<>();
         for (List<Object> supply : data) {
             ProfitSupply profitSupply = new ProfitSupply();
-            profitSupply.setId(idService.genId(TabId.p_profit_supply));   // ID序列号
-            profitSupply.setSourceId(DateUtil.getDays());                 // 录入日期
+            profitSupply.setId(idService.genId(TabId.p_profit_supply));// ID序列号
+            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));// 录入日期
             try {
-                profitSupply.setAgentPid(null != supply.get(0) ? String.valueOf(supply.get(0)) : "");      // 代理商唯一码
-                profitSupply.setAgentName(null != supply.get(1) ? String.valueOf(supply.get(1)) : "");     // 代理商名称
-                profitSupply.setSupplyDate(null != supply.get(2) ? String.valueOf(supply.get(2)) : "");    // 月份
-                profitSupply.setSupplyType(null != supply.get(3) ? String.valueOf(supply.get(3)) : "");    // 补款类型
-                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(4))));                  // 补款金额
-                profitSupply.setSupplyCode(null != supply.get(5) ? String.valueOf(supply.get(5)) : "");    // 补款码
+                profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
+                profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
+                profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
+                profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
+                profitSupply.setSupplyDate(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//月份
+                profitSupply.setSupplyType(null!=supply.get(5)?String.valueOf(supply.get(5)):"");//补款类型
+                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(6))));//补款金额
+                profitSupply.setSupplyCode(null!=supply.get(7)?String.valueOf(supply.get(7)):"");//补款码
             } catch (Exception e) {
-                logger.info("Excel参数错误！");
-                throw new ProcessException("Excel参数错误！");
+                e.printStackTrace();
+                throw e;
             }
 
-            logger.info("导入补款数据============================================{}" , JSONObject.toJSON(supply));
+            logger.info("补款数据信息-------------------------------------" , JSONObject.toJSON(supply));
             if (1 != insertSelective(profitSupply)) {
                 logger.info("插入失败！");
-                throw new ProcessException("插入失败！");
+                throw new MessageException("代理商编号为:"+profitSupply.getAgentId()+"插入补款数据失败");
             }
             list.add(profitSupply.getId());
         }

@@ -20,6 +20,16 @@ public class ProfitSupply implements Serializable {
     //新增 20180821
     private String parentAgentId;
 
+    public String getParentAgentName() {
+        return parentAgentName;
+    }
+
+    public void setParentAgentName(String parentAgentName) {
+        this.parentAgentName = parentAgentName;
+    }
+
+    private String parentAgentName;
+
     public String getParentAgentId() {
         return parentAgentId;
     }

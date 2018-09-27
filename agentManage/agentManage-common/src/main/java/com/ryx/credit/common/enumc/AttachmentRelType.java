@@ -15,7 +15,8 @@ public enum AttachmentRelType {
     ActivityEdit("退补差价代理商打款附件"),
     ActivityFinanceEdit("退补差价财务打款附件"),
     Clear("结算附件"),
-    Return("退货打款附件");
+    Return("退货打款附件"),
+    ExitApplyfor("代理商退出申请");
 
     public String  msg;
 

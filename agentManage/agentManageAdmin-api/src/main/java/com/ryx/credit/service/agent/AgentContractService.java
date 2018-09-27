@@ -22,7 +22,7 @@ public interface AgentContractService {
      * @param attr
      * @return
      */
-    public AgentContract insertAgentContract(AgentContract contract, List<String> attr)throws ProcessException;
+    public AgentContract insertAgentContract(AgentContract contract, List<String> attr,String userId)throws ProcessException;
 
 
     /**
@@ -47,7 +47,7 @@ public interface AgentContractService {
     public int update(AgentContract a);
 
 
-    public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent);
+    public ResultVO updateAgentContractVo(List<AgentContractVo> list, Agent agent,String userId);
 
 
 }

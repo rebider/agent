@@ -1217,6 +1217,456 @@ public class CapitalExample {
             addCriterion("C_USER not between", value1, value2, "cUser");
             return (Criteria) this;
         }
+
+        public Criteria andCPayuserIsNull() {
+            addCriterion("C_PAYUSER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserIsNotNull() {
+            addCriterion("C_PAYUSER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserEqualTo(String value) {
+            addCriterion("C_PAYUSER =", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserNotEqualTo(String value) {
+            addCriterion("C_PAYUSER <>", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserGreaterThan(String value) {
+            addCriterion("C_PAYUSER >", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserGreaterThanOrEqualTo(String value) {
+            addCriterion("C_PAYUSER >=", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserLessThan(String value) {
+            addCriterion("C_PAYUSER <", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserLessThanOrEqualTo(String value) {
+            addCriterion("C_PAYUSER <=", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserLike(String value) {
+            addCriterion("C_PAYUSER like", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserNotLike(String value) {
+            addCriterion("C_PAYUSER not like", value, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserIn(List<String> values) {
+            addCriterion("C_PAYUSER in", values, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserNotIn(List<String> values) {
+            addCriterion("C_PAYUSER not in", values, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserBetween(String value1, String value2) {
+            addCriterion("C_PAYUSER between", value1, value2, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayuserNotBetween(String value1, String value2) {
+            addCriterion("C_PAYUSER not between", value1, value2, "cPayuser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountIsNull() {
+            addCriterion("C_FQ_COUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountIsNotNull() {
+            addCriterion("C_FQ_COUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_COUNT =", value, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountNotEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_COUNT <>", value, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountGreaterThan(BigDecimal value) {
+            addCriterion("C_FQ_COUNT >", value, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_COUNT >=", value, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountLessThan(BigDecimal value) {
+            addCriterion("C_FQ_COUNT <", value, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_COUNT <=", value, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountIn(List<BigDecimal> values) {
+            addCriterion("C_FQ_COUNT in", values, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountNotIn(List<BigDecimal> values) {
+            addCriterion("C_FQ_COUNT not in", values, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("C_FQ_COUNT between", value1, value2, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqCountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("C_FQ_COUNT not between", value1, value2, "cFqCount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeIsNull() {
+            addCriterion("C_PAY_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeIsNotNull() {
+            addCriterion("C_PAY_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeEqualTo(String value) {
+            addCriterion("C_PAY_TYPE =", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeNotEqualTo(String value) {
+            addCriterion("C_PAY_TYPE <>", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeGreaterThan(String value) {
+            addCriterion("C_PAY_TYPE >", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("C_PAY_TYPE >=", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeLessThan(String value) {
+            addCriterion("C_PAY_TYPE <", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeLessThanOrEqualTo(String value) {
+            addCriterion("C_PAY_TYPE <=", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeLike(String value) {
+            addCriterion("C_PAY_TYPE like", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeNotLike(String value) {
+            addCriterion("C_PAY_TYPE not like", value, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeIn(List<String> values) {
+            addCriterion("C_PAY_TYPE in", values, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeNotIn(List<String> values) {
+            addCriterion("C_PAY_TYPE not in", values, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeBetween(String value1, String value2) {
+            addCriterion("C_PAY_TYPE between", value1, value2, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCPayTypeNotBetween(String value1, String value2) {
+            addCriterion("C_PAY_TYPE not between", value1, value2, "cPayType");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComIsNull() {
+            addCriterion("C_IN_COM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComIsNotNull() {
+            addCriterion("C_IN_COM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComEqualTo(String value) {
+            addCriterion("C_IN_COM =", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComNotEqualTo(String value) {
+            addCriterion("C_IN_COM <>", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComGreaterThan(String value) {
+            addCriterion("C_IN_COM >", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComGreaterThanOrEqualTo(String value) {
+            addCriterion("C_IN_COM >=", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComLessThan(String value) {
+            addCriterion("C_IN_COM <", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComLessThanOrEqualTo(String value) {
+            addCriterion("C_IN_COM <=", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComLike(String value) {
+            addCriterion("C_IN_COM like", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComNotLike(String value) {
+            addCriterion("C_IN_COM not like", value, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComIn(List<String> values) {
+            addCriterion("C_IN_COM in", values, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComNotIn(List<String> values) {
+            addCriterion("C_IN_COM not in", values, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComBetween(String value1, String value2) {
+            addCriterion("C_IN_COM between", value1, value2, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCInComNotBetween(String value1, String value2) {
+            addCriterion("C_IN_COM not between", value1, value2, "cInCom");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountIsNull() {
+            addCriterion("C_FQ_IN_AMOUNT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountIsNotNull() {
+            addCriterion("C_FQ_IN_AMOUNT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_IN_AMOUNT =", value, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountNotEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_IN_AMOUNT <>", value, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountGreaterThan(BigDecimal value) {
+            addCriterion("C_FQ_IN_AMOUNT >", value, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_IN_AMOUNT >=", value, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountLessThan(BigDecimal value) {
+            addCriterion("C_FQ_IN_AMOUNT <", value, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("C_FQ_IN_AMOUNT <=", value, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountIn(List<BigDecimal> values) {
+            addCriterion("C_FQ_IN_AMOUNT in", values, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountNotIn(List<BigDecimal> values) {
+            addCriterion("C_FQ_IN_AMOUNT not in", values, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("C_FQ_IN_AMOUNT between", value1, value2, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqInAmountNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("C_FQ_IN_AMOUNT not between", value1, value2, "cFqInAmount");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateIsNull() {
+            addCriterion("C_FQ_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateIsNotNull() {
+            addCriterion("C_FQ_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateEqualTo(Date value) {
+            addCriterion("C_FQ_DATE =", value, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateNotEqualTo(Date value) {
+            addCriterion("C_FQ_DATE <>", value, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateGreaterThan(Date value) {
+            addCriterion("C_FQ_DATE >", value, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateGreaterThanOrEqualTo(Date value) {
+            addCriterion("C_FQ_DATE >=", value, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateLessThan(Date value) {
+            addCriterion("C_FQ_DATE <", value, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateLessThanOrEqualTo(Date value) {
+            addCriterion("C_FQ_DATE <=", value, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateIn(List<Date> values) {
+            addCriterion("C_FQ_DATE in", values, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateNotIn(List<Date> values) {
+            addCriterion("C_FQ_DATE not in", values, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateBetween(Date value1, Date value2) {
+            addCriterion("C_FQ_DATE between", value1, value2, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCFqDateNotBetween(Date value1, Date value2) {
+            addCriterion("C_FQ_DATE not between", value1, value2, "cFqDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusIsNull() {
+            addCriterion("CLO_REVIEW_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusIsNotNull() {
+            addCriterion("CLO_REVIEW_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusEqualTo(BigDecimal value) {
+            addCriterion("CLO_REVIEW_STATUS =", value, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusNotEqualTo(BigDecimal value) {
+            addCriterion("CLO_REVIEW_STATUS <>", value, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusGreaterThan(BigDecimal value) {
+            addCriterion("CLO_REVIEW_STATUS >", value, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("CLO_REVIEW_STATUS >=", value, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusLessThan(BigDecimal value) {
+            addCriterion("CLO_REVIEW_STATUS <", value, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("CLO_REVIEW_STATUS <=", value, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusIn(List<BigDecimal> values) {
+            addCriterion("CLO_REVIEW_STATUS in", values, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusNotIn(List<BigDecimal> values) {
+            addCriterion("CLO_REVIEW_STATUS not in", values, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CLO_REVIEW_STATUS between", value1, value2, "cloReviewStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloReviewStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("CLO_REVIEW_STATUS not between", value1, value2, "cloReviewStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

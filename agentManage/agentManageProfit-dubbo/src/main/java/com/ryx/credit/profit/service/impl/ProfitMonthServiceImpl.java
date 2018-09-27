@@ -183,7 +183,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             criteria.andProfitDateEqualTo(profitDetailMonth.getProfitDate());
         }
         if(StringUtils.isNotBlank(profitDetailMonth.getStatus())){
-            criteria.andStatusEqualTo(profitDetailMonth.getStatus());
+             if (profitDetailMonth.getStatus().contains(",")) {
+                 criteria.andPayStatusIn(Arrays.asList(profitDetailMonth.getStatus().split(",")));
+             }else {
+                 criteria.andStatusEqualTo(profitDetailMonth.getStatus());
+             }
         }
         if (StringUtils.isNotBlank(profitDetailMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitDetailMonth.getProfitDateEnd()))
         {
@@ -402,7 +406,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 // 退单补款+
                 sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
                 // 其他补款+
-                profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.total_supply(profitDetailMonthTemp.getAgentPid(), null));
+                profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
                 sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
                 // POS考核奖励
                  getPosReward(profitDetailMonthTemp, parentPosReward);
@@ -440,6 +444,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
                 profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
             });
+            try {
+                profitComputerService.new_computerTax();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }else{
             LOG.error("没有分润数据。");
         }
@@ -451,7 +460,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitDetailMonth detailMonth = new ProfitDetailMonth();
-        detailMonth.setStatus("4");
+        detailMonth.setStatus("4,6");
         detailMonth.setProfitDate(profitDate);
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null,null, detailMonth);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
@@ -516,7 +525,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
                 profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
                 profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
-                if (!"0".equals(map.get("parentDeductPosRewardAmt").toString())) {
+                if (map.get("parentDeductPosRewardAmt") != null && !"0".equals(map.get("parentDeductPosRewardAmt").toString())) {
                     parentPosReward.put(map.get("parentAgentPid").toString(), (BigDecimal) map.get("parentDeductPosRewardAmt"));
                 }
                 // 判断是否存在奖励
@@ -530,6 +539,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             }
         }else{
             profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
+            profitDetailMonthTemp.setPosRewardDeductionAmt(BigDecimal.ZERO);
         }
     }
 
@@ -601,6 +611,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private BigDecimal doTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentId());
+        profitDeduction.setParentAgentPid(profitDetailMonthTemp.getParentAgentId());
         profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitDeduction.setSourceId("02");
         // pos退单应扣款

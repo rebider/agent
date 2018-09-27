@@ -13,6 +13,10 @@ public class AssProtoColRel extends AssProtoColRelKey implements Serializable {
 
     private BigDecimal status;
 
+    private String protocolRule;
+
+    private String protocolRuleValue;
+
     public String getRemark() {
         return remark;
     }
@@ -43,5 +47,21 @@ public class AssProtoColRel extends AssProtoColRelKey implements Serializable {
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public String getProtocolRule() {
+        return protocolRule;
+    }
+
+    public void setProtocolRule(String protocolRule) {
+        this.protocolRule = protocolRule == null ? null : protocolRule.trim();
+    }
+
+    public String getProtocolRuleValue() {
+        return protocolRuleValue;
+    }
+
+    public void setProtocolRuleValue(String protocolRuleValue) {
+        this.protocolRuleValue = protocolRuleValue == null ? null : protocolRuleValue.trim();
     }
 }

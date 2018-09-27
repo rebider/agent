@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
+import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
@@ -46,6 +47,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     private AgentColinfoMapper agentColinfoMapper;
 	@Autowired
 	private AgentDataHistoryService agentDataHistoryService;
+	@Autowired
+	private AssProtoColMapper assProtoColMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -104,6 +107,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	if(1!=agentBusInfoMapper.insert(agentBusInfo)){
         		throw new ProcessException("业务添加失败");
 			}
+			//记录历史业务平台
+			if(!agentDataHistoryService.saveDataHistory(agentBusInfo, DataHistoryType.BUSINESS.getValue()).isOK()){
+				throw new ProcessException("业务添加失败,历史保存失败");
+			}
             return agentBusInfo;
 
 
@@ -152,11 +159,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	@Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
 	@Override
-	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent)throws Exception {
+	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 
-			outer:
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
 				agentBusInfoVo.setcUser(agent.getcUser());
 				agentBusInfoVo.setAgentId(agent.getId());
@@ -167,6 +173,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentBusInfoVo.getAgentAssProtocol());
+						if(StringUtils.isNotBlank(agentBusInfoVo.getProtocolRuleValue())){
+							String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentBusInfoVo.getProtocolRuleValue());
+							rel.setProtocolRule(ruleReplace);
+						}else{
+							rel.setProtocolRule(assProtoCol.getProtocolRule());
+						}
+						rel.setProtocolRuleValue(agentBusInfoVo.getProtocolRuleValue());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
 							throw new MessageException("业务分管协议添加失败");
 						}
@@ -215,16 +229,23 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 					if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(db_AgentBusInfo)){
 						throw new MessageException("更新业务信息失败");
+					}else{
+						agentDataHistoryService.saveDataHistory(db_AgentBusInfo,db_AgentBusInfo.getId(), DataHistoryType.BUSINESS.getValue(),userId,db_AgentBusInfo.getVersion());
 					}
+
+					//是否已经存在
+					boolean is_in = false;
                     //更新分管协议
 					if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(agentBusInfoVo.getAgentAssProtocol())){
 						List<AssProtoCol> assProtoCol_list = agentAssProtocolService.queryProtoColByBusId(db_AgentBusInfo.getId());
 						for (AssProtoCol assProtoCol : assProtoCol_list) {
 							if(assProtoCol.getId().equals(agentBusInfoVo.getAgentAssProtocol())){
-							 break outer;
+								is_in = true;
+							    break;
 							}
 						}
-
+						//如果存在就处理下一个业务
+						if(is_in)continue;
 
 						List<AssProtoColRel>  rels =agentAssProtocolService.queryProtoColByBusIds(Arrays.asList(db_AgentBusInfo.getId()));
 						for (AssProtoColRel rel : rels) {
@@ -237,6 +258,14 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 						AssProtoColRel rel = new AssProtoColRel();
 						rel.setAgentBusinfoId(db_AgentBusInfo.getId());
 						rel.setAssProtocolId(agentBusInfoVo.getAgentAssProtocol());
+						AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(agentBusInfoVo.getAgentAssProtocol());
+						if(StringUtils.isNotBlank(agentBusInfoVo.getProtocolRuleValue())){
+							String ruleReplace = assProtoCol.getProtocolRule().replace("{}", agentBusInfoVo.getProtocolRuleValue());
+							rel.setProtocolRule(ruleReplace);
+						}else{
+							rel.setProtocolRule(assProtoCol.getProtocolRule());
+						}
+						rel.setProtocolRuleValue(agentBusInfoVo.getProtocolRuleValue());
 						if(1!=agentAssProtocolService.addProtocolRel(rel,agent.getcUser())){
 							throw new MessageException("业务分管协议添加失败");
 						}
@@ -252,7 +281,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 					}
 				}
-				agentDataHistoryService.saveDataHistory(agentBusInfoVo, DataHistoryType.BUSINESS.getValue());
+
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {
@@ -322,6 +351,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		return list;
 	}
 
+	/**
+	 * 业务编码可为空
+	 * @param list
+	 * @param busId
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryParenLevel(List<AgentBusInfo> list, String busId) {
 		if(list==null) {
@@ -347,6 +382,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 	}
 
+	/**
+	 * 业务编码不为空
+	 * @param list
+	 * @param platformCode
+	 * @param agentId
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryParenFourLevel(List<AgentBusInfo> list, String platformCode, String agentId) {
 		if(list==null) {
@@ -357,14 +399,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId)
-                .andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+                .andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0)
 			return list;
 		AgentBusInfo platInfo = plats.get(0);
 		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
 			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
-			if(parent!=null){
+			if(parent!=null && StringUtils.isNotEmpty(parent.getBusNum())){
 				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
 					list.add(parent);
 					if (StringUtils.isNotEmpty(parent.getAgentId())) {
@@ -385,6 +430,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
+	/**
+	 * 业务编码不为空
+	 * @param list
+	 * @param platformCode
+	 * @param busNum
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryParenFourLevelBusNum(List<AgentBusInfo> list, String platformCode, String busNum) {
 		if(list==null) {
@@ -398,14 +450,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andBusNumEqualTo(busNum)
-				.andBusPlatformEqualTo(platformCode).andBusStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+				.andBusPlatformEqualTo(platformCode)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0)
 			return list;
 		AgentBusInfo platInfo = plats.get(0);
 		if(StringUtils.isNotEmpty(platInfo.getBusParent())) {
 			AgentBusInfo parent = agentBusInfoMapper.selectByPrimaryKey(platInfo.getBusParent());
-			if(parent!=null){
+			if(parent!=null && StringUtils.isNotEmpty(parent.getBusNum())){
 				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
 					list.add(parent);
 					if (StringUtils.isNotEmpty(parent.getAgentId())) {
@@ -425,7 +480,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 	/**
-	 * 把给定的代理商指定的平台的下级节点全部放回
+	 * 把给定的代理商指定的平台的下级节点全部放回 业务编码不为空
 	 * @param list
 	 * @param platformCode
 	 * @param agentId
@@ -442,7 +497,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		//当前代理商
 		AgentBusInfoExample example = new AgentBusInfoExample();
 		example.or().andAgentIdEqualTo(agentId)
-				.andBusPlatformEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status).andBusStatusEqualTo(Status.STATUS_1.status);
+				.andBusPlatformEqualTo(platformCode)
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 
 		if(plats.size()==0) {
@@ -455,7 +513,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
 				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status);
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
         //没有下级别就返回
 		if(child_plat.size()==0) {
@@ -472,6 +531,13 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	}
 
 
+	/**
+	 * 业务编码不为空
+	 * @param list
+	 * @param platformCode
+	 * @param busNum
+	 * @return
+	 */
 	@Override
 	public List<AgentBusInfo> queryChildLevelByBusNum(List<AgentBusInfo> list, String platformCode, String busNum) {
 		if(list==null) {
@@ -489,7 +555,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode)
 				.andStatusEqualTo(Status.STATUS_1.status)
-				.andBusStatusEqualTo(Status.STATUS_1.status);
+				.andBusStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0) {
 			return list;
@@ -501,7 +568,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		child_example.or().andBusParentEqualTo(platInfo.getId())
 				.andBusPlatformEqualTo(platformCode)
 				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status);
+				.andStatusEqualTo(Status.STATUS_1.status)
+				.andBusNumIsNotNull();
 		List<AgentBusInfo> child_plat = agentBusInfoMapper.selectByExample(child_example);
 		//没有下级别就返回
 		if(child_plat.size()==0) {

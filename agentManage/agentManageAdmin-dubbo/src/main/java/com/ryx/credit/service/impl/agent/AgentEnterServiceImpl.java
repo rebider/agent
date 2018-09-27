@@ -4,14 +4,17 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.*;
+import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.DateUtils;
+import com.ryx.credit.common.util.FastMap;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
-import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
@@ -19,7 +22,6 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.RegionService;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
-
-import static com.ryx.credit.common.enumc.AgStatus.getAgStatusByValue;
 
 /**
  * Created by cx on 2018/5/28.
@@ -85,6 +85,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private CUserMapper cUserMapper;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private AssProtoColMapper assProtoColMapper;
+
+
     /**
      * 商户入网
      *
@@ -95,15 +99,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
-            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile());
-            agentDataHistoryService.saveDataHistory(agent, DataHistoryType.BASICS.getValue());
+            Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
-                agentContractService.insertAgentContract(item, item.getContractTableFile());
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
+
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
                 item.setcAgentId(agent.getId());
@@ -112,17 +115,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 if (!res.isOK()) {
                     throw new ProcessException("添加交款项异常");
                 }
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
+
             }
             for (AgentColinfoVo item : agentVo.getColinfoVoList()) {
                 item.setAgentId(agent.getId());
                 item.setcUser(agent.getcUser());
                 item.setCloReviewStatus(AgStatus.Create.status);
                 agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
             }
             //判断平台是否重复
-
             List hav = new ArrayList();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 if (hav.contains(item.getBusPlatform())) {
@@ -140,11 +141,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     AssProtoColRel rel = new AssProtoColRel();
                     rel.setAgentBusinfoId(db_AgentBusInfo.getId());
                     rel.setAssProtocolId(item.getAgentAssProtocol());
+                    AssProtoCol assProtoCol = assProtoColMapper.selectByPrimaryKey(item.getAgentAssProtocol());
+                    if(org.apache.commons.lang.StringUtils.isNotBlank(item.getProtocolRuleValue())){
+                        String ruleReplace = assProtoCol.getProtocolRule().replace("{}", item.getProtocolRuleValue());
+                        rel.setProtocolRule(ruleReplace);
+                    }else{
+                        rel.setProtocolRule(assProtoCol.getProtocolRule());
+                    }
+                    rel.setProtocolRuleValue(item.getProtocolRuleValue());
                     if (1 != agentAssProtocolService.addProtocolRel(rel, agent.getcUser())) {
                         throw new ProcessException("业务分管协议添加失败");
                     }
                 }
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
+
             }
 
             return ResultVO.success(agentVo);
@@ -664,35 +673,31 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
         try {
 
-            agent.getAgent().setcUser(userId);
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = null;
-            {
-                if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
-                    ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile());
-                    agentDataHistoryService.saveDataHistory(agent.getAgent(), DataHistoryType.BASICS.getValue());
-                }
+            if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
+                ag = agentService.updateAgentVo(agent.getAgent(), agent.getAgentTableFile(),userId);
             }
             logger.info("用户{}{}修改代理商信息结果{}", userId, agent.getAgent().getId(), "成功");
 
             if (agent.getCapitalVoList() != null && agent.getCapitalVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getCapitalVoList()));
-                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent());
+                ResultVO updateAccountPaidUpdateRes = accountPaidItemService.updateListCapitalVo(agent.getCapitalVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAccountPaidUpdateRes.getResInfo());
             }
             if (agent.getContractVoList() != null && agent.getContractVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商合同信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getContractVoList()));
-                ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(agent.getContractVoList(), agent.getAgent());
+                ResultVO updateAgentContractVoRes = agentContractService.updateAgentContractVo(agent.getContractVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商合同信息结果{}", userId, agent.getAgent().getId(), updateAgentContractVoRes.getResInfo());
             }
             if (agent.getColinfoVoList() != null && agent.getColinfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商收款信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getColinfoVoList()));
-                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent());
+                ResultVO updateAgentColinfoVoRes = agentColinfoService.updateAgentColinfoVo(agent.getColinfoVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商收款信息结果{}", userId, agent.getAgent().getId(), updateAgentColinfoVoRes.getResInfo());
             }
             if (agent.getBusInfoVoList() != null && agent.getBusInfoVoList().size() > 0) {
                 logger.info("用户{}{}修改代理商业务信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent.getBusInfoVoList()));
-                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent());
+                ResultVO updateAgentBusInfoVoRes = agentBusinfoService.updateAgentBusInfoVo(agent.getBusInfoVoList(), agent.getAgent(),userId);
                 logger.info("用户{}{}修改代理商业务信息结果{}", userId, agent.getAgent().getId(), updateAgentBusInfoVoRes.getResInfo());
             }
 
@@ -747,8 +752,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 map.put("time", reltime);
             }
         }
+        String isZpos = String.valueOf(map.get("isZpos"));
+        if (org.apache.commons.lang.StringUtils.isNotBlank(isZpos) && !isZpos.equals("null")) {
+            map.put("isZpos", isZpos);
+            map.put("platForm", Platform.ZPOS.getValue());
+        }
         List<AgentoutVo> agentoutVos = agentMapper.excelAgent(map);
-        if (null==agentoutVos && agentoutVos.size()>1)
+        if (null==agentoutVos && agentoutVos.size()<1)
             return null;
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());

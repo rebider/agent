@@ -12,6 +12,8 @@ public class AgentBusInfoVo extends AgentBusInfo {
 
     private String agentAssProtocol;
 
+    private String protocolRuleValue;
+
     public String getAgentAssProtocol() {
         return agentAssProtocol;
     }
@@ -26,5 +28,13 @@ public class AgentBusInfoVo extends AgentBusInfo {
 
     public void setBusInfoTableFile(List<String> busInfoTableFile) {
         this.busInfoTableFile = busInfoTableFile;
+    }
+
+    public String getProtocolRuleValue() {
+        return protocolRuleValue;
+    }
+
+    public void setProtocolRuleValue(String protocolRuleValue) {
+        this.protocolRuleValue = protocolRuleValue;
     }
 }

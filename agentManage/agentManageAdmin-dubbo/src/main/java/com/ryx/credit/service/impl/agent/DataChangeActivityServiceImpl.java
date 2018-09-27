@@ -2,12 +2,14 @@ package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.DateChangeRequestMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.*;
@@ -59,14 +61,48 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AimportService aimportService;
     @Autowired
     private AgentNotifyService agentNotifyService;
+    @Autowired
+    private AColinfoPaymentService colinfoPaymentService;
+
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public ResultVO startDataChangeActivity(String dataChangeId,String userId) {
+    public ResultVO startDataChangeActivity(String dataChangeId,String userId) throws Exception{
         logger.info("========用户{}启动数据修改申请{}",userId,dataChangeId);
         DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(dataChangeId);
 
+        DateChangeRequestExample dateChangeRequestExample = new DateChangeRequestExample();
+        DateChangeRequestExample.Criteria criteria = dateChangeRequestExample.createCriteria();
+        criteria.andDataIdEqualTo(dateChangeRequest.getDataId());
+        criteria.andDataTypeEqualTo(BusActRelBusType.DC_Colinfo.name());
+        criteria.andAppyStatusEqualTo(AgStatus.Approving.getValue());
+        List<DateChangeRequest> dateChangeRequests = dateChangeRequestMapper.selectByExample(dateChangeRequestExample);
+        if(null==dateChangeRequests){
+            logger.info("数据修改申请:{}", "查询审批状态失败");
+            throw new MessageException("查询审批状态失败！");
+        }
+        if(dateChangeRequests.size()>0){
+            logger.info("数据修改申请:{}", "审批中请勿重复提交");
+            throw new MessageException("审批中请勿重复提交！");
+        }
+        AgentVo agentVo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+        if(null==agentVo){
+            logger.info("数据修改申请:{}", "转换异常");
+            throw new MessageException("修改申请提交审批失败！");
+        }
+        List<AgentColinfoVo> colinfoVoList = agentVo.getColinfoVoList();
+        for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
+            List<AColinfoPayment> aColinfoPayments = colinfoPaymentService.queryConlifoPaymentList(dateChangeRequest.getDataId(), agentColinfoVo.getCloBankAccount());
+            if(null==aColinfoPayments){
+                logger.info("数据修改申请:{}", "收款账号查询失败");
+                throw new MessageException("收款账号查询失败");
+            }
+            if(aColinfoPayments.size()>2){
+                logger.info("数据修改申请:{}", "收款账号已验证超过2次请更换银行卡");
+                throw new MessageException("收款账号已验证超过2次请更换银行卡！");
+            }
+        }
         BusActRelExample example = new BusActRelExample();
         example.or().andBusIdEqualTo(dateChangeRequest.getId()).andActivStatusEqualTo(AgStatus.Approving.name()).andStatusEqualTo(Status.STATUS_1.status);
         List<BusActRel> list = busActRelMapper.selectByExample(example);
@@ -87,23 +123,23 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         dateChangeRequest.setAppyStatus(AgStatus.Approving.status);
         if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest)){
             logger.info("代理商审批，启动审批异常，更新记录状态{}:{}",dateChangeRequest.getId(),userId);
-            throw  new ProcessException("更新记录状态异常");
+            throw  new MessageException("更新记录状态异常");
         }
         if(StringUtils.isEmpty(workId)) {
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
-            throw new ProcessException("审批流启动失败字典中未配置部署流程!");
+            throw new MessageException("审批流启动失败字典中未配置部署流程!");
         }
         Map startPar = agentEnterService.startPar(userId);
         if(null==startPar){
             logger.info("========用户{}启动数据修改申请{}{}启动部门参数为空",dataChangeId,userId,"审批流启动失败字典中未配置部署流程");
-            throw new ProcessException("启动部门参数为空!");
+            throw new MessageException("启动部门参数为空!");
         }
 
         String proce = activityService.createDeloyFlow(null,workId,null,null,startPar);
         if(proce==null){
             logger.info("========用户{}启动数据修改申请{}{}",dataChangeId,userId,"数据修改审批，审批流启动失败");
             logger.info("数据修改审批，审批流启动失败{}:{}",dataChangeId,userId);
-            throw new ProcessException("审批流启动失败!");
+            throw new MessageException("审批流启动失败!");
         }
         //代理商业务视频关系
         BusActRel record = new BusActRel();
@@ -116,7 +152,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setActivStatus(AgStatus.Approving.name());
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
-            throw  new ProcessException("添加审批关系失败");
+            throw  new MessageException("添加审批关系失败");
 
         }
 
@@ -153,7 +189,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                     if(DataChangeApyType.DC_Colinfo.name().equals(dr.getDataType())) {
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
-                        ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent());
+                        ResultVO res = agentColinfoService.updateAgentColinfoVo(vo.getColinfoVoList(), vo.getAgent(),rel.getcUser());
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
                         if(res.isSuccess()){

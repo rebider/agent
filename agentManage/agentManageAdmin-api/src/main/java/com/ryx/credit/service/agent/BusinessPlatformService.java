@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.pojo.admin.vo.BusinessOutVo;
@@ -23,7 +24,7 @@ import java.util.Map;
  */
 public interface BusinessPlatformService {
 
-    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag);
+    PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos);
 
     AgentResult verifyAgent(String agUniqNum);
 
@@ -51,4 +52,13 @@ public interface BusinessPlatformService {
      *
      */
     public List<BusinessOutVo> exportAgent(Map map, Long userId) throws ParseException;
+
+
+    List<Map<String, Object>> queryByBusNum(String busNum);
+
+
+    Map<String,Object> queryIsBZYD(String agBusLic,List<AgentBusInfoVo> busInfoVoList);
+
+
+    List<Map<String,Object>> queryIsBZYDList(String agBusLic,List<AgentBusInfo> busInfoVoList);
 }

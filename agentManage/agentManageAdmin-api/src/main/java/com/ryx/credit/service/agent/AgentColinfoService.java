@@ -3,6 +3,7 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.agent.AColinfoPayment;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
@@ -10,6 +11,7 @@ import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by cx on 2018/5/28.
@@ -31,11 +33,19 @@ public interface AgentColinfoService {
 
     public int update(AgentColinfo a);
 
-    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent);
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId);
 
     public AgentColinfo queryPoint(AgentColinfo agentColinfo);
 
     int updateByPrimaryKeySelective(AgentColinfo record);
 
     public AgentResult checkColInfo(AgentColinfo agentColinfo);
+
+    void insertByPayment(AColinfoPayment colinfoPayment) throws Exception;
+
+    void updateByPaymentResult(AColinfoPayment aColinfoPayment, Map<String, Object> resultMap) throws Exception;
+
+    AgentColinfo selectByPrimaryKey(String id);
+
+    AgentColinfo selectByAgentId(String agentId);
 }

@@ -75,7 +75,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Autowired
     private AgentQueryService agentQueryService;
     @Override
-    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag) {
+    public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos) {
         Map<String, Object> reqMap = new HashMap<>();
 
         reqMap.put("agStatus", AgStatus.Approved.name());
@@ -108,6 +108,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             reqMap.put("userId",Long.valueOf(agentBusInfo.getcUser()));
         }
         reqMap.put("status", Status.STATUS_1.status);
+        reqMap.put("isZpos",isZpos);
+        reqMap.put("platForm", Platform.ZPOS.getValue());
         List<Map<String, Object>> agentBusInfoList = agentBusInfoMapper.queryBusinessPlatformList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentBusInfoList);
@@ -226,8 +228,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
                     item.setAgentId(agent.getId());
-                    agentContractService.insertAgentContract(item, item.getContractTableFile());
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.CONTRACT.getValue());
+                    agentContractService.insertAgentContract(item, item.getContractTableFile(),agent.getcUser());
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
@@ -238,7 +239,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     if (!result.isOK()) {
                         throw new ProcessException("缴纳款项信息录入失败");
                     }
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.PAYMENT.getValue());
                 }
             }
             if (null != agentVo.getColinfoVoList()) {
@@ -246,7 +246,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     item.setAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
                     agentColinfoService.agentColinfoInsert(item, item.getColinfoTableFile());
-                    agentDataHistoryService.saveDataHistory(item, DataHistoryType.GATHER.getValue());
                 }
             }
             List<AgentBusInfo> agentBusInfoList = new ArrayList<>();
@@ -255,7 +254,6 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 item.setAgentId(agent.getId());
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 agentBusInfoList.add(agentBusInfo);
-                agentDataHistoryService.saveDataHistory(item, DataHistoryType.BUSINESS.getValue());
             }
             return AgentResult.ok(agentBusInfoList);
         } catch (Exception e) {
@@ -399,6 +397,8 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
 
         map.put("agStatus", AgStatus.Approved.name());
         map.put("status", Status.STATUS_1.status);
+        map.put("isZpos",String.valueOf(map.get("isZpos")));
+        map.put("platForm", Platform.ZPOS.getValue());
         List<BusinessOutVo> agentoutVos = agentBusInfoMapper.excelAgent(map);
         List<Dict> BUS_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name());
         List<Dict> BUS_SCOPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.BUS_SCOPE.name());
@@ -439,6 +439,121 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
         return agentoutVos;
+    }
+
+
+    @Override
+    public List<Map<String, Object>> queryByBusNum(String busNum){
+        if(StringUtils.isBlank(busNum)){
+            return null;
+        }
+        return agentBusInfoMapper.queryByBusNum(busNum);
+    }
+
+
+    /**
+     * 查询代理商是否有标准一代的
+     * @param agBusLic
+     * @param busInfoVoList
+     * @return
+     */
+    @Override
+    public Map<String,Object> queryIsBZYD(String agBusLic,List<AgentBusInfoVo> busInfoVoList){
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("code","200");
+        resultMap.put("msg","成功");
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria = agentExample.createCriteria();
+        criteria.andAgBusLicEqualTo(agBusLic);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+        for (Agent agent : agents) {
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria busCriteria = agentBusInfoExample.createCriteria();
+            busCriteria.andAgentIdEqualTo(agent.getId());
+            busCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                    if(agentBusInfo.getBusPlatform().equals(agentBusInfoVo.getBusPlatform())){
+                        if(agentBusInfo.getBusType().equals(BusType.BZYD.key)){
+                            resultMap.put("code","500");
+                            resultMap.put("msg","唯一编号："+agentBusInfo.getAgentId()+",已有标准一代");
+                            return resultMap;
+                        }
+                        if(StringUtils.isBlank(agentBusInfo.getBusParent()) && StringUtils.isBlank(agentBusInfo.getBusParent())){
+                            continue;
+                        }
+                        if((StringUtils.isBlank(agentBusInfo.getBusParent()) && StringUtils.isNotBlank(agentBusInfo.getBusParent())) ||
+                                (StringUtils.isNotBlank(agentBusInfo.getBusParent()) && StringUtils.isBlank(agentBusInfo.getBusParent())) ){
+                            resultMap.put("code","500");
+                            resultMap.put("msg","平台："+Platform.getContentByValue(agentBusInfo.getBusPlatform())+",上级不一致");
+                            return resultMap;
+                        }
+                        if(!agentBusInfo.getBusParent().equals(agentBusInfoVo.getBusParent())){
+                            resultMap.put("code","500");
+                            AgentBusInfo agentBus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                            Agent agent1 = agentMapper.selectByPrimaryKey(agentBus.getAgentId());
+                            resultMap.put("msg","平台："+Platform.getContentByValue(agentBusInfo.getBusPlatform())+",上级不一致,上级名称:"+agent1.getAgName());
+                            return resultMap;
+                        }
+                    }
+                }
+            }
+        }
+        return resultMap;
+    }
+
+    @Override
+    public List<Map<String,Object>> queryIsBZYDList(String agBusLic,List<AgentBusInfo> busInfoVoList){
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        AgentExample agentExample = new AgentExample();
+        AgentExample.Criteria criteria = agentExample.createCriteria();
+        criteria.andAgBusLicEqualTo(agBusLic);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> agents = agentMapper.selectByExample(agentExample);
+        for (Agent agent : agents) {
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria busCriteria = agentBusInfoExample.createCriteria();
+            busCriteria.andAgentIdEqualTo(agent.getId());
+            busCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                for (AgentBusInfo agentBusInfoVo : busInfoVoList) {
+                    if(agentBusInfo.getBusPlatform().equals(agentBusInfoVo.getBusPlatform())){
+                        if(agentBusInfo.getBusType().equals(BusType.BZYD.key)){
+                            Map<String,Object> resultMap = new HashMap<>();
+                            resultMap.put("msg","存在标准一代");
+                            resultMap.put("agentId",agentBusInfo.getAgentId());
+                            resultMap.put("agentName",agent.getAgName());
+                            resultList.add(resultMap);
+                        }
+                        if(StringUtils.isBlank(agentBusInfo.getBusParent()) && StringUtils.isBlank(agentBusInfo.getBusParent())){
+                             continue;
+                        }
+                        if((StringUtils.isBlank(agentBusInfo.getBusParent()) && StringUtils.isNotBlank(agentBusInfo.getBusParent())) ||
+                            (StringUtils.isNotBlank(agentBusInfo.getBusParent()) && StringUtils.isBlank(agentBusInfo.getBusParent())) ){
+                            Map<String,Object> resultMap = new HashMap<>();
+                            resultMap.put("msg","上级不一致");
+                            resultMap.put("agentId",agentBusInfo.getAgentId());
+                            resultMap.put("agentName",agent.getAgName());
+                            resultMap.put("busPlatform",Platform.getContentByValue(agentBusInfo.getBusPlatform()));
+                        }else if(!agentBusInfo.getBusParent().equals(agentBusInfoVo.getBusParent())){
+                            Map<String,Object> resultMap = new HashMap<>();
+                            AgentBusInfo agentBus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                            Agent agent1 = agentMapper.selectByPrimaryKey(agentBus.getAgentId());
+                            resultMap.put("msg","上级不一致");
+                            resultMap.put("agentId",agentBusInfo.getAgentId());
+                            resultMap.put("agentName",agent.getAgName());
+                            resultMap.put("busPlatform",Platform.getContentByValue(agentBusInfo.getBusPlatform()));
+                            resultMap.put("busParent",agent1.getAgName());
+                            resultList.add(resultMap);
+                        }
+                    }
+                }
+            }
+        }
+        return resultList;
     }
 
 }

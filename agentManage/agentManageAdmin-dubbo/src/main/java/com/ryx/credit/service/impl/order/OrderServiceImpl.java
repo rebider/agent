@@ -13,9 +13,7 @@ import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
-import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.pojo.admin.vo.OReceiptOrderVo;
-import com.ryx.credit.pojo.admin.vo.OrderFormVo;
+import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -1293,6 +1291,7 @@ public class OrderServiceImpl implements OrderService {
             //更新订单状态 审批状态，结算状态 订单生效时间
             order.setOrderStatus(OrderStatus.ENABLE.status);
             order.setReviewStatus(AgStatus.Approved.status);
+            order.setoInuretime(d.getTime());
             //付款单设置
             switch (order.getPaymentMethod()) {
                 case "FKFQ":
@@ -2659,5 +2658,42 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return AgentResult.ok("批量更新成功");
+    }
+
+    @Override
+    public List<OrderoutVo> exportOrder(Map map) {
+        List<OrderoutVo> orderoutList = orderMapper.excelOrder(map);
+        List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
+        List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
+
+        if (null!=orderoutList  && orderoutList.size()>1){
+            for (OrderoutVo orderoutVo : orderoutList) {
+                if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
+                    for (Dict dict : dictList) {
+                        if (null!=dict  &&  orderoutVo.getPayMethod().equals(dict.getdItemvalue())){
+                            orderoutVo.setPayMethod(dict.getdItemname());
+                            break;
+                        }
+                    }
+                }
+                if (StringUtils.isNotBlank(orderoutVo.getDeductionType()) && !orderoutVo.getDeductionType().equals("null")){
+                    for (Dict dict : capitalType) {
+                        if (null!=dict  &&  orderoutVo.getDeductionType().equals(dict.getdItemvalue())){
+                            orderoutVo.setDeductionType(dict.getdItemname());
+                            BigDecimal deductionAmount=new BigDecimal(0);
+                            if (null!=orderoutVo.getDeductionAmount()){
+                                deductionAmount= orderoutVo.getDeductionAmount();
+                            }
+                            orderoutVo.setAmount(orderoutVo.getDeductionType()+":"+orderoutVo.getDeductionAmount());
+                            break;
+                        }
+                    }
+                }
+
+
+
+            }
+        }
+        return orderoutList;
     }
 }

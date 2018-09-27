@@ -10,6 +10,7 @@
 
     <!-- 提供方应用信息，用于计算依赖关系 -->
     <dubbo:application name="pms-dubbo-server"/>
+    <dubbo:provider id="payload" payload="888888888"/>
 
     <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
     <!-- 用dubbo协议在22880端口暴露服务 -->
@@ -53,6 +54,7 @@
     <dubbo:service interface="com.ryx.credit.service.agent.BusActRelService" ref="busActRelService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.AgentColinfoService" ref="agentColinfoService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.ApprovalFlowRecordService" ref="approvalFlowRecordService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.AColinfoPaymentService" ref="aColinfoPaymentService"  timeout="1200000" registry="${zk.group}"/>
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />
@@ -74,6 +76,7 @@
     <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.CompensateService" ref="compensateService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.OLogisticsService" ref="oLogisticService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.order.OLogisticsDetailService" ref="oLogisticsDetailService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IOrderReturnService" ref="orderReturnService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IAccountAdjustService" ref="accountAdjustService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.bank.PosRegionService" ref="posRegionService"  timeout="1200000" registry="${zk.group}"/>

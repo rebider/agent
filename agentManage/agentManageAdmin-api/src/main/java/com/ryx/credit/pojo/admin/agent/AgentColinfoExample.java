@@ -1387,6 +1387,136 @@ public class AgentColinfoExample {
             addCriterion("CLO_INVOICE not between", value1, value2, "cloInvoice");
             return (Criteria) this;
         }
+
+        public Criteria andCloBankCodeIsNull() {
+            addCriterion("CLO_BANK_CODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeIsNotNull() {
+            addCriterion("CLO_BANK_CODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeEqualTo(String value) {
+            addCriterion("CLO_BANK_CODE =", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeNotEqualTo(String value) {
+            addCriterion("CLO_BANK_CODE <>", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeGreaterThan(String value) {
+            addCriterion("CLO_BANK_CODE >", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("CLO_BANK_CODE >=", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeLessThan(String value) {
+            addCriterion("CLO_BANK_CODE <", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeLessThanOrEqualTo(String value) {
+            addCriterion("CLO_BANK_CODE <=", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeLike(String value) {
+            addCriterion("CLO_BANK_CODE like", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeNotLike(String value) {
+            addCriterion("CLO_BANK_CODE not like", value, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeIn(List<String> values) {
+            addCriterion("CLO_BANK_CODE in", values, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeNotIn(List<String> values) {
+            addCriterion("CLO_BANK_CODE not in", values, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeBetween(String value1, String value2) {
+            addCriterion("CLO_BANK_CODE between", value1, value2, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andCloBankCodeNotBetween(String value1, String value2) {
+            addCriterion("CLO_BANK_CODE not between", value1, value2, "cloBankCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusIsNull() {
+            addCriterion("PAY_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusIsNotNull() {
+            addCriterion("PAY_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS =", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusNotEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS <>", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusGreaterThan(BigDecimal value) {
+            addCriterion("PAY_STATUS >", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS >=", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusLessThan(BigDecimal value) {
+            addCriterion("PAY_STATUS <", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS <=", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusIn(List<BigDecimal> values) {
+            addCriterion("PAY_STATUS in", values, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusNotIn(List<BigDecimal> values) {
+            addCriterion("PAY_STATUS not in", values, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PAY_STATUS between", value1, value2, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PAY_STATUS not between", value1, value2, "payStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

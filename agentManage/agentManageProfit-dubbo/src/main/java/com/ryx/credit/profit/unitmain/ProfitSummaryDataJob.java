@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.unitmain;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
@@ -8,6 +9,7 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.profit.dao.PAgentPidLinkMapper;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
@@ -17,6 +19,7 @@ import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitComputerService;
+import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
@@ -51,6 +54,8 @@ public class ProfitSummaryDataJob {
     private OrderService orderService;
     @Autowired
     private ProfitComputerService computerService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
 
     private int index = 1;
 
@@ -59,16 +64,18 @@ public class ProfitSummaryDataJob {
     }
 
     /**
-     * 交易月份（空则为上一月）
+     * 汇总数据
+     * transDate 交易月份（空则为上一月）
      * 每月12号上午12点：@Scheduled(cron = "0 0 12 12 * ?")
-     * 2018.9.7 17:55：@Scheduled(cron = "0 55 17 7 * ?")
      */
-    @Scheduled(cron = "0 0 12 12 * ?")
+//    @Scheduled(cron = "0 0 12 12 * ?")
     public void MPos_Summary(){
         String transDate = null;
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
+
         List<TransProfitDetail> details = transProfitDetailMapper.selectListByDate(transDate);//手刷同步过来的小汇数据
         for(TransProfitDetail detail : details){
+            boolean isAdd = false;
             Agent agent = agentService.getAgentById(detail.getAgentId());
             ProfitDetailMonth where = new ProfitDetailMonth();
             where.setAgentId(detail.getAgentId());
@@ -77,6 +84,7 @@ public class ProfitSummaryDataJob {
             ProfitDetailMonth detailMonth = detailMonthMapper.selectByIdAndParent(where);
             if(null == detailMonth){
                 detailMonth = new ProfitDetailMonth();
+                isAdd = true;
             }
             detailMonth.setProfitDate(transDate);
             BigDecimal transAmt = detailMonth.getTranAmt()==null?BigDecimal.ZERO:detailMonth.getTranAmt();
@@ -104,20 +112,34 @@ public class ProfitSummaryDataJob {
                 detailMonth.setTpProfitAmt(detail.getProfitAmt());
             }
 
-            if(null == detailMonth){//新增汇总
+            if(detail.getSupplyAmt()!=null && detail.getSupplyAmt().compareTo(BigDecimal.ZERO)>0){
+                detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt()==null?detail.getSupplyAmt():detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
+            }
+            //获取账户信息
+            List<AgentColinfo> agentColinfos = agentColinfoService.queryAgentColinfoService(detail.getAgentId(),null, AgStatus.Approved.status);
+            if (agentColinfos != null && agentColinfos.size() > 0) {
+                AgentColinfo agentColinfo = agentColinfos.get(0);
+                detailMonth.setAccountId(agentColinfo.getCloBankAccount());
+                detailMonth.setAccountName(agentColinfo.getCloRealname());
+                detailMonth.setOpenBankName(agentColinfo.getCloBank());
+                detailMonth.setBankCode(agentColinfo.getBranchLineNum());
+                detailMonth.setTax(agentColinfo.getCloTaxPoint());
+                detailMonth.setPayStatus(agentColinfo.getCloType().toString());
+            }
+
+            if (isAdd) {//新增汇总
                 detailMonth.setId(idService.genId(TabId.P_PROFIT_DETAIL_M));
-                detailMonth.setAgentName(agent.getAgName());
+                detailMonth.setAgentName(null==agent?"":agent.getAgName());
                 detailMonth.setAgentId(detail.getAgentId());
                 detailMonth.setParentAgentId(detail.getParentAgentId());
                 detailMonth.setAgentPid(detail.getAgentId());
                 detailMonthMapper.insertSelective(detailMonth);
-
-            }else{//更新汇总
+            } else {//更新汇总
                 detailMonthMapper.updateByPrimaryKeySelective(detailMonth);
             }
 
-            //
         }
     }
+
 
 }

@@ -156,12 +156,21 @@ public class NewProfitDataJob {
                 ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
                 profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
                 profitDetailMonthTemp.setAgentId(transProfitDetail.getAgentId());
-                transProfitDetail.setProfitDate(profitDate);
+                profitDetailMonthTemp.setProfitDate(profitDate);
                 profitDetailMonthTemp= profitDetailMonthMapper.selectByIdAndParent(profitDetailMonthTemp);
                 if (profitDetailMonthTemp==null) {
                     profitDetailMonthTemp = new ProfitDetailMonth();
+                    insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
+                }else{
+                    profitDetailMonthTemp.setTranAmt((profitDetailMonthTemp.getTranAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getTranAmt()).add(transProfitDetail.getInTransAmt()));
+                    profitDetailMonthTemp.setPayAmt((profitDetailMonthTemp.getPayAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPayAmt()).add(transProfitDetail.getOutTransAmt()));
+                    profitDetailMonthTemp.setTranProfitScale(transProfitDetail.getInProfitScale().toString());
+                    profitDetailMonthTemp.setPayProfitScale(transProfitDetail.getOutProfitScale().toString());
+                    profitDetailMonthTemp.setTranProfitAmt((profitDetailMonthTemp.getTranProfitAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getTranProfitAmt()).add(transProfitDetail.getInProfitAmt()));
+                    profitDetailMonthTemp.setPayProfitAmt((profitDetailMonthTemp.getPayProfitAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPayProfitAmt()).add(transProfitDetail.getOutProfitAmt()));
+                    profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
+                    profitDetailMonthServiceImpl.update(profitDetailMonthTemp);
                 }
-                insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
             });
         }
     }
@@ -212,11 +221,9 @@ public class NewProfitDataJob {
      */
     private Map<String, Object> getAgentId(String orgId) {
         // 获取代理商平台id
-        AgentBusInfo agentBusInfo = new AgentBusInfo();
-        agentBusInfo.setBusNum(orgId);
-        PageInfo pageInfo = businessPlatformService.queryBusinessPlatformList(agentBusInfo, new Agent(),null,null);
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
-            Map<String, Object> agentMap = (Map<String, Object>) pageInfo.getRows().get(0);
+        List<Map<String, Object>> agentList = businessPlatformService.queryByBusNum(orgId);
+        if (agentList != null && agentList.size() > 0) {
+            Map<String, Object> agentMap = agentList.get(0);
             try {
                 getParentAgentId(agentMap);
                 return agentMap;

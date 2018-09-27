@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AttachmentRelType;
-import com.ryx.credit.common.enumc.DataHistoryType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -70,6 +67,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         Date nowDate = new Date();
         capital.setcTime(nowDate);
         capital.setcUtime(nowDate);
+        capital.setCloReviewStatus(AgStatus.Create.status);
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
             if(fileIdList!=null) {
@@ -89,10 +87,14 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                     }
                 }
             }
+            //记录历史缴款
+            if(!agentDataHistoryService.saveDataHistory(capital, DataHistoryType.PAYMENT.getValue()).isOK()){
+                throw new ProcessException("历史数据保存失败");
+            }
             log.info("insertAccountPaid缴纳款项添加:成功");
             return AgentResult.ok();
         }
-        return new AgentResult(500,"系统异常","");
+       throw new ProcessException("缴款信息处理失败");
     }
 
     @Override
@@ -108,8 +110,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent) throws Exception {
-
+    public ResultVO updateListCapitalVo(List<CapitalVo> capitalVoList, Agent agent,String userId) throws Exception {
             try {
                 if(agent==null)throw new ProcessException("代理商信息不能为空");
                 for (CapitalVo capitalVo : capitalVoList) {
@@ -117,7 +118,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                     capitalVo.setcAgentId(agent.getId());
                     if(StringUtils.isEmpty(capitalVo.getId())) {
                         //直接新曾
-                        AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), agent.getcUser());
+                        AgentResult result =   insertAccountPaid(capitalVo, capitalVo.getCapitalTableFile(), userId);
                         if(!result.isOK())throw new ProcessException("新增收款信息失败");
                     }else{
 
@@ -130,8 +131,21 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         db_capital.setcUser(capitalVo.getcUser());
                         db_capital.setRemark(capitalVo.getRemark());
                         db_capital.setStatus(capitalVo.getStatus());
+
+                        db_capital.setcFqCount(capitalVo.getcFqCount());
+                        db_capital.setcPayuser(capitalVo.getcPayuser());
+                        db_capital.setcPaytime(capitalVo.getcPaytime());
+                        db_capital.setcInCom(capitalVo.getcInCom());
+                        db_capital.setcPayType(capitalVo.getcPayType());
+
+
+
                         if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){
                             throw new ProcessException("更新收款信息失败");
+                        }else{
+                            if(!agentDataHistoryService.saveDataHistory(db_capital,db_capital.getId(), DataHistoryType.PAYMENT.getValue(),userId,db_capital.getVersion()).isOK()){
+                                throw new ProcessException("更新收款信息失败");
+                            }
                         }
 
                         //删除老的附件
@@ -168,7 +182,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         }
 
                     }
-                    agentDataHistoryService.saveDataHistory(capitalVo, DataHistoryType.PAYMENT.getValue());
+
                 }
                 return ResultVO.success(null);
             } catch (Exception e) {

@@ -72,6 +72,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if(dict!=null){
                 stringObjectMap.put("PRO_COM",dict.getdItemname());
             }
+            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
+            if (null!=modelType){
+                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
+            }
+
         }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
@@ -175,7 +180,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("请填写物流单号");
                     throw new MessageException("请填写物流单号");
                 }
-
+                OSubOrderExample example = new OSubOrderExample();
+                example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
+                List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
+                if(subOrders.size()!=1){
+                    logger.info("请填写物流单号");
+                    throw new MessageException("订单["+orderId+"]的商品["+proId+"]数量大于1");
+                }
+                OSubOrder subOrderItem = subOrders.get(0);
                 //校验文档不能更改
                 List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
                 if(listItem.size()>0){
@@ -219,10 +231,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
                 oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
                 try {
-                    oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                    oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
                 }catch (Exception e){
                     try {
-                        oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
+                        oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
                     }catch (Exception m){
                         throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
                     }
@@ -235,7 +247,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogistics.setOrderId(orderId);       // 订单编号
                 oLogistics.setProId(proId);         // 商品ID
                 oLogistics.setProName(proName);       // 商品名称
-
+                oLogistics.setProPrice(subOrderItem.getProRelPrice());//商品单价
                 //排单信息
                 ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
                 if(planVo==null)throw new MessageException("排单信息未找到");
@@ -465,7 +477,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return ResultVO.success(null);
     }
 
-    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
+
+    private List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
         //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
         int begin = begins - 1;
         ArrayList<String> list = new ArrayList<>();
