@@ -115,7 +115,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         example.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andCAgentIdEqualTo(agentId)
                 .andCTypeEqualTo(type)
-                .andCIsinEqualTo(Status.STATUS_0.status);
+                .andCIsinEqualTo(Status.STATUS_0.status)
+        .andCloReviewStatusEqualTo(AgStatus.Approved.status);
 
         example.setOrderByClause(" c_amount desc ");
 
