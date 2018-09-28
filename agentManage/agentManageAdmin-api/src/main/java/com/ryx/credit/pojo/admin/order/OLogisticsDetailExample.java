@@ -1607,6 +1607,286 @@ public class OLogisticsDetailExample {
             addCriterion("ORDER_NUM not between", value1, value2, "orderNum");
             return (Criteria) this;
         }
+
+        public Criteria andTerminalidIsNull() {
+            addCriterion("TERMINALID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidIsNotNull() {
+            addCriterion("TERMINALID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidEqualTo(String value) {
+            addCriterion("TERMINALID =", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidNotEqualTo(String value) {
+            addCriterion("TERMINALID <>", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidGreaterThan(String value) {
+            addCriterion("TERMINALID >", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMINALID >=", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidLessThan(String value) {
+            addCriterion("TERMINALID <", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidLessThanOrEqualTo(String value) {
+            addCriterion("TERMINALID <=", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidLike(String value) {
+            addCriterion("TERMINALID like", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidNotLike(String value) {
+            addCriterion("TERMINALID not like", value, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidIn(List<String> values) {
+            addCriterion("TERMINALID in", values, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidNotIn(List<String> values) {
+            addCriterion("TERMINALID not in", values, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidBetween(String value1, String value2) {
+            addCriterion("TERMINALID between", value1, value2, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidNotBetween(String value1, String value2) {
+            addCriterion("TERMINALID not between", value1, value2, "terminalid");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyIsNull() {
+            addCriterion("TERMINALID_KEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyIsNotNull() {
+            addCriterion("TERMINALID_KEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyEqualTo(String value) {
+            addCriterion("TERMINALID_KEY =", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyNotEqualTo(String value) {
+            addCriterion("TERMINALID_KEY <>", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyGreaterThan(String value) {
+            addCriterion("TERMINALID_KEY >", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_KEY >=", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyLessThan(String value) {
+            addCriterion("TERMINALID_KEY <", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyLessThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_KEY <=", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyLike(String value) {
+            addCriterion("TERMINALID_KEY like", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyNotLike(String value) {
+            addCriterion("TERMINALID_KEY not like", value, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyIn(List<String> values) {
+            addCriterion("TERMINALID_KEY in", values, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyNotIn(List<String> values) {
+            addCriterion("TERMINALID_KEY not in", values, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyBetween(String value1, String value2) {
+            addCriterion("TERMINALID_KEY between", value1, value2, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidKeyNotBetween(String value1, String value2) {
+            addCriterion("TERMINALID_KEY not between", value1, value2, "terminalidKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqIsNull() {
+            addCriterion("TERMINALID_SEQ is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqIsNotNull() {
+            addCriterion("TERMINALID_SEQ is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqEqualTo(String value) {
+            addCriterion("TERMINALID_SEQ =", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqNotEqualTo(String value) {
+            addCriterion("TERMINALID_SEQ <>", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqGreaterThan(String value) {
+            addCriterion("TERMINALID_SEQ >", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_SEQ >=", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqLessThan(String value) {
+            addCriterion("TERMINALID_SEQ <", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqLessThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_SEQ <=", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqLike(String value) {
+            addCriterion("TERMINALID_SEQ like", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqNotLike(String value) {
+            addCriterion("TERMINALID_SEQ not like", value, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqIn(List<String> values) {
+            addCriterion("TERMINALID_SEQ in", values, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqNotIn(List<String> values) {
+            addCriterion("TERMINALID_SEQ not in", values, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqBetween(String value1, String value2) {
+            addCriterion("TERMINALID_SEQ between", value1, value2, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidSeqNotBetween(String value1, String value2) {
+            addCriterion("TERMINALID_SEQ not between", value1, value2, "terminalidSeq");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeIsNull() {
+            addCriterion("TERMINALID_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeIsNotNull() {
+            addCriterion("TERMINALID_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeEqualTo(String value) {
+            addCriterion("TERMINALID_TYPE =", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeNotEqualTo(String value) {
+            addCriterion("TERMINALID_TYPE <>", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeGreaterThan(String value) {
+            addCriterion("TERMINALID_TYPE >", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_TYPE >=", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeLessThan(String value) {
+            addCriterion("TERMINALID_TYPE <", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeLessThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_TYPE <=", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeLike(String value) {
+            addCriterion("TERMINALID_TYPE like", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeNotLike(String value) {
+            addCriterion("TERMINALID_TYPE not like", value, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeIn(List<String> values) {
+            addCriterion("TERMINALID_TYPE in", values, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeNotIn(List<String> values) {
+            addCriterion("TERMINALID_TYPE not in", values, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeBetween(String value1, String value2) {
+            addCriterion("TERMINALID_TYPE between", value1, value2, "terminalidType");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidTypeNotBetween(String value1, String value2) {
+            addCriterion("TERMINALID_TYPE not between", value1, value2, "terminalidType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

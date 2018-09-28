@@ -24,6 +24,10 @@
     <result column="RECORD_STATUS" jdbcType="DECIMAL" property="recordStatus" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="ORDER_NUM" jdbcType="VARCHAR" property="orderNum" />
+    <result column="TERMINALID" jdbcType="VARCHAR" property="terminalid" />
+    <result column="TERMINALID_KEY" jdbcType="VARCHAR" property="terminalidKey" />
+    <result column="TERMINALID_SEQ" jdbcType="VARCHAR" property="terminalidSeq" />
+    <result column="TERMINALID_TYPE" jdbcType="VARCHAR" property="terminalidType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -55,9 +59,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, 
-    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER, 
-    U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM
+    ID, ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME,
+    G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM, TERMINALID, TERMINALID_KEY, TERMINALID_SEQ,
+    TERMINALID_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -76,7 +81,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_LOGISTICS_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -88,22 +93,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
-    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID, 
-      PRO_ID, PRO_NAME, SETTLEMENT_PRICE, 
-      ACTIVITY_ID, ACTIVITY_NAME, G_TIME, 
-      SN_NUM, AGENT_ID, OPT_ID, 
-      OPT_TYPE, RETURN_ORDER_ID, C_TIME, 
-      U_TIME, C_USER, U_USER, 
-      STATUS, RECORD_STATUS, VERSION, 
-      ORDER_NUM)
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR}, 
-      #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL}, 
-      #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL}, 
-      #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR}, 
-      #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
-      #{orderNum,jdbcType=VARCHAR})
+    insert into O_LOGISTICS_DETAIL (ID, ORDER_ID, LOGISTICS_ID,
+    PRO_ID, PRO_NAME, SETTLEMENT_PRICE,
+    ACTIVITY_ID, ACTIVITY_NAME, G_TIME,
+    SN_NUM, AGENT_ID, OPT_ID,
+    OPT_TYPE, RETURN_ORDER_ID, C_TIME,
+    U_TIME, C_USER, U_USER,
+    STATUS, RECORD_STATUS, VERSION,
+    ORDER_NUM, TERMINALID, TERMINALID_KEY,
+    TERMINALID_SEQ, TERMINALID_TYPE)
+    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR},
+    #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
+    #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
+    #{snNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{optId,jdbcType=VARCHAR},
+    #{optType,jdbcType=VARCHAR}, #{returnOrderId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{recordStatus,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{orderNum,jdbcType=VARCHAR}, #{terminalid,jdbcType=VARCHAR}, #{terminalidKey,jdbcType=VARCHAR},
+    #{terminalidSeq,jdbcType=VARCHAR}, #{terminalidType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     insert into O_LOGISTICS_DETAIL
@@ -174,6 +181,18 @@
       <if test="orderNum != null">
         ORDER_NUM,
       </if>
+      <if test="terminalid != null">
+        TERMINALID,
+      </if>
+      <if test="terminalidKey != null">
+        TERMINALID_KEY,
+      </if>
+      <if test="terminalidSeq != null">
+        TERMINALID_SEQ,
+      </if>
+      <if test="terminalidType != null">
+        TERMINALID_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -241,6 +260,18 @@
       </if>
       <if test="orderNum != null">
         #{orderNum,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalid != null">
+        #{terminalid,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalidKey != null">
+        #{terminalidKey,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalidSeq != null">
+        #{terminalidSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalidType != null">
+        #{terminalidType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -316,6 +347,18 @@
       <if test="orderNum != null">
         ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
       </if>
+      <if test="terminalid != null">
+        TERMINALID = #{terminalid,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalidKey != null">
+        TERMINALID_KEY = #{terminalidKey,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalidSeq != null">
+        TERMINALID_SEQ = #{terminalidSeq,jdbcType=VARCHAR},
+      </if>
+      <if test="terminalidType != null">
+        TERMINALID_TYPE = #{terminalidType,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -341,12 +384,16 @@
       STATUS = #{status,jdbcType=DECIMAL},
       RECORD_STATUS = #{recordStatus,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
-      ORDER_NUM = #{orderNum,jdbcType=VARCHAR}
+      ORDER_NUM = #{orderNum,jdbcType=VARCHAR},
+      TERMINALID = #{terminalid,jdbcType=VARCHAR},
+      TERMINALID_KEY = #{terminalidKey,jdbcType=VARCHAR},
+      TERMINALID_SEQ = #{terminalidSeq,jdbcType=VARCHAR},
+      TERMINALID_TYPE = #{terminalidType,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

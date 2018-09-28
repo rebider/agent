@@ -383,6 +383,36 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return map;
     }
 
+    @Override
+    public List<String> addSn(List<List<String>> data, String user) throws Exception {
+        for (List<String> list : data) {
+            String terminalid="";
+            String terminalid_key="";
+            String terminalid_seq="";
+            String sn_num="";
+            terminalid=String.valueOf(list.get(0));
+            sn_num=String.valueOf(list.get(1));
+            terminalid_key= String.valueOf(list.get(2));
+            terminalid_seq=String.valueOf(list.get(3));
+            OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+            oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
+            oLogisticsDetail.setcTime(Calendar.getInstance().getTime());
+            oLogisticsDetail.setcUser(user);
+            oLogisticsDetail.setTerminalid(terminalid);
+            oLogisticsDetail.setTerminalidKey(terminalid_key);
+            oLogisticsDetail.setTerminalidSeq(terminalid_seq);
+            oLogisticsDetail.setSnNum(sn_num);
+            oLogisticsDetail.setStatus(Status.STATUS_0.status);
+            oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
+            oLogisticsDetail.setVersion(Status.STATUS_0.status);
+            oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
+            int i = oLogisticsDetailMapper.insertSelective(oLogisticsDetail);
+            System.out.println(i+"000000000000000");
+
+        }
+        return null;
+    }
+
 
     /**
      * @Author: Zhang Lei
