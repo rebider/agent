@@ -1,10 +1,9 @@
 package com.ryx.credit.pojo.admin.order;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OLogisticsDetail implements Serializable{
+public class OLogisticsDetail {
     private String id;
 
     private String orderId;
@@ -48,6 +47,14 @@ public class OLogisticsDetail implements Serializable{
     private BigDecimal version;
 
     private String orderNum;
+
+    private String terminalid;
+
+    private String terminalidKey;
+
+    private String terminalidSeq;
+
+    private String terminalidType;
 
     public String getId() {
         return id;
@@ -223,5 +230,37 @@ public class OLogisticsDetail implements Serializable{
 
     public void setOrderNum(String orderNum) {
         this.orderNum = orderNum == null ? null : orderNum.trim();
+    }
+
+    public String getTerminalid() {
+        return terminalid;
+    }
+
+    public void setTerminalid(String terminalid) {
+        this.terminalid = terminalid == null ? null : terminalid.trim();
+    }
+
+    public String getTerminalidKey() {
+        return terminalidKey;
+    }
+
+    public void setTerminalidKey(String terminalidKey) {
+        this.terminalidKey = terminalidKey == null ? null : terminalidKey.trim();
+    }
+
+    public String getTerminalidSeq() {
+        return terminalidSeq;
+    }
+
+    public void setTerminalidSeq(String terminalidSeq) {
+        this.terminalidSeq = terminalidSeq == null ? null : terminalidSeq.trim();
+    }
+
+    public String getTerminalidType() {
+        return terminalidType;
+    }
+
+    public void setTerminalidType(String terminalidType) {
+        this.terminalidType = terminalidType == null ? null : terminalidType.trim();
     }
 }

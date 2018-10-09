@@ -383,6 +383,60 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return map;
     }
 
+    @Override
+    public List<String> addSn(List<List<String>> data, String user) throws Exception {
+        List<String> snList = new ArrayList<>();
+        if (null == data && data.size() == 0) {
+            logger.info("导入的数据为空");
+            throw new MessageException("导入的数据为空");
+        }
+        for (List<String> list : data) {
+            String terminalid="";
+            String terminalid_key="";
+            String terminalid_seq="";
+            String sn_num="";
+                if (StringUtils.isBlank(list.get(0))) {
+                    logger.info("终端号不能为空");
+                    throw new MessageException("终端号不能为空");
+                }
+                if (StringUtils.isBlank(list.get(1))) {
+                    logger.info("SN码不能为空");
+                    throw new MessageException("SN码不能为空");
+                }
+                if (StringUtils.isBlank(list.get(2))) {
+                    logger.info("秘钥不能为空");
+                    throw new MessageException("秘钥不能为空");
+                }
+                if (StringUtils.isBlank(list.get(3))) {
+                    logger.info("序列不能为空");
+                    throw new MessageException("序列不能为空");
+                }
+                terminalid=String.valueOf(list.get(0));
+                sn_num=String.valueOf(list.get(1));
+                terminalid_key= String.valueOf(list.get(2));
+                terminalid_seq=String.valueOf(list.get(3));
+                OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+                oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
+                oLogisticsDetail.setcTime(Calendar.getInstance().getTime());
+                oLogisticsDetail.setcUser(user);
+                oLogisticsDetail.setTerminalid(terminalid);
+                oLogisticsDetail.setTerminalidKey(terminalid_key);
+                oLogisticsDetail.setTerminalidSeq(terminalid_seq);
+                oLogisticsDetail.setSnNum(sn_num);
+                oLogisticsDetail.setStatus(Status.STATUS_0.status);
+                oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
+                oLogisticsDetail.setVersion(Status.STATUS_0.status);
+                oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
+                if ( oLogisticsDetailMapper.insertSelective(oLogisticsDetail)==0){
+                    logger.info("导入sn码失败");
+                    throw new MessageException("导入sn码失败");
+                }
+                snList.add(oLogisticsDetail.getId());
+
+        }
+        return snList;
+    }
+
 
     /**
      * @Author: Zhang Lei
