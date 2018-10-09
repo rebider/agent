@@ -17,23 +17,23 @@
 			<property name="forceLongs" value="false" />
 		</javaTypeResolver>
 		<!-- 生成模型的包名和位置 -->
-		<javaModelGenerator targetPackage="com.ryx.credit.activity.entity"
+		<javaModelGenerator targetPackage="com.ryx.credit.machine.entity"
 			targetProject="src\main\java">
 			<property name="enableSubPackages" value="true" />
 			<property name="trimStrings" value="true" />
 		</javaModelGenerator>
 		<!-- 生成的映射文件包名和位置 -->
-		<sqlMapGenerator targetPackage="com.ryx.credit.activity.mapper"
+		<sqlMapGenerator targetPackage="com.ryx.credit.machine.mapper"
 			targetProject="src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</sqlMapGenerator>
 		 <!--生成DAO的包名和位置-->
 		<javaClientGenerator type="XMLMAPPER"
-			targetPackage="com.ryx.credit.activity.dao" targetProject="src\main\java">
+			targetPackage="com.ryx.credit.machine.dao" targetProject="src\main\java">
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-		<table tableName="IMS_TERM_MACHINE" domainObjectName="ImsTermMachine" enableUpdateByExample="false"
+		<table tableName="IMS_TERM_WAREHOUSE_DETAIL" domainObjectName="ImsTermWarehouseDetail" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 
 	</context>
