@@ -196,8 +196,14 @@ public class OrderServiceImpl implements OrderService {
         List<OOrder> orders = orderMapper.selectByExample(example);
         List<String> ids = orders.stream().map(OOrder::getId).collect(Collectors.toList());
         OPaymentExample oPaymentExample = new OPaymentExample();
-        oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status).andOrderIdIn(ids);
-        return oPaymentMapper.selectByExample(oPaymentExample);
+        OPaymentExample.Criteria c = oPaymentExample.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(ids.size()>0){
+            c.andOrderIdIn(ids);
+            return oPaymentMapper.selectByExample(oPaymentExample);
+        }else{
+            return new ArrayList<>();
+        }
+
     }
 
     /**
@@ -452,6 +458,10 @@ public class OrderServiceImpl implements OrderService {
             logger.info("下订单:{}", "请选择商品");
             throw new MessageException("请选择商品");
         }
+
+
+
+
         for (OSubOrder oSubOrder : OSubOrders) {
             oSubOrder.setId(idService.genId(TabId.o_sub_order));
             OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
@@ -618,6 +628,29 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
         orderFormVo.setoAmo(forPayAmount);//订单总金额
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
+
+        //检查抵扣金额
+        if(StringUtils.isNotBlank(oPayment.getDeductionType())){
+            //抵扣金额查询
+            AgentResult agentResult = queryAgentCapital(orderFormVo.getAgentId(),oPayment.getDeductionType());
+            if(agentResult.isOK()){
+                FastMap f =   (FastMap)agentResult.getData();
+                BigDecimal can = new BigDecimal(f.get("can")+"");
+                if(oPayment.getDeductionAmount()==null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)<0) {
+                    throw new MessageException("请填写抵扣金额");
+                }
+                if(can.compareTo(oPayment.getDeductionAmount())<0){
+                    throw new MessageException("抵扣金额不足");
+                }
+                //抵扣金额大于待付金额
+                if(oPayment.getDeductionAmount().compareTo(oPayment.getPayAmount())>0){
+                    throw new MessageException("抵扣金额大于应付金额");
+                }
+            }else{
+                throw new MessageException("不可抵扣");
+            }
+        }
+
         //插入订单
         if (1 != orderMapper.insertSelective(orderFormVo)) {
             throw new MessageException("订单添加失败");
@@ -996,6 +1029,36 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.fail("订单提交审批，禁止重复提交审批");
         }
         OOrder order = orderMapper.selectByPrimaryKey(id);
+
+        //抵扣金额检查
+        OPaymentExample oPaymentExample = new OPaymentExample();
+        oPaymentExample.or().andOrderIdEqualTo(order.getId());
+        List<OPayment> pament= oPaymentMapper.selectByExample(oPaymentExample);
+        if(pament.size()==1){
+            OPayment  oPayment = pament.get(0);
+            //检查抵扣金额
+            if(StringUtils.isNotBlank(oPayment.getDeductionType())){
+                //抵扣金额查询
+                AgentResult agentResult = queryAgentCapital(order.getAgentId(),oPayment.getDeductionType());
+                if(agentResult.isOK()){
+                    FastMap f =   (FastMap)agentResult.getData();
+                    BigDecimal can = new BigDecimal(f.get("can")+"");
+                    if(oPayment.getDeductionAmount()==null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)<0) {
+                        throw new MessageException("请填写抵扣金额");
+                    }
+                    if(can.compareTo(oPayment.getDeductionAmount())<0){
+                        throw new MessageException("抵扣金额不足");
+                    }
+                    //抵扣金额大于待付金额
+                    if(oPayment.getDeductionAmount().compareTo(oPayment.getPayAmount())>0){
+                        throw new MessageException("抵扣金额大于应付金额");
+                    }
+                }else{
+                    throw new MessageException("不可抵扣");
+                }
+            }
+        }
+
 
         //提交审批的用户必须是创建人
         if (!order.getUserId().equals(cuser)) {
