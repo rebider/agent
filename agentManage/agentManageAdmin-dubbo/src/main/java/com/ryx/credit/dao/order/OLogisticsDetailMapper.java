@@ -2,6 +2,7 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -30,4 +31,6 @@ public interface OLogisticsDetailMapper {
     List<String> querySnLList(Map<String, Object> param);
 
     int querySnCount(Map<String, Object> param);
+
+    String  selectSn(@Param("terminalidType") String terminalidType, @Param("sn") String sn);
 }

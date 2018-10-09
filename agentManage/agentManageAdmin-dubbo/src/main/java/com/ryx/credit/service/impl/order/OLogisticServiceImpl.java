@@ -114,6 +114,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String endSnCount = "";
             String logCom = "";
             String wNumber = "";
+            String proType="";
             try {
 
                 List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
@@ -131,6 +132,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 endSn = String.valueOf(objectList.get(col.indexOf("d")));
                 beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
                 endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
+                proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE")));
 
                 if (StringUtils.isBlank(sendDate)) {
                     logger.info("发货日期不能为空");
@@ -223,7 +225,17 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("请仔细核对发货数量");
                     throw new MessageException("请仔细核对发货数量");
                 }
-
+                //遍历查询库里是否存在sn码
+                if (proType.equals(PlatformType.MPOS.msg)){
+                    //如果是手刷的话  需要做校验
+                    for (String sn : stringList) {
+                        String excitSn=oLogisticsDetailMapper.selectSn(PlatformType.MPOS.code,sn);
+                        if (StringUtils.isBlank(excitSn)){
+                            logger.info("此SN码不存在");
+                            throw new MessageException("此SN码不存在");
+                        }
+                    }
+                }
                 //物流信息
                 OLogistics oLogistics = new OLogistics();
                 oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
@@ -423,7 +435,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setTerminalidKey(terminalid_key);
                 oLogisticsDetail.setTerminalidSeq(terminalid_seq);
                 oLogisticsDetail.setSnNum(sn_num);
-                oLogisticsDetail.setStatus(Status.STATUS_0.status);
+                oLogisticsDetail.setStatus(Status.STATUS_1.status);
                 oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
                 oLogisticsDetail.setVersion(Status.STATUS_0.status);
                 oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
