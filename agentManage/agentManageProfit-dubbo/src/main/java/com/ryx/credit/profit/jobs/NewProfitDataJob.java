@@ -156,12 +156,21 @@ public class NewProfitDataJob {
                 ProfitDetailMonth profitDetailMonthTemp = new ProfitDetailMonth();
                 profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
                 profitDetailMonthTemp.setAgentId(transProfitDetail.getAgentId());
-                transProfitDetail.setProfitDate(profitDate);
+                profitDetailMonthTemp.setProfitDate(profitDate);
                 profitDetailMonthTemp= profitDetailMonthMapper.selectByIdAndParent(profitDetailMonthTemp);
                 if (profitDetailMonthTemp==null) {
                     profitDetailMonthTemp = new ProfitDetailMonth();
+                    insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
+                }else{
+                    profitDetailMonthTemp.setTranAmt((profitDetailMonthTemp.getTranAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getTranAmt()).add(transProfitDetail.getInTransAmt()));
+                    profitDetailMonthTemp.setPayAmt((profitDetailMonthTemp.getPayAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPayAmt()).add(transProfitDetail.getOutTransAmt()));
+                    profitDetailMonthTemp.setTranProfitScale(transProfitDetail.getInProfitScale().toString());
+                    profitDetailMonthTemp.setPayProfitScale(transProfitDetail.getOutProfitScale().toString());
+                    profitDetailMonthTemp.setTranProfitAmt((profitDetailMonthTemp.getTranProfitAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getTranProfitAmt()).add(transProfitDetail.getInProfitAmt()));
+                    profitDetailMonthTemp.setPayProfitAmt((profitDetailMonthTemp.getPayProfitAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPayProfitAmt()).add(transProfitDetail.getOutProfitAmt()));
+                    profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
+                    profitDetailMonthServiceImpl.update(profitDetailMonthTemp);
                 }
-                insertProfitMonthDetail(profitDetailMonthTemp, transProfitDetail);
             });
         }
     }

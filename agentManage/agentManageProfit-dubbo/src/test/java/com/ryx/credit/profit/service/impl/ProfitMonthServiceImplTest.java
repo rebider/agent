@@ -26,18 +26,18 @@ public class ProfitMonthServiceImplTest {
 
     @Test
     public void testPayMoney() throws Exception {
-        profitMonthService.payMoney();
+        profitMonthService.computeProfitAmt();
     }
 
-    @Test
-    public void testDept() throws Exception {
-        List<String> lis = profitDetailMonthMapper.getDistrictAgent("200");
-        lis.forEach(s -> System.out.println(s));
-    }
-
-    @Test
-    public void testPro() throws Exception {
-        List<String> lis = profitDetailMonthMapper.getProAgent("210");
-        lis.forEach(s -> System.out.println(s));
-    }
+//    @Test
+//    public void testDept() throws Exception {
+//        List<String> lis = profitDetailMonthMapper.getDistrictAgent("200");
+//        lis.forEach(s -> System.out.println(s));
+//    }
+//
+//    @Test
+//    public void testPro() throws Exception {
+//        List<String> lis = profitDetailMonthMapper.getProAgent("210");
+//        lis.forEach(s -> System.out.println(s));
+//    }
 }

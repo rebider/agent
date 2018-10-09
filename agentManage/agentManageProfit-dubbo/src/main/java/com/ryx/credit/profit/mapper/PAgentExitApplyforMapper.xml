@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PAgentExitApplyforMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PAgentExitApplyfor">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="APPLY_PLAT" jdbcType="VARCHAR" property="applyPlat" />
+    <result column="KETUBBAH_ID" jdbcType="VARCHAR" property="ketubbahId" />
+    <result column="DEBT_AMT" jdbcType="DECIMAL" property="debtAmt" />
+    <result column="DEBT_BILL" jdbcType="DECIMAL" property="debtBill" />
+    <result column="SUPPLY_DEBT_AMT" jdbcType="DECIMAL" property="supplyDebtAmt" />
+    <result column="SUPPLY_DEBT_BILL" jdbcType="DECIMAL" property="supplyDebtBill" />
+    <result column="SUPPLY_TYPE" jdbcType="VARCHAR" property="supplyType" />
+    <result column="PAY_COMPANY" jdbcType="VARCHAR" property="payCompany" />
+    <result column="REFUND_STATUS" jdbcType="VARCHAR" property="refundStatus" />
+    <result column="FLOW_STATUS" jdbcType="VARCHAR" property="flowStatus" />
+    <result column="CREATE_DATE" jdbcType="VARCHAR" property="createDate" />
+    <result column="PASS_DATE" jdbcType="VARCHAR" property="passDate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, APPLY_PLAT, KETUBBAH_ID, DEBT_AMT, DEBT_BILL, SUPPLY_DEBT_AMT, SUPPLY_DEBT_BILL, 
+    SUPPLY_TYPE, PAY_COMPANY, REFUND_STATUS, FLOW_STATUS, CREATE_DATE, PASS_DATE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyforExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_AGENT_EXIT_APPLYFOR
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_AGENT_EXIT_APPLYFOR
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyforExample">
+    delete from P_AGENT_EXIT_APPLYFOR
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyfor">
+    insert into P_AGENT_EXIT_APPLYFOR (ID, APPLY_PLAT, KETUBBAH_ID, 
+      DEBT_AMT, DEBT_BILL, SUPPLY_DEBT_AMT, 
+      SUPPLY_DEBT_BILL, SUPPLY_TYPE, PAY_COMPANY, 
+      REFUND_STATUS, FLOW_STATUS,
+      CREATE_DATE, PASS_DATE)
+    values (#{id,jdbcType=VARCHAR}, #{applyPlat,jdbcType=VARCHAR}, #{ketubbahId,jdbcType=VARCHAR}, 
+      #{debtAmt,jdbcType=DECIMAL}, #{debtBill,jdbcType=DECIMAL}, #{supplyDebtAmt,jdbcType=DECIMAL}, 
+      #{supplyDebtBill,jdbcType=DECIMAL}, #{supplyType,jdbcType=VARCHAR}, #{payCompany,jdbcType=VARCHAR}, 
+      #{refundStatus,jdbcType=VARCHAR}, #{flowStatus,jdbcType=VARCHAR},
+      #{createDate,jdbcType=VARCHAR}, #{passDate,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyfor">
+    insert into P_AGENT_EXIT_APPLYFOR
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="applyPlat != null">
+        APPLY_PLAT,
+      </if>
+      <if test="ketubbahId != null">
+        KETUBBAH_ID,
+      </if>
+      <if test="debtAmt != null">
+        DEBT_AMT,
+      </if>
+      <if test="debtBill != null">
+        DEBT_BILL,
+      </if>
+      <if test="supplyDebtAmt != null">
+        SUPPLY_DEBT_AMT,
+      </if>
+      <if test="supplyDebtBill != null">
+        SUPPLY_DEBT_BILL,
+      </if>
+      <if test="supplyType != null">
+        SUPPLY_TYPE,
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY,
+      </if>
+      <if test="refundStatus != null">
+        REFUND_STATUS,
+      </if>
+      <if test="flowStatus != null">
+        FLOW_STATUS,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+      <if test="passDate != null">
+        PASS_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="applyPlat != null">
+        #{applyPlat,jdbcType=VARCHAR},
+      </if>
+      <if test="ketubbahId != null">
+        #{ketubbahId,jdbcType=VARCHAR},
+      </if>
+      <if test="debtAmt != null">
+        #{debtAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="debtBill != null">
+        #{debtBill,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyDebtAmt != null">
+        #{supplyDebtAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyDebtBill != null">
+        #{supplyDebtBill,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyType != null">
+        #{supplyType,jdbcType=VARCHAR},
+      </if>
+      <if test="payCompany != null">
+        #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="refundStatus != null">
+        #{refundStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="flowStatus != null">
+        #{flowStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="passDate != null">
+        #{passDate,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyforExample" resultType="java.lang.Long">
+    select count(*) from P_AGENT_EXIT_APPLYFOR
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyfor">
+    update P_AGENT_EXIT_APPLYFOR
+    <set>
+      <if test="applyPlat != null">
+        APPLY_PLAT = #{applyPlat,jdbcType=VARCHAR},
+      </if>
+      <if test="ketubbahId != null">
+        KETUBBAH_ID = #{ketubbahId,jdbcType=VARCHAR},
+      </if>
+      <if test="debtAmt != null">
+        DEBT_AMT = #{debtAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="debtBill != null">
+        DEBT_BILL = #{debtBill,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyDebtAmt != null">
+        SUPPLY_DEBT_AMT = #{supplyDebtAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyDebtBill != null">
+        SUPPLY_DEBT_BILL = #{supplyDebtBill,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyType != null">
+        SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR},
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="refundStatus != null">
+        REFUND_STATUS = #{refundStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="flowStatus != null">
+        FLOW_STATUS = #{flowStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      </if>
+      <if test="passDate != null">
+        PASS_DATE = #{passDate,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PAgentExitApplyfor">
+    update P_AGENT_EXIT_APPLYFOR
+    set APPLY_PLAT = #{applyPlat,jdbcType=VARCHAR},
+      KETUBBAH_ID = #{ketubbahId,jdbcType=VARCHAR},
+      DEBT_AMT = #{debtAmt,jdbcType=DECIMAL},
+      DEBT_BILL = #{debtBill,jdbcType=DECIMAL},
+      SUPPLY_DEBT_AMT = #{supplyDebtAmt,jdbcType=DECIMAL},
+      SUPPLY_DEBT_BILL = #{supplyDebtBill,jdbcType=DECIMAL},
+      SUPPLY_TYPE = #{supplyType,jdbcType=VARCHAR},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      REFUND_STATUS = #{refundStatus,jdbcType=VARCHAR},
+      FLOW_STATUS = #{flowStatus,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=VARCHAR},
+      PASS_DATE = #{passDate,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

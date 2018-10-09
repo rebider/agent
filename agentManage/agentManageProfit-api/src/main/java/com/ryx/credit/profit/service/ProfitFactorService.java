@@ -17,7 +17,9 @@ public interface ProfitFactorService {
 
     public int insertImportData(PProfitFactor pProfitFactor);
 
-    public List<String> addList(List<List<Object>> data)throws Exception;
+    public List<String> addList(List<List<Object>> data, String userId)throws Exception;
 
     PProfitFactor selectByData(PProfitFactor profitFactor);
+
+    int resetDataFactor();
 }

@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitSupplyDiff;
 import com.ryx.credit.profit.pojo.ProfitSupplyDiffExample;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProfitSupplyDiffMapper {
@@ -16,6 +18,8 @@ public interface ProfitSupplyDiffMapper {
     List<ProfitSupplyDiff> selectByExample(ProfitSupplyDiffExample example);
 
     ProfitSupplyDiff selectByPrimaryKey(String id);
+
+    BigDecimal selectAmtByWhere(ProfitSupplyDiff where);
 
     int updateByPrimaryKeySelective(ProfitSupplyDiff record);
 
