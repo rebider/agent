@@ -709,6 +709,12 @@ public class OrderServiceImpl implements OrderService {
         oPayment_db.setActualReceipt(oPayment.getActualReceipt());
         oPayment_db.setCollectCompany(oPayment.getCollectCompany());
         oPayment_db.setRemark(oPayment.getRemark());
+        if(StringUtils.isNotBlank(oPayment.getDeductionType())){
+            oPayment_db.setDeductionType(oPayment.getDeductionType());
+        }
+        if(null!=oPayment.getDeductionAmount()){
+            oPayment_db.setDeductionAmount(oPayment.getDeductionAmount());
+        }
         if (StringUtils.isBlank(orderFormVo.getPaymentMethod())) {
             logger.info("下订单:{}", "商品价格数据错误");
             throw new MessageException("付款方式不能为空");
@@ -906,6 +912,29 @@ public class OrderServiceImpl implements OrderService {
         order_db.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
         order_db.setoAmo(forPayAmount);//订单总金额
         order_db.setPayAmo(forRealPayAmount);//订单应付金额
+
+
+        //检查抵扣金额
+        if(StringUtils.isNotBlank(oPayment.getDeductionType())){
+            //抵扣金额查询
+            AgentResult agentResult = queryAgentCapital(orderFormVo.getAgentId(),oPayment.getDeductionType());
+            if(agentResult.isOK()){
+                FastMap f =   (FastMap)agentResult.getData();
+                BigDecimal can = new BigDecimal(f.get("can")+"");
+                if(oPayment.getDeductionAmount()==null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)<0) {
+                    throw new MessageException("请填写抵扣金额");
+                }
+                if(can.compareTo(oPayment.getDeductionAmount())<0){
+                    throw new MessageException("抵扣金额不足");
+                }
+                //抵扣金额大于待付金额
+                if(oPayment.getDeductionAmount().compareTo(oPayment.getPayAmount())>0){
+                    throw new MessageException("抵扣金额大于应付金额");
+                }
+            }else{
+                throw new MessageException("不可抵扣");
+            }
+        }
 
         //插入订单
         if (1 != orderMapper.updateByPrimaryKeySelective(order_db)) {
