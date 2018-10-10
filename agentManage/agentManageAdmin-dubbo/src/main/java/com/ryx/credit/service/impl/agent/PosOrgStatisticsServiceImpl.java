@@ -124,7 +124,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             Map<String, String> map = new HashMap<>();
             map.put("agencyId",orgId);
             String toJson = JsonUtil.objectToJson(map);
-            String httpResult = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agentInterface/queryAgencyTermNum.do", toJson);
+            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("pos_org_statistics_url"), toJson);
             Map<String, Object> stringObjectMap = JsonUtil.jsonToMap(httpResult);
             String data = String.valueOf(stringObjectMap.get("data"));
             List<Map> dataMap = JsonUtil.jsonToList(data, Map.class);
