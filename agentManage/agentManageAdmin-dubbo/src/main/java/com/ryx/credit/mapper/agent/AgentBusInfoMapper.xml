@@ -885,8 +885,8 @@
         b.AG_NAME
       from  a_agent b,a_agent_businfo a
       <where>
-         b.id = a.agent_id
-         bus_num = #{busNum}
+         b.id = a.agent_id and
+         a.bus_num = #{busNum}
       </where>
   </select>
 

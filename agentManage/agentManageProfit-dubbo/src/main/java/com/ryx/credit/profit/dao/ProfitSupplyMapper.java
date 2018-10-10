@@ -12,6 +12,8 @@ public interface ProfitSupplyMapper {
 
     int deleteByExample(ProfitSupplyExample example);
 
+    int resetData();
+
     int insert(ProfitSupply record);
 
     int insertSelective(ProfitSupply record);

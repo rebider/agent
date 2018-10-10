@@ -73,8 +73,14 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentId())){
             criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())){
+            criteria.andAgentIdEqualTo(profitDeduction.getParentAgentId());
+        }
         if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
             criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
+        }
+        if (StringUtils.isNotBlank(profitDeduction.getParentAgentPid())){
+            criteria.andAgentPidEqualTo(profitDeduction.getParentAgentPid());
         }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());

@@ -454,4 +454,8 @@
       and status = #{status}
   </select>
 
+  <select id="selectSn" resultType="string" parameterType="string">
+  select SN_NUM from O_LOGISTICS_DETAIL where 1=1 and status=1 and TERMINALID_TYPE=#{terminalidType} and SN_NUM=#{sn}
+  </select>
+
 </mapper>

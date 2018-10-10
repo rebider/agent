@@ -72,7 +72,8 @@ public enum TabId {
     P_PROFIT_SUPPLU_DIFF("PPSD%s%015d"),
     PBSL("PBSL%s%015d"),
     TPD("TPD%s%015d"),
-    A_COLINFO_PAYMENT("ACP%s%015d");
+    A_COLINFO_PAYMENT("ACP%s%015d"),
+    P_AGENT_EXIT_APPLYFOR("PAEA%s%015d");
 
 
     TabId(String thePatt){
