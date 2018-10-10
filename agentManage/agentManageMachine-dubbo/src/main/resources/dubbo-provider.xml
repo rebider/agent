@@ -17,5 +17,6 @@
     <dubbo:protocol name="dubbo" port="${zk.port}"/>
     <dubbo:annotation package="com.ryx.credit.machine.service.*" />
     <dubbo:service interface="com.ryx.credit.machine.service.ImsTermMachineService" ref="imsTermMachineService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.TermMachineService" ref="termMachineService"  timeout="1200000" registry="${zk.group}" />
 
 </beans>
