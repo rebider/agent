@@ -45,18 +45,19 @@ public class OActivity implements Serializable{
 
     private BigDecimal gTime;
 
-    private String venderName;
-
-
     private String activityCondition;
 
-    public String getActivityCondition() {
-        return activityCondition;
-    }
+    private String busProCode;
 
-    public void setActivityCondition(String activityCondition) {
-        this.activityCondition = activityCondition;
-    }
+    private String busProName;
+
+    private String termBatchcode;
+
+    private String termBatchname;
+
+    private String termtype;
+
+    private String termtypename;
 
     private String proTypeName;
 
@@ -67,6 +68,7 @@ public class OActivity implements Serializable{
     public void setProTypeName(String proTypeName) {
         this.proTypeName = proTypeName;
     }
+    private String venderName;
 
     public String getVenderName() {
         return venderName;
@@ -234,5 +236,61 @@ public class OActivity implements Serializable{
 
     public void setgTime(BigDecimal gTime) {
         this.gTime = gTime;
+    }
+
+    public String getActivityCondition() {
+        return activityCondition;
+    }
+
+    public void setActivityCondition(String activityCondition) {
+        this.activityCondition = activityCondition == null ? null : activityCondition.trim();
+    }
+
+    public String getBusProCode() {
+        return busProCode;
+    }
+
+    public void setBusProCode(String busProCode) {
+        this.busProCode = busProCode == null ? null : busProCode.trim();
+    }
+
+    public String getBusProName() {
+        return busProName;
+    }
+
+    public void setBusProName(String busProName) {
+        this.busProName = busProName == null ? null : busProName.trim();
+    }
+
+    public String getTermBatchcode() {
+        return termBatchcode;
+    }
+
+    public void setTermBatchcode(String termBatchcode) {
+        this.termBatchcode = termBatchcode == null ? null : termBatchcode.trim();
+    }
+
+    public String getTermBatchname() {
+        return termBatchname;
+    }
+
+    public void setTermBatchname(String termBatchname) {
+        this.termBatchname = termBatchname == null ? null : termBatchname.trim();
+    }
+
+    public String getTermtype() {
+        return termtype;
+    }
+
+    public void setTermtype(String termtype) {
+        this.termtype = termtype == null ? null : termtype.trim();
+    }
+
+    public String getTermtypename() {
+        return termtypename;
+    }
+
+    public void setTermtypename(String termtypename) {
+        this.termtypename = termtypename == null ? null : termtypename.trim();
     }
 }

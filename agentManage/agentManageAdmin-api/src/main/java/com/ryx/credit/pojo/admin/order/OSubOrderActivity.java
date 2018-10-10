@@ -45,6 +45,18 @@ public class OSubOrderActivity implements Serializable{
 
     private BigDecimal status;
 
+    private String busProCode;
+
+    private String busProName;
+
+    private String termBatchcode;
+
+    private String termBatchname;
+
+    private String termtype;
+
+    private String termtypename;
+
     public String getId() {
         return id;
     }
@@ -203,5 +215,53 @@ public class OSubOrderActivity implements Serializable{
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public String getBusProCode() {
+        return busProCode;
+    }
+
+    public void setBusProCode(String busProCode) {
+        this.busProCode = busProCode == null ? null : busProCode.trim();
+    }
+
+    public String getBusProName() {
+        return busProName;
+    }
+
+    public void setBusProName(String busProName) {
+        this.busProName = busProName == null ? null : busProName.trim();
+    }
+
+    public String getTermBatchcode() {
+        return termBatchcode;
+    }
+
+    public void setTermBatchcode(String termBatchcode) {
+        this.termBatchcode = termBatchcode == null ? null : termBatchcode.trim();
+    }
+
+    public String getTermBatchname() {
+        return termBatchname;
+    }
+
+    public void setTermBatchname(String termBatchname) {
+        this.termBatchname = termBatchname == null ? null : termBatchname.trim();
+    }
+
+    public String getTermtype() {
+        return termtype;
+    }
+
+    public void setTermtype(String termtype) {
+        this.termtype = termtype == null ? null : termtype.trim();
+    }
+
+    public String getTermtypename() {
+        return termtypename;
+    }
+
+    public void setTermtypename(String termtypename) {
+        this.termtypename = termtypename == null ? null : termtypename.trim();
     }
 }
