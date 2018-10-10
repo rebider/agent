@@ -23,6 +23,12 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="G_TIME" jdbcType="DECIMAL" property="gTime" />
     <result column="ACTIVITY_CONDITION" jdbcType="VARCHAR" property="activityCondition" />
+    <result column="BUS_PRO_CODE" jdbcType="VARCHAR" property="busProCode" />
+    <result column="BUS_PRO_NAME" jdbcType="VARCHAR" property="busProName" />
+    <result column="TERM_BATCHCODE" jdbcType="VARCHAR" property="termBatchcode" />
+    <result column="TERM_BATCHNAME" jdbcType="VARCHAR" property="termBatchname" />
+    <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
+    <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -56,7 +62,8 @@
   <sql id="Base_Column_List">
     ID, PRODUCT_ID, RULE_ID, ACTIVITY_NAME, PRO_TYPE, ACTIVITY_WAY, ACTIVITY_RULE, PLATFORM,
     PRICE, BEGIN_TIME, END_TIME, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
-    VERSION, G_TIME, ACTIVITY_CONDITION
+    VERSION, G_TIME, ACTIVITY_CONDITION, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
+    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -93,7 +100,9 @@
     BEGIN_TIME, END_TIME, VENDER,
     PRO_MODEL, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, G_TIME, ACTIVITY_CONDITION
+    VERSION, G_TIME, ACTIVITY_CONDITION,
+    BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
+    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME
     )
     values (#{id,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR},
@@ -101,7 +110,9 @@
     #{beginTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{vender,jdbcType=VARCHAR},
     #{proModel,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{gTime,jdbcType=DECIMAL}, #{activityCondition,jdbcType=VARCHAR}
+    #{version,jdbcType=DECIMAL}, #{gTime,jdbcType=DECIMAL}, #{activityCondition,jdbcType=VARCHAR},
+    #{busProCode,jdbcType=VARCHAR}, #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR},
+    #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}
     )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
@@ -170,6 +181,24 @@
       <if test="activityCondition != null">
         ACTIVITY_CONDITION,
       </if>
+      <if test="busProCode != null">
+        BUS_PRO_CODE,
+      </if>
+      <if test="busProName != null">
+        BUS_PRO_NAME,
+      </if>
+      <if test="termBatchcode != null">
+        TERM_BATCHCODE,
+      </if>
+      <if test="termBatchname != null">
+        TERM_BATCHNAME,
+      </if>
+      <if test="termtype != null">
+        TERMTYPE,
+      </if>
+      <if test="termtypename != null">
+        TERMTYPENAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -234,6 +263,24 @@
       </if>
       <if test="activityCondition != null">
         #{activityCondition,jdbcType=VARCHAR},
+      </if>
+      <if test="busProCode != null">
+        #{busProCode,jdbcType=VARCHAR},
+      </if>
+      <if test="busProName != null">
+        #{busProName,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchcode != null">
+        #{termBatchcode,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchname != null">
+        #{termBatchname,jdbcType=VARCHAR},
+      </if>
+      <if test="termtype != null">
+        #{termtype,jdbcType=VARCHAR},
+      </if>
+      <if test="termtypename != null">
+        #{termtypename,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -306,6 +353,24 @@
       <if test="activityCondition != null">
         ACTIVITY_CONDITION = #{activityCondition,jdbcType=VARCHAR},
       </if>
+      <if test="busProCode != null">
+        BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
+      </if>
+      <if test="busProName != null">
+        BUS_PRO_NAME = #{busProName,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchcode != null">
+        TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchname != null">
+        TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
+      </if>
+      <if test="termtype != null">
+        TERMTYPE = #{termtype,jdbcType=VARCHAR},
+      </if>
+      <if test="termtypename != null">
+        TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -330,7 +395,13 @@
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
     G_TIME = #{gTime,jdbcType=DECIMAL},
-    ACTIVITY_CONDITION = #{activityCondition,jdbcType=VARCHAR}
+    ACTIVITY_CONDITION = #{activityCondition,jdbcType=VARCHAR},
+    BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
+    BUS_PRO_NAME = #{busProName,jdbcType=VARCHAR},
+    TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
+    TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
+    TERMTYPE = #{termtype,jdbcType=VARCHAR},
+    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

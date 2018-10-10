@@ -22,6 +22,12 @@
     <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
     <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="BUS_PRO_CODE" jdbcType="VARCHAR" property="busProCode" />
+    <result column="BUS_PRO_NAME" jdbcType="VARCHAR" property="busProName" />
+    <result column="TERM_BATCHCODE" jdbcType="VARCHAR" property="termBatchcode" />
+    <result column="TERM_BATCHNAME" jdbcType="VARCHAR" property="termBatchname" />
+    <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
+    <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -53,9 +59,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, ACTIVITY_ID, SUB_ORDER_ID, ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, ACTIVITY_WAY, 
-    PRICE, PRO_MODEL, VENDER, PLATFORM, G_TIME, C_TIME, U_TIME, C_USER, U_USER, VERSION, 
-    PRO_ID, PRO_NAME, STATUS
+    ID, ACTIVITY_ID, SUB_ORDER_ID, ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, ACTIVITY_WAY,
+    PRICE, PRO_MODEL, VENDER, PLATFORM, G_TIME, C_TIME, U_TIME, C_USER, U_USER, VERSION,
+    PRO_ID, PRO_NAME, STATUS, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
+    TERMTYPE, TERMTYPENAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -74,7 +81,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_SUB_ORDER_ACTIVITY
     where ID = #{id,jdbcType=VARCHAR}
@@ -86,20 +93,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
-    insert into O_SUB_ORDER_ACTIVITY (ID, ACTIVITY_ID, SUB_ORDER_ID, 
-      ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, 
-      ACTIVITY_WAY, PRICE, PRO_MODEL, 
-      VENDER, PLATFORM, G_TIME, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, VERSION, PRO_ID, 
-      PRO_NAME, STATUS)
-    values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, 
-      #{activityName,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR}, 
-      #{activityWay,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR}, 
-      #{vender,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{proId,jdbcType=VARCHAR}, 
-      #{proName,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL})
+    insert into O_SUB_ORDER_ACTIVITY (ID, ACTIVITY_ID, SUB_ORDER_ID,
+    ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE,
+    ACTIVITY_WAY, PRICE, PRO_MODEL,
+    VENDER, PLATFORM, G_TIME,
+    C_TIME, U_TIME, C_USER,
+    U_USER, VERSION, PRO_ID,
+    PRO_NAME, STATUS, BUS_PRO_CODE,
+    BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
+    TERMTYPE, TERMTYPENAME)
+    values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR},
+    #{activityName,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR},
+    #{activityWay,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR},
+    #{vender,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{proId,jdbcType=VARCHAR},
+    #{proName,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{busProCode,jdbcType=VARCHAR},
+    #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, #{termBatchname,jdbcType=VARCHAR},
+    #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
     insert into O_SUB_ORDER_ACTIVITY
@@ -164,6 +175,24 @@
       <if test="status != null">
         STATUS,
       </if>
+      <if test="busProCode != null">
+        BUS_PRO_CODE,
+      </if>
+      <if test="busProName != null">
+        BUS_PRO_NAME,
+      </if>
+      <if test="termBatchcode != null">
+        TERM_BATCHCODE,
+      </if>
+      <if test="termBatchname != null">
+        TERM_BATCHNAME,
+      </if>
+      <if test="termtype != null">
+        TERMTYPE,
+      </if>
+      <if test="termtypename != null">
+        TERMTYPENAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -225,6 +254,24 @@
       </if>
       <if test="status != null">
         #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="busProCode != null">
+        #{busProCode,jdbcType=VARCHAR},
+      </if>
+      <if test="busProName != null">
+        #{busProName,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchcode != null">
+        #{termBatchcode,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchname != null">
+        #{termBatchname,jdbcType=VARCHAR},
+      </if>
+      <if test="termtype != null">
+        #{termtype,jdbcType=VARCHAR},
+      </if>
+      <if test="termtypename != null">
+        #{termtypename,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -294,35 +341,59 @@
       <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
+      <if test="busProCode != null">
+        BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
+      </if>
+      <if test="busProName != null">
+        BUS_PRO_NAME = #{busProName,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchcode != null">
+        TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
+      </if>
+      <if test="termBatchname != null">
+        TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
+      </if>
+      <if test="termtype != null">
+        TERMTYPE = #{termtype,jdbcType=VARCHAR},
+      </if>
+      <if test="termtypename != null">
+        TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
     update O_SUB_ORDER_ACTIVITY
     set ACTIVITY_ID = #{activityId,jdbcType=VARCHAR},
-      SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
-      ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
-      RULE_ID = #{ruleId,jdbcType=VARCHAR},
-      ACTIVITY_RULE = #{activityRule,jdbcType=VARCHAR},
-      ACTIVITY_WAY = #{activityWay,jdbcType=VARCHAR},
-      PRICE = #{price,jdbcType=DECIMAL},
-      PRO_MODEL = #{proModel,jdbcType=VARCHAR},
-      VENDER = #{vender,jdbcType=VARCHAR},
-      PLATFORM = #{platform,jdbcType=VARCHAR},
-      G_TIME = #{gTime,jdbcType=DECIMAL},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      VERSION = #{version,jdbcType=DECIMAL},
-      PRO_ID = #{proId,jdbcType=VARCHAR},
-      PRO_NAME = #{proName,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL}
+    SUB_ORDER_ID = #{subOrderId,jdbcType=VARCHAR},
+    ACTIVITY_NAME = #{activityName,jdbcType=VARCHAR},
+    RULE_ID = #{ruleId,jdbcType=VARCHAR},
+    ACTIVITY_RULE = #{activityRule,jdbcType=VARCHAR},
+    ACTIVITY_WAY = #{activityWay,jdbcType=VARCHAR},
+    PRICE = #{price,jdbcType=DECIMAL},
+    PRO_MODEL = #{proModel,jdbcType=VARCHAR},
+    VENDER = #{vender,jdbcType=VARCHAR},
+    PLATFORM = #{platform,jdbcType=VARCHAR},
+    G_TIME = #{gTime,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    VERSION = #{version,jdbcType=DECIMAL},
+    PRO_ID = #{proId,jdbcType=VARCHAR},
+    PRO_NAME = #{proName,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    BUS_PRO_CODE = #{busProCode,jdbcType=VARCHAR},
+    BUS_PRO_NAME = #{busProName,jdbcType=VARCHAR},
+    TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
+    TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
+    TERMTYPE = #{termtype,jdbcType=VARCHAR},
+    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
