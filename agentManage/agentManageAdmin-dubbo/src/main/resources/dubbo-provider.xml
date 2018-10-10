@@ -93,5 +93,7 @@
     <dubbo:service interface="com.ryx.credit.service.data.AttachmentService" ref="attachmentService" timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.order.IPaymentDetailService" ref="paymentDetailService" timeout="1200000" registry="${zk.group}"/>
 
+    <!--平台接口服务-->
     <dubbo:reference interface="com.ryx.credit.machine.service.ImsTermMachineService" id="imsTermMachineService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:reference interface="com.ryx.credit.machine.service.TermMachineService" id="termMachineService"  timeout="1200000" registry="${zk.group}"/>
 </beans>
