@@ -1,23 +1,25 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
+import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.service.agent.PosOrgStatisticsService;
 import com.ryx.credit.util.Constants;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by RYX on 2018/10/9.
@@ -26,10 +28,26 @@ import java.util.UUID;
 public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
 
     private static Logger log = LoggerFactory.getLogger(PosOrgStatisticsServiceImpl.class);
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
-    public AgentResult posOrgStatistics(String orgId)throws Exception{
+    public AgentResult posOrgStatistics(String busPlatform,String orgId)throws Exception{
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
+        String platformType = platForm.getPlatformType();
+        if(PlatformType.MPOS.getValue().equals(platformType)){
+            AgentResult agentResult = httpForMpos(orgId);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
+            AgentResult agentResult = httpForPos(orgId);
+            agentResult.setMsg(platformType);
+            return agentResult;
+        }
+        return AgentResult.fail();
+    }
+
+    private AgentResult httpForPos(String orgId)throws Exception{
         try {
-
             String cooperator = com.ryx.credit.util.Constants.cooperator;
             String charset = "UTF-8"; // 字符集
             String tranCode = "ORG005"; // 交易码
@@ -85,7 +103,13 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                     System.out.println("签名验证失败");
                 } else {
                     System.out.println("签名验证成功");
-                    return AgentResult.ok(respXML);
+                    Map<String, Object> respXMLMap = JsonUtil.jsonToMap(respXML);
+                    String respType = String.valueOf(respXMLMap.get("respType"));
+                    Map<String, Object> resultMap = new HashMap<>();
+                    if(respType.equals("S")){
+                        resultMap = JsonUtil.jsonToMap(String.valueOf(respXMLMap.get("data")));
+                    }
+                    return AgentResult.ok(resultMap);
                 }
                 return new AgentResult(500,"http请求异常","");
             }
@@ -95,5 +119,20 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
+    private AgentResult httpForMpos(String orgId)throws Exception{
+        try {
+            Map<String, String> map = new HashMap<>();
+            map.put("agencyId",orgId);
+            String toJson = JsonUtil.objectToJson(map);
+            String httpResult = HttpClientUtil.doPostJson("http://12.3.10.161:8007/qtfr-inter/agentInterface/queryAgencyTermNum.do", toJson);
+            Map<String, Object> stringObjectMap = JsonUtil.jsonToMap(httpResult);
+            String data = String.valueOf(stringObjectMap.get("data"));
+            List<Map> dataMap = JsonUtil.jsonToList(data, Map.class);
+            return AgentResult.ok(dataMap);
+        } catch (Exception e) {
+            log.info("http请求超时:{}",e.getMessage());
+            throw e;
+        }
+    }
 
 }

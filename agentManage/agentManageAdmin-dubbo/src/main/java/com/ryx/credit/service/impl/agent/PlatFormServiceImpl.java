@@ -95,7 +95,7 @@ public class PlatFormServiceImpl implements PlatFormService{
 
     @Override
     public PlatForm selectByPlatformNum(String platformNum){
-        return platFormMapper.selectByPlatformNum(platformNum);
+        return platFormMapper.selectByPlatFormNum(platformNum);
     }
 
 }

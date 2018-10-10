@@ -363,12 +363,4 @@
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 
-  <select id="selectByPlatformNum" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select
-    <include refid="Base_Column_List" />
-    from A_PLATFORM
-    <where>
-      PLATFORM_NUM = #{platformNum}
-    </where>
-  </select>
 </mapper>

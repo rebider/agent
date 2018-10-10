@@ -7,6 +7,6 @@ import com.ryx.credit.common.result.AgentResult;
  */
 public interface PosOrgStatisticsService {
 
-    AgentResult posOrgStatistics(String orgId)throws Exception;
+    AgentResult posOrgStatistics(String busPlatform,String orgId)throws Exception;
     
 }
