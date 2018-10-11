@@ -1225,7 +1225,9 @@ public class OrderServiceImpl implements OrderService {
     @Transactional( isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTaskBussiData(AgentVo agentVo, String userId) throws Exception {
-
+        if(!"pass".equals(agentVo.getApprovalOpinion())){
+            return AgentResult.ok();
+        }
         //如果有业务数据就保存
         if (null != agentVo.getoPayment()) {
             if(StringUtils.isNotBlank(agentVo.getoPayment().get("id"))){
@@ -1312,11 +1314,10 @@ public class OrderServiceImpl implements OrderService {
                     } else {
                         throw new MessageException("不可抵扣");
                     }
-                }
-
-                //抵扣审批判断
-                if(oPayment.getDeductionAmount().compareTo(db.getOutstandingAmount())>0){
-                    throw new MessageException("抵扣超出待付");
+                    //抵扣审批判断
+                    if(oPayment.getDeductionAmount().compareTo(db.getOutstandingAmount())>0){
+                        throw new MessageException("抵扣超出待付");
+                    }
                 }
 
                 //首付审批
