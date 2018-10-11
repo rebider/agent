@@ -1,6 +1,7 @@
 package com.ryx.credit.machine.service.impl;
 
 import com.ryx.credit.machine.service.ImsTermActiveService;
+import org.springframework.stereotype.Service;
 
 /***
  * @Author liudh
@@ -9,5 +10,7 @@ import com.ryx.credit.machine.service.ImsTermActiveService;
  * @Param
  * @return
  **/
+@Service("imsTermActiveService")
 public class ImsTermActiveServiceImpl implements ImsTermActiveService {
+
 }

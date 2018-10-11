@@ -1,6 +1,7 @@
 package com.ryx.credit.machine.service.impl;
 
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
+import org.springframework.stereotype.Service;
 
 /***
  * @Author liudh
@@ -9,5 +10,6 @@ import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
  * @Param
  * @return
  **/
+@Service("imsTermWarehouseDetailService")
 public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetailService {
 }

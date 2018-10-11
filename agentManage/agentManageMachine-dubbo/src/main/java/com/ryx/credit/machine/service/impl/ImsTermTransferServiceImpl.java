@@ -1,6 +1,7 @@
 package com.ryx.credit.machine.service.impl;
 
 import com.ryx.credit.machine.service.ImsTermTransferService;
+import org.springframework.stereotype.Service;
 
 /***
  * @Author liudh
@@ -9,5 +10,6 @@ import com.ryx.credit.machine.service.ImsTermTransferService;
  * @Param
  * @return
  **/
+@Service("imsTermTransferService")
 public class ImsTermTransferServiceImpl implements ImsTermTransferService {
 }
