@@ -31,6 +31,10 @@ public class OrderoutVo implements Serializable{
     private BigDecimal money;//分期金额
     private BigDecimal planNum;//分期笔数
 
+    private String nuclearUser;
+    private Date nuclearTime;
+    private String nuclearTimeString;
+
     public BigDecimal getMoney() {
         return money;
     }
@@ -183,5 +187,29 @@ public class OrderoutVo implements Serializable{
 
     public void setInuretime(Date inuretime) {
         this.inuretime = inuretime;
+    }
+
+    public String getNuclearUser() {
+        return nuclearUser;
+    }
+
+    public void setNuclearUser(String nuclearUser) {
+        this.nuclearUser = nuclearUser;
+    }
+
+    public Date getNuclearTime() {
+        return nuclearTime;
+    }
+
+    public void setNuclearTime(Date nuclearTime) {
+        this.nuclearTime = nuclearTime;
+    }
+
+    public String getNuclearTimeString() {
+        return nuclearTimeString;
+    }
+
+    public void setNuclearTimeString(String nuclearTimeString) {
+        this.nuclearTimeString = nuclearTimeString;
     }
 }
