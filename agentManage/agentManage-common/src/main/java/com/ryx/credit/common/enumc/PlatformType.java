@@ -53,4 +53,14 @@ public enum PlatformType {
         return "";
     }
 
+
+    public static PlatformType getContentEnum(String value){
+        PlatformType[] fundType = PlatformType.values();
+        for(PlatformType cc : fundType){
+            if(cc.code.equals(value)){
+                return cc;
+            }
+        }
+        return null;
+    }
 }

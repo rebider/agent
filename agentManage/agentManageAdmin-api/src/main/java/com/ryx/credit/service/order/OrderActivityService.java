@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OActivity;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -28,4 +29,6 @@ public interface OrderActivityService {
     List<OActivity> allActivity();
 
     List<OActivity> productActivity(String product,String angetId);
+
+    Map selectTermMachine(String platformNum);
 }
