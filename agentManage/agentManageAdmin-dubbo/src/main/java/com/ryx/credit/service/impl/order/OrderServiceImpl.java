@@ -924,7 +924,7 @@ public class OrderServiceImpl implements OrderService {
                 if(oPayment.getDeductionAmount()==null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)<0) {
                     throw new MessageException("请填写抵扣金额");
                 }
-                if(can.compareTo(oPayment.getDeductionAmount())<0){
+                if(can.add(oPayment_db.getDeductionAmount()).compareTo(oPayment.getDeductionAmount())<0){
                     throw new MessageException("抵扣金额不足");
                 }
                 //抵扣金额大于待付金额
@@ -939,11 +939,17 @@ public class OrderServiceImpl implements OrderService {
         //插入订单
         if (1 != orderMapper.updateByPrimaryKeySelective(order_db)) {
             throw new MessageException("订单添加失败");
+        }else{
+            //添加到数据历史表
+            agentDataHistoryService.saveDataHistory(order_db,order_db.getId(),DataHistoryType.ORDER.code,userId,order_db.getVersion());
         }
         oPayment_db = initPayment(oPayment_db);
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
             throw new MessageException("oPayment添加失败");
+        }else{
+            //添加到数据历史表
+            agentDataHistoryService.saveDataHistory(oPayment_db,oPayment_db.getId(),DataHistoryType.ORDER_PAYMENT.code,userId,oPayment_db.getVersion());
         }
         return orderFormVo;
     }
@@ -1219,31 +1225,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional( isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTaskBussiData(AgentVo agentVo, String userId) throws Exception {
-        if (null != agentVo.getoPayment()) {
-            if (StringUtils.isNotBlank(agentVo.getoPayment().get("id"))) {
-                //付款单
-                OPayment pre_oPayment =  oPaymentMapper.selectByPrimaryKey(agentVo.getoPayment().get("id"));
-                //抵扣类型
-                if (StringUtils.isNotBlank(pre_oPayment.getPayMethod()) && pre_oPayment.getPayMethod().equals(SettlementType.QT.code)) {
-                    if (StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))) {
-                        //抵扣金额查询
-                        pre_oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
-                        //可使用的抵扣金额
-                        AgentResult agentResult = queryAgentCapital(pre_oPayment.getAgentId(), pre_oPayment.getDeductionType());
-                        if (agentResult.isOK()) {
-                            FastMap f = (FastMap) agentResult.getData();
-                            BigDecimal can = new BigDecimal(f.get("can") + "");
-                            //可抵扣金额小于传递过来的抵扣金额
-                            if (can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount"))) < 0) {
-                                logger.info("订单提交审批，完成任务{}:{}：{},其他支付方式，抵扣金额超出可用余额", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
-                                return AgentResult.fail("其他支付方式，抵扣金额超出可用余额");
-                            }
-                        }
 
-                    }
-                }
-            }
-        }
         //如果有业务数据就保存
         if (null != agentVo.getoPayment()) {
             if(StringUtils.isNotBlank(agentVo.getoPayment().get("id"))){
@@ -1305,27 +1287,31 @@ public class OrderServiceImpl implements OrderService {
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("guaranteeAgent"))){
                     oPayment.setGuaranteeAgent(agentVo.getoPayment().get("guaranteeAgent"));
                 }
+
                 //抵扣类型
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
+                    //抵扣金额不能为空
+                    if(agentVo.getoPayment().get("deductionAmount")==null || new BigDecimal(agentVo.getoPayment().get("deductionAmount")+"").compareTo(BigDecimal.ZERO)<=0){
+                        throw new MessageException("选择抵扣方式,必须填写抵扣金额");
+                    }
                     //抵扣金额查询
                     oPayment.setDeductionType(agentVo.getoPayment().get("deductionType"));
-                    AgentResult agentResult = queryAgentCapital(db.getAgentId(),oPayment.getDeductionType());
-                    if(agentResult.isOK()){
-                        FastMap f =   (FastMap)agentResult.getData();
-                        BigDecimal can = new BigDecimal(f.get("can")+"");
-                        if(agentVo.getoPayment().get("deductionAmount")!=null) {
+                    AgentResult agentResult = queryAgentCapital(db.getAgentId(), oPayment.getDeductionType());
+                    if (agentResult.isOK()) {
+                        FastMap f = (FastMap) agentResult.getData();
+                        BigDecimal can = new BigDecimal(f.get("can") + "");
+                        if (agentVo.getoPayment().get("deductionAmount") != null) {
                             oPayment.setDeductionAmount(new BigDecimal(agentVo.getoPayment().get("deductionAmount")));
-                        }else{
-                            throw new MessageException("请填写抵扣金额");
+                        } else {
+                            throw new MessageException("抵扣类型不为空，请填写抵扣金额");
                         }
-                        if(can.compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount")))<0){
+                        //把老的加你上去比较新的
+                        if (can.add(db.getDeductionAmount()).compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount"))) < 0) {
                             throw new MessageException("抵扣金额不足");
                         }
-                    }else{
+                    } else {
                         throw new MessageException("不可抵扣");
                     }
-                }else{
-                    oPayment.setDeductionAmount(BigDecimal.ZERO);
                 }
 
                 //抵扣审批判断
@@ -1346,7 +1332,11 @@ public class OrderServiceImpl implements OrderService {
                 if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                     logger.info("付款单数据储存失败");
                     throw new MessageException("付款单数据储存失败");
+                }else{
+                    //添加到数据历史表
+                    agentDataHistoryService.saveDataHistory(oPayment,oPayment.getId(),DataHistoryType.ORDER_PAYMENT.code,userId,oPayment.getVersion());
                 }
+
             }
         }
         return AgentResult.ok();

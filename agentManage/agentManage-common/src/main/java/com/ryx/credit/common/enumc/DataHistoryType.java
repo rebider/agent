@@ -16,6 +16,7 @@ public enum DataHistoryType {
     PAYMENT("payment","缴纳款项"),
     GATHER("gather","收款账户"),
     PAYMENT_DETAIL("paymentDetail","付款明细"),
+    ORDER_PAYMENT("ORDER_PAYMENT","付款单"),
     ORDER("order","订单");
 
     public String code;
