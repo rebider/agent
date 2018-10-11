@@ -3,6 +3,7 @@ import com.ryx.credit.pojo.admin.agent.PayComp;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.service.dict.PayCompService;
 import com.ryx.credit.service.order.IPaymentDetailService;
+import com.ryx.credit.service.order.OrderService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,6 +16,8 @@ public class PayCompServiceImplTest extends BaseSpringTest {
     private PayCompService payCompService;
     @Autowired
     private IPaymentDetailService paymentDetailService;
+    @Autowired
+    private OrderService orderService;
 
     @Test
     public void insertPayComp() throws Exception {
@@ -58,6 +61,11 @@ public class PayCompServiceImplTest extends BaseSpringTest {
         list.add(map);
         ResultVO resultVO = paymentDetailService.uploadStatus(list);
         System.out.println(resultVO);
+    }
+
+    @Test
+    public void testQueryAgentDebt() {
+        System.out.println("======================================"+orderService.queryAgentDebt("AG20180817000000000006101"));
     }
 
 }

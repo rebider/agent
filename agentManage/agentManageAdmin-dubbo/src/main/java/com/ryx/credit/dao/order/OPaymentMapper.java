@@ -27,4 +27,6 @@ public interface OPaymentMapper {
     int updateByPrimaryKey(OPayment record);
 
     List<Map<String,Object>> queryPaymentXXDK(@Param("params") Map<String,Object> params);
+
+    Double queryAgentDebt(@Param("agentId")String agentId);
 }

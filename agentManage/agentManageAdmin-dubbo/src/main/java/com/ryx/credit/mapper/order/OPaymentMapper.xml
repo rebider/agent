@@ -494,4 +494,8 @@
     </where>
   </select>
 
+  <select id="queryAgentDebt" parameterType="string" resultType="double">
+    select nvl(sum(o_payment_detail.pay_amount - nvl(o_payment_detail.real_pay_amount,0)),0) from o_payment_detail where agent_id = #{agentId,jdbcType=VARCHAR} and payment_status in ('1','2','3')
+  </select>
+
 </mapper>

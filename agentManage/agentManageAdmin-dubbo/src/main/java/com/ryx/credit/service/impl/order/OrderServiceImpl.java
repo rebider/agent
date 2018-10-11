@@ -2844,4 +2844,11 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderoutList;
     }
+
+    @Override
+    public BigDecimal queryAgentDebt(String agentId) {
+        Double res = oPaymentMapper.queryAgentDebt(agentId);
+        if(res==null)return BigDecimal.ZERO;
+        return BigDecimal.valueOf(res);
+    }
 }

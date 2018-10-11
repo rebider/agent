@@ -210,5 +210,7 @@ public interface OrderService {
      */
     public List<OrderoutVo> exportOrder(Map map)  ;
 
+    public BigDecimal queryAgentDebt(String agentId);
+
 
 }
