@@ -18,5 +18,11 @@
     <dubbo:annotation package="com.ryx.credit.machine.service.*" />
     <dubbo:service interface="com.ryx.credit.machine.service.ImsTermMachineService" ref="imsTermMachineService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.machine.service.TermMachineService" ref="termMachineService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermActiveService" ref="imsTermActiveService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermAdjustDetailService" ref="imsTermAdjustDetailService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermAdjustService" ref="imsTermAdjustService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermTransferDetailService" ref="imsTermTransferDetailService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermTransferService" ref="imsTermTransferService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermWarehouseDetailService" ref="imsTermWarehouseDetailService"  timeout="1200000" registry="${zk.group}" />
 
 </beans>

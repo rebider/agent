@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsTermAdjustDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsTermAdjustDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="POS_SN" jdbcType="VARCHAR" property="posSn" />
+    <result column="MACHINE_ID" jdbcType="VARCHAR" property="machineId" />
+    <result column="AD_ID" jdbcType="VARCHAR" property="adId" />
+    <result column="Y_ORG_ID" jdbcType="VARCHAR" property="yOrgId" />
+    <result column="N_ORG_ID" jdbcType="VARCHAR" property="nOrgId" />
+    <result column="CREATE_PERSON" jdbcType="VARCHAR" property="createPerson" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, POS_SN, MACHINE_ID, AD_ID, Y_ORG_ID, N_ORG_ID, CREATE_PERSON, CREATE_TIME
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_TERM_ADJUST_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_TERM_ADJUST_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetailExample">
+    delete from IMS_TERM_ADJUST_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetail">
+    insert into IMS_TERM_ADJUST_DETAIL (ID, POS_SN, MACHINE_ID, 
+      AD_ID, Y_ORG_ID, N_ORG_ID, 
+      CREATE_PERSON, CREATE_TIME)
+    values (#{id,jdbcType=VARCHAR}, #{posSn,jdbcType=VARCHAR}, #{machineId,jdbcType=VARCHAR}, 
+      #{adId,jdbcType=VARCHAR}, #{yOrgId,jdbcType=VARCHAR}, #{nOrgId,jdbcType=VARCHAR}, 
+      #{createPerson,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetail">
+    insert into IMS_TERM_ADJUST_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="posSn != null">
+        POS_SN,
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID,
+      </if>
+      <if test="adId != null">
+        AD_ID,
+      </if>
+      <if test="yOrgId != null">
+        Y_ORG_ID,
+      </if>
+      <if test="nOrgId != null">
+        N_ORG_ID,
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="posSn != null">
+        #{posSn,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="adId != null">
+        #{adId,jdbcType=VARCHAR},
+      </if>
+      <if test="yOrgId != null">
+        #{yOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="nOrgId != null">
+        #{nOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="createPerson != null">
+        #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetailExample" resultType="java.lang.Long">
+    select count(*) from IMS_TERM_ADJUST_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetail">
+    update IMS_TERM_ADJUST_DETAIL
+    <set>
+      <if test="posSn != null">
+        POS_SN = #{posSn,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID = #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="adId != null">
+        AD_ID = #{adId,jdbcType=VARCHAR},
+      </if>
+      <if test="yOrgId != null">
+        Y_ORG_ID = #{yOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="nOrgId != null">
+        N_ORG_ID = #{nOrgId,jdbcType=VARCHAR},
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.ImsTermAdjustDetail">
+    update IMS_TERM_ADJUST_DETAIL
+    set POS_SN = #{posSn,jdbcType=VARCHAR},
+      MACHINE_ID = #{machineId,jdbcType=VARCHAR},
+      AD_ID = #{adId,jdbcType=VARCHAR},
+      Y_ORG_ID = #{yOrgId,jdbcType=VARCHAR},
+      N_ORG_ID = #{nOrgId,jdbcType=VARCHAR},
+      CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

@@ -36,5 +36,5 @@ public interface PlatFormMapper {
 
     int updateByPrimaryKey(PlatForm record);
 
-    PlatForm selectByPlatformNum(String platformNum);
+    String selectPlatType(String platformNum);
 }
