@@ -924,7 +924,8 @@ public class OrderServiceImpl implements OrderService {
                 if(oPayment.getDeductionAmount()==null || oPayment.getDeductionAmount().compareTo(BigDecimal.ZERO)<0) {
                     throw new MessageException("请填写抵扣金额");
                 }
-                if(can.add(oPayment_db.getDeductionAmount()).compareTo(oPayment.getDeductionAmount())<0){
+
+                if(can.add(oPayment_db.getDeductionAmount()==null?BigDecimal.ZERO:oPayment_db.getDeductionAmount()).compareTo(oPayment.getDeductionAmount())<0){
                     throw new MessageException("抵扣金额不足");
                 }
                 //抵扣金额大于待付金额
@@ -1225,7 +1226,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional( isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTaskBussiData(AgentVo agentVo, String userId) throws Exception {
-        if(!"pass".equals(agentVo.getApprovalOpinion())){
+        if(!"pass".equals(agentVo.getApprovalResult())){
             return AgentResult.ok();
         }
         //如果有业务数据就保存
@@ -1290,6 +1291,19 @@ public class OrderServiceImpl implements OrderService {
                     oPayment.setGuaranteeAgent(agentVo.getoPayment().get("guaranteeAgent"));
                 }
 
+                //核款时间
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("nuclearTime"))){
+                    try {
+                        Date nuclearTime = DateUtil.format(agentVo.getoPayment().get("nuclearTime") + "", "yyyy-MM-dd");
+                        oPayment.setNuclearTime(nuclearTime);
+                        oPayment.setNuclearUser(userId);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                        throw new MessageException("核款日期错误");
+                    }
+                }
+
+
                 //抵扣类型
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("deductionType"))){
                     //抵扣金额不能为空
@@ -1308,7 +1322,7 @@ public class OrderServiceImpl implements OrderService {
                             throw new MessageException("抵扣类型不为空，请填写抵扣金额");
                         }
                         //把老的加你上去比较新的
-                        if (can.add(db.getDeductionAmount()).compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount"))) < 0) {
+                        if (can.add(db.getDeductionAmount()==null?BigDecimal.ZERO:db.getDeductionAmount()).compareTo(new BigDecimal(agentVo.getoPayment().get("deductionAmount"))) < 0) {
                             throw new MessageException("抵扣金额不足");
                         }
                     } else {
@@ -2094,7 +2108,7 @@ public class OrderServiceImpl implements OrderService {
             //检查保证金等是否有分期
                 for (Capital capitalItem : listc) {
                     //银行汇款抵扣
-                    if (PayType.YHHK.equals(capitalItem.getcPayType() + "")){
+                    if (PayType.YHHK.code.equals(capitalItem.getcPayType() + "")){
                         if (capitalItem.getcAmount().compareTo(for_deal) > 0) {
                             //扣除缴款项
                             capitalItem.setcAmount(capitalItem.getcAmount().subtract(for_deal));
@@ -2196,7 +2210,7 @@ public class OrderServiceImpl implements OrderService {
                             for_deal = for_deal.subtract(camount);
                         }
                         //分润分期抵扣
-                    }else if(PayType.FRDK.equals(capitalItem.getcPayType() + "")){
+                    }else if(PayType.FRDK.code.equals(capitalItem.getcPayType() + "")){
 
                         //已入账金额
                         BigDecimal cInAmount = capitalItem.getcInAmount()==null?new BigDecimal(0):capitalItem.getcInAmount();

@@ -2127,6 +2127,136 @@ public class OPaymentExample {
             addCriterion("SETTLEMENT_PRICE_STR not between", value1, value2, "settlementPriceStr");
             return (Criteria) this;
         }
+
+        public Criteria andNuclearTimeIsNull() {
+            addCriterion("NUCLEAR_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeIsNotNull() {
+            addCriterion("NUCLEAR_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeEqualTo(Date value) {
+            addCriterion("NUCLEAR_TIME =", value, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeNotEqualTo(Date value) {
+            addCriterion("NUCLEAR_TIME <>", value, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeGreaterThan(Date value) {
+            addCriterion("NUCLEAR_TIME >", value, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("NUCLEAR_TIME >=", value, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeLessThan(Date value) {
+            addCriterion("NUCLEAR_TIME <", value, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeLessThanOrEqualTo(Date value) {
+            addCriterion("NUCLEAR_TIME <=", value, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeIn(List<Date> values) {
+            addCriterion("NUCLEAR_TIME in", values, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeNotIn(List<Date> values) {
+            addCriterion("NUCLEAR_TIME not in", values, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeBetween(Date value1, Date value2) {
+            addCriterion("NUCLEAR_TIME between", value1, value2, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearTimeNotBetween(Date value1, Date value2) {
+            addCriterion("NUCLEAR_TIME not between", value1, value2, "nuclearTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserIsNull() {
+            addCriterion("NUCLEAR_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserIsNotNull() {
+            addCriterion("NUCLEAR_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserEqualTo(String value) {
+            addCriterion("NUCLEAR_USER =", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserNotEqualTo(String value) {
+            addCriterion("NUCLEAR_USER <>", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserGreaterThan(String value) {
+            addCriterion("NUCLEAR_USER >", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserGreaterThanOrEqualTo(String value) {
+            addCriterion("NUCLEAR_USER >=", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserLessThan(String value) {
+            addCriterion("NUCLEAR_USER <", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserLessThanOrEqualTo(String value) {
+            addCriterion("NUCLEAR_USER <=", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserLike(String value) {
+            addCriterion("NUCLEAR_USER like", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserNotLike(String value) {
+            addCriterion("NUCLEAR_USER not like", value, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserIn(List<String> values) {
+            addCriterion("NUCLEAR_USER in", values, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserNotIn(List<String> values) {
+            addCriterion("NUCLEAR_USER not in", values, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserBetween(String value1, String value2) {
+            addCriterion("NUCLEAR_USER between", value1, value2, "nuclearUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andNuclearUserNotBetween(String value1, String value2) {
+            addCriterion("NUCLEAR_USER not between", value1, value2, "nuclearUser");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

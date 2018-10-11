@@ -106,6 +106,10 @@ public class OPayment implements Serializable{
 
     private String settlementPriceStr;
 
+    private Date nuclearTime;
+
+    private String nuclearUser;
+
     public String getId() {
         return id;
     }
@@ -352,5 +356,21 @@ public class OPayment implements Serializable{
 
     public void setSettlementPriceStr(String settlementPriceStr) {
         this.settlementPriceStr = settlementPriceStr == null ? null : settlementPriceStr.trim();
+    }
+
+    public Date getNuclearTime() {
+        return nuclearTime;
+    }
+
+    public void setNuclearTime(Date nuclearTime) {
+        this.nuclearTime = nuclearTime;
+    }
+
+    public String getNuclearUser() {
+        return nuclearUser;
+    }
+
+    public void setNuclearUser(String nuclearUser) {
+        this.nuclearUser = nuclearUser == null ? null : nuclearUser.trim();
     }
 }
