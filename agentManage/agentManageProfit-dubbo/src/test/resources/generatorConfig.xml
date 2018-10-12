@@ -43,7 +43,7 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="P_REWARD_TEMPLATE" domainObjectName="PosRewardTemplate" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<!--<table tableName="P_AGENT_EXIT_APPLYFOR" domainObjectName="PAgentExitApplyfor" enableUpdateByExample="false"-->
+		<!--<table tableName="P_AGENT_QUIT" domainObjectName="PAgentQuit" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_PAYMENT_DETAIL" domainObjectName="OPaymentDetail" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
