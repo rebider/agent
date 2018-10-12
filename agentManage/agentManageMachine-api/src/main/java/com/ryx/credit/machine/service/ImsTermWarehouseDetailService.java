@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface ImsTermWarehouseDetailService {
 
-    AgentResult insertWarehouse(List<String> snList, ImsTermWarehouseDetail imsTermWarehouseDetail)throws MessageException;
+    AgentResult insertWarehouseAndTransfer(List<String> snList, ImsTermWarehouseDetail imsTermWarehouseDetail)throws MessageException;
 
 }

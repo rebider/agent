@@ -516,6 +516,12 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setuUser(userId);
                     oSubOrderActivity.setStatus(Status.STATUS_1.status);
                     oSubOrderActivity.setVersion(Status.STATUS_0.status);
+                    oSubOrderActivity.setBusProCode(activity.getBusProCode());
+                    oSubOrderActivity.setBusProName(activity.getBusProName());
+                    oSubOrderActivity.setTermBatchcode(activity.getTermBatchcode());
+                    oSubOrderActivity.setTermBatchname(activity.getTermBatchname());
+                    oSubOrderActivity.setTermtype(activity.getTermtype());
+                    oSubOrderActivity.setTermtypename(activity.getTermtypename());
                     if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
                         logger.info("下订单:{}{}", activity.getActivityName(), "商品添加活动失败");
                         throw new MessageException("商品添加活动失败");
@@ -807,6 +813,12 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setuUser(userId);
                     oSubOrderActivity.setVersion(Status.STATUS_0.status);
                     oSubOrderActivity.setStatus(Status.STATUS_1.status);
+                    oSubOrderActivity.setBusProCode(activity.getBusProCode());
+                    oSubOrderActivity.setBusProName(activity.getBusProName());
+                    oSubOrderActivity.setTermBatchcode(activity.getTermBatchcode());
+                    oSubOrderActivity.setTermBatchname(activity.getTermBatchname());
+                    oSubOrderActivity.setTermtype(activity.getTermtype());
+                    oSubOrderActivity.setTermtypename(activity.getTermtypename());
                 } else {
                     //设置商品实际单价
                     oSubOrder.setProRelPrice(product.getProPrice());
