@@ -73,7 +73,8 @@ public enum TabId {
     PBSL("PBSL%s%015d"),
     TPD("TPD%s%015d"),
     A_COLINFO_PAYMENT("ACP%s%015d"),
-    P_AGENT_EXIT_APPLYFOR("PAEA%s%015d");
+    P_AGENT_QUIT("PAQ%s%015d"),
+    P_AGENT_MERGE("PAM%s%015d");
 
 
     TabId(String thePatt){
