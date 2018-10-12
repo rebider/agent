@@ -91,7 +91,7 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             ImsTermTransfer imsTermTransfer = new ImsTermTransfer();
             imsTermTransfer.setTransferId(transferId);
             imsTermTransfer.setStatus("0");  //0：处理完成
-            imsTermTransfer.setOrgId(imsTermWarehouseDetail.getOrgId());
+            imsTermTransfer.setOrgId(ZHYY_ROOT_ORG_ID);
             imsTermTransfer.setCreateTime(createTime);
             imsTermTransfer.setCreatePerson(ZHYY_CREATE_PERSON);
             imsTermTransfer.setTransferType("0");   //0:划拨
