@@ -1,5 +1,8 @@
 package com.ryx.credit.common.enumc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @Author Lihl
  * @Date 2018/9/26
@@ -28,6 +31,20 @@ public enum SupplyType {
             }
         }
         return "";
+    }
+
+    public static Map<String, Object> getResultMap() {
+        SupplyType[] valus = values();
+        Map<String, Object> resultMap = new HashMap();
+        SupplyType[] var2 = valus;
+        int var3 = valus.length;
+
+        for(int var4 = 0; var4 < var3; ++var4) {
+            SupplyType supplyType = var2[var4];
+            resultMap.put(supplyType.name(), supplyType.msg);
+        }
+
+        return resultMap;
     }
 
 }
