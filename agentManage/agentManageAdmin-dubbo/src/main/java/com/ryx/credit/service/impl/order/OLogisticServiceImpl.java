@@ -350,6 +350,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
                             criteria.andSubOrderIdEqualTo(subOrderItem.getId());
                             List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                            if(null==oSubOrderActivities){
+                                logger.info("查询活动数据错误1");
+                                throw new MessageException("查询活动数据错误");
+                            }
+                            if(0==oSubOrderActivities.size()){
+                                logger.info("查询活动数据错误2");
+                                throw new MessageException("查询活动数据错误");
+                            }
                             imsTermWarehouseDetail.setMachineId(oSubOrderActivities.get(0).getBusProCode());
                             imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
 
