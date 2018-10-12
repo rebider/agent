@@ -5,12 +5,13 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtils;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.util.*;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
+import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -57,6 +58,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private ReceiptPlanMapper receiptPlanMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private ImsTermWarehouseDetailService imsTermWarehouseDetailService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private OSubOrderActivityMapper subOrderActivityMapper;
 
     /**
      * 物流信息:
@@ -326,6 +333,32 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                             System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                         }
+                        //进行入库、机具划拨操作
+                        if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+                            List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
+                            ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
+                            OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
+                            if (null==oOrder) {
+                                throw new MessageException("查询订单数据失败！");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+                            if (null==agentBusInfo) {
+                                throw new MessageException("查询业务数据失败！");
+                            }
+                            imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
+                            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                            OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
+                            criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+                            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                            imsTermWarehouseDetail.setMachineId(oSubOrderActivities.get(0).getBusProCode());
+                            imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
+
+                        }else if(proType.equals(PlatformType.MPOS.msg)){
+
+                        }else{
+                            logger.info("导入物流：平台类型错误");
+                            throw new MessageException("平台类型错误");
+                        }
                     }
                 }
             } catch (MessageException e) {
@@ -547,7 +580,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 }
             }
         }
-        return ResultVO.success(null);
+        return ResultVO.success(idList);
     }
 
     @Override
@@ -625,7 +658,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 }
             }
         }
-        return ResultVO.success(null);
+        return ResultVO.success(idList);
     }
 
 
