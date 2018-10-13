@@ -26,8 +26,6 @@ import com.ryx.credit.service.order.OLogisticsDetailService;
 import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.ibatis.ognl.enhance.OrderedReturn;
-import org.apache.shiro.authz.annotation.Logical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.pojo.admin.order.OReturnOrder;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -51,6 +48,8 @@ import java.util.*;
 public class OrderReturnServiceImpl implements IOrderReturnService {
 
     private static Logger log = LoggerFactory.getLogger(OrderReturnServiceImpl.class);
+    public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
+    public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 
     private static String refund_agent_modify_id = AppConfig.getProperty("refund_agent_modify_id");
     private static String refund_business1_id = AppConfig.getProperty("refund_business1_id");
@@ -99,6 +98,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OReceiptProMapper receiptProMapper;
     @Autowired
     private OLogisticsDetailService logisticsDetailService;
+    @Autowired
+    private OSubOrderMapper oSubOrderMapper;
+    @Autowired
+    private OLogisticsMapper oLogisticsMapper;
+    @Autowired
+    private OLogisticsDetailMapper oLogisticsDetailMapper;
+
 
     /**
      * @Author: Zhang Lei
@@ -1016,5 +1022,275 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         pageInfo.setRows(list);
         return pageInfo;
     }
+
+
+    /**
+     * 退货导入物流信息
+     * @param data
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public List<String> addList(List<List<Object>> data, String user) throws Exception {
+        List<String> list = new ArrayList<>();
+        for (List<Object> objectList : data) {
+
+            String planNum = "";
+            String orderId = "";
+            String proCode = "";
+            String proId = "";
+            String proName = "";
+            String sendDate = "";
+            String sendProNum = "";
+            String beginSn = "";
+            String endSn = "";
+            String beginSnCount = "";
+            String endSnCount = "";
+            String logCom = "";
+            String wNumber = "";
+            String proType="";
+            try {
+
+                List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+                planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
+                orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
+                proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
+                proId = String.valueOf(objectList.get(col.indexOf("PRO_ID")));
+                proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME")));
+
+                sendDate = String.valueOf(objectList.get(col.indexOf("h")));
+                sendProNum = String.valueOf(objectList.get(col.indexOf("g")));
+                logCom = String.valueOf(objectList.get(col.indexOf("a")));
+                wNumber = String.valueOf(objectList.get(col.indexOf("b")));
+                beginSn = String.valueOf(objectList.get(col.indexOf("c")));
+                endSn = String.valueOf(objectList.get(col.indexOf("d")));
+                beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
+                endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
+                proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE")));
+
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(sendDate)) {
+                    log.info("发货日期不能为空");
+                    throw new MessageException("发货日期不能为空");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(planNum)) {
+                    log.info("排单编号为空");
+                    throw new MessageException("排单编号为空");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(orderId)){
+                    log.info("订单编号为空");
+                    throw new MessageException("订单编号为空");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(proCode)) {
+                    log.info("商品编号为空");
+                    throw new MessageException("商品编号为空");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(proId)) {
+                    log.info("商品ID为空");
+                    throw new MessageException("商品ID为空");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(sendProNum)) {
+                    log.info("请填写发货数量");
+                    throw new MessageException("请填写发货数量");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSn)) {
+                    log.info("请填写起始SN序列号");
+                    throw new MessageException("请填写起始SN序列号");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(endSn)){
+                    log.info("请填写结束SN序列号");
+                    throw new MessageException("请填写结束SN序列号");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSnCount)) {
+                    log.info("请填写起始SN位数");
+                    throw new MessageException("请填写起始SN位数");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(endSnCount)) {
+                    log.info("请填写结束SN位数");
+                    throw new MessageException("请填写结束SN位数");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(logCom)) {
+                    log.info("请填写物流公司");
+                    throw new MessageException("请填写物流公司");
+                }
+                if (com.ryx.credit.commons.utils.StringUtils.isBlank(wNumber)) {
+                    log.info("请填写物流单号");
+                    throw new MessageException("请填写物流单号");
+                }
+                OSubOrderExample example = new OSubOrderExample();
+                example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
+                List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
+                if(subOrders.size()!=1){
+                    log.info("请填写物流单号");
+                    throw new MessageException("订单["+orderId+"]的商品["+proId+"]数量大于1");
+                }
+                OSubOrder subOrderItem = subOrders.get(0);
+                //校验文档不能更改
+                List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
+                if(listItem.size()>0){
+                    //检查列是否有更改
+                    AgentResult agentResult = checkRecordPlan(objectList,listItem.get(0));
+                    if(!agentResult.isOK()){
+                        log.info("校验Excel文档失败：[],[]",planNum,agentResult.getMsg());
+                        throw new MessageException(agentResult.getMsg());
+                    }
+                }else{
+                    throw new MessageException("排单信息未找到");
+                }
+
+                OLogisticsExample oLogisticsExample = new OLogisticsExample();
+                OLogisticsExample.Criteria criteria1 = oLogisticsExample.createCriteria();
+                criteria1.andSnBeginNumEqualTo(beginSn);
+                criteria1.andSnEndNumEqualTo(endSn);
+                criteria1.andWNumberEqualTo(wNumber);
+                criteria1.andLogComEqualTo(logCom);
+                List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
+                if(null==oLogistics1){
+                    log.info("该商品已发货请勿重复提交1");
+                    throw new MessageException("该商品已发货请勿重复提交");
+                }
+                if(oLogistics1.size()!=0){
+                    log.info("该商品已发货请勿重复提交2");
+                    throw new MessageException("该商品已发货请勿重复提交");
+                }
+
+                //IDlist检查
+                List<String> stringList = new OLogisticServiceImpl().idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
+                if (Integer.valueOf(sendProNum) != stringList.size()) {
+                    log.info("请仔细核对发货数量");
+                    throw new MessageException("请仔细核对发货数量");
+                }
+
+                //物流信息
+                OLogistics oLogistics = new OLogistics();
+                oLogistics.setId(idService.genId(TabId.o_logistics));           // 物流ID序列号
+                oLogistics.setcUser(user);                                      // 创建人
+                oLogistics.setStatus(Status.STATUS_1.status);                   // 默认记录状态为1
+                oLogistics.setLogType(LogType.Deliver.getValue());              // 默认物流类型为1
+                try {
+                    oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
+                }catch (Exception e){
+                    try {
+                        oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                    }catch (Exception m){
+                        throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
+                    }
+                }
+                oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
+                oLogistics.setIsdeall(Status.STATUS_1.status);
+
+                //ID信息
+                oLogistics.setReceiptPlanId(planNum); // 排单编号
+                oLogistics.setOrderId(orderId);       // 订单编号
+                oLogistics.setProId(proId);         // 商品ID
+                oLogistics.setProName(proName);       // 商品名称
+                oLogistics.setProPrice(subOrderItem.getProRelPrice());//商品单价
+                //排单信息
+                ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
+                if(planVo==null)throw new MessageException("排单信息未找到");
+
+                //商品信息从排单表里查
+                oLogistics.setProCom(planVo.getProCom());// 厂家
+                oLogistics.setProType(planVo.getProType());//排单添加商品类型
+                oLogistics.setProModel(planVo.getModel());//型号
+
+                oLogistics.setSendNum(new BigDecimal(sendProNum));  // 发货数量
+                oLogistics.setLogCom(logCom);       // 物流公司
+                oLogistics.setwNumber(wNumber);      // 物流单号
+                oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
+                oLogistics.setSnEndNum(endSn);     // 结束SN序列号
+
+                log.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
+                if (1 != oLogisticsService.insertImportData(oLogistics)) {
+                    throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败");
+                }
+                list.add(oLogistics.getId());
+                //调用明细接口之前需要先去数据库进行查询是否已有数据
+                if (null != stringList && stringList.size() > 0) {
+                    for (String snNum : stringList) {
+                        //检查sn是否存在物流状态和记录状态
+                        OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                        OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
+                        criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
+                        criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                        criteria.andSnNumEqualTo(snNum);
+                        List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                        if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
+                            //说明已经存在数据
+                            log.info(snNum+"此物流已经存在,正在发货中!!!");
+                            throw new MessageException(snNum+"此物流已经存在,正在发货中!!!");
+                        }
+                    }
+                }
+                // 调用明细接口 插入物流明细
+                ResultVO resultVO = oLogisticsService.insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
+
+                //插入成功更新排单信息
+                if (resultVO.isSuccess()) {
+                    String id =  oLogistics.getReceiptPlanId();   // 排单编号
+                    if (null == id) {
+                        throw new MessageException("排单ID查询失败！");
+                    } else {
+                        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
+                        if (receiptPlan != null) {
+                            if(receiptPlan.getSendProNum()==null || receiptPlan.getSendProNum().compareTo(BigDecimal.ZERO)==0) {// 发货数量
+                                receiptPlan.setSendProNum(new BigDecimal(sendProNum));
+                            }else{
+                                receiptPlan.setSendProNum(receiptPlan.getSendProNum().add(new BigDecimal(sendProNum)));
+                            }
+                            receiptPlan.setRealSendDate(Calendar.getInstance().getTime());                          // 实际发货时间
+                            receiptPlan.setPlanOrderStatus(new BigDecimal(PlannerStatus.YesDeliver.getValue()));    // 排单状态为已发货
+                            if (receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!= 1) {
+                                throw new MessageException("更新排单数据失败！");
+                            }
+                            System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
+                        }
+                        //进行机具调整操作
+                        if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+
+                        }else if(proType.equals(PlatformType.MPOS.msg)){
+
+                        }else{
+                            log.info("导入物流：平台类型错误");
+                            throw new MessageException("平台类型错误");
+                        }
+                    }
+                }
+            } catch (MessageException e) {
+                e.printStackTrace();
+                throw e;
+            }catch (Exception e) {
+                e.printStackTrace();
+                throw e;
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 检查上传物流excel列是否修改过
+     * @param excel
+     * @param db
+     * @return
+     */
+    private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
+        Object PLAN_NUM = db.get("PLAN_NUM");
+        String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
+        String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
+        for (int i=0;i<18;i++){
+            if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
+                continue;
+            }
+            if(excel.get(i)==null || com.ryx.credit.commons.utils.StringUtils.isBlank(excel.get(i).toString())){
+                return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+            }
+            if(!(excel.get(i)+"").equals((db.get(col[i])+""))){
+                return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+            }
+        }
+        return AgentResult.ok();
+    }
+
 
 }
