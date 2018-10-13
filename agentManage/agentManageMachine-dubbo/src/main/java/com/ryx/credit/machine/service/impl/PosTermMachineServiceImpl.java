@@ -59,7 +59,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo) {
+    public AgentResult changeActMachine(List<ChangeActMachineVo> changeActMachineVoList) {
         return null;
     }
 

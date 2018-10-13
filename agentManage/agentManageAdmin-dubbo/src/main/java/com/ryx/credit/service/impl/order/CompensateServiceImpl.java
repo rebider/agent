@@ -8,10 +8,10 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AttachmentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.machine.service.TermMachineService;
+import com.ryx.credit.machine.vo.ChangeActMachineVo;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -20,6 +20,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
@@ -80,6 +81,14 @@ public class CompensateServiceImpl implements CompensateService {
     private IUserService userService;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private TermMachineService termMachineService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private OOrderMapper oOrderMapper;
+    @Autowired
+    private PlatFormService platFormService;
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -541,7 +550,7 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus){
+    public AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception{
 
         BusActRelExample example = new BusActRelExample();
         example.or().andActivIdEqualTo(proIns).andActivStatusEqualTo(AgStatus.Approving.name());
@@ -567,7 +576,11 @@ public class CompensateServiceImpl implements CompensateService {
         ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
         criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        //修改 业务系统数据集合
+        List<ChangeActMachineVo> changeActMachineVos = new ArrayList<ChangeActMachineVo>();
+
         oRefundPriceDiffDetails.forEach(row->{
+
             OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
             OLogisticsDetailExample.Criteria criteria1 = oLogisticsDetailExample.createCriteria();
             criteria1.andSnNumBetween(row.getBeginSn(),row.getEndSn());
@@ -577,31 +590,62 @@ public class CompensateServiceImpl implements CompensateService {
             if(null==oLogisticsDetails){
                 throw new ProcessException("退补差价数据完成失败");
             }
+            OActivity activity = orderActivityService.findById(row.getActivityRealId());
+            OActivity activity_old = orderActivityService.findById(row.getActivityFrontId());
             oLogisticsDetails.forEach(oLogisticsDetail->{
-                OLogisticsDetail upoLogisticsDetail = new OLogisticsDetail();
-                upoLogisticsDetail.setId(oLogisticsDetail.getId());
-                upoLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
-                int update = logisticsDetailMapper.updateByPrimaryKeySelective(upoLogisticsDetail);
+
+                //更新
+                oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+                int update = logisticsDetailMapper.updateByPrimaryKeySelective(oLogisticsDetail);
                 if(1!=update){
                     throw new ProcessException("退补差价数据更新完成失败");
                 }
+                //插入新的物流信息
                 oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
                 oLogisticsDetail.setOptId(row.getId());
                 oLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
                 oLogisticsDetail.setActivityId(row.getActivityRealId());
                 oLogisticsDetail.setActivityName(row.getActivityName());
-                OActivity activity = orderActivityService.findById(row.getActivityRealId());
+
+
                 oLogisticsDetail.setgTime(activity.getgTime());
                 oLogisticsDetail.setSettlementPrice(row.getPrice());
                 oLogisticsDetail.setcTime(new Date());
                 oLogisticsDetail.setuTime(new Date());
                 oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+
+                oLogisticsDetail.setBusProCode(activity.getBusProCode());
+                oLogisticsDetail.setBusProName(activity.getBusProName());
+                oLogisticsDetail.setTermBatchcode(activity.getTermBatchcode());
+                oLogisticsDetail.setTermBatchname(activity.getTermBatchname());
+                oLogisticsDetail.setTermtype(activity.getTermtype());
+                oLogisticsDetail.setTermtypename(activity.getTermtypename());
+                oLogisticsDetail.setVersion(Status.STATUS_0.status);
                 int insert = logisticsDetailMapper.insert(oLogisticsDetail);
                 if(1!=insert){
                     throw new ProcessException("退补差价数据新增完成失败");
                 }
             });
+
+            //cxinfo 机具的调整
+            OOrder oo = oOrderMapper.selectByPrimaryKey(row.getOrderId());
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
+            PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
+
+            ChangeActMachineVo cav = new ChangeActMachineVo();
+            cav.setBusNum(agentBusInfo.getBusNum());
+            cav.setNewAct(activity.getBusProCode());
+            cav.setOldAct(activity_old.getBusProCode());
+            cav.setOptUser(row.getcUser());
+            cav.setSnStart(row.getBeginSn());
+            cav.setSnEnd(row.getEndSn());
+            cav.setPlatformType(platformType.code);
+            //待调整集合
+            changeActMachineVos.add(cav);
         });
+
+        //cxinfo 调用活动变更接口进行活动的变更
+        AgentResult ar = termMachineService.changeActMachine(changeActMachineVos);
         return AgentResult.ok();
     }
 

@@ -59,10 +59,10 @@ public interface TermMachineService {
 
     /**
      * 机具活动的变更
-     * @param changeActMachineVo
+     * @param changeActMachineVoList
      * @return
      */
-    public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo)throws Exception;
+    public AgentResult changeActMachine(List<ChangeActMachineVo> changeActMachineVoList)throws Exception;
 
 
     /**

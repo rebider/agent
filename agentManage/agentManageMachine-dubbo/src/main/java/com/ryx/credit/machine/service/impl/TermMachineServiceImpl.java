@@ -30,6 +30,9 @@ public class TermMachineServiceImpl  implements TermMachineService {
     @Resource(name = "mposTermMachineServiceImpl")
     private TermMachineService mposTermMachineServiceImpl;
 
+
+
+
     @Override
     public List<TermMachineVo> queryTermMachine(PlatformType platformType) throws Exception{
         switch (platformType.name()){
@@ -86,12 +89,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     /**
      * 机具活动的变更
-     * @param changeActMachineVo
+     * @param changeActMachineVoList
      * @return
      */
     @Override
-    public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo) throws Exception{
-        return mposTermMachineServiceImpl.changeActMachine(changeActMachineVo);
+    public AgentResult changeActMachine(List<ChangeActMachineVo> changeActMachineVoList) throws Exception{
+        return mposTermMachineServiceImpl.changeActMachine(changeActMachineVoList);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
+import com.ryx.credit.pojo.admin.agent.PlatFormExample;
 import com.ryx.credit.service.agent.PlatFormService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,5 +99,15 @@ public class PlatFormServiceImpl implements PlatFormService{
     public PlatForm selectByPlatformNum(String platformNum){
         return platFormMapper.selectByPlatFormNum(platformNum);
     }
-
+    @Override
+    public PlatformType byPlatformCode(String platformCode) {
+        PlatFormExample example = new PlatFormExample();
+        example.or().andPlatformNumEqualTo(platformCode).andStatusEqualTo(Status.STATUS_1.status);
+        List<PlatForm> list = platFormMapper.selectByExample(example);
+        if (list.size() > 0) {
+            PlatForm p = list.get(0);
+            return PlatformType.getContentEnum(p.getPlatformType());
+        }
+        return null;
+    }
 }

@@ -18,6 +18,8 @@ public class ChangeActMachineVo implements Serializable{
     private String newAct;
 //    下发人。
     private String optUser;
+    //平台类型
+    private String platformType;
 
     public String getBusNum() {
         return busNum;
@@ -65,5 +67,13 @@ public class ChangeActMachineVo implements Serializable{
 
     public void setOptUser(String optUser) {
         this.optUser = optUser;
+    }
+
+    public String getPlatformType() {
+        return platformType;
+    }
+
+    public void setPlatformType(String platformType) {
+        this.platformType = platformType;
     }
 }
