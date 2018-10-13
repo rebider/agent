@@ -2,9 +2,8 @@ package com.ryx.credit.machine.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
-import com.ryx.credit.machine.vo.MposTermBatchVo;
-import com.ryx.credit.machine.vo.MposTermTypeVo;
-import com.ryx.credit.machine.vo.TermMachineVo;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.machine.vo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,31 @@ public interface TermMachineService {
      * @return
      */
     public List<MposTermTypeVo> queryMposTermType(PlatformType platformType)throws Exception;
+
+    /**
+     * 机具的下发
+     * @param snList
+     * @param data
+     * @return
+     */
+    public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo)throws Exception;
+
+
+    /**
+     * 机具的调整
+     * @param adjustmentMachineVo
+     * @return
+     */
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo)throws Exception;
+
+
+    /**
+     * 机具活动的变更
+     * @param changeActMachineVo
+     * @return
+     */
+    public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo)throws Exception;
+
 
     /**
      * 发送请求

@@ -2,12 +2,11 @@ package com.ryx.credit.machine.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.machine.entity.ImsTermMachine;
 import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.MposTermBatchVo;
-import com.ryx.credit.machine.vo.MposTermTypeVo;
-import com.ryx.credit.machine.vo.TermMachineVo;
+import com.ryx.credit.machine.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -47,6 +46,21 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     @Override
     public List<MposTermTypeVo> queryMposTermType(PlatformType platformType) throws Exception{
         return new ArrayList<>();
+    }
+
+    @Override
+    public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo) {
+        return null;
+    }
+
+    @Override
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) {
+        return null;
+    }
+
+    @Override
+    public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo) {
+        return null;
     }
 
     @Override

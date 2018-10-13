@@ -1,11 +1,13 @@
 package com.ryx.credit.machine.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.MposTermBatchVo;
-import com.ryx.credit.machine.vo.MposTermTypeVo;
-import com.ryx.credit.machine.vo.TermMachineVo;
+import com.ryx.credit.machine.vo.*;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -60,6 +62,36 @@ public class TermMachineServiceImpl  implements TermMachineService {
             default:
                 return new ArrayList<>();
         }
+    }
+
+    /**
+     * 机具的下发
+     * @param lowerHairMachineVo
+     * @return
+     */
+    @Override
+    public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo) throws Exception{
+        return mposTermMachineServiceImpl.lowerHairMachine(lowerHairMachineVo);
+    }
+
+    /**
+     * 机具的调整，，退货是使用
+     * @param adjustmentMachineVo
+     * @return
+     */
+    @Override
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception{
+        return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+    }
+
+    /**
+     * 机具活动的变更
+     * @param changeActMachineVo
+     * @return
+     */
+    @Override
+    public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo) throws Exception{
+        return mposTermMachineServiceImpl.changeActMachine(changeActMachineVo);
     }
 
     @Override
