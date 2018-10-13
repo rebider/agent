@@ -1887,6 +1887,426 @@ public class OLogisticsDetailExample {
             addCriterion("TERMINALID_TYPE not between", value1, value2, "terminalidType");
             return (Criteria) this;
         }
+
+        public Criteria andBusProCodeIsNull() {
+            addCriterion("BUS_PRO_CODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeIsNotNull() {
+            addCriterion("BUS_PRO_CODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeEqualTo(String value) {
+            addCriterion("BUS_PRO_CODE =", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeNotEqualTo(String value) {
+            addCriterion("BUS_PRO_CODE <>", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeGreaterThan(String value) {
+            addCriterion("BUS_PRO_CODE >", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_PRO_CODE >=", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeLessThan(String value) {
+            addCriterion("BUS_PRO_CODE <", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeLessThanOrEqualTo(String value) {
+            addCriterion("BUS_PRO_CODE <=", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeLike(String value) {
+            addCriterion("BUS_PRO_CODE like", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeNotLike(String value) {
+            addCriterion("BUS_PRO_CODE not like", value, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeIn(List<String> values) {
+            addCriterion("BUS_PRO_CODE in", values, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeNotIn(List<String> values) {
+            addCriterion("BUS_PRO_CODE not in", values, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeBetween(String value1, String value2) {
+            addCriterion("BUS_PRO_CODE between", value1, value2, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProCodeNotBetween(String value1, String value2) {
+            addCriterion("BUS_PRO_CODE not between", value1, value2, "busProCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameIsNull() {
+            addCriterion("BUS_PRO_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameIsNotNull() {
+            addCriterion("BUS_PRO_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameEqualTo(String value) {
+            addCriterion("BUS_PRO_NAME =", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameNotEqualTo(String value) {
+            addCriterion("BUS_PRO_NAME <>", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameGreaterThan(String value) {
+            addCriterion("BUS_PRO_NAME >", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_PRO_NAME >=", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameLessThan(String value) {
+            addCriterion("BUS_PRO_NAME <", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameLessThanOrEqualTo(String value) {
+            addCriterion("BUS_PRO_NAME <=", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameLike(String value) {
+            addCriterion("BUS_PRO_NAME like", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameNotLike(String value) {
+            addCriterion("BUS_PRO_NAME not like", value, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameIn(List<String> values) {
+            addCriterion("BUS_PRO_NAME in", values, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameNotIn(List<String> values) {
+            addCriterion("BUS_PRO_NAME not in", values, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameBetween(String value1, String value2) {
+            addCriterion("BUS_PRO_NAME between", value1, value2, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusProNameNotBetween(String value1, String value2) {
+            addCriterion("BUS_PRO_NAME not between", value1, value2, "busProName");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeIsNull() {
+            addCriterion("TERM_BATCHCODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeIsNotNull() {
+            addCriterion("TERM_BATCHCODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeEqualTo(String value) {
+            addCriterion("TERM_BATCHCODE =", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeNotEqualTo(String value) {
+            addCriterion("TERM_BATCHCODE <>", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeGreaterThan(String value) {
+            addCriterion("TERM_BATCHCODE >", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeGreaterThanOrEqualTo(String value) {
+            addCriterion("TERM_BATCHCODE >=", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeLessThan(String value) {
+            addCriterion("TERM_BATCHCODE <", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeLessThanOrEqualTo(String value) {
+            addCriterion("TERM_BATCHCODE <=", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeLike(String value) {
+            addCriterion("TERM_BATCHCODE like", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeNotLike(String value) {
+            addCriterion("TERM_BATCHCODE not like", value, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeIn(List<String> values) {
+            addCriterion("TERM_BATCHCODE in", values, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeNotIn(List<String> values) {
+            addCriterion("TERM_BATCHCODE not in", values, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeBetween(String value1, String value2) {
+            addCriterion("TERM_BATCHCODE between", value1, value2, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchcodeNotBetween(String value1, String value2) {
+            addCriterion("TERM_BATCHCODE not between", value1, value2, "termBatchcode");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameIsNull() {
+            addCriterion("TERM_BATCHNAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameIsNotNull() {
+            addCriterion("TERM_BATCHNAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameEqualTo(String value) {
+            addCriterion("TERM_BATCHNAME =", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameNotEqualTo(String value) {
+            addCriterion("TERM_BATCHNAME <>", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameGreaterThan(String value) {
+            addCriterion("TERM_BATCHNAME >", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameGreaterThanOrEqualTo(String value) {
+            addCriterion("TERM_BATCHNAME >=", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameLessThan(String value) {
+            addCriterion("TERM_BATCHNAME <", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameLessThanOrEqualTo(String value) {
+            addCriterion("TERM_BATCHNAME <=", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameLike(String value) {
+            addCriterion("TERM_BATCHNAME like", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameNotLike(String value) {
+            addCriterion("TERM_BATCHNAME not like", value, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameIn(List<String> values) {
+            addCriterion("TERM_BATCHNAME in", values, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameNotIn(List<String> values) {
+            addCriterion("TERM_BATCHNAME not in", values, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameBetween(String value1, String value2) {
+            addCriterion("TERM_BATCHNAME between", value1, value2, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermBatchnameNotBetween(String value1, String value2) {
+            addCriterion("TERM_BATCHNAME not between", value1, value2, "termBatchname");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeIsNull() {
+            addCriterion("TERMTYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeIsNotNull() {
+            addCriterion("TERMTYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeEqualTo(String value) {
+            addCriterion("TERMTYPE =", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeNotEqualTo(String value) {
+            addCriterion("TERMTYPE <>", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeGreaterThan(String value) {
+            addCriterion("TERMTYPE >", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMTYPE >=", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeLessThan(String value) {
+            addCriterion("TERMTYPE <", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeLessThanOrEqualTo(String value) {
+            addCriterion("TERMTYPE <=", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeLike(String value) {
+            addCriterion("TERMTYPE like", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeNotLike(String value) {
+            addCriterion("TERMTYPE not like", value, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeIn(List<String> values) {
+            addCriterion("TERMTYPE in", values, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeNotIn(List<String> values) {
+            addCriterion("TERMTYPE not in", values, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeBetween(String value1, String value2) {
+            addCriterion("TERMTYPE between", value1, value2, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypeNotBetween(String value1, String value2) {
+            addCriterion("TERMTYPE not between", value1, value2, "termtype");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameIsNull() {
+            addCriterion("TERMTYPENAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameIsNotNull() {
+            addCriterion("TERMTYPENAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameEqualTo(String value) {
+            addCriterion("TERMTYPENAME =", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameNotEqualTo(String value) {
+            addCriterion("TERMTYPENAME <>", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameGreaterThan(String value) {
+            addCriterion("TERMTYPENAME >", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMTYPENAME >=", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameLessThan(String value) {
+            addCriterion("TERMTYPENAME <", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameLessThanOrEqualTo(String value) {
+            addCriterion("TERMTYPENAME <=", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameLike(String value) {
+            addCriterion("TERMTYPENAME like", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameNotLike(String value) {
+            addCriterion("TERMTYPENAME not like", value, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameIn(List<String> values) {
+            addCriterion("TERMTYPENAME in", values, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameNotIn(List<String> values) {
+            addCriterion("TERMTYPENAME not in", values, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameBetween(String value1, String value2) {
+            addCriterion("TERMTYPENAME between", value1, value2, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andTermtypenameNotBetween(String value1, String value2) {
+            addCriterion("TERMTYPENAME not between", value1, value2, "termtypename");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

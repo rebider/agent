@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.order;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OLogisticsDetail {
+public class OLogisticsDetail implements Serializable{
     private String id;
 
     private String orderId;
@@ -55,6 +56,18 @@ public class OLogisticsDetail {
     private String terminalidSeq;
 
     private String terminalidType;
+
+    private String busProCode;
+
+    private String busProName;
+
+    private String termBatchcode;
+
+    private String termBatchname;
+
+    private String termtype;
+
+    private String termtypename;
 
     public String getId() {
         return id;
@@ -262,5 +275,53 @@ public class OLogisticsDetail {
 
     public void setTerminalidType(String terminalidType) {
         this.terminalidType = terminalidType == null ? null : terminalidType.trim();
+    }
+
+    public String getBusProCode() {
+        return busProCode;
+    }
+
+    public void setBusProCode(String busProCode) {
+        this.busProCode = busProCode == null ? null : busProCode.trim();
+    }
+
+    public String getBusProName() {
+        return busProName;
+    }
+
+    public void setBusProName(String busProName) {
+        this.busProName = busProName == null ? null : busProName.trim();
+    }
+
+    public String getTermBatchcode() {
+        return termBatchcode;
+    }
+
+    public void setTermBatchcode(String termBatchcode) {
+        this.termBatchcode = termBatchcode == null ? null : termBatchcode.trim();
+    }
+
+    public String getTermBatchname() {
+        return termBatchname;
+    }
+
+    public void setTermBatchname(String termBatchname) {
+        this.termBatchname = termBatchname == null ? null : termBatchname.trim();
+    }
+
+    public String getTermtype() {
+        return termtype;
+    }
+
+    public void setTermtype(String termtype) {
+        this.termtype = termtype == null ? null : termtype.trim();
+    }
+
+    public String getTermtypename() {
+        return termtypename;
+    }
+
+    public void setTermtypename(String termtypename) {
+        this.termtypename = termtypename == null ? null : termtypename.trim();
     }
 }
