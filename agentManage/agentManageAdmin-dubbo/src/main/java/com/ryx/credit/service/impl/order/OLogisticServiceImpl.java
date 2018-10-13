@@ -299,7 +299,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 //遍历查询库里是否存在sn码
                 if (proType.equals(PlatformType.MPOS.msg)){
                     for (String sn : stringList) {
-                        Map  map=oLogisticsDetailMapper.selectSn(PlatformType.MPOS.code,sn);
+                        OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+                        oLogisticsDetail.setStatus(Status.STATUS_0.status);
+                        oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
+                        oLogisticsDetail.setSnNum(sn);
+                        oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
+                        Map  map=oLogisticsDetailMapper.selectSn(oLogisticsDetail);
                         if (map==null){
                             logger.info("此SN码不存在");
                             throw new MessageException("此SN码不存在");
@@ -307,6 +312,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             logger.info("此SN码不存在");
                             throw new MessageException("此SN码不存在");
                         }
+
                         resultVO = updateLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId(),String.valueOf(map.get("ID")));
                     }
                 }else{
@@ -484,8 +490,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setTerminalidKey(terminalid_key);
                 oLogisticsDetail.setTerminalidSeq(terminalid_seq);
                 oLogisticsDetail.setSnNum(sn_num);
-                oLogisticsDetail.setStatus(Status.STATUS_1.status);
-                oLogisticsDetail.setRecordStatus(Status.STATUS_0.status);
+                oLogisticsDetail.setStatus(Status.STATUS_0.status);
+                oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
                 oLogisticsDetail.setVersion(Status.STATUS_0.status);
                 oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
                 if ( oLogisticsDetailMapper.insertSelective(oLogisticsDetail)==0){
@@ -595,6 +601,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
     @Override
     public ResultVO updateLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String planId, String oLogisticsDetailId) throws MessageException {
         ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(planId);
+        OLogisticsDetail oLogisticsDetail = oLogisticsDetailMapper.selectByPrimaryKey(oLogisticsDetailId);
         String orderId = planVo.getOrderId();//订单ID
         String proId = planVo.getProId();//收货单商品id
         OReceiptPro oReceiptPro  = oReceiptProMapper.selectByPrimaryKey(proId);
@@ -659,8 +666,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-                detail.setVersion(Status.STATUS_1.status);
-                detail.setRecordStatus(Status.STATUS_1.status);
+                detail.setVersion(oLogisticsDetail.getVersion());
                 if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
                     logger.info("修改失败");
                     throw new ProcessException("修改失败");
@@ -671,7 +677,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
     }
 
 
-    private List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
+    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
         //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
         int begin = begins - 1;
         ArrayList<String> list = new ArrayList<>();

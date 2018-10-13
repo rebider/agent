@@ -10,7 +10,7 @@ public enum OLogisticsDetailStatus {
 
     STATUS_FH("1","发货"),
     STATUS_TH("2","退货"),
-
+    STATUS_KC("0","库存"),
     RECORD_STATUS_HIS("3","历史"),
     RECORD_STATUS_LOC("2","锁定"),
     RECORD_STATUS_VAL("1","有效"),
