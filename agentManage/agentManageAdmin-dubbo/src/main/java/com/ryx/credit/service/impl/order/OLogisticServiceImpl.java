@@ -311,6 +311,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             logger.info("此SN码不存在");
                             throw new MessageException("此SN码不存在");
                         }
+
                         resultVO = updateLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId(),String.valueOf(map.get("ID")));
                     }
                 }else{
@@ -599,6 +600,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
     @Override
     public ResultVO updateLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String planId, String oLogisticsDetailId) throws MessageException {
         ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(planId);
+        OLogisticsDetail oLogisticsDetail = oLogisticsDetailMapper.selectByPrimaryKey(oLogisticsDetailId);
         String orderId = planVo.getOrderId();//订单ID
         String proId = planVo.getProId();//收货单商品id
         OReceiptPro oReceiptPro  = oReceiptProMapper.selectByPrimaryKey(proId);
@@ -663,8 +665,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
-                detail.setVersion(Status.STATUS_1.status);
-                detail.setRecordStatus(Status.STATUS_1.status);
+                detail.setVersion(oLogisticsDetail.getVersion());
                 if (1 != oLogisticsDetailMapper.updateByPrimaryKeySelective(detail)) {
                     logger.info("修改失败");
                     throw new ProcessException("修改失败");
