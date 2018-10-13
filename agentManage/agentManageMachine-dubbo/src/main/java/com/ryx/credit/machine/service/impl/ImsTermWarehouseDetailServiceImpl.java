@@ -79,6 +79,7 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             imsTermWarehouseDetail.setStatus("0");  //正常
             imsTermWarehouseDetail.setCreateTime(createTime);
             imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
+            imsTermWarehouseDetail.setUpdateTime(createTime);
             imsTermWarehouseDetail.setPosType("0");  //pos类型 0普通级，1：特价机
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
 
@@ -94,6 +95,8 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             imsTermTransfer.setOrgId(ZHYY_ROOT_ORG_ID);
             imsTermTransfer.setCreateTime(createTime);
             imsTermTransfer.setCreatePerson(ZHYY_CREATE_PERSON);
+            imsTermTransfer.setUpdateTime(createTime);
+            imsTermTransfer.setUpdatePerson(ZHYY_CREATE_PERSON);
             imsTermTransfer.setTransferType("0");   //0:划拨
 
             int j = imsTermTransferMapper.insert(imsTermTransfer);
