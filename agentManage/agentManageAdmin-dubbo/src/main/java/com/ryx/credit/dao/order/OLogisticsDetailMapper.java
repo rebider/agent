@@ -32,5 +32,5 @@ public interface OLogisticsDetailMapper {
 
     int querySnCount(Map<String, Object> param);
 
-    Map  selectSn(@Param("terminalidType") String terminalidType, @Param("sn") String sn);
+    Map  selectSn(OLogisticsDetail oLogisticsDetail);
 }

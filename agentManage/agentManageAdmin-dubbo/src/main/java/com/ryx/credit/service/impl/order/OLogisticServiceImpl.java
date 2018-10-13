@@ -298,7 +298,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 //遍历查询库里是否存在sn码
                 if (proType.equals(PlatformType.MPOS.msg)){
                     for (String sn : stringList) {
-                        Map  map=oLogisticsDetailMapper.selectSn(PlatformType.MPOS.code,sn);
+                        OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
+                        oLogisticsDetail.setStatus(Status.STATUS_0.status);
+                        oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
+                        oLogisticsDetail.setSnNum(sn);
+                        oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
+                        Map  map=oLogisticsDetailMapper.selectSn(oLogisticsDetail);
                         if (map==null){
                             logger.info("此SN码不存在");
                             throw new MessageException("此SN码不存在");
@@ -483,8 +488,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setTerminalidKey(terminalid_key);
                 oLogisticsDetail.setTerminalidSeq(terminalid_seq);
                 oLogisticsDetail.setSnNum(sn_num);
-                oLogisticsDetail.setStatus(Status.STATUS_1.status);
-                oLogisticsDetail.setRecordStatus(Status.STATUS_0.status);
+                oLogisticsDetail.setStatus(Status.STATUS_0.status);
+                oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
                 oLogisticsDetail.setVersion(Status.STATUS_0.status);
                 oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
                 if ( oLogisticsDetailMapper.insertSelective(oLogisticsDetail)==0){
