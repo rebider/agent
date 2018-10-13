@@ -530,9 +530,13 @@ public class OrderServiceImpl implements OrderService {
                     }
                 } else {
                     oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+                    logger.info("下订单 商品必须选择 商品活动:{}", oSubOrder.getProId());
+                    throw new MessageException("下订单商品必须选择商品活动");
                 }
             } else {
                 oSubOrder.setProRelPrice(oSubOrder.getProPrice());
+                logger.info("下订单 商品必须选择 商品活动:{}", oSubOrder.getProId());
+                throw new MessageException("下订单商品必须选择商品活动");
             }
             //插入订单商品信息
             if (1 != oSubOrderMapper.insertSelective(oSubOrder)) {
@@ -2028,6 +2032,22 @@ public class OrderServiceImpl implements OrderService {
                     logger.error("更新收货单商品异常{}",order.getId());
                     throw new MessageException("更新收货单商品异常");
                 }
+            }
+
+            //根据订单审批成功检查业务状态 是否需要更新成从未激活更新成启用
+            Agent agent_check = agentMapper.selectByPrimaryKey(order.getAgentId());
+            AgentBusInfo ab_check = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+            //未激活业务
+            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().equals(Status.STATUS_2.status)){
+                ab_check.setBusStatus(Status.STATUS_1.status);
+                if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(ab_check)){
+                    logger.error("更新业务 未激活 到 启用 失败{}{}",order.getId(),ab_check.getId());
+                }
+            }
+            //未入网未激活状态下更新代理商状态
+            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().equals(AgentInStatus.NO_ACT.status)){
+                agent_check.setcIncomStatus(AgentInStatus.IN.status);
+                agentMapper.updateByPrimaryKeySelective(agent_check);
             }
 
         } else if (actname.equals("reject_end")) {

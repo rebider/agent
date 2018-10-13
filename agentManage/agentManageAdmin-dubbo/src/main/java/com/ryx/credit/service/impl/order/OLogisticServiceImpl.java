@@ -101,6 +101,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * 物流信息：
      * 1、导入物流信息
      * 2、调用明细接口
+     * 订单发货上传物流信息
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
