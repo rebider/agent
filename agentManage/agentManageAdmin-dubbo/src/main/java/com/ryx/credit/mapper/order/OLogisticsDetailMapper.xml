@@ -454,9 +454,9 @@
       and status = #{status}
   </select>
 
-  <select id="selectSn" resultType="map" parameterType="string">
+  <select id="selectSn" resultType="map" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
   select  ID,SN_NUM
-    from O_LOGISTICS_DETAIL where 1=1 and status=1 and TERMINALID_TYPE=#{terminalidType} and SN_NUM=#{sn}
+    from O_LOGISTICS_DETAIL where 1=1 and status=#{status} and RECORD_STATUS =#{recordStatus} and TERMINALID_TYPE=#{terminalidType} and SN_NUM=#{snNum}
   </select>
 
 </mapper>
