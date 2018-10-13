@@ -347,6 +347,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
                         //进行入库、机具划拨操作 POS下发业务系统
                         if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+
                             List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
                             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
                             OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
@@ -360,6 +361,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
                             imsTermWarehouseDetail.setMachineId(oSubOrderActivity.getBusProCode());
                             imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
+
                         //首刷洗发业务系统
                         }else if(proType.equals(PlatformType.MPOS.msg)){
 
@@ -373,7 +375,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             lowerHairMachineVo.setSnStart(oLogistics.getSnBeginNum());
                             lowerHairMachineVo.setSnEnd(oLogistics.getSnEndNum());
                             //sn明细
-                            List<MposSnVo> listSn = new ArrayList<>();
+                            List<MposSnVo> listSn = new ArrayList<MposSnVo>();
                             for (OLogisticsDetail forsendSn : forsendSns) {
                                 listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
                                         ,forsendSn.getSnNum()
@@ -382,6 +384,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                         ,forsendSn.getTermtype()));
                             }
                             lowerHairMachineVo.setListSn(listSn);
+
                             //机具下发接口
                             AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
                             logger.info("导入物流：洗发到首刷平台结果:{}",lowerHairMachineRes.getMsg());
