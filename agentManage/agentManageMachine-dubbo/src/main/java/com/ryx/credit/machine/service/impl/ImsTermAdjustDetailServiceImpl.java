@@ -77,6 +77,7 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
             imsTermAdjust.setId(adjustId);
             imsTermAdjust.setCreateTime(createTime);
             imsTermAdjust.setCreatePerson(ZHYY_CREATE_PERSON);
+            imsTermAdjust.setBatchNo(IDUtils.getBatchNo());
             int i = imsTermAdjustMapper.insert(imsTermAdjust);
             log.info("同步POS调整返回结果:{}",i);
             if(i!=1){
