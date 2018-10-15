@@ -3,9 +3,12 @@ package com.ryx.credit.profit.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class PAgentExitApplyfor implements Serializable{
+public class PAgentQuit implements Serializable{
     private static final long serialVersionUID = 3587825133059793912L;
+
     private String id;
+
+    private String agentId;
 
     private String applyPlat;
 
@@ -29,7 +32,11 @@ public class PAgentExitApplyfor implements Serializable{
 
     private String createDate;
 
+    private String applyUser;
+
     private String passDate;
+
+    private BigDecimal resultAmt;
 
     public String getId() {
         return id;
@@ -37,6 +44,14 @@ public class PAgentExitApplyfor implements Serializable{
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 
     public String getApplyPlat() {
@@ -127,11 +142,27 @@ public class PAgentExitApplyfor implements Serializable{
         this.createDate = createDate == null ? null : createDate.trim();
     }
 
+    public String getApplyUser() {
+        return applyUser;
+    }
+
+    public void setApplyUser(String applyUser) {
+        this.applyUser = applyUser;
+    }
+
     public String getPassDate() {
         return passDate;
     }
 
     public void setPassDate(String passDate) {
         this.passDate = passDate == null ? null : passDate.trim();
+    }
+
+    public BigDecimal getResultAmt() {
+        return resultAmt;
+    }
+
+    public void setResultAmt(BigDecimal resultAmt) {
+        this.resultAmt = resultAmt;
     }
 }

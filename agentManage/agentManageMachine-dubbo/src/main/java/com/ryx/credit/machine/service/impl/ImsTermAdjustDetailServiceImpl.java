@@ -1,6 +1,7 @@
 package com.ryx.credit.machine.service.impl;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.IDUtils;
@@ -13,6 +14,8 @@ import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 import com.ryx.credit.machine.service.ImsTermActiveService;
 import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.service.order.IOrderReturnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +50,13 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
     private ImsTermAdjustMapper imsTermAdjustMapper;
     @Autowired
     private ImsTermWarehouseDetailMapper imsTermWarehouseDetailMapper;
-
+    @Autowired
+    private IOrderReturnService orderReturnService;
 
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
-//    @Override
-    public void insertImsTermAdjustDetail(List<String> snList, ImsTermAdjustDetail imsTermAdjustDetail)throws MessageException {
+    @Override
+    public AgentResult insertImsTermAdjustDetail(List<String> snList, ImsTermAdjustDetail imsTermAdjustDetail)throws MessageException {
         if(null==snList){
             throw new MessageException("sn列表异常");
         }
@@ -82,6 +86,8 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
             imsTermAdjustDetail.setAdId(adjustId);
             imsTermAdjustDetail.setCreateTime(createTime);
             imsTermAdjustDetail.setCreatePerson(ZHYY_CREATE_PERSON);
+            AgentBusInfo agentBusInfo = orderReturnService.queryBusInfoBySn(sn);
+            imsTermAdjustDetail.setyOrgId(agentBusInfo.getBusNum());
             int j = imsTermAdjustDetailMapper.insert(imsTermAdjustDetail);
             log.info("同步POS调整返回结果:{}",j);
             if(j!=1){
@@ -96,5 +102,6 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
                 throw new MessageException("SN调整失败");
             }
         }
+        return AgentResult.ok();
     }
 }

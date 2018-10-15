@@ -56,6 +56,14 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+
+  <select id="selectBySubAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_AGENT_MERGE
+    WHERE SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} AND MERGE_STATUS = 3
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PAgentMergeExample">
     delete from P_AGENT_MERGE
     <if test="_parameter != null">

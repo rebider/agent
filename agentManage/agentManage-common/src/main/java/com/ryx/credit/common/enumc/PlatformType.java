@@ -1,6 +1,11 @@
 package com.ryx.credit.common.enumc;
 
 
+import sun.tools.jar.Main;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * pos/手刷 平台类型
  * @version V1.0
@@ -12,7 +17,8 @@ public enum PlatformType {
 
     POS("POS","POS"),
     ZPOS("ZPOS","ZPOS"),
-    MPOS("MPOS","手刷");
+    MPOS("MPOS","手刷"),
+    POSANDMPOS("POSANDMPOS","手刷+POS");
 
     public String code;
 
@@ -63,4 +69,16 @@ public enum PlatformType {
         }
         return null;
     }
+
+    public static Map<String,Object> getContentMap(){
+        Map<String,Object> resultMap = new HashMap<>();
+        PlatformType[] fundType = PlatformType.values();
+        for(PlatformType cc : fundType){
+            if(!cc.code.equals("ZPOS")){
+                resultMap.put(cc.code,cc.msg);
+            }
+        }
+        return resultMap;
+    }
+
 }

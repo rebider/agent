@@ -3,6 +3,7 @@ package com.ryx.credit.service.order;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
@@ -52,4 +53,7 @@ public interface IOrderReturnService {
 
 
     List<String> addList(List<List<Object>> data, String user) throws Exception;
+
+
+    AgentBusInfo queryBusInfoBySn(String sn);
 }
