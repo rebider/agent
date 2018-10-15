@@ -1,5 +1,12 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryx.credit.common.util.DateJsonDeserializer;
+import com.ryx.credit.common.util.DateJsonSerializer;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -46,6 +53,26 @@ public class OReturnOrder implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    @JSONField(
+            format = "yyyy-MM-dd"
+    )
+    @JsonFormat(
+            shape = JsonFormat.Shape.STRING,
+            pattern = "yyyy-MM-dd",
+            timezone = "GMT+8"
+    )
+    @JsonDeserialize(
+            using = DateJsonDeserializer.class
+    )
+    @JsonSerialize(
+            using = DateJsonSerializer.class
+    )
+    private Date refundtime;
+
+    private String refundpeople;
+
+    private String auditor;
 
     public String getId() {
         return id;
@@ -213,5 +240,29 @@ public class OReturnOrder implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public Date getRefundtime() {
+        return refundtime;
+    }
+
+    public void setRefundtime(Date refundtime) {
+        this.refundtime = refundtime;
+    }
+
+    public String getRefundpeople() {
+        return refundpeople;
+    }
+
+    public void setRefundpeople(String refundpeople) {
+        this.refundpeople = refundpeople == null ? null : refundpeople.trim();
+    }
+
+    public String getAuditor() {
+        return auditor;
+    }
+
+    public void setAuditor(String auditor) {
+        this.auditor = auditor == null ? null : auditor.trim();
     }
 }

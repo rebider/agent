@@ -546,6 +546,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             returnOrder.setCutAmo(BigDecimal.ZERO);
             returnOrder.setTakeOutAmo(BigDecimal.ZERO);
             returnOrder.setRelReturnAmo(BigDecimal.ZERO);
+            returnOrder.setVersion(Status.STATUS_1.status);
+            returnOrder.setStatus(Status.STATUS_1.status);
             returnOrderMapper.insertSelective(returnOrder);
         } catch (Exception e) {
             log.error("生成退货单失败", e);
@@ -776,6 +778,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
 
                 AgentResult agentResult = saveAttachments(agentVo, userId);
+                //退款日期   退款人   审核人的更新
+                agentVo.getoReturnOrder().setId(returnId);
+                agentVo.getoReturnOrder().setAuditor(userId);
+                returnOrderMapper.updateByPrimaryKeySelective(agentVo.getoReturnOrder());
+
+
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
                 }
