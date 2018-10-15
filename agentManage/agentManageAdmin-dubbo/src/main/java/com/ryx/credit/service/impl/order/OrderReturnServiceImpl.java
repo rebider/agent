@@ -121,6 +121,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private ImsTermAdjustDetailService imsTermAdjustDetailService;
     @Autowired
     private OSubOrderActivityMapper subOrderActivityMapper;
+    @Autowired
+    private OReceiptProMapper oReceiptProMapper;
+    @Autowired
+    private OSubOrderActivityMapper oSubOrderActivityMapper;
+
 
 
     /**
@@ -1250,7 +1255,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     }
                 }
                 // 调用明细接口 插入物流明细
-                ResultVO resultVO = oLogisticsService.insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
+                ResultVO resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
 
                 //插入成功更新排单信息
                 if (resultVO.isSuccess()) {
@@ -1288,7 +1293,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
                         //进行机具调整操作
                         if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
-                            List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
+                            List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                             OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                             if(null==oOrder){
                                 throw new MessageException("查询订单数据失败！");
@@ -1376,21 +1381,106 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     /**
      * 根据SN查询业务信息
-     * @param sn
+     * @param oLogisticsDetail
      * @return
      */
     @Override
-    public AgentBusInfo queryBusInfoBySn(String sn){
+    public AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail){
 
-        OLogisticsDetail oLogisticsDetail = oLogisticsDetailService.queryBySn(sn);
-        if(null==oLogisticsDetail){
-            return null;
-        }
         OOrder oOrder = oOrderMapper.selectByPrimaryKey(oLogisticsDetail.getOrderId());
         if(null==oOrder){
             return null;
         }
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
         return agentBusInfo;
+    }
+
+    /**
+     * 插入物流明细
+     */
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish, String logisticsId, String cUser, String planId) throws MessageException {
+        ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(planId);
+        String orderId = planVo.getOrderId();//订单ID
+        String proId = planVo.getProId();//收货单商品id
+        OReceiptPro oReceiptPro  = oReceiptProMapper.selectByPrimaryKey(proId);
+        OSubOrderExample example = new OSubOrderExample();
+        example.or().andOrderIdEqualTo(orderId).andProIdEqualTo(oReceiptPro.getProId()).andStatusEqualTo(Status.STATUS_1.status);
+        List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(example);
+        if(oSubOrders.size()==0){
+            throw new MessageException("商品价格未能锁定");
+        }
+        OSubOrder oSubOrder = oSubOrders.get(0);
+        OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+        oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andProIdEqualTo(oSubOrder.getProId()).andStatusEqualTo(Status.STATUS_1.status);
+        List<OSubOrderActivity>  OSubOrderActivitylist = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+        OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
+        //1.起始SN序列号  2.结束SN序列号  3.开始截取的位数   4.结束截取的位数
+        if (StringUtils.isBlank(startSn)) {
+            log.info("起始SN序列号为空{}:", startSn);
+            throw new ProcessException("起始SN序列号为空");
+        }
+        if (StringUtils.isBlank(endSn)) {
+            log.info("结束SN序列号为空{}:", endSn);
+            throw new ProcessException("结束SN序列号为空");
+        }
+        if (null == begins) {
+            log.info("开始截取的位数为空{}:", begins);
+            throw new ProcessException("开始截取的位数为空");
+        }
+        if (null == finish) {
+            log.info("结束截取的位数为空{}:", finish);
+            throw new ProcessException("结束截取的位数为空");
+        }
+        List<String> idList = new OLogisticServiceImpl().idList(startSn, endSn, begins, finish);
+        List<OLogisticsDetail> detailList = new ArrayList<>();
+        if (null != idList && idList.size() > 0) {
+            for (String idSn : idList) {
+                OLogisticsDetail detail = new OLogisticsDetail();
+                //id，物流id，创建人，更新人，状态
+                detail.setId(idService.genId(TabId.o_logistics_detail));
+                detail.setOrderId(oSubOrder.getOrderId());
+                detail.setOrderNum(order.getoNum());
+                detail.setLogisticsId(logisticsId);
+                detail.setProId(oSubOrder.getProId());
+                detail.setProName(oSubOrder.getProName());
+                detail.setSettlementPrice(oSubOrder.getProRelPrice());
+                if(OSubOrderActivitylist.size()>0){
+                    OSubOrderActivity oSubOrderActivity = OSubOrderActivitylist.get(0);
+                    detail.setActivityId(oSubOrderActivity.getActivityId());
+                    detail.setActivityName(oSubOrderActivity.getActivityName());
+                    detail.setgTime(oSubOrderActivity.getgTime());
+                    detail.setBusProCode(oSubOrderActivity.getBusProCode());
+                    detail.setBusProName(oSubOrderActivity.getBusProName());
+                    detail.setTermBatchcode(oSubOrderActivity.getTermBatchcode());
+                    detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
+                    detail.setTermtype(oSubOrderActivity.getTermtype());
+                    detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                }
+                detail.setSnNum(idSn);
+                detail.setAgentId(order.getAgentId());
+                detail.setcUser(cUser);
+                detail.setuUser(cUser);
+                detail.setcTime(Calendar.getInstance().getTime());
+                detail.setuTime(Calendar.getInstance().getTime());
+                detail.setOptType(OLogisticsDetailOptType.ORDER.code);
+                detail.setOptId(orderId);
+                if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                    detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+                }else{
+                    detail.setReturnOrderId(planVo.getReturnOrderDetailId());
+                    detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                    detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                }
+                detail.setVersion(Status.STATUS_1.status);
+                if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
+                    log.info("添加失败");
+                    throw new ProcessException("添加失败");
+                }
+                detailList.add(detail);
+            }
+        }
+        return ResultVO.success(detailList);
     }
 }

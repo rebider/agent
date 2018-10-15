@@ -45,11 +45,28 @@ public class IDUtils {
 		return id;
 	}
 
+	public static long genTimeMillisId() {
+		//取当前时间的长整形值包含毫秒
+		long millis = System.currentTimeMillis();
+		return millis;
+	}
 
+	/**
+	 * 综合运营平台id
+	 * @return
+	 */
 	public static String genImsTermId() {
 		String format = DateUtil.format(new Date(), DateUtil.DATE_FORMAT_4);
 		String id = format + genImageName();
 		return id;
+	}
+
+	/**
+	 * 批次号
+	 * @return
+	 */
+	public static String getBatchNo(){
+		return "TD"+genTimeMillisId();
 	}
 
 }
