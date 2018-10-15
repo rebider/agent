@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://code.alibabatech.com/schema/dubbo
+       http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <!-- 提供方应用信息，用于计算依赖关系 -->
+    <dubbo:application name="pms-dubbo-server"/>
+    <dubbo:provider id="payload" payload="888888888"/>
+
+    <dubbo:registry protocol="zookeeper" address="${zk.server}" group="${zk.group}" id="myGroup"/>
+    <!-- 用dubbo协议在22880端口暴露服务 -->
+    <dubbo:protocol name="dubbo" port="${zk.port}"/>
+    <dubbo:annotation package="com.ryx.credit.machine.service.*" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermMachineService" ref="imsTermMachineService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.TermMachineService" ref="termMachineService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermActiveService" ref="imsTermActiveService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermAdjustDetailService" ref="imsTermAdjustDetailService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermAdjustService" ref="imsTermAdjustService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermTransferDetailService" ref="imsTermTransferDetailService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermTransferService" ref="imsTermTransferService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.machine.service.ImsTermWarehouseDetailService" ref="imsTermWarehouseDetailService"  timeout="1200000" registry="${zk.group}" />
+
+
+
+    <dubbo:reference interface="com.ryx.credit.service.order.IOrderReturnService" id="orderReturnService"  timeout="1200000" registry="${zk.group}"/>
+
+</beans>

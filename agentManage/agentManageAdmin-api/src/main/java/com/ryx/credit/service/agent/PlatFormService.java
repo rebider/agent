@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 
@@ -21,4 +22,5 @@ public interface PlatFormService {
     int updateByPrimaryKey(PlatForm record);
 
     PlatForm selectByPlatformNum(String platformNum);
+    public PlatformType byPlatformCode(String platformCode);
 }

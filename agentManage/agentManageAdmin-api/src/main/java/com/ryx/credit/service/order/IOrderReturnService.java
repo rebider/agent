@@ -3,10 +3,12 @@ package com.ryx.credit.service.order;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,4 +50,10 @@ public interface IOrderReturnService {
      * @return
      */
     PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo);
+
+
+    List<String> addList(List<List<Object>> data, String user) throws Exception;
+
+
+    AgentBusInfo queryBusInfoBySn(String sn);
 }

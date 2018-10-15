@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsTermActiveMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsTermActive">
+    <id column="POS_SN" jdbcType="VARCHAR" property="posSn" />
+    <result column="MER_ID" jdbcType="VARCHAR" property="merId" />
+    <result column="TERM_ID" jdbcType="VARCHAR" property="termId" />
+    <result column="MACHINE_ID" jdbcType="VARCHAR" property="machineId" />
+    <result column="ACTIVE_TIME" jdbcType="VARCHAR" property="activeTime" />
+    <result column="AMT" jdbcType="DECIMAL" property="amt" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="AMT_TIME" jdbcType="VARCHAR" property="amtTime" />
+    <result column="INSERT_TIME" jdbcType="VARCHAR" property="insertTime" />
+    <result column="SERIAL_NO" jdbcType="VARCHAR" property="serialNo" />
+    <result column="CK_STATUS" jdbcType="VARCHAR" property="ckStatus" />
+    <result column="CK_RESULT" jdbcType="VARCHAR" property="ckResult" />
+    <result column="PAYMENT_CARD" jdbcType="VARCHAR" property="paymentCard" />
+    <result column="PAYMENT_OPEN_BANK" jdbcType="VARCHAR" property="paymentOpenBank" />
+    <result column="PAYMENT_TIME" jdbcType="VARCHAR" property="paymentTime" />
+    <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
+    <result column="STAND_AMT" jdbcType="DECIMAL" property="standAmt" />
+    <result column="BACK_TYPE" jdbcType="VARCHAR" property="backType" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    POS_SN, MER_ID, TERM_ID, MACHINE_ID, ACTIVE_TIME, AMT, UPDATE_TIME, STATUS, AMT_TIME, 
+    INSERT_TIME, SERIAL_NO, CK_STATUS, CK_RESULT, PAYMENT_CARD, PAYMENT_OPEN_BANK, PAYMENT_TIME, 
+    POS_SPE_PRICE, STAND_AMT, BACK_TYPE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermActiveExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_TERM_ACTIVE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_TERM_ACTIVE
+    where POS_SN = #{posSn,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsTermActiveExample">
+    delete from IMS_TERM_ACTIVE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsTermActive">
+    insert into IMS_TERM_ACTIVE (POS_SN, MER_ID, TERM_ID, 
+      MACHINE_ID, ACTIVE_TIME, AMT, 
+      UPDATE_TIME, STATUS, AMT_TIME, 
+      INSERT_TIME, SERIAL_NO, CK_STATUS, 
+      CK_RESULT, PAYMENT_CARD, PAYMENT_OPEN_BANK, 
+      PAYMENT_TIME, POS_SPE_PRICE, STAND_AMT, 
+      BACK_TYPE)
+    values (#{posSn,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{termId,jdbcType=VARCHAR}, 
+      #{machineId,jdbcType=VARCHAR}, #{activeTime,jdbcType=VARCHAR}, #{amt,jdbcType=DECIMAL}, 
+      #{updateTime,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{amtTime,jdbcType=VARCHAR}, 
+      #{insertTime,jdbcType=VARCHAR}, #{serialNo,jdbcType=VARCHAR}, #{ckStatus,jdbcType=VARCHAR}, 
+      #{ckResult,jdbcType=VARCHAR}, #{paymentCard,jdbcType=VARCHAR}, #{paymentOpenBank,jdbcType=VARCHAR}, 
+      #{paymentTime,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, #{standAmt,jdbcType=DECIMAL}, 
+      #{backType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermActive">
+    insert into IMS_TERM_ACTIVE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="posSn != null">
+        POS_SN,
+      </if>
+      <if test="merId != null">
+        MER_ID,
+      </if>
+      <if test="termId != null">
+        TERM_ID,
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID,
+      </if>
+      <if test="activeTime != null">
+        ACTIVE_TIME,
+      </if>
+      <if test="amt != null">
+        AMT,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="amtTime != null">
+        AMT_TIME,
+      </if>
+      <if test="insertTime != null">
+        INSERT_TIME,
+      </if>
+      <if test="serialNo != null">
+        SERIAL_NO,
+      </if>
+      <if test="ckStatus != null">
+        CK_STATUS,
+      </if>
+      <if test="ckResult != null">
+        CK_RESULT,
+      </if>
+      <if test="paymentCard != null">
+        PAYMENT_CARD,
+      </if>
+      <if test="paymentOpenBank != null">
+        PAYMENT_OPEN_BANK,
+      </if>
+      <if test="paymentTime != null">
+        PAYMENT_TIME,
+      </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE,
+      </if>
+      <if test="standAmt != null">
+        STAND_AMT,
+      </if>
+      <if test="backType != null">
+        BACK_TYPE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="posSn != null">
+        #{posSn,jdbcType=VARCHAR},
+      </if>
+      <if test="merId != null">
+        #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="termId != null">
+        #{termId,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="activeTime != null">
+        #{activeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="amt != null">
+        #{amt,jdbcType=DECIMAL},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="amtTime != null">
+        #{amtTime,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        #{insertTime,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNo != null">
+        #{serialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="ckStatus != null">
+        #{ckStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="ckResult != null">
+        #{ckResult,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentCard != null">
+        #{paymentCard,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentOpenBank != null">
+        #{paymentOpenBank,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentTime != null">
+        #{paymentTime,jdbcType=VARCHAR},
+      </if>
+      <if test="posSpePrice != null">
+        #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="standAmt != null">
+        #{standAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="backType != null">
+        #{backType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsTermActiveExample" resultType="java.lang.Long">
+    select count(*) from IMS_TERM_ACTIVE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.ImsTermActive">
+    update IMS_TERM_ACTIVE
+    <set>
+      <if test="merId != null">
+        MER_ID = #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="termId != null">
+        TERM_ID = #{termId,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID = #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="activeTime != null">
+        ACTIVE_TIME = #{activeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="amt != null">
+        AMT = #{amt,jdbcType=DECIMAL},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="amtTime != null">
+        AMT_TIME = #{amtTime,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null">
+        INSERT_TIME = #{insertTime,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNo != null">
+        SERIAL_NO = #{serialNo,jdbcType=VARCHAR},
+      </if>
+      <if test="ckStatus != null">
+        CK_STATUS = #{ckStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="ckResult != null">
+        CK_RESULT = #{ckResult,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentCard != null">
+        PAYMENT_CARD = #{paymentCard,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentOpenBank != null">
+        PAYMENT_OPEN_BANK = #{paymentOpenBank,jdbcType=VARCHAR},
+      </if>
+      <if test="paymentTime != null">
+        PAYMENT_TIME = #{paymentTime,jdbcType=VARCHAR},
+      </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="standAmt != null">
+        STAND_AMT = #{standAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="backType != null">
+        BACK_TYPE = #{backType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where POS_SN = #{posSn,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.ImsTermActive">
+    update IMS_TERM_ACTIVE
+    set MER_ID = #{merId,jdbcType=VARCHAR},
+      TERM_ID = #{termId,jdbcType=VARCHAR},
+      MACHINE_ID = #{machineId,jdbcType=VARCHAR},
+      ACTIVE_TIME = #{activeTime,jdbcType=VARCHAR},
+      AMT = #{amt,jdbcType=DECIMAL},
+      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      AMT_TIME = #{amtTime,jdbcType=VARCHAR},
+      INSERT_TIME = #{insertTime,jdbcType=VARCHAR},
+      SERIAL_NO = #{serialNo,jdbcType=VARCHAR},
+      CK_STATUS = #{ckStatus,jdbcType=VARCHAR},
+      CK_RESULT = #{ckResult,jdbcType=VARCHAR},
+      PAYMENT_CARD = #{paymentCard,jdbcType=VARCHAR},
+      PAYMENT_OPEN_BANK = #{paymentOpenBank,jdbcType=VARCHAR},
+      PAYMENT_TIME = #{paymentTime,jdbcType=VARCHAR},
+      POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      STAND_AMT = #{standAmt,jdbcType=DECIMAL},
+      BACK_TYPE = #{backType,jdbcType=VARCHAR}
+    where POS_SN = #{posSn,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

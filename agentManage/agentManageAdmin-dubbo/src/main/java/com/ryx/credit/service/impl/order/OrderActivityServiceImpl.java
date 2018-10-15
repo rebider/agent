@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
@@ -8,8 +9,13 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.OActivityMapper;
 import com.ryx.credit.dao.order.OProductMapper;
+import com.ryx.credit.machine.service.TermMachineService;
+import com.ryx.credit.machine.vo.MposTermBatchVo;
+import com.ryx.credit.machine.vo.MposTermTypeVo;
+import com.ryx.credit.machine.vo.TermMachineVo;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
 import com.ryx.credit.pojo.admin.order.OProduct;
@@ -24,9 +30,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -42,6 +46,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private OProductMapper oProductMapper;
     @Autowired
     private ProfitMonthService profitMonthService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
+    @Autowired
+    private TermMachineService termMachineService;
 
     @Override
     public PageInfo activityList(OActivity activity, Page page) {
@@ -100,6 +108,17 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         }
         if (StringUtils.isBlank(activity.getId())) {
             return result;
+        }
+        String platFormType= platFormMapper.selectPlatType(activity.getPlatform());
+
+        if (StringUtils.isNotBlank(platFormType)){
+            if (platFormType.equals(PlatformType.POS.code) || platFormType.equals(PlatformType.ZPOS.code)){
+                //如果是POS或者是智能POS  则需要清除终端批次和终端类型的id name
+                activity.setTermBatchcode(" ");
+                activity.setTermBatchname(" ");
+                activity.setTermtype(" ");
+                activity.setTermtypename(" ");
+            }
         }
         activity.setuTime(new Date());
         int update = activityMapper.updateByPrimaryKeySelective(activity);
@@ -177,5 +196,32 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 //            }
 //        }
         return activitys;
+    }
+
+    @Override
+    public Map selectTermMachine(String platformNum) {
+     String platFormType= platFormMapper.selectPlatType(platformNum);
+     List termMachineVos = null;
+     List mposTermBatchVos=null;
+        List mposTermTypeVos=null;
+        HashMap<Object, Object> map = new HashMap<>();
+        if (StringUtils.isNotBlank(platFormType)){
+             try {
+                 termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+
+                 mposTermBatchVos= termMachineService.queryMposTermBatch(PlatformType.getContentEnum(platFormType));
+
+                 mposTermTypeVos = termMachineService.queryMposTermType(PlatformType.getContentEnum(platFormType));
+                 map.put("termMachineList",termMachineVos);
+                 map.put("mposTermBatchList",mposTermBatchVos);
+                 map.put("mposTermTypeList",mposTermTypeVos);
+             } catch (Exception e) {
+                 e.printStackTrace();
+             }
+
+
+     }
+
+        return map;
     }
 }

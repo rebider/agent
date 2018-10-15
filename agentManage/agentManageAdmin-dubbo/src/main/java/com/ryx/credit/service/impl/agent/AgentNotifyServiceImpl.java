@@ -709,16 +709,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
         if(czResult==1 && null!=result && !"".equals(result) && result.isOK()){
             log.info("入网开户修改操作: 接收入网更新入网状态开始,业务id：{},返回结果:{}",busId);
-            //更新入网状态
-            Agent updateAgent = new Agent();
-            updateAgent.setId(agent.getId());
-            updateAgent.setVersion(agent.getVersion());
-            updateAgent.setcIncomStatus(AgentInStatus.IN.status);
-            Date nowDate = new Date();
-            updateAgent.setcIncomTime(nowDate);
-            updateAgent.setcUtime(nowDate);
-            int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
-            log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
+
+
             //更新业务编号
             AgentBusInfo updateBusInfo = new AgentBusInfo();
             JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
@@ -730,9 +722,53 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
             }
-            updateBusInfo.setBusStatus(Status.STATUS_1.status);
+
+
+            //代理商修改也会走这里
+            // cxinfo  如果有已有效的业务信息就为已入网，否则为已入网未激活 业务平台状态：1启用和0注销2开户未激活，注销是指代理商解除某项业务平台合作。
+            if(updateBusInfo.getBusStatus()==null || !updateBusInfo.getBusStatus().equals(Status.STATUS_1.status)){
+                PlatFormExample example  = new PlatFormExample();
+                example.or().andPlatformNumEqualTo(agentBusInfo.getBusPlatform()).andStatusEqualTo(Status.STATUS_1.status);
+                List<PlatForm>  platForms = platFormMapper.selectByExample(example);
+                if(platForms.size()==1){
+                    PlatForm p = platForms.get(0);
+                    //首刷初始状态为开户未激活s
+                    if(PlatformType.MPOS.code.equals(p.getPlatformType()+"")){
+                        updateBusInfo.setBusStatus(Status.STATUS_2.status);
+                    }else{
+                        updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                    }
+                }else{
+                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                }
+            }else{
+                updateBusInfo.setBusStatus(Status.STATUS_1.status);
+            }
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
+
+
+
+
+            //更新入网状态
+            // cxinfo   如果有已有效的业务信息就为已入网，否则为已入网未激活 0未入网，1已入网，2已入网未激活
+            Agent updateAgent = new Agent();
+            updateAgent.setId(agent.getId());
+            updateAgent.setVersion(agent.getVersion());
+            //检查是否可以更新为入网状态
+            if(agentService.checkAgentIsIn(agent.getId()).isOK()){
+                updateAgent.setcIncomStatus(AgentInStatus.IN.status);//已入网
+            }else{
+                updateAgent.setcIncomStatus(AgentInStatus.NO_ACT.status);//入网未激活
+            }
+            Date nowDate = new Date();
+            updateAgent.setcIncomTime(nowDate);
+            updateAgent.setcUtime(nowDate);
+            int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
+            log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
+
+
+            //更新任务记录
             if(upResult1!=1 || upResult2!=1){
                 if(impId!=null) {
                     updateImportAgent(impId, Status.STATUS_3.status, "更新异常");

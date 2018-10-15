@@ -6,6 +6,7 @@ import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.ColinfoPayStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TransFlag;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
@@ -40,6 +41,14 @@ public class ColinfoTask {
 
     private static final  String COLINFO_URL =  AppConfig.getProperty("colinfo_out_money");
 
+    private static final String INSERT_SYS_KEY = "synColinfoToPayment_lock";
+
+    private static final String QUERY_SYS_KEY = "synColinfoToQueryPayment_lock";
+
+    private static final long TIME_OUT = 60000*5;      //锁的超时时间
+
+    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
+
     @Autowired
     private AgentColinfoMapper agentColinfoMapper;
     @Autowired
@@ -48,29 +57,35 @@ public class ColinfoTask {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private AgentColinfoService agentColinfoService;
-
+    @Autowired
+    private RedisService redisService;
     /**
      * 9:00 - 21:30
      */
 //    @Scheduled(cron = "0/30 * * * * ?")
-//    @Scheduled(cron = "0 30 13 * * ?")
     @Scheduled(cron = "0 0/30 9-21 * * ? ")
     public void synColinfoToPayment() {
         log.info("synColinfoToPayment定时任务启动:{}",new Date());
-        Map<String,Object> params = new HashMap<>();
-        params.put("payStatus", ColinfoPayStatus.A.getValue());
-        params.put("agStatus",AgStatus.Approved.name());
-        List<Map<String, Object>> synList = agentColinfoMapper.synConinfo(params);
-        if(null==synList){
-            log.info("synColinfoToPayment,synList is null");
-            return;
-        }
-        if(synList.size()==0){
-            log.info("synColinfoToPayment,synList为空暂不同步size：0");
-            return;
-        }
+        String indentifier = null;
         String merchId = "";
         try {
+            indentifier = redisService.lockWithTimeout(INSERT_SYS_KEY,ACQUIRE_TIME_OUT,TIME_OUT);
+            if(StringUtils.isBlank(indentifier)){
+                log.info("synColinfoToPayment,lock锁定中");
+                return;
+            }
+            Map<String,Object> params = new HashMap<>();
+            params.put("payStatus", ColinfoPayStatus.A.getValue());
+            params.put("agStatus",AgStatus.Approved.name());
+            List<Map<String, Object>> synList = agentColinfoMapper.synConinfo(params);
+            if(null==synList){
+                log.info("synColinfoToPayment,synList is null");
+                return;
+            }
+            if(synList.size()==0){
+                log.info("synColinfoToPayment,synList为空暂不同步size：0");
+                return;
+            }
             for (Map<String, Object> row : synList) {
                 AColinfoPayment payment = new AColinfoPayment();
                 Date nowDate = new Date();
@@ -107,6 +122,10 @@ public class ColinfoTask {
         } catch (Exception e) {
             log.info("synColinfoToPayment同步出现异常:{},代理商ID:{}",e.getMessage(),merchId);
             e.printStackTrace();
+        } finally {
+            if(StringUtils.isNotBlank(indentifier)){
+                redisService.releaseLock(INSERT_SYS_KEY, indentifier);
+            }
         }
     }
 
@@ -137,8 +156,14 @@ public class ColinfoTask {
 //  @Scheduled(cron = "0/30 * * * * ?")
     @Scheduled(cron = "0 0/30 * * * ?")
     public void synColinfoToQueryPayment() {
+        String indentifier = null;
         try {
             log.info("synColinfoToQueryPayment定时查询启动:{}",new Date());
+            indentifier = redisService.lockWithTimeout(QUERY_SYS_KEY,ACQUIRE_TIME_OUT,TIME_OUT);
+            if(StringUtils.isBlank(indentifier)){
+                log.info("synColinfoToQueryPayment,lock锁定中");
+                return;
+            }
             AColinfoPaymentExample aColinfoPaymentExample = new AColinfoPaymentExample();
             AColinfoPaymentExample.Criteria criteria = aColinfoPaymentExample.createCriteria();
             criteria.andFlagEqualTo(TransFlag.A.getValue());
@@ -176,6 +201,10 @@ public class ColinfoTask {
         } catch (Exception e) {
             log.info("synColinfoToQueryPayment处理异常:{}",e.getMessage());
             e.printStackTrace();
+        }finally {
+            if(StringUtils.isNotBlank(indentifier)){
+                redisService.releaseLock(INSERT_SYS_KEY, indentifier);
+            }
         }
     }
 
