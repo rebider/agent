@@ -27,7 +27,9 @@ public interface PAgentQuitMapper {
 
     Long getAgentQuitCount(Map<String, Object> param);
 
-    PAgentQuit getAgentQuitById(String id);
+    PAgentQuit getBusIdByAgentId(String agentId);
+
+//    PAgentQuit getAgUniqNumAndId(String agUniqNum);
 
     List<Map<String,Object>> queryBusPlat(Map<String, Object> param);
 

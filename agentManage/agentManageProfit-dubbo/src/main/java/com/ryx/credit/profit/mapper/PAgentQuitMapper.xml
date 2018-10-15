@@ -286,7 +286,7 @@
 
   <select id="getAgentQuitList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    SELECT P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS,
+    SELECT P.ID, P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS,
     A.AG_UNIQ_NUM, A.AG_NAME, A.AG_HEAD, A.AG_HEAD_MOBILE,
     A.AG_REMARK, A.AG_DOC_DISTRICT, A.AG_DOC_PRO
     FROM P_AGENT_QUIT P
@@ -297,7 +297,7 @@
     <include refid="PAGING_END" />
   </select>
 
-  <select id="getAgentExitApplyforCount" parameterType="java.util.Map" resultType="java.lang.Long">
+  <select id="getAgentQuitCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM P_AGENT_QUIT P
     LEFT JOIN A_AGENT A ON P.AGENT_ID = A.ID
@@ -308,6 +308,8 @@
   <sql id="BASE_WHERE_SQL">
     <where>
       1=1
+      <if test="ID != null and ID !='' "> and P.ID = #{ID} </if>
+      <if test="AGENT_ID != null and AGENT_ID !='' "> and P.AGENT_ID = #{AGENT_ID} </if>
       <if test="CREATE_DATE != null and CREATE_DATE !='' "> and P.CREATE_DATE = #{CREATE_DATE} </if>
       <if test="PASS_DATE != null and PASS_DATE != '' "> and P.PASS_DATE = #{PASS_DATE} </if>
       <if test="FLOW_STATUS != null and FLOW_STATUS != '' "> and P.FLOW_STATUS = #{FLOW_STATUS} </if>
@@ -337,16 +339,23 @@
     </if>
   </sql>
 
-  <select id="getAgentExitApplyforById" parameterType="java.lang.String" resultType="java.lang.String">
-    SELECT
-    P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS, A.AG_UNIQ_NUM, A.AG_NAME,
-    A.AG_HEAD, A.AG_HEAD_MOBILE, A.AG_REMARK, A.AG_DOC_DISTRICT, A.AG_DOC_PRO
-    FROM P_AGENT_QUIT p
-    LEFT JOIN A_AGENT A ON P.AGENT_ID = A.ID
-    LEFT JOIN A_CAPITAL C ON p.KETUBBAH_ID = C.ID
-    <include refid="BASE_WHERE_SQL"></include>
-    WHERE A.AG_UNIQ_NUM = #{AG_UNIQ_NUM}
+  <select id="getBusIdByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_AGENT_QUIT
+    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
+
+  <!--<select id="getAgUniqNumAndId" parameterType="java.lang.String" resultType="java.lang.String">-->
+    <!--SELECT-->
+    <!--P.ID, P.AGENT_ID, P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS, A.AG_UNIQ_NUM, A.AG_NAME,-->
+    <!--A.AG_HEAD, A.AG_HEAD_MOBILE, A.AG_REMARK, A.AG_DOC_DISTRICT, A.AG_DOC_PRO-->
+    <!--FROM P_AGENT_QUIT P-->
+    <!--LEFT JOIN A_AGENT A ON P.AGENT_ID = A.ID-->
+    <!--LEFT JOIN A_CAPITAL C ON p.KETUBBAH_ID = C.ID-->
+    <!--<include refid="BASE_WHERE_SQL"></include>-->
+    <!--WHERE P.AG_UNIQ_NUM = #{AG_UNIQ_NUM,jdbcType=VARCHAR}-->
+  <!--</select>-->
 
   <select id="queryBusPlat" parameterType="string" resultType="map">
     select
