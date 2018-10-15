@@ -16,4 +16,11 @@ public interface PAgentMergeMapper {
     List<PAgentMerge> selectByExample(PAgentMergeExample example);
 
     PAgentMerge selectBySubAgentId(String subAgentId);
+
+    /**
+     * 根据subAgentId查询是否存在与本代理商合并的主代理商或副代理商
+     * @param subAgentId
+     * @return
+     */
+    List<PAgentMerge> selectByAgentId(String subAgentId);
 }
