@@ -406,7 +406,7 @@
     to_char(odetail.return_time,'YYYY-MM-DD') as returntime,
     to_char(ro.refundtime,'YYYY-MM-DD') as refundtime,
     ro.refundpeople,ro.auditor,
-    c.PLATFORM_NAME ,
+    c.PLATFORM_NAME ,ro.ret_schedule,
     ro.id ,odetail.return_count , odetail.return_count * odetail.return_price as return_price,
     odetail.begin_sn  ,odetail.end_sn ,
     agent.AG_UNIQ_NUM ,agent.AG_NAME ,os.pro_type,
