@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1474,6 +1475,206 @@ public class OReturnOrderExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeIsNull() {
+            addCriterion("REFUNDTIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeIsNotNull() {
+            addCriterion("REFUNDTIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeEqualTo(Date value) {
+            addCriterion("REFUNDTIME =", value, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeNotEqualTo(Date value) {
+            addCriterion("REFUNDTIME <>", value, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeGreaterThan(Date value) {
+            addCriterion("REFUNDTIME >", value, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("REFUNDTIME >=", value, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeLessThan(Date value) {
+            addCriterion("REFUNDTIME <", value, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeLessThanOrEqualTo(Date value) {
+            addCriterion("REFUNDTIME <=", value, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeIn(List<Date> values) {
+            addCriterion("REFUNDTIME in", values, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeNotIn(List<Date> values) {
+            addCriterion("REFUNDTIME not in", values, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeBetween(Date value1, Date value2) {
+            addCriterion("REFUNDTIME between", value1, value2, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundtimeNotBetween(Date value1, Date value2) {
+            addCriterion("REFUNDTIME not between", value1, value2, "refundtime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleIsNull() {
+            addCriterion("REFUNDPEOPLE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleIsNotNull() {
+            addCriterion("REFUNDPEOPLE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleEqualTo(String value) {
+            addCriterion("REFUNDPEOPLE =", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleNotEqualTo(String value) {
+            addCriterion("REFUNDPEOPLE <>", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleGreaterThan(String value) {
+            addCriterion("REFUNDPEOPLE >", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleGreaterThanOrEqualTo(String value) {
+            addCriterion("REFUNDPEOPLE >=", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleLessThan(String value) {
+            addCriterion("REFUNDPEOPLE <", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleLessThanOrEqualTo(String value) {
+            addCriterion("REFUNDPEOPLE <=", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleLike(String value) {
+            addCriterion("REFUNDPEOPLE like", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleNotLike(String value) {
+            addCriterion("REFUNDPEOPLE not like", value, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleIn(List<String> values) {
+            addCriterion("REFUNDPEOPLE in", values, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleNotIn(List<String> values) {
+            addCriterion("REFUNDPEOPLE not in", values, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleBetween(String value1, String value2) {
+            addCriterion("REFUNDPEOPLE between", value1, value2, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefundpeopleNotBetween(String value1, String value2) {
+            addCriterion("REFUNDPEOPLE not between", value1, value2, "refundpeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorIsNull() {
+            addCriterion("AUDITOR is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorIsNotNull() {
+            addCriterion("AUDITOR is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorEqualTo(String value) {
+            addCriterion("AUDITOR =", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorNotEqualTo(String value) {
+            addCriterion("AUDITOR <>", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorGreaterThan(String value) {
+            addCriterion("AUDITOR >", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorGreaterThanOrEqualTo(String value) {
+            addCriterion("AUDITOR >=", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorLessThan(String value) {
+            addCriterion("AUDITOR <", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorLessThanOrEqualTo(String value) {
+            addCriterion("AUDITOR <=", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorLike(String value) {
+            addCriterion("AUDITOR like", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorNotLike(String value) {
+            addCriterion("AUDITOR not like", value, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorIn(List<String> values) {
+            addCriterion("AUDITOR in", values, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorNotIn(List<String> values) {
+            addCriterion("AUDITOR not in", values, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorBetween(String value1, String value2) {
+            addCriterion("AUDITOR between", value1, value2, "auditor");
+            return (Criteria) this;
+        }
+
+        public Criteria andAuditorNotBetween(String value1, String value2) {
+            addCriterion("AUDITOR not between", value1, value2, "auditor");
             return (Criteria) this;
         }
     }
