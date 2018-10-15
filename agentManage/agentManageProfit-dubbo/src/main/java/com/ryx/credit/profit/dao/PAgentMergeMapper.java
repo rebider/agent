@@ -14,4 +14,6 @@ public interface PAgentMergeMapper {
     int insertSelective(PAgentMerge record);
 
     List<PAgentMerge> selectByExample(PAgentMergeExample example);
+
+    PAgentMerge selectBySubAgentId(String subAgentId);
 }
