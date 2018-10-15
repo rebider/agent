@@ -51,10 +51,10 @@ public interface TermMachineService {
 
     /**
      * 机具的调整
-     * @param adjustmentMachineVo
+     * @param adjustmentMachineVoList
      * @return
      */
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo)throws Exception;
+    public AgentResult adjustmentMachine(List<AdjustmentMachineVo> adjustmentMachineVoList )throws Exception;
 
 
     /**

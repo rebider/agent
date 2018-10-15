@@ -27,6 +27,7 @@ public class AgentNotifyVo {
     private String[] busiAreas;
     private String hasS0;
     private String busiType;
+    private String loginName;
 
     public String getUniqueId() {
         return uniqueId;
@@ -154,5 +155,13 @@ public class AgentNotifyVo {
 
     public void setBusiType(String busiType) {
         this.busiType = busiType;
+    }
+
+    public String getLoginName() {
+        return loginName;
+    }
+
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 }

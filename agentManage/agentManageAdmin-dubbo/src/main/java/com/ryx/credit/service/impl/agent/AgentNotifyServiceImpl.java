@@ -337,6 +337,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
+            agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
+        }
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
         if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
             agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
@@ -646,6 +649,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
+            agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
+        }
+
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
         if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
             agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
@@ -851,6 +858,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("hasS0",agentNotifyVo.getHasS0());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
+            }
+            if(StringUtils.isNotBlank(agentNotifyVo.getLoginName())){
+                data.put("loginName",agentNotifyVo.getLoginName());
             }
 //            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
 //                data.put("province",agentNotifyVo.getProvince());

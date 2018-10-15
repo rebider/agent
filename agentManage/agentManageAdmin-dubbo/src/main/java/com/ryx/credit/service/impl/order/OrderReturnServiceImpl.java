@@ -7,18 +7,19 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.agent.BusActRelExample;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.machine.service.TermMachineService;
+import com.ryx.credit.machine.vo.AdjustmentMachineVo;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusActRelService;
+import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IOrderReturnService;
@@ -104,6 +105,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OLogisticsMapper oLogisticsMapper;
     @Autowired
     private OLogisticsDetailMapper oLogisticsDetailMapper;
+    @Autowired
+    private TermMachineService termMachineService;
+    @Autowired
+    private PlatFormService platFormService;
+    @Autowired
+    private OOrderMapper oOrderMapper;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
 
     /**
@@ -1035,6 +1044,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Override
     public List<String> addList(List<List<Object>> data, String user) throws Exception {
         List<String> list = new ArrayList<>();
+        List<AdjustmentMachineVo> adjustmentMachineVoList = new ArrayList<AdjustmentMachineVo>();
         for (List<Object> objectList : data) {
 
             String planNum = "";
@@ -1249,7 +1259,27 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         //进行机具调整操作
                         if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
 
+                        //cxinfo 机具退货调整首刷接口调用
                         }else if(proType.equals(PlatformType.MPOS.msg)){
+                            AdjustmentMachineVo vo = new AdjustmentMachineVo();
+                            vo.setOptUser(user);
+                            vo.setSnStart(oLogistics.getSnBeginNum());
+                            vo.setSnEnd(oLogistics.getSnEndNum());
+
+                            //发货订单的业务编号
+                            OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
+                            AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+                            vo.setNewBusNum(busInfo.getBusNum());
+
+                            //退货订单的业务编号
+                            OReturnOrderDetailExample exampleOReturnOrderDetailExample = new OReturnOrderDetailExample();
+                            exampleOReturnOrderDetailExample.or().andSubOrderIdEqualTo(receiptPlan.getId());
+                            List<OReturnOrderDetail> listOReturnOrderDetail= returnOrderDetailMapper.selectByExample(exampleOReturnOrderDetailExample);
+                            OReturnOrderDetail oReturnOrderDetail =  listOReturnOrderDetail.get(0);
+                            OOrder orderreturn =  oOrderMapper.selectByPrimaryKey(oReturnOrderDetail.getOrderId());
+                            AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
+                            vo.setOldBusNum(returnbusInfo.getBusNum());
+                            adjustmentMachineVoList.add(vo);
 
                         }else{
                             log.info("导入物流：平台类型错误");
@@ -1263,6 +1293,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }catch (Exception e) {
                 e.printStackTrace();
                 throw e;
+            }
+        }
+
+        ////cxinfo 机具退货调整首刷接口调用
+        if(adjustmentMachineVoList.size()>0) {
+            AgentResult mposXF = termMachineService.adjustmentMachine(adjustmentMachineVoList);
+            if (!mposXF.isOK()) {
+                log.info("导入物流：首刷下发失败");
+                throw new MessageException("导入物流：首刷下发失败");
             }
         }
         return list;
