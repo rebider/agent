@@ -164,15 +164,21 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public JSONObject request(Map data, String url) throws Exception {
-        String json = JsonUtil.objectToJson(data);
-        logger.info("通知手刷请求参数：{},{}",url,json);
-        String httpResult = HttpClientUtil.doPostJsonWithException(url, json);
-        logger.info("通知手刷返回参数：{},{}",url,httpResult);
-        if(StringUtils.isNotBlank(httpResult)) {
-            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
-            return respXMLObj;
-        }else{
-            throw new Exception("请求出错");
+        try {
+            String json = JsonUtil.objectToJson(data);
+            logger.info("通知手刷请求参数：{},{}",url,json);
+            String httpResult = HttpClientUtil.doPostJsonWithException(url, json);
+            logger.info("通知手刷返回参数：{},{}",url,httpResult);
+            if(StringUtils.isNotBlank(httpResult)) {
+                JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+                return respXMLObj;
+            }else{
+                throw new Exception("请求出错");
+            }
+        } catch (Exception e) {
+            logger.error("首刷发送请求失败：",e);
+            e.printStackTrace();
+            throw e;
         }
 
     }
