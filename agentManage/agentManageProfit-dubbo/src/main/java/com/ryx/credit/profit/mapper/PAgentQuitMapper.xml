@@ -286,8 +286,8 @@
 
   <select id="getAgentQuitList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    SELECT P.ID, P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS,
-    A.AG_UNIQ_NUM, A.AG_NAME, A.AG_HEAD, A.AG_HEAD_MOBILE,
+    SELECT P.AGENT_ID, P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS,
+    A.ID, A.AG_NAME, A.AG_HEAD, A.AG_HEAD_MOBILE,
     A.AG_REMARK, A.AG_DOC_DISTRICT, A.AG_DOC_PRO
     FROM P_AGENT_QUIT P
     LEFT JOIN A_AGENT A ON P.AGENT_ID = A.ID
@@ -308,12 +308,12 @@
   <sql id="BASE_WHERE_SQL">
     <where>
       1=1
-      <if test="ID != null and ID !='' "> and P.ID = #{ID} </if>
       <if test="AGENT_ID != null and AGENT_ID !='' "> and P.AGENT_ID = #{AGENT_ID} </if>
       <if test="CREATE_DATE != null and CREATE_DATE !='' "> and P.CREATE_DATE = #{CREATE_DATE} </if>
       <if test="PASS_DATE != null and PASS_DATE != '' "> and P.PASS_DATE = #{PASS_DATE} </if>
       <if test="FLOW_STATUS != null and FLOW_STATUS != '' "> and P.FLOW_STATUS = #{FLOW_STATUS} </if>
-      <if test="AG_UNIQ_NUM != null and AG_UNIQ_NUM != '' "> and A.AG_UNIQ_NUM = #{AG_UNIQ_NUM} </if>
+      <if test="ID != null and ID !='' "> and A.ID = #{ID} </if>
+      <!--<if test="AG_UNIQ_NUM != null and AG_UNIQ_NUM != '' "> and A.AG_UNIQ_NUM = #{AG_UNIQ_NUM} </if>-->
       <if test="AG_NAME != null and AG_NAME != '' "> and A.AG_NAME = #{AG_NAME} </if>
       <if test="AG_HEAD != null and AG_HEAD !='' "> and A.AG_HEAD = #{AG_HEAD} </if>
       <if test="AG_HEAD_MOBILE != null and AG_HEAD_MOBILE !='' "> and A.AG_HEAD_MOBILE = #{AG_HEAD_MOBILE} </if>
@@ -348,7 +348,7 @@
 
   <!--<select id="getAgUniqNumAndId" parameterType="java.lang.String" resultType="java.lang.String">-->
     <!--SELECT-->
-    <!--P.ID, P.AGENT_ID, P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS, A.AG_UNIQ_NUM, A.AG_NAME,-->
+    <!--P.AGENT_ID, P.CREATE_DATE, P.PASS_DATE, P.FLOW_STATUS, A.AG_UNIQ_NUM, A.AG_NAME,-->
     <!--A.AG_HEAD, A.AG_HEAD_MOBILE, A.AG_REMARK, A.AG_DOC_DISTRICT, A.AG_DOC_PRO-->
     <!--FROM P_AGENT_QUIT P-->
     <!--LEFT JOIN A_AGENT A ON P.AGENT_ID = A.ID-->

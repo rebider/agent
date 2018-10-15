@@ -34,7 +34,7 @@ public interface PAgentQuitService {
      * 代理商退出申请，进行审批流
      * @param pAgentQuit
      */
-    ResultVO applyPAgentQuit(PAgentQuit pAgentQuit,String cuser)throws ProcessException;
+    ResultVO applyPAgentQuit(PAgentQuit pAgentQuit,String cuser, String workId)throws ProcessException;
 
     /**
      * 处理审批任务
