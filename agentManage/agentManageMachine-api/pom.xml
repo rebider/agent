@@ -16,5 +16,10 @@
             <artifactId>agentManage-common</artifactId>
             <version>${agentManage.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageAdmin-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
