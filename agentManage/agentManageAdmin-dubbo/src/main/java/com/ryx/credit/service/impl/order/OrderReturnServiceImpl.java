@@ -1170,22 +1170,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     throw new MessageException("排单信息未找到");
                 }
 
-                OLogisticsExample oLogisticsExample = new OLogisticsExample();
-                OLogisticsExample.Criteria criteria1 = oLogisticsExample.createCriteria();
-                criteria1.andSnBeginNumEqualTo(beginSn);
-                criteria1.andSnEndNumEqualTo(endSn);
-                criteria1.andWNumberEqualTo(wNumber);
-                criteria1.andLogComEqualTo(logCom);
-                List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
-                if(null==oLogistics1){
-                    log.info("该商品已发货请勿重复提交1");
-                    throw new MessageException("该商品已发货请勿重复提交");
-                }
-                if(oLogistics1.size()!=0){
-                    log.info("该商品已发货请勿重复提交2");
-                    throw new MessageException("该商品已发货请勿重复提交");
-                }
-
                 //IDlist检查
                 List<String> stringList = new OLogisticServiceImpl().idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
                 if (Integer.valueOf(sendProNum) != stringList.size()) {
@@ -1465,7 +1449,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 detail.setuTime(Calendar.getInstance().getTime());
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
-                if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 }else{
