@@ -293,14 +293,14 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
 
             // 如果最终金额还有剩余，走线下退款
             ORefundAgent refundAgent = new ORefundAgent();
-            if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
+//            if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
                 refundAgent.setRefundType(adjustType);
                 refundAgent.setSrcId(srcId);
                 refundAgent.setRefundAmount(leftAmt);
                 refundAgent.setAgentId(agentId);
                 refundAgent.setcUser(userid);
                 result.put("refund", refundAgent);
-            }
+//            }
 
             if (isRealAdjust) {
                 //生成调账记录

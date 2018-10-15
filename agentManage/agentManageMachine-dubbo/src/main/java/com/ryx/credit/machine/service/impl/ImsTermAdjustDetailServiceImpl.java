@@ -15,6 +15,7 @@ import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 import com.ryx.credit.machine.service.ImsTermActiveService;
 import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.service.order.IOrderReturnService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,16 +57,16 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult insertImsTermAdjustDetail(List<String> snList, ImsTermAdjustDetail imsTermAdjustDetail)throws MessageException {
-        if(null==snList){
+    public AgentResult insertImsTermAdjustDetail(List<OLogisticsDetail> logisticsDetailList, ImsTermAdjustDetail imsTermAdjustDetail)throws MessageException {
+        if(null==logisticsDetailList){
             throw new MessageException("sn列表异常");
         }
-        if(snList.size()==0){
+        if(logisticsDetailList.size()==0){
             throw new MessageException("sn数据有误");
         }
-        log.info("同步POS调整数据开始:snList:{},请求参数:{}",snList.size(),imsTermAdjustDetail);
-        for (String sn : snList) {
-            ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(sn);
+        log.info("同步POS调整数据开始:snList:{},请求参数:{}",logisticsDetailList.size(),imsTermAdjustDetail);
+        for (OLogisticsDetail oLogisticsDetail : logisticsDetailList) {
+            ImsTermActive imsTermActive = imsTermActiveService.selectByPrimaryKey(oLogisticsDetail.getSnNum());
             //有记录就表示已激活
             if(null!=imsTermActive){
                 throw new MessageException("Sn机具已激活");
@@ -82,11 +83,11 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
                 throw new MessageException("SN调整失败");
             }
             imsTermAdjustDetail.setId(IDUtils.genImsTermId());
-            imsTermAdjustDetail.setPosSn(sn);
+            imsTermAdjustDetail.setPosSn(oLogisticsDetail.getSnNum());
             imsTermAdjustDetail.setAdId(adjustId);
             imsTermAdjustDetail.setCreateTime(createTime);
             imsTermAdjustDetail.setCreatePerson(ZHYY_CREATE_PERSON);
-            AgentBusInfo agentBusInfo = orderReturnService.queryBusInfoBySn(sn);
+            AgentBusInfo agentBusInfo = orderReturnService.queryBusInfoByLogDetail(oLogisticsDetail);
             imsTermAdjustDetail.setyOrgId(agentBusInfo.getBusNum());
             int j = imsTermAdjustDetailMapper.insert(imsTermAdjustDetail);
             log.info("同步POS调整返回结果:{}",j);
@@ -94,7 +95,7 @@ public class ImsTermAdjustDetailServiceImpl implements ImsTermAdjustDetailServic
                 throw new MessageException("SN调整失败");
             }
             ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
-            imsTermWarehouseDetail.setPosSn(sn);
+            imsTermWarehouseDetail.setPosSn(oLogisticsDetail.getSnNum());
             imsTermWarehouseDetail.setOrgId(imsTermAdjustDetail.getnOrgId());
             int k = imsTermWarehouseDetailMapper.updateByPrimaryKeySelective(imsTermWarehouseDetail);
             log.info("同步POS调整更新库存明细返回结果:{}",k);
