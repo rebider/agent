@@ -25,4 +25,8 @@
     <dubbo:service interface="com.ryx.credit.machine.service.ImsTermTransferService" ref="imsTermTransferService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.machine.service.ImsTermWarehouseDetailService" ref="imsTermWarehouseDetailService"  timeout="1200000" registry="${zk.group}" />
 
+
+
+    <dubbo:reference interface="com.ryx.credit.service.order.IOrderReturnService" id="orderReturnService"  timeout="1200000" registry="${zk.group}"/>
+
 </beans>

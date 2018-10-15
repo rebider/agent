@@ -7,16 +7,17 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
-import com.ryx.credit.pojo.admin.agent.BusActRelExample;
-import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
+import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -104,7 +105,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OLogisticsMapper oLogisticsMapper;
     @Autowired
     private OLogisticsDetailMapper oLogisticsDetailMapper;
-
+    @Autowired
+    private OLogisticsDetailService oLogisticsDetailService;
+    @Autowired
+    private OOrderMapper orderMapper;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private ImsTermAdjustDetailService imsTermAdjustDetailService;
+    @Autowired
+    private OSubOrderActivityMapper subOrderActivityMapper;
 
     /**
      * @Author: Zhang Lei
@@ -1246,8 +1256,35 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             }
                             System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                         }
+                        //商品活动
+                        OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                        OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
+                        criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+                        List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                        if(null==oSubOrderActivities){
+                            log.info("查询活动数据错误1");
+                            throw new MessageException("查询活动数据错误");
+                        }
+                        if(0==oSubOrderActivities.size()){
+                            log.info("查询活动数据错误2");
+                            throw new MessageException("查询活动数据错误");
+                        }
+                        OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
                         //进行机具调整操作
                         if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+                            List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
+                            OOrder oOrder = orderMapper.selectByPrimaryKey(orderId);
+                            if(null==oOrder){
+                                throw new MessageException("查询订单数据失败！");
+                            }
+                            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+                            if(null==agentBusInfo){
+                                throw new MessageException("查询订单业务数据失败！");
+                            }
+                            ImsTermAdjustDetail imsTermAdjustDetail = new ImsTermAdjustDetail();
+                            imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
+                            imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
+                            imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
 
                         }else if(proType.equals(PlatformType.MPOS.msg)){
 
@@ -1292,5 +1329,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         return AgentResult.ok();
     }
 
+    /**
+     * 根据SN查询业务信息
+     * @param sn
+     * @return
+     */
+    @Override
+    public AgentBusInfo queryBusInfoBySn(String sn){
 
+        OLogisticsDetail oLogisticsDetail = oLogisticsDetailService.queryBySn(sn);
+        if(null==oLogisticsDetail){
+            return null;
+        }
+        OOrder oOrder = orderMapper.selectByPrimaryKey(oLogisticsDetail.getOrderId());
+        if(null==oOrder){
+            return null;
+        }
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+        return agentBusInfo;
+    }
 }
