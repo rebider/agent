@@ -66,7 +66,7 @@ public class PAgentQuitServiceImpl implements PAgentQuitService {
     }
 
     @Override
-    public ResultVO applyPAgentQuit(PAgentQuit pAgentQuit, String cuser) throws ProcessException {
+    public ResultVO applyPAgentQuit(PAgentQuit pAgentQuit, String cuser, String workId) throws ProcessException {
         pAgentQuit.setId(idService.genId(TabId.P_AGENT_QUIT));
         System.out.println("序列ID---------------------"+idService.genId(TabId.P_AGENT_QUIT));
         pAgentQuitMapper.insertSelective(pAgentQuit);
@@ -76,7 +76,7 @@ public class PAgentQuitServiceImpl implements PAgentQuitService {
             throw new ProcessException("启动部门参数为空！");
         }
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, "quitCity", null, null, startPar);
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proceId == null) {
             logger.error("代理商退出申请审批流启动失败，代理商ID：{}", pAgentQuit.getAgentId());
             throw new ProcessException("代理商退出申请审批流启动失败！");

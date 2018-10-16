@@ -837,7 +837,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         return regions.get(0);
     }
 
-    private AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
+    @Override
+    public AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
         try {
 
             String cooperator = com.ryx.credit.util.Constants.cooperator;
