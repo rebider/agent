@@ -31,5 +31,9 @@ public interface ProfitDeductionMapper {
 
     List<Map<String, Object>> getDeductDetail(String deductDate);
 
+    BigDecimal getNotDeductionSum(String agentId);
+
     List<Map<String,Object>> getNotDeductDetail(@Param("beforeDeductDate") String beforeDeductDate, @Param("deductDate") String deductDate, @Param("type") String type);
+
+    BigDecimal getCurrentDeductionAmtSum(ProfitDeduction profitDeduction);
 }

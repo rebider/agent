@@ -1,8 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
-import java.io.Serializable;
-
-public class PAgentMerge implements Serializable{
+public class PAgentMerge {
     private String id;
 
     private String mainAgentId;
