@@ -82,6 +82,13 @@
     from P_DEDUCTION
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+  <select id="getCurrentDeductionAmtSum"  resultMap="BaseResultMap">
+   select
+    sum(case when d.deduction_Status = '0' then d.MUST_DEDUCTION_AMT else d.NOT_DEDUCTION_AMT end) MUST_DEDUCTION_AMT
+    from  p_deduction d
+    where   d.deduction_type In ('01','03') and d.deduction_date =#{deductionDate}
+    and d.agent_pid=#{agentPid,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample">
     delete from P_DEDUCTION
     <if test="_parameter != null">

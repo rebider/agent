@@ -116,4 +116,13 @@ public interface ProfitDeductionService {
     BigDecimal  getSupplyAmt(String agentId, String bussType , String parentAgentId);
 
     BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
+
+    /***
+    * @Description: 获取所有未扣足的总额
+    * @Param:  agentId 代理商id  pare
+    * @return:
+    * @Author: zhaodw
+    * @Date: 2018/10/15
+    */
+    BigDecimal getNotDeductionSum(String agentId);
 }
