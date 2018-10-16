@@ -577,7 +577,6 @@ public class CompensateServiceImpl implements CompensateService {
         criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
         //修改 业务系统数据集合
-        List<ChangeActMachineVo> changeActMachineVos = new ArrayList<ChangeActMachineVo>();
 
         oRefundPriceDiffDetails.forEach(row->{
 
@@ -592,6 +591,7 @@ public class CompensateServiceImpl implements CompensateService {
             }
             OActivity activity = orderActivityService.findById(row.getActivityRealId());
             OActivity activity_old = orderActivityService.findById(row.getActivityFrontId());
+
             oLogisticsDetails.forEach(oLogisticsDetail->{
 
                 //更新
@@ -625,13 +625,14 @@ public class CompensateServiceImpl implements CompensateService {
                 if(1!=insert){
                     throw new ProcessException("退补差价数据新增完成失败");
                 }
-            });
 
-            //cxinfo 机具的调整
+
+
+            });
+            //待调整集合 cxinfo 机具的调整  调货明细
             OOrder oo = oOrderMapper.selectByPrimaryKey(row.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
             PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
-
             ChangeActMachineVo cav = new ChangeActMachineVo();
             cav.setBusNum(agentBusInfo.getBusNum());
             cav.setNewAct(activity.getBusProCode());
@@ -640,12 +641,16 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setSnStart(row.getBeginSn());
             cav.setSnEnd(row.getEndSn());
             cav.setPlatformType(platformType.code);
-            //待调整集合
-            changeActMachineVos.add(cav);
+            cav.setoRefundPriceDiffDetailId(row.getId());
+            //cxinfo 调用活动变更接口进行活动的变更
+            try {
+                AgentResult ar = termMachineService.changeActMachine(cav);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
 
-        //cxinfo 调用活动变更接口进行活动的变更
-        AgentResult ar = termMachineService.changeActMachine(changeActMachineVos);
+
         return AgentResult.ok();
     }
 

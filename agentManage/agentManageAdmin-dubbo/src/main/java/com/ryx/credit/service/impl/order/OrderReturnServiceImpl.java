@@ -1321,7 +1321,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                             //退货订单的业务编号
                             OReturnOrderDetailExample exampleOReturnOrderDetailExample = new OReturnOrderDetailExample();
-                            exampleOReturnOrderDetailExample.or().andSubOrderIdEqualTo(receiptPlan.getId());
+                            exampleOReturnOrderDetailExample.or().andSubOrderIdEqualTo(receiptPlan.getReturnOrderDetailId());
                             List<OReturnOrderDetail> listOReturnOrderDetail= returnOrderDetailMapper.selectByExample(exampleOReturnOrderDetailExample);
                             OReturnOrderDetail oReturnOrderDetail =  listOReturnOrderDetail.get(0);
                             OOrder orderreturn =  oOrderMapper.selectByPrimaryKey(oReturnOrderDetail.getOrderId());

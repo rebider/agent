@@ -21,6 +21,11 @@ public class ChangeActMachineVo implements Serializable{
     //平台类型
     private String platformType;
 
+    /**
+     * 活动调整明细ID
+     */
+    private String oRefundPriceDiffDetailId;
+
     public String getBusNum() {
         return busNum;
     }
@@ -75,5 +80,13 @@ public class ChangeActMachineVo implements Serializable{
 
     public void setPlatformType(String platformType) {
         this.platformType = platformType;
+    }
+
+    public String getoRefundPriceDiffDetailId() {
+        return oRefundPriceDiffDetailId;
+    }
+
+    public void setoRefundPriceDiffDetailId(String oRefundPriceDiffDetailId) {
+        this.oRefundPriceDiffDetailId = oRefundPriceDiffDetailId;
     }
 }
