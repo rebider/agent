@@ -59,4 +59,6 @@ public interface IOrderReturnService {
 
 
     AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail);
+
+    Map selectByReturnDeId(String returnDetailsId);
 }

@@ -25,4 +25,6 @@ public interface OReturnOrderMapper {
     Long getOrderReturnCount(Map<String, Object> param);
 
     List<Map<String,Object>> getOrderReturnList(Map<String, Object> param);
+
+    Map selectByReturnDeId(String returnDetailsId);
 }

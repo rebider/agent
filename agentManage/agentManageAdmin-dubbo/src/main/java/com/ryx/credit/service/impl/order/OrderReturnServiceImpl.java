@@ -1436,6 +1436,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         return agentBusInfo;
     }
 
+    @Override
+    public Map selectByReturnDeId(String returnDetailsId) {
+        Map map = returnOrderMapper.selectByReturnDeId(returnDetailsId);
+        if (null==map){
+            ResultVO.fail("无对应数据");
+        }
+        return map;
+    }
+
     /**
      * 插入物流明细
      */
