@@ -3,6 +3,7 @@ package com.ryx.credit.pojo.admin.order;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 public class ORefundPriceDiffDetail  implements Serializable {
     private String id;
@@ -55,11 +56,14 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private BigDecimal version;
 
+    private Map<String, Object> refundPriceDiffDetailMap;
+
     private String orderId;
 
     private BigDecimal sendStatus;
 
     private String sendMsg;
+
 
     public String getId() {
         return id;
@@ -283,5 +287,13 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     public void setSendMsg(String sendMsg) {
         this.sendMsg = sendMsg == null ? null : sendMsg.trim();
+    }
+
+    public Map<String, Object> getRefundPriceDiffDetailMap() {
+        return refundPriceDiffDetailMap;
+    }
+
+    public void setRefundPriceDiffDetailMap(Map<String, Object> refundPriceDiffDetailMap) {
+        this.refundPriceDiffDetailMap = refundPriceDiffDetailMap;
     }
 }

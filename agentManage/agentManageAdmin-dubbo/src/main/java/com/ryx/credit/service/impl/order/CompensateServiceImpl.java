@@ -8,8 +8,12 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AttachmentMapper;
+import com.ryx.credit.dao.agent.AttachmentRelMapper;
+import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.ChangeActMachineVo;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -24,9 +28,7 @@ import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
-import com.ryx.credit.service.order.IAccountAdjustService;
 import com.ryx.credit.service.order.OrderActivityService;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * 补差价处理
@@ -89,6 +90,8 @@ public class CompensateServiceImpl implements CompensateService {
     private OOrderMapper oOrderMapper;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private ImsTermWarehouseDetailService imsTermWarehouseDetailService;
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -576,7 +579,6 @@ public class CompensateServiceImpl implements CompensateService {
         ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
         criteria.andRefundPriceDiffIdEqualTo(rel.getBusId());
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
-        //修改 业务系统数据集合
 
         oRefundPriceDiffDetails.forEach(row->{
 
@@ -593,40 +595,41 @@ public class CompensateServiceImpl implements CompensateService {
             OActivity activity_old = orderActivityService.findById(row.getActivityFrontId());
 
             oLogisticsDetails.forEach(oLogisticsDetail->{
+                try {
+                    //更新
+                    oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+                    int update = logisticsDetailMapper.updateByPrimaryKeySelective(oLogisticsDetail);
+                    if(1!=update){
+                        throw new ProcessException("退补差价数据更新完成失败");
+                    }
+                    //插入新的物流信息
+                    oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
+                    oLogisticsDetail.setOptId(row.getId());
+                    oLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
+                    oLogisticsDetail.setActivityId(row.getActivityRealId());
+                    oLogisticsDetail.setActivityName(row.getActivityName());
 
-                //更新
-                oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
-                int update = logisticsDetailMapper.updateByPrimaryKeySelective(oLogisticsDetail);
-                if(1!=update){
-                    throw new ProcessException("退补差价数据更新完成失败");
+
+                    oLogisticsDetail.setgTime(activity.getgTime());
+                    oLogisticsDetail.setSettlementPrice(row.getPrice());
+                    oLogisticsDetail.setcTime(new Date());
+                    oLogisticsDetail.setuTime(new Date());
+                    oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+
+                    oLogisticsDetail.setBusProCode(activity.getBusProCode());
+                    oLogisticsDetail.setBusProName(activity.getBusProName());
+                    oLogisticsDetail.setTermBatchcode(activity.getTermBatchcode());
+                    oLogisticsDetail.setTermBatchname(activity.getTermBatchname());
+                    oLogisticsDetail.setTermtype(activity.getTermtype());
+                    oLogisticsDetail.setTermtypename(activity.getTermtypename());
+                    oLogisticsDetail.setVersion(Status.STATUS_0.status);
+                    int insert = logisticsDetailMapper.insert(oLogisticsDetail);
+                    if(1!=insert){
+                        throw new ProcessException("退补差价数据新增完成失败");
+                    }
+                } catch (Exception e) {
+                    throw new ProcessException("退补差价处理完成失败");
                 }
-                //插入新的物流信息
-                oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
-                oLogisticsDetail.setOptId(row.getId());
-                oLogisticsDetail.setOptType(OLogisticsDetailOptType.BCJ.code);
-                oLogisticsDetail.setActivityId(row.getActivityRealId());
-                oLogisticsDetail.setActivityName(row.getActivityName());
-
-
-                oLogisticsDetail.setgTime(activity.getgTime());
-                oLogisticsDetail.setSettlementPrice(row.getPrice());
-                oLogisticsDetail.setcTime(new Date());
-                oLogisticsDetail.setuTime(new Date());
-                oLogisticsDetail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-
-                oLogisticsDetail.setBusProCode(activity.getBusProCode());
-                oLogisticsDetail.setBusProName(activity.getBusProName());
-                oLogisticsDetail.setTermBatchcode(activity.getTermBatchcode());
-                oLogisticsDetail.setTermBatchname(activity.getTermBatchname());
-                oLogisticsDetail.setTermtype(activity.getTermtype());
-                oLogisticsDetail.setTermtypename(activity.getTermtypename());
-                oLogisticsDetail.setVersion(Status.STATUS_0.status);
-                int insert = logisticsDetailMapper.insert(oLogisticsDetail);
-                if(1!=insert){
-                    throw new ProcessException("退补差价数据新增完成失败");
-                }
-
-
 
             });
             //待调整集合 cxinfo 机具的调整  调货明细
@@ -642,6 +645,7 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setSnEnd(row.getEndSn());
             cav.setPlatformType(platformType.code);
             cav.setoRefundPriceDiffDetailId(row.getId());
+            cav.setLogisticsDetailList(oLogisticsDetails);
             //cxinfo 调用活动变更接口进行活动的变更
             try {
                 AgentResult ar = termMachineService.changeActMachine(cav);
@@ -649,8 +653,6 @@ public class CompensateServiceImpl implements CompensateService {
                 e.printStackTrace();
             }
         });
-
-
         return AgentResult.ok();
     }
 

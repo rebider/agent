@@ -1,6 +1,9 @@
 package com.ryx.credit.machine.vo;
 
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 作者：cx
@@ -25,6 +28,8 @@ public class ChangeActMachineVo implements Serializable{
      * 活动调整明细ID
      */
     private String oRefundPriceDiffDetailId;
+
+    private List<OLogisticsDetail> logisticsDetailList;
 
     public String getBusNum() {
         return busNum;
@@ -88,5 +93,13 @@ public class ChangeActMachineVo implements Serializable{
 
     public void setoRefundPriceDiffDetailId(String oRefundPriceDiffDetailId) {
         this.oRefundPriceDiffDetailId = oRefundPriceDiffDetailId;
+    }
+
+    public List<OLogisticsDetail> getLogisticsDetailList() {
+        return logisticsDetailList;
+    }
+
+    public void setLogisticsDetailList(List<OLogisticsDetail> logisticsDetailList) {
+        this.logisticsDetailList = logisticsDetailList;
     }
 }
