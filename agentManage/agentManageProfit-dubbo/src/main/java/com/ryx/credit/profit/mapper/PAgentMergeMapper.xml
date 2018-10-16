@@ -7,6 +7,12 @@
     <result column="SUB_AGENT_ID" jdbcType="VARCHAR" property="subAgentId" />
     <result column="MERGE_DATE" jdbcType="VARCHAR" property="mergeDate" />
     <result column="MERGE_STATUS" jdbcType="VARCHAR" property="mergeStatus" />
+    <result column="MAIN_AGENT_NAME" jdbcType="VARCHAR" property="mainAgentName" />
+    <result column="SUB_AGENT_NAME" jdbcType="VARCHAR" property="subAgentName" />
+    <result column="MAIN_HEAD" jdbcType="VARCHAR" property="mainHead" />
+    <result column="MAIN_HEAD_MOBILE" jdbcType="VARCHAR" property="mainHeadMobile" />
+    <result column="SUBN_HEAD" jdbcType="VARCHAR" property="subnHead" />
+    <result column="SUB_HEAD_MOBILE" jdbcType="VARCHAR" property="subHeadMobile" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -38,7 +44,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, MAIN_AGENT_ID, SUB_AGENT_ID, MERGE_DATE, MERGE_STATUS
+    ID, MAIN_AGENT_ID, SUB_AGENT_ID, MERGE_DATE, MERGE_STATUS, MAIN_AGENT_NAME, SUB_AGENT_NAME, 
+    MAIN_HEAD, MAIN_HEAD_MOBILE, SUBN_HEAD, SUB_HEAD_MOBILE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PAgentMergeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -79,9 +86,13 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PAgentMerge">
     insert into P_AGENT_MERGE (ID, MAIN_AGENT_ID, SUB_AGENT_ID, 
-      MERGE_DATE, MERGE_STATUS)
+      MERGE_DATE, MERGE_STATUS, MAIN_AGENT_NAME, 
+      SUB_AGENT_NAME, MAIN_HEAD, MAIN_HEAD_MOBILE, 
+      SUBN_HEAD, SUB_HEAD_MOBILE)
     values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR}, 
-      #{mergeDate,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=VARCHAR})
+      #{mergeDate,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR}, 
+      #{subAgentName,jdbcType=VARCHAR}, #{mainHead,jdbcType=VARCHAR}, #{mainHeadMobile,jdbcType=VARCHAR}, 
+      #{subnHead,jdbcType=VARCHAR}, #{subHeadMobile,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PAgentMerge">
     insert into P_AGENT_MERGE
@@ -101,6 +112,24 @@
       <if test="mergeStatus != null">
         MERGE_STATUS,
       </if>
+      <if test="mainAgentName != null">
+        MAIN_AGENT_NAME,
+      </if>
+      <if test="subAgentName != null">
+        SUB_AGENT_NAME,
+      </if>
+      <if test="mainHead != null">
+        MAIN_HEAD,
+      </if>
+      <if test="mainHeadMobile != null">
+        MAIN_HEAD_MOBILE,
+      </if>
+      <if test="subnHead != null">
+        SUBN_HEAD,
+      </if>
+      <if test="subHeadMobile != null">
+        SUB_HEAD_MOBILE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -117,6 +146,24 @@
       </if>
       <if test="mergeStatus != null">
         #{mergeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentName != null">
+        #{mainAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentName != null">
+        #{subAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainHead != null">
+        #{mainHead,jdbcType=VARCHAR},
+      </if>
+      <if test="mainHeadMobile != null">
+        #{mainHeadMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="subnHead != null">
+        #{subnHead,jdbcType=VARCHAR},
+      </if>
+      <if test="subHeadMobile != null">
+        #{subHeadMobile,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -136,4 +183,40 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+  <select id="getProfitAgentMergeCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM P_AGENT_MERGE
+    <!--<include refid="BASE_WHERE_SQL" />-->
+  </select>
+
+  <select id="getProfitAgentMergeList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_AGENT_MERGE
+    <!--<include refid="BASE_WHERE_SQL" />-->
+    <!--<include refid="SORTING" />-->
+    <include refid="PAGING_END" />
+  </select>
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
+<!--  <sql id="BASE_WHERE_SQL">
+    <where>
+      <trim prefixOverrides="and">
+        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+        <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID}</if>
+      </trim>
+    </where>
+  </sql>-->
 </mapper>

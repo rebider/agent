@@ -3,9 +3,12 @@ package com.ryx.credit.profit.dao;
 import com.ryx.credit.profit.pojo.PAgentMerge;
 import com.ryx.credit.profit.pojo.PAgentMergeExample;
 import java.util.List;
+import java.util.Map;
 
 public interface PAgentMergeMapper {
     long countByExample(PAgentMergeExample example);
+
+    long getProfitAgentMergeCount(Map<String, Object> param);
 
     int deleteByExample(PAgentMergeExample example);
 
@@ -23,4 +26,8 @@ public interface PAgentMergeMapper {
      * @return
      */
     List<PAgentMerge> selectByAgentId(String subAgentId);
+
+    List<Map<String, Object>> getProfitAgentMergeList(Map<String, Object> param);
+
+    void updateByPrimaryKeySelective(PAgentMerge  pAgentMerge);
 }
