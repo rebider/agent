@@ -1,5 +1,6 @@
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.machine.vo.AdjustmentMachineVo;
 import com.ryx.credit.machine.vo.ChangeActMachineVo;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
@@ -67,5 +68,14 @@ public class TestMain {
         System.out.println(JSONObject.toJSONString(changeActMachineVos));
 
 
+        AdjustmentMachineVo adjustmentMachineVo = new AdjustmentMachineVo();
+        adjustmentMachineVo.setNewBusNum("新机构编号");
+        adjustmentMachineVo.setOldBusNum("老机构编号");
+        adjustmentMachineVo.setSnStart("sn开始");
+        adjustmentMachineVo.setSnEnd("sn结束");
+        adjustmentMachineVo.setOptUser("操作人");
+        adjustmentMachineVo.setSnNum(100);
+        adjustmentMachineVo.setPlatformNum("平台号");
+        System.out.println(JSONObject.toJSONString(adjustmentMachineVo));
     }
 }
