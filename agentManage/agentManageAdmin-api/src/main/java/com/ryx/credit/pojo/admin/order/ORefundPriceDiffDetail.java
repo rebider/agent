@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Map;
 
-public class ORefundPriceDiffDetail implements Serializable{
+public class ORefundPriceDiffDetail  implements Serializable {
     private String id;
 
     private String subOrderId;
@@ -17,8 +17,6 @@ public class ORefundPriceDiffDetail implements Serializable{
     private String activityRealId;
 
     private String refundPriceDiffId;
-
-    private String orderId;
 
     private String proId;
 
@@ -59,6 +57,13 @@ public class ORefundPriceDiffDetail implements Serializable{
     private BigDecimal version;
 
     private Map<String, Object> refundPriceDiffDetailMap;
+
+    private String orderId;
+
+    private BigDecimal sendStatus;
+
+    private String sendMsg;
+
 
     public String getId() {
         return id;
@@ -108,12 +113,12 @@ public class ORefundPriceDiffDetail implements Serializable{
         this.refundPriceDiffId = refundPriceDiffId == null ? null : refundPriceDiffId.trim();
     }
 
-    public String getOrderId() {
-        return orderId;
+    public String getProId() {
+        return proId;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId == null ? null : orderId.trim();
+    public void setProId(String proId) {
+        this.proId = proId == null ? null : proId.trim();
     }
 
     public String getProName() {
@@ -260,12 +265,28 @@ public class ORefundPriceDiffDetail implements Serializable{
         this.version = version;
     }
 
-    public String getProId() {
-        return proId;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setProId(String proId) {
-        this.proId = proId;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId == null ? null : orderId.trim();
+    }
+
+    public BigDecimal getSendStatus() {
+        return sendStatus;
+    }
+
+    public void setSendStatus(BigDecimal sendStatus) {
+        this.sendStatus = sendStatus;
+    }
+
+    public String getSendMsg() {
+        return sendMsg;
+    }
+
+    public void setSendMsg(String sendMsg) {
+        this.sendMsg = sendMsg == null ? null : sendMsg.trim();
     }
 
     public Map<String, Object> getRefundPriceDiffDetailMap() {

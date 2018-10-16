@@ -16,13 +16,15 @@ public interface BusiPlatService {
 
     /**
      * 冻结
+     * @param agentIds 代理商AG码list
      */
-    void mPos_Frozen();
+    void mPos_Frozen(List<String> agentIds);
 
     /**
      * 解冻
+     * @param agentIds 代理商AG码list
      */
-    void mPos_unFrozen();
+    void mPos_unFrozen(List<String> agentIds);
 
     /**
      * 代理商更名(手刷)
@@ -35,7 +37,6 @@ public interface BusiPlatService {
      * 代理商更名(POS)
      * @param agentNotifyVo 代理商信息
      *                      uniqueId 代理商AB码
-     *                      useOrgan 使用范围
      *                      orgName 变更后名称
      *                      orgType 机构类型
      */

@@ -40,13 +40,47 @@ public class BusiPlatServiceImpl implements BusiPlatService {
     AgentNotifyService agentNotifyService;
 
     @Override
-    public void mPos_Frozen() {
-
+    public void mPos_Frozen(List<String> agentIds) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type","1");//1、冻结 0、解冻
+        map.put("type","1");//1-冻结本身以及下属，2-冻结自身（默认）；3-本身不冻结，冻结所有下级
+        map.put("unfreeze","0");//0-双冻结（默认）;1-分润冻结; 2-返现冻结
+        map.put("flag","4");//4冻结;0解冻
+        map.put("batchIds",agentIds.toString());//AG码list
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"),params);
+        log.debug(res);
+        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
+            log.error("请求失败！");
+            AppConfig.sendEmails("代理商冻结失败","代理商冻结失败");
+            return;
+        }
+        String data = JSONObject.parseObject(res).get("data").toString();
+        log.debug(data);
+        log.debug("代理商冻结成功！");
     }
 
     @Override
-    public void mPos_unFrozen() {
-
+    public void mPos_unFrozen(List<String> agentIds) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type","0");//1、冻结 0、解冻
+        map.put("type","1");//解冻时无视该类型
+        map.put("unfreeze","0");//解冻时无视该类型
+        map.put("flag","0");//4冻结;0解冻
+        map.put("batchIds",agentIds.toString());//AG码list
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"),params);
+        log.debug(res);
+        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
+            log.error("请求失败！");
+            AppConfig.sendEmails("代理商解冻失败","代理商解冻失败");
+            return;
+        }
+        String data = JSONObject.parseObject(res).get("data").toString();
+        log.debug(data);
+        log.debug("代理商解冻成功！");
     }
 
 
@@ -57,7 +91,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         map.put("batchIds",platId.toString());
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.bucha"),params);
+                (AppConfig.getProperty("busiPlat.upAgName"),params);
         log.debug(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
@@ -71,7 +105,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
 
     @Override
     public void pos_updateAgName(AgentNotifyVo agentNotifyVo) throws Exception {
-        agentNotifyVo.setUseOrgan("886");
+        agentNotifyVo.setUseOrgan("886");//使用范围 886-代理商
         agentNotifyService.httpRequestForPos(agentNotifyVo);
     }
 
