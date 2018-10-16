@@ -374,6 +374,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             lowerHairMachineVo.setOptUser(user);
                             lowerHairMachineVo.setSnStart(oLogistics.getSnBeginNum());
                             lowerHairMachineVo.setSnEnd(oLogistics.getSnEndNum());
+                            lowerHairMachineVo.setoLogisticsId(oLogistics.getId());
                             //sn明细
                             List<MposSnVo> listSn = new ArrayList<MposSnVo>();
                             for (OLogisticsDetail forsendSn : forsendSns) {
@@ -384,7 +385,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                         ,forsendSn.getTermtype()));
                             }
                             lowerHairMachineVo.setListSn(listSn);
-
                             //机具下发接口
                             AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
                             logger.info("导入物流：洗发到首刷平台结果:{}",lowerHairMachineRes.getMsg());

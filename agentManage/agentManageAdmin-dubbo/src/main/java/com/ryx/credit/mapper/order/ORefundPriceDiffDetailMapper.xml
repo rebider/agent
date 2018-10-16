@@ -29,6 +29,7 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
     <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
+    <result column="SEND_MSG" jdbcType="VARCHAR" property="sendMsg" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,7 +64,7 @@
     ID, SUB_ORDER_ID, AGENT_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
     PRO_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, FRONT_PRICE,
     PRICE, S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER,
-    STATUS, VERSION, ORDER_ID, SEND_STATUS
+    STATUS, VERSION, ORDER_ID, SEND_STATUS, SEND_MSG
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,8 +103,8 @@
     BEGIN_SN, END_SN, VENDER,
     PRO_MODEL, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, ORDER_ID, SEND_STATUS
-    )
+    VERSION, ORDER_ID, SEND_STATUS,
+    SEND_MSG)
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
@@ -112,8 +113,8 @@
     #{beginSn,jdbcType=VARCHAR}, #{endSn,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR},
     #{proModel,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL}
-    )
+    #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
+    #{sendMsg,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -199,6 +200,9 @@
       <if test="sendStatus != null">
         SEND_STATUS,
       </if>
+      <if test="sendMsg != null">
+        SEND_MSG,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -281,6 +285,9 @@
       </if>
       <if test="sendStatus != null">
         #{sendStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="sendMsg != null">
+        #{sendMsg,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -371,6 +378,9 @@
       <if test="sendStatus != null">
         SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
       </if>
+      <if test="sendMsg != null">
+        SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -401,7 +411,8 @@
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
     ORDER_ID = #{orderId,jdbcType=VARCHAR},
-    SEND_STATUS = #{sendStatus,jdbcType=DECIMAL}
+    SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+    SEND_MSG = #{sendMsg,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

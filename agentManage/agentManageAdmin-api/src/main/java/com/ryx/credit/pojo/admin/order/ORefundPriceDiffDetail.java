@@ -59,6 +59,8 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private BigDecimal sendStatus;
 
+    private String sendMsg;
+
     public String getId() {
         return id;
     }
@@ -273,5 +275,13 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     public void setSendStatus(BigDecimal sendStatus) {
         this.sendStatus = sendStatus;
+    }
+
+    public String getSendMsg() {
+        return sendMsg;
+    }
+
+    public void setSendMsg(String sendMsg) {
+        this.sendMsg = sendMsg == null ? null : sendMsg.trim();
     }
 }

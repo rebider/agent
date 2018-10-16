@@ -24,6 +24,7 @@
         <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
         <result column="STATUS" jdbcType="DECIMAL" property="status" />
         <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
+        <result column="SEND_MSG" jdbcType="VARCHAR" property="sendMsg" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -57,7 +58,7 @@
     <sql id="Base_Column_List">
         ID, ORDER_ID, SRC_ID, RECEIPT_PLAN_ID, PRO_COM, PRO_ID, PRO_NAME, PRO_TYPE, SEND_NUM,
         PRO_PRICE, PRO_MODEL, SEND_DATE, LOG_COM, W_NUMBER, ISDEALL, SN_BEGIN_NUM, SN_END_NUM,
-        LOG_TYPE, C_TIME, C_USER, STATUS, SEND_STATUS
+        LOG_TYPE, C_TIME, C_USER, STATUS, SEND_STATUS, SEND_MSG
     </sql>
     <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample" resultMap="BaseResultMap">
         <include refid="OracleDialectPrefix" />
@@ -95,7 +96,7 @@
         LOG_COM, W_NUMBER, ISDEALL,
         SN_BEGIN_NUM, SN_END_NUM, LOG_TYPE,
         C_TIME, C_USER, STATUS,
-        SEND_STATUS)
+        SEND_STATUS, SEND_MSG)
         values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR},
         #{receiptPlanId,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR},
         #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{sendNum,jdbcType=DECIMAL},
@@ -103,7 +104,7 @@
         #{logCom,jdbcType=VARCHAR}, #{wNumber,jdbcType=VARCHAR}, #{isdeall,jdbcType=DECIMAL},
         #{snBeginNum,jdbcType=VARCHAR}, #{snEndNum,jdbcType=VARCHAR}, #{logType,jdbcType=VARCHAR},
         #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-        #{sendStatus,jdbcType=DECIMAL})
+        #{sendStatus,jdbcType=DECIMAL}, #{sendMsg,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
         insert into O_LOGISTICS
@@ -174,6 +175,9 @@
             <if test="sendStatus != null">
                 SEND_STATUS,
             </if>
+            <if test="sendMsg != null">
+                SEND_MSG,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -241,6 +245,9 @@
             </if>
             <if test="sendStatus != null">
                 #{sendStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="sendMsg != null">
+                #{sendMsg,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -316,6 +323,9 @@
             <if test="sendStatus != null">
                 SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
             </if>
+            <if test="sendMsg != null">
+                SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -341,7 +351,8 @@
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
         C_USER = #{cUser,jdbcType=VARCHAR},
         STATUS = #{status,jdbcType=DECIMAL},
-        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL}
+        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+        SEND_MSG = #{sendMsg,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <sql id="OracleDialectPrefix">

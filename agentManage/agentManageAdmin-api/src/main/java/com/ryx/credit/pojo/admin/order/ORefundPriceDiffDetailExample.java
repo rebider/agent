@@ -1937,6 +1937,76 @@ public class ORefundPriceDiffDetailExample {
             addCriterion("SEND_STATUS not between", value1, value2, "sendStatus");
             return (Criteria) this;
         }
+
+        public Criteria andSendMsgIsNull() {
+            addCriterion("SEND_MSG is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgIsNotNull() {
+            addCriterion("SEND_MSG is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgEqualTo(String value) {
+            addCriterion("SEND_MSG =", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgNotEqualTo(String value) {
+            addCriterion("SEND_MSG <>", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgGreaterThan(String value) {
+            addCriterion("SEND_MSG >", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgGreaterThanOrEqualTo(String value) {
+            addCriterion("SEND_MSG >=", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgLessThan(String value) {
+            addCriterion("SEND_MSG <", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgLessThanOrEqualTo(String value) {
+            addCriterion("SEND_MSG <=", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgLike(String value) {
+            addCriterion("SEND_MSG like", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgNotLike(String value) {
+            addCriterion("SEND_MSG not like", value, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgIn(List<String> values) {
+            addCriterion("SEND_MSG in", values, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgNotIn(List<String> values) {
+            addCriterion("SEND_MSG not in", values, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgBetween(String value1, String value2) {
+            addCriterion("SEND_MSG between", value1, value2, "sendMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendMsgNotBetween(String value1, String value2) {
+            addCriterion("SEND_MSG not between", value1, value2, "sendMsg");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

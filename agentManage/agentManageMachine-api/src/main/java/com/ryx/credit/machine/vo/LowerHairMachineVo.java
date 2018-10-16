@@ -20,6 +20,11 @@ public class LowerHairMachineVo  implements Serializable {
     //sn集合
     private List<MposSnVo> listSn;
 
+    /**
+     * 物流id
+     */
+    private String oLogisticsId;
+
 
     public String getBusNum() {
         return busNum;
@@ -59,5 +64,13 @@ public class LowerHairMachineVo  implements Serializable {
 
     public void setListSn(List<MposSnVo> listSn) {
         this.listSn = listSn;
+    }
+
+    public String getoLogisticsId() {
+        return oLogisticsId;
+    }
+
+    public void setoLogisticsId(String oLogisticsId) {
+        this.oLogisticsId = oLogisticsId;
     }
 }
