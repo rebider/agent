@@ -28,6 +28,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+    <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -62,7 +63,7 @@
     ID, SUB_ORDER_ID, AGENT_ID, ACTIVITY_FRONT_ID, ACTIVITY_REAL_ID, REFUND_PRICE_DIFF_ID,
     PRO_ID, PRO_NAME, CHANGE_COUNT, ACTIVITY_NAME, ACTIVITY_WAY, ACTIVITY_RULE, FRONT_PRICE,
     PRICE, S_TIME, BEGIN_SN, END_SN, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER,
-    STATUS, VERSION, ORDER_ID
+    STATUS, VERSION, ORDER_ID, SEND_STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -101,7 +102,8 @@
     BEGIN_SN, END_SN, VENDER,
     PRO_MODEL, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, ORDER_ID)
+    VERSION, ORDER_ID, SEND_STATUS
+    )
     values (#{id,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
     #{activityFrontId,jdbcType=VARCHAR}, #{activityRealId,jdbcType=VARCHAR}, #{refundPriceDiffId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{changeCount,jdbcType=DECIMAL},
@@ -110,7 +112,8 @@
     #{beginSn,jdbcType=VARCHAR}, #{endSn,jdbcType=VARCHAR}, #{vender,jdbcType=VARCHAR},
     #{proModel,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR})
+    #{version,jdbcType=DECIMAL}, #{orderId,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail">
     insert into O_REFUND_PRICE_DIFF_DETAIL
@@ -193,6 +196,9 @@
       <if test="orderId != null">
         ORDER_ID,
       </if>
+      <if test="sendStatus != null">
+        SEND_STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -272,6 +278,9 @@
       </if>
       <if test="orderId != null">
         #{orderId,jdbcType=VARCHAR},
+      </if>
+      <if test="sendStatus != null">
+        #{sendStatus,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -359,6 +368,9 @@
       <if test="orderId != null">
         ORDER_ID = #{orderId,jdbcType=VARCHAR},
       </if>
+      <if test="sendStatus != null">
+        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -388,7 +400,8 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
-    ORDER_ID = #{orderId,jdbcType=VARCHAR}
+    ORDER_ID = #{orderId,jdbcType=VARCHAR},
+    SEND_STATUS = #{sendStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

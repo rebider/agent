@@ -1547,6 +1547,66 @@ public class OLogisticsExample {
             addCriterion("STATUS not between", value1, value2, "status");
             return (Criteria) this;
         }
+
+        public Criteria andSendStatusIsNull() {
+            addCriterion("SEND_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusIsNotNull() {
+            addCriterion("SEND_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS =", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusNotEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS <>", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusGreaterThan(BigDecimal value) {
+            addCriterion("SEND_STATUS >", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS >=", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusLessThan(BigDecimal value) {
+            addCriterion("SEND_STATUS <", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS <=", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusIn(List<BigDecimal> values) {
+            addCriterion("SEND_STATUS in", values, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusNotIn(List<BigDecimal> values) {
+            addCriterion("SEND_STATUS not in", values, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SEND_STATUS between", value1, value2, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SEND_STATUS not between", value1, value2, "sendStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
