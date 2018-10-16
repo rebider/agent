@@ -226,4 +226,42 @@
       </trim>
     </where>
   </sql>-->
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PAgentMerge">
+    update P_AGENT_MERGE
+    <set>
+      <if test="mainAgentId != null">
+        MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentId != null">
+        SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeDate != null">
+        MERGE_DATE = #{mergeDate,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeStatus != null">
+        MERGE_STATUS = #{mergeStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentName != null">
+        MAIN_AGENT_NAME = #{mainAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentName != null">
+        SUB_AGENT_NAME = #{subAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainHead != null">
+        MAIN_HEAD = #{mainHead,jdbcType=VARCHAR},
+      </if>
+      <if test="mainHeadMobile != null">
+        MAIN_HEAD_MOBILE = #{mainHeadMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="subnHead != null">
+        SUBN_HEAD = #{subnHead,jdbcType=VARCHAR},
+      </if>
+      <if test="subHeadMobile != null">
+        SUB_HEAD_MOBILE = #{subHeadMobile,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

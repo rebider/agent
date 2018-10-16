@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsTermWarehouseLogMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsTermWarehouseLog">
+    <result column="WD_ID" jdbcType="VARCHAR" property="wdId" />
+    <result column="MACHINE_ID" jdbcType="VARCHAR" property="machineId" />
+    <result column="POS_SN" jdbcType="VARCHAR" property="posSn" />
+    <result column="OLD_WAREHOUSE_DETAIL" jdbcType="VARCHAR" property="oldWarehouseDetail" />
+    <result column="NEW_WAREHOUSE_DETAIL" jdbcType="VARCHAR" property="newWarehouseDetail" />
+    <result column="OPER_DESCRIBE" jdbcType="VARCHAR" property="operDescribe" />
+    <result column="OPER_TYPE" jdbcType="CHAR" property="operType" />
+    <result column="OPER_TIME" jdbcType="VARCHAR" property="operTime" />
+    <result column="OPER_USER" jdbcType="VARCHAR" property="operUser" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    WD_ID, MACHINE_ID, POS_SN, OLD_WAREHOUSE_DETAIL, NEW_WAREHOUSE_DETAIL, OPER_DESCRIBE, 
+    OPER_TYPE, OPER_TIME, OPER_USER
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseLogExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_TERM_WAREHOUSE_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseLogExample">
+    delete from IMS_TERM_WAREHOUSE_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseLog">
+    insert into IMS_TERM_WAREHOUSE_LOG (WD_ID, MACHINE_ID, POS_SN, 
+      OLD_WAREHOUSE_DETAIL, NEW_WAREHOUSE_DETAIL, 
+      OPER_DESCRIBE, OPER_TYPE, OPER_TIME, 
+      OPER_USER)
+    values (#{wdId,jdbcType=VARCHAR}, #{machineId,jdbcType=VARCHAR}, #{posSn,jdbcType=VARCHAR}, 
+      #{oldWarehouseDetail,jdbcType=VARCHAR}, #{newWarehouseDetail,jdbcType=VARCHAR}, 
+      #{operDescribe,jdbcType=VARCHAR}, #{operType,jdbcType=CHAR}, #{operTime,jdbcType=VARCHAR}, 
+      #{operUser,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseLog">
+    insert into IMS_TERM_WAREHOUSE_LOG
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="wdId != null">
+        WD_ID,
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID,
+      </if>
+      <if test="posSn != null">
+        POS_SN,
+      </if>
+      <if test="oldWarehouseDetail != null">
+        OLD_WAREHOUSE_DETAIL,
+      </if>
+      <if test="newWarehouseDetail != null">
+        NEW_WAREHOUSE_DETAIL,
+      </if>
+      <if test="operDescribe != null">
+        OPER_DESCRIBE,
+      </if>
+      <if test="operType != null">
+        OPER_TYPE,
+      </if>
+      <if test="operTime != null">
+        OPER_TIME,
+      </if>
+      <if test="operUser != null">
+        OPER_USER,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="wdId != null">
+        #{wdId,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="posSn != null">
+        #{posSn,jdbcType=VARCHAR},
+      </if>
+      <if test="oldWarehouseDetail != null">
+        #{oldWarehouseDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="newWarehouseDetail != null">
+        #{newWarehouseDetail,jdbcType=VARCHAR},
+      </if>
+      <if test="operDescribe != null">
+        #{operDescribe,jdbcType=VARCHAR},
+      </if>
+      <if test="operType != null">
+        #{operType,jdbcType=CHAR},
+      </if>
+      <if test="operTime != null">
+        #{operTime,jdbcType=VARCHAR},
+      </if>
+      <if test="operUser != null">
+        #{operUser,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseLogExample" resultType="java.lang.Long">
+    select count(*) from IMS_TERM_WAREHOUSE_LOG
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

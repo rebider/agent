@@ -23,6 +23,16 @@ public class AdjustmentMachineVo implements Serializable{
     public String snStart;
     public String snEnd;
     /**
+     * sn数量
+     */
+    public Integer snNum;
+
+    /**
+     * 业务平台号
+     */
+    public String platformNum;
+
+    /**
      *下发人。
      */
     public String optUser;
@@ -66,5 +76,21 @@ public class AdjustmentMachineVo implements Serializable{
 
     public void setOptUser(String optUser) {
         this.optUser = optUser;
+    }
+
+    public Integer getSnNum() {
+        return snNum;
+    }
+
+    public void setSnNum(Integer snNum) {
+        this.snNum = snNum;
+    }
+
+    public String getPlatformNum() {
+        return platformNum;
+    }
+
+    public void setPlatformNum(String platformNum) {
+        this.platformNum = platformNum;
     }
 }

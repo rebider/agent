@@ -93,39 +93,20 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     /**
      * 机具活动的变更
-     * @param changeActMachineVoList
+     * @param changeActMachine
      * @return
      */
     @Override
-    public AgentResult changeActMachine(List<ChangeActMachineVo> changeActMachineVoList) throws Exception{
-        List<ChangeActMachineVo> changeActMachineVoListMpos = new ArrayList<ChangeActMachineVo>();
-        List<ChangeActMachineVo> changeActMachineVoListPos = new ArrayList<ChangeActMachineVo>();
-        for (ChangeActMachineVo changeActMachineVo : changeActMachineVoList) {
-            if(changeActMachineVo.getPlatformType().equals(PlatformType.MPOS.code)){
-                changeActMachineVoListMpos.add(changeActMachineVo);
-            }else{
-                changeActMachineVoListPos.add(changeActMachineVo);
-            }
-        }
-
-        AgentResult res_Mpos = AgentResult.ok();
-        AgentResult res_Pos = AgentResult.ok();
-
-        if(changeActMachineVoListMpos.size()>0) {
-            AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachineVoList);
+    public AgentResult changeActMachine(ChangeActMachineVo changeActMachine) throws Exception{
+        if(changeActMachine.getPlatformType().equals(PlatformType.MPOS.code)) {
+            AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachine);
             logger.info("mpos机具的互动变更接口:{}",res.getMsg());
-        }
-        if(changeActMachineVoListPos.size()>0) {
-            AgentResult res =   posTermMachineServiceImpl.changeActMachine(changeActMachineVoListPos);
-            logger.info("pos机具的互动变更接口:{}",res.getMsg());
-        }
-
-        if(res_Mpos.isOK() && res_Pos.isOK()) {
             return AgentResult.ok();
         }else{
-            return AgentResult.fail();
+            AgentResult res =   posTermMachineServiceImpl.changeActMachine(changeActMachine);
+            logger.info("pos机具的互动变更接口:{}",res.getMsg());
+            return AgentResult.ok();
         }
-
     }
 
     @Override
