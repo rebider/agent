@@ -33,7 +33,9 @@
 			<property name="enableSubPackages" value="true" />
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
-		<table tableName="o_Payment" domainObjectName="OPayment" enableUpdateByExample="false"
+		<table tableName="o_Refund_price_diff_detail" domainObjectName="ORefundPriceDiffDetail" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
+		<table tableName="o_logistics" domainObjectName="OLogistics" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 
 	</context>
