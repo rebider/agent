@@ -80,7 +80,7 @@ public class CuserAgentServiceImpl implements ICuserAgentService {
             Long count = cuserAgentMapper.countByExample(cuserAgentExample);
             page.setCount(count.intValue());
             cuserAgentExample.setPage(page);
-            cuserAgentExample.setOrderByClause("CREATE_TIME "+Page.ORDER_DIRECTION_DESC);
+//            cuserAgentExample.setOrderByClause("CREATE_TIME "+Page.ORDER_DIRECTION_DESC);
             HashMap hashMap = new HashMap();
             hashMap.put("list",cuserAgentMapper.selectByExample(cuserAgentExample));
             hashMap.put("page",page);
