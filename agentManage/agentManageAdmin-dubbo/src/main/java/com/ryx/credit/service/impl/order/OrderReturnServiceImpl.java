@@ -125,6 +125,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OReceiptProMapper oReceiptProMapper;
     @Autowired
     private OSubOrderActivityMapper oSubOrderActivityMapper;
+    @Autowired
+    private IOrderReturnService iOrderReturnService;
 
 
 
@@ -722,6 +724,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTaskAjustPeople(OReturnOrder oReturnOrder) throws ProcessException {
+        return returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder)==1?AgentResult.ok():AgentResult.fail();
+    }
 
     /**
      * 审批订单任务
@@ -741,7 +748,22 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             String returnId = agentVo.getReturnId();
             OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            //独立事物更新
+            if(null!=agentVo.getoReturnOrder() && StringUtils.isNotEmpty(agentVo.getoReturnOrder().getRefundpeople())) {
+                if(null==agentVo.getoReturnOrder().getRefundtime()) {
+                    throw new ProcessException("核款时间不能为空");
+                }
+                returnOrder.setAuditor(userId);
+                returnOrder.setRefundpeople(agentVo.getoReturnOrder().getRefundpeople());
+                returnOrder.setRefundtime(agentVo.getoReturnOrder().getRefundtime());
+                //独立事务更新
+                if (!iOrderReturnService.approvalTaskAjustPeople(returnOrder).isOK()) {
+                    throw new ProcessException("核款人更新失败");
+                }
 
+            }
+            //再次查询
+            returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
             //业务处理
             String sid = agentVo.getSid();
 
@@ -783,12 +805,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
 
                 AgentResult agentResult = saveAttachments(agentVo, userId);
-                //退款日期   退款人   审核人的更新
-                agentVo.getoReturnOrder().setId(returnId);
-                agentVo.getoReturnOrder().setAuditor(userId);
-                returnOrderMapper.updateByPrimaryKeySelective(agentVo.getoReturnOrder());
-
-
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
                 }
