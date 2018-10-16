@@ -74,7 +74,8 @@
     select
     <include refid="Base_Column_List" />
     from P_AGENT_MERGE
-    WHERE SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} AND MERGE_STATUS = 3
+    WHERE SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} AND
+    (MERGE_STATUS = 3 OR MERGE_STATUS = 1 OR MERGE_STATUS = 2)
   </select>
 
   <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
