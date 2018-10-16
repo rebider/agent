@@ -152,6 +152,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
      */
     @Override
     public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo) throws Exception{
+        changeActMachineVo.setLogisticsDetailList(null);
         logger.info("Mpos机具的调整，，退货是使用");
         JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(changeActMachineVo));
         JSONObject res = request(data, AppConfig.getProperty("mpos.changeActMachine"));
