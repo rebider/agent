@@ -23,7 +23,7 @@ import java.util.Map;
  * @see CuserAgentServiceImpl
  * To change this template use File | Settings | File Templates.
  */
-@Service("ICuserAgentService")
+@Service("cuserAgentService")
 public class CuserAgentServiceImpl implements ICuserAgentService {
     @Autowired
     private CuserAgentMapper cuserAgentMapper;

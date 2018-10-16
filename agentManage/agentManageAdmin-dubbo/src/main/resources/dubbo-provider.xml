@@ -63,7 +63,7 @@
     <dubbo:reference interface="com.ryx.credit.profit.service.ProfitMonthService" id="profitMonthService"  timeout="1200000" registry="${zk.group}" check="false" />
     <dubbo:reference interface="com.ryx.credit.profit.service.IProfitDirectService" id="profitDirectService"  timeout="1200000" registry="${zk.group}" check="false" />
    <!--<dubbo:reference interface="com.ryx.credit.profit.service.ProfitComputerService" id="profitComputerService"  timeout="1200000" registry="${zk.group}" check="false" />-->
-    <dubbo:reference interface="com.ryx.credit.service.ISendSMSService" id="sendSMSService"  timeout="1200000" registry="${zk.group}" check="false" />
+
 
     <dubbo:service interface="com.ryx.credit.service.bank.EtbSyscardinfoService" ref="etbSyscardinfoService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}"/>
@@ -105,4 +105,6 @@
     <dubbo:reference interface="com.ryx.credit.machine.service.ImsTermTransferService" id="imsTermTransferService"  timeout="1200000" registry="${zk.group}"  check="false" />
     <dubbo:reference interface="com.ryx.credit.machine.service.ImsTermWarehouseDetailService" id="imsTermWarehouseDetailService"  timeout="1200000" registry="${zk.group}" check="false" />
 
+    <dubbo:service interface="com.ryx.credit.service.ISendSMSService" ref="sendSMSService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.ICuserAgentService" ref="cuserAgentService"  timeout="1200000" registry="${zk.group}" />
 </beans>
