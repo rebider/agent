@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface PlannerService {
 
-    PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page);
+    PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page,Map map);
 
     AgentResult savePlanner(ReceiptPlan receiptPlan,String receiptProId) throws Exception;
 

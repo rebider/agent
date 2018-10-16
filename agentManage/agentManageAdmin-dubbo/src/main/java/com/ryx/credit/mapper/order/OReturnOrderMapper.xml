@@ -452,4 +452,10 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
     </if>
   </sql>
+
+  <select id="selectByReturnDeId" parameterType="string" resultType="map">
+select subact.activity_id,subact.pro_id from o_return_order_detail orderdetail left join o_sub_order suborder on orderdetail.order_id=suborder.order_id
+and orderdetail.pro_id=suborder.pro_id
+left join o_sub_order_activity subact on subact.sub_order_id=suborder.id where orderdetail.id=#{returnDetailsId}
+  </select>
 </mapper>
