@@ -975,7 +975,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 receiptPlan.setProCom(jsonObject.getString("proCom"));
                 receiptPlan.setModel(jsonObject.getString("model"));
                 receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
-                receiptPlan.setReturnOrderDetailId(agentVo.getReturnId());
+                receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
                 String receiptProId = jsonObject.getString("receiptProId");
                 plannerService.savePlanner(receiptPlan, receiptProId);
             }

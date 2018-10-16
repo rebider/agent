@@ -76,6 +76,8 @@ public class PlannerServiceImpl implements PlannerService {
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){
             for (Map<String, Object> stringObjectMap : plannerList) {
                 stringObjectMap.put("O_RETURN_ORDER_DETAIL_ID",map.get("O_RETURN_ORDER_DETAIL_ID"));
+                //回填退货数量
+                stringObjectMap.put("planProNum",map.get("RETURN_COUNT"));
             }
         }
         PageInfo pageInfo = new PageInfo();
