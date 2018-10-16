@@ -1,8 +1,10 @@
 package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.PAgentMerge;
 
 import java.util.Map;
@@ -19,6 +21,22 @@ public interface IProfitAgentMergerService {
     PageInfo getProfitAgentMergeList(Map<String, Object> param, PageInfo pageInfo);
     /**代理商合并提交存库*/
     void agentMergeTaxEnterIn(PAgentMerge record,Long  userId)throws ProcessException;
-    /**代理商提交初*/
-    //PAgentMerge getMergeById(String var1);
+    /**代理商合并查询一条数据*/
+    PAgentMerge getMergeById(String var1);
+
+    /**
+     * 处理审批任务
+     * @param agentVo
+     * @param userId
+     * @throws ProcessException
+     */
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
+
+    /**
+     * 审批流回调方法
+     * @param insid
+     * @param status
+     */
+    public void completeTaskEnterActivity(String insid, String status);
+
 }

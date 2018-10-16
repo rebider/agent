@@ -3,16 +3,21 @@ package com.ryx.credit.profit.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PAgentMergeMapper;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
 import com.ryx.credit.profit.pojo.PAgentMerge;
+import com.ryx.credit.profit.pojo.PAgentQuit;
 import com.ryx.credit.profit.service.IProfitAgentMergerService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -22,10 +27,12 @@ import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 代理商合并Impl
@@ -47,6 +54,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private AgentEnterService agentEnterService;
+
     /**代理商合并*/
     @Override
     public PageInfo getProfitAgentMergeList(Map<String, Object> param, PageInfo pageInfo) {
@@ -81,22 +89,64 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         record.setBusType(BusActRelBusType.MERGE.name());
         try {
             taskApprovalService.addABusActRel(record);
-            logger.info("代理商合申请审批流启动成功");
+            logger.info("代理商合并申请审批流启动成功");
         } catch (Exception e) {
             e.getStackTrace();
-            logger.error("代理商合申请审批流启动失败{}");
-            throw new ProcessException("代理商合申请审批流启动失败!:{}",e.getMessage());
+            logger.error("代理商合并申请审批流启动失败{}");
+            throw new ProcessException("代理商合并申请审批流启动失败!:{}",e.getMessage());
         }
         pAgentMerge.setMergeStatus(AgStatus.Approving.name());
         pAgentMergeMapper.updateByPrimaryKeySelective(pAgentMerge);
     }
 
-    /*@Override
+    @Override
     public PAgentMerge getMergeById(String id) {
         if (StringUtils.isNotBlank(id)) {
             return pAgentMergeMapper.selectByPrimaryKey(id);
         }else{
             return null;
         }
-    }*/
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
+        logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
+        try {
+            taskApprovalService.updateApproval(agentVo, userId);
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
+            if(!result.isOK()){
+                logger.error(result.getMsg());
+                throw new ProcessException("工作流处理任务异常");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new ProcessException("catch工作流处理任务异常!");
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public void completeTaskEnterActivity(String insid, String status) {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        BusActRel busActRel = new BusActRel();
+        busActRel.setActivId(insid);
+        try {
+            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            if (rel != null) {
+                PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
+                pAgentMerge.setMergeStatus(AgStatus.Approved.name());//审批状态：Approved 3: 审批通过
+                pAgentMerge.setMergeDate(df.format(new Date()));//合并日期（生效日期）
+                logger.info("1.更新代理商退出申请状态为通过，已生效");
+                pAgentMergeMapper.updateByPrimaryKeySelective(pAgentMerge);
+                logger.info("2.更新审批流与业务对象");
+                rel.setStatus(Status.STATUS_2.status);
+                taskApprovalService.updateABusActRel(rel);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("代理商退出申请审批流回调异常，activId：{}" + insid);
+        }
+    }
+
 }

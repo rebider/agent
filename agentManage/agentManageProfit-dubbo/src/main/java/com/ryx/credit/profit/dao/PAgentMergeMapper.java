@@ -18,6 +18,8 @@ public interface PAgentMergeMapper {
 
     List<PAgentMerge> selectByExample(PAgentMergeExample example);
 
+    PAgentMerge selectByPrimaryKey(String id);
+
     PAgentMerge selectBySubAgentId(String subAgentId);
 
     /**
