@@ -80,7 +80,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult adjustmentMachine(List<AdjustmentMachineVo> adjustmentMachineVoList) {
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) {
         return null;
     }
 
