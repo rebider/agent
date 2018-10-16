@@ -387,7 +387,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
                             }
 
-                            //首刷洗发业务系统
+                        //首刷下发业务系统
                         }else if(proType.equals(PlatformType.MPOS.msg)){
 
                             List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
