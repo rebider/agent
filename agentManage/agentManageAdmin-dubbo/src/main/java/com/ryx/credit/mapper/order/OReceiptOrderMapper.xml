@@ -414,17 +414,21 @@
   <select id="queryPlannerAll" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
 
-    select  ac.vender,ac.pro_model,rp.pro_num,
+    select  ac.vender as "proCom",ac.pro_model as "model",
     ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
     ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
     ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
     ro.AGENT_ID, rp.ORDERID, rp.RECEIPT_ID, rp.PRO_ID, rp.PRO_CODE, rp.PRO_NAME, rp.PRO_NUM,rp.SEND_NUM,rp.id as receipt_Pro_Id
     from O_Receipt_order ro left join o_Receipt_pro rp on ro.id = rp.receipt_id
-
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id
-    where  ac.activity_id=#{par.activityId} and ac.pro_id=#{par.proId}
-
+    <where>
+     <if test="par.activityId != null and par.activityId!=''" >
+       and ac.activity_id=#{par.activityId}
+    </if>
+    <if test="par.proId != null and par.proId!=''" >
+     and ac.pro_id=#{par.proId}
+    </if>
     <if test="par.receiptStatus != null and par.receiptStatus!=''" >
       and receipt_status = #{par.receiptStatus}
     </if>
@@ -440,6 +444,7 @@
     <if test="par.addrRealname != null and par.addrRealname!=''" >
       and ro.ADDR_REALNAME = #{par.addrRealname}
     </if>
+    </where>
     <include refid="OracleDialectSuffix" />
   </select>
 </mapper>
