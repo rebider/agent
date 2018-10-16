@@ -77,6 +77,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Autowired
     TransProfitDetailMapper transProfitDetailMapper;
     @Autowired
+    PAgentMergeMapper pAgentMergeMapper;
+    @Autowired
     AgentColinfoService colinfoService;
     @Autowired
     OrderService orderService;
@@ -848,6 +850,18 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 tax = new BigDecimal("0.06");
             }else tax = point.getCloTaxPoint()==null?new BigDecimal("0.06"):point.getCloTaxPoint();//税点为空默认0.06
         }
+
+        //如果本代理商被合并，则使用合并代理商税点
+        PAgentMerge merge = pAgentMergeMapper.selectBySubAgentId(detailMonth.getAgentId());
+        if(null!=merge){
+            AgentColinfo condition = new AgentColinfo();
+            condition.setAgentId(merge.getMainAgentId());//主代理商
+            AgentColinfo point = colinfoService.queryPoint(condition);
+            if(null==point){
+                tax = new BigDecimal("0.06");
+            }else tax = point.getCloTaxPoint()==null?new BigDecimal("0.06"):point.getCloTaxPoint();//税点为空默认0.06
+        }
+
         logger.info("税点："+tax);
         //-------------------查询该代理商下级代理应补税额-------------------
         BigDecimal subTax1 = BigDecimal.ZERO;//直发补税

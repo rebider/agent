@@ -116,6 +116,9 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     @Override
     public AgentResult lowerHairMachine(LowerHairMachineVo lowerHairMachineVo) throws Exception{
         logger.info("Mpos机具的下发:");
+        if(1==1) {
+            return AgentResult.ok();
+        }
         JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(lowerHairMachineVo));
         JSONObject res = request(data, AppConfig.getProperty("mpos.lowerHairMachine"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
@@ -128,14 +131,17 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     /**
      * 机具的调整，，退货是使用
-     * @param adjustmentMachineVo
+     * @param adjustmentMachineVoList
      * @return
      */
     @Override
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception{
+    public AgentResult adjustmentMachine(List<AdjustmentMachineVo> adjustmentMachineVoList) throws Exception{
         logger.info("Mpos机具的调整，退货是使用");
-        JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(adjustmentMachineVo));
-        JSONObject res = request(data, AppConfig.getProperty("mpos.lowerHairMachine"));
+        if(1==1) {
+            return AgentResult.ok();
+        }
+        JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(adjustmentMachineVoList));
+        JSONObject res = request(data, AppConfig.getProperty("mpos.adjustmentMachine"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
             JSONArray respdata =  res.getJSONArray("data");
             return AgentResult.ok();
@@ -151,9 +157,12 @@ public class MposTermMachineServiceImpl implements TermMachineService {
      */
     @Override
     public AgentResult changeActMachine(List<ChangeActMachineVo> changeActMachineVoList) throws Exception{
+        if(1==1) {
+            return AgentResult.ok();
+        }
         logger.info("Mpos机具的调整，，退货是使用");
         JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(changeActMachineVoList));
-        JSONObject res = request(data, AppConfig.getProperty("mpos.lowerHairMachine"));
+        JSONObject res = request(data, AppConfig.getProperty("mpos.changeActMachine"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
             JSONArray respdata =  res.getJSONArray("data");
             return AgentResult.ok();
@@ -164,15 +173,21 @@ public class MposTermMachineServiceImpl implements TermMachineService {
 
     @Override
     public JSONObject request(Map data, String url) throws Exception {
-        String json = JsonUtil.objectToJson(data);
-        logger.info("通知手刷请求参数：{},{}",url,json);
-        String httpResult = HttpClientUtil.doPostJsonWithException(url, json);
-        logger.info("通知手刷返回参数：{},{}",url,httpResult);
-        if(StringUtils.isNotBlank(httpResult)) {
-            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
-            return respXMLObj;
-        }else{
-            throw new Exception("请求出错");
+        try {
+            String json = JsonUtil.objectToJson(data);
+            logger.info("通知手刷请求参数：{},{}",url,json);
+            String httpResult = HttpClientUtil.doPostJsonWithException(url, json);
+            logger.info("通知手刷返回参数：{},{}",url,httpResult);
+            if(StringUtils.isNotBlank(httpResult)) {
+                JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+                return respXMLObj;
+            }else{
+                throw new Exception("请求出错");
+            }
+        } catch (Exception e) {
+            logger.error("首刷发送请求失败：",e);
+            e.printStackTrace();
+            throw e;
         }
 
     }

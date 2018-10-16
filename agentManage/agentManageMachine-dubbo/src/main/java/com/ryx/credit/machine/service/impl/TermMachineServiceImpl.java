@@ -8,6 +8,8 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -23,6 +25,8 @@ import java.util.Map;
 @Service("termMachineService")
 public class TermMachineServiceImpl  implements TermMachineService {
 
+
+    private Logger logger = LoggerFactory.getLogger(TermMachineServiceImpl.class);
 
     @Resource(name = "posTermMachineServiceImpl")
     private TermMachineService posTermMachineServiceImpl;
@@ -79,12 +83,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     /**
      * 机具的调整，，退货是使用
-     * @param adjustmentMachineVo
+     * @param adjustmentMachineVoList
      * @return
      */
     @Override
-    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception{
-        return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
+    public AgentResult adjustmentMachine(List<AdjustmentMachineVo> adjustmentMachineVoList) throws Exception{
+        return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVoList);
     }
 
     /**
@@ -94,7 +98,34 @@ public class TermMachineServiceImpl  implements TermMachineService {
      */
     @Override
     public AgentResult changeActMachine(List<ChangeActMachineVo> changeActMachineVoList) throws Exception{
-        return mposTermMachineServiceImpl.changeActMachine(changeActMachineVoList);
+        List<ChangeActMachineVo> changeActMachineVoListMpos = new ArrayList<ChangeActMachineVo>();
+        List<ChangeActMachineVo> changeActMachineVoListPos = new ArrayList<ChangeActMachineVo>();
+        for (ChangeActMachineVo changeActMachineVo : changeActMachineVoList) {
+            if(changeActMachineVo.getPlatformType().equals(PlatformType.MPOS.code)){
+                changeActMachineVoListMpos.add(changeActMachineVo);
+            }else{
+                changeActMachineVoListPos.add(changeActMachineVo);
+            }
+        }
+
+        AgentResult res_Mpos = AgentResult.ok();
+        AgentResult res_Pos = AgentResult.ok();
+
+        if(changeActMachineVoListMpos.size()>0) {
+            AgentResult res =   mposTermMachineServiceImpl.changeActMachine(changeActMachineVoList);
+            logger.info("mpos机具的互动变更接口:{}",res.getMsg());
+        }
+        if(changeActMachineVoListPos.size()>0) {
+            AgentResult res =   posTermMachineServiceImpl.changeActMachine(changeActMachineVoListPos);
+            logger.info("pos机具的互动变更接口:{}",res.getMsg());
+        }
+
+        if(res_Mpos.isOK() && res_Pos.isOK()) {
+            return AgentResult.ok();
+        }else{
+            return AgentResult.fail();
+        }
+
     }
 
     @Override

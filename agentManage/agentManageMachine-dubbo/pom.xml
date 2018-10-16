@@ -36,7 +36,7 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>agentManageActivity-dubbo</finalName>
+        <finalName>agentManageMachine-dubbo</finalName>
         <filters>
             <!-- 全局配置 -->
             <filter>${project.basedir}/../src/main/filters/filter-global.properties</filter>
