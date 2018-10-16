@@ -85,7 +85,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     }
 
     @Override
-    public AgentResult changeActMachine(ChangeActMachineVo changeActMachine) throws Exception{
+    public AgentResult changeActMachine(ChangeActMachineVo changeActMachine) throws MessageException{
         List<OLogisticsDetail> logisticsDetailList = changeActMachine.getLogisticsDetailList();
         if(null==logisticsDetailList){
             log.info("updateWarehouse请求参数错误1");
@@ -118,7 +118,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
             imsTermWarehouseLog.setMachineId(oLogisticsDetail.getBusProCode());
             imsTermWarehouseLog.setPosSn(oLogisticsDetail.getSnNum());
             imsTermWarehouseLog.setOldWarehouseDetail(JsonUtil.objectToJson(queryImsTerm));
-            imsTermWarehouseLog.setNewWarehouseDetail(JsonUtil.objectToJson(imsTermWarehouseDetail));
+            queryImsTerm.setPosSn(oLogisticsDetail.getSnNum());
+            queryImsTerm.setMachineId(oLogisticsDetail.getBusProCode());
+            imsTermWarehouseLog.setNewWarehouseDetail(JsonUtil.objectToJson(queryImsTerm));
             imsTermWarehouseLog.setOperDescribe("修改");
             imsTermWarehouseLog.setOperType("1");  //修改
             imsTermWarehouseLog.setOperTime(DateUtil.format(new Date()));

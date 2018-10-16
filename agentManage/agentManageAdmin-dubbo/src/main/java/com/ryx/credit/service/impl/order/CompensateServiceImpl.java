@@ -648,9 +648,24 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setLogisticsDetailList(oLogisticsDetails);
             //cxinfo 调用活动变更接口进行活动的变更
             try {
-                AgentResult ar = termMachineService.changeActMachine(cav);
+                AgentResult agentResult = termMachineService.changeActMachine(cav);
+                row.setSendMsg(agentResult.getMsg());
+                if(agentResult.isOK()){
+                    row.setSendStatus(Status.STATUS_1.status);
+                }else{
+                    row.setSendStatus(Status.STATUS_2.status);
+                }
+                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+            } catch (MessageException e) {
+                e.printStackTrace();
+                row.setSendMsg(e.getMsg());
+                row.setSendStatus(Status.STATUS_2.status);
+                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
             } catch (Exception e) {
                 e.printStackTrace();
+                row.setSendMsg("下发异常");
+                row.setSendStatus(Status.STATUS_2.status);
+                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
             }
         });
         return AgentResult.ok();
