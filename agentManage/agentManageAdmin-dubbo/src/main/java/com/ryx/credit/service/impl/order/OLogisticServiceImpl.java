@@ -21,6 +21,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -360,9 +361,33 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                             imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
                             imsTermWarehouseDetail.setMachineId(oSubOrderActivity.getBusProCode());
-                            imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
+                            OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                            try {
+                                //机具下发接口
+                                AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(snList,imsTermWarehouseDetail);
+                                if(posSendRes.isOK()){
+                                    logistics_send.setSendMsg(posSendRes.getMsg());
+                                    logistics_send.setSendStatus(Status.STATUS_1.status);
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                                }else{
+                                    logistics_send.setSendMsg(posSendRes.getMsg());
+                                    logistics_send.setSendStatus(Status.STATUS_2.status);
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                                }
 
-                        //首刷洗发业务系统
+                            } catch (MessageException e) {
+                                e.printStackTrace();
+                                logistics_send.setSendMsg(e.getMsg());
+                                logistics_send.setSendStatus(Status.STATUS_2.status);
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                            }catch (Exception e){
+                                e.printStackTrace();
+                                logistics_send.setSendMsg("下发异常");
+                                logistics_send.setSendStatus(Status.STATUS_2.status);
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                            }
+
+                            //首刷洗发业务系统
                         }else if(proType.equals(PlatformType.MPOS.msg)){
 
                             List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
@@ -386,9 +411,30 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             }
                             lowerHairMachineVo.setListSn(listSn);
                             //机具下发接口
-                            AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
-                            logger.info("导入物流：洗发到首刷平台结果:{}",lowerHairMachineRes.getMsg());
-
+                            OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
+                            try {
+                                AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
+                                logger.info("导入物流：洗发到首刷平台结果:{}",lowerHairMachineRes.getMsg());
+                                if(lowerHairMachineRes.isOK()) {
+                                    logistics_send.setSendStatus(Status.STATUS_1.status);
+                                    logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                                }else{
+                                    logistics_send.setSendStatus(Status.STATUS_2.status);
+                                    logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                                }
+                            }catch (MessageException e) {
+                                e.printStackTrace();
+                                logistics_send.setSendStatus(Status.STATUS_2.status);
+                                logistics_send.setSendMsg(e.getMsg());
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                logistics_send.setSendStatus(Status.STATUS_2.status);
+                                logistics_send.setSendMsg("下发异常");
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics_send);
+                            }
                         }else{
                             logger.info("导入物流：平台类型错误");
                             throw new MessageException("平台类型错误");
