@@ -195,6 +195,17 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("请填写物流单号");
                     throw new MessageException("请填写物流单号");
                 }
+                //需要验证截取sn前面的字符是否一致
+                String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
+                String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
+                HashSet<Object> set = new HashSet<>();
+                set.add(startSnString);
+                set.add(endSnString);
+                if (set.size()>1){
+                    logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
+                    throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
+                }
+
                 OSubOrderExample example = new OSubOrderExample();
                 example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
                 List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);

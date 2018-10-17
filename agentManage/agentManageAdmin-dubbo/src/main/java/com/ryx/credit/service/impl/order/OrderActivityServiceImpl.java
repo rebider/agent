@@ -204,7 +204,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
     @Override
     public Map selectTermMachine(String platformNum) throws MessageException {
-        if (StringUtils.isNotBlank(platformNum)){
+        if (StringUtils.isBlank(platformNum)){
             throw new MessageException("平台类型为空");
         }
      String platFormType= platFormMapper.selectPlatType(platformNum);
