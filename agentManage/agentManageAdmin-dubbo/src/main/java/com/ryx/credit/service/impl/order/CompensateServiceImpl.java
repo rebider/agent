@@ -645,6 +645,7 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setNewAct(activity.getBusProCode());
             cav.setOldAct(activity_old.getBusProCode());
             cav.setOptUser(row.getcUser());
+
             //起始sn
             OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
             exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(row.getBeginSn());
