@@ -3,9 +3,10 @@ package junit;
 import com.alibaba.fastjson.JSONArray;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.MposTermBatchVo;
-import com.ryx.credit.machine.vo.MposTermTypeVo;
-import com.ryx.credit.machine.vo.TermMachineVo;
+import com.ryx.credit.machine.vo.*;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.order.OOrder;
+import com.ryx.credit.pojo.admin.order.OReturnOrderDetail;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,44 @@ public class MeTest extends BaseSpringTest {
         try {
             List<MposTermTypeVo> list =  termMachineService.queryMposTermType(PlatformType.MPOS);
             logger.debug(JSONArray.toJSONString(list));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testadjustmentMachine(){
+        try {
+
+            AdjustmentMachineVo vo = new AdjustmentMachineVo();
+            vo.setOptUser("1");
+            vo.setSnStart("8850003000000000");
+            vo.setSnEnd("8850003000000019");
+            //发货订单的业务编号
+            vo.setNewBusNum("50000001");
+            //退货订单的业务编号
+            vo.setOldBusNum("50000015");
+            vo.setPlatformNum("50000000");
+            vo.setSnNum("2");
+            logger.debug(JSONArray.toJSONString(termMachineService.adjustmentMachine(vo)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void testchangeActMachine(){
+        try {
+
+            ChangeActMachineVo changeActMachineVo = new ChangeActMachineVo();
+            changeActMachineVo.setBusNum("50000001");
+            changeActMachineVo.setSnStart("8850003000000000");
+            changeActMachineVo.setSnEnd("8850003000000019");
+            changeActMachineVo.setPlatformType("MPOS");
+            changeActMachineVo.setOldAct("1004");
+            changeActMachineVo.setNewAct("1005");
+            logger.debug(JSONArray.toJSONString(termMachineService.changeActMachine(changeActMachineVo)));
         } catch (Exception e) {
             e.printStackTrace();
         }

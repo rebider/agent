@@ -649,6 +649,7 @@ public class CompensateServiceImpl implements CompensateService {
             OOrder oo = oOrderMapper.selectByPrimaryKey(row.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
             PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
+
             ChangeActMachineVo cav = new ChangeActMachineVo();
             cav.setBusNum(agentBusInfo.getBusNum());
             cav.setNewAct(activity.getBusProCode());
