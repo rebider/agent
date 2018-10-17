@@ -109,6 +109,7 @@ public class ColinfoTask {
                 payment.setStatus(Status.STATUS_1.status);
                 payment.setVersion(Status.STATUS_0.status);
                 payment.setSynchronizeDate(tranDate);
+                payment.setDatasource("13");  //收款账户同步清结算类型
                 AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
                 criteria.andAgentIdEqualTo(payment.getMerchId());
