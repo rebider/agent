@@ -28,15 +28,22 @@ public interface IProfitAgentMergerService {
      * 处理审批任务
      * @param agentVo
      * @param userId
-     * @throws ProcessException
+     * @throws Exception
      */
-    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
+    public AgentResult approvalTask(AgentVo agentVo, String userId)throws Exception;
 
     /**
      * 审批流回调方法
      * @param insid
      * @param status
      */
-    public void completeTaskEnterActivity(String insid, String status);
+    public AgentResult approveFinish(String insid, String status)throws Exception;
+
+    /**
+     * 审批退回，修改申请信息
+     * @param pAgentMerge
+     * @throws Exception
+     */
+    public void editMergeRegect(PAgentMerge pAgentMerge)throws Exception;
 
 }

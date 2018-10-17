@@ -102,11 +102,14 @@ public class ColinfoTask {
                 payment.setcUser(String.valueOf(row.get("C_USER")));
                 payment.setuUser(String.valueOf(row.get("C_USER")));
                 payment.setCreateTime(nowDate);
-                payment.setTranDate(DateUtil.format(nowDate, DateUtil.DATE_FORMAT_3));
+                String tranDate = DateUtil.format(nowDate, DateUtil.DATE_FORMAT_3);
+                payment.setTranDate(tranDate);
                 payment.setInputTime(DateUtil.format(nowDate, DateUtil.DATE_FORMAT_2));
                 payment.setBalanceAmt(getRandomAmt());
                 payment.setStatus(Status.STATUS_1.status);
                 payment.setVersion(Status.STATUS_0.status);
+                payment.setSynchronizeDate(tranDate);
+                payment.setDatasource("13");  //收款账户同步清结算类型
                 AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
                 criteria.andAgentIdEqualTo(payment.getMerchId());

@@ -42,9 +42,9 @@ public interface IOrderReturnService {
     void doPlan(String returnId, BigDecimal takeAmt, String userid);
 
 
-    void approvalReject(String processInstanceId, String activityName);
+    void approvalReject(String processInstanceId, String activityName)throws Exception;
 
-    void approvalFinish(String processInstanceId, String activityName);
+    void approvalFinish(String processInstanceId, String activityName)throws Exception;
 
     /**
      * 退货列表及导出
