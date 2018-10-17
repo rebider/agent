@@ -525,6 +525,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String terminalid="";
             String terminalid_key="";
             String terminalid_seq="";
+            String terminalidCheck="";
             String sn_num="";
                 if (StringUtils.isBlank(list.get(0))) {
                     logger.info("终端号不能为空");
@@ -543,9 +544,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     throw new MessageException("序列不能为空");
                 }
                 terminalid=String.valueOf(list.get(0));
-                sn_num=String.valueOf(list.get(1));
+                String sn = list.get(1);
+                sn_num=String.valueOf(sn.substring(0, sn.length() - 1));
                 terminalid_key= String.valueOf(list.get(2));
                 terminalid_seq=String.valueOf(list.get(3));
+                terminalidCheck=String.valueOf(sn.substring(sn.length()-1));
                 OLogisticsDetail oLogisticsDetail = new OLogisticsDetail();
                 oLogisticsDetail.setId(idService.genId(TabId.o_logistics_detail));
                 oLogisticsDetail.setcTime(Calendar.getInstance().getTime());
@@ -553,6 +556,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setTerminalid(terminalid);
                 oLogisticsDetail.setTerminalidKey(terminalid_key);
                 oLogisticsDetail.setTerminalidSeq(terminalid_seq);
+                oLogisticsDetail.setTerminalidCheck(terminalidCheck);
                 oLogisticsDetail.setSnNum(sn_num);
                 oLogisticsDetail.setStatus(Status.STATUS_0.status);
                 oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
