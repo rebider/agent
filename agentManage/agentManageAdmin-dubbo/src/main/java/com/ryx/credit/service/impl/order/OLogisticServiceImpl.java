@@ -392,18 +392,30 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
                             OOrder oOrder = oOrderMapper.selectByPrimaryKey(subOrderItem.getOrderId());
                             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+
+                            //起始sn
+                            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
+                            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                            List<OLogisticsDetail> logisticsDetailsstart = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
+                            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+                            //结束sn
+                            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
+                            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                            List<OLogisticsDetail> logisticsDetailsend = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
+                            OLogisticsDetail detailend = logisticsDetailsend.get(0);
+
                             //sn号码段
                             LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
                             lowerHairMachineVo.setBusNum(agentBusInfo.getBusNum());
                             lowerHairMachineVo.setOptUser(user);
-                            lowerHairMachineVo.setSnStart(oLogistics.getSnBeginNum());
-                            lowerHairMachineVo.setSnEnd(oLogistics.getSnEndNum());
+                            lowerHairMachineVo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
+                            lowerHairMachineVo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
                             lowerHairMachineVo.setoLogisticsId(oLogistics.getId());
                             //sn明细
                             List<MposSnVo> listSn = new ArrayList<MposSnVo>();
                             for (OLogisticsDetail forsendSn : forsendSns) {
                                 listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
-                                        ,forsendSn.getSnNum()
+                                        ,forsendSn.getSnNum()+forsendSn.getTerminalidCheck()
                                         ,forsendSn.getTerminalidKey()
                                         ,forsendSn.getBusProCode()
                                         ,forsendSn.getTermtype()));
