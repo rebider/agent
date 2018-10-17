@@ -1345,7 +1345,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             AdjustmentMachineVo vo = new AdjustmentMachineVo();
                             vo.setOptUser(user);
                             vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
-                            vo.setSnEnd(detailstart.getSnNum()+detailstart.getTerminalidCheck());
+                            vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
 
                             //发货订单的业务编号
                             OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
