@@ -632,6 +632,19 @@ public class CompensateServiceImpl implements CompensateService {
                 }
 
             });
+
+            //起始sn
+            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
+            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(row.getBeginSn()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+            List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
+            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+            //结束sn
+            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
+            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(row.getEndSn()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+            List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
+            OLogisticsDetail detailend = logisticsDetailsend.get(0);
+
+
             //待调整集合 cxinfo 机具的调整  调货明细
             OOrder oo = oOrderMapper.selectByPrimaryKey(row.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
@@ -641,8 +654,8 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setNewAct(activity.getBusProCode());
             cav.setOldAct(activity_old.getBusProCode());
             cav.setOptUser(row.getcUser());
-            cav.setSnStart(row.getBeginSn());
-            cav.setSnEnd(row.getEndSn());
+            cav.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
+            cav.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
             cav.setPlatformType(platformType.code);
             cav.setoRefundPriceDiffDetailId(row.getId());
             cav.setLogisticsDetailList(oLogisticsDetails);

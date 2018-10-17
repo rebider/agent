@@ -1330,10 +1330,22 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         //cxinfo 机具退货调整首刷接口调用
                         }else if(proType.equals(PlatformType.MPOS.msg)){
 
+
+                            //起始sn
+                            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
+                            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                            List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
+                            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+                            //结束sn
+                            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
+                            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(oLogistics.getSnEndNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                            List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
+                            OLogisticsDetail detailend = logisticsDetailsend.get(0);
+
                             AdjustmentMachineVo vo = new AdjustmentMachineVo();
                             vo.setOptUser(user);
-                            vo.setSnStart(oLogistics.getSnBeginNum());
-                            vo.setSnEnd(oLogistics.getSnEndNum());
+                            vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
+                            vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
 
                             //发货订单的业务编号
                             OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
