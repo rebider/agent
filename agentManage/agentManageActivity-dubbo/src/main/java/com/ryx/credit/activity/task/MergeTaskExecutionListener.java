@@ -4,6 +4,7 @@ import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
+import com.ryx.credit.profit.service.IProfitAgentMergerService;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.order.OrderService;
 import com.ryx.credit.spring.MySpringContextHandler;
@@ -38,18 +39,18 @@ public class MergeTaskExecutionListener implements TaskListener, ExecutionListen
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            OrderService orderService = (OrderService)MySpringContextHandler.applicationContext.getBean("orderService");
+            IProfitAgentMergerService profitAgentMergerService = (IProfitAgentMergerService)MySpringContextHandler.applicationContext.getBean("profitAgentMergerService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========MergeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = orderService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
-                logger.info("=========MergeTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+//                AgentResult res = profitAgentMergerService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
+//                logger.info("=========MergeTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 logger.info("=========MergeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = orderService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
+                AgentResult res = profitAgentMergerService.approveFinish(delegateExecution.getProcessInstanceId(),activityName);
                 logger.info("=========MergeTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
 
             }
