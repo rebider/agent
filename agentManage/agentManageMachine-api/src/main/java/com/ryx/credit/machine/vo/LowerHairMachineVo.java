@@ -20,6 +20,7 @@ public class LowerHairMachineVo  implements Serializable {
     //sn集合
     private List<MposSnVo> listSn;
 
+
     /**
      * 物流id
      */

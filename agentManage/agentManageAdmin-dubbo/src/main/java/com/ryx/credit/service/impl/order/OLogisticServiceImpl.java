@@ -89,7 +89,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if (null!=modelType){
                 stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
             }
-
         }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);

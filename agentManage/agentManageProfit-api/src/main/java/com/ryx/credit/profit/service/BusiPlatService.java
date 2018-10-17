@@ -17,14 +17,16 @@ public interface BusiPlatService {
     /**
      * 冻结
      * @param agentIds 代理商AG码list
+     *                 return true：冻结失败
      */
-    void mPos_Frozen(List<String> agentIds);
+    boolean mPos_Frozen(List<String> agentIds);
 
     /**
      * 解冻
      * @param agentIds 代理商AG码list
+     *                 return true：解冻失败
      */
-    void mPos_unFrozen(List<String> agentIds);
+    boolean mPos_unFrozen(List<String> agentIds);
 
     /**
      * 代理商更名(手刷)

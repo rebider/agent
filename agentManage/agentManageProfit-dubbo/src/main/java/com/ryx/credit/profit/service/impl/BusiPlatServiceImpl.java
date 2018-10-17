@@ -39,8 +39,10 @@ public class BusiPlatServiceImpl implements BusiPlatService {
     @Autowired
     AgentNotifyService agentNotifyService;
 
+    
+
     @Override
-    public void mPos_Frozen(List<String> agentIds) {
+    public boolean mPos_Frozen(List<String> agentIds) {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("agencyBlack_type","1");//1、冻结 0、解冻
         map.put("type","1");//1-冻结本身以及下属，2-冻结自身（默认）；3-本身不冻结，冻结所有下级
@@ -54,15 +56,16 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
             AppConfig.sendEmails("代理商冻结失败","代理商冻结失败");
-            return;
+            return true;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         log.debug(data);
         log.debug("代理商冻结成功！");
+        return false;
     }
 
     @Override
-    public void mPos_unFrozen(List<String> agentIds) {
+    public boolean mPos_unFrozen(List<String> agentIds) {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("agencyBlack_type","0");//1、冻结 0、解冻
         map.put("type","1");//解冻时无视该类型
@@ -76,11 +79,12 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
             AppConfig.sendEmails("代理商解冻失败","代理商解冻失败");
-            return;
+            return true;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
         log.debug(data);
         log.debug("代理商解冻成功！");
+        return false;
     }
 
 

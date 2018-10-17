@@ -29,4 +29,6 @@ public interface OReceiptOrderMapper {
     List<Map<String,Object>> queryPlannerList(@Param("par") Map<String,Object> par,@Param("page") Page page);
 
     int queryPlannerCount(@Param("par") Map<String,Object> par);
+
+    List<Map<String,Object>> queryPlannerAll(@Param("par")Map<String, Object> reqMap, @Param("page")Page page);
 }

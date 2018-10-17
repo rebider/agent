@@ -35,6 +35,8 @@ public interface IOrderReturnService {
 
     Map<String, Object> cwAudit(String returnId, String remark, String userid, String auditResult, String[] attachments) throws ProcessException;
 
+    AgentResult approvalTaskAjustPeople(OReturnOrder oReturnOrder) throws ProcessException;
+
     AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 
     void doPlan(String returnId, BigDecimal takeAmt, String userid);
@@ -57,4 +59,6 @@ public interface IOrderReturnService {
 
 
     AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail);
+
+    Map selectByReturnDeId(String returnDetailsId);
 }
