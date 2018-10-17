@@ -125,6 +125,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OReceiptProMapper oReceiptProMapper;
     @Autowired
     private OSubOrderActivityMapper oSubOrderActivityMapper;
+    @Autowired
+    private IOrderReturnService iOrderReturnService;
 
 
 
@@ -722,6 +724,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTaskAjustPeople(OReturnOrder oReturnOrder) throws ProcessException {
+        return returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder)==1?AgentResult.ok():AgentResult.fail();
+    }
 
     /**
      * 审批订单任务
@@ -741,7 +748,22 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             String returnId = agentVo.getReturnId();
             OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            //独立事物更新
+            if(null!=agentVo.getoReturnOrder() && StringUtils.isNotEmpty(agentVo.getoReturnOrder().getRefundpeople())) {
+                if(null==agentVo.getoReturnOrder().getRefundtime()) {
+                    throw new ProcessException("核款时间不能为空");
+                }
+                returnOrder.setAuditor(userId);
+                returnOrder.setRefundpeople(agentVo.getoReturnOrder().getRefundpeople());
+                returnOrder.setRefundtime(agentVo.getoReturnOrder().getRefundtime());
+                //独立事务更新
+                if (!iOrderReturnService.approvalTaskAjustPeople(returnOrder).isOK()) {
+                    throw new ProcessException("核款人更新失败");
+                }
 
+            }
+            //再次查询
+            returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
             //业务处理
             String sid = agentVo.getSid();
 
@@ -783,12 +805,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
 
                 AgentResult agentResult = saveAttachments(agentVo, userId);
-                //退款日期   退款人   审核人的更新
-                agentVo.getoReturnOrder().setId(returnId);
-                agentVo.getoReturnOrder().setAuditor(userId);
-                returnOrderMapper.updateByPrimaryKeySelective(agentVo.getoReturnOrder());
-
-
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
                 }
@@ -959,7 +975,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 receiptPlan.setProCom(jsonObject.getString("proCom"));
                 receiptPlan.setModel(jsonObject.getString("model"));
                 receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
-                receiptPlan.setReturnOrderDetailId(agentVo.getReturnId());
+                receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
                 String receiptProId = jsonObject.getString("receiptProId");
                 plannerService.savePlanner(receiptPlan, receiptProId);
             }
@@ -1275,6 +1291,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             throw new MessageException("查询活动数据错误");
                         }
                         OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+
+                        //===============================================================================
                         //进行机具调整操作
                         if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
                             List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
@@ -1289,10 +1307,29 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             ImsTermAdjustDetail imsTermAdjustDetail = new ImsTermAdjustDetail();
                             imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
                             imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
-                            imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
-
+                            OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                            try {
+                                AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
+                                if(ar.isOK()){
+                                    logistics.setSendStatus(Status.STATUS_1.status);
+                                    logistics.setSendMsg(ar.getMsg());
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                                }else{
+                                    logistics.setSendStatus(Status.STATUS_2.status);
+                                    logistics.setSendMsg(ar.getMsg());
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                                }
+                            } catch (MessageException e) {
+                                e.printStackTrace();
+                                log.error("机具退货调整首刷接口调用异常"+logistics.getId(),e);
+                                logistics.setSendStatus(Status.STATUS_2.status);
+                                logistics.setSendMsg("机具退货调整首刷接口调用异常");
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                            }
+                        //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
                         }else if(proType.equals(PlatformType.MPOS.msg)){
+
                             AdjustmentMachineVo vo = new AdjustmentMachineVo();
                             vo.setOptUser(user);
                             vo.setSnStart(oLogistics.getSnBeginNum());
@@ -1303,6 +1340,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
                             vo.setNewBusNum(busInfo.getBusNum());
 
+
                             //退货订单的业务编号
                             OReturnOrderDetailExample exampleOReturnOrderDetailExample = new OReturnOrderDetailExample();
                             exampleOReturnOrderDetailExample.or().andSubOrderIdEqualTo(receiptPlan.getReturnOrderDetailId());
@@ -1311,8 +1349,34 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             OOrder orderreturn =  oOrderMapper.selectByPrimaryKey(oReturnOrderDetail.getOrderId());
                             AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
                             vo.setOldBusNum(returnbusInfo.getBusNum());
-                            adjustmentMachineVoList.add(vo);
-
+                            vo.setPlatformNum(returnbusInfo.getBusPlatform());
+                            //cxinfo 机具退货调整首刷接口调用
+                            OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                            //同平台下发，不同平台不下发
+                            if(busInfo.getBusPlatform().equals(returnbusInfo.getBusPlatform())) {
+                                try {
+                                    AgentResult mposXF = termMachineService.adjustmentMachine(vo);
+                                    log.info("机具退货调整首刷接口调用:{}",mposXF.getMsg());
+                                    if (!mposXF.isOK()) {
+                                        logistics.setSendStatus(Status.STATUS_2.status);
+                                        logistics.setSendMsg(mposXF.getMsg());
+                                        oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                                    }else{
+                                        logistics.setSendStatus(Status.STATUS_1.status);
+                                        logistics.setSendMsg(mposXF.getMsg());
+                                        oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    logistics.setSendStatus(Status.STATUS_2.status);
+                                    logistics.setSendMsg("退货物流业务系统联动调整异常");
+                                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                                }
+                            }else{
+                                logistics.setSendStatus(Status.STATUS_0.status);
+                                logistics.setSendMsg("不同平台不下发，手动调整");
+                                oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                            }
                         }else{
                             log.info("导入物流：平台类型错误");
                             throw new MessageException("平台类型错误");
@@ -1328,14 +1392,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
         }
 
-        ////cxinfo 机具退货调整首刷接口调用
-        if(adjustmentMachineVoList.size()>0) {
-            AgentResult mposXF = termMachineService.adjustmentMachine(adjustmentMachineVoList);
-            if (!mposXF.isOK()) {
-                log.info("导入物流：首刷下发失败");
-                throw new MessageException("导入物流：首刷下发失败");
-            }
-        }
+
         return list;
     }
 
@@ -1377,6 +1434,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
         return agentBusInfo;
+    }
+
+    @Override
+    public Map selectByReturnDeId(String returnDetailsId) {
+        Map map = returnOrderMapper.selectByReturnDeId(returnDetailsId);
+        if (null==map){
+            ResultVO.fail("无对应数据");
+        }
+        return map;
     }
 
     /**

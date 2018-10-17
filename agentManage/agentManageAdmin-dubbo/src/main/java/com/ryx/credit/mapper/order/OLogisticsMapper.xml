@@ -370,8 +370,8 @@
     <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
         <include refid="PAGING_START" />
         SELECT  L.SEND_NUM as sendnum,
-        L.SEND_NUM * L.PRO_PRICE as proPrice,
-        R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,
+        L.SEND_NUM * L.PRO_PRICE as proPrice,L.PRO_PRICE,
+        R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,L.SEND_NUM AS O_LOGISTICS_SEND_NUM,
         R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
         P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
         O.ADDR_REALNAME,O.RECEIPT_STATUS,
@@ -379,7 +379,7 @@
         AGENT.ID,AGENT.AG_NAME,AGENT.AG_UNIQ_NUM,
         c.PLATFORM_NAME,O.addr_mobile,O.addr_detail,
         to_char(ORDERS.O_INURETIME,'YYYY-MM-DD') as TIME,
-        to_char(L.send_date,'YYYY-MM-DD') as SENDTIME,oso.ACTIVITY_NAME,os.PRO_TYPE
+        to_char(L.send_date,'YYYY-MM-DD') as SENDTIME,oso.ACTIVITY_NAME,os.PRO_TYPE,L.SEND_STATUS,L.SEND_MSG
         FROM O_LOGISTICS L
         LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
         LEFT JOIN O_RECEIPT_ORDER O ON O.ID = R.RECEIPT_ID

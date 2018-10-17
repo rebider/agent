@@ -52,8 +52,7 @@ public class PlannerServiceImpl implements PlannerService {
 
 
     @Override
-    public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page) {
-
+    public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page,Map map) {
         Map<String, Object> reqMap = new HashMap<>();
 //        reqMap.put("receiptStatus", OReceiptStatus.WAITING_LIST.code);
         reqMap.put("receiptProStatus", OReceiptStatus.WAITING_LIST.code);
@@ -66,12 +65,27 @@ public class PlannerServiceImpl implements PlannerService {
         if (StringUtils.isNotBlank(receiptOrder.getAddrRealname())) {
             reqMap.put("addrRealname", receiptOrder.getAddrRealname());
         }
-        List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerList(reqMap, page);
+        if (null!=map.get("ACTIVITY_ID") && StringUtils.isNotBlank(map.get("ACTIVITY_ID")+"")){
+            reqMap.put("activityId", map.get("ACTIVITY_ID"));
+        }
+        if (null!=map.get("PRO_ID") && StringUtils.isNotBlank(map.get("PRO_ID")+"")){
+            reqMap.put("proId", map.get("PRO_ID"));
+        }
+        List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
+        //退货子订单编号
+        if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){
+            for (Map<String, Object> stringObjectMap : plannerList) {
+                stringObjectMap.put("O_RETURN_ORDER_DETAIL_ID",map.get("O_RETURN_ORDER_DETAIL_ID"));
+                //回填退货数量
+                stringObjectMap.put("planProNum",map.get("RETURN_COUNT"));
+            }
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(plannerList);
         pageInfo.setTotal(receiptOrderMapper.queryPlannerCount(reqMap));
         return pageInfo;
     }
+
 
     /**
      * 分配排单

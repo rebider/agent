@@ -83,12 +83,12 @@ public class TermMachineServiceImpl  implements TermMachineService {
 
     /**
      * 机具的调整，，退货是使用
-     * @param adjustmentMachineVoList
+     * @param adjustmentMachineVo
      * @return
      */
     @Override
-    public AgentResult adjustmentMachine(List<AdjustmentMachineVo> adjustmentMachineVoList) throws Exception{
-        return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVoList);
+    public AgentResult adjustmentMachine(AdjustmentMachineVo adjustmentMachineVo) throws Exception{
+        return mposTermMachineServiceImpl.adjustmentMachine(adjustmentMachineVo);
     }
 
     /**

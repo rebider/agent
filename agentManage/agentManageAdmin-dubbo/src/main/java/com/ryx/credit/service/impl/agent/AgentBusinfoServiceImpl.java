@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
+import com.ryx.credit.service.agent.PlatFormService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentDataHistoryService agentDataHistoryService;
 	@Autowired
 	private AssProtoColMapper assProtoColMapper;
+	@Autowired
+	private PlatFormService platFormService;
 
     /**
      * 代理商查询插件数据获取
@@ -140,6 +143,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	public AgentBusInfo getById(String id){
 		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+		PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+		if(null!=platForm){
+			agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+		}
 		if(agentBusInfo!=null)
 		//查询业务关联账户
 		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
