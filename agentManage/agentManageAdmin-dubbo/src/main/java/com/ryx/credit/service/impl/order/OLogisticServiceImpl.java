@@ -400,7 +400,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                             OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
                             //结束sn
                             OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
-                            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(oLogistics.getSnEndNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
                             List<OLogisticsDetail> logisticsDetailsend = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
                             OLogisticsDetail detailend = logisticsDetailsend.get(0);
 
