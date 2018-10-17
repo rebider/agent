@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.pojo.PAgentMerge;
 import com.ryx.credit.profit.pojo.PAgentMergeExample;
 import java.util.List;
@@ -32,4 +33,6 @@ public interface PAgentMergeMapper {
     List<Map<String, Object>> getProfitAgentMergeList(Map<String, Object> param);
 
     void updateByPrimaryKeySelective(PAgentMerge  pAgentMerge);
+
+    List<AgentBusInfo> getByBusPlatform(String agentId);
 }
