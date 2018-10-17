@@ -2307,6 +2307,136 @@ public class OLogisticsDetailExample {
             addCriterion("TERMTYPENAME not between", value1, value2, "termtypename");
             return (Criteria) this;
         }
+
+        public Criteria andSendStatusIsNull() {
+            addCriterion("SEND_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusIsNotNull() {
+            addCriterion("SEND_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS =", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusNotEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS <>", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusGreaterThan(BigDecimal value) {
+            addCriterion("SEND_STATUS >", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS >=", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusLessThan(BigDecimal value) {
+            addCriterion("SEND_STATUS <", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SEND_STATUS <=", value, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusIn(List<BigDecimal> values) {
+            addCriterion("SEND_STATUS in", values, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusNotIn(List<BigDecimal> values) {
+            addCriterion("SEND_STATUS not in", values, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SEND_STATUS between", value1, value2, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSendStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SEND_STATUS not between", value1, value2, "sendStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckIsNull() {
+            addCriterion("TERMINALID_CHECK is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckIsNotNull() {
+            addCriterion("TERMINALID_CHECK is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckEqualTo(String value) {
+            addCriterion("TERMINALID_CHECK =", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckNotEqualTo(String value) {
+            addCriterion("TERMINALID_CHECK <>", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckGreaterThan(String value) {
+            addCriterion("TERMINALID_CHECK >", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckGreaterThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_CHECK >=", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckLessThan(String value) {
+            addCriterion("TERMINALID_CHECK <", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckLessThanOrEqualTo(String value) {
+            addCriterion("TERMINALID_CHECK <=", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckLike(String value) {
+            addCriterion("TERMINALID_CHECK like", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckNotLike(String value) {
+            addCriterion("TERMINALID_CHECK not like", value, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckIn(List<String> values) {
+            addCriterion("TERMINALID_CHECK in", values, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckNotIn(List<String> values) {
+            addCriterion("TERMINALID_CHECK not in", values, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckBetween(String value1, String value2) {
+            addCriterion("TERMINALID_CHECK between", value1, value2, "terminalidCheck");
+            return (Criteria) this;
+        }
+
+        public Criteria andTerminalidCheckNotBetween(String value1, String value2) {
+            addCriterion("TERMINALID_CHECK not between", value1, value2, "terminalidCheck");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
