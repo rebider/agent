@@ -17,65 +17,11 @@ import java.util.regex.Pattern;
 public class TestMain {
 
     public static void main(String[] args) {
-
-        //sn号码段
-        LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
-        lowerHairMachineVo.setBusNum("busNum");
-        lowerHairMachineVo.setOptUser("user");
-        lowerHairMachineVo.setSnStart("E001");
-        lowerHairMachineVo.setSnEnd("E002");
-        //sn明细
-        List<MposSnVo> listSn = new ArrayList<MposSnVo>();
-        listSn.add(new MposSnVo("批次号"
-                    ,"SN码"
-                    ,"密钥"
-                    ,"活动编号"
-                    ,"终端类型"));
-        listSn.add(new MposSnVo("批次号"
-                ,"SN码"
-                ,"密钥"
-                ,"活动编号"
-                ,"终端类型"));
-        lowerHairMachineVo.setListSn(listSn);
-
-        System.out.println(JSONObject.toJSONString(lowerHairMachineVo));
-
-
-        //修改 业务系统数据集合
-        List<ChangeActMachineVo> changeActMachineVos = new ArrayList<ChangeActMachineVo>();
-        ChangeActMachineVo cav = new ChangeActMachineVo();
-        cav.setBusNum("业务编号");
-        cav.setNewAct("新活动1");
-        cav.setOldAct("老活动1");
-        cav.setOptUser("操作人");
-        cav.setSnStart("开始sn");
-        cav.setSnEnd("结束sn");
-        cav.setPlatformType("MPOS");
-        //待调整集合
-        changeActMachineVos.add(cav);
-
-        cav = new ChangeActMachineVo();
-        cav.setBusNum("业务编号");
-        cav.setNewAct("新活动2");
-        cav.setOldAct("老活动2");
-        cav.setOptUser("操作人");
-        cav.setSnStart("开始sn");
-        cav.setSnEnd("结束sn");
-        cav.setPlatformType("MPOS");
-        //待调整集合
-        changeActMachineVos.add(cav);
-
-        System.out.println(JSONObject.toJSONString(changeActMachineVos));
-
-
-        AdjustmentMachineVo adjustmentMachineVo = new AdjustmentMachineVo();
-        adjustmentMachineVo.setNewBusNum("新机构编号");
-        adjustmentMachineVo.setOldBusNum("老机构编号");
-        adjustmentMachineVo.setSnStart("sn开始");
-        adjustmentMachineVo.setSnEnd("sn结束");
-        adjustmentMachineVo.setOptUser("操作人");
-        adjustmentMachineVo.setSnNum(100);
-        adjustmentMachineVo.setPlatformNum("平台号");
-        System.out.println(JSONObject.toJSONString(adjustmentMachineVo));
+        String str="8850003000010saw";
+        String substring = str.substring(0, str.length() - 1);
+        str.substring(0, str.length() - 1);
+        str.substring(str.length()-1);
+        System.out.println(substring+"---");
+        System.out.println();
     }
 }
