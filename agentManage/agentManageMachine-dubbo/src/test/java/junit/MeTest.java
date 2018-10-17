@@ -65,10 +65,10 @@ public class MeTest extends BaseSpringTest {
             vo.setSnStart("8850003000000000");
             vo.setSnEnd("8850003000000019");
             //发货订单的业务编号
-            vo.setNewBusNum("50000001");
+            vo.setNewBusNum("50000015");
             //退货订单的业务编号
-            vo.setOldBusNum("50000015");
-            vo.setPlatformNum("50000000");
+            vo.setOldBusNum("50000001");
+            vo.setPlatformNum("5000");
             vo.setSnNum("2");
             logger.debug(JSONArray.toJSONString(termMachineService.adjustmentMachine(vo)));
         } catch (Exception e) {

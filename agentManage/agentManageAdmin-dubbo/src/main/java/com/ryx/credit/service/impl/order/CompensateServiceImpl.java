@@ -649,12 +649,14 @@ public class CompensateServiceImpl implements CompensateService {
             //起始sn
             OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
             exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(row.getBeginSn());
+            exampleOLogisticsDetailExamplestart.setOrderByClause(" c_time desc");
             List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
             OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
 
             //结束sn
             OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
             exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(row.getEndSn());
+            exampleOLogisticsDetailExampleend.setOrderByClause(" c_time desc");
             List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
             OLogisticsDetail detailend = logisticsDetailsend.get(0);
 
