@@ -633,16 +633,6 @@ public class CompensateServiceImpl implements CompensateService {
 
             });
 
-            //起始sn
-            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
-            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(row.getBeginSn()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
-            List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
-            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
-            //结束sn
-            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
-            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(row.getEndSn()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
-            List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
-            OLogisticsDetail detailend = logisticsDetailsend.get(0);
 
 
             //待调整集合 cxinfo 机具的调整  调货明细
@@ -654,8 +644,21 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setNewAct(activity.getBusProCode());
             cav.setOldAct(activity_old.getBusProCode());
             cav.setOptUser(row.getcUser());
-            cav.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
-            cav.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
+            //起始sn
+            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
+            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(row.getBeginSn());
+            List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
+            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+
+            //结束sn
+            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
+            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(row.getEndSn());
+            List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
+            OLogisticsDetail detailend = logisticsDetailsend.get(0);
+
+            cav.setSnStart(detailstart.getSnNum()+(detailstart.getTerminalidCheck()==null?"":detailstart.getTerminalidCheck()));
+            cav.setSnEnd(detailend.getSnNum()+(detailend.getTerminalidCheck()==null?"":detailend.getTerminalidCheck()));
+
             cav.setPlatformType(platformType.code);
             cav.setoRefundPriceDiffDetailId(row.getId());
             cav.setLogisticsDetailList(oLogisticsDetails);
