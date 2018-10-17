@@ -30,5 +30,5 @@ public interface OrderActivityService {
 
     List<OActivity> productActivity(String product,String angetId);
 
-    Map selectTermMachine(String platformNum);
+    Map selectTermMachine(String platformNum) throws MessageException;
 }
