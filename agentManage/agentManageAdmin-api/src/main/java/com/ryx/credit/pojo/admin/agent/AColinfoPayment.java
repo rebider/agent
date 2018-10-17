@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AColinfoPayment implements Serializable {
+public class AColinfoPayment implements Serializable{
     private String id;
 
     private String colinfoId;
@@ -68,6 +68,8 @@ public class AColinfoPayment implements Serializable {
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String synchronizeDate;
 
     public String getId() {
         return id;
@@ -323,5 +325,13 @@ public class AColinfoPayment implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getSynchronizeDate() {
+        return synchronizeDate;
+    }
+
+    public void setSynchronizeDate(String synchronizeDate) {
+        this.synchronizeDate = synchronizeDate == null ? null : synchronizeDate.trim();
     }
 }
