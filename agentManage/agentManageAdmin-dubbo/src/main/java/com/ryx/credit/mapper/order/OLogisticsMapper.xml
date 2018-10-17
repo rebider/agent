@@ -416,7 +416,7 @@
                 <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
                 <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
                 <if test="AGENT_ID != null and AGENT_ID != ''">AND O.AGENT_ID = #{AGENT_ID}</if>
-                <if test="returnId != null and returnId != ''">AND R.return_order_detail_id = #{returnId}</if>
+                <if test="returnId != null and returnId != ''">AND R.return_order_detail_id in (select id from o_return_order_detail where o_return_order_detail.return_id= #{returnId} ) </if>
                 <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
                 <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
                 <if test="platform!=null and platform!=''"> and c.PLATFORM_NUM=#{platform} </if>

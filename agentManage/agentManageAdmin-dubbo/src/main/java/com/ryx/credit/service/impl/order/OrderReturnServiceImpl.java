@@ -452,13 +452,20 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
     public void delReceiptAndLogistis(String returnId) {
+        OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+        example.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
+        List<OReturnOrderDetail>  order_return_details = returnOrderDetailMapper.selectByExample(example);
+
+        List<String> order_return_details_id = new ArrayList<>();
+        for (OReturnOrderDetail order_return_detail : order_return_details) {
+            order_return_details_id.add(order_return_detail.getId());
+        }
         //删除排单计划
         ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
-        receiptPlanExample.or().andReturnOrderDetailIdEqualTo(returnId);
+        receiptPlanExample.or().andReturnOrderDetailIdIn(order_return_details_id);
         List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
         for (ReceiptPlan receiptPlan : receiptPlans) {
             String receiptPlanId = receiptPlan.getId();
-
             //更新收货单商品表已排单数量
             String receiptProId = receiptPlan.getProId();
             OReceiptProExample receiptProExample = new OReceiptProExample();
@@ -472,7 +479,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");
                 }
             }
-
             //删除物流及物流明细
             OLogisticsExample logisticsExample = new OLogisticsExample();
             logisticsExample.or().andReceiptPlanIdEqualTo(receiptPlanId);
@@ -883,7 +889,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     @Override
     @Transactional
-    public void approvalReject(String processInstanceId, String activityName) {
+    public void approvalReject(String processInstanceId, String activityName) throws Exception{
         try {
             log.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
             //审批流关系
@@ -898,6 +904,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             delReceiptAndLogistis(returnId);
         } catch (Exception e) {
             log.error("退货审批拒绝回调错误", e);
+            throw e;
         }
     }
 
@@ -907,7 +914,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 16:38 2018/8/8
      */
     @Override
-    public void approvalFinish(String processInstanceId, String activityName) {
+    public void approvalFinish(String processInstanceId, String activityName) throws Exception{
         try {
             log.info("退货审批完成回调:{},{}", processInstanceId, activityName);
             //审批流关系
@@ -922,6 +929,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             updateNewOrderSnStatus(returnId);
         } catch (Exception e) {
             log.error("退货审批完成回调", e);
+            throw e;
         }
     }
 
@@ -930,11 +938,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 更新新订单物流明细SN状态
      * @Date: 20:03 2018/8/10
      */
-    public void updateNewOrderSnStatus(String returnId) {
+    public void updateNewOrderSnStatus(String returnId)throws Exception {
         try {
-            //根据returnId查询排单计划
+
+            //根据退货单查询明细
+            OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
+            oReturnOrderDetailExample.or().andStatusEqualTo(Status.STATUS_1.status).andReturnIdEqualTo(returnId);
+            List<OReturnOrderDetail>  list_return_order_detail =  returnOrderDetailMapper.selectByExample(oReturnOrderDetailExample);
+            List<String> list_return_order_detail_id = new ArrayList<>();
+            for (OReturnOrderDetail detail : list_return_order_detail) {
+                list_return_order_detail_id.add(detail.getId());
+            }
+            if(list_return_order_detail_id.size()==0){
+                throw new MessageException("未找到对应的退货单明细");
+            }
+            //根据退货单查询明细查询排单信息 更具排单信息 查询订单和sn
             ReceiptPlanExample example = new ReceiptPlanExample();
-            example.or().andReturnOrderDetailIdEqualTo(returnId);
+            example.or().andReturnOrderDetailIdIn(list_return_order_detail_id);
             List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
             for (ReceiptPlan receiptPlan : receiptPlans) {
                 //查询发货物流
@@ -952,6 +972,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         }
     }
 
@@ -1354,10 +1375,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
                             //退货订单的业务编号
-                            OReturnOrderDetailExample exampleOReturnOrderDetailExample = new OReturnOrderDetailExample();
-                            exampleOReturnOrderDetailExample.or().andSubOrderIdEqualTo(receiptPlan.getReturnOrderDetailId());
-                            List<OReturnOrderDetail> listOReturnOrderDetail= returnOrderDetailMapper.selectByExample(exampleOReturnOrderDetailExample);
-                            OReturnOrderDetail oReturnOrderDetail =  listOReturnOrderDetail.get(0);
+                            OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
                             OOrder orderreturn =  oOrderMapper.selectByPrimaryKey(oReturnOrderDetail.getOrderId());
                             AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
                             vo.setOldBusNum(returnbusInfo.getBusNum());
@@ -1498,7 +1516,31 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         List<OLogisticsDetail> detailList = new ArrayList<>();
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {
+
+                //查询发货锁定
+                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andSnNumEqualTo(idSn)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andRecordStatusEqualTo(Status.STATUS_2.status);
+                oLogisticsDetailExample.setOrderByClause(" c_time desc ");
+
+                List<OLogisticsDetail>  OLogisticsDetaillist_fahuo =  oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                if(OLogisticsDetaillist_fahuo.size()>0) {
+                   throw new MessageException(OLogisticsDetaillist_fahuo.get(0).getSnNum()+"已处于发货锁定状态");
+                }
+
+                //查询退货锁定
+                oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andSnNumEqualTo(idSn)
+                        .andStatusEqualTo(Status.STATUS_2.status)
+                        .andRecordStatusEqualTo(Status.STATUS_2.status);
+                oLogisticsDetailExample.setOrderByClause(" c_time desc ");
+                List<OLogisticsDetail>  OLogisticsDetaillist_tuihuo =  oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                 OLogisticsDetail detail = new OLogisticsDetail();
+                if(OLogisticsDetaillist_tuihuo.size()>0) {
+                     detail = OLogisticsDetaillist_tuihuo.get(0);
+                }
+
                 //id，物流id，创建人，更新人，状态
                 detail.setId(idService.genId(TabId.o_logistics_detail));
                 detail.setOrderId(oSubOrder.getOrderId());
