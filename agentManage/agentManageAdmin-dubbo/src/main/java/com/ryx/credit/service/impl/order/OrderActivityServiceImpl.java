@@ -86,6 +86,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("请选择型号");
             throw new MessageException("请选择型号");
         }
+        if (StringUtils.isBlank(activity.getPlatform())) {
+            logger.info("请选择平台类型");
+            throw new MessageException("请选择平台类型");
+        }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
@@ -199,7 +203,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     }
 
     @Override
-    public Map selectTermMachine(String platformNum) {
+    public Map selectTermMachine(String platformNum) throws MessageException {
+        if (StringUtils.isNotBlank(platformNum)){
+            throw new MessageException("平台类型为空");
+        }
      String platFormType= platFormMapper.selectPlatType(platformNum);
      List termMachineVos = null;
      List mposTermBatchVos=null;
