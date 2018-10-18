@@ -217,7 +217,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             }
                             //查询首刷业务
                             AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-                            agentBusInfoExample.or().andStatusEqualTo(Status.STATUS_1.status).andBusPlatformIn(pltcode);
+                            agentBusInfoExample.or()
+                                    .andStatusEqualTo(Status.STATUS_1.status)
+                                    .andBusPlatformIn(pltcode)
+                                    .andAgentIdEqualTo(vo.getAgent().getId());
                             List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
                             //入网程序调用
@@ -232,7 +235,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                     if (1 != aimportService.insertAgentImportData(importAgent)) {
                                         logger.info("代理商账户修改审批通过-添加修改任务失败");
                                     } else {
-                                        logger.info("代理商账户修改审批通过-添加修改任务失败!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+                                        logger.info("代理商账户修改审批通过-添加修改任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
                                     }
 
                                 }
