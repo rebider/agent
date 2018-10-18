@@ -216,6 +216,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
+                                throw new ProcessException("更新賬戶数据申请失败");
                             } finally {
                                 agentNotifyService.asynNotifyPlatform();
                             }
@@ -251,6 +252,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
+                            throw new ProcessException("更新数据申请失败");
                         } finally {
                             agentNotifyService.asynNotifyPlatform();
                         }

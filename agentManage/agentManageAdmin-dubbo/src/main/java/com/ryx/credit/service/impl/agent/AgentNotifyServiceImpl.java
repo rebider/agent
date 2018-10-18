@@ -13,9 +13,7 @@ import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
-import com.ryx.credit.service.agent.AgentNotifyService;
-import com.ryx.credit.service.agent.AgentService;
-import com.ryx.credit.service.agent.PlatformSynService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -82,6 +80,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private List<PlatformSynService> platformSynServiceList ;
     @Autowired
     private DPosRegionMapper posRegionMapper;
+    @Autowired
+    private ApaycompService apaycompService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+
+
 
     @PostConstruct
     public void init(){
@@ -388,6 +392,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
             //调用首刷接口
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
+                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+                agentColinfo.setAccountId(agentBusInfo.getCloPayCompany());
+                agentColinfo.setAccountName(payComp.getComName());
+                agentNotifyVo.setColinfoMessage(agentColinfo);
                 //MPOS传递的唯一id为代理商唯一ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
@@ -946,6 +955,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
             jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
             jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
+            jsonParams.put("colinfoMessage",agentNotifyVo.getColinfoMessage());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 jsonParams.put("province",agentNotifyVo.getProvince());
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
