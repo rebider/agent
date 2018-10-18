@@ -1344,6 +1344,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
                             imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
                             OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                            log.info("退货上传物流下发到首刷系统:{}:{}:{}",user,logistics.getId(),snList.toString());
                             try {
                                 AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
                                 if(ar.isOK()){
@@ -1400,8 +1401,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             //同平台下发，不同平台不下发
                             if(busInfo.getBusPlatform().equals(returnbusInfo.getBusPlatform())) {
                                 try {
+                                    log.info("退货上传物流下发到首刷系统:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd());
                                     AgentResult mposXF = termMachineService.adjustmentMachine(vo);
-                                    log.info("机具退货调整首刷接口调用:{}",mposXF.getMsg());
+                                    log.info("机具退货调整首刷接口调用:{}:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd(),mposXF.getMsg());
                                     if (!mposXF.isOK()) {
                                         logistics.setSendStatus(Status.STATUS_2.status);
                                         logistics.setSendMsg(mposXF.getMsg());
