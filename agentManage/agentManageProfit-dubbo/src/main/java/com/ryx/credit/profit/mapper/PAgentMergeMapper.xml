@@ -231,20 +231,14 @@
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
     </if>
   </sql>
-
+  <sql id="SORTING">
+    ORDER BY MERGE_DATE DESC
+  </sql>
   <sql id="PAGING_END">
     <if test="begin != null  and end != null and end &gt;0">
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
     </if>
   </sql>
-<!--  <sql id="BASE_WHERE_SQL">
-    <where>
-      <trim prefixOverrides="and">
-        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
-        <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID}</if>
-      </trim>
-    </where>
-  </sql>-->
 
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PAgentMerge">
     update P_AGENT_MERGE

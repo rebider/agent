@@ -214,7 +214,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      */
     @Override
     public AgentResult approveFinish(String insid, String status) throws Exception{
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HHmmss");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
         try {
