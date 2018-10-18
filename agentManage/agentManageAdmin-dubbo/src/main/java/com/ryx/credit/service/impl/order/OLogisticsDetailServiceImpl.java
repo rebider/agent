@@ -42,6 +42,7 @@ public class OLogisticsDetailServiceImpl implements OLogisticsDetailService {
         reqParam.put("snBegin",beginSn);
         reqParam.put("snEnd",endSn);
         reqParam.put("status", OLogisticsDetailStatus.STATUS_FH.code);
+        reqParam.put("recordStatus", OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
         List<String> resultList = logisticsDetailMapper.querySnLList(reqParam);
         return resultList;
     }
