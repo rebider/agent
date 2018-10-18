@@ -58,7 +58,7 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         for (ImsTermMachine imsTermMachine : list) {
             TermMachineVo newvo = new TermMachineVo();
             newvo.setId(imsTermMachine.getMachineId());
-            newvo.setMechineName(imsTermMachine.getModel()+"|"+imsTermMachine.getRemark());
+            newvo.setMechineName(imsTermMachine.getModel()+"|"+imsTermMachine.getPrice());
             termMachineVoList.add(newvo);
         }
         return termMachineVoList;
