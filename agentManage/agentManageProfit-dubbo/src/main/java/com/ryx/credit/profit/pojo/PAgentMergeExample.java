@@ -1,7 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
-
 import java.util.ArrayList;
 import java.util.List;
 

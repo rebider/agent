@@ -106,7 +106,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         String proceId = activityService.createDeloyFlow(null, "taxPoint", null, null, null);
         if (proceId == null) {
             logger.error("税点调整审批流启动失败，代理商ID：{}", tax.getAgentPid());
-            throw new ProcessException("税点调整审批流启动失败!");
+            throw new ProcessException("代理商合并审批流启动失败!");
         }
         BusActRel record = new BusActRel();
         record.setBusId(tax.getId());

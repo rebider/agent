@@ -57,7 +57,10 @@ public enum DictGroup {
     TOOLS_APR_EXPAND("扣款调整审批客户拓展部门参数"),
     PAYMENT_SRC_TYPE("付款明细表源类型"),
     SETTLEMENT_PRICESTR("结算价类型"),
-    PAY_TYPE("打款方式");
+    PAY_TYPE("打款方式"),
+    MERGE("代理商合并"),
+    MERGE_MARKET("代理商合并审批市场部参数"),
+    MERGE_YUHUA("代理商合并审批于华参数");
     public String  msg;
 
     DictGroup(String s){

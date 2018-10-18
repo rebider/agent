@@ -1380,7 +1380,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             vo.setOptUser(user);
                             vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
                             vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
-
+                            vo.setSnNum(oLogistics.getSendNum().toString());
                             //发货订单的业务编号
                             OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
                             AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());

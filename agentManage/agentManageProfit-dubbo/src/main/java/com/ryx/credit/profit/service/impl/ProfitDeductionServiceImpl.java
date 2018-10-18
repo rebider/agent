@@ -259,9 +259,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (deductionList != null && deductionList.size() > 0) {
             BigDecimal profitAmt = (BigDecimal)param.get("profitAmt");
            if ("02".equals((String)param.get("sourceId"))) {
-              return getDeductionAmt(deductionList, profitAmt);
+              return getDeductionAmt(deductionList, profitAmt, (String) param.get("computeType"));
            }else{
-              return getMposDeductionAmt(deductionList, profitAmt);
+              return getMposDeductionAmt(deductionList, profitAmt, (String) param.get("computeType"));
            }
         }
         return  BigDecimal.ZERO;
@@ -281,12 +281,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/9
     */
-    private BigDecimal getMposDeductionAmt( List<ProfitDeduction> deductionList, BigDecimal profitAmt) {
+    private BigDecimal getMposDeductionAmt( List<ProfitDeduction> deductionList, BigDecimal profitAmt, String computeType) {
         BigDecimal result =  BigDecimal.ZERO;
         if (deductionList != null && deductionList.size() > 0) {
             BigDecimal currentProfit = null;
             for (ProfitDeduction profitDeductionTemp : deductionList) {
-                  result = deduction(result, profitAmt, profitDeductionTemp);
+                  result = deduction(result, profitAmt, profitDeductionTemp, computeType);
             }
         }
         return  result;
@@ -324,7 +324,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         // 获取代理商所有其它扣款信息
         param.put("type", DeductionType.OTHER.getType());
         List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
-        return getDeductionAmt(deductionList, (BigDecimal) param.get("profitAmt"));
+        return getDeductionAmt(deductionList, (BigDecimal) param.get("profitAmt"), (String) param.get("computeType"));
     }
 
     /***
@@ -335,11 +335,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/9
     */
-    private BigDecimal getDeductionAmt( List<ProfitDeduction> deductionList, BigDecimal profitAmt) {
+    private BigDecimal getDeductionAmt( List<ProfitDeduction> deductionList, BigDecimal profitAmt, String computeType) {
         BigDecimal result =  BigDecimal.ZERO;
         if (deductionList != null && deductionList.size() > 0) {
             for (ProfitDeduction profitDeductionTemp : deductionList) {
-                result = deduction(result, profitAmt, profitDeductionTemp);
+                result = deduction(result, profitAmt, profitDeductionTemp, computeType);
             }
         }
         return  result;
@@ -353,7 +353,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/9
     */
-    private BigDecimal deduction(BigDecimal result , BigDecimal profitAmt , ProfitDeduction profitDeductionTemp) {
+    private BigDecimal deduction(BigDecimal result, BigDecimal profitAmt, ProfitDeduction profitDeductionTemp, String computeType) {
         BigDecimal currentProfit = null;
         if (profitAmt.doubleValue() > 0) {
             currentProfit = profitAmt;
@@ -367,12 +367,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             currentProfit = BigDecimal.ZERO;
             profitAmt = BigDecimal.ZERO;
         }
-
-        // 申请分期
-        if ("3".equals(profitDeductionTemp.getStagingStatus())) {
-            stagingDeal(currentProfit, profitAmt, profitDeductionTemp);
-        } else {
-            generalDeal(currentProfit, profitAmt, profitDeductionTemp);
+        if ("1".equals(computeType)) {
+            // 申请分期
+            if ("3".equals(profitDeductionTemp.getStagingStatus())) {
+                stagingDeal(currentProfit, profitAmt, profitDeductionTemp);
+            } else {
+                generalDeal(currentProfit, profitAmt, profitDeductionTemp);
+            }
         }
         return result;
     }
@@ -525,5 +526,21 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction) {
         return profitDeductionMapper.totalBuckleByMonth(profitDeduction);
+    }
+
+    @Override
+    public BigDecimal getNotDeductionSum(String agentId) {
+        // 获取代理商未扣足分期总金额
+        Map<String, Object> param = new HashMap<>(2);
+        param.put("agentPid", agentId);
+        BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(param);
+
+        // 获取本月新增
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        ProfitDeduction profitDeduction = new ProfitDeduction();
+        profitDeduction.setAgentPid(agentId);
+        profitDeduction.setDeductionDate(deductionDate);
+        BigDecimal deductionAmt = profitDeductionMapper.getCurrentDeductionAmtSum(profitDeduction);
+        return (stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt).add((deductionAmt==null?BigDecimal.ZERO:deductionAmt));
     }
 }

@@ -413,13 +413,76 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                  sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
                 //退单扣款-
                 if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
-                    sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt);
+                    sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt,"1");
                 }
                 // 机具扣款-
                 sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt);
                 Map<String, Object> param = new HashMap<>(5);
                 param.put("profitAmt", sumAmt);
                 param.put("agentPid",  profitDetailMonthTemp.getAgentPid());
+                param.put("computeType", "1");
+//               param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentPid());
+                param.put("remark", "POS考核扣款（新国都、瑞易送）");
+                //POS考核扣款（新国都、瑞易送）-
+                profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());
+
+                param.put("profitAmt", sumAmt);
+                param.put("remark", "手刷考核扣款（小蓝牙、MPOS）");
+                //手刷考核扣款（小蓝牙、MPOS）-
+                profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
+                //保理扣款-
+                profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentPid(), null));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
+
+                param.put("profitAmt", sumAmt);
+                param.put("remark", "1");
+                //其他扣款-
+                profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+                sumAmt = sumAmt.subtract(profitDetailMonthTemp.getOtherDeductionAmt());
+                // 实发分润
+                profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
+                profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
+            });
+            try {
+                profitComputerService.new_computerTax();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else{
+            LOG.error("没有分润数据。");
+        }
+    }
+
+    @Override
+    public void testComputeProfitAmt() {
+        // 获取所有代理商月度分润明细
+        ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
+        profitDetailMonth.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
+        List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null,null, profitDetailMonth);
+        Map<String, BigDecimal> parentPosReward = new HashMap<>(5);
+        if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
+            profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
+                BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
+                // 退单补款+
+                sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
+                // 其他补款+
+                profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
+                sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
+                // POS考核奖励
+                getPosReward(profitDetailMonthTemp, parentPosReward);
+                sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
+                //退单扣款-
+                if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
+                    sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt, "2");
+                }
+                // 机具扣款-
+                sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt);
+                Map<String, Object> param = new HashMap<>(5);
+                param.put("profitAmt", sumAmt);
+                param.put("agentPid",  profitDetailMonthTemp.getAgentPid());
+                param.put("computeType", "2");
 //               param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentPid());
                 param.put("remark", "POS考核扣款（新国都、瑞易送）");
                 //POS考核扣款（新国都、瑞易送）-
@@ -608,7 +671,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @Author: zhaodw
      * @Date: 2018/8/12
      */
-    private BigDecimal doTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt) {
+    private BigDecimal doTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String type) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentId());
         profitDeduction.setParentAgentPid(profitDetailMonthTemp.getParentAgentId());
@@ -622,6 +685,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "02");
         param.put("agentPid",  profitDetailMonthTemp.getAgentId());
+        param.put("computeType", type);
 //        param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentPid());
         BigDecimal realDeductionAmt = BigDecimal.ZERO;
         if (posMustDeductionAmt.doubleValue() > 0) {

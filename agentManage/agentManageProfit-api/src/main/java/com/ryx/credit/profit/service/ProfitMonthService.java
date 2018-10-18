@@ -150,6 +150,13 @@ public interface ProfitMonthService {
     void computeProfitAmt();
 
     /***
+     * @Description: 试算计算代理商分润金额
+     * @Author: zhaodw
+     * @Date: 2018/8/12
+     */
+    void testComputeProfitAmt();
+
+    /***
     * @Description: 出款
     * @Author: zhaodw
     * @Date: 2018/8/24
