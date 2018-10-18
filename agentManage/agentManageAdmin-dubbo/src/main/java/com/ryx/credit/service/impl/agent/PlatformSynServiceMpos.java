@@ -69,9 +69,9 @@ public class PlatformSynServiceMpos implements PlatformSynService {
     @Override
     public JSONObject request(Map data,String url) throws Exception {
         String json = JsonUtil.objectToJson(data);
-        log.info("通知手刷请求参数：{}",json);
+        log.info("升级通知手刷请求参数：{}",json);
         String httpResult = HttpClientUtil.doPostJson(url, json);
-        log.info("通知手刷返回参数：{}",httpResult);
+        log.info("升级通知手刷返回参数：{}",httpResult);
         JSONObject respXMLObj = JSONObject.parseObject(httpResult);
         return respXMLObj;
     }
