@@ -201,6 +201,25 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
                             }
+
+                            //入网程序调用
+                            try {
+                                ImportAgent importAgent = new ImportAgent();
+                                importAgent.setDataid(vo.getAgent().getId());
+                                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+                                importAgent.setBatchcode(proIns);
+                                importAgent.setcUser(rel.getcUser());
+                                if (1 != aimportService.insertAgentImportData(importAgent)) {
+                                    logger.info("代理商账户修改审批通过-添加修改任务失败");
+                                } else {
+                                    logger.info("代理商账户修改审批通过-添加修改任务失败!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            } finally {
+                                agentNotifyService.asynNotifyPlatform();
+                            }
+
                         }
                     //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
@@ -217,6 +236,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 throw new ProcessException("更新数据申请失败");
                             }
                         }
+
                         //入网程序调用
                         try {
                             ImportAgent importAgent = new ImportAgent();
