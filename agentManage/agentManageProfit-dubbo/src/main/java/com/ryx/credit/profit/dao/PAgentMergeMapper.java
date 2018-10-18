@@ -35,4 +35,8 @@ public interface PAgentMergeMapper {
     void updateByPrimaryKeySelective(PAgentMerge  pAgentMerge);
 
     List<AgentBusInfo> getByBusPlatform(String agentId);
+
+    List<PAgentMerge> selectBySubAgenId(String subAgentId);
+
+
 }

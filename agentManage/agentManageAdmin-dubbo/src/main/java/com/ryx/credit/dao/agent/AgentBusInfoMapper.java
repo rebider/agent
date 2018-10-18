@@ -65,4 +65,7 @@ public interface AgentBusInfoMapper {
     List<Map<String,Object>> queryAgentNameByBusId();
 
     List<Map<String,Object>> queryByBusNum(String busNum);
+
+    /**根据代理商信息查询业务类型*/
+    List<AgentBusInfo> selectByAgenId(String agentId);
 }

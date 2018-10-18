@@ -95,7 +95,7 @@ public class PlannerServiceImpl implements PlannerService {
      * @return
      * @throws Exception
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public AgentResult savePlanner(ReceiptPlan receiptPlan, String receiptProId) throws Exception {
         AgentResult result = new AgentResult(500, "系统异常", "");

@@ -590,4 +590,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return list;
 	}
+
+	@Override
+	public List<AgentBusInfo> selectByAgenId(String agentId) {
+		return agentBusInfoMapper.selectByAgenId(agentId);
+	}
 }
