@@ -214,7 +214,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      */
     @Override
     public AgentResult approveFinish(String insid, String status) throws Exception{
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HHmmss");
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
         try {
@@ -222,13 +222,13 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
             if (rel != null) {
                 PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
 
-                //手刷改名接口(agentName、agentId)
+                //一、手刷改名接口(agentName、agentId)
                 String agentName = pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")";
                 List<String> platId = new ArrayList<>();
                 platId.add(pAgentMerge.getSubAgentId());
                 busiPlatService.mPos_updateAgName(agentName, platId);
 
-                //POS改名接口(uniqueId、orgName、orgType)
+                //二、POS改名接口(uniqueId、orgName、orgType)
                 List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
                 for (AgentBusInfo agentBusInfo : list) {
                     AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
@@ -241,6 +241,11 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                     }
                     busiPlatService.pos_updateAgName(agentNotifyVo);
                 }
+
+                //三、更改代理商信息的名称
+                Agent agent = agentService.getAgentById(pAgentMerge.getSubAgentId());
+                agent.setAgName(pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")");
+                agentService.updateByPrimaryKeySelective(agent);
 
                 pAgentMerge.setMergeStatus(AgStatus.Approved.name());//审批状态：Approved 3: 审批通过
                 pAgentMerge.setMergeDate(df.format(new Date()));//合并日期（生效日期）
