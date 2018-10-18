@@ -44,6 +44,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private static Logger logger = LoggerFactory.getLogger(OLogisticServiceImpl.class);
     public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     public final static SimpleDateFormat sdfyyyyMMdd = new SimpleDateFormat("yyyy-MM-dd");
+    public final static SimpleDateFormat yyyyMMdd = new SimpleDateFormat("yyyy/MM/dd");
     @Autowired
     private OOrderMapper oOrderMapper;
     @Autowired
@@ -260,9 +261,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     oLogistics.setSendDate(sdfyyyyMMdd.parse(sendDate));
                 }catch (Exception e){
                     try {
-                        oLogistics.setSendDate(sdf.parse(sendDate));// 物流日期
+                        oLogistics.setSendDate(yyyyMMdd.parse(sendDate));// 物流日期
                     }catch (Exception m){
-                        throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd");
+                        try {
+                            oLogistics.setSendDate(sdf.parse(sendDate));
+                        }catch (Exception c){
+                            throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd 或者 yyyy/MM/dd");
+                        }
+
                     }
                 }
                 oLogistics.setcTime(Calendar.getInstance().getTime());          // 创建时间
