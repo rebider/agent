@@ -2,27 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.dao.order.OLogisticsMapper">
     <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OLogistics">
-        <id column="ID" jdbcType="VARCHAR" property="id"/>
-        <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId"/>
-        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId"/>
-        <result column="RECEIPT_PLAN_ID" jdbcType="VARCHAR" property="receiptPlanId"/>
-        <result column="PRO_COM" jdbcType="VARCHAR" property="proCom"/>
-        <result column="PRO_ID" jdbcType="VARCHAR" property="proId"/>
-        <result column="PRO_NAME" jdbcType="VARCHAR" property="proName"/>
-        <result column="PRO_TYPE" jdbcType="VARCHAR" property="proType"/>
-        <result column="SEND_NUM" jdbcType="DECIMAL" property="sendNum"/>
-        <result column="PRO_PRICE" jdbcType="DECIMAL" property="proPrice"/>
-        <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel"/>
-        <result column="SEND_DATE" jdbcType="TIMESTAMP" property="sendDate"/>
-        <result column="LOG_COM" jdbcType="VARCHAR" property="logCom"/>
-        <result column="W_NUMBER" jdbcType="VARCHAR" property="wNumber"/>
-        <result column="ISDEALL" jdbcType="DECIMAL" property="isdeall"/>
-        <result column="SN_BEGIN_NUM" jdbcType="VARCHAR" property="snBeginNum"/>
-        <result column="SN_END_NUM" jdbcType="VARCHAR" property="snEndNum"/>
-        <result column="LOG_TYPE" jdbcType="VARCHAR" property="logType"/>
-        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime"/>
-        <result column="C_USER" jdbcType="VARCHAR" property="cUser"/>
-        <result column="STATUS" jdbcType="DECIMAL" property="status"/>
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="ORDER_ID" jdbcType="VARCHAR" property="orderId" />
+        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
+        <result column="RECEIPT_PLAN_ID" jdbcType="VARCHAR" property="receiptPlanId" />
+        <result column="PRO_COM" jdbcType="VARCHAR" property="proCom" />
+        <result column="PRO_ID" jdbcType="VARCHAR" property="proId" />
+        <result column="PRO_NAME" jdbcType="VARCHAR" property="proName" />
+        <result column="PRO_TYPE" jdbcType="VARCHAR" property="proType" />
+        <result column="SEND_NUM" jdbcType="DECIMAL" property="sendNum" />
+        <result column="PRO_PRICE" jdbcType="DECIMAL" property="proPrice" />
+        <result column="PRO_MODEL" jdbcType="VARCHAR" property="proModel" />
+        <result column="SEND_DATE" jdbcType="TIMESTAMP" property="sendDate" />
+        <result column="LOG_COM" jdbcType="VARCHAR" property="logCom" />
+        <result column="W_NUMBER" jdbcType="VARCHAR" property="wNumber" />
+        <result column="ISDEALL" jdbcType="DECIMAL" property="isdeall" />
+        <result column="SN_BEGIN_NUM" jdbcType="VARCHAR" property="snBeginNum" />
+        <result column="SN_END_NUM" jdbcType="VARCHAR" property="snEndNum" />
+        <result column="LOG_TYPE" jdbcType="VARCHAR" property="logType" />
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+        <result column="STATUS" jdbcType="DECIMAL" property="status" />
+        <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
+        <result column="SEND_MSG" jdbcType="VARCHAR" property="sendMsg" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -42,8 +44,7 @@
                                 </when>
                                 <when test="criterion.listValue">
                                     and ${criterion.condition}
-                                    <foreach close=")" collection="criterion.value" item="listItem" open="("
-                                             separator=",">
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                                         #{listItem}
                                     </foreach>
                                 </when>
@@ -55,57 +56,56 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    ID, ORDER_ID, SRC_ID, RECEIPT_PLAN_ID, PRO_COM, PRO_ID, PRO_NAME, PRO_TYPE, SEND_NUM, 
-    PRO_PRICE, PRO_MODEL, SEND_DATE, LOG_COM, W_NUMBER, ISDEALL, SN_BEGIN_NUM, SN_END_NUM, 
-    LOG_TYPE, C_TIME, C_USER, STATUS
-  </sql>
-    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample"
-            resultMap="BaseResultMap">
-        <include refid="OracleDialectPrefix"/>
+        ID, ORDER_ID, SRC_ID, RECEIPT_PLAN_ID, PRO_COM, PRO_ID, PRO_NAME, PRO_TYPE, SEND_NUM,
+        PRO_PRICE, PRO_MODEL, SEND_DATE, LOG_COM, W_NUMBER, ISDEALL, SN_BEGIN_NUM, SN_END_NUM,
+        LOG_TYPE, C_TIME, C_USER, STATUS, SEND_STATUS, SEND_MSG
+    </sql>
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample" resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix" />
         select
         <if test="distinct">
             distinct
         </if>
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from O_LOGISTICS
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
         <if test="orderByClause != null">
             order by ${orderByClause}
         </if>
-        <include refid="OracleDialectSuffix"/>
+        <include refid="OracleDialectSuffix" />
     </select>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from O_LOGISTICS
         where ID = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample">
         delete from O_LOGISTICS
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
     </delete>
     <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
-    insert into O_LOGISTICS (ID, ORDER_ID, SRC_ID, 
-      RECEIPT_PLAN_ID, PRO_COM, PRO_ID, 
-      PRO_NAME, PRO_TYPE, SEND_NUM, 
-      PRO_PRICE, PRO_MODEL, SEND_DATE, 
-      LOG_COM, W_NUMBER, ISDEALL, 
-      SN_BEGIN_NUM, SN_END_NUM, LOG_TYPE, 
-      C_TIME, C_USER, STATUS
-      )
-    values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, 
-      #{receiptPlanId,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR}, 
-      #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{sendNum,jdbcType=DECIMAL}, 
-      #{proPrice,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR}, #{sendDate,jdbcType=TIMESTAMP}, 
-      #{logCom,jdbcType=VARCHAR}, #{wNumber,jdbcType=VARCHAR}, #{isdeall,jdbcType=DECIMAL}, 
-      #{snBeginNum,jdbcType=VARCHAR}, #{snEndNum,jdbcType=VARCHAR}, #{logType,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}
-      )
-  </insert>
+        insert into O_LOGISTICS (ID, ORDER_ID, SRC_ID,
+        RECEIPT_PLAN_ID, PRO_COM, PRO_ID,
+        PRO_NAME, PRO_TYPE, SEND_NUM,
+        PRO_PRICE, PRO_MODEL, SEND_DATE,
+        LOG_COM, W_NUMBER, ISDEALL,
+        SN_BEGIN_NUM, SN_END_NUM, LOG_TYPE,
+        C_TIME, C_USER, STATUS,
+        SEND_STATUS, SEND_MSG)
+        values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR},
+        #{receiptPlanId,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proId,jdbcType=VARCHAR},
+        #{proName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{sendNum,jdbcType=DECIMAL},
+        #{proPrice,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR}, #{sendDate,jdbcType=TIMESTAMP},
+        #{logCom,jdbcType=VARCHAR}, #{wNumber,jdbcType=VARCHAR}, #{isdeall,jdbcType=DECIMAL},
+        #{snBeginNum,jdbcType=VARCHAR}, #{snEndNum,jdbcType=VARCHAR}, #{logType,jdbcType=VARCHAR},
+        #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+        #{sendStatus,jdbcType=DECIMAL}, #{sendMsg,jdbcType=VARCHAR})
+    </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
         insert into O_LOGISTICS
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -172,6 +172,12 @@
             <if test="status != null">
                 STATUS,
             </if>
+            <if test="sendStatus != null">
+                SEND_STATUS,
+            </if>
+            <if test="sendMsg != null">
+                SEND_MSG,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -237,13 +243,18 @@
             <if test="status != null">
                 #{status,jdbcType=DECIMAL},
             </if>
+            <if test="sendStatus != null">
+                #{sendStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="sendMsg != null">
+                #{sendMsg,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample"
-            resultType="java.lang.Long">
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsExample" resultType="java.lang.Long">
         select count(*) from O_LOGISTICS
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
     </select>
     <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
@@ -309,33 +320,41 @@
             <if test="status != null">
                 STATUS = #{status,jdbcType=DECIMAL},
             </if>
+            <if test="sendStatus != null">
+                SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+            </if>
+            <if test="sendMsg != null">
+                SEND_MSG = #{sendMsg,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OLogistics">
-    update O_LOGISTICS
-    set ORDER_ID = #{orderId,jdbcType=VARCHAR},
-      SRC_ID = #{srcId,jdbcType=VARCHAR},
-      RECEIPT_PLAN_ID = #{receiptPlanId,jdbcType=VARCHAR},
-      PRO_COM = #{proCom,jdbcType=VARCHAR},
-      PRO_ID = #{proId,jdbcType=VARCHAR},
-      PRO_NAME = #{proName,jdbcType=VARCHAR},
-      PRO_TYPE = #{proType,jdbcType=VARCHAR},
-      SEND_NUM = #{sendNum,jdbcType=DECIMAL},
-      PRO_PRICE = #{proPrice,jdbcType=DECIMAL},
-      PRO_MODEL = #{proModel,jdbcType=VARCHAR},
-      SEND_DATE = #{sendDate,jdbcType=TIMESTAMP},
-      LOG_COM = #{logCom,jdbcType=VARCHAR},
-      W_NUMBER = #{wNumber,jdbcType=VARCHAR},
-      ISDEALL = #{isdeall,jdbcType=DECIMAL},
-      SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
-      SN_END_NUM = #{snEndNum,jdbcType=VARCHAR},
-      LOG_TYPE = #{logType,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
+        update O_LOGISTICS
+        set ORDER_ID = #{orderId,jdbcType=VARCHAR},
+        SRC_ID = #{srcId,jdbcType=VARCHAR},
+        RECEIPT_PLAN_ID = #{receiptPlanId,jdbcType=VARCHAR},
+        PRO_COM = #{proCom,jdbcType=VARCHAR},
+        PRO_ID = #{proId,jdbcType=VARCHAR},
+        PRO_NAME = #{proName,jdbcType=VARCHAR},
+        PRO_TYPE = #{proType,jdbcType=VARCHAR},
+        SEND_NUM = #{sendNum,jdbcType=DECIMAL},
+        PRO_PRICE = #{proPrice,jdbcType=DECIMAL},
+        PRO_MODEL = #{proModel,jdbcType=VARCHAR},
+        SEND_DATE = #{sendDate,jdbcType=TIMESTAMP},
+        LOG_COM = #{logCom,jdbcType=VARCHAR},
+        W_NUMBER = #{wNumber,jdbcType=VARCHAR},
+        ISDEALL = #{isdeall,jdbcType=DECIMAL},
+        SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
+        SN_END_NUM = #{snEndNum,jdbcType=VARCHAR},
+        LOG_TYPE = #{logType,jdbcType=VARCHAR},
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+        C_USER = #{cUser,jdbcType=VARCHAR},
+        STATUS = #{status,jdbcType=DECIMAL},
+        SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
+        SEND_MSG = #{sendMsg,jdbcType=VARCHAR}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
     <sql id="OracleDialectPrefix">
         <if test="page != null">
             select * from ( select row_.*, rownum rownum_ from (
@@ -351,8 +370,8 @@
     <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
         <include refid="PAGING_START" />
         SELECT  L.SEND_NUM as sendnum,
-        L.SEND_NUM * L.PRO_PRICE as proPrice,
-        R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,
+        L.SEND_NUM * L.PRO_PRICE as proPrice,L.PRO_PRICE,
+        R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,L.SEND_NUM AS O_LOGISTICS_SEND_NUM,
         R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,
         P.PRO_CODE,P.PRO_ID,P.PRO_NAME,P.PRO_NUM,P.SEND_NUM,
         O.ADDR_REALNAME,O.RECEIPT_STATUS,
@@ -360,7 +379,7 @@
         AGENT.ID,AGENT.AG_NAME,AGENT.AG_UNIQ_NUM,
         c.PLATFORM_NAME,O.addr_mobile,O.addr_detail,
         to_char(ORDERS.O_INURETIME,'YYYY-MM-DD') as TIME,
-        to_char(L.send_date,'YYYY-MM-DD') as SENDTIME,oso.ACTIVITY_NAME,os.PRO_TYPE
+        to_char(L.send_date,'YYYY-MM-DD') as SENDTIME,oso.ACTIVITY_NAME,os.PRO_TYPE,L.SEND_STATUS,L.SEND_MSG
         FROM O_LOGISTICS L
         LEFT JOIN O_RECEIPT_PLAN R ON L.RECEIPT_PLAN_ID = R.ID
         LEFT JOIN O_RECEIPT_ORDER O ON O.ID = R.RECEIPT_ID
@@ -397,7 +416,7 @@
                 <if test="PLAN_NUM != null and PLAN_NUM !=''">AND R.PLAN_NUM = #{PLAN_NUM}</if>
                 <if test="ORDER_ID != null and ORDER_ID != ''">AND R.ORDER_ID = #{ORDER_ID}</if>
                 <if test="AGENT_ID != null and AGENT_ID != ''">AND O.AGENT_ID = #{AGENT_ID}</if>
-                <if test="returnId != null and returnId != ''">AND R.return_order_detail_id = #{returnId}</if>
+                <if test="returnId != null and returnId != ''">AND R.return_order_detail_id in (select id from o_return_order_detail where o_return_order_detail.return_id= #{returnId} ) </if>
                 <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
                 <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
                 <if test="platform!=null and platform!=''"> and c.PLATFORM_NUM=#{platform} </if>

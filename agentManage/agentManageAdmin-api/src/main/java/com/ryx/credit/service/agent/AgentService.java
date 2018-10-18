@@ -51,4 +51,12 @@ public interface AgentService {
     void createBackUserbyAgentByredis();
 
     int updateByPrimaryKeySelective(Agent record);
+
+    /**
+     * 检查代理商是否已经入网
+     * @param agentId
+     * @return
+     */
+    public AgentResult checkAgentIsIn(String agentId);
+
 }

@@ -34,6 +34,7 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="SYNCHRONIZE_DATE" jdbcType="VARCHAR" property="synchronizeDate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +70,7 @@
     BALANCE_RCV_NAME, BALANCE_RCV_CODE, BALANCE_RCV_TYPE, INPUT_TIME, CHANNEL_ID, REMARK,
     BALANCE_LS, CREATE_BATCH_TIME, BATCH_CODE, FLAG, ERR_DESC, DATASOURCE, ACCOUNT_ID,
     PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME, UPDATE_TIME, RESERVE, MEMO, SYSFLOWSOURCE,
-    C_USER, U_USER, STATUS, VERSION
+    C_USER, U_USER, STATUS, VERSION, SYNCHRONIZE_DATE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPaymentExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -110,7 +111,8 @@
     PAY_DATE, ORG_ACCOUNT_ID, CREATE_TIME,
     UPDATE_TIME, RESERVE, MEMO,
     SYSFLOWSOURCE, C_USER, U_USER,
-    STATUS, VERSION)
+    STATUS, VERSION, SYNCHRONIZE_DATE
+    )
     values (#{id,jdbcType=VARCHAR}, #{colinfoId,jdbcType=VARCHAR}, #{merchId,jdbcType=VARCHAR},
     #{merchName,jdbcType=VARCHAR}, #{tranDate,jdbcType=VARCHAR}, #{balanceAmt,jdbcType=DECIMAL},
     #{balanceRcvAcc,jdbcType=VARCHAR}, #{balanceRcvBank,jdbcType=VARCHAR}, #{balanceRcvName,jdbcType=VARCHAR},
@@ -121,7 +123,8 @@
     #{payDate,jdbcType=VARCHAR}, #{orgAccountId,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
     #{updateTime,jdbcType=VARCHAR}, #{reserve,jdbcType=VARCHAR}, #{memo,jdbcType=VARCHAR},
     #{sysflowsource,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{synchronizeDate,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
     insert into A_COLINFO_PAYMENT
@@ -222,6 +225,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="synchronizeDate != null">
+        SYNCHRONIZE_DATE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -319,6 +325,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="synchronizeDate != null">
+        #{synchronizeDate,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -424,42 +433,46 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="synchronizeDate != null">
+        SYNCHRONIZE_DATE = #{synchronizeDate,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AColinfoPayment">
     update A_COLINFO_PAYMENT
     set COLINFO_ID = #{colinfoId,jdbcType=VARCHAR},
-      MERCH_ID = #{merchId,jdbcType=VARCHAR},
-      MERCH_NAME = #{merchName,jdbcType=VARCHAR},
-      TRAN_DATE = #{tranDate,jdbcType=VARCHAR},
-      BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
-      BALANCE_RCV_ACC = #{balanceRcvAcc,jdbcType=VARCHAR},
-      BALANCE_RCV_BANK = #{balanceRcvBank,jdbcType=VARCHAR},
-      BALANCE_RCV_NAME = #{balanceRcvName,jdbcType=VARCHAR},
-      BALANCE_RCV_CODE = #{balanceRcvCode,jdbcType=VARCHAR},
-      BALANCE_RCV_TYPE = #{balanceRcvType,jdbcType=VARCHAR},
-      INPUT_TIME = #{inputTime,jdbcType=VARCHAR},
-      CHANNEL_ID = #{channelId,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      BALANCE_LS = #{balanceLs,jdbcType=VARCHAR},
-      CREATE_BATCH_TIME = #{createBatchTime,jdbcType=VARCHAR},
-      BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
-      FLAG = #{flag,jdbcType=VARCHAR},
-      ERR_DESC = #{errDesc,jdbcType=VARCHAR},
-      DATASOURCE = #{datasource,jdbcType=VARCHAR},
-      ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
-      PAY_DATE = #{payDate,jdbcType=VARCHAR},
-      ORG_ACCOUNT_ID = #{orgAccountId,jdbcType=VARCHAR},
-      CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
-      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
-      RESERVE = #{reserve,jdbcType=VARCHAR},
-      MEMO = #{memo,jdbcType=VARCHAR},
-      SYSFLOWSOURCE = #{sysflowsource,jdbcType=VARCHAR},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    MERCH_ID = #{merchId,jdbcType=VARCHAR},
+    MERCH_NAME = #{merchName,jdbcType=VARCHAR},
+    TRAN_DATE = #{tranDate,jdbcType=VARCHAR},
+    BALANCE_AMT = #{balanceAmt,jdbcType=DECIMAL},
+    BALANCE_RCV_ACC = #{balanceRcvAcc,jdbcType=VARCHAR},
+    BALANCE_RCV_BANK = #{balanceRcvBank,jdbcType=VARCHAR},
+    BALANCE_RCV_NAME = #{balanceRcvName,jdbcType=VARCHAR},
+    BALANCE_RCV_CODE = #{balanceRcvCode,jdbcType=VARCHAR},
+    BALANCE_RCV_TYPE = #{balanceRcvType,jdbcType=VARCHAR},
+    INPUT_TIME = #{inputTime,jdbcType=VARCHAR},
+    CHANNEL_ID = #{channelId,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    BALANCE_LS = #{balanceLs,jdbcType=VARCHAR},
+    CREATE_BATCH_TIME = #{createBatchTime,jdbcType=VARCHAR},
+    BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+    FLAG = #{flag,jdbcType=VARCHAR},
+    ERR_DESC = #{errDesc,jdbcType=VARCHAR},
+    DATASOURCE = #{datasource,jdbcType=VARCHAR},
+    ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+    PAY_DATE = #{payDate,jdbcType=VARCHAR},
+    ORG_ACCOUNT_ID = #{orgAccountId,jdbcType=VARCHAR},
+    CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+    UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+    RESERVE = #{reserve,jdbcType=VARCHAR},
+    MEMO = #{memo,jdbcType=VARCHAR},
+    SYSFLOWSOURCE = #{sysflowsource,jdbcType=VARCHAR},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    SYNCHRONIZE_DATE = #{synchronizeDate,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

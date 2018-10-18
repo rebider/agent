@@ -25,6 +25,7 @@ import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import org.apache.poi.ss.formula.functions.Days360;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -104,7 +106,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         String proceId = activityService.createDeloyFlow(null, "taxPoint", null, null, null);
         if (proceId == null) {
             logger.error("税点调整审批流启动失败，代理商ID：{}", tax.getAgentPid());
-            throw new ProcessException("税点调整审批流启动失败!");
+            throw new ProcessException("代理商合并审批流启动失败!");
         }
         BusActRel record = new BusActRel();
         record.setBusId(tax.getId());
@@ -126,25 +128,25 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void completeTaskEnterActivity(String insid, String status) {
-        LocalDate date = LocalDate.now();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
         try {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 PTaxAdjust taxAdjust = adjustMapper.selectByPrimaryKey(rel.getBusId());
-                taxAdjust.setTaxStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
-                taxAdjust.setValidDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                taxAdjust.setTaxStatus(RewardStatus.PASS.getStatus());//PASS 1:生效
+                taxAdjust.setValidDate(df.format(new Date()));//生效日期
                 logger.info("1.更新税点调整申请状态为通过，有效");
                 logger.info("审批通过，原税点：{},现税点：{}",taxAdjust.getTaxOld(),taxAdjust.getTaxIng());
                 adjustMapper.updateByPrimaryKeySelective(taxAdjust);
 
-                String agentId = taxAdjust.getAgentPid();   // 代理商唯一码
+                String agentId = taxAdjust.getAgentPid();//代理商唯一码
 
-                // 更新收款账户表的 税点值
+                //更新收款账户表的 税点值
                 AgentColinfo colinfo = new AgentColinfo();
                 colinfo.setAgentId(agentId);
-                AgentColinfo agentColinfo = agentColinfoService.queryPoint(colinfo);    // 查询数据
+                AgentColinfo agentColinfo = agentColinfoService.queryPoint(colinfo);//查询数据
                 if (agentColinfo != null) {
                     BigDecimal colinfoPoint = taxAdjust.getTaxIng();
                     agentColinfo.setCloTaxPoint(colinfoPoint);
@@ -154,7 +156,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
                 }
 
                 // 更新代理商表的 税点值
-                Agent agent = agentService.getAgentById(agentId);    // 查询数据
+                Agent agent = agentService.getAgentById(agentId);//查询数据
                 if (agent != null) {
                     BigDecimal agentPoint = taxAdjust.getTaxIng();
                     agent.setCloTaxPoint(agentPoint);

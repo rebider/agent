@@ -48,4 +48,6 @@ public interface AgentColinfoService {
     AgentColinfo selectByPrimaryKey(String id);
 
     AgentColinfo selectByAgentId(String agentId);
+
+    AgentColinfo selectByAgentIdAndBusId(String agentId,String agentbusId);
 }

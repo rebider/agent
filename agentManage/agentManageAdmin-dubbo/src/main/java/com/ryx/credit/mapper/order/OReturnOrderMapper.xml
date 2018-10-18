@@ -23,6 +23,9 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="REFUNDTIME" jdbcType="TIMESTAMP" property="refundtime" />
+    <result column="REFUNDPEOPLE" jdbcType="VARCHAR" property="refundpeople" />
+    <result column="AUDITOR" jdbcType="VARCHAR" property="auditor" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -54,9 +57,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_ID, APPLY_REMARK, RET_INVOICE, RET_RECEIPT, RET_SCHEDULE, RETURN_AMO, GOODS_RETURN_AMO, 
-    CUT_AMO, REL_RETURN_AMO, TAKE_OUT_AMO, RETURN_ADDRESS, RET_TIME, REMARK, BATCH_CODE, 
-    C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+    ID, AGENT_ID, APPLY_REMARK, RET_INVOICE, RET_RECEIPT, RET_SCHEDULE, RETURN_AMO, GOODS_RETURN_AMO,
+    CUT_AMO, REL_RETURN_AMO, TAKE_OUT_AMO, RETURN_ADDRESS, RET_TIME, REMARK, BATCH_CODE,
+    C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, REFUNDTIME, REFUNDPEOPLE, AUDITOR
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -75,7 +78,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_RETURN_ORDER
     where ID = #{id,jdbcType=VARCHAR}
@@ -87,22 +90,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
-    insert into O_RETURN_ORDER (ID, AGENT_ID, APPLY_REMARK, 
-      RET_INVOICE, RET_RECEIPT, RET_SCHEDULE, 
-      RETURN_AMO, GOODS_RETURN_AMO, CUT_AMO, 
-      REL_RETURN_AMO, TAKE_OUT_AMO, RETURN_ADDRESS, 
-      RET_TIME, REMARK, BATCH_CODE, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, STATUS, VERSION
-      )
-    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{applyRemark,jdbcType=VARCHAR}, 
-      #{retInvoice,jdbcType=DECIMAL}, #{retReceipt,jdbcType=DECIMAL}, #{retSchedule,jdbcType=DECIMAL}, 
-      #{returnAmo,jdbcType=DECIMAL}, #{goodsReturnAmo,jdbcType=DECIMAL}, #{cutAmo,jdbcType=DECIMAL}, 
-      #{relReturnAmo,jdbcType=DECIMAL}, #{takeOutAmo,jdbcType=DECIMAL}, #{returnAddress,jdbcType=VARCHAR}, 
-      #{retTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+    insert into O_RETURN_ORDER (ID, AGENT_ID, APPLY_REMARK,
+    RET_INVOICE, RET_RECEIPT, RET_SCHEDULE,
+    RETURN_AMO, GOODS_RETURN_AMO, CUT_AMO,
+    REL_RETURN_AMO, TAKE_OUT_AMO, RETURN_ADDRESS,
+    RET_TIME, REMARK, BATCH_CODE,
+    C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION,
+    REFUNDTIME, REFUNDPEOPLE, AUDITOR
+    )
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{applyRemark,jdbcType=VARCHAR},
+    #{retInvoice,jdbcType=DECIMAL}, #{retReceipt,jdbcType=DECIMAL}, #{retSchedule,jdbcType=DECIMAL},
+    #{returnAmo,jdbcType=DECIMAL}, #{goodsReturnAmo,jdbcType=DECIMAL}, #{cutAmo,jdbcType=DECIMAL},
+    #{relReturnAmo,jdbcType=DECIMAL}, #{takeOutAmo,jdbcType=DECIMAL}, #{returnAddress,jdbcType=VARCHAR},
+    #{retTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{refundtime,jdbcType=TIMESTAMP}, #{refundpeople,jdbcType=VARCHAR}, #{auditor,jdbcType=VARCHAR}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
     insert into O_RETURN_ORDER
@@ -170,6 +175,15 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="refundtime != null">
+        REFUNDTIME,
+      </if>
+      <if test="refundpeople != null">
+        REFUNDPEOPLE,
+      </if>
+      <if test="auditor != null">
+        AUDITOR,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -234,6 +248,15 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="refundtime != null">
+        #{refundtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refundpeople != null">
+        #{refundpeople,jdbcType=VARCHAR},
+      </if>
+      <if test="auditor != null">
+        #{auditor,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -306,36 +329,48 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="refundtime != null">
+        REFUNDTIME = #{refundtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refundpeople != null">
+        REFUNDPEOPLE = #{refundpeople,jdbcType=VARCHAR},
+      </if>
+      <if test="auditor != null">
+        AUDITOR = #{auditor,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
     update O_RETURN_ORDER
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
-      RET_INVOICE = #{retInvoice,jdbcType=DECIMAL},
-      RET_RECEIPT = #{retReceipt,jdbcType=DECIMAL},
-      RET_SCHEDULE = #{retSchedule,jdbcType=DECIMAL},
-      RETURN_AMO = #{returnAmo,jdbcType=DECIMAL},
-      GOODS_RETURN_AMO = #{goodsReturnAmo,jdbcType=DECIMAL},
-      CUT_AMO = #{cutAmo,jdbcType=DECIMAL},
-      REL_RETURN_AMO = #{relReturnAmo,jdbcType=DECIMAL},
-      TAKE_OUT_AMO = #{takeOutAmo,jdbcType=DECIMAL},
-      RETURN_ADDRESS = #{returnAddress,jdbcType=VARCHAR},
-      RET_TIME = #{retTime,jdbcType=TIMESTAMP},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    APPLY_REMARK = #{applyRemark,jdbcType=VARCHAR},
+    RET_INVOICE = #{retInvoice,jdbcType=DECIMAL},
+    RET_RECEIPT = #{retReceipt,jdbcType=DECIMAL},
+    RET_SCHEDULE = #{retSchedule,jdbcType=DECIMAL},
+    RETURN_AMO = #{returnAmo,jdbcType=DECIMAL},
+    GOODS_RETURN_AMO = #{goodsReturnAmo,jdbcType=DECIMAL},
+    CUT_AMO = #{cutAmo,jdbcType=DECIMAL},
+    REL_RETURN_AMO = #{relReturnAmo,jdbcType=DECIMAL},
+    TAKE_OUT_AMO = #{takeOutAmo,jdbcType=DECIMAL},
+    RETURN_ADDRESS = #{returnAddress,jdbcType=VARCHAR},
+    RET_TIME = #{retTime,jdbcType=TIMESTAMP},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    BATCH_CODE = #{batchCode,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    REFUNDTIME = #{refundtime,jdbcType=TIMESTAMP},
+    REFUNDPEOPLE = #{refundpeople,jdbcType=VARCHAR},
+    AUDITOR = #{auditor,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -343,6 +378,11 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+
+
+
 
 
   <select id="getOrderReturnCount" parameterType="java.util.Map" resultType="java.lang.Long">
@@ -364,7 +404,9 @@
     <include refid="PAGING_START" />
     select   to_char(ro.c_time,'YYYY-MM-DD') as rotime,
     to_char(odetail.return_time,'YYYY-MM-DD') as returntime,
-    c.PLATFORM_NAME ,
+    to_char(ro.refundtime,'YYYY-MM-DD') as refundtime,
+    ro.refundpeople,ro.auditor,
+    c.PLATFORM_NAME ,ro.ret_schedule,
     ro.id ,odetail.return_count , odetail.return_count * odetail.return_price as return_price,
     odetail.begin_sn  ,odetail.end_sn ,
     agent.AG_UNIQ_NUM ,agent.AG_NAME ,os.pro_type,
@@ -393,6 +435,7 @@
       <if test="vender != null and vender != '' "> and oso.vender=#{vender}</if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(odetail.return_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="agentId !=null and agentId !='' "> and ro.AGENT_ID=#{agentId}</if>
     </where>
   </sql>
 
@@ -410,4 +453,12 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
     </if>
   </sql>
+
+  <select id="selectByReturnDeId" parameterType="string" resultType="map">
+    select subact.activity_id,subact.pro_id,orderdetail.id as O_RETURN_ORDER_DETAIL_ID,orderdetail.return_count
+    from o_return_order_detail orderdetail
+      left join o_sub_order suborder on orderdetail.order_id=suborder.order_id and orderdetail.pro_id=suborder.pro_id
+      left join o_sub_order_activity subact on subact.sub_order_id=suborder.id
+      where orderdetail.id=#{returnDetailsId}
+  </select>
 </mapper>

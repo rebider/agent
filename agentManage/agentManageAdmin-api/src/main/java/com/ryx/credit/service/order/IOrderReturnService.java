@@ -3,10 +3,13 @@ package com.ryx.credit.service.order;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,14 +35,16 @@ public interface IOrderReturnService {
 
     Map<String, Object> cwAudit(String returnId, String remark, String userid, String auditResult, String[] attachments) throws ProcessException;
 
+    AgentResult approvalTaskAjustPeople(OReturnOrder oReturnOrder) throws ProcessException;
+
     AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 
     void doPlan(String returnId, BigDecimal takeAmt, String userid);
 
 
-    void approvalReject(String processInstanceId, String activityName);
+    void approvalReject(String processInstanceId, String activityName)throws Exception;
 
-    void approvalFinish(String processInstanceId, String activityName);
+    void approvalFinish(String processInstanceId, String activityName)throws Exception;
 
     /**
      * 退货列表及导出
@@ -48,4 +53,12 @@ public interface IOrderReturnService {
      * @return
      */
     PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo);
+
+
+    List<String> addList(List<List<Object>> data, String user) throws Exception;
+
+
+    AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail);
+
+    Map selectByReturnDeId(String returnDetailsId);
 }

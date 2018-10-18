@@ -13,6 +13,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
+import com.ryx.credit.service.agent.PlatFormService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AgentDataHistoryService agentDataHistoryService;
 	@Autowired
 	private AssProtoColMapper assProtoColMapper;
+	@Autowired
+	private PlatFormService platFormService;
 
     /**
      * 代理商查询插件数据获取
@@ -140,6 +143,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 	public AgentBusInfo getById(String id){
 		AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(id);
+		PlatForm platForm = platFormService.selectByPlatformNum(agentBusInfo.getBusPlatform());
+		if(null!=platForm){
+			agentBusInfo.setBusPlatformType(platForm.getPlatformType());
+		}
 		if(agentBusInfo!=null)
 		//查询业务关联账户
 		agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
@@ -217,7 +224,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					db_AgentBusInfo.setBusUseOrgan(agentBusInfoVo.getBusUseOrgan());
 					db_AgentBusInfo.setBusScope(agentBusInfoVo.getBusScope());
 					db_AgentBusInfo.setDredgeS0(agentBusInfoVo.getDredgeS0());
-
+					db_AgentBusInfo.setBusLoginNum(agentBusInfoVo.getBusLoginNum());
 					if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusParent())){
 						if(StringUtils.isNotEmpty(db_AgentBusInfo.getBusPlatform())){
 							AgentBusInfo busInfoParent = agentBusInfoMapper.selectByPrimaryKey(db_AgentBusInfo.getBusParent());
@@ -582,5 +589,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			queryChildLevel(list,platformCode,agentBusInfo.getBusNum());
 		}
 		return list;
+	}
+
+	@Override
+	public List<AgentBusInfo> selectByAgenId(String agentId) {
+		return agentBusInfoMapper.selectByAgenId(agentId);
 	}
 }

@@ -1,5 +1,7 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
+
 import java.util.List;
 import java.util.Map;
 
@@ -13,4 +15,6 @@ public interface OLogisticsDetailService {
     List<String> querySnLList(String beginSn,String endSn);
 
     int querySnCount(String beginSn,String endSn);
+
+    OLogisticsDetail queryBySn(String snNum);
 }

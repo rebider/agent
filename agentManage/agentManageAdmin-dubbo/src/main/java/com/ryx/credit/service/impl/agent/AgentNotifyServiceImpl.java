@@ -13,9 +13,7 @@ import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
-import com.ryx.credit.service.agent.AgentNotifyService;
-import com.ryx.credit.service.agent.AgentService;
-import com.ryx.credit.service.agent.PlatformSynService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -82,6 +80,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     private List<PlatformSynService> platformSynServiceList ;
     @Autowired
     private DPosRegionMapper posRegionMapper;
+    @Autowired
+    private ApaycompService apaycompService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+
+
 
     @PostConstruct
     public void init(){
@@ -91,6 +95,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     }
 
 
+    /**
+     * 流程调用入网流程，修改流程
+     */
     @Override
     public void asynNotifyPlatform(){
         threadPoolTaskExecutor.execute(new Runnable() {
@@ -255,6 +262,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     }
                     log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地平台{}",userid,agentBusInfo.getBusNum(),"入网成功");
                     agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                    agentBusInfo.setBusLoginNum(agentBusInfo.getBusNum());
                     if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",userid,agentBusInfo.getId(),"入网成功");
                     }else{
@@ -337,6 +345,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
+            agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
+        }
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
         if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
             agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
@@ -385,6 +396,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
             //调用首刷接口
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
+                PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
+                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+                agentColinfo.setAccountId(agentBusInfo.getCloPayCompany());
+                agentColinfo.setAccountName(payComp.getComName());
+                agentNotifyVo.setColinfoMessage(agentColinfo);
                 //MPOS传递的唯一id为代理商唯一ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 log.info("已有编号进行入网修改：接收入网请求开始MPOS: busId：{},userId:{},data:{}",busId,userId,JSONObject.toJSONString(agentNotifyVo));
@@ -548,7 +564,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新成功");
                         }
 
-
                         if(impId!=null){
                           updateImportAgent(impId, Status.STATUS_2.status, "处理成功");
                         }
@@ -615,6 +630,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
             return;
         }
+        ImportAgent importAgent = importAgentMapper.selectByPrimaryKey(impId);
         //直签不直发不通知
         if(agentBusInfo.getBusType().equals("8")){
             log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
@@ -646,6 +662,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         agentNotifyVo.setBaseMessage(agent);
         agentNotifyVo.setBusMessage(agentBusInfo);
         agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+        if(StringUtils.isNotBlank(agentBusInfo.getBusLoginNum())){
+            agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
+        }
+
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
         if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
             agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
@@ -670,7 +690,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
-            record.setNotifyType(NotifyType.NetInAdd.getValue());
+            //根据数据类型设置接口类型
+            record.setNotifyType(importAgent==null?NotifyType.NetInAdd.getValue():AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
@@ -686,7 +707,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 result = httpRequestForPos(agentNotifyVo);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-
+                PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
+                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+                agentColinfo.setAccountId(agentBusInfo.getCloPayCompany());
+                agentColinfo.setAccountName(payComp.getComName());
+                agentNotifyVo.setColinfoMessage(agentColinfo);
                 //首刷传递代理商ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
@@ -709,16 +734,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
         if(czResult==1 && null!=result && !"".equals(result) && result.isOK()){
             log.info("入网开户修改操作: 接收入网更新入网状态开始,业务id：{},返回结果:{}",busId);
-            //更新入网状态
-            Agent updateAgent = new Agent();
-            updateAgent.setId(agent.getId());
-            updateAgent.setVersion(agent.getVersion());
-            updateAgent.setcIncomStatus(AgentInStatus.IN.status);
-            Date nowDate = new Date();
-            updateAgent.setcIncomTime(nowDate);
-            updateAgent.setcUtime(nowDate);
-            int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
-            log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
+
+
             //更新业务编号
             AgentBusInfo updateBusInfo = new AgentBusInfo();
             JSONObject jsonObject = JSONObject.parseObject(String.valueOf(result.getData()));
@@ -730,9 +747,53 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }else if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
                 updateBusInfo.setBusLoginNum(jsonObject.getString("orgId"));
             }
-            updateBusInfo.setBusStatus(Status.STATUS_1.status);
+
+
+            //代理商修改也会走这里
+            // cxinfo  如果有已有效的业务信息就为已入网，否则为已入网未激活 业务平台状态：1启用和0注销2开户未激活，注销是指代理商解除某项业务平台合作。
+            if(updateBusInfo.getBusStatus()==null || !updateBusInfo.getBusStatus().equals(Status.STATUS_1.status)){
+                PlatFormExample example  = new PlatFormExample();
+                example.or().andPlatformNumEqualTo(agentBusInfo.getBusPlatform()).andStatusEqualTo(Status.STATUS_1.status);
+                List<PlatForm>  platForms = platFormMapper.selectByExample(example);
+                if(platForms.size()==1){
+                    PlatForm p = platForms.get(0);
+                    //首刷初始状态为开户未激活s
+                    if(PlatformType.MPOS.code.equals(p.getPlatformType()+"")){
+                        updateBusInfo.setBusStatus(Status.STATUS_2.status);
+                    }else{
+                        updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                    }
+                }else{
+                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                }
+            }else{
+                updateBusInfo.setBusStatus(Status.STATUS_1.status);
+            }
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
+
+
+
+
+            //更新入网状态
+            // cxinfo   如果有已有效的业务信息就为已入网，否则为已入网未激活 0未入网，1已入网，2已入网未激活
+            Agent updateAgent = new Agent();
+            updateAgent.setId(agent.getId());
+            updateAgent.setVersion(agent.getVersion());
+            //检查是否可以更新为入网状态
+            if(agentService.checkAgentIsIn(agent.getId()).isOK()){
+                updateAgent.setcIncomStatus(AgentInStatus.IN.status);//已入网
+            }else{
+                updateAgent.setcIncomStatus(AgentInStatus.NO_ACT.status);//入网未激活
+            }
+            Date nowDate = new Date();
+            updateAgent.setcIncomTime(nowDate);
+            updateAgent.setcUtime(nowDate);
+            int upResult1 = agentMapper.updateByPrimaryKeySelective(updateAgent);
+            log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult1:{}",upResult1);
+
+
+            //更新任务记录
             if(upResult1!=1 || upResult2!=1){
                 if(impId!=null) {
                     updateImportAgent(impId, Status.STATUS_3.status, "更新异常");
@@ -794,7 +855,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         return regions.get(0);
     }
 
-    private AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
+    @Override
+    public AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
         try {
 
             String cooperator = com.ryx.credit.util.Constants.cooperator;
@@ -815,6 +877,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("hasS0",agentNotifyVo.getHasS0());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
+            }
+            if(StringUtils.isNotBlank(agentNotifyVo.getLoginName())){
+                data.put("loginName",agentNotifyVo.getLoginName());
             }
 //            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
 //                data.put("province",agentNotifyVo.getProvince());
@@ -899,6 +964,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             jsonParams.put("agHeadMobile",agentNotifyVo.getAgHeadMobile());
             jsonParams.put("baseMessage",agentNotifyVo.getBaseMessage());
             jsonParams.put("busMessage",agentNotifyVo.getBusMessage());
+            jsonParams.put("colinfoMessage",agentNotifyVo.getColinfoMessage());
             if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
                 jsonParams.put("province",agentNotifyVo.getProvince());
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))

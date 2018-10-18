@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsTermWarehouseDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
+    <id column="POS_SN" jdbcType="VARCHAR" property="posSn" />
+    <result column="WD_ID" jdbcType="VARCHAR" property="wdId" />
+    <result column="MACHINE_ID" jdbcType="VARCHAR" property="machineId" />
+    <result column="ORG_ID" jdbcType="VARCHAR" property="orgId" />
+    <result column="MER_ID" jdbcType="VARCHAR" property="merId" />
+    <result column="TERM_ID" jdbcType="VARCHAR" property="termId" />
+    <result column="USE_STATUS" jdbcType="VARCHAR" property="useStatus" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="CREATE_PERSON" jdbcType="VARCHAR" property="createPerson" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="POS_TYPE" jdbcType="VARCHAR" property="posType" />
+    <result column="PAY_STATUS" jdbcType="VARCHAR" property="payStatus" />
+    <result column="PAY_TIME" jdbcType="VARCHAR" property="payTime" />
+    <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
+    <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    POS_SN, WD_ID, MACHINE_ID, ORG_ID, MER_ID, TERM_ID, USE_STATUS, STATUS, CREATE_TIME, 
+    CREATE_PERSON, UPDATE_TIME, POS_TYPE, PAY_STATUS, PAY_TIME, POS_SPE_PRICE, DELIVERY_TIME
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_TERM_WAREHOUSE_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_TERM_WAREHOUSE_DETAIL
+    where POS_SN = #{posSn,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetailExample">
+    delete from IMS_TERM_WAREHOUSE_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
+    insert into IMS_TERM_WAREHOUSE_DETAIL (POS_SN, WD_ID, MACHINE_ID, 
+      ORG_ID, MER_ID, TERM_ID, 
+      USE_STATUS, STATUS, CREATE_TIME, 
+      CREATE_PERSON, UPDATE_TIME, POS_TYPE, 
+      PAY_STATUS, PAY_TIME, POS_SPE_PRICE, 
+      DELIVERY_TIME)
+    values (#{posSn,jdbcType=VARCHAR}, #{wdId,jdbcType=VARCHAR}, #{machineId,jdbcType=VARCHAR}, 
+      #{orgId,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{termId,jdbcType=VARCHAR}, 
+      #{useStatus,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, 
+      #{createPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, #{posType,jdbcType=VARCHAR}, 
+      #{payStatus,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, 
+      #{deliveryTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
+    insert into IMS_TERM_WAREHOUSE_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="posSn != null">
+        POS_SN,
+      </if>
+      <if test="wdId != null">
+        WD_ID,
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID,
+      </if>
+      <if test="orgId != null">
+        ORG_ID,
+      </if>
+      <if test="merId != null">
+        MER_ID,
+      </if>
+      <if test="termId != null">
+        TERM_ID,
+      </if>
+      <if test="useStatus != null">
+        USE_STATUS,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="posType != null">
+        POS_TYPE,
+      </if>
+      <if test="payStatus != null">
+        PAY_STATUS,
+      </if>
+      <if test="payTime != null">
+        PAY_TIME,
+      </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE,
+      </if>
+      <if test="deliveryTime != null">
+        DELIVERY_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="posSn != null">
+        #{posSn,jdbcType=VARCHAR},
+      </if>
+      <if test="wdId != null">
+        #{wdId,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null">
+        #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="merId != null">
+        #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="termId != null">
+        #{termId,jdbcType=VARCHAR},
+      </if>
+      <if test="useStatus != null">
+        #{useStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createPerson != null">
+        #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="posType != null">
+        #{posType,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        #{payStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null">
+        #{payTime,jdbcType=VARCHAR},
+      </if>
+      <if test="posSpePrice != null">
+        #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryTime != null">
+        #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetailExample" resultType="java.lang.Long">
+    select count(*) from IMS_TERM_WAREHOUSE_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
+    update IMS_TERM_WAREHOUSE_DETAIL
+    <set>
+      <if test="wdId != null">
+        WD_ID = #{wdId,jdbcType=VARCHAR},
+      </if>
+      <if test="machineId != null">
+        MACHINE_ID = #{machineId,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null">
+        ORG_ID = #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="merId != null">
+        MER_ID = #{merId,jdbcType=VARCHAR},
+      </if>
+      <if test="termId != null">
+        TERM_ID = #{termId,jdbcType=VARCHAR},
+      </if>
+      <if test="useStatus != null">
+        USE_STATUS = #{useStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="posType != null">
+        POS_TYPE = #{posType,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        PAY_STATUS = #{payStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null">
+        PAY_TIME = #{payTime,jdbcType=VARCHAR},
+      </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="deliveryTime != null">
+        DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where POS_SN = #{posSn,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
+    update IMS_TERM_WAREHOUSE_DETAIL
+    set WD_ID = #{wdId,jdbcType=VARCHAR},
+      MACHINE_ID = #{machineId,jdbcType=VARCHAR},
+      ORG_ID = #{orgId,jdbcType=VARCHAR},
+      MER_ID = #{merId,jdbcType=VARCHAR},
+      TERM_ID = #{termId,jdbcType=VARCHAR},
+      USE_STATUS = #{useStatus,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      POS_TYPE = #{posType,jdbcType=VARCHAR},
+      PAY_STATUS = #{payStatus,jdbcType=VARCHAR},
+      PAY_TIME = #{payTime,jdbcType=VARCHAR},
+      POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR}
+    where POS_SN = #{posSn,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

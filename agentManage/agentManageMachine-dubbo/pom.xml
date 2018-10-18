@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>agentManage</artifactId>
+        <groupId>com.ryx.ry</groupId>
+        <version>${agentManage.version}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>agentManageMachine-dubbo</artifactId>
+    <version>${agentManage.version}</version>
+    <packaging>war</packaging>
+    <name>agentManageMachine-dubbo</name>
+    <dependencies>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManage-common</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageMachine-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ryx.ry</groupId>
+            <artifactId>agentManageAdmin-api</artifactId>
+            <version>${agentManage.version}</version>
+        </dependency>
+        <!-- 单元测试包 -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>agentManageMachine-dubbo</finalName>
+        <filters>
+            <!-- 全局配置 -->
+            <filter>${project.basedir}/../src/main/filters/filter-global.properties</filter>
+            <!-- 全局模块配置 -->
+            <!--<filter>${project.basedir}/../src/main/filters/filter-global-${project.name}.properties</filter> -->
+            <!-- 部署环境 全局配置 -->
+            <filter>${project.basedir}/../src/main/filters/${deploy.env.name}/filter-${deploy.env.name}.properties</filter>
+            <!-- 部署环境 全局模块配置 -->
+            <!--<filter>${project.basedir}/../src/main/filters/${deploy.env.name}/filter-${deploy.env.name}-${project.name}.properties</filter> -->
+            <!-- 部署环境 节点配置 -->
+            <filter>${project.basedir}/../src/main/filters/${deploy.env.name}/filter-${deploy.env.name}-${project.name}-${deploy.env.host.name}.properties</filter>
+        </filters>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                    <include>**/*.png</include>
+                    <include>**/*.bpmn</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <!--<include>**/cache.xml</include> -->
+                    <include>**/applicationContext-security.xml</include>
+                    <include>**/message.xml</include>
+                    <include>**/applicationContext-mongo.xml</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+</project>

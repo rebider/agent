@@ -20,6 +20,7 @@ public class DateUtil {
     public final static String DATE_FORMAT_1 = "yyyy-MM-dd HH:mm:ss";
     public final static String DATE_FORMAT_2 = "yyyyMMddHHmmss";
     public final static String DATE_FORMAT_3 = "yyyyMMdd";
+    public final static String DATE_FORMAT_4 = "yyyyMMddHHmmssss";
 
     public final static SimpleDateFormat sdfDays = new SimpleDateFormat(
             "yyyyMMdd");

@@ -106,6 +106,7 @@ public class ProfitDServiceImpl implements IProfitDService {
     @Override
     public PageInfo profitDList(ProfitDay record, Page page) {
         ProfitDayExample example = new ProfitDayExample();
+        example.setPage(page);
         ProfitDayExample.Criteria criteria = example.createCriteria();
         if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentName())){
             criteria.andAgentNameEqualTo(record.getAgentName());

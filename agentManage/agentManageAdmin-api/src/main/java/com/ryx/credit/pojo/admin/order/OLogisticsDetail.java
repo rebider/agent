@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OLogisticsDetail implements Serializable{
+public class OLogisticsDetail implements Serializable {
     private String id;
 
     private String orderId;
@@ -48,6 +48,30 @@ public class OLogisticsDetail implements Serializable{
     private BigDecimal version;
 
     private String orderNum;
+
+    private String terminalid;
+
+    private String terminalidKey;
+
+    private String terminalidSeq;
+
+    private String terminalidType;
+
+    private String busProCode;
+
+    private String busProName;
+
+    private String termBatchcode;
+
+    private String termBatchname;
+
+    private String termtype;
+
+    private String termtypename;
+
+    private BigDecimal sendStatus;
+
+    private String terminalidCheck;
 
     public String getId() {
         return id;
@@ -223,5 +247,101 @@ public class OLogisticsDetail implements Serializable{
 
     public void setOrderNum(String orderNum) {
         this.orderNum = orderNum == null ? null : orderNum.trim();
+    }
+
+    public String getTerminalid() {
+        return terminalid;
+    }
+
+    public void setTerminalid(String terminalid) {
+        this.terminalid = terminalid == null ? null : terminalid.trim();
+    }
+
+    public String getTerminalidKey() {
+        return terminalidKey;
+    }
+
+    public void setTerminalidKey(String terminalidKey) {
+        this.terminalidKey = terminalidKey == null ? null : terminalidKey.trim();
+    }
+
+    public String getTerminalidSeq() {
+        return terminalidSeq;
+    }
+
+    public void setTerminalidSeq(String terminalidSeq) {
+        this.terminalidSeq = terminalidSeq == null ? null : terminalidSeq.trim();
+    }
+
+    public String getTerminalidType() {
+        return terminalidType;
+    }
+
+    public void setTerminalidType(String terminalidType) {
+        this.terminalidType = terminalidType == null ? null : terminalidType.trim();
+    }
+
+    public String getBusProCode() {
+        return busProCode;
+    }
+
+    public void setBusProCode(String busProCode) {
+        this.busProCode = busProCode == null ? null : busProCode.trim();
+    }
+
+    public String getBusProName() {
+        return busProName;
+    }
+
+    public void setBusProName(String busProName) {
+        this.busProName = busProName == null ? null : busProName.trim();
+    }
+
+    public String getTermBatchcode() {
+        return termBatchcode;
+    }
+
+    public void setTermBatchcode(String termBatchcode) {
+        this.termBatchcode = termBatchcode == null ? null : termBatchcode.trim();
+    }
+
+    public String getTermBatchname() {
+        return termBatchname;
+    }
+
+    public void setTermBatchname(String termBatchname) {
+        this.termBatchname = termBatchname == null ? null : termBatchname.trim();
+    }
+
+    public String getTermtype() {
+        return termtype;
+    }
+
+    public void setTermtype(String termtype) {
+        this.termtype = termtype == null ? null : termtype.trim();
+    }
+
+    public String getTermtypename() {
+        return termtypename;
+    }
+
+    public void setTermtypename(String termtypename) {
+        this.termtypename = termtypename == null ? null : termtypename.trim();
+    }
+
+    public BigDecimal getSendStatus() {
+        return sendStatus;
+    }
+
+    public void setSendStatus(BigDecimal sendStatus) {
+        this.sendStatus = sendStatus;
+    }
+
+    public String getTerminalidCheck() {
+        return terminalidCheck;
+    }
+
+    public void setTerminalidCheck(String terminalidCheck) {
+        this.terminalidCheck = terminalidCheck == null ? null : terminalidCheck.trim();
     }
 }

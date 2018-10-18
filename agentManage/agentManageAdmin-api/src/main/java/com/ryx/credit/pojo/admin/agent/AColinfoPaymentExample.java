@@ -2337,6 +2337,76 @@ public class AColinfoPaymentExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andSynchronizeDateIsNull() {
+            addCriterion("SYNCHRONIZE_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateIsNotNull() {
+            addCriterion("SYNCHRONIZE_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateEqualTo(String value) {
+            addCriterion("SYNCHRONIZE_DATE =", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateNotEqualTo(String value) {
+            addCriterion("SYNCHRONIZE_DATE <>", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateGreaterThan(String value) {
+            addCriterion("SYNCHRONIZE_DATE >", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateGreaterThanOrEqualTo(String value) {
+            addCriterion("SYNCHRONIZE_DATE >=", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateLessThan(String value) {
+            addCriterion("SYNCHRONIZE_DATE <", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateLessThanOrEqualTo(String value) {
+            addCriterion("SYNCHRONIZE_DATE <=", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateLike(String value) {
+            addCriterion("SYNCHRONIZE_DATE like", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateNotLike(String value) {
+            addCriterion("SYNCHRONIZE_DATE not like", value, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateIn(List<String> values) {
+            addCriterion("SYNCHRONIZE_DATE in", values, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateNotIn(List<String> values) {
+            addCriterion("SYNCHRONIZE_DATE not in", values, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateBetween(String value1, String value2) {
+            addCriterion("SYNCHRONIZE_DATE between", value1, value2, "synchronizeDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynchronizeDateNotBetween(String value1, String value2) {
+            addCriterion("SYNCHRONIZE_DATE not between", value1, value2, "synchronizeDate");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class CuserAgent extends CuserAgentKey {
+public class CuserAgent extends CuserAgentKey implements Serializable  {
     private Date cTime;
 
     private String cUser;

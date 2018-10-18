@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PAgentExitApplyforExample {
+public class PAgentQuitExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -19,7 +19,7 @@ public class PAgentExitApplyforExample {
 
     protected Integer limitEnd;
 
-    public PAgentExitApplyforExample() {
+    public PAgentQuitExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
 
@@ -204,6 +204,76 @@ public class PAgentExitApplyforExample {
 
         public Criteria andIdNotBetween(String value1, String value2) {
             addCriterion("ID not between", value1, value2, "id");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
             return (Criteria) this;
         }
 
@@ -937,6 +1007,76 @@ public class PAgentExitApplyforExample {
             return (Criteria) this;
         }
 
+        public Criteria andApplyUserIsNull() {
+            addCriterion("APPLY_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserIsNotNull() {
+            addCriterion("APPLY_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserEqualTo(String value) {
+            addCriterion("APPLY_USER =", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserNotEqualTo(String value) {
+            addCriterion("APPLY_USER <>", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserGreaterThan(String value) {
+            addCriterion("APPLY_USER >", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserGreaterThanOrEqualTo(String value) {
+            addCriterion("APPLY_USER >=", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserLessThan(String value) {
+            addCriterion("APPLY_USER <", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserLessThanOrEqualTo(String value) {
+            addCriterion("APPLY_USER <=", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserLike(String value) {
+            addCriterion("APPLY_USER like", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserNotLike(String value) {
+            addCriterion("APPLY_USER not like", value, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserIn(List<String> values) {
+            addCriterion("APPLY_USER in", values, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserNotIn(List<String> values) {
+            addCriterion("APPLY_USER not in", values, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserBetween(String value1, String value2) {
+            addCriterion("APPLY_USER between", value1, value2, "applyUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andApplyUserNotBetween(String value1, String value2) {
+            addCriterion("APPLY_USER not between", value1, value2, "applyUser");
+            return (Criteria) this;
+        }
+
         public Criteria andPassDateIsNull() {
             addCriterion("PASS_DATE is null");
             return (Criteria) this;
@@ -1004,6 +1144,76 @@ public class PAgentExitApplyforExample {
 
         public Criteria andPassDateNotBetween(String value1, String value2) {
             addCriterion("PASS_DATE not between", value1, value2, "passDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtIsNull() {
+            addCriterion("RESULT_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtIsNotNull() {
+            addCriterion("RESULT_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtEqualTo(BigDecimal value) {
+            addCriterion("RESULT_AMT =", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtNotEqualTo(BigDecimal value) {
+            addCriterion("RESULT_AMT <>", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtGreaterThan(BigDecimal value) {
+            addCriterion("RESULT_AMT >", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("RESULT_AMT >=", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtLessThan(BigDecimal value) {
+            addCriterion("RESULT_AMT <", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("RESULT_AMT <=", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtLike(BigDecimal value) {
+            addCriterion("RESULT_AMT like", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtNotLike(BigDecimal value) {
+            addCriterion("RESULT_AMT not like", value, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtIn(List<BigDecimal> values) {
+            addCriterion("RESULT_AMT in", values, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtNotIn(List<BigDecimal> values) {
+            addCriterion("RESULT_AMT not in", values, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("RESULT_AMT between", value1, value2, "resultAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andResultAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("RESULT_AMT not between", value1, value2, "resultAmt");
             return (Criteria) this;
         }
     }

@@ -1,15 +1,16 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.CapitalMapper;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AttachmentRel;
-import com.ryx.credit.pojo.admin.agent.AttachmentRelExample;
-import com.ryx.credit.pojo.admin.agent.Capital;
+import com.ryx.credit.dao.order.OPaymentDetailMapper;
+import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.agent.AccountPaidItemService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
@@ -24,9 +25,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 缴纳款项服务层
@@ -47,6 +50,8 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private OPaymentDetailMapper oPaymentDetailMapper;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
@@ -68,6 +73,8 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         capital.setcTime(nowDate);
         capital.setcUtime(nowDate);
         capital.setCloReviewStatus(AgStatus.Create.status);
+        capital.setcInAmount(Status.STATUS_0.status);
+        capital.setcFqInAmount(Status.STATUS_0.status);
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
             if(fileIdList!=null) {
@@ -107,6 +114,24 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         return 0;
     }
 
+    @Override
+    public List<Capital> queryCap(String agentId, String type, BigDecimal isIn, BigDecimal cloReviewStatus) {
+        CapitalExample example = new CapitalExample();
+       CapitalExample.Criteria c =  example.or().andStatusEqualTo(Status.STATUS_1.status);
+        if(StringUtils.isNotEmpty(agentId)){
+           c.andCAgentIdEqualTo(agentId);
+        }
+        if(StringUtils.isNotEmpty(type)){
+            c.andCTypeEqualTo(type);
+        }
+        if(isIn!=null){
+            c.andCIsinEqualTo(isIn);
+        }
+        if(cloReviewStatus!=null){
+            c.andCloReviewStatusEqualTo(cloReviewStatus);
+        }
+        return  capitalMapper.selectByExample(example);
+    }
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
@@ -189,5 +214,57 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                 e.printStackTrace();
                 throw e;
             }
+    }
+
+    @Override
+    public int update(Capital capital){
+        return capitalMapper.updateByPrimaryKeySelective(capital);
+    }
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult capitalFq(Capital capital)throws Exception{
+        if(capital==null)return AgentResult.fail();
+        if(capital.getcFqCount()==null || capital.getcFqCount().intValue()<=0)return AgentResult.fail();
+        Capital db_capital = capitalMapper.selectByPrimaryKey(capital.getId());
+        if(db_capital==null)return AgentResult.fail();
+
+        if(PayType.FRDK.equals(db_capital.getcPayType())) {
+            Calendar temp = Calendar.getInstance();
+            String batchCode =temp.getTime().getTime()+"";
+            //分期数据
+            List<Map> FKFQ_data = StageUtil.stageOrder(
+                    db_capital.getcAmount(),
+                    db_capital.getcFqCount().intValue(),
+                    new Date(), temp.get(Calendar.DAY_OF_MONTH));
+
+            //明细处理
+            for (Map datum : FKFQ_data) {
+                OPaymentDetail record = new OPaymentDetail();
+                record.setId(idService.genId(TabId.o_payment_detail));
+                record.setBatchCode(batchCode);
+                record.setPaymentId(db_capital.getId());
+                record.setPaymentType(PamentIdType.ORDER_BZJ.code);
+                record.setOrderId(db_capital.getId());
+                record.setPayType(PaymentType.FRFQ.code);
+                record.setPayAmount((BigDecimal) datum.get("item"));
+                record.setRealPayAmount(BigDecimal.ZERO);
+                record.setPlanPayTime((Date) datum.get("date"));
+                record.setPlanNum((BigDecimal) datum.get("count"));
+                record.setAgentId(db_capital.getcAgentId());
+                record.setPaymentStatus(PaymentStatus.DF.code);
+                record.setcUser(db_capital.getcUser());
+                record.setcDate(temp.getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setVersion(Status.STATUS_1.status);
+                if (1 != oPaymentDetailMapper.insert(record)) {
+                    log.info("保证金分期抵扣分润:明细生成失败:capitalID:{}",
+                            db_capital.getId());
+                    throw new MessageException("保证金分期抵扣分润异常");
+                }
+            }
+        }
+
+        return AgentResult.ok();
     }
 }

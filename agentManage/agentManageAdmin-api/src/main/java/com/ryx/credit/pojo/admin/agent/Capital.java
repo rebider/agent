@@ -67,6 +67,48 @@ public class Capital implements Serializable{
     private Date cFqDate;
 
     private BigDecimal cloReviewStatus;
+    //新增
+    private BigDecimal debt;
+
+    public BigDecimal getDebt() {
+        return debt;
+    }
+
+    @Override
+    public String toString() {
+        return "Capital{" +
+                "id='" + id + '\'' +
+                ", cType='" + cType + '\'' +
+                ", cAmount=" + cAmount +
+                ", cIsin=" + cIsin +
+                ", cInAmount=" + cInAmount +
+                ", cBusStatus=" + cBusStatus +
+                ", cSrc='" + cSrc + '\'' +
+                ", cPlanintime=" + cPlanintime +
+                ", cIntime=" + cIntime +
+                ", cPaytime=" + cPaytime +
+                ", cTime=" + cTime +
+                ", cUtime=" + cUtime +
+                ", remark='" + remark + '\'' +
+                ", status=" + status +
+                ", version=" + version +
+                ", cAgentId='" + cAgentId + '\'' +
+                ", attachmentList=" + attachmentList +
+                ", cUser='" + cUser + '\'' +
+                ", cPayuser='" + cPayuser + '\'' +
+                ", cFqCount=" + cFqCount +
+                ", cPayType='" + cPayType + '\'' +
+                ", cInCom='" + cInCom + '\'' +
+                ", cFqInAmount=" + cFqInAmount +
+                ", cFqDate=" + cFqDate +
+                ", cloReviewStatus=" + cloReviewStatus +
+                ", debt=" + debt +
+                '}';
+    }
+
+    public void setDebt(BigDecimal debt) {
+        this.debt = debt;
+    }
 
     public List<Attachment> getAttachmentList() {
         return attachmentList;

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  */
 public enum AgentInStatus {
 
-    IN(1,"已入网"),NO(0,"未入网");
+    IN(1,"已入网"),NO(0,"未入网"),NO_ACT(2,"入网未激活");
 
     public BigDecimal status;
 

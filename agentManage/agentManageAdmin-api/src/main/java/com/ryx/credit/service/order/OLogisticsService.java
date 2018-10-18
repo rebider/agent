@@ -24,6 +24,8 @@ public interface OLogisticsService {
 
     ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish,String logisticsId, String cUser, String planId) throws MessageException;
 
+    ResultVO updateLogisticsDetail(List<String> idList,String logisticsId, String cUser, String planId) throws MessageException;
+
     public List<String> addList(List<List<Object>> data, String user)throws Exception;
 
     public int insertImportData(OLogistics oLogistics);
@@ -33,4 +35,5 @@ public interface OLogisticsService {
     Map<String, Object> getLogisticsBySn(String sn, String agentId) throws ProcessException;
 
 //    List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException;
+    public List<String> addSn(List<List<String>>  data, String user)throws Exception;
 }

@@ -57,6 +57,16 @@ public class AgentVo implements Serializable {
     private List<ReceiptPlan> receiptPlanList;
 
     private String payMethod;
+    //退货单
+    private OReturnOrder oReturnOrder;
+
+    public OReturnOrder getoReturnOrder() {
+        return oReturnOrder;
+    }
+
+    public void setoReturnOrder(OReturnOrder oReturnOrder) {
+        this.oReturnOrder = oReturnOrder;
+    }
 
     public String getPayMethod() {
         return payMethod;

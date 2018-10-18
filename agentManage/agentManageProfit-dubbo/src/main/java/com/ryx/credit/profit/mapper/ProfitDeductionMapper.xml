@@ -24,6 +24,7 @@
     <result column="USER_ID" jdbcType="VARCHAR" property="userId" />
     <result column="CREATE_DATE_TIME" jdbcType="TIMESTAMP" property="createDateTime" />
     <result column="DEDUCTION_STATUS" jdbcType="CHAR" property="deductionStatus" />
+    <result column="NEXT_ID" jdbcType="VARCHAR" property="nextId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -58,7 +59,7 @@
     ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME, 
     DEDUCTION_DATE, DEDUCTION_TYPE, DEDUCTION_DESC, SUM_DEDUCTION_AMT, ADD_DEDUCTION_AMT, 
     MUST_DEDUCTION_AMT, ACTUAL_DEDUCTION_AMT, NOT_DEDUCTION_AMT, REMARK, SOURCE_ID, UPPER_NOT_DEDUCTION_AMT, 
-    STAGING_STATUS, USER_ID, CREATE_DATE_TIME,DEDUCTION_STATUS
+    STAGING_STATUS, USER_ID, CREATE_DATE_TIME,DEDUCTION_STATUS,NEXT_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -82,6 +83,13 @@
     from P_DEDUCTION
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+  <select id="getCurrentDeductionAmtSum"  resultMap="BaseResultMap">
+   select
+    sum(case when d.deduction_Status = '0' then d.MUST_DEDUCTION_AMT else d.NOT_DEDUCTION_AMT end) MUST_DEDUCTION_AMT
+    from  p_deduction d
+    where   d.deduction_type In ('01','03') and d.deduction_date =#{deductionDate}
+    and d.agent_pid=#{agentPid,jdbcType=VARCHAR}
+  </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample">
     delete from P_DEDUCTION
     <if test="_parameter != null">
@@ -95,7 +103,7 @@
       DEDUCTION_DESC, SUM_DEDUCTION_AMT, ADD_DEDUCTION_AMT, 
       MUST_DEDUCTION_AMT, ACTUAL_DEDUCTION_AMT, NOT_DEDUCTION_AMT, 
       REMARK, SOURCE_ID, UPPER_NOT_DEDUCTION_AMT, 
-      STAGING_STATUS, USER_ID, CREATE_DATE_TIME,DEDUCTION_STATUS
+      STAGING_STATUS, USER_ID, CREATE_DATE_TIME,DEDUCTION_STATUS,NEXT_ID
       )
     values (#{id,jdbcType=VARCHAR}, #{parentAgentPid,jdbcType=CHAR}, #{parentAgentId,jdbcType=CHAR}, 
       #{parentAgentName,jdbcType=CHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
@@ -104,7 +112,7 @@
       #{mustDeductionAmt,jdbcType=DECIMAL}, #{actualDeductionAmt,jdbcType=DECIMAL}, #{notDeductionAmt,jdbcType=DECIMAL}, 
       #{remark,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR}, #{upperNotDeductionAmt,jdbcType=DECIMAL}, 
       #{stagingStatus,jdbcType=CHAR}, #{userId,jdbcType=VARCHAR}, #{createDateTime,jdbcType=TIMESTAMP},#{deductionStatus,jdbcType=CHAR}
-      )
+      , #{nextId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDeduction">
     insert into P_DEDUCTION
@@ -175,6 +183,9 @@
       <if test="deductionStatus != null">
         DEDUCTION_STATUS,
       </if>
+      <if test="nextId != null">
+        NEXT_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -242,6 +253,9 @@
       </if>
       <if test="deductionStatus != null">
         #{deductionStatus,jdbcType=CHAR},
+      </if>
+      <if test="nextId != null">
+        #{nextId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -317,6 +331,9 @@
       <if test="deductionStatus != null">
         DEDUCTION_STATUS = #{deductionStatus,jdbcType=CHAR},
       </if>
+      <if test="nextId != null">
+        NEXT_ID = #{nextId,jdbcType=CHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -343,6 +360,7 @@
       USER_ID = #{userId,jdbcType=VARCHAR},
       CREATE_DATE_TIME = #{createDateTime,jdbcType=TIMESTAMP},
        DEDUCTION_STATUS = #{deductionStatus,jdbcType=CHAR}
+      NEXT_ID = #{nextId,jdbcType=VARCHAR},
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -381,6 +399,9 @@
     WHERE DEDUCTION_DATE = #{deductionDate} AND  AGENT_PID = #{agentPid} AND DEDUCTION_TYPE = '01' AND source_id = #{sourceId}
     and DEDUCTION_STATUS IS NULL
   </select>
+  <delete id="deleteById">
+    delete  P_DEDUCTION where id = #{id}
+  </delete>
 
   <select id="getNotDeductDetail" resultType="java.util.Map">
     SELECT *

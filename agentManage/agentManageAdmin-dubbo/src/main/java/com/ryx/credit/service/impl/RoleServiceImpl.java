@@ -95,7 +95,7 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
             List<Map<Long, String>> resourceList = roleMapper.selectResourceListByRoleId(roleId);
             if (resourceList != null) {
                 for (Map<Long, String> map : resourceList) {
-                    if (StringUtils.isNotBlank(map.get("URL"))) {
+                    if (map!=null && StringUtils.isNotBlank(map.get("URL"))) {
                         urlSet.add(map.get("URL"));
                     }
                 }

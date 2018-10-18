@@ -793,7 +793,10 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name
+    c.platform_name,
+    d.nuclear_user,
+    d.nuclear_time,
+    NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
@@ -801,6 +804,7 @@
     left join a_pay_comp comp on comp.id=d.COLLECT_COMPANY
     <where>
       <if test="1==1"> and  o.status = 1 </if>
+      <if test="nuclearUser!=null and nuclearUser!=''"> and  d.nuclear_user = #{nuclearUser} </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
@@ -844,6 +848,10 @@
     <result column="DEDUCTION_AMOUNT" property="deductionAmount" jdbcType="DECIMAL"/>
     <result column="PAY_AMOUNT" property="money" jdbcType="DECIMAL"/>
     <result column="PLAN_NUM" property="planNum" jdbcType="DECIMAL"/>
+
+    <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
+    <result column="nuclear_user_string" property="nuclearTimeString" jdbcType="VARCHAR"/>
+    <result column="nuclear_time" property="nuclearTime" jdbcType="TIMESTAMP"/>
 
   </resultMap>
 </mapper>

@@ -54,7 +54,9 @@ public class ProfitDeduction implements Serializable {
 
     private String deductionStatus;
 
-    public String getId() {
+    private String nextId;
+
+   public String getId() {
         return id;
     }
 
@@ -244,5 +246,13 @@ public class ProfitDeduction implements Serializable {
 
     public void setDeductionStatus(String deductionStatus) {
         this.deductionStatus = deductionStatus;
+    }
+
+    public String getNextId() {
+        return nextId;
+    }
+
+    public void setNextId(String nextId) {
+        this.nextId = nextId;
     }
 }

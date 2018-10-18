@@ -115,7 +115,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         example.or().andStatusEqualTo(Status.STATUS_1.status)
                 .andCAgentIdEqualTo(agentId)
                 .andCTypeEqualTo(type)
-                .andCIsinEqualTo(Status.STATUS_0.status);
+                .andCIsinEqualTo(Status.STATUS_0.status)
+        .andCloReviewStatusEqualTo(AgStatus.Approved.status);
 
         example.setOrderByClause(" c_amount desc ");
 
@@ -240,7 +241,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.COMPENSATE.name())){
                 ORefundPriceDiff refundrPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(rel.getBusId());
-                return FastMap.fastSuccessMap().putKeyV("refundrPriceDiff",refundrPriceDiff).putKeyV("rel",rel);
+                return FastMap.fastSuccessMap().putKeyV("refundrPriceDiff",refundrPriceDiff).putKeyV("rel",rel)
+                        .putKeyV("agentId","").putKeyV("agName","");
             }
             if(StringUtils.isNotBlank(rel.getBusType()) && rel.getBusType().equals(BusActRelBusType.refund.name())){
                 OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(rel.getBusId());

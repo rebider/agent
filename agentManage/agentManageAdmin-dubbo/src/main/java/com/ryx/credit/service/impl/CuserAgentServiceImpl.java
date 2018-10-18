@@ -23,7 +23,7 @@ import java.util.Map;
  * @see CuserAgentServiceImpl
  * To change this template use File | Settings | File Templates.
  */
-@Service("ICuserAgentService")
+@Service("cuserAgentService")
 public class CuserAgentServiceImpl implements ICuserAgentService {
     @Autowired
     private CuserAgentMapper cuserAgentMapper;
@@ -80,7 +80,7 @@ public class CuserAgentServiceImpl implements ICuserAgentService {
             Long count = cuserAgentMapper.countByExample(cuserAgentExample);
             page.setCount(count.intValue());
             cuserAgentExample.setPage(page);
-            cuserAgentExample.setOrderByClause("CREATE_TIME "+Page.ORDER_DIRECTION_DESC);
+//            cuserAgentExample.setOrderByClause("CREATE_TIME "+Page.ORDER_DIRECTION_DESC);
             HashMap hashMap = new HashMap();
             hashMap.put("list",cuserAgentMapper.selectByExample(cuserAgentExample));
             hashMap.put("page",page);

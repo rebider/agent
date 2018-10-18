@@ -507,9 +507,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     @Override
     public List<Map<String,Object>> queryIsBZYDList(String agBusLic,List<AgentBusInfo> busInfoVoList){
         List<Map<String,Object>> resultList = new ArrayList<>();
+        List<String> idList = new ArrayList<>();
+        busInfoVoList.forEach(row->{
+            idList.add(row.getAgentId());
+        });
         AgentExample agentExample = new AgentExample();
         AgentExample.Criteria criteria = agentExample.createCriteria();
         criteria.andAgBusLicEqualTo(agBusLic);
+        criteria.andIdNotIn(idList);
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         List<Agent> agents = agentMapper.selectByExample(agentExample);
         for (Agent agent : agents) {

@@ -9,10 +9,7 @@ import com.ryx.credit.commons.utils.DigestUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AttachmentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
@@ -73,6 +70,8 @@ public class AgentServiceImpl implements AgentService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private AgentDataHistoryService agentDataHistoryService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
 
     /**
@@ -468,4 +467,20 @@ public class AgentServiceImpl implements AgentService {
     public int updateByPrimaryKeySelective(Agent record) {
         return agentMapper.updateByPrimaryKeySelective(record);
     }
+
+    @Override
+    public AgentResult checkAgentIsIn(String agentId){
+        AgentBusInfoExample example = new AgentBusInfoExample();
+        example.or().andAgentIdEqualTo(agentId).andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(example);
+        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            //如果是pos 启用状态 有效状态就可激活
+            if(agentBusInfo.getBusStatus().compareTo(Status.STATUS_1.status)==0){
+                 return AgentResult.ok();
+            }
+
+        }
+        return AgentResult.fail();
+    }
+
 }

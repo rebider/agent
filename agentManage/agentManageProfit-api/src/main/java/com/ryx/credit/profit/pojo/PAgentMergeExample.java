@@ -485,6 +485,426 @@ public class PAgentMergeExample {
             addCriterion("MERGE_STATUS not between", value1, value2, "mergeStatus");
             return (Criteria) this;
         }
+
+        public Criteria andMainAgentNameIsNull() {
+            addCriterion("MAIN_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameIsNotNull() {
+            addCriterion("MAIN_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameEqualTo(String value) {
+            addCriterion("MAIN_AGENT_NAME =", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameNotEqualTo(String value) {
+            addCriterion("MAIN_AGENT_NAME <>", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameGreaterThan(String value) {
+            addCriterion("MAIN_AGENT_NAME >", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("MAIN_AGENT_NAME >=", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameLessThan(String value) {
+            addCriterion("MAIN_AGENT_NAME <", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("MAIN_AGENT_NAME <=", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameLike(String value) {
+            addCriterion("MAIN_AGENT_NAME like", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameNotLike(String value) {
+            addCriterion("MAIN_AGENT_NAME not like", value, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameIn(List<String> values) {
+            addCriterion("MAIN_AGENT_NAME in", values, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameNotIn(List<String> values) {
+            addCriterion("MAIN_AGENT_NAME not in", values, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameBetween(String value1, String value2) {
+            addCriterion("MAIN_AGENT_NAME between", value1, value2, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainAgentNameNotBetween(String value1, String value2) {
+            addCriterion("MAIN_AGENT_NAME not between", value1, value2, "mainAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameIsNull() {
+            addCriterion("SUB_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameIsNotNull() {
+            addCriterion("SUB_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameEqualTo(String value) {
+            addCriterion("SUB_AGENT_NAME =", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameNotEqualTo(String value) {
+            addCriterion("SUB_AGENT_NAME <>", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameGreaterThan(String value) {
+            addCriterion("SUB_AGENT_NAME >", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("SUB_AGENT_NAME >=", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameLessThan(String value) {
+            addCriterion("SUB_AGENT_NAME <", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("SUB_AGENT_NAME <=", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameLike(String value) {
+            addCriterion("SUB_AGENT_NAME like", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameNotLike(String value) {
+            addCriterion("SUB_AGENT_NAME not like", value, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameIn(List<String> values) {
+            addCriterion("SUB_AGENT_NAME in", values, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameNotIn(List<String> values) {
+            addCriterion("SUB_AGENT_NAME not in", values, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameBetween(String value1, String value2) {
+            addCriterion("SUB_AGENT_NAME between", value1, value2, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubAgentNameNotBetween(String value1, String value2) {
+            addCriterion("SUB_AGENT_NAME not between", value1, value2, "subAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadIsNull() {
+            addCriterion("MAIN_HEAD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadIsNotNull() {
+            addCriterion("MAIN_HEAD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadEqualTo(String value) {
+            addCriterion("MAIN_HEAD =", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadNotEqualTo(String value) {
+            addCriterion("MAIN_HEAD <>", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadGreaterThan(String value) {
+            addCriterion("MAIN_HEAD >", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadGreaterThanOrEqualTo(String value) {
+            addCriterion("MAIN_HEAD >=", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadLessThan(String value) {
+            addCriterion("MAIN_HEAD <", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadLessThanOrEqualTo(String value) {
+            addCriterion("MAIN_HEAD <=", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadLike(String value) {
+            addCriterion("MAIN_HEAD like", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadNotLike(String value) {
+            addCriterion("MAIN_HEAD not like", value, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadIn(List<String> values) {
+            addCriterion("MAIN_HEAD in", values, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadNotIn(List<String> values) {
+            addCriterion("MAIN_HEAD not in", values, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadBetween(String value1, String value2) {
+            addCriterion("MAIN_HEAD between", value1, value2, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadNotBetween(String value1, String value2) {
+            addCriterion("MAIN_HEAD not between", value1, value2, "mainHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileIsNull() {
+            addCriterion("MAIN_HEAD_MOBILE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileIsNotNull() {
+            addCriterion("MAIN_HEAD_MOBILE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileEqualTo(String value) {
+            addCriterion("MAIN_HEAD_MOBILE =", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileNotEqualTo(String value) {
+            addCriterion("MAIN_HEAD_MOBILE <>", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileGreaterThan(String value) {
+            addCriterion("MAIN_HEAD_MOBILE >", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileGreaterThanOrEqualTo(String value) {
+            addCriterion("MAIN_HEAD_MOBILE >=", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileLessThan(String value) {
+            addCriterion("MAIN_HEAD_MOBILE <", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileLessThanOrEqualTo(String value) {
+            addCriterion("MAIN_HEAD_MOBILE <=", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileLike(String value) {
+            addCriterion("MAIN_HEAD_MOBILE like", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileNotLike(String value) {
+            addCriterion("MAIN_HEAD_MOBILE not like", value, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileIn(List<String> values) {
+            addCriterion("MAIN_HEAD_MOBILE in", values, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileNotIn(List<String> values) {
+            addCriterion("MAIN_HEAD_MOBILE not in", values, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileBetween(String value1, String value2) {
+            addCriterion("MAIN_HEAD_MOBILE between", value1, value2, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andMainHeadMobileNotBetween(String value1, String value2) {
+            addCriterion("MAIN_HEAD_MOBILE not between", value1, value2, "mainHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadIsNull() {
+            addCriterion("SUBN_HEAD is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadIsNotNull() {
+            addCriterion("SUBN_HEAD is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadEqualTo(String value) {
+            addCriterion("SUBN_HEAD =", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadNotEqualTo(String value) {
+            addCriterion("SUBN_HEAD <>", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadGreaterThan(String value) {
+            addCriterion("SUBN_HEAD >", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadGreaterThanOrEqualTo(String value) {
+            addCriterion("SUBN_HEAD >=", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadLessThan(String value) {
+            addCriterion("SUBN_HEAD <", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadLessThanOrEqualTo(String value) {
+            addCriterion("SUBN_HEAD <=", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadLike(String value) {
+            addCriterion("SUBN_HEAD like", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadNotLike(String value) {
+            addCriterion("SUBN_HEAD not like", value, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadIn(List<String> values) {
+            addCriterion("SUBN_HEAD in", values, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadNotIn(List<String> values) {
+            addCriterion("SUBN_HEAD not in", values, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadBetween(String value1, String value2) {
+            addCriterion("SUBN_HEAD between", value1, value2, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubnHeadNotBetween(String value1, String value2) {
+            addCriterion("SUBN_HEAD not between", value1, value2, "subnHead");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileIsNull() {
+            addCriterion("SUB_HEAD_MOBILE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileIsNotNull() {
+            addCriterion("SUB_HEAD_MOBILE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileEqualTo(String value) {
+            addCriterion("SUB_HEAD_MOBILE =", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileNotEqualTo(String value) {
+            addCriterion("SUB_HEAD_MOBILE <>", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileGreaterThan(String value) {
+            addCriterion("SUB_HEAD_MOBILE >", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileGreaterThanOrEqualTo(String value) {
+            addCriterion("SUB_HEAD_MOBILE >=", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileLessThan(String value) {
+            addCriterion("SUB_HEAD_MOBILE <", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileLessThanOrEqualTo(String value) {
+            addCriterion("SUB_HEAD_MOBILE <=", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileLike(String value) {
+            addCriterion("SUB_HEAD_MOBILE like", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileNotLike(String value) {
+            addCriterion("SUB_HEAD_MOBILE not like", value, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileIn(List<String> values) {
+            addCriterion("SUB_HEAD_MOBILE in", values, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileNotIn(List<String> values) {
+            addCriterion("SUB_HEAD_MOBILE not in", values, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileBetween(String value1, String value2) {
+            addCriterion("SUB_HEAD_MOBILE between", value1, value2, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSubHeadMobileNotBetween(String value1, String value2) {
+            addCriterion("SUB_HEAD_MOBILE not between", value1, value2, "subHeadMobile");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

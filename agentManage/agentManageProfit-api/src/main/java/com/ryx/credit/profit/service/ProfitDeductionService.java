@@ -79,6 +79,8 @@ public interface ProfitDeductionService {
     */
     BigDecimal otherDeductionByType(Map<String, Object> param) throws DeductionException;
 
+    Map<String, Object> otherDeductionHbByType(Map<String, Object> param) throws DeductionException;
+
     /***
      * @Description:退单扣款计算
      * @Param: param profitAmt 分润金额  bussType 业务类型 02 01 agentPid 机构id  parentAgentPid 机构id
@@ -87,6 +89,15 @@ public interface ProfitDeductionService {
      * @Date: 2018/8/7
      */
     BigDecimal settleErrDeduction(Map<String, Object> param) throws DeductionException;
+
+    /*** 
+    * @Description: 扣除合并代理商金额
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/10/17 
+    */ 
+    Map<String, Object> settleErrHbDeduction(Map<String, Object> param) throws DeductionException;
 
     /*** 
     * @Description: 获取退单扣款总金额
@@ -116,4 +127,13 @@ public interface ProfitDeductionService {
     BigDecimal  getSupplyAmt(String agentId, String bussType , String parentAgentId);
 
     BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
+
+    /***
+    * @Description: 获取所有未扣足的总额
+    * @Param:  agentId 代理商id  pare
+    * @return:
+    * @Author: zhaodw
+    * @Date: 2018/10/15
+    */
+    BigDecimal getNotDeductionSum(String agentId);
 }
