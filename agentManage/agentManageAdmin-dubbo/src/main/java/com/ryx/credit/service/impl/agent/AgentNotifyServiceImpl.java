@@ -95,6 +95,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     }
 
 
+    /**
+     * 流程调用入网流程，修改流程
+     */
     @Override
     public void asynNotifyPlatform(){
         threadPoolTaskExecutor.execute(new Runnable() {
