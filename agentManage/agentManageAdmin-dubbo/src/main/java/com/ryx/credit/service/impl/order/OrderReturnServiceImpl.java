@@ -1241,6 +1241,19 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 //排单信息
                 ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
                 if(planVo==null)throw new MessageException("排单信息未找到");
+                if (null==planVo.getReturnOrderDetailId())throw new MessageException("退货明细未找到");
+                OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                String firstSn = returnOrderDetail.getBeginSn();
+                String lastSn = returnOrderDetail.getEndSn();
+                if (beginSn.compareTo(firstSn)<=0 && beginSn.compareTo(lastSn)>=0){
+                    if (endSn.compareTo(firstSn)<=0 && endSn.compareTo(lastSn)>=0){
+                        if (endSn.compareTo(beginSn)<=0){
+                            log.info("与退货的sn不符合");
+                            throw new MessageException("与退货的sn不符合");
+                        }
+                    }
+                }
+
 
                 //商品信息从排单表里查
                 oLogistics.setProCom(planVo.getProCom());// 厂家
@@ -1367,7 +1380,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             vo.setOptUser(user);
                             vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
                             vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
-
+                            vo.setSnNum(oLogistics.getSendNum().toString());
                             //发货订单的业务编号
                             OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
                             AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
