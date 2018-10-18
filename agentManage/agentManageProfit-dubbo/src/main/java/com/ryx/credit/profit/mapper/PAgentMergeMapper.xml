@@ -264,4 +264,48 @@
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 
+  <!--根据agentId查询平台编号-->
+  <select id="getByBusPlatform" parameterType="map" resultMap="BusInfoMap">
+    SELECT * FROM A_AGENT_BUSINFO
+    WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    AND (BUS_PLATFORM = '100002' OR BUS_PLATFORM = '100003')
+  </select>
+
+  <resultMap id="BusInfoMap" type="com.ryx.credit.pojo.admin.agent.AgentBusInfo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+    <result column="BUS_PARENT" jdbcType="VARCHAR" property="busParent" />
+    <result column="BUS_RISK_PARENT" jdbcType="VARCHAR" property="busRiskParent" />
+    <result column="BUS_ACTIVATION_PARENT" jdbcType="VARCHAR" property="busActivationParent" />
+    <result column="BUS_REGION" jdbcType="VARCHAR" property="busRegion" />
+    <result column="BUS_SENT_DIRECTLY" jdbcType="DECIMAL" property="busSentDirectly" />
+    <result column="BUS_DIRECT_CASHBACK" jdbcType="DECIMAL" property="busDirectCashback" />
+    <result column="BUS_INDE_ASS" jdbcType="DECIMAL" property="busIndeAss" />
+    <result column="BUS_CONTACT" jdbcType="VARCHAR" property="busContact" />
+    <result column="BUS_CONTACT_MOBILE" jdbcType="VARCHAR" property="busContactMobile" />
+    <result column="BUS_CONTACT_EMAIL" jdbcType="VARCHAR" property="busContactEmail" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
+    <result column="BUS_RISK_EMAIL" jdbcType="VARCHAR" property="busRiskEmail" />
+    <result column="CLO_TAX_POINT" jdbcType="DECIMAL" property="cloTaxPoint" />
+    <result column="CLO_INVOICE" jdbcType="DECIMAL" property="cloInvoice" />
+    <result column="CLO_RECEIPT" jdbcType="DECIMAL" property="cloReceipt" />
+    <result column="CLO_PAY_COMPANY" jdbcType="VARCHAR" property="cloPayCompany" />
+    <result column="CLO_AGENT_COLINFO" jdbcType="VARCHAR" property="cloAgentColinfo" />
+    <result column="BUS_STATUS" jdbcType="DECIMAL" property="busStatus" />
+    <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="C_UTIME" jdbcType="TIMESTAMP" property="cUtime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="AG_ZBH" jdbcType="VARCHAR" property="agZbh" />
+    <result column="BUS_USE_ORGAN" jdbcType="VARCHAR" property="busUseOrgan" />
+    <result column="BUS_SCOPE" jdbcType="VARCHAR" property="busScope" />
+    <result column="DREDGE_S0" jdbcType="DECIMAL" property="dredgeS0" />
+    <result column="BUS_LOGIN_NUM" jdbcType="VARCHAR" property="busLoginNum" />
+  </resultMap>
+
 </mapper>

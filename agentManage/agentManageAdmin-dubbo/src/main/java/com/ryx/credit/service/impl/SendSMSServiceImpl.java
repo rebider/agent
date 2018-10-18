@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.AppConfig;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.HttpJsonClient;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.pojo.admin.RequestInfo;
@@ -55,7 +56,7 @@ public class SendSMSServiceImpl implements ISendSMSService {
 					Map<String, Object> mapMQ = new HashMap<>();
 					try{
 						redisService.setValue(content.getMobileNos(),content.getParams(),60L);
-						redisService.hSet("sms",content.getMobileNos(),content.getParams());
+						redisService.hSet("sms",content.getMobileNos()+DateUtils.dateToStringss(new Date()),content.getParams());
 					}catch(Exception e){
 						logger.info("插入短信记录失败");
 					}
