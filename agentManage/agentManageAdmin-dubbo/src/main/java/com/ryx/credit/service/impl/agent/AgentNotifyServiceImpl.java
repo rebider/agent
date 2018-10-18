@@ -262,6 +262,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     }
                     log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地平台{}",userid,agentBusInfo.getBusNum(),"入网成功");
                     agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                    agentBusInfo.setBusLoginNum(agentBusInfo.getBusNum());
                     if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",userid,agentBusInfo.getId(),"入网成功");
                     }else{
