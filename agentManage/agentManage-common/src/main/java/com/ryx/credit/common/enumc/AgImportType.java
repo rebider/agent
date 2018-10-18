@@ -18,6 +18,7 @@ public enum AgImportType {
     GATHER("GATHER","收款账户"),
 
     DATACHANGEAPP("DATACHANGEAPP","数据修改审批"),
+    COLINF("COLINF","收款账户变更"),
     NETINAPP("NETINAPP","入网业务审批"),
     BUSAPP("BUSAPP","业务审批");
 

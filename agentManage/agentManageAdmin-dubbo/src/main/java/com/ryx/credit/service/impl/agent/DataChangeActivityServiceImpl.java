@@ -9,6 +9,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.DateChangeRequestMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
@@ -204,9 +205,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                             //入网程序调用
                             try {
+
                                 ImportAgent importAgent = new ImportAgent();
                                 importAgent.setDataid(vo.getAgent().getId());
-                                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+                                importAgent.setDatatype(AgImportType.COLINF.name());
                                 importAgent.setBatchcode(proIns);
                                 importAgent.setcUser(rel.getcUser());
                                 if (1 != aimportService.insertAgentImportData(importAgent)) {
@@ -214,6 +216,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                                 } else {
                                     logger.info("代理商账户修改审批通过-添加修改任务失败!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
                                 }
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                             } finally {
@@ -223,6 +226,7 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                         }
                     //代理商新修改
                     }else if(DataChangeApyType.DC_Agent.name().equals(dr.getDataType())){
+
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
                         ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser());
@@ -239,16 +243,26 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                         //入网程序调用
                         try {
-                            ImportAgent importAgent = new ImportAgent();
-                            importAgent.setDataid(vo.getAgent().getId());
-                            importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
-                            importAgent.setBatchcode(proIns);
-                            importAgent.setcUser(rel.getcUser());
-                            if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                logger.info("代理商修改审批通过-添加开户任务失败");
-                            } else {
-                                logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+                            if(vo.getBusInfoVoList()!=null){
+
+                                for (AgentBusInfoVo agentBusInfoVo : vo.getBusInfoVoList()) {
+
+                                    ImportAgent importAgent = new ImportAgent();
+                                    importAgent.setDataid(agentBusInfoVo.getId());
+                                    importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+                                    importAgent.setBatchcode(proIns);
+                                    importAgent.setcUser(rel.getcUser());
+                                    if (1 != aimportService.insertAgentImportData(importAgent)) {
+                                        logger.info("代理商修改审批通过-添加开户任务失败");
+                                    } else {
+                                        logger.info("代理商修改审批通过-添加开户任务成功!{},{}", AgImportType.DATACHANGEAPP.getValue(), vo.getAgent().getId());
+                                    }
+
+                                }
+
                             }
+
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         } finally {

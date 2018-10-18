@@ -1293,7 +1293,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     if (null == id) {
                         throw new MessageException("排单ID查询失败！");
                     } else {
+
                         ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
+                        OReturnOrderDetail returnOrderDetail1Info = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
+                        if(returnOrderDetail1Info.getAgentId().equals(subOrderItem.getAgentId())){
+                            throw new MessageException("发货退货不能是同一个代理商！");
+                        }
+
                         if (receiptPlan != null) {
                             if(receiptPlan.getSendProNum()==null || receiptPlan.getSendProNum().compareTo(BigDecimal.ZERO)==0) {// 发货数量
                                 receiptPlan.setSendProNum(new BigDecimal(sendProNum));
