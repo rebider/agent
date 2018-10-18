@@ -691,7 +691,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
             //根据数据类型设置接口类型
-            record.setNotifyType(AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
+            record.setNotifyType(importAgent==null?NotifyType.NetInAdd.getValue():AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
@@ -707,7 +707,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 result = httpRequestForPos(agentNotifyVo);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-
+                PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
+                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+                agentColinfo.setAccountId(agentBusInfo.getCloPayCompany());
+                agentColinfo.setAccountName(payComp.getComName());
+                agentNotifyVo.setColinfoMessage(agentColinfo);
                 //首刷传递代理商ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
