@@ -1351,9 +1351,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 }
                             } catch (MessageException e) {
                                 e.printStackTrace();
-                                log.error("机具退货调整首刷接口调用异常"+logistics.getId(),e);
+                                log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
                                 logistics.setSendStatus(Status.STATUS_2.status);
-                                logistics.setSendMsg("机具退货调整首刷接口调用异常");
+                                logistics.setSendMsg("机具退货调整POS接口调用异常");
                                 oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                             }
                         //===============================================================================
