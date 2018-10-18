@@ -230,8 +230,6 @@ public class ColinfoTask {
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                            } finally {
-                                agentNotifyService.asynNotifyPlatform();
                             }
                         }
                     }
@@ -247,6 +245,8 @@ public class ColinfoTask {
             if(StringUtils.isNotBlank(indentifier)){
                 redisService.releaseLock(INSERT_SYS_KEY, indentifier);
             }
+            //通知业务平台修改数据
+            agentNotifyService.asynNotifyPlatform();
         }
     }
 
