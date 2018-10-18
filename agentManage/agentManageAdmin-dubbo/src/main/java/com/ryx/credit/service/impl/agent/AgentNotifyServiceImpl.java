@@ -95,6 +95,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
     }
 
 
+    /**
+     * 流程调用入网流程，修改流程
+     */
     @Override
     public void asynNotifyPlatform(){
         threadPoolTaskExecutor.execute(new Runnable() {
@@ -259,6 +262,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     }
                     log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地平台{}",userid,agentBusInfo.getBusNum(),"入网成功");
                     agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                    agentBusInfo.setBusLoginNum(agentBusInfo.getBusNum());
                     if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",userid,agentBusInfo.getId(),"入网成功");
                     }else{
@@ -560,7 +564,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新成功");
                         }
 
-
                         if(impId!=null){
                           updateImportAgent(impId, Status.STATUS_2.status, "处理成功");
                         }
@@ -627,6 +630,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
             return;
         }
+        ImportAgent importAgent = importAgentMapper.selectByPrimaryKey(impId);
         //直签不直发不通知
         if(agentBusInfo.getBusType().equals("8")){
             log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
@@ -686,7 +690,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
-            record.setNotifyType(NotifyType.NetInAdd.getValue());
+            //根据数据类型设置接口类型
+            record.setNotifyType(AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
