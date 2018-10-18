@@ -537,7 +537,7 @@
       from o_logistics_detail
       where
       sn_num between #{snBegin} and #{snEnd}
-      and status = #{status}
+      and status = #{status} and RECORD_STATUS =#{recordStatus}
   </select>
 
   <select id="querySnCount" parameterType="java.util.Map" resultType="java.lang.Integer">
