@@ -1015,6 +1015,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 //对象集合
                 receiptPlanDetails.add(receiptPlan);
             }
+
             if(planCount==0){
                 throw new MessageException("排单数量不能为0");
             }
