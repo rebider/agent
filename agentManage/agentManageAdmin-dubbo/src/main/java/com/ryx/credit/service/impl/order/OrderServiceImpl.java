@@ -2038,14 +2038,16 @@ public class OrderServiceImpl implements OrderService {
             Agent agent_check = agentMapper.selectByPrimaryKey(order.getAgentId());
             AgentBusInfo ab_check = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
             //未激活业务
-            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().equals(Status.STATUS_2.status)){
+            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().compareTo(Status.STATUS_2.status)==0){
+                logger.info("代理商订单审批完审批完成激活业务{}",rel.getBusId());
                 ab_check.setBusStatus(Status.STATUS_1.status);
                 if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(ab_check)){
                     logger.error("更新业务 未激活 到 启用 失败{}{}",order.getId(),ab_check.getId());
                 }
             }
             //未入网未激活状态下更新代理商状态
-            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().equals(AgentInStatus.NO_ACT.status)){
+            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().compareTo(AgentInStatus.NO_ACT.status)==0){
+                logger.info("代理商订单审批完审批完成激活代理商{}",rel.getBusId());
                 agent_check.setcIncomStatus(AgentInStatus.IN.status);
                 agentMapper.updateByPrimaryKeySelective(agent_check);
             }
