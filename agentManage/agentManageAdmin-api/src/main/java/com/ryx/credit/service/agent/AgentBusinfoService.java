@@ -85,6 +85,7 @@ public interface AgentBusinfoService {
      * @return
      */
     public List<AgentBusInfo> queryChildLevelByBusNum(List<AgentBusInfo> list,String platformCode, String busNum);
-
+    /**根据代理商id查询业务类型*/
+    public List<AgentBusInfo> selectByAgenId(String agentId);
 
 }

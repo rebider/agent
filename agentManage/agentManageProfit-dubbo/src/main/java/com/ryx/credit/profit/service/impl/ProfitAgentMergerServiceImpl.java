@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
@@ -13,9 +14,11 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
+import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PAgentMergeMapper;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
@@ -27,6 +30,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentService;
+import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
@@ -66,12 +70,17 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private IProfitAgentMergerService profitAgentMergerService;
 
     /**
      * 列表展示
      * @param param
      * @param pageInfo
      */
+    /*@Autowired
+    private CapitalService capitalService;*/
+    /**代理商合并*/
     @Override
     public PageInfo getProfitAgentMergeList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = pAgentMergeMapper.getProfitAgentMergeCount(param);
@@ -88,8 +97,43 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      * @param userId
      */
     @Override
-    public void agentMergeTaxEnterIn(PAgentMerge pAgentMerge, Long userId) throws ProcessException {
+    public ResultVO agentMergeTaxEnterIn(PAgentMerge pAgentMerge, Long userId) throws ProcessException, MessageException {
         pAgentMerge.setId(idService.genId(TabId.P_AGENT_MERGE));
+        /**校验主附代理上是否可以合并*/
+        logger.info("主代理商ID:" + pAgentMerge.getMainAgentId());
+        logger.info("主代理商ID:" + pAgentMerge.getSubAgentId());
+        if(pAgentMerge.getMainAgentId()== null || pAgentMerge.getMainAgentId()== pAgentMerge.getSubAgentId() ||pAgentMerge.getSubAgentId() == null){
+            throw new MessageException("主附代理商重复!");
+        }
+        /**获取资金类型*/
+        if(pAgentMerge.getMainAgentId()!= null && pAgentMerge.getSubAgentId() != null){
+            //主代理商查业务类型
+            List<AgentBusInfo> mainAgentlist = agentBusinfoService.selectByAgenId(pAgentMerge.getMainAgentId());
+            //附代理商查询业务类型
+            List<AgentBusInfo> subAgentlist =  agentBusinfoService.selectByAgenId(pAgentMerge.getSubAgentId());
+            //判断附代理商是否已存在
+            List<PAgentMerge> subAgentMergelist = profitAgentMergerService.selectBySubAgenId(pAgentMerge.getSubAgentId());
+            if(subAgentMergelist.size() > 0){
+                throw new MessageException("该代理商已经存在!");
+            }
+            if(mainAgentlist.size() > 0 && subAgentlist.size() > 0){
+                StringBuffer main = new StringBuffer();
+                StringBuffer sub = new StringBuffer();
+                //StringBuffer strSub = new StringBuffer();
+                for(AgentBusInfo agentBusInfo:mainAgentlist){
+                    main.append(agentBusInfo.getBusPlatform());
+                }
+                for(AgentBusInfo agentBusInfo:subAgentlist){
+                    sub.append(agentBusInfo.getBusPlatform());
+                }
+                logger.info("主代理商业务类型" +main.toString() );
+                logger.info("附代理商业务类型" +sub.toString() );
+                boolean status = main.toString().contains(sub.toString());
+                if(!status){
+                    throw new MessageException("业务类型不匹配!");
+                }
+            }
+        }
         pAgentMergeMapper.insertSelective(pAgentMerge);
         Map startPar = agentEnterService.startPar(String.valueOf(userId));
         if (null == startPar) {
@@ -113,10 +157,11 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         } catch (Exception e) {
             e.getStackTrace();
             logger.error("代理商合并申请审批流启动失败{}");
-            throw new ProcessException("代理商合并申请审批流启动失败!:{}", e.getMessage());
+            throw new ProcessException("代理商合并申请审批流启动失败!:{}",e.getMessage());
         }
         pAgentMerge.setMergeStatus(AgStatus.Approving.name());
         pAgentMergeMapper.updateByPrimaryKeySelective(pAgentMerge);
+        return ResultVO.success(record);
     }
 
     @Override
@@ -225,6 +270,12 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
             e.printStackTrace();
             throw new Exception();
         }
+    }
+
+
+    @Override
+    public List<PAgentMerge> selectBySubAgenId(String subAgentId) {
+        return pAgentMergeMapper.selectBySubAgenId(subAgentId);
     }
 
 
