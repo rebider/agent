@@ -75,14 +75,14 @@
     <include refid="Base_Column_List" />
     from P_AGENT_MERGE
     WHERE SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} AND
-    (MERGE_STATUS = 3 OR MERGE_STATUS = 1 OR MERGE_STATUS = 2)
+    (MERGE_STATUS = 'Approved' OR MERGE_STATUS = 'Create' OR MERGE_STATUS = 'Approving')
   </select>
 
   <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from P_AGENT_MERGE
-    WHERE MERGE_STATUS = 3 AND (SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} OR MAIN_AGENT_ID = #{subAgentId,jdbcType=VARCHAR})
+    WHERE MERGE_STATUS = 'Approved' AND (SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} OR MAIN_AGENT_ID = #{subAgentId,jdbcType=VARCHAR})
   </select>
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PAgentMergeExample">
