@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author yangmx
@@ -49,13 +50,22 @@ public class ToolsDeductJobTest {
     @Test
     public void computeToolsDeduct() throws Exception {
         Map<String, Object> map = new HashMap<String, Object>(10);
-        map.put("agentPid", "AG20180817000000000006101"); //AG20180813000000000006020
+        map.put("agentPid", "AG20180809000000000005966"); //AG20180813000000000006020
         map.put("paltformNo", "100003");        //平台编号
-        map.put("deductDate", "2018-07");       //扣款月份
-        map.put("agentProfitAmt", "111111");        //代理商分润
+        map.put("agentProfitAmt", "0");        //代理商分润
+        map.put("computType", "1");        //类型
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Map<String, Object> newMap = new HashMap<String, Object>(10);
+        newMap.put("id","P_PROFIT_DETAIL_M20180920000000000128510");
+        newMap.put("basicAmt","16.66");
+        Map<String, Object> newMa1p = new HashMap<String, Object>(10);
+        newMa1p.put("id","P_PROFIT_DETAIL_M20180920000000000128572");
+        newMa1p.put("basicAmt", "80");
+        list.add(newMap);
+        list.add(newMa1p);
+        map.put("hbList", list);
         map = profitToolsDeductService.execut(map);
-        System.out.println("应扣："+map.get("mustDeductionAmtSum"));//返回应扣金额
-        System.out.println("实扣："+map.get("actualDeductionAmtSum"));//实扣金额
+        System.out.println(map.toString());
     }
 
     @Test
@@ -87,7 +97,8 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computeJGPosreWard() throws Exception {
-        List<String> busNum = new ArrayList<String>();
+        Supplier<List<String>> list = ArrayList<String>::new;
+        List<String> busNum = list.get();
 //        busNum.add("O00000000110370");
 //        busNum.add("O00000000145380");
 //        busNum.add("O00000000218951");

@@ -192,8 +192,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentPid())){
                 criteria.andParentAgentPidEqualTo(profitDeduction.getParentAgentPid());
-        }else {
-            criteria.andParentAgentPidIsNull();
         }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionStatus())){
             criteria.andDeductionStatusEqualTo(profitDeduction.getDeductionStatus());
@@ -212,6 +210,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionDesc())){
             criteria.andDeductionDescEqualTo(profitDeduction.getDeductionDesc());
+        }
+        if (StringUtils.isNotBlank(profitDeduction.getStagingStatus())){
+            criteria.andStagingStatusEqualTo(profitDeduction.getStagingStatus());
         }
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         if(profitDeductions != null && !profitDeductions.isEmpty()){

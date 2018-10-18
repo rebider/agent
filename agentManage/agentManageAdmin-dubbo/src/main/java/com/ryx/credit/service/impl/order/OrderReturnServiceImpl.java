@@ -1245,7 +1245,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                 String firstSn = returnOrderDetail.getBeginSn();
                 String lastSn = returnOrderDetail.getEndSn();
-                if (beginSn.compareTo(firstSn)<=0 || beginSn.compareTo(lastSn)>=0 || endSn.compareTo(firstSn)<=0 || endSn.compareTo(lastSn)>=0 || endSn.compareTo(beginSn)<=0){
+                if (beginSn.compareTo(firstSn)<0 || beginSn.compareTo(lastSn)>0 || endSn.compareTo(firstSn)<0 || endSn.compareTo(lastSn)>0 || endSn.compareTo(beginSn)<0){
                     log.info("与退货的sn不符合");
                     throw new MessageException("与退货的sn不符合");
                 }
@@ -1351,9 +1351,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 }
                             } catch (MessageException e) {
                                 e.printStackTrace();
-                                log.error("机具退货调整首刷接口调用异常"+logistics.getId(),e);
+                                log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
                                 logistics.setSendStatus(Status.STATUS_2.status);
-                                logistics.setSendMsg("机具退货调整首刷接口调用异常");
+                                logistics.setSendMsg("机具退货调整POS接口调用异常");
                                 oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                             }
                         //===============================================================================

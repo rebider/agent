@@ -41,7 +41,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
     }
 
     @Override
-    public void insertDeducttionDetail(ProfitDeduction profitDeduction) throws Exception{
+    public void insertDeducttionDetail(ProfitDeduction profitDeduction){
         ProfitDeducttionDetail profitDeducttionDetail = new ProfitDeducttionDetail();
         profitDeducttionDetail.setAgentId(profitDeduction.getAgentId());
         profitDeducttionDetail.setAgentName(profitDeduction.getAgentName());

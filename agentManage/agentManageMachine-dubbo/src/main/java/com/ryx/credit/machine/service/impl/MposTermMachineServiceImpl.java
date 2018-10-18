@@ -120,7 +120,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(lowerHairMachineVo));
         JSONObject res = request(data, AppConfig.getProperty("mpos.lowerHairMachine"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
-            JSONArray respdata =  res.getJSONArray("data");
+            logger.info("Mpos机具的调整，下发:{}{}{}",AppConfig.getProperty("mpos.lowerHairMachine"),data.toJSONString(),res.getString("respMsg"));
             return AgentResult.ok();
         }else{
             throw new MessageException(res.getString("respMsg"));
@@ -139,7 +139,7 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(adjustmentMachineVo));
         JSONObject res = request(data, AppConfig.getProperty("mpos.adjustmentMachine"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
-            JSONArray respdata =  res.getJSONArray("data");
+            logger.info("Mpos机具的调整，退货是使用:{}{}{}",AppConfig.getProperty("mpos.adjustmentMachine"),data.toJSONString(),res.getString("respMsg"));
             return AgentResult.ok();
         }else{
             throw new MessageException(res.getString("respMsg"));
@@ -154,11 +154,11 @@ public class MposTermMachineServiceImpl implements TermMachineService {
     @Override
     public AgentResult changeActMachine(ChangeActMachineVo changeActMachineVo) throws Exception{
         changeActMachineVo.setLogisticsDetailList(null);
-        logger.info("Mpos机具的调整，，退货是使用");
+        logger.info("Mpos机具的调整，，机具活动的变更");
         JSONObject data = JSONObject.parseObject(JSONObject.toJSONString(changeActMachineVo));
         JSONObject res = request(data, AppConfig.getProperty("mpos.changeActMachine"));
         if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
-            JSONArray respdata =  res.getJSONArray("data");
+            logger.info("Mpos机具的调整，机具活动的变更:{}{}{}",AppConfig.getProperty("mpos.changeActMachine"),data.toJSONString(),res.getString("respMsg"));
             return AgentResult.ok();
         }else{
             throw new MessageException(res.getString("respMsg"));
