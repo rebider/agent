@@ -2046,7 +2046,7 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
             //未入网未激活状态下更新代理商状态
-            if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().compareTo(AgentInStatus.NO_ACT.status)==0){
+            if(agent_check.getcIncomStatus()!=null && agent_check.getcIncomStatus().compareTo(AgentInStatus.NO_ACT.status)==0){
                 logger.info("代理商订单审批完审批完成激活代理商{}",rel.getBusId());
                 agent_check.setcIncomStatus(AgentInStatus.IN.status);
                 agentMapper.updateByPrimaryKeySelective(agent_check);
