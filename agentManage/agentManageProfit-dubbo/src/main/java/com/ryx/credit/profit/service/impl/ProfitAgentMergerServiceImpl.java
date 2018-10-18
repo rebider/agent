@@ -178,15 +178,15 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
 
                 //手刷改名接口(agentName、agentId)
-                String agentName = pAgentMerge.getMainAgentName();
+                String agentName = pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")";
                 List<String> platId = new ArrayList<>();
-                platId.add(pAgentMerge.getMainAgentId());
+                platId.add(pAgentMerge.getSubAgentId());
                 busiPlatService.mPos_updateAgName(agentName, platId);
 
                 //POS改名接口(uniqueId、orgName、orgType)
                 List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
                 for (AgentBusInfo agentBusInfo : list) {
-                    AgentNotifyVo agentNotifyVo = null;
+                    AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
                     agentNotifyVo.setUniqueId(agentBusInfo.getId());//代理商AB码
                     agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")");//变更后名称=主名称+(自己名称)
                     if (agentBusInfo.getBusType().equals("2") || agentBusInfo.getBusType().equals("6")){
