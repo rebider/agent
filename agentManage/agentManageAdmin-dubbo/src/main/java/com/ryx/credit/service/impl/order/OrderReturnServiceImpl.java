@@ -988,7 +988,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
 
             List<String> details = new ArrayList<>();
-
+            List<ReceiptPlan> receiptPlanDetails = new ArrayList<ReceiptPlan>();
             int planCount = 0;
 
             for (Object obj : jsonArray) {
@@ -1006,24 +1006,34 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
                 String receiptProId = jsonObject.getString("receiptProId");
                 if(receiptPlan.getPlanProNum().intValue()==0){
-                    throw new MessageException("派单数量不能为0");
+                    throw new MessageException("排单数量不能为0");
                 }
-                details.add(receiptPlan.getReturnOrderDetailId());
+
                 planCount=planCount+receiptPlan.getPlanProNum().intValue();
+                //id集合
+                details.add(receiptPlan.getReturnOrderDetailId());
+                //对象集合
+                receiptPlanDetails.add(receiptPlan);
             }
             if(planCount==0){
-                throw new MessageException("派单数量不能为0");
+                throw new MessageException("排单数量不能为0");
             }
             OReturnOrderDetailExample example = new OReturnOrderDetailExample();
             example.or().andIdIn(details).andStatusEqualTo(Status.STATUS_1.status);
             List<OReturnOrderDetail> detailsList = returnOrderDetailMapper.selectByExample(example);
             int returnCount = 0;
-            for (OReturnOrderDetail detail : detailsList) {
-                returnCount = returnCount+detail.getReturnCount().intValue();
+            for (OReturnOrderDetail return_detail : detailsList) {
+                returnCount = returnCount+return_detail.getReturnCount().intValue();
+                for (ReceiptPlan receiptPlanDetail : receiptPlanDetails) {
+                    if(receiptPlanDetail.getReturnOrderDetailId().equals(return_detail.getId())
+                            && receiptPlanDetail.getPlanProNum().compareTo(return_detail.getReturnCount()) > 0){
+                        throw new MessageException("排单数量["+receiptPlanDetail.getPlanProNum()+"]大于退货["+return_detail.getReturnCount()+"]的数量");
+                    }
+                }
             }
 
             if(returnCount!=planCount){
-                throw new MessageException("退货数量必须和派单数量一致");
+                throw new MessageException("退货数量必须和排单数量一致");
             }
 
             for (Object obj : jsonArray) {
