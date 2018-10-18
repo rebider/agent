@@ -564,7 +564,6 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新成功");
                         }
 
-
                         if(impId!=null){
                           updateImportAgent(impId, Status.STATUS_2.status, "处理成功");
                         }
