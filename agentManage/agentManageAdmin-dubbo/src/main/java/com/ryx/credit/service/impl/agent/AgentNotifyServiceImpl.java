@@ -707,7 +707,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 result = httpRequestForPos(agentNotifyVo);
             }
             if(platForm.getPlatformType().equals(PlatformType.MPOS.getValue())){
-
+                PayComp payComp = apaycompService.selectById(agentBusInfo.getCloPayCompany());
+                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agent.getId(), agentBusInfo.getId());
+                agentColinfo.setAccountId(agentBusInfo.getCloPayCompany());
+                agentColinfo.setAccountName(payComp.getComName());
+                agentNotifyVo.setColinfoMessage(agentColinfo);
                 //首刷传递代理商ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getAgentId());
                 String sendJson = JsonUtil.objectToJson(agentNotifyVo);
