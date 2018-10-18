@@ -13,6 +13,8 @@ public interface ProfitDeductionMapper {
 
     int deleteByExample(ProfitDeductionExample example);
 
+    void deleteById(String id);
+
     int insert(ProfitDeduction record);
 
     int insertSelective(ProfitDeduction record);
