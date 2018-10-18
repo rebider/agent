@@ -1245,13 +1245,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                 String firstSn = returnOrderDetail.getBeginSn();
                 String lastSn = returnOrderDetail.getEndSn();
-                if (beginSn.compareTo(firstSn)<=0 && beginSn.compareTo(lastSn)>=0){
-                    if (endSn.compareTo(firstSn)<=0 && endSn.compareTo(lastSn)>=0){
-                        if (endSn.compareTo(beginSn)<=0){
-                            log.info("与退货的sn不符合");
-                            throw new MessageException("与退货的sn不符合");
-                        }
-                    }
+                if (beginSn.compareTo(firstSn)<=0 || beginSn.compareTo(lastSn)>=0 || endSn.compareTo(firstSn)<=0 || endSn.compareTo(lastSn)>=0 || endSn.compareTo(beginSn)<=0){
+                    log.info("与退货的sn不符合");
+                    throw new MessageException("与退货的sn不符合");
                 }
 
 
