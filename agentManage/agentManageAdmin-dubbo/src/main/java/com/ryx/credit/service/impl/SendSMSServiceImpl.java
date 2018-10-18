@@ -56,7 +56,7 @@ public class SendSMSServiceImpl implements ISendSMSService {
 					Map<String, Object> mapMQ = new HashMap<>();
 					try{
 						redisService.setValue(content.getMobileNos(),content.getTemplateId(),60L);
-						redisService.hSet("sms",content.getMobileNos(),content.getParams()+"|"+DateUtils.dateToStringss(new Date()));
+						redisService.hSet("sms",content.getMobileNos()+"|"+DateUtils.dateToStringss(new Date()),content.getParams());
 					}catch(Exception e){
 						logger.info("插入短信记录失败");
 					}
