@@ -224,9 +224,9 @@ public class ColinfoTask {
                                 importAgent.setBatchcode(DateUtil.format(new Date()));
                                 importAgent.setcUser(aColinfoPayment.getcUser());
                                 if (1 != aimportService.insertAgentImportData(importAgent)) {
-                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台");
+                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台失败");
                                 } else {
-                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台失败!");
+                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台!");
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
