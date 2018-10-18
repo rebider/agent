@@ -2,10 +2,7 @@ package com.ryx.credit.task;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.ColinfoPayStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TransFlag;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
@@ -15,11 +12,11 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AColinfoPaymentMapper;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.pojo.admin.agent.AColinfoPayment;
-import com.ryx.credit.pojo.admin.agent.AColinfoPaymentExample;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
+import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.agent.AgentColinfoService;
+import com.ryx.credit.service.agent.AgentNotifyService;
+import com.ryx.credit.service.agent.AimportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +56,12 @@ public class ColinfoTask {
     private AgentColinfoService agentColinfoService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private AimportService aimportService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
+
+
     /**
      * 9:00 - 21:30
      */
@@ -196,6 +199,40 @@ public class ColinfoTask {
                 Map<String, Object> resultInfoMap = JsonUtil.jsonToMap(JsonUtil.objectToJson(jsonArray.get(0)));
                 if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.A.getValue())){
                     agentColinfoService.updateByPaymentResult(aColinfoPayment,resultInfoMap);
+                    if(String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.B.getValue())){
+                        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                        AgentBusInfoExample.Criteria criteria1 = agentBusInfoExample.createCriteria();
+                        criteria1.andAgentIdEqualTo(aColinfoPayment.getMerchId());
+                        List<String> busPlatformList = new ArrayList<>();
+                        busPlatformList.add(Platform.RYX.getValue());
+                        busPlatformList.add(Platform.RS.getValue());
+                        busPlatformList.add(Platform.TP.getValue());
+                        busPlatformList.add(Platform.RHB.getValue());
+                        busPlatformList.add(Platform.RYXHD.getValue());
+                        busPlatformList.add(Platform.RSHD.getValue());
+                        busPlatformList.add(Platform.RHBZF.getValue());
+                        busPlatformList.add(Platform.RZT.getValue());
+                        criteria1.andBusPlatformIn(busPlatformList);
+                        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+                        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                        for (AgentBusInfo agentBusInfo : agentBusInfos) {
+                            try {
+                                ImportAgent importAgent = new ImportAgent();
+                                //代理商ID
+                                importAgent.setDataid(agentBusInfo.getId());
+                                importAgent.setDatatype(AgImportType.DATACHANGEAPP.name());
+                                importAgent.setBatchcode(DateUtil.format(new Date()));
+                                importAgent.setcUser(aColinfoPayment.getcUser());
+                                if (1 != aimportService.insertAgentImportData(importAgent)) {
+                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台");
+                                } else {
+                                    log.info("synColinfoToQueryPayment代理商账户修改同步业务平台失败!");
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }else{
                     log.info("synColinfoToQueryPayment,清结算平台未对账暂不处理,balanceLs：{}",aColinfoPayment.getBalanceLs());
                     continue;
@@ -208,6 +245,8 @@ public class ColinfoTask {
             if(StringUtils.isNotBlank(indentifier)){
                 redisService.releaseLock(INSERT_SYS_KEY, indentifier);
             }
+            //通知业务平台修改数据
+            agentNotifyService.asynNotifyPlatform();
         }
     }
 

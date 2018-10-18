@@ -468,4 +468,23 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
         return agentColinfos.get(0);
     }
+
+    @Override
+    public AgentColinfo selectByAgentIdAndBusId(String agentId,String agentbusId){
+        AgentColinfoRelExample agentColinfoRelExample = new AgentColinfoRelExample();
+        AgentColinfoRelExample.Criteria criteria = agentColinfoRelExample.createCriteria();
+        criteria.andAgentidEqualTo(agentId);
+        criteria.andAgentbusidEqualTo(agentbusId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentColinfoRel> agentColinfoRels = agentColinfoRelMapper.selectByExample(agentColinfoRelExample);
+        if(null==agentColinfoRels){
+            return null;
+        }
+        if(agentColinfoRels.size()==0){
+            return null;
+        }
+        AgentColinfoRel agentColinfoRel = agentColinfoRels.get(0);
+        AgentColinfo agentColinfo = agentColinfoMapper.selectByPrimaryKey(agentColinfoRel.getAgentColinfoid());
+        return agentColinfo;
+    }
 }

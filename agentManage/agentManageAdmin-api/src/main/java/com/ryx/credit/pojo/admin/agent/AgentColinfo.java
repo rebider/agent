@@ -50,6 +50,10 @@ public class AgentColinfo implements Serializable {
 
     private List<Attachment> attachmentList;
 
+    private String accountId;
+
+    private String accountName;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -224,5 +228,21 @@ public class AgentColinfo implements Serializable {
 
     public void setPayStatus(BigDecimal payStatus) {
         this.payStatus = payStatus;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 }

@@ -2,6 +2,7 @@ package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 
 import java.io.Serializable;
 
@@ -26,6 +27,7 @@ public class AgentNotifyVo implements Serializable{
     private String agHeadMobile;
     private Agent baseMessage;
     private AgentBusInfo busMessage;
+    private AgentColinfo colinfoMessage;
     private String[] busiAreas;
     private String hasS0;
     private String busiType;
@@ -165,5 +167,13 @@ public class AgentNotifyVo implements Serializable{
 
     public void setLoginName(String loginName) {
         this.loginName = loginName;
+    }
+
+    public AgentColinfo getColinfoMessage() {
+        return colinfoMessage;
+    }
+
+    public void setColinfoMessage(AgentColinfo colinfoMessage) {
+        this.colinfoMessage = colinfoMessage;
     }
 }
