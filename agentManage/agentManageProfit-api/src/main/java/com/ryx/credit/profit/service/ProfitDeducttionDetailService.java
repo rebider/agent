@@ -20,5 +20,5 @@ public interface ProfitDeducttionDetailService {
      * 新增扣款明细
      * @param profitDeduction
      */
-    public void insertDeducttionDetail(ProfitDeduction profitDeduction)throws Exception;
+    public void insertDeducttionDetail(ProfitDeduction profitDeduction);
 }

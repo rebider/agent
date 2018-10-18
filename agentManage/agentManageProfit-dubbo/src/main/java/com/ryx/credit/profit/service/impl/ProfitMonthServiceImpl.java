@@ -377,12 +377,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate) {
+    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate, String parentAgentId) {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
             criteria.andAgentPidEqualTo(agentId);
             criteria.andProfitDateEqualTo(profitDate);
+            if(StringUtils.isNotBlank(parentAgentId)){
+                criteria.andParentAgentIdEqualTo(parentAgentId);
+            }
             List<ProfitDetailMonth> list = profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
             if(list != null && !list.isEmpty()){
                 ProfitDetailMonth profitMonth = list.get(0);
