@@ -11,16 +11,22 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 
+import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PAgentMergeMapper;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
 import com.ryx.credit.profit.pojo.PAgentMerge;
 import com.ryx.credit.profit.pojo.PAgentQuit;
+import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.profit.service.IProfitAgentMergerService;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.apache.log4j.Logger;
@@ -54,6 +60,12 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private AgentEnterService agentEnterService;
+    @Autowired
+    private BusiPlatService busiPlatService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private AgentService agentService;
 
     /**
      * 列表展示
@@ -164,6 +176,27 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
             BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
+
+                //手刷改名接口(agentName、agentId)
+                String agentName = pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")";
+                List<String> platId = new ArrayList<>();
+                platId.add(pAgentMerge.getSubAgentId());
+                busiPlatService.mPos_updateAgName(agentName, platId);
+
+                //POS改名接口(uniqueId、orgName、orgType)
+                List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
+                for (AgentBusInfo agentBusInfo : list) {
+                    AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+                    agentNotifyVo.setUniqueId(agentBusInfo.getId());//代理商AB码
+                    agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")");//变更后名称=主名称+(自己名称)
+                    if (agentBusInfo.getBusType().equals("2") || agentBusInfo.getBusType().equals("6")){
+                        agentNotifyVo.setOrgType("01");//机构类型：01-普通机构
+                    } else {
+                        agentNotifyVo.setOrgType("02");//机构类型：02-直签机构
+                    }
+                    busiPlatService.pos_updateAgName(agentNotifyVo);
+                }
+
                 pAgentMerge.setMergeStatus(AgStatus.Approved.name());//审批状态：Approved 3: 审批通过
                 pAgentMerge.setMergeDate(df.format(new Date()));//合并日期（生效日期）
                 logger.info("1.更新代理商合并申请状态为通过，已生效");
@@ -193,5 +226,6 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
             throw new Exception();
         }
     }
+
 
 }

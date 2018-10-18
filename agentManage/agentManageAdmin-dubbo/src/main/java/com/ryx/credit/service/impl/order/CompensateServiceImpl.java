@@ -639,20 +639,24 @@ public class CompensateServiceImpl implements CompensateService {
             OOrder oo = oOrderMapper.selectByPrimaryKey(row.getOrderId());
             AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oo.getBusId());
             PlatformType platformType = platFormService.byPlatformCode(agentBusInfo.getBusPlatform());
+
             ChangeActMachineVo cav = new ChangeActMachineVo();
             cav.setBusNum(agentBusInfo.getBusNum());
             cav.setNewAct(activity.getBusProCode());
             cav.setOldAct(activity_old.getBusProCode());
             cav.setOptUser(row.getcUser());
+
             //起始sn
             OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
             exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(row.getBeginSn());
+            exampleOLogisticsDetailExamplestart.setOrderByClause(" c_time desc");
             List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
             OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
 
             //结束sn
             OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
             exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(row.getEndSn());
+            exampleOLogisticsDetailExampleend.setOrderByClause(" c_time desc");
             List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
             OLogisticsDetail detailend = logisticsDetailsend.get(0);
 
