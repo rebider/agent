@@ -691,7 +691,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
             //根据数据类型设置接口类型
-            record.setNotifyType(AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
+            record.setNotifyType(importAgent==null?NotifyType.NetInAdd.getValue():AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
