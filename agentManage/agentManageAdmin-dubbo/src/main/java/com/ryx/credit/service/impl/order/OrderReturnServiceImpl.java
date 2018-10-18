@@ -984,7 +984,48 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     public AgentResult savePlans(AgentVo agentVo, String userid) {
         try {
+
             JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
+
+            List<String> details = new ArrayList<>();
+
+            int planCount = 0;
+
+            for (Object obj : jsonArray) {
+
+                JSONObject jsonObject = (JSONObject) obj;
+                ReceiptPlan receiptPlan = new ReceiptPlan();
+                receiptPlan.setProId(jsonObject.getString("receiptProId"));
+                receiptPlan.setcUser(userid);
+                receiptPlan.setUserId(userid);
+                receiptPlan.setOrderId(jsonObject.getString("orderId"));
+                receiptPlan.setReceiptId(jsonObject.getString("receiptId"));
+                receiptPlan.setProCom(jsonObject.getString("proCom"));
+                receiptPlan.setModel(jsonObject.getString("model"));
+                receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
+                receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
+                String receiptProId = jsonObject.getString("receiptProId");
+                if(receiptPlan.getPlanProNum().intValue()==0){
+                    throw new MessageException("派单数量不能为0");
+                }
+                details.add(receiptPlan.getReturnOrderDetailId());
+                planCount=planCount+receiptPlan.getPlanProNum().intValue();
+            }
+            if(planCount==0){
+                throw new MessageException("派单数量不能为0");
+            }
+            OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+            example.or().andIdIn(details).andStatusEqualTo(Status.STATUS_1.status);
+            List<OReturnOrderDetail> detailsList = returnOrderDetailMapper.selectByExample(example);
+            int returnCount = 0;
+            for (OReturnOrderDetail detail : detailsList) {
+                returnCount = returnCount+detail.getReturnCount().intValue();
+            }
+
+            if(returnCount!=planCount){
+                throw new MessageException("退货数量必须和派单数量一致");
+            }
+
             for (Object obj : jsonArray) {
                 JSONObject jsonObject = (JSONObject) obj;
                 ReceiptPlan receiptPlan = new ReceiptPlan();
@@ -998,7 +1039,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
                 receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
                 String receiptProId = jsonObject.getString("receiptProId");
-                plannerService.savePlanner(receiptPlan, receiptProId);
+                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId);
+                log.info("退货排单信息保存:{}{}",receiptPlan.getReturnOrderDetailId(),receiptPlan.getProId(),result.getMsg());
             }
 
         } catch (Exception e) {
