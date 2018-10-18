@@ -111,6 +111,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 dataType.add(AgImportType.NETINAPP.getValue());
                 dataType.add(AgImportType.BUSAPP.getValue());
                 dataType.add(AgImportType.DATACHANGEAPP.getValue());
+                dataType.add(AgImportType.COLINF.getValue());
                 criteria.andDatatypeIn(dataType);
                 criteria.andDealstatusEqualTo(Status.STATUS_0.status);
                 List<ImportAgent> importAgents = importAgentMapper.selectByExample(example);
@@ -142,6 +143,17 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     if(importAgent.getDatatype().equals(AgImportType.DATACHANGEAPP.getValue())){
                         try {
                             agentNotifyService.notifyPlatform(importAgent.getDataid(),importAgent.getId());
+                        } catch (Exception e) {
+                            log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
+                            e.printStackTrace();
+                        }
+                    }
+                    if(importAgent.getDatatype().equals(AgImportType.COLINF.getValue())){
+                        try {
+
+                            agentNotifyService.notifyPlatform(importAgent.getDataid(),importAgent.getId());
+
+
                         } catch (Exception e) {
                             log.info("异步通知pos手刷接口异常:{},busId:{},--{}",e.getMessage(),importAgent.getDataid(),AgImportType.DATACHANGEAPP.getValue());
                             e.printStackTrace();
