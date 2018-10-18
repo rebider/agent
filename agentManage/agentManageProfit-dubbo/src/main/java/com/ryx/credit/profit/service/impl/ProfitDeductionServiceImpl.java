@@ -296,12 +296,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                         BigDecimal basicAmt = (BigDecimal)hb.get("basicAmt");
                         if(basicAmt.doubleValue() >= notDeductionAmt.doubleValue()) {
                             result=result.add(notDeductionAmt);
-                            notDeductionAmt = BigDecimal.ZERO;
                             if (basicAmt.equals(notDeductionAmt.doubleValue())) {
                                 delList.add(hb);
                             }else{
                                 hb.put("basicAmt", basicAmt.subtract(notDeductionAmt));
                             }
+                            notDeductionAmt = BigDecimal.ZERO;
                             break;
                         }else{
                             delList.add(hb);
@@ -313,7 +313,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                     profitDeductionTemp.setActualDeductionAmt(profitDeductionTemp.getMustDeductionAmt().subtract(notDeductionAmt));
                     profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionTemp);
                     // 已扣足
-                    if ("0".equals(notDeductionAmt)) {
+                    if (notDeductionAmt.doubleValue()==0) {
                         // 不存在分期，直接删除下期扣款
                         if (profitDeductionTemp.getMustDeductionAmt().equals(profitDeductionTemp.getSumDeductionAmt())) {
                             delDeduction(profitDeductionTemp.getNextId());

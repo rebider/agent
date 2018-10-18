@@ -505,6 +505,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 param.put("parentAgentPid", profitDetailMonth.getParentAgentId());
                 param.put("remark", "POS考核扣款（新国都、瑞易送）");
                 param.put("hbList", hbList);     //代理商分润
+                param.put("deductionStatus","1");
                 //POS考核扣款（新国都、瑞易送）-
                 param = profitDeductionServiceImpl.otherDeductionHbByType(param);
                 realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
@@ -586,6 +587,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("computeType", computeType);
         param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentId());
         param.put("hbList", hbList);     //代理商分润
+        param.put("deductionStatus","1");
         BigDecimal realDeductionAmt = BigDecimal.ZERO;
         //退单扣款-pos 未扣足
         if (!profitDetailMonthTemp.getPosTdMustDeductionAmt().equals(profitDetailMonthTemp.getPosTdRealDeductionAmt())) {
