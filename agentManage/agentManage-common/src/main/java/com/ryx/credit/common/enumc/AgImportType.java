@@ -21,13 +21,33 @@ public enum AgImportType {
     NETINAPP("NETINAPP","入网业务审批"),
     BUSAPP("BUSAPP","业务审批");
 
+
+//    NetInAdd("netInAdd","新增入网"),
+//    NetInEdit("netInEdit","入网修改"),
+//    NetInUpgrade("netInUpgrade","入网升级"),
+//    IdentityAuth("identityAuth","身份认证");
+
     public String code;
 
     public String msg;
 
+    public String notifyType;
+
     AgImportType(String c, String m){
+
         this.code=c;
         this.msg =m;
+
+        if(c.equals("DATACHANGEAPP")){
+            notifyType = "netInEdit";
+        }else if(c.equals("NETINAPP")){
+            notifyType = "netInAdd";
+        }else if(c.equals("BUSAPP")){
+            notifyType = "netInAdd";
+        }else{
+            notifyType = "netInAdd";
+        }
+
     }
 
     /**
@@ -59,5 +79,22 @@ public enum AgImportType {
         }
         return "";
     }
+
+
+    /**
+     * 根据值获取内容
+     * @param value
+     * @return
+     */
+    public static AgImportType getAgImportTypeByValue(String value){
+        AgImportType[] fundType = AgImportType.values();
+        for(AgImportType cc : fundType){
+            if(cc.code.equals(value)){
+                return cc;
+            }
+        }
+        return null;
+    }
+
 
 }

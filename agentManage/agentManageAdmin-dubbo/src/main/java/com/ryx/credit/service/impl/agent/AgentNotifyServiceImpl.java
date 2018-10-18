@@ -630,6 +630,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
             return;
         }
+        ImportAgent importAgent = importAgentMapper.selectByPrimaryKey(impId);
         //直签不直发不通知
         if(agentBusInfo.getBusType().equals("8")){
             log.info("直签不直发不通知：agentId:{},busId:{}",agentBusInfo.getAgentId(),agentBusInfo.getId());
@@ -689,7 +690,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(agentBusInfo.getcUser());
-            record.setNotifyType(NotifyType.NetInAdd.getValue());
+            //根据数据类型设置接口类型
+            record.setNotifyType(AgImportType.getAgImportTypeByValue(importAgent.getDatatype()).notifyType);
             if(platForm==null){
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
