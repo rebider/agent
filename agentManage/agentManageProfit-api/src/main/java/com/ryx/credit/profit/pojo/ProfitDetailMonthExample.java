@@ -3416,6 +3416,11 @@ public class ProfitDetailMonthExample {
             addCriterion("STATUS <>", value, "status");
             return (Criteria) this;
         }
+
+        public Criteria andParentAgentIdEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID =", value, "parentAgentId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

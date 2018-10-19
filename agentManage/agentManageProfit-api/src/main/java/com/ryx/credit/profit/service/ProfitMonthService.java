@@ -140,7 +140,16 @@ public interface ProfitMonthService {
      * @param profitDate
      * @return
      */
-    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate);
+    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate, String parentAgentId);
+
+    /*** 
+    * @Description: 获取担保代理商信息
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/10/17 
+    */ 
+    Map<String, Object> getDbProfitAmt(String agentId, String parentAgentId, String computType);
 
     /***
     * @Description: 计算代理商分润金额

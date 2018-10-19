@@ -4,13 +4,15 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 
+import java.io.Serializable;
+
 /**
  * @version V1.0
  * @Description:
  * @author: Liudh
  * @date: 2018/6/11 15:11
  */
-public class AgentNotifyVo {
+public class AgentNotifyVo implements Serializable{
 
     private String uniqueId;
     private String useOrgan;  //885:自营，886：代理商，A00：机构，887：手刷
