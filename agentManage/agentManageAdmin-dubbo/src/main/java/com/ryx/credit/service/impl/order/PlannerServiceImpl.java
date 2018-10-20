@@ -10,10 +10,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.order.OReceiptOrderMapper;
-import com.ryx.credit.dao.order.OReceiptProMapper;
-import com.ryx.credit.dao.order.OSubOrderMapper;
-import com.ryx.credit.dao.order.ReceiptPlanMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.PlannerService;
@@ -49,7 +46,10 @@ public class PlannerServiceImpl implements PlannerService {
     private OReceiptProMapper receiptProMapper;
     @Autowired
     private OSubOrderMapper oSubOrderMapper;
-
+    @Autowired
+    private OSubOrderActivityMapper oSubOrderActivityMapper;
+    @Autowired
+    private OActivityMapper oActivityMapper;
 
     @Override
     public PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page,Map map) {
@@ -125,9 +125,52 @@ public class PlannerServiceImpl implements PlannerService {
                 throw new MessageException("订购商品未找到!");
             }
             OSubOrder  oSubOrderItem = oSubOrders.get(0);
+            //子订单 根据活动id 找到活动代码，根据活动代码 厂家和型号
+            OSubOrderActivityExample oSubOrderActivity = new OSubOrderActivityExample();
+            oSubOrderActivity.or().andStatusEqualTo(Status.STATUS_1.status).andSubOrderIdEqualTo(oSubOrderItem.getId());
+            List<OSubOrderActivity> oSubOrderActivities =oSubOrderActivityMapper.selectByExample(oSubOrderActivity);
+            if(oSubOrderActivities.size()==0){
+                throw new MessageException("订购商品活动未找到!");
+            }
+            OSubOrderActivity OSubOrderActivityItem = oSubOrderActivities.get(0);
+            //查找相关活动
+            OActivity activity =oActivityMapper.selectByPrimaryKey(oSubOrderActivities.get(0).getActivityId());
+            //根据活动代码和厂家和型号更新采购单活动快表信息
+            OActivityExample oActivityQuery = new OActivityExample();
+            oActivityQuery.or().andActCodeEqualTo(activity.getActCode())
+                    .andProductIdEqualTo(OSubOrderActivityItem.getProId())
+                    .andVenderEqualTo(receiptPlan.getProCom())
+                    .andProModelEqualTo(receiptPlan.getModel());
+            List<OActivity>  venderModeActivity =  oActivityMapper.selectByExample(oActivityQuery);
+
+            if(venderModeActivity.size()!=1){
+                throw new MessageException(activity.getVender()+"厂商和"+activity.getProModel()+"活动确定不了具体的活动");
+            }
+            //确定活动
+            OActivity real_activity = venderModeActivity.get(0);
+            OSubOrderActivityItem.setActivityId(real_activity.getId());
+            OSubOrderActivityItem.setActivityName(real_activity.getActivityName());
+            OSubOrderActivityItem.setActivityWay(real_activity.getActivityWay());
+            OSubOrderActivityItem.setActivityRule(real_activity.getActivityRule());
+            OSubOrderActivityItem.setVender(real_activity.getVender());
+            OSubOrderActivityItem.setProModel(real_activity.getProModel());
+            OSubOrderActivityItem.setBusProCode(real_activity.getBusProCode());
+            OSubOrderActivityItem.setBusProName(real_activity.getBusProName());
+            OSubOrderActivityItem.setTermBatchcode(real_activity.getTermBatchcode());
+            OSubOrderActivityItem.setTermBatchname(real_activity.getTermBatchname());
+            OSubOrderActivityItem.setTermtype(real_activity.getTermtype());
+            OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
+            if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
+                throw new MessageException("更新活动失败!");
+            }
+
+
             receiptPlan.setProType(oSubOrderItem.getProType());
             int receiptInsert = receiptPlanMapper.insert(receiptPlan);
-
+            if (receiptInsert != 1 ) {
+                log.info("保存排单异常");
+                throw new MessageException("保存排单异常!");
+            }
             OReceiptPro receiptPro = new OReceiptPro();
             receiptPro.setId(receiptProId);
             receiptPro.setSendNum(oReceiptPro.getSendNum().add(receiptPlan.getPlanProNum()));
@@ -135,7 +178,7 @@ public class PlannerServiceImpl implements PlannerService {
                 receiptPro.setReceiptProStatus(OReceiptStatus.DISPATCHED_ORDER.code);
             }
             int receiptProUpdate = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
-            if (receiptInsert != 1 || receiptProUpdate != 1) {
+            if ( receiptProUpdate != 1) {
                 log.info("保存排单异常");
                 throw new MessageException("保存排单异常!");
             }

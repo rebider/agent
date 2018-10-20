@@ -291,7 +291,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultType="java.lang.Integer">
     select count(*) from O_ACTIVITY
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -425,4 +425,36 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="productActivityOrderBuild" resultType="hashmap" parameterType="hashmap">
+    select ACT_CODE,max(o_activity.id)as ID,max(o_activity.activity_name)as ACTIVITYNAME,max(o_activity.price) as PRICE from o_activity
+    <where>
+      o_activity.status=1
+      <if test="productId!=null and productId!=''" > and o_activity.product_id=#{productId} </if>
+      <if test="beginTime!=null" > and o_activity.begin_time &lt;= #{beginTime} </if>
+      <if test="endTime!=null" > and o_activity.end_time &gt;= #{endTime}</if>
+    </where>
+    group by act_code
+    order by act_code desc
+  </select>
+
+  <!--/排单查询可选择的厂商和型号-->
+  <select id="planChoiseProComAndModel" resultMap="BaseResultMap" parameterType="hashmap">
+    select * from o_activity a
+    <where>
+      a.status=1
+      and  a.act_code = (
+        select d.act_code from o_sub_order b
+        left join o_sub_order_activity c on b.id=c.sub_order_id
+        left join o_activity d on d.id = c.activity_id
+        <where>
+          b.status=1 and c.status=1 and rownum=1
+          <if test="orderId!=null and orderId!=''" > and b.order_id=#{orderId} </if>
+          <if test="productId!=null and productId!=''" > and b.pro_id=#{productId} </if>
+        </where>
+      )
+      <if test="productId!=null and productId!=''" > and a.product_id=#{productId} </if>
+      <if test="beginTime!=null" > and a.begin_time &lt;= #{beginTime} </if>
+      <if test="endTime!=null" > and a.end_time &gt;= #{endTime}</if>
+    </where>
+  </select>
 </mapper>
