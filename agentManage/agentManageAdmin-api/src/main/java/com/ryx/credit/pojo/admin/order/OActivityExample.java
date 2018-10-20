@@ -1946,6 +1946,76 @@ public class OActivityExample {
             addCriterion("TERMTYPENAME not between", value1, value2, "termtypename");
             return (Criteria) this;
         }
+
+        public Criteria andActCodeIsNull() {
+            addCriterion("ACT_CODE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeIsNotNull() {
+            addCriterion("ACT_CODE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeEqualTo(String value) {
+            addCriterion("ACT_CODE =", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeNotEqualTo(String value) {
+            addCriterion("ACT_CODE <>", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeGreaterThan(String value) {
+            addCriterion("ACT_CODE >", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("ACT_CODE >=", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeLessThan(String value) {
+            addCriterion("ACT_CODE <", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeLessThanOrEqualTo(String value) {
+            addCriterion("ACT_CODE <=", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeLike(String value) {
+            addCriterion("ACT_CODE like", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeNotLike(String value) {
+            addCriterion("ACT_CODE not like", value, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeIn(List<String> values) {
+            addCriterion("ACT_CODE in", values, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeNotIn(List<String> values) {
+            addCriterion("ACT_CODE not in", values, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeBetween(String value1, String value2) {
+            addCriterion("ACT_CODE between", value1, value2, "actCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andActCodeNotBetween(String value1, String value2) {
+            addCriterion("ACT_CODE not between", value1, value2, "actCode");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

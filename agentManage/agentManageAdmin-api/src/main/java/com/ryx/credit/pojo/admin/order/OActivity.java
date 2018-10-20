@@ -59,6 +59,8 @@ public class OActivity implements Serializable{
 
     private String termtypename;
 
+    private String actCode;
+
     private String proTypeName;
 
     public String getProTypeName() {
@@ -292,5 +294,13 @@ public class OActivity implements Serializable{
 
     public void setTermtypename(String termtypename) {
         this.termtypename = termtypename == null ? null : termtypename.trim();
+    }
+
+    public String getActCode() {
+        return actCode;
+    }
+
+    public void setActCode(String actCode) {
+        this.actCode = actCode == null ? null : actCode.trim();
     }
 }
