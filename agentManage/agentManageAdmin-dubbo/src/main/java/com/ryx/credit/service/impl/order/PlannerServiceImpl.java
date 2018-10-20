@@ -65,8 +65,8 @@ public class PlannerServiceImpl implements PlannerService {
         if (StringUtils.isNotBlank(receiptOrder.getAddrRealname())) {
             reqMap.put("addrRealname", receiptOrder.getAddrRealname());
         }
-        if (null!=map.get("ACTIVITY_ID") && StringUtils.isNotBlank(map.get("ACTIVITY_ID")+"")){
-            reqMap.put("activityId", map.get("ACTIVITY_ID"));
+        if (null!=map.get("ACT_CODE") && StringUtils.isNotBlank(map.get("ACT_CODE")+"")){
+            reqMap.put("actCode", map.get("ACT_CODE"));
         }
         if (null!=map.get("PRO_ID") && StringUtils.isNotBlank(map.get("PRO_ID")+"")){
             reqMap.put("proId", map.get("PRO_ID"));

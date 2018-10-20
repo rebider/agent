@@ -130,6 +130,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
 
+
+
+
     /**
      * @Author: Zhang Lei
      * @Description: 退货列表查询
@@ -992,7 +995,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             int planCount = 0;
 
             for (Object obj : jsonArray) {
-
                 JSONObject jsonObject = (JSONObject) obj;
                 ReceiptPlan receiptPlan = new ReceiptPlan();
                 receiptPlan.setProId(jsonObject.getString("receiptProId"));
@@ -1000,8 +1002,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 receiptPlan.setUserId(userid);
                 receiptPlan.setOrderId(jsonObject.getString("orderId"));
                 receiptPlan.setReceiptId(jsonObject.getString("receiptId"));
-                receiptPlan.setProCom(jsonObject.getString("proCom"));
-                receiptPlan.setModel(jsonObject.getString("model"));
+                //根据退货单进行设置机型和厂家
+                // receiptPlan.setProCom(jsonObject.getString("proCom"));
+                // receiptPlan.setModel(jsonObject.getString("model"));
                 receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
                 receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
                 String receiptProId = jsonObject.getString("receiptProId");
@@ -1045,11 +1048,31 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 receiptPlan.setUserId(userid);
                 receiptPlan.setOrderId(jsonObject.getString("orderId"));
                 receiptPlan.setReceiptId(jsonObject.getString("receiptId"));
-                receiptPlan.setProCom(jsonObject.getString("proCom"));
-                receiptPlan.setModel(jsonObject.getString("model"));
                 receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
                 receiptPlan.setReturnOrderDetailId(jsonObject.getString("O_RETURN_ORDER_DETAIL_ID"));
                 String receiptProId = jsonObject.getString("receiptProId");
+
+                //根据退货单的商品活动补充极具类型
+                String O_RETURN_ORDER_DETAIL_ID = jsonObject.getString("O_RETURN_ORDER_DETAIL_ID");
+                OReturnOrderDetail oReturnOrderDetail =  returnOrderDetailMapper.selectByPrimaryKey(O_RETURN_ORDER_DETAIL_ID);
+                //根据订单和商品查询子订单及子订单商品对应的活动
+                OSubOrderExample oSubOrderExample = new OSubOrderExample();
+                oSubOrderExample.or().andOrderIdEqualTo(oReturnOrderDetail.getOrderId()).andProIdEqualTo(oReturnOrderDetail.getProId()).andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrder>  zidingdanList =  oSubOrderMapper.selectByExample(oSubOrderExample);
+                if(zidingdanList.size()!=1){
+                    throw new MessageException("未找到退货单商品子订单");
+                }
+                OSubOrder zidingdan = zidingdanList.get(0);
+                OSubOrderActivityExample subOrderActivityExample = new OSubOrderActivityExample();
+                subOrderActivityExample.or().andSubOrderIdEqualTo(zidingdan.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrderActivity>  listAct =  subOrderActivityMapper.selectByExample(subOrderActivityExample);
+                if(zidingdanList.size()!=1){
+                    throw new MessageException("未找到退货单商品对应活动");
+                }
+                OSubOrderActivity orderActivity = listAct.get(0);
+                //机具型号要和退货的机具型号和厂家要一样
+                receiptPlan.setProCom(orderActivity.getVender());
+                receiptPlan.setModel(orderActivity.getProModel());
                 AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId);
                 log.info("退货排单信息保存:{}{}",receiptPlan.getReturnOrderDetailId(),receiptPlan.getProId(),result.getMsg());
             }

@@ -405,6 +405,15 @@
       <if test="par.receiptProStatus != null and par.receiptProStatus!=''" >
         and receipt_pro_status = #{par.receiptProStatus}
       </if>
+      <if test="par.orderId != null and par.orderId!=''" >
+      and ro.ORDER_ID = #{par.orderId}
+      </if>
+      <if test="par.receiptNum != null and par.receiptNum!=''" >
+        and ro.RECEIPT_NUM = #{par.receiptNum}
+      </if>
+      <if test="par.addrRealname != null and par.addrRealname!=''" >
+        and ro.ADDR_REALNAME = #{par.addrRealname}
+      </if>
   </select>
 
 
@@ -423,10 +432,12 @@
     left join o_Receipt_pro rp on ro.id = rp.receipt_id
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id
+    left join o_activity oa on ac.activity_id = oa.id
     left join a_agent ag on ag.id = ro.agent_id
     <where>
-     <if test="par.activityId != null and par.activityId!=''" >
-       and ac.activity_id=#{par.activityId}
+
+    <if test="par.actCode != null and par.actCode!=''" >
+      and oa.act_code=#{par.actCode}
     </if>
     <if test="par.proId != null and par.proId!=''" >
      and ac.pro_id=#{par.proId}
