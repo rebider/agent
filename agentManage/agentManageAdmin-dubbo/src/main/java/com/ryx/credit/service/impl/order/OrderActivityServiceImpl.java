@@ -243,6 +243,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActCode(stringObjectMap.get("ACT_CODE")+"");
             activitys.add(oActivity);
         }
+
 //        List<OActivity> newActivitys = new ArrayList<>();
 //        for (OActivity activity : activitys) {
 //            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
