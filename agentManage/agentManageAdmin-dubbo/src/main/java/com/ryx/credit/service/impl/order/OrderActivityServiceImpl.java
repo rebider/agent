@@ -154,7 +154,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         activity.setuTime(new Date());
 
         OActivityExample oActivityExample = new OActivityExample();
-        oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status);
+        oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status).andIdNotEqualTo(activity.getId());
         oActivityExample.setOrderByClause(" c_time desc ");
         List<OActivity>  list = activityMapper.selectByExample(oActivityExample);
 
@@ -207,7 +207,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
 
     @Override
-    public List<OActivity> productActivity(String product, String angetId) {
+    public List<OActivity> productActivity(String product, String angetId,String oldActivityId) {
         //TODO 检查代理商销售额
 //        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
 //        BigDecimal transAmt = new BigDecimal(800000000);
@@ -217,11 +217,23 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 //                .andBeginTimeLessThanOrEqualTo(new Date())
 //                .andEndTimeGreaterThanOrEqualTo(new Date());
 //        List<OActivity> activitys = activityMapper.selectByExample(example);
+        //如果传递老的活动就排除老的活动
 
+        //查询条件
         Date date = new Date();
-        List<Map<String,Object>> actList = activityMapper.productActivityOrderBuild(FastMap.fastMap("productId",productObj.getId())
+        FastMap par = FastMap.fastMap("productId",productObj.getId())
                 .putKeyV("beginTime",date)
-                .putKeyV("endTime",date));
+                .putKeyV("endTime",date);
+
+        OActivity oldActivity = null;
+        if(StringUtils.isNotBlank(oldActivityId)) {
+            //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
+            oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
+            par.putKeyV("notEqActcode",oldActivity.getActCode()).putKeyV("vender",oldActivity.getVender()).putKeyV("proModel",oldActivity.getProModel());
+        }
+
+
+        List<Map<String,Object>> actList = activityMapper.productActivityOrderBuild(par);
         List<OActivity> activitys = new ArrayList<OActivity>();
         for (Map<String, Object> stringObjectMap : actList) {
             OActivity oActivity = new OActivity();

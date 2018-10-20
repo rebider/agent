@@ -429,6 +429,9 @@
     select ACT_CODE,max(o_activity.id)as ID,max(o_activity.activity_name)as ACTIVITYNAME,max(o_activity.price) as PRICE from o_activity
     <where>
       o_activity.status=1
+      <if test="notEqActcode!=null and notEqActcode!=''" > and o_activity.act_code!=#{notEqActcode} </if>
+      <if test="vender!=null and vender!=''" > and o_activity.vender=#{vender} </if>
+      <if test="proModel!=null and proModel!=''" > and o_activity.pro_model=#{proModel} </if>
       <if test="productId!=null and productId!=''" > and o_activity.product_id=#{productId} </if>
       <if test="beginTime!=null" > and o_activity.begin_time &lt;= #{beginTime} </if>
       <if test="endTime!=null" > and o_activity.end_time &gt;= #{endTime}</if>
