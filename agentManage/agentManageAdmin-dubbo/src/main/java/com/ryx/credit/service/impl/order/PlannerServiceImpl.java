@@ -213,8 +213,7 @@ public class PlannerServiceImpl implements PlannerService {
      * @Date: 15:58 2018/7/27
      */
     public List<Map<String, Object>> queryOrderReceiptPlanInfo(Map<String, String> params) throws ProcessException {
-        List<Map<String, Object>> list = null;
-        list = receiptPlanMapper.queryOrderReceiptPlanInfo(params);
+        List<Map<String, Object>> list = receiptPlanMapper.queryOrderReceiptPlanInfo(params);
         return list;
     }
 

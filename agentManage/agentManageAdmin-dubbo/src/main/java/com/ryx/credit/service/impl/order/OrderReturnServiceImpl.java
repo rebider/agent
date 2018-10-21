@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.print.attribute.standard.MediaSize;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -267,7 +268,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Date: 10:20 2018/7/30
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     public Map<String, Object> bizAudit(String returnId, String plans, String remark, String userid, String auditResult) {
 
         if (auditResult.equals("no")) {
@@ -1120,10 +1121,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 执行扣款计划后更新退货单和退货明细
      * @Date: 19:13 2018/8/3
      */
-    public void doPlan(String returnId, BigDecimal takeAmt, String userid) {
-        try {
+    public void doPlan(String returnId, BigDecimal takeAmt, String userid)throws Exception{
 
+        try {
             OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+
+            if(oReturnOrder.getRetSchedule()!=null && (oReturnOrder.getRetSchedule().equals(RetSchedule.TKZ.code) || oReturnOrder.getRetSchedule().equals(RetSchedule.WC.code)) ){
+                throw new MessageException("禁止重复调账");
+            }
+
             BigDecimal returnAmo = oReturnOrder.getReturnAmo();
             oReturnOrder.setTakeOutAmo(takeAmt);
             oReturnOrder.setRelReturnAmo(returnAmo.subtract(takeAmt));
@@ -1137,12 +1143,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oReturnOrder.setRetTime(new Date());
             oReturnOrder.setuUser(userid);
 
-            returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder);
-
-        } catch (Exception e) {
-            log.error("执行扣款时更新退货单失败", e);
+            if(1!=returnOrderMapper.updateByPrimaryKeySelective(oReturnOrder)){
+                throw new MessageException("退款单更更新失败");
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
             throw e;
         }
+
+
     }
 
 

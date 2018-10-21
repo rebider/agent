@@ -437,10 +437,12 @@
       and plan.order_id = #{params.orderId}
     </if>
     <if test="params.subOrderId != null and params.subOrderId!=''" >
-      and plan.Receipt_id = #{params.subOrderId}
+      /*收货单编号*/
+      and plan.Receipt_id = #{params.receiptId}
     </if>
     <if test="params.returnId != null and params.returnId!=''" >
-      and plan.return_order_detail_id = #{params.returnId}
+      /*cxinfo #应该传递退货单详情*/
+      and plan.return_order_detail_id in (select id FROM o_return_order_detail where status=1 AND return_id = #{params.returnId} )
     </if>
     <if test="params.planOrderStatus != null and params.planOrderStatus!=''" >
       and plan.plan_order_status = #{params.planOrderStatus}

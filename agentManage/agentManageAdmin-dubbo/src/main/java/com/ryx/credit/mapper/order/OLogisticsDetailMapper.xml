@@ -538,6 +538,7 @@
       where
       sn_num between #{snBegin} and #{snEnd}
       and status = #{status} and RECORD_STATUS =#{recordStatus}
+      order by sn_num asc
   </select>
 
   <select id="querySnCount" parameterType="java.util.Map" resultType="java.lang.Integer">

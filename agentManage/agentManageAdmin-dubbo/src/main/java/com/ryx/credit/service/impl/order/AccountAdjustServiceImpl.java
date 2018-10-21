@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.MapUtil;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
@@ -17,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -89,7 +92,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
      * @Date: 15:47 2018/7/24
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     public Map<String, Object> adjust(boolean isRealAdjust, BigDecimal adjustAmt, String adjustType,
                                       int isAdjustOrder, String agentId, String userid, String srcId, String srcType) throws ProcessException {
 
@@ -115,18 +118,15 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                 //查询欠款明细列表
                 List<OPaymentDetail> paymentDetails = paymentDetailService.getCanTakeoutPaymentsByAgentId(agentId);
                 for (OPaymentDetail ndetail : paymentDetails) {
-
                     //金额全部抵扣完时退出循环
                     if (leftAmt.compareTo(BigDecimal.ZERO) <= 0) {
                         break;
                     }
-
                     String paymentId = ndetail.getPaymentId();
                     //如果已处理过这个付款单，跳过
                     if (takesPaymentId.contains(paymentId)) {
                         continue;
                     }
-
                     //进行抵扣
                     takesPaymentId.add(paymentId);
                     //查询付款单和付款单明细
@@ -138,50 +138,42 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     for (OPaymentDetail oneDetail : oPaymentDetails) {
                         thisPaymentOutstandingAmt = thisPaymentOutstandingAmt.add(oneDetail.getPayAmount());
                     }
-
-                    //=================剩余退款金额可完整抵扣此订单时======================
+                    //=================剩余退款金额可大于当前循环订单欠款======================
                     if (thisPaymentOutstandingAmt.compareTo(leftAmt) <= 0) {
+                        //抵扣金额减去当前订单的欠款金额
                         leftAmt = leftAmt.subtract(thisPaymentOutstandingAmt);
-
                         //抵扣记录
                         takeoutList.add(createTkeRecord(payment, thisPaymentOutstandingAmt));
-
                         if (isRealAdjust) {
                             //更新付款明细
                             for (OPaymentDetail oneDetail : oPaymentDetails) {
                                 OPaymentDetail updateOPaymentDetail = paymentDetailMapper.selectByPrimaryKey(oneDetail.getId());
+                                //更新为结清
                                 updatePaymentDetail(updateOPaymentDetail, srcId, srcType);
                             }
-
-
                             //更新付款单
                             if (payment.getOutstandingAmount().compareTo(thisPaymentOutstandingAmt) > 0) {
+                                //更新为部分付款
                                 updatePaymentOutstandingAmt(paymentId, thisPaymentOutstandingAmt);
                             } else if (payment.getOutstandingAmount().compareTo(thisPaymentOutstandingAmt) == 0) {
+                                //更新为部分付款
                                 updatePaymentComplete(paymentId, srcId, srcType);
                             } else {
                                 throw new ProcessException("计算后订单剩余待还金额出现小于0的情况");
                             }
                         }
-
-
-                        //==========================剩余金额不足以抵扣完整订单时=============================
+                        //==========================剩余抵扣金额小于订单待付金额=============================
                     } else {
-
+                        //订单剩余待付
                         thisPaymentOutstandingAmt = leftAmt;
-                        leftAmt = BigDecimal.ZERO;
-
-                        //抵扣记录
-                        takeoutList.add(createTkeRecord(payment, thisPaymentOutstandingAmt));
-
+                        //抵扣记录 抵扣剩余所有金额
+                        takeoutList.add(createTkeRecord(payment, leftAmt));
                         //========生成新的付款计划。先计算剩余代付金额和剩余期数======
-
                         List<OPaymentDetail> planNows = paymentDetailService.getPaymentDetails(paymentId);
                         //现在付款计划未还部分
                         List<OPaymentDetail> planNows_df = new ArrayList<>();
                         //现在付款计划已付部分
                         List<OPaymentDetail> planNows_complate = new ArrayList<>();
-
                         //付款分期未还金额
                         BigDecimal outAmt = BigDecimal.ZERO;
                         //分期待付期数
@@ -190,12 +182,11 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                         BigDecimal startPlanNum = BigDecimal.ONE;
                         //代付分期起始时间
                         Date startTime = null;
-
                         for (OPaymentDetail detail : planNows) {
                             if (!detail.getPaymentStatus().equals(PaymentStatus.JQ.code) && !detail.getPaymentStatus().equals(PaymentStatus.FKING.code)) {
                                 outAmt = outAmt.add(detail.getPayAmount());
                                 if (detail.getPayType().equals(PaymentType.DKFQ.code) || detail.getPayType().equals(PaymentType.FRFQ.code)) {
-                                    outPlanNum++;
+                                    outPlanNum = outPlanNum + 1;
                                     if (startTime == null) {
                                         startTime = detail.getPlanPayTime();
                                         startPlanNum = detail.getPlanNum().subtract(BigDecimal.ONE);
@@ -239,16 +230,15 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                 newDeatilPlan.setcUser(userid);
                                 newDeatilPlan.setAgentId(agentId);
                                 planNews.add(newDeatilPlan);
-
                                 //新付款计划入库
                                 if (isRealAdjust) {
-                                    paymentDetailMapper.insertSelective(newDeatilPlan);
+                                    if(1!=paymentDetailMapper.insertSelective(newDeatilPlan)){
+                                        throw new MessageException("添加付款明细异常");
+                                    }
                                 }
 
                             }
                         }
-
-
                         //付款明细中现在付款计划未还部分移入历史表
                         if (isRealAdjust) {
                             for (OPaymentDetail wh : planNows_df) {
@@ -267,30 +257,24 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                                 paymentDetailMapper.deleteByExample(example);
                             }
                         }
-
                         //付款明细中插入退款抵扣记录
                         if (isRealAdjust) {
-                            insertToPaymentDetail(paymentId, planNows_df.get(0), thisPaymentOutstandingAmt, agentId, srcId, srcType, userid);
+                            insertToPaymentDetail(paymentId, planNows_df.get(0), leftAmt, agentId, srcId, srcType, userid);
                         }
-
-
                         //===========更新订单部分金额支付完成=============
                         if (isRealAdjust) {
                             updatePaymentOutstandingAmt(paymentId, leftAmt);
                         }
-
                         result.put("planNows", planNows);
                         result.put("planNows_df", planNows_df);
                         result.put("planNows_complate", planNows_complate);
                         result.put("planNews", planNews);
-
+                        //退款抵扣成0
+                        leftAmt = BigDecimal.ZERO;
                     }
                 }
             }
-
-
             result.put("takeoutList", takeoutList);
-
             // 如果最终金额还有剩余，走线下退款
             ORefundAgent refundAgent = new ORefundAgent();
 //            if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -301,7 +285,6 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                 refundAgent.setcUser(userid);
                 result.put("refund", refundAgent);
 //            }
-
             if (isRealAdjust) {
                 //生成调账记录
                 OAccountAdjust oAccountAdjust = new OAccountAdjust();
@@ -313,7 +296,9 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                 oAccountAdjust.setAgentId(agentId);
                 oAccountAdjust.setcUser(userid);
                 oAccountAdjust.setcDate(new Date());
-                accountAdjustMapper.insertSelective(oAccountAdjust);
+                if(1!=accountAdjustMapper.insertSelective(oAccountAdjust)){
+                    throw new MessageException("调账记录生成失败");
+                }
 
                 //生成调账抵扣明细
                 for (Map<String, Object> map : takeoutList) {
@@ -331,20 +316,21 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     oAccountAdjustDetail.setAgentId(agentId);
                     oAccountAdjustDetail.setcUser(userid);
                     oAccountAdjustDetail.setcDate(new Date());
-                    accountAdjustDetailMapper.insertSelective(oAccountAdjustDetail);
+                    if(accountAdjustDetailMapper.insertSelective(oAccountAdjustDetail)!=1){
+                        throw new MessageException("生成调账抵扣明细失败");
+                    }
                 }
 
                 refundAgent.setId(idService.genId(TabId.o_refund_agent));
                 refundAgent.setAdjustId(oAccountAdjust.getId());
-                refundAgentMapper.insertSelective(refundAgent);
+                if(1!=refundAgentMapper.insertSelective(refundAgent)){
+                    throw new MessageException("代理商退款单生成失败");
+                }
             }
-
-
             //抵扣欠款金额
             BigDecimal takeAmt = BigDecimal.ZERO;
             takeAmt = adjustAmt.subtract(leftAmt);
             result.put("takeAmt", takeAmt);
-
             //更新退货表
             if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {
                 orderReturnService.doPlan(srcId, takeAmt, userid);
@@ -380,7 +366,9 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             newDeatil.setcUser(userid);
             newDeatil.setPlanNum(BigDecimal.ZERO);
             newDeatil.setPlanPayTime(new Date());
-            paymentDetailMapper.insertSelective(newDeatil);
+            if(1!=paymentDetailMapper.insertSelective(newDeatil)){
+                throw new MessageException("添加付款明细异常");
+            }
         } catch (Exception e) {
             log.error("插入抵扣付款明细失败srcId={" + srcId + "},srcType{" + srcType + "}", e);
             throw new ProcessException("插入抵扣付款明细失败srcId={" + srcId + "},srcType{" + srcType + "}");
