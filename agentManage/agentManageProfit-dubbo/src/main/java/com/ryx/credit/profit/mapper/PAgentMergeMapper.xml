@@ -220,10 +220,10 @@
     <include refid="Base_Column_List" />
     FROM P_AGENT_MERGE
     <include refid="BASE_WHERE_SQL" />
-    <include refid="SORTING" />
+    <include refid="SORT" />
     <include refid="PAGING_END" />
   </select>
-  <sql id='SORTING'>
+  <sql id='SORT'>
     ORDER BY MERGE_DATE DESC
   </sql>
   <sql id="PAGING_START">
