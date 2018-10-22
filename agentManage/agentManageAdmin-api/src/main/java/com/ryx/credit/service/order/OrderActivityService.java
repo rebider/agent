@@ -28,7 +28,9 @@ public interface OrderActivityService {
 
     List<OActivity> allActivity();
 
-    List<OActivity> productActivity(String product,String angetId);
+    List<OActivity> productActivity(String product,String angetId,String orderAgentBusifo,String oldActivityId);
 
     Map selectTermMachine(String platformNum) throws MessageException;
+
+    List<Map<String,String>> planChoiseProComAndModel(String productId,String orderId);
 }

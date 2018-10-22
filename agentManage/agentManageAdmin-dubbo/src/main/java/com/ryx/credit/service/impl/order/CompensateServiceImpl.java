@@ -92,6 +92,11 @@ public class CompensateServiceImpl implements CompensateService {
     private PlatFormService platFormService;
     @Autowired
     private ImsTermWarehouseDetailService imsTermWarehouseDetailService;
+    @Autowired
+    private OSubOrderMapper subOrderMapper;
+    @Autowired
+    private OSubOrderActivityMapper subOrderActivityMapper;
+
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -632,6 +637,46 @@ public class CompensateServiceImpl implements CompensateService {
                 }
 
             });
+
+            ORefundPriceDiffDetailExample priceDiffDetailExample = new ORefundPriceDiffDetailExample();
+            ORefundPriceDiffDetailExample.Criteria detailcriteria = priceDiffDetailExample.createCriteria();
+            detailcriteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+            List<ORefundPriceDiffDetail> oRefundPriceDiffDetails1 = refundPriceDiffDetailMapper.selectByExample(priceDiffDetailExample);
+            for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails1) {
+                OSubOrderExample oSubOrderExample = new OSubOrderExample();
+                OSubOrderExample.Criteria criteria2 = oSubOrderExample.createCriteria();
+                criteria2.andProIdEqualTo(oRefundPriceDiffDetail.getProId());
+                criteria2.andOrderIdEqualTo(oRefundPriceDiffDetail.getOrderId());
+                List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
+                OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                OSubOrderActivityExample.Criteria criteria3 = oSubOrderActivityExample.createCriteria();
+                criteria3.andSubOrderIdEqualTo(oSubOrders.get(0).getId());
+                List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+
+                OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+                OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityRealId());
+                oSubOrderActivity.setActivityId(oActivity.getId());
+                oSubOrderActivity.setActivityName(oActivity.getActivityName());
+                oSubOrderActivity.setRuleId(oActivity.getRuleId());
+                oSubOrderActivity.setActivityRule(oActivity.getActivityRule());
+                oSubOrderActivity.setActivityWay(oActivity.getActivityWay());
+                oSubOrderActivity.setProModel(oActivity.getProModel());
+                oSubOrderActivity.setVender(oActivity.getVender());
+                oSubOrderActivity.setgTime(oActivity.getgTime());
+                oSubOrderActivity.setuTime(new Date());
+                oSubOrderActivity.setuUser(oRefundPriceDiffDetail.getuUser());
+                oSubOrderActivity.setPlatform(oActivity.getPlatform());
+                oSubOrderActivity.setBusProCode(oActivity.getBusProCode());
+                oSubOrderActivity.setBusProName(oActivity.getBusProName());
+                oSubOrderActivity.setTermBatchcode(oActivity.getTermBatchcode());
+                oSubOrderActivity.setTermBatchname(oActivity.getTermBatchname());
+                oSubOrderActivity.setTermtype(oActivity.getTermtype());
+                oSubOrderActivity.setTermtypename(oActivity.getTermtypename());
+                int j = subOrderActivityMapper.updateByPrimaryKeySelective(oSubOrderActivity);
+                if(1!=j){
+                    throw new ProcessException("退补差价数据更新活动失败");
+                }
+            }
 
 
 

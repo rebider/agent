@@ -4,6 +4,7 @@ import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OActivityMapper {
     int countByExample(OActivityExample example);
@@ -21,4 +22,8 @@ public interface OActivityMapper {
     int updateByPrimaryKeySelective(OActivity record);
 
     int updateByPrimaryKey(OActivity record);
+
+    List<Map<String,Object>> productActivityOrderBuild(Map par);
+
+    List<OActivity> planChoiseProComAndModel(Map par);
 }
