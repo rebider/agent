@@ -56,7 +56,7 @@ public interface IOrderReturnService {
 
 
     List<String> addList(List<List<Object>> data, String user) throws Exception;
-
+    String addListItem(List<Object> objectList, String user) throws Exception;
 
     AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail);
 
