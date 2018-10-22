@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.ryx.credit.common.util.DateJsonDeserializer;
+import com.ryx.credit.common.util.DateJsonDeserializerMonth;
 import com.ryx.credit.common.util.DateJsonSerializer;
+import com.ryx.credit.common.util.DateJsonSerializerMonth;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -59,18 +61,18 @@ public class OPayment implements Serializable{
     private BigDecimal downPaymentCount;
 
     @JSONField(
-            format = "yyyy-MM-dd"
+            format = "yyyy-MM"
     )
     @JsonFormat(
             shape = JsonFormat.Shape.STRING,
-            pattern = "yyyy-MM-dd",
+            pattern = "yyyy-MM",
             timezone = "GMT+8"
     )
     @JsonDeserialize(
-            using = DateJsonDeserializer.class
+            using = DateJsonDeserializerMonth.class
     )
     @JsonSerialize(
-            using = DateJsonSerializer.class
+            using = DateJsonSerializerMonth.class
     )
     private Date downPaymentDate;
 
