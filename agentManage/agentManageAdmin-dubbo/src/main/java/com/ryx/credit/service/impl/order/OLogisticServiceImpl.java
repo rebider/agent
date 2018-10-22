@@ -543,6 +543,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return map;
     }
 
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public List<String> addSn(List<List<String>> data, String user) throws Exception {
         List<String> snList = new ArrayList<>();
@@ -572,6 +573,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     logger.info("序列不能为空");
                     throw new MessageException("序列不能为空");
                 }
+
                 terminalid=String.valueOf(list.get(0));
                 String sn = list.get(1);
                 sn_num=String.valueOf(sn.substring(0, sn.length() - 1));
@@ -591,6 +593,14 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 oLogisticsDetail.setRecordStatus(Status.STATUS_1.status);
                 oLogisticsDetail.setVersion(Status.STATUS_0.status);
                 oLogisticsDetail.setTerminalidType(PlatformType.MPOS.code);
+
+                OLogisticsDetailExample example = new OLogisticsDetailExample();
+                example.or().andSnNumEqualTo(sn_num);
+                if(oLogisticsDetailMapper.selectByExample(example).size()>0){
+                    logger.info("导入sn{}已存在",sn_num);
+                    throw new MessageException(sn_num+"已存在");
+                }
+
                 if ( oLogisticsDetailMapper.insertSelective(oLogisticsDetail)==0){
                     logger.info("导入sn码失败");
                     throw new MessageException("导入sn码失败");

@@ -29,6 +29,7 @@
     <result column="TERM_BATCHNAME" jdbcType="VARCHAR" property="termBatchname" />
     <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
     <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
+    <result column="ACT_CODE" jdbcType="VARCHAR" property="actCode" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,7 +64,7 @@
     ID, PRODUCT_ID, RULE_ID, ACTIVITY_NAME, PRO_TYPE, ACTIVITY_WAY, ACTIVITY_RULE, PLATFORM,
     PRICE, BEGIN_TIME, END_TIME, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
     VERSION, G_TIME, ACTIVITY_CONDITION, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
-    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME
+    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, ACT_CODE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,8 +103,8 @@
     C_USER, U_USER, STATUS,
     VERSION, G_TIME, ACTIVITY_CONDITION,
     BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
-    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME
-    )
+    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME,
+    ACT_CODE)
     values (#{id,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR},
     #{activityRule,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL},
@@ -112,8 +113,8 @@
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
     #{version,jdbcType=DECIMAL}, #{gTime,jdbcType=DECIMAL}, #{activityCondition,jdbcType=VARCHAR},
     #{busProCode,jdbcType=VARCHAR}, #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR},
-    #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}
-    )
+    #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR},
+    #{actCode,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
     insert into O_ACTIVITY
@@ -199,6 +200,9 @@
       <if test="termtypename != null">
         TERMTYPENAME,
       </if>
+      <if test="actCode != null">
+        ACT_CODE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -281,6 +285,9 @@
       </if>
       <if test="termtypename != null">
         #{termtypename,jdbcType=VARCHAR},
+      </if>
+      <if test="actCode != null">
+        #{actCode,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -371,6 +378,9 @@
       <if test="termtypename != null">
         TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
       </if>
+      <if test="actCode != null">
+        ACT_CODE = #{actCode,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -401,7 +411,8 @@
     TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
     TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
     TERMTYPE = #{termtype,jdbcType=VARCHAR},
-    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR}
+    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
+    ACT_CODE = #{actCode,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -414,4 +425,39 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="productActivityOrderBuild" resultType="hashmap" parameterType="hashmap">
+    select ACT_CODE,max(o_activity.id)as ID,max(o_activity.activity_name)as ACTIVITYNAME,max(o_activity.price) as PRICE from o_activity
+    <where>
+      o_activity.status=1
+      <if test="notEqActcode!=null and notEqActcode!=''" > and o_activity.act_code!=#{notEqActcode} </if>
+      <if test="vender!=null and vender!=''" > and o_activity.vender=#{vender} </if>
+      <if test="proModel!=null and proModel!=''" > and o_activity.pro_model=#{proModel} </if>
+      <if test="productId!=null and productId!=''" > and o_activity.product_id=#{productId} </if>
+      <if test="beginTime!=null" > and o_activity.begin_time &lt;= #{beginTime} </if>
+      <if test="endTime!=null" > and o_activity.end_time &gt;= #{endTime}</if>
+    </where>
+    group by act_code
+    order by act_code desc
+  </select>
+
+  <!--/排单查询可选择的厂商和型号-->
+  <select id="planChoiseProComAndModel" resultMap="BaseResultMap" parameterType="hashmap">
+    select * from o_activity a
+    <where>
+      a.status=1
+      and  a.act_code = (
+        select d.act_code from o_sub_order b
+        left join o_sub_order_activity c on b.id=c.sub_order_id
+        left join o_activity d on d.id = c.activity_id
+        <where>
+          b.status=1 and c.status=1 and rownum=1
+          <if test="orderId!=null and orderId!=''" > and b.order_id=#{orderId} </if>
+          <if test="productId!=null and productId!=''" > and b.pro_id=#{productId} </if>
+        </where>
+      )
+      <if test="productId!=null and productId!=''" > and a.product_id=#{productId} </if>
+      <if test="beginTime!=null" > and a.begin_time &lt;= #{beginTime} </if>
+      <if test="endTime!=null" > and a.end_time &gt;= #{endTime}</if>
+    </where>
+  </select>
 </mapper>

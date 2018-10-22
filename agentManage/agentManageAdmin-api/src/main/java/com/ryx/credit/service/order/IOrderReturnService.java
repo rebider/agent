@@ -39,7 +39,7 @@ public interface IOrderReturnService {
 
     AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 
-    void doPlan(String returnId, BigDecimal takeAmt, String userid);
+    void doPlan(String returnId, BigDecimal takeAmt, String userid)throws Exception;
 
 
     void approvalReject(String processInstanceId, String activityName)throws Exception;
