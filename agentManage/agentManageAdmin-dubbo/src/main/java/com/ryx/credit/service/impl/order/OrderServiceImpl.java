@@ -326,6 +326,9 @@ public class OrderServiceImpl implements OrderService {
                 if (StringUtils.isBlank(payment.getDownPaymentUser())) {
                     throw new MessageException("打款人不能为空");
                 }
+                if (payment.getDownPayment() != null && payment.getPayAmount()!=null && payment.getDownPayment().compareTo(payment.getPayAmount()) >= 0) {
+                    throw new MessageException("首付+分润分期支付方式，首付不能大于等于订单金额");
+                }
                 AgentResult SF1_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF1_checkDownPaymentDateres.isOK()) {
                     throw new MessageException(SF1_checkDownPaymentDateres.getMsg());
@@ -346,6 +349,9 @@ public class OrderServiceImpl implements OrderService {
                 }
                 if (payment.getDownPaymentUser() == null ) {
                     throw new MessageException("打款人不能为空");
+                }
+                if (payment.getDownPayment() != null && payment.getPayAmount()!=null && payment.getDownPayment().compareTo(payment.getPayAmount()) >= 0) {
+                    throw new MessageException("首付+打款分期支付方式，首付不能大于等于订单金额");
                 }
                 AgentResult SF2_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF2_checkDownPaymentDateres.isOK()) {
@@ -639,6 +645,10 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setoAmo(forPayAmount);//订单总金额
         orderFormVo.setPayAmo(forRealPayAmount);//订单应付金额
 
+        //订单首付金额不能大于订单金额
+        if (oPayment.getDownPayment() != null && orderFormVo.getPayAmo()!=null && oPayment.getDownPayment().compareTo(orderFormVo.getPayAmo()) >= 0) {
+            throw new MessageException("首付+分期支付方式，首付不能大于等于订单金额");
+        }
         //检查抵扣金额
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){
             //抵扣金额查询
@@ -719,6 +729,7 @@ public class OrderServiceImpl implements OrderService {
         oPayment_db.setActualReceipt(oPayment.getActualReceipt());
         oPayment_db.setCollectCompany(oPayment.getCollectCompany());
         oPayment_db.setRemark(oPayment.getRemark());
+        oPayment_db.setActualReceiptDate(oPayment.getActualReceiptDate());
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){
             oPayment_db.setDeductionType(oPayment.getDeductionType());
         }
@@ -928,7 +939,10 @@ public class OrderServiceImpl implements OrderService {
         order_db.setIncentiveAmo(forPayAmount.subtract(forRealPayAmount));//订单优惠金额
         order_db.setoAmo(forPayAmount);//订单总金额
         order_db.setPayAmo(forRealPayAmount);//订单应付金额
-
+        //订单首付金额不能大于订单金额
+        if (oPayment_db.getDownPayment() != null && order_db.getPayAmo()!=null && oPayment_db.getDownPayment().compareTo(order_db.getPayAmo()) >= 0) {
+            throw new MessageException("首付+分期支付方式，首付不能大于等于订单金额");
+        }
 
         //检查抵扣金额
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){

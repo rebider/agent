@@ -1,10 +1,12 @@
 package com.ryx.credit.service.impl.order;
 
+import com.ryx.credit.common.enumc.DictGroup;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
@@ -16,10 +18,12 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.MposTermBatchVo;
 import com.ryx.credit.machine.vo.MposTermTypeVo;
 import com.ryx.credit.machine.vo.TermMachineVo;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
 import com.ryx.credit.pojo.admin.order.OProduct;
 import com.ryx.credit.profit.service.ProfitMonthService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderActivityService;
 import org.slf4j.LoggerFactory;
@@ -50,6 +54,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private TermMachineService termMachineService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     @Override
     public PageInfo activityList(OActivity activity, Page page) {
@@ -62,7 +68,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             criteria.andPlatformEqualTo(activity.getPlatform());
         }
         criteria.andStatusEqualTo(Status.STATUS_1.status);
-        example.setOrderByClause("C_TIME desc");
+        example.setOrderByClause(" ACT_CODE desc");
         example.setPage(page);
         List<OActivity> activitys = activityMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
@@ -90,12 +96,33 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("请选择平台类型");
             throw new MessageException("请选择平台类型");
         }
+        if (StringUtils.isBlank(activity.getActCode())) {
+            logger.info("活动代码不能为空");
+            throw new MessageException("活动代码不能为空");
+        }
+        if (activity.getPrice()==null) {
+            logger.info("活动价格不能为空");
+            throw new MessageException("活动价格不能为空");
+        }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
         activity.setuTime(nowDate);
         activity.setStatus(Status.STATUS_1.status);
         activity.setVersion(Status.STATUS_1.status);
+
+
+        OActivityExample oActivityExample = new OActivityExample();
+        oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status);
+        oActivityExample.setOrderByClause(" c_time desc ");
+        List<OActivity>  list = activityMapper.selectByExample(oActivityExample);
+
+        for (OActivity oActivity : list) {
+            if(oActivity.getPrice()!=null && oActivity.getPrice().compareTo(activity.getPrice())!=0){
+                throw new MessageException("相同活动代码价格必须相同");
+            }
+        }
+
         int insert = activityMapper.insert(activity);
         if (insert != 1) {
             throw new MessageException("添加失败");
@@ -125,6 +152,18 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             }
         }
         activity.setuTime(new Date());
+
+        OActivityExample oActivityExample = new OActivityExample();
+        oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status).andIdNotEqualTo(activity.getId());
+        oActivityExample.setOrderByClause(" c_time desc ");
+        List<OActivity>  list = activityMapper.selectByExample(oActivityExample);
+
+        for (OActivity oActivity : list) {
+            if(oActivity.getPrice()!=null && oActivity.getPrice().compareTo(activity.getPrice())!=0){
+                return AgentResult.fail("相同活动代码价格必须相同");
+            }
+        }
+
         int update = activityMapper.updateByPrimaryKeySelective(activity);
         if (update == 1) {
             return AgentResult.ok();
@@ -168,16 +207,43 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
 
     @Override
-    public List<OActivity> productActivity(String product, String angetId) {
+    public List<OActivity> productActivity(String product, String angetId,String oldActivityId) {
         //TODO 检查代理商销售额
 //        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
 //        BigDecimal transAmt = new BigDecimal(800000000);
         OProduct productObj = oProductMapper.selectByPrimaryKey(product);
-        OActivityExample example = new OActivityExample();
-        example.or().andProductIdEqualTo(productObj.getId())
-                .andBeginTimeLessThanOrEqualTo(new Date())
-                .andEndTimeGreaterThanOrEqualTo(new Date());
-        List<OActivity> activitys = activityMapper.selectByExample(example);
+//        OActivityExample example = new OActivityExample();
+//        example.or().andProductIdEqualTo(productObj.getId())
+//                .andBeginTimeLessThanOrEqualTo(new Date())
+//                .andEndTimeGreaterThanOrEqualTo(new Date());
+//        List<OActivity> activitys = activityMapper.selectByExample(example);
+        //如果传递老的活动就排除老的活动
+
+        //查询条件
+        Date date = new Date();
+        FastMap par = FastMap.fastMap("productId",productObj.getId())
+                .putKeyV("beginTime",date)
+                .putKeyV("endTime",date);
+
+        OActivity oldActivity = null;
+        if(StringUtils.isNotBlank(oldActivityId)) {
+            //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
+            oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
+            par.putKeyV("notEqActcode",oldActivity.getActCode()).putKeyV("vender",oldActivity.getVender()).putKeyV("proModel",oldActivity.getProModel());
+        }
+
+
+        List<Map<String,Object>> actList = activityMapper.productActivityOrderBuild(par);
+        List<OActivity> activitys = new ArrayList<OActivity>();
+        for (Map<String, Object> stringObjectMap : actList) {
+            OActivity oActivity = new OActivity();
+            oActivity.setId(stringObjectMap.get("ID")+"");
+            oActivity.setActivityName(stringObjectMap.get("ACTIVITYNAME")+"");
+            oActivity.setPrice(new BigDecimal(stringObjectMap.get("PRICE")+""));
+            oActivity.setActCode(stringObjectMap.get("ACT_CODE")+"");
+            activitys.add(oActivity);
+        }
+
 //        List<OActivity> newActivitys = new ArrayList<>();
 //        for (OActivity activity : activitys) {
 //            BigDecimal activityRule = new BigDecimal(activity.getActivityRule());
@@ -230,5 +296,30 @@ public class OrderActivityServiceImpl implements OrderActivityService {
      }
 
         return map;
+    }
+
+
+    @Override
+    public List<Map<String,String>> planChoiseProComAndModel(String productId, String orderId) {
+        Date date = new Date();
+        List<OActivity> OActivityList  = activityMapper.planChoiseProComAndModel(
+                FastMap.fastMap("productId",productId)
+                        .putKeyV("orderId",orderId)
+                        .putKeyV("beginTime",date)
+                        .putKeyV("endTime",date));
+        List<Map<String,String>> resList = new ArrayList<>();
+        for (OActivity oActivity : OActivityList) {
+            Map<String,String> item = new HashMap<>();
+            item.put("proCom",oActivity.getVender());
+            item.put("proModel",oActivity.getProModel());
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(),DictGroup.MANUFACTURER.name(),oActivity.getVender());
+            if(dict!=null){
+                item.put("proComName",dict.getdItemname());
+            }else{
+                item.put("proComName","系统未配置该厂商信息");
+            }
+            resList.add(item);
+        }
+        return resList;
     }
 }

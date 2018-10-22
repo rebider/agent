@@ -201,6 +201,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
+        if (profitDeduction.getActualDeductionAmt() != null && profitDeduction.getActualDeductionAmt().doubleValue()==0){
+            criteria.andActualDeductionAmtIsNotNull();
+        }
         if (StringUtils.isNotBlank(profitDeduction.getRemark())){
             if (!"POS考核扣款（新国都、瑞易送）".equals(profitDeduction.getRemark()) && !"手刷考核扣款（小蓝牙、MPOS）".equals(profitDeduction.getRemark())) {
                 criteria.andRemarkNotIn(Arrays.asList(new String[]{"POS考核扣款（新国都、瑞易送）", "手刷考核扣款（小蓝牙、MPOS）"}));

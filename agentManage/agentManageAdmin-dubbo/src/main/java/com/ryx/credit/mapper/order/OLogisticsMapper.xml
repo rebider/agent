@@ -447,9 +447,19 @@
 
     <select id="getOrderAndLogisticsBySn" resultType="java.util.Map" parameterType="java.lang.String">
     select
-   detail.order_id as orderId,detail.order_num as orderNum,logi.id as logisticsId,detail.pro_id as proId,detail.pro_name as proName,logi.pro_type as proType,detail.settlement_price as proPrice
-    ,logi.pro_MODEL as proModel,logi.Log_type as logType,detail.agent_id as agentId,logi.pro_com as proCom,detail.sn_num as sn,
-    logi.pro_MODEL as proModel,logi.Receipt_plan_id as receiptId
+        detail.order_id as orderId,
+        detail.order_num as orderNum,
+        logi.id as logisticsId,
+        detail.pro_id as proId,
+        detail.pro_name as proName,
+        logi.pro_type as proType,
+        detail.settlement_price as proPrice,
+        logi.pro_MODEL as proModel,
+        logi.Log_type as logType,
+        detail.agent_id as agentId,
+        logi.pro_com as proCom,
+        detail.sn_num as sn,
+        logi.Receipt_plan_id as receiptId
     from o_logistics_detail detail,O_LOGISTICS logi
     where detail.sn_num = #{SN,jdbcType=VARCHAR}
     and detail.status = '1'
@@ -460,9 +470,19 @@
 
     <select id="getOrderAndLogisticsBySns" resultType="java.util.Map" parameterType="java.lang.String">
     select
-    detail.order_id as orderId,detail.order_num as orderNum,logi.id as logisticsId,detail.pro_id as proId,detail.pro_name as proName,logi.pro_type as proType,detail.settlement_price as proPrice
-    ,logi.pro_MODEL as proModel,logi.Log_type as logType,detail.agent_id as agentId,logi.pro_com as proCom,detail.sn_num as sn,
-    logi.pro_MODEL as proModel,logi.Receipt_plan_id as receiptId
+    detail.order_id as orderId,
+        detail.order_num as orderNum,
+        logi.id as logisticsId,
+        logi.pro_type as proType,
+        detail.pro_id as proId,
+        detail.pro_name as proName,
+        detail.settlement_price as proPrice,
+        logi.pro_MODEL as proModel,
+        logi.Log_type as logType,
+        detail.agent_id as agentId,
+        logi.pro_com as proCom,
+        detail.sn_num as sn,
+        logi.Receipt_plan_id as receiptId
     from o_logistics_detail detail,O_LOGISTICS logi
     where
     <![CDATA[detail.sn_num >= #{startSn,jdbcType=VARCHAR} and detail.sn_num <= #{endSn,jdbcType=VARCHAR}]]>
