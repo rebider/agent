@@ -11,6 +11,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.OActivityMapper;
 import com.ryx.credit.dao.order.OProductMapper;
@@ -18,6 +19,7 @@ import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.machine.vo.MposTermBatchVo;
 import com.ryx.credit.machine.vo.MposTermTypeVo;
 import com.ryx.credit.machine.vo.TermMachineVo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OActivity;
 import com.ryx.credit.pojo.admin.order.OActivityExample;
@@ -56,6 +58,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private TermMachineService termMachineService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     @Override
     public PageInfo activityList(OActivity activity, Page page) {
@@ -207,7 +211,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
 
 
     @Override
-    public List<OActivity> productActivity(String product, String angetId,String oldActivityId) {
+    public List<OActivity> productActivity(String product, String angetId,String orderAgentBusifo,String oldActivityId) {
         //TODO 检查代理商销售额
 //        BigDecimal transAmt = profitMonthService.getTranByAgentId(angetId);
 //        BigDecimal transAmt = new BigDecimal(800000000);
@@ -230,6 +234,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             //如果变更活动传递老活动，排除老的活动代码并匹配 相同的厂商和型号。
             oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
             par.putKeyV("notEqActcode",oldActivity.getActCode()).putKeyV("vender",oldActivity.getVender()).putKeyV("proModel",oldActivity.getProModel());
+        }
+        if(StringUtils.isNotBlank(orderAgentBusifo) && !"null".equals(orderAgentBusifo)) {
+            //查询平台活动
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(orderAgentBusifo);
+            par.putKeyV("platform",agentBusInfo.getBusPlatform());
         }
 
 
