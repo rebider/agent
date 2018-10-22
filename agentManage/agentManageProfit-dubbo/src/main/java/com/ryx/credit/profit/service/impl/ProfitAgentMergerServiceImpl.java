@@ -114,7 +114,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
             //判断附代理商是否已存在
             List<PAgentMerge> subAgentMergelist = profitAgentMergerService.selectBySubAgenId(pAgentMerge.getSubAgentId());
             if(subAgentMergelist.size() > 0){
-                throw new MessageException("该代理商已经存在!");
+                throw new ProcessException("该代理商已经存在!");
             }
             if(mainAgentlist.size() > 0 && subAgentlist.size() > 0){
                 StringBuffer main = new StringBuffer();
@@ -130,7 +130,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 logger.info("附代理商业务类型" +sub.toString() );
                 boolean status = main.toString().contains(sub.toString());
                 if(!status){
-                    throw new MessageException("业务类型不匹配!");
+                    throw new ProcessException("业务类型不匹配!");
                 }
             }
         }
