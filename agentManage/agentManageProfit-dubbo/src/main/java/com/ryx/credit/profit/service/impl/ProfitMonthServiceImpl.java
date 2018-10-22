@@ -786,8 +786,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             map.put("agentType", detail.getAgentType());
             map.put("agentId", detail.getBusNum());
             map.put("agentPid", detail.getAgentId());
-            map.put("posTranAmt", detail.getInTransAmt());
-            map.put("posJlTranAmt", detail.getPosRewardAmt());
+            map.put("posTranAmt", detail.getPosRewardAmt());
+            map.put("posJlTranAmt", detail.getPosCreditAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
                 BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
