@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.pojo;
 
-public class ProfitAdjustM {
+import java.io.Serializable;
+
+public class ProfitAdjustM implements Serializable{
     private String id;
 
     private String adjustMainId;
