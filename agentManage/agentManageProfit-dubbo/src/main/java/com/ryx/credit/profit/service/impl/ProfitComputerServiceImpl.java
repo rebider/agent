@@ -85,6 +85,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     private int index = 1;
     private BigDecimal tranAmount = BigDecimal.ZERO;
+    private BigDecimal zfAmount = BigDecimal.ZERO;
 
     @Override
     public BigDecimal totalP_day_RHB(String agentPid,String month) {
@@ -428,6 +429,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     }
 
+//    @Test
+//    public void test(){
+//        String transDate = "201809";
+//        BigDecimal tranAmount = synchroSSTotalTransAmt(transDate);
+//        System.out.println(tranAmount);
+//    }
 
     /**
      * 同步手刷月分润交易汇总
@@ -435,13 +442,25 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      */
     @Override
     public BigDecimal synchroSSTotalTransAmt(String transDate){
+        BigDecimal tranAmount = synchroAmt(transDate);
+
+        BigDecimal zfAmount = synchZFAmt(transDate);
+
+        return tranAmount.add(zfAmount);
+    }
+
+    /**
+     * 同步手刷月分润交易汇总
+     * @param transDate 交易日期（空则为上一月）
+     */
+    public BigDecimal synchroAmt(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("profit.month"),params);
+                (AppConfig.getProperty("profit.newmonth"),params);
         System.out.println(res);
         JSONObject json = JSONObject.parseObject(res);
         if(!json.get("respCode").equals("000000")){
@@ -454,6 +473,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         if(list.size()>0){
             addTransAmt(list,transDate);//手刷交易额汇总
         }
+        index = 1;
         BigDecimal fxAmount = isDecimalNull(json.getBigDecimal("fxAmount"));//分销系统交易汇总
         BigDecimal wjrAmount = isDecimalNull(json.getBigDecimal("wjrAmount"));//未计入分润汇总
         BigDecimal wtbAmount = isDecimalNull(json.getBigDecimal("wtbAmount"));//未同步到分润
@@ -461,12 +481,50 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     }
 
+    /**
+     * 汇总直发交易金额
+     * @param transDate
+     * @return
+     */
+    public BigDecimal synchZFAmt(String transDate){
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("frmonth",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
+        map.put("pageNumber",index++ +"");
+        map.put("pageSize","50");
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("profit.zhifa"),params);
+        System.out.println(res);
+        JSONObject json = JSONObject.parseObject(res);
+        if(!json.get("respCode").equals("000000")){
+            logger.error("请求同步失败！");
+            AppConfig.sendEmails("直发分润交易汇总失败","直发分润交易汇总失败");
+            return null;
+        }
+        String data = JSONObject.parseObject(res).get("data").toString();
+        List<JSONObject> list = JSONObject.parseObject(data,List.class);
+        if(list.size()>0){
+            addZFTransAmt(list,transDate);//zhifa交易额汇总
+        }
+
+        return zfAmount;
+
+    }
+
     public void addTransAmt(List<JSONObject> profitMonths,String transDate){
         for(JSONObject json:profitMonths){
-            BigDecimal transAmt = isDecimalNull(json.getBigDecimal("TRANAMT"));
+            BigDecimal transAmt = isDecimalNull(json.getBigDecimal("SAMOUNT"));
             tranAmount = tranAmount.add(transAmt);
         }
         synchroSSTotalTransAmt(transDate);
+    }
+
+    public void addZFTransAmt(List<JSONObject> profitMonths,String transDate){
+        for(JSONObject json:profitMonths){
+            BigDecimal transAmt = isDecimalNull(json.getBigDecimal("TRANSAMT"));
+            zfAmount = zfAmount.add(transAmt);
+        }
+        synchZFAmt(transDate);
     }
 
     @Override

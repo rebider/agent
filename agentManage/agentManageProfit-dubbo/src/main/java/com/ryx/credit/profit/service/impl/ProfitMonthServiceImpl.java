@@ -307,7 +307,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         record.setActivId(proceId);
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(userId);
+        record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.THAW.name());
+        record.setAgentId(profitUnfreeze.getAgentId());
+        record.setAgentName(profitUnfreeze.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);
             LOG.info("月分润解冻申请审批流启动成功");
