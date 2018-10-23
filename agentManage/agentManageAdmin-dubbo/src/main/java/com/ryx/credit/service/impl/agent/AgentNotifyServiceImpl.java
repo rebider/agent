@@ -875,6 +875,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("orgName",agentNotifyVo.getOrgName());
             data.put("busiAreas",agentNotifyVo.getBusiAreas());
             data.put("hasS0",agentNotifyVo.getHasS0());
+            data.put("busiType",agentNotifyVo.getBusiType());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
             }
