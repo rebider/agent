@@ -563,11 +563,13 @@
     <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
     </if>
-    <if test="reqMap.isZpos != null" >
-      and b.bus_platform = #{reqMap.platForm}
-    </if>
-    <if test="reqMap.isZpos == null" >
-      and b.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.isZpos != 'all'" >
+      <if test="reqMap.isZpos != null" >
+        and b.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == null" >
+        and b.bus_platform != #{reqMap.platForm}
+      </if>
     </if>
     and b.status = #{reqMap.status}
     UNION
@@ -598,11 +600,13 @@
     <if test="reqMap.userId!=null and reqMap.userId!=''">
       and a.C_USER = #{reqMap.userId}
     </if>
-    <if test="reqMap.isZpos != null" >
-      and b.bus_platform = #{reqMap.platForm}
-    </if>
-    <if test="reqMap.isZpos == null" >
-      and b.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.isZpos != 'all'" >
+      <if test="reqMap.isZpos != null" >
+        and b.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == null" >
+        and b.bus_platform != #{reqMap.platForm}
+      </if>
     </if>
     and b.status = #{reqMap.status}
     </where>
@@ -640,11 +644,13 @@
     <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
     </if>
-    <if test="reqMap.isZpos != null" >
-      and b.bus_platform = #{reqMap.platForm}
-    </if>
-    <if test="reqMap.isZpos == null" >
-      and b.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.isZpos != 'all'" >
+      <if test="reqMap.isZpos != null" >
+        and b.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == null" >
+        and b.bus_platform != #{reqMap.platForm}
+      </if>
     </if>
     and b.status = #{reqMap.status}
     UNION
@@ -674,11 +680,13 @@
       <if test="reqMap.userId!=null and reqMap.userId!=''">
         and a.C_USER = #{reqMap.userId}
       </if>
-      <if test="reqMap.isZpos != null" >
-        and b.bus_platform = #{reqMap.platForm}
-      </if>
-      <if test="reqMap.isZpos == null" >
-        and b.bus_platform != #{reqMap.platForm}
+      <if test="reqMap.isZpos != 'all'" >
+        <if test="reqMap.isZpos != null" >
+          and b.bus_platform = #{reqMap.platForm}
+        </if>
+        <if test="reqMap.isZpos == null" >
+          and b.bus_platform != #{reqMap.platForm}
+        </if>
       </if>
       and b.status = #{reqMap.status}
     </where>
@@ -740,7 +748,7 @@
   <select id="queryTreeByBusInfo" parameterType="map" resultType="map">
     select
     A.ID,A.AGENT_ID,A.BUS_NUM,A.BUS_PLATFORM,A.BUS_TYPE,A.BUS_PARENT,
-    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME||'（机构编码:'||A.BUS_NUM||')') as FIELDSHOW
+    B.AG_UNIQ_NUM,B.AG_NAME,C.PLATFORM_NAME,D.D_ITEMNAME,(C.PLATFORM_NAME) as FIELDSHOW
     from
     a_agent_businfo a
     left join a_agent b on a.agent_id=b.id

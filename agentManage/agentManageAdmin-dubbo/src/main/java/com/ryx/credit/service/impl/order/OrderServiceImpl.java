@@ -339,7 +339,7 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("请填写首付金额");
                 }
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
+                    throw new MessageException("5号以后必须选择下个月");
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
@@ -360,7 +360,7 @@ public class OrderServiceImpl implements OrderService {
                 return payment;
             case "FKFQ"://打款分期
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
+                    throw new MessageException("5号以后必须选择下个月");
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
@@ -370,7 +370,7 @@ public class OrderServiceImpl implements OrderService {
                 return payment;
             case "FRFQ"://分润分期
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("分期时间必须大于今天，5号以后必须选择下个月");
+                    throw new MessageException("5号以后必须选择下个月");
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
@@ -1182,6 +1182,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("审批流启动失败!");
         }
 
+        Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
         //代理商业务视频关系
         BusActRel record = new BusActRel();
         record.setBusId(order.getId());
@@ -1191,6 +1192,8 @@ public class OrderServiceImpl implements OrderService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.ORDER.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(order.getAgentId());
+        record.setAgentName(agent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");

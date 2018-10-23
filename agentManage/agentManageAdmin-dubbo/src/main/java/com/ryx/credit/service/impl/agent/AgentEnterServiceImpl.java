@@ -88,7 +88,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private AssProtoColMapper assProtoColMapper;
 
-
     /**
      * 商户入网
      *
@@ -270,6 +269,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             record.setStatus(Status.STATUS_1.status);
             record.setBusType(BusActRelBusType.Agent.name());
             record.setActivStatus(AgStatus.Approving.name());
+            record.setAgentId(agentId);
+            record.setAgentName(agent.getAgName());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
@@ -367,6 +368,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.Business.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(agent.getId());
+        record.setAgentName(agent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }

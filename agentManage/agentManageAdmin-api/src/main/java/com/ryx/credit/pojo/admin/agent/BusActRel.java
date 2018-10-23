@@ -15,6 +15,10 @@ public class BusActRel extends BusActRelKey implements Serializable {
 
     private BigDecimal status;
 
+    private String agentId;
+
+    private String agentName;
+
     public String getBusType() {
         return busType;
     }
@@ -53,5 +57,21 @@ public class BusActRel extends BusActRelKey implements Serializable {
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
     }
 }
