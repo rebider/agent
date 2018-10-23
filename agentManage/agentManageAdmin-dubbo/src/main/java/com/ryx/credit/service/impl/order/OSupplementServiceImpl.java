@@ -267,7 +267,10 @@ public class OSupplementServiceImpl implements OSupplementService {
         if (null!=oSupplement.getAgentId()){
             record.setAgentId(oSupplement.getAgentId());
             Agent agent = agentMapper.selectByPrimaryKey(oSupplement.getAgentId());
-            record.setAgentName(agent.getAgName());
+            if (null!=agent){
+                record.setAgentName(agent.getAgName());
+            }
+
         }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("补款审批审批，启动审批异常，添加审批关系失败{}:{}", oSupplement.getId(), proce);
