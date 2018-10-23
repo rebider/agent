@@ -150,6 +150,23 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款添加:{}", "源数据不能为空");
             return ResultVO.fail("源数据不能为空");
         }
+        //去查询是否已经在审批
+        String srcId = oSupplement.getSrcId();
+        String pkType = oSupplement.getPkType();
+        OSupplementExample oSupplementExample = new OSupplementExample();
+        OSupplementExample.Criteria criteria = oSupplementExample.createCriteria();
+        criteria.andSrcIdEqualTo(srcId);
+        criteria.andPkTypeEqualTo(pkType);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andReviewStatusIn(Arrays.asList(AgStatus.Create.status ,AgStatus.Approving.status
+                ,AgStatus.Approved.status ,AgStatus.Reject.status));
+        List<OSupplement> oSupplements = oSupplementMapper.selectByExample(oSupplementExample);
+        if (null !=oSupplements && oSupplements.size()>0){
+                logger.info("补款添加:{}", "已在补款中");
+                return ResultVO.fail("已在补款中！！");
+        }
+
+
         Date date = Calendar.getInstance().getTime();
         oSupplement.setId(idService.genId(TabId.o_Supplement));
         oSupplement.setcTime(date);
@@ -210,8 +227,8 @@ public class OSupplementServiceImpl implements OSupplementService {
             OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
             BigDecimal paymentStatus = oPaymentDetail.getPaymentStatus();
             if (!paymentStatus.equals(PaymentStatus.DF.code)) {
-                logger.info("订单还未生效{}:{}", id, userId);
-                throw new MessageException("订单还未生效");
+                logger.info("补款信息状态异常{}:{}", id, userId);
+                throw new MessageException("补款信息状态异常");
             }
 
             //只有是待付款状态才可以启动流程   并修改状态为付款中
@@ -267,7 +284,10 @@ public class OSupplementServiceImpl implements OSupplementService {
         if (null!=oSupplement.getAgentId()){
             record.setAgentId(oSupplement.getAgentId());
             Agent agent = agentMapper.selectByPrimaryKey(oSupplement.getAgentId());
-            record.setAgentName(agent.getAgName());
+            if (null!=agent){
+                record.setAgentName(agent.getAgName());
+            }
+
         }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("补款审批审批，启动审批异常，添加审批关系失败{}:{}", oSupplement.getId(), proce);
