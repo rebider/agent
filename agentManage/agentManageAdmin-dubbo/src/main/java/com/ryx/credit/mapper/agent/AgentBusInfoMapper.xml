@@ -563,11 +563,13 @@
     <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
     </if>
-    <if test="reqMap.isZpos != null" >
-      and b.bus_platform = #{reqMap.platForm}
-    </if>
-    <if test="reqMap.isZpos == null" >
-      and b.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.isZpos != 'all'" >
+      <if test="reqMap.isZpos != null" >
+        and b.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == null" >
+        and b.bus_platform != #{reqMap.platForm}
+      </if>
     </if>
     and b.status = #{reqMap.status}
     UNION
@@ -598,11 +600,13 @@
     <if test="reqMap.userId!=null and reqMap.userId!=''">
       and a.C_USER = #{reqMap.userId}
     </if>
-    <if test="reqMap.isZpos != null" >
-      and b.bus_platform = #{reqMap.platForm}
-    </if>
-    <if test="reqMap.isZpos == null" >
-      and b.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.isZpos != 'all'" >
+      <if test="reqMap.isZpos != null" >
+        and b.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == null" >
+        and b.bus_platform != #{reqMap.platForm}
+      </if>
     </if>
     and b.status = #{reqMap.status}
     </where>
@@ -640,11 +644,13 @@
     <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
     </if>
-    <if test="reqMap.isZpos != null" >
-      and b.bus_platform = #{reqMap.platForm}
-    </if>
-    <if test="reqMap.isZpos == null" >
-      and b.bus_platform != #{reqMap.platForm}
+    <if test="reqMap.isZpos != 'all'" >
+      <if test="reqMap.isZpos != null" >
+        and b.bus_platform = #{reqMap.platForm}
+      </if>
+      <if test="reqMap.isZpos == null" >
+        and b.bus_platform != #{reqMap.platForm}
+      </if>
     </if>
     and b.status = #{reqMap.status}
     UNION
@@ -674,11 +680,13 @@
       <if test="reqMap.userId!=null and reqMap.userId!=''">
         and a.C_USER = #{reqMap.userId}
       </if>
-      <if test="reqMap.isZpos != null" >
-        and b.bus_platform = #{reqMap.platForm}
-      </if>
-      <if test="reqMap.isZpos == null" >
-        and b.bus_platform != #{reqMap.platForm}
+      <if test="reqMap.isZpos != 'all'" >
+        <if test="reqMap.isZpos != null" >
+          and b.bus_platform = #{reqMap.platForm}
+        </if>
+        <if test="reqMap.isZpos == null" >
+          and b.bus_platform != #{reqMap.platForm}
+        </if>
       </if>
       and b.status = #{reqMap.status}
     </where>
