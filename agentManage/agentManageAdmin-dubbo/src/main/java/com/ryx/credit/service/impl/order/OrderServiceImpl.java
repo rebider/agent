@@ -1182,6 +1182,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("审批流启动失败!");
         }
 
+        Agent agent = agentMapper.selectByPrimaryKey(order.getAgentId());
         //代理商业务视频关系
         BusActRel record = new BusActRel();
         record.setBusId(order.getId());
@@ -1191,6 +1192,8 @@ public class OrderServiceImpl implements OrderService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.ORDER.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(order.getAgentId());
+        record.setAgentName(agent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");

@@ -152,6 +152,8 @@ public class ActivityServiceImpl implements ActivityService {
             approvalFlowRecord.setApprovalOpinion(approvalOpinion);
             approvalFlowRecord.setApprovalPerson(approvalPerson);
             approvalFlowRecord.setApprovalResult(approvalResult);
+            approvalFlowRecord.setAgentId(busActRel.getAgentId());
+            approvalFlowRecord.setAgentName(busActRel.getAgentName());
             String insert = approvalFlowRecordService.insert(approvalFlowRecord);
             upFlowRecord.setId(insert);
             TaskService taskService = processEngine.getTaskService();

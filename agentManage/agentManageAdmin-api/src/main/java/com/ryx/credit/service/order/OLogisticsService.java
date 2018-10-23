@@ -28,6 +28,8 @@ public interface OLogisticsService {
 
     public List<String> addList(List<List<Object>> data, String user)throws Exception;
 
+    public String addListItem(List<Object> data, String user) throws Exception;
+
     public int insertImportData(OLogistics oLogistics);
 
     void updateSnStatus(String orderId, String startSn, String endSn, BigDecimal code, BigDecimal recordStatus,String returnId)throws Exception;

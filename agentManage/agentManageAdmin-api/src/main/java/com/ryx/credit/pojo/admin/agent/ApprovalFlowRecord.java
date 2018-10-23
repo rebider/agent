@@ -35,11 +35,16 @@ public class ApprovalFlowRecord implements Serializable{
 
     private String errorMsg;
 
+    private String agentId;
+
+    private String agentName;
+
     private String busTypeName;
 
     private String beginTime;
 
     private String endTime;
+
 
     public String getId() {
         return id;
@@ -184,5 +189,21 @@ public class ApprovalFlowRecord implements Serializable{
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
     }
 }
