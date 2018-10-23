@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
@@ -128,7 +129,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private IOrderReturnService iOrderReturnService;
-
+    @Autowired
+    private AgentMapper agentMapper;
 
 
 
@@ -694,6 +696,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.refund.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(agentId);
+        Agent agent = agentMapper.selectByPrimaryKey(agentId);
+        if(agent!=null)
+        record.setAgentName(agent.getAgName());
+
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
