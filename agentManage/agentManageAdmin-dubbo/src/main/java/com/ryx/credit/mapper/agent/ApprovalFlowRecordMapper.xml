@@ -17,6 +17,8 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="ACTIVITY_STATUS" jdbcType="DECIMAL" property="activityStatus" />
     <result column="ERROR_MSG" jdbcType="VARCHAR" property="errorMsg" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -50,7 +52,7 @@
   <sql id="Base_Column_List">
     ID, TASK_ID, EXECUTION_ID, TASK_NAME, BUS_ID, BUS_TYPE, APPROVAL_PERSON, APPROVAL_DEP,
     APPROVAL_TIME, APPROVAL_RESULT, APPROVAL_OPINION, STATUS, VERSION, ACTIVITY_STATUS,
-    ERROR_MSG
+    ERROR_MSG, AGENT_ID, AGENT_NAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -85,14 +87,14 @@
     TASK_NAME, BUS_ID, BUS_TYPE,
     APPROVAL_PERSON, APPROVAL_DEP, APPROVAL_TIME,
     APPROVAL_RESULT, APPROVAL_OPINION, STATUS,
-    VERSION, ACTIVITY_STATUS, ERROR_MSG
-    )
+    VERSION, ACTIVITY_STATUS, ERROR_MSG,
+    AGENT_ID, AGENT_NAME)
     values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{executionId,jdbcType=VARCHAR},
     #{taskName,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR},
     #{approvalPerson,jdbcType=VARCHAR}, #{approvalDep,jdbcType=VARCHAR}, #{approvalTime,jdbcType=TIMESTAMP},
     #{approvalResult,jdbcType=VARCHAR}, #{approvalOpinion,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{activityStatus,jdbcType=DECIMAL}, #{errorMsg,jdbcType=VARCHAR}
-    )
+    #{version,jdbcType=DECIMAL}, #{activityStatus,jdbcType=DECIMAL}, #{errorMsg,jdbcType=VARCHAR},
+    #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
     insert into A_APPROVAL_FLOW_RECORD
@@ -142,6 +144,12 @@
       <if test="errorMsg != null">
         ERROR_MSG,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -188,6 +196,12 @@
       </if>
       <if test="errorMsg != null">
         #{errorMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -242,25 +256,33 @@
       <if test="errorMsg != null">
         ERROR_MSG = #{errorMsg,jdbcType=VARCHAR},
       </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord">
     update A_APPROVAL_FLOW_RECORD
     set TASK_ID = #{taskId,jdbcType=VARCHAR},
-      EXECUTION_ID = #{executionId,jdbcType=VARCHAR},
-      TASK_NAME = #{taskName,jdbcType=VARCHAR},
-      BUS_ID = #{busId,jdbcType=VARCHAR},
-      BUS_TYPE = #{busType,jdbcType=VARCHAR},
-      APPROVAL_PERSON = #{approvalPerson,jdbcType=VARCHAR},
-      APPROVAL_DEP = #{approvalDep,jdbcType=VARCHAR},
-      APPROVAL_TIME = #{approvalTime,jdbcType=TIMESTAMP},
-      APPROVAL_RESULT = #{approvalResult,jdbcType=VARCHAR},
-      APPROVAL_OPINION = #{approvalOpinion,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
-      ERROR_MSG = #{errorMsg,jdbcType=VARCHAR}
+    EXECUTION_ID = #{executionId,jdbcType=VARCHAR},
+    TASK_NAME = #{taskName,jdbcType=VARCHAR},
+    BUS_ID = #{busId,jdbcType=VARCHAR},
+    BUS_TYPE = #{busType,jdbcType=VARCHAR},
+    APPROVAL_PERSON = #{approvalPerson,jdbcType=VARCHAR},
+    APPROVAL_DEP = #{approvalDep,jdbcType=VARCHAR},
+    APPROVAL_TIME = #{approvalTime,jdbcType=TIMESTAMP},
+    APPROVAL_RESULT = #{approvalResult,jdbcType=VARCHAR},
+    APPROVAL_OPINION = #{approvalOpinion,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    ACTIVITY_STATUS = #{activityStatus,jdbcType=DECIMAL},
+    ERROR_MSG = #{errorMsg,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
