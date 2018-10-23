@@ -35,7 +35,6 @@ import java.util.Map;
  */
 @Service("profitSupplyService")
 public class ProfitSupplyServiceImpl implements ProfitSupplyService {
-
     private static Logger logger = LoggerFactory.getLogger(ProfitSupplyServiceImpl.class);
 
     @Autowired

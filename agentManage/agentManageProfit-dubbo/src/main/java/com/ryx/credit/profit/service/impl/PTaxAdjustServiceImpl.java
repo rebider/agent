@@ -114,6 +114,8 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(tax.getUserId());
         record.setBusType(BusActRelBusType.POSTAX.name());
+        record.setAgentId(tax.getAgentPid());
+        record.setAgentName(tax.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("税点调整申请审批流启动成功");

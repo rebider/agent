@@ -136,4 +136,6 @@ public interface ProfitDeductionService {
     * @Date: 2018/10/15
     */
     BigDecimal getNotDeductionSum(String agentId);
+
+    int resetDataDeduction();
 }
