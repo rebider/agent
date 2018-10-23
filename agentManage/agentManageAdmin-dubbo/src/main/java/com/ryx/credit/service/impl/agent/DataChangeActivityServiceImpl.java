@@ -6,10 +6,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.agent.DateChangeRequestMapper;
-import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
@@ -67,6 +64,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private PlatFormMapper platFormMapper;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private AgentMapper agentMapper;
 
 
 
@@ -156,6 +155,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(dateChangeRequest.getDataType());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(dataChangeId);
+        Agent agent = agentMapper.selectByPrimaryKey(dataChangeId);
+        if(agent!=null)
+        record.setAgentName(agent.getAgName());
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
             throw  new MessageException("添加审批关系失败");
