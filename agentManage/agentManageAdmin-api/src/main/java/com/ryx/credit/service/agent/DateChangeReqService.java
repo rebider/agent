@@ -5,6 +5,8 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 
+import java.util.Map;
+
 /**
  * @ClassName DateChangeReqService
  * @Description 数据变更记录
@@ -24,5 +26,5 @@ public interface DateChangeReqService {
     /**
      * 数据变更的查询
      */
-    public PageInfo queryData( Page page,DateChangeRequest dateChangeRequest);
+    public PageInfo queryData( Page page,Map map);
 }

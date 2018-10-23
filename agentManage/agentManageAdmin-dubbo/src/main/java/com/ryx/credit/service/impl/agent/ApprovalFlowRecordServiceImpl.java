@@ -72,6 +72,12 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalDep())){
             criteria.andApprovalDepEqualTo(approvalFlowRecord.getApprovalDep());
         }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getAgentId())){
+            criteria.andAgentIdEqualTo(approvalFlowRecord.getAgentId());
+        }
+        if(StringUtils.isNotBlank(approvalFlowRecord.getAgentName())){
+            criteria.andAgentNameEqualTo(approvalFlowRecord.getAgentName());
+        }
         if(StringUtils.isNotBlank(approvalFlowRecord.getApprovalResult())){
             criteria.andApprovalResultEqualTo(approvalFlowRecord.getApprovalResult());
         }

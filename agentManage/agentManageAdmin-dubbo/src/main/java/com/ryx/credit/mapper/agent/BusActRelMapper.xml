@@ -1,34 +1,36 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.dao.agent.BusActRelMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.BusActRel" >
-    <id column="ACTIV_ID" property="activId" jdbcType="VARCHAR" />
-    <id column="BUS_ID" property="busId" jdbcType="VARCHAR" />
-    <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR" />
-    <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP" />
-    <result column="C_USER" property="cUser" jdbcType="VARCHAR" />
-    <result column="ACTIV_STATUS" property="activStatus" jdbcType="VARCHAR" />
-    <result column="STATUS" property="status" jdbcType="DECIMAL" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.BusActRelMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.BusActRel">
+    <id column="ACTIV_ID" jdbcType="VARCHAR" property="activId" />
+    <id column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="ACTIV_STATUS" jdbcType="VARCHAR" property="activStatus" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
   </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
                   and ${criterion.condition}
                 </when>
-                <when test="criterion.singleValue" >
+                <when test="criterion.singleValue">
                   and ${criterion.condition} #{criterion.value}
                 </when>
-                <when test="criterion.betweenValue" >
+                <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                 </when>
-                <when test="criterion.listValue" >
+                <when test="criterion.listValue">
                   and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                     #{listItem}
                   </foreach>
                 </when>
@@ -39,140 +41,162 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
-    ACTIV_ID, BUS_ID, BUS_TYPE, C_TIME, C_USER, ACTIV_STATUS, STATUS
+  <sql id="Base_Column_List">
+    ACTIV_ID, BUS_ID, BUS_TYPE, C_TIME, C_USER, ACTIV_STATUS, STATUS, AGENT_ID, AGENT_NAME
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" >
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
     from A_BUS_ACT_REL
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelKey" >
-    select 
+  <select id="selectByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelKey" resultMap="BaseResultMap">
+    select
     <include refid="Base_Column_List" />
     from A_BUS_ACT_REL
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
-      and BUS_ID = #{busId,jdbcType=VARCHAR}
+    and BUS_ID = #{busId,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample">
     delete from A_BUS_ACT_REL
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel" >
-    insert into A_BUS_ACT_REL (ACTIV_ID, BUS_ID, BUS_TYPE, 
-      C_TIME, C_USER, ACTIV_STATUS, 
-      STATUS)
-    values (#{activId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{activStatus,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL})
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
+    insert into A_BUS_ACT_REL (ACTIV_ID, BUS_ID, BUS_TYPE,
+    C_TIME, C_USER, ACTIV_STATUS,
+    STATUS, AGENT_ID, AGENT_NAME
+    )
+    values (#{activId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR},
+    #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{activStatus,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}
+    )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel" >
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
     insert into A_BUS_ACT_REL
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="activId != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="activId != null">
         ACTIV_ID,
       </if>
-      <if test="busId != null" >
+      <if test="busId != null">
         BUS_ID,
       </if>
-      <if test="busType != null" >
+      <if test="busType != null">
         BUS_TYPE,
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         C_TIME,
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         C_USER,
       </if>
-      <if test="activStatus != null" >
+      <if test="activStatus != null">
         ACTIV_STATUS,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="activId != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="activId != null">
         #{activId,jdbcType=VARCHAR},
       </if>
-      <if test="busId != null" >
+      <if test="busId != null">
         #{busId,jdbcType=VARCHAR},
       </if>
-      <if test="busType != null" >
+      <if test="busType != null">
         #{busType,jdbcType=VARCHAR},
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         #{cUser,jdbcType=VARCHAR},
       </if>
-      <if test="activStatus != null" >
+      <if test="activStatus != null">
         #{activStatus,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" resultType="java.lang.Long">
     select count(*) from A_BUS_ACT_REL
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
     update A_BUS_ACT_REL
-    <set >
-      <if test="busType != null" >
+    <set>
+      <if test="busType != null">
         BUS_TYPE = #{busType,jdbcType=VARCHAR},
       </if>
-      <if test="cTime != null" >
+      <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="cUser != null" >
+      <if test="cUser != null">
         C_USER = #{cUser,jdbcType=VARCHAR},
       </if>
-      <if test="activStatus != null" >
+      <if test="activStatus != null">
         ACTIV_STATUS = #{activStatus,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       </if>
     </set>
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
-      and BUS_ID = #{busId,jdbcType=VARCHAR}
+    and BUS_ID = #{busId,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel" >
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
     update A_BUS_ACT_REL
     set BUS_TYPE = #{busType,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      ACTIV_STATUS = #{activStatus,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL}
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    ACTIV_STATUS = #{activStatus,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR}
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
-      and BUS_ID = #{busId,jdbcType=VARCHAR}
+    and BUS_ID = #{busId,jdbcType=VARCHAR}
   </update>
-  <sql id="OracleDialectPrefix" >
-    <if test="page != null" >
-      select * from ( select row_.*, rownum rownum_ from ( 
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
-  <sql id="OracleDialectSuffix" >
-    <if test="page != null" >
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>

@@ -73,14 +73,7 @@ public class DateChangeReqServiceImpl implements DateChangeReqService{
     }
 
     @Override
-    public PageInfo queryData(Page page, DateChangeRequest dateChangeRequest) {
-        Map<String, Object> map = new HashMap<>();
-        if(null!=dateChangeRequest.getAppyStatus()){
-            map.put("appStatus",dateChangeRequest.getAppyStatus());
-        }
-        if(!StringUtils.isBlank(dateChangeRequest.getDataType())){
-            map.put("dataType",dateChangeRequest.getDataType());
-        }
+    public PageInfo queryData(Page page,Map map) {
         List<Map<String, Object>> dateChangeReqList = dateChangeRequestMapper.queryData(map,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(dateChangeReqList);
