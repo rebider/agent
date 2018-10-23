@@ -726,10 +726,12 @@ public class OrderServiceImpl implements OrderService {
         oPayment_db.setDownPayment(oPayment.getDownPayment());
         oPayment_db.setDownPaymentCount(oPayment.getDownPaymentCount());
         oPayment_db.setDownPaymentDate(oPayment.getDownPaymentDate());
+        oPayment_db.setDownPaymentUser(oPayment.getDownPaymentUser());
         oPayment_db.setActualReceipt(oPayment.getActualReceipt());
         oPayment_db.setCollectCompany(oPayment.getCollectCompany());
         oPayment_db.setRemark(oPayment.getRemark());
         oPayment_db.setActualReceiptDate(oPayment.getActualReceiptDate());
+        oPayment_db.setIsCloInvoice(oPayment.getIsCloInvoice());
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){
             oPayment_db.setDeductionType(oPayment.getDeductionType());
         }
