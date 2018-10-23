@@ -264,6 +264,11 @@ public class OSupplementServiceImpl implements OSupplementService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.PkType.name());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
+        if (null!=oSupplement.getAgentId()){
+            record.setAgentId(oSupplement.getAgentId());
+            Agent agent = agentMapper.selectByPrimaryKey(oSupplement.getAgentId());
+            record.setAgentName(agent.getAgName());
+        }
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("补款审批审批，启动审批异常，添加审批关系失败{}:{}", oSupplement.getId(), proce);
             throw new MessageException("添加审批关系失败");
