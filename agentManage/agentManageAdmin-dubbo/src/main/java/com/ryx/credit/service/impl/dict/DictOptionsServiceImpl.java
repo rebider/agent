@@ -42,7 +42,7 @@ public class DictOptionsServiceImpl implements DictOptionsService {
         DictExample example = new DictExample();
         DictExample.Criteria criteria = example.createCriteria();
         criteria.andDGroupEqualTo(group);
-        criteria.andDItemvalueEqualTo(itemValue);
+        criteria.andDItemvalueEqualTo(itemValue==null?"":itemValue);
         criteria.andDArtifactEqualTo(artifact);
         List<Dict> dicts = dictMapper.selectByExample(example);
         if (null == dicts || dicts.size() != 1) {

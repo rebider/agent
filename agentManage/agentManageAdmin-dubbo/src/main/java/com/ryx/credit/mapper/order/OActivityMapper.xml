@@ -430,6 +430,7 @@
     <where>
       o_activity.status=1
       <if test="notEqActcode!=null and notEqActcode!=''" > and o_activity.act_code!=#{notEqActcode} </if>
+      <if test="platform!=null and platform!=''" > and o_activity.platform=#{platform} </if>
       <if test="vender!=null and vender!=''" > and o_activity.vender=#{vender} </if>
       <if test="proModel!=null and proModel!=''" > and o_activity.pro_model=#{proModel} </if>
       <if test="productId!=null and productId!=''" > and o_activity.product_id=#{productId} </if>

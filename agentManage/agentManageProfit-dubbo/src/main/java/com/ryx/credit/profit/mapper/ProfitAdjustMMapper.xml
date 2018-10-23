@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitAdjustMMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitAdjustM">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="ADJUST_MAIN_ID" jdbcType="VARCHAR" property="adjustMainId" />
+    <result column="ADJUST_MAIN_NAME" jdbcType="VARCHAR" property="adjustMainName" />
+    <result column="ADJUST_SUB_ID" jdbcType="VARCHAR" property="adjustSubId" />
+    <result column="ADJUST_SUB_NAME" jdbcType="VARCHAR" property="adjustSubName" />
+    <result column="ADJUST_MTYPE" jdbcType="VARCHAR" property="adjustMtype" />
+    <result column="ADJUST_AMT" jdbcType="VARCHAR" property="adjustAmt" />
+    <result column="ADJUST_DATE" jdbcType="VARCHAR" property="adjustDate" />
+    <result column="ADJUST_CONTENT" jdbcType="VARCHAR" property="adjustContent" />
+    <result column="ADJUST_PERSON" jdbcType="VARCHAR" property="adjustPerson" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, ADJUST_MAIN_ID, ADJUST_MAIN_NAME, ADJUST_SUB_ID, ADJUST_SUB_NAME, ADJUST_MTYPE, 
+    ADJUST_AMT, ADJUST_DATE, ADJUST_CONTENT, ADJUST_PERSON
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitAdjustMExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PROFIT_ADJUST_M
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitAdjustMExample">
+    delete from PROFIT_ADJUST_M
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitAdjustM">
+    insert into PROFIT_ADJUST_M (ID, ADJUST_MAIN_ID, ADJUST_MAIN_NAME, 
+      ADJUST_SUB_ID, ADJUST_SUB_NAME, ADJUST_MTYPE, 
+      ADJUST_AMT, ADJUST_DATE, ADJUST_CONTENT, 
+      ADJUST_PERSON)
+    values (#{id,jdbcType=VARCHAR}, #{adjustMainId,jdbcType=VARCHAR}, #{adjustMainName,jdbcType=VARCHAR}, 
+      #{adjustSubId,jdbcType=VARCHAR}, #{adjustSubName,jdbcType=VARCHAR}, #{adjustMtype,jdbcType=VARCHAR}, 
+      #{adjustAmt,jdbcType=VARCHAR}, #{adjustDate,jdbcType=VARCHAR}, #{adjustContent,jdbcType=VARCHAR}, 
+      #{adjustPerson,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitAdjustM">
+    insert into PROFIT_ADJUST_M
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="adjustMainId != null">
+        ADJUST_MAIN_ID,
+      </if>
+      <if test="adjustMainName != null">
+        ADJUST_MAIN_NAME,
+      </if>
+      <if test="adjustSubId != null">
+        ADJUST_SUB_ID,
+      </if>
+      <if test="adjustSubName != null">
+        ADJUST_SUB_NAME,
+      </if>
+      <if test="adjustMtype != null">
+        ADJUST_MTYPE,
+      </if>
+      <if test="adjustAmt != null">
+        ADJUST_AMT,
+      </if>
+      <if test="adjustDate != null">
+        ADJUST_DATE,
+      </if>
+      <if test="adjustContent != null">
+        ADJUST_CONTENT,
+      </if>
+      <if test="adjustPerson != null">
+        ADJUST_PERSON,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustMainId != null">
+        #{adjustMainId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustMainName != null">
+        #{adjustMainName,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustSubId != null">
+        #{adjustSubId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustSubName != null">
+        #{adjustSubName,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustMtype != null">
+        #{adjustMtype,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustAmt != null">
+        #{adjustAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustDate != null">
+        #{adjustDate,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustContent != null">
+        #{adjustContent,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustPerson != null">
+        #{adjustPerson,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitAdjustMExample" resultType="java.lang.Long">
+    select count(*) from PROFIT_ADJUST_M
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
