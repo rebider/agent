@@ -231,9 +231,6 @@
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
     </if>
   </sql>
-  <sql id="SORTING">
-    ORDER BY MERGE_DATE DESC
-  </sql>
   <sql id="PAGING_END">
     <if test="begin != null  and end != null and end &gt;0">
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}

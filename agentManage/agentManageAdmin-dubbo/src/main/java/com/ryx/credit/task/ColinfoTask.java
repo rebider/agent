@@ -197,7 +197,7 @@ public class ColinfoTask {
                 }
                 JSONArray jsonArray = JSONObject.parseArray(String.valueOf(resultMap.get("info")));
                 Map<String, Object> resultInfoMap = JsonUtil.jsonToMap(JsonUtil.objectToJson(jsonArray.get(0)));
-                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.A.getValue())){
+                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.A.getValue()) && StringUtils.isNotBlank(TransFlag.getContentByValue(String.valueOf(resultInfoMap.get("flag"))))){
                     agentColinfoService.updateByPaymentResult(aColinfoPayment,resultInfoMap);
                     if(String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.B.getValue())){
                         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
