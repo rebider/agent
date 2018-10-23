@@ -1433,7 +1433,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     //===============================================================================
                     //进行机具调整操作
-                    if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg)){
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
@@ -1468,7 +1468,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
-                    }else if(proType.equals(PlatformType.MPOS.msg)){
+                    }else{
 
 
                         //起始sn
@@ -1535,9 +1535,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                             }
                         }
-                    }else{
-                        log.info("导入物流：平台类型错误{}",JSONObject.toJSONString(oLogistics));
-                        throw new MessageException("平台类型错误");
                     }
                 }
             }else{
