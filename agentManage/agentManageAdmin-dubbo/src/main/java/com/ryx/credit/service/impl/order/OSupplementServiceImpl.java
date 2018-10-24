@@ -390,6 +390,9 @@ public class OSupplementServiceImpl implements OSupplementService {
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
                 oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
+                if (null != supplement && null != supplement.getRemitTime())
+                oPaymentDetail.setPayTime(supplement.getRemitTime());
+                else
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
@@ -468,6 +471,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             OSupplement oSupplement = new OSupplement();
             oSupplement.setId(agentVo.getSupplementId());
             oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
+            oSupplement.setRemitTime(agentVo.getRemitTime());
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("实际金额保存失败");
                 throw new MessageException("实际金额保存失败");
