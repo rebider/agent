@@ -105,15 +105,16 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
     }
 
     @Override
-    public TransProfitDetail getTransProfitDetail(String busNum, String profitDate, String agentType) {
-        if(StringUtils.isBlank(busNum)){
+    public TransProfitDetail getTransProfitDetail(String agentId, String profitDate, String agentType) {
+        if(StringUtils.isBlank(agentId)){
             return null;
         }
         TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
         criteria.andProfitDateEqualTo(profitDate);
-        criteria.andBusNumEqualTo(busNum);
+        criteria.andAgentIdEqualTo(agentId);
         criteria.andAgentTypeEqualTo(agentType);
+        criteria.andBusCodeEqualTo("100003");
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
         if(transProfitDetails != null && !transProfitDetails.isEmpty()){
             return transProfitDetails.get(0);
@@ -122,37 +123,40 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
     }
 
     @Override
-    public List<TransProfitDetail> getChildTransProfitDetailList(String busNum, List<String> profitDate, String agentType) {
-        if(StringUtils.isBlank(busNum)){
+    public List<TransProfitDetail> getChildTransProfitDetailList(String agentId, List<String> profitDate, String agentType) {
+        if(StringUtils.isBlank(agentId)){
             return null;
         }
         TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
         criteria.andProfitDateIn(profitDate);
-        criteria.andBusNumEqualTo(busNum);
+        criteria.andAgentIdEqualTo(agentId);
         criteria.andAgentTypeEqualTo(agentType);
+        criteria.andBusCodeEqualTo("100003");
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
         return transProfitDetails;
     }
 
     @Override
-    public List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, String profitDate, String agentType) {
+    public List<TransProfitDetail> getChildTransProfitDetailList(List<String> agentId, String profitDate, String agentType) {
         TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
         criteria.andProfitDateEqualTo(profitDate);
-        criteria.andBusNumIn(busNum);
+        criteria.andAgentIdIn(agentId);
         criteria.andAgentTypeEqualTo(agentType);
+        criteria.andBusCodeEqualTo("100003");
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
         return transProfitDetails;
     }
 
     @Override
-    public List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, List<String> profitDate, String agentType) {
+    public List<TransProfitDetail> getChildTransProfitDetailList(List<String> agentId, List<String> profitDate, String agentType) {
         TransProfitDetailExample transProfitDetailExample = new TransProfitDetailExample();
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
         criteria.andProfitDateIn(profitDate);
-        criteria.andBusNumIn(busNum);
+        criteria.andAgentIdIn(agentId);
         criteria.andAgentTypeEqualTo(agentType);
+
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
         return transProfitDetails;
     }

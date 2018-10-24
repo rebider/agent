@@ -49,23 +49,32 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computeToolsDeduct() throws Exception {
-        Map<String, Object> map = new HashMap<String, Object>(10);
-        map.put("agentPid", "AG20180809000000000005966"); //AG20180813000000000006020
-        map.put("paltformNo", "100003");        //平台编号
-        map.put("agentProfitAmt", "0");        //代理商分润
-        map.put("computType", "1");        //类型
-        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-        Map<String, Object> newMap = new HashMap<String, Object>(10);
-        newMap.put("id","P_PROFIT_DETAIL_M20180920000000000128510");
-        newMap.put("basicAmt","16.66");
-        Map<String, Object> newMa1p = new HashMap<String, Object>(10);
-        newMa1p.put("id","P_PROFIT_DETAIL_M20180920000000000128572");
-        newMa1p.put("basicAmt", "80");
-        list.add(newMap);
-        list.add(newMa1p);
-        map.put("hbList", list);
+        Map<String, Object> map = new HashMap<>(10);
+        map.put("agentType", "3");
+        map.put("agentId", "AG20180726000000000001230");
+        map.put("posTranAmt", "8056974.83");
+        map.put("posJlTranAmt", "8048081.83");
         map = profitToolsDeductService.execut(map);
         System.out.println(map.toString());
+
+
+//        Map<String, Object> map = new HashMap<String, Object>(10);
+//        map.put("agentPid", "AG20180809000000000005966"); //AG20180813000000000006020
+//        map.put("paltformNo", "100003");        //平台编号
+//        map.put("agentProfitAmt", "0");        //代理商分润
+//        map.put("computType", "1");        //类型
+//        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+//        Map<String, Object> newMap = new HashMap<String, Object>(10);
+//        newMap.put("id","P_PROFIT_DETAIL_M20180920000000000128510");
+//        newMap.put("basicAmt","16.66");
+//        Map<String, Object> newMa1p = new HashMap<String, Object>(10);
+//        newMa1p.put("id","P_PROFIT_DETAIL_M20180920000000000128572");
+//        newMa1p.put("basicAmt", "80");
+//        list.add(newMap);
+//        list.add(newMa1p);
+//        map.put("hbList", list);
+//        map = profitToolsDeductService.execut(map);
+//        System.out.println(map.toString());
     }
 
     @Test
