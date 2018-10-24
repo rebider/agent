@@ -37,4 +37,6 @@ public interface TransProfitDetailMapper {
     List<TransProfitDetail> selectByIdAndMonth(TransProfitDetail record);
 
     int updateByPrimaryKeySelective(TransProfitDetail record);
+
+    BigDecimal selectAmtBySummary(String profitDate);
 }

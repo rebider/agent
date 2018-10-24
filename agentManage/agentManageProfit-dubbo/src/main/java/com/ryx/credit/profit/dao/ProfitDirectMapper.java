@@ -50,4 +50,6 @@ public interface ProfitDirectMapper {
     List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect);
     //直发分润修改状态
     void  updateByStatus(ProfitDirect profitDirectSingleList);
+
+    BigDecimal selectAmtByDeal(String transMonth);
 }
