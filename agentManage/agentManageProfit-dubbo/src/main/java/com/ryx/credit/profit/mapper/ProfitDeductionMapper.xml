@@ -421,4 +421,9 @@
     WHERE N.DEDUCTION_DATE = #{deductDate}
     AND N.DEDUCTION_TYPE = '02')
   </select>
+
+  <delete id="resetDataDeduction">
+    delete from P_DEDUCTION
+    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyymm')
+  </delete>
 </mapper>

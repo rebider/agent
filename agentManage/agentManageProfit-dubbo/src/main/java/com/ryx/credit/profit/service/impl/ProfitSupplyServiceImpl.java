@@ -35,7 +35,6 @@ import java.util.Map;
  */
 @Service("profitSupplyService")
 public class ProfitSupplyServiceImpl implements ProfitSupplyService {
-
     private static Logger logger = LoggerFactory.getLogger(ProfitSupplyServiceImpl.class);
 
     @Autowired
@@ -74,8 +73,9 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
     }
 
     @Override
-    public int insertSelective(ProfitSupply record) {
-        return pProfitSupplyMapper.insertSelective(record);
+    public int insertSelective(ProfitSupply profitSupply) {
+        profitSupply.setId(idService.genId(TabId.p_profit_supply));
+        return pProfitSupplyMapper.insertSelective(profitSupply);
     }
 
     @Override

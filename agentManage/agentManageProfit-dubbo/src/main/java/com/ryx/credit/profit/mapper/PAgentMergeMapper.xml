@@ -220,16 +220,16 @@
     <include refid="Base_Column_List" />
     FROM P_AGENT_MERGE
     <include refid="BASE_WHERE_SQL" />
-    <include refid="SORTING" />
+    <include refid="SORT" />
     <include refid="PAGING_END" />
   </select>
+  <sql id='SORT'>
+    ORDER BY MERGE_DATE DESC
+  </sql>
   <sql id="PAGING_START">
     <if test="begin != null  and end != null and end &gt;0">
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
     </if>
-  </sql>
-  <sql id="SORTING">
-    ORDER BY MERGE_DATE DESC
   </sql>
   <sql id="PAGING_END">
     <if test="begin != null  and end != null and end &gt;0">

@@ -307,7 +307,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         record.setActivId(proceId);
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(userId);
+        record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.THAW.name());
+        record.setAgentId(profitUnfreeze.getAgentId());
+        record.setAgentName(profitUnfreeze.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);
             LOG.info("月分润解冻申请审批流启动成功");
@@ -786,8 +789,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             map.put("agentType", detail.getAgentType());
             map.put("agentId", detail.getBusNum());
             map.put("agentPid", detail.getAgentId());
-            map.put("posTranAmt", detail.getInTransAmt());
-            map.put("posJlTranAmt", detail.getPosRewardAmt());
+            map.put("posTranAmt", detail.getPosRewardAmt());
+            map.put("posJlTranAmt", detail.getPosCreditAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
                 BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
