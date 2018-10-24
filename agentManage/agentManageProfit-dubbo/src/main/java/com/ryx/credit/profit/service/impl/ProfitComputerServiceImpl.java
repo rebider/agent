@@ -429,22 +429,15 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     }
 
-//    @Test
-//    public void test(){
-//        String transDate = "201809";
-//        BigDecimal tranAmount = synchroSSTotalTransAmt(transDate);
-//        System.out.println(tranAmount);
-//    }
-
     /**
      * 同步手刷月分润交易汇总
      * @param transDate 交易日期（空则为上一月）
      */
     @Override
     public BigDecimal synchroSSTotalTransAmt(String transDate){
-        BigDecimal tranAmount = synchroAmt(transDate);
+        BigDecimal tranAmount = synchroAmt(transDate);//汇总手刷交易金额
 
-        BigDecimal zfAmount = synchZFAmt(transDate);
+        BigDecimal zfAmount = synchZFAmt(transDate);//汇总直发交易金额
 
         return tranAmount.add(zfAmount);
     }
