@@ -429,6 +429,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     }
 
+//    @Test
+//    public void test(){
+//        synchroSSTotalTransAmt("201809");
+//    }
+
     /**
      * 同步手刷月分润交易汇总
      * @param transDate 交易日期（空则为上一月）
@@ -448,7 +453,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      */
     public BigDecimal synchroAmt(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
+        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
@@ -481,7 +486,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      */
     public BigDecimal synchZFAmt(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("frmonth",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
+        map.put("frmonth",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
