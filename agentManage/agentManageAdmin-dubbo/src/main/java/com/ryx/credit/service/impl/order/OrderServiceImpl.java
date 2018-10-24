@@ -2904,4 +2904,18 @@ public class OrderServiceImpl implements OrderService {
         if(res==null)return BigDecimal.ZERO;
         return BigDecimal.valueOf(res);
     }
+
+    @Override
+    public AgentResult updateStatus(String id, String user) {
+        if (null == user) return AgentResult.fail("操作用户不能为空");
+        if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        OOrder oOrder = new OOrder();
+        oOrder.setId(id);
+        oOrder.setuUser(user);
+        oOrder.setStatus(Status.STATUS_0.status);
+        if (1==orderMapper.updateByPrimaryKeySelective(oOrder)){
+            return AgentResult.ok("成功");
+        }
+        return AgentResult.fail();
+    }
 }
