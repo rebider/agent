@@ -160,8 +160,11 @@ public class CompensateServiceImpl implements CompensateService {
         if(compensateLList.size()==0){
             throw new ProcessException("sn号在审批中或已退货");
         }
-        String proNum = String.valueOf(compensateLList.get(0).get("PRO_NUM"));
-        if(!proNum.equals(count)){
+        BigDecimal proNumSum = new BigDecimal(0);
+        for (Map<String, Object> stringObjectMap : compensateLList) {
+            proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
+        }
+        if(!String.valueOf(proNumSum).equals(count)){
             throw new ProcessException("sn号数量不匹配");
         }
         //判断是否是自己省区下的订单
