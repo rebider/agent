@@ -71,7 +71,7 @@ public class NewProfitDataJob {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
 
 
-    @Scheduled(cron = "0 40 11 22 * ?")
+    @Scheduled(cron = "0 0 11 10 * ?")
     public void deal() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+profitDate);
