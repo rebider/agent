@@ -33,6 +33,8 @@ public class OSupplement implements Serializable {
 
     private BigDecimal version;
 
+    private Date remitTime;
+
     public String getId() {
         return id;
     }
@@ -143,5 +145,13 @@ public class OSupplement implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public Date getRemitTime() {
+        return remitTime;
+    }
+
+    public void setRemitTime(Date remitTime) {
+        this.remitTime = remitTime;
     }
 }

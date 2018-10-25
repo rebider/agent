@@ -30,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -78,7 +80,7 @@ public class RefundJob {
 
 
 
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         // 上月的开始及结束日期
         JSONObject param = new JSONObject();
@@ -246,6 +248,7 @@ public class RefundJob {
         query.setAgentPid(deduction.getAgentPid());
         query.setDeductionType(DeductionType.SETTLE_ERR.getType());
         query.setParentAgentPid(deduction.getParentAgentPid());
+        query.setActualDeductionAmt(BigDecimal.ZERO);
         List<ProfitDeduction> profitDeductions = profitDeductionService.getProfitDeduction(query);
         if (profitDeductions != null && profitDeductions.size() > 0) {
             return profitDeductions.stream().map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).get();

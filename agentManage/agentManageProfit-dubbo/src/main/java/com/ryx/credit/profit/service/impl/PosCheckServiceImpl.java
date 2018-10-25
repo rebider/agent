@@ -166,6 +166,8 @@ public class PosCheckServiceImpl implements IPosCheckService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(userId);
         record.setBusType(BusActRelBusType.POSCHECK.name());
+        record.setAgentId(posCheck.getAgentPid());
+        record.setAgentName(posCheck.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("分润比例考核审批流启动成功");

@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
@@ -21,6 +23,8 @@ import com.ryx.credit.profit.service.ProfitDeducttionDetailService;
 import com.ryx.credit.profit.service.ProfitSupplyService;
 import com.ryx.credit.profit.service.StagingService;
 import com.ryx.credit.service.dict.IdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,21 +44,20 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ProfitDeductionServiceImpl implements ProfitDeductionService {
+    private static Logger logger = LoggerFactory.getLogger(ProfitDeductionServiceImpl.class);
 
     @Autowired
     private ProfitDeductionMapper profitDeductionMapper;
-
     @Autowired
     private StagingService stagingServiceImpl;
-
     @Autowired
     private IdService idService;
-
     @Autowired
     private ProfitDeducttionDetailService profitDeducttionDetailServiceImpl;
-
     @Autowired
     private ProfitSupplyService profitSupplyServiceImpl;
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page) {
@@ -200,6 +203,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
+        }
+        if (profitDeduction.getActualDeductionAmt() != null && profitDeduction.getActualDeductionAmt().doubleValue()==0){
+            criteria.andActualDeductionAmtIsNotNull();
         }
         if (StringUtils.isNotBlank(profitDeduction.getRemark())){
             if (!"POS考核扣款（新国都、瑞易送）".equals(profitDeduction.getRemark()) && !"手刷考核扣款（小蓝牙、MPOS）".equals(profitDeduction.getRemark())) {
@@ -607,4 +613,22 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         BigDecimal deductionAmt = profitDeductionMapper.getCurrentDeductionAmtSum(profitDeduction);
         return (stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt).add((deductionAmt==null?BigDecimal.ZERO:deductionAmt));
     }
+
+    /**
+     * 清除本月导入
+     * @return
+     */
+    @Override
+    public int resetDataDeduction() {
+        // 终审后不能清除
+        String finalStatus = redisService.getValue("commitFinal");
+        if (StringUtils.isBlank(finalStatus)) {
+            if("1".equals(finalStatus)){
+                logger.info("终审状态不能清除！");
+                throw new ProcessException("终审状态不能清除！");
+            }
+        }
+        return profitDeductionMapper.resetDataDeduction();
+    }
+
 }

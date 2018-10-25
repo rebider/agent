@@ -76,7 +76,7 @@
     where
     DIFF_DATE = #{diffDate,jdbcType=VARCHAR}
     AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
-    <if test="parentAgentId != null">
+    <if test="parentAgentid != null">
       AND PARENT_AGENTID=#{parentAgentid,jdbcType=VARCHAR}
     </if>
   </select>

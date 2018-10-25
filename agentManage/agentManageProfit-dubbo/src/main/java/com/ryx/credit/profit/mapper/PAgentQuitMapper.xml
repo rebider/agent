@@ -293,7 +293,7 @@
     LEFT JOIN A_AGENT A ON P.AGENT_ID = A.ID
     LEFT JOIN A_CAPITAL C ON P.KETUBBAH_ID = C.ID
     <include refid="BASE_WHERE_SQL"></include>
-    <include refid="SORTING"></include>
+    <include refid="SORTORD"></include>
     <include refid="PAGING_END" />
   </select>
 
@@ -323,7 +323,7 @@
     </where>
   </sql>
 
-  <sql id='SORTING'>
+  <sql id='SORTORD'>
     ORDER BY P.CREATE_DATE DESC
   </sql>
 
