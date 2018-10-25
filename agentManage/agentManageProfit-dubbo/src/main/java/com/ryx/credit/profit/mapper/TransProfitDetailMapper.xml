@@ -343,4 +343,14 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectAmtBySummary" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
+  select
+  SUM(IN_TRANS_AMT)
+  from TRANS_PROFIT_DETAIL
+  where
+  PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+  AND SOURCE_INFO = 'MPOS'
+</select>
+
 </mapper>

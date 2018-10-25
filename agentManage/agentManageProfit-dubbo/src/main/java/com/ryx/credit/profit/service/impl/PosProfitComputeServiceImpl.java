@@ -7,13 +7,14 @@ import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.agent.AgentBusinfoService;
-import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -62,34 +63,34 @@ public class PosProfitComputeServiceImpl implements DeductService {
         posMap.put("posRewardAmt", BigDecimal.ZERO);
         posMap.put("posAssDeductAmt", BigDecimal.ZERO);
 
-        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         if(Objects.equals(map.get("agentType"), AGENT_TYPE_2) || Objects.equals(map.get("agentType"), AGENT_TYPE_6)){
-            LOG.info("POS奖励，代理商ID：{}，POS交易金额：{}，POS贷记交易金额：{}",
+            LOG.info("POS奖励，代理商AG：{}，POS交易金额：{}，POS贷记交易金额：{}",
                     map.get("agentId"), map.get("posTranAmt"), map.get("posJlTranAmt"));
             PosReward posReward = new PosReward();
             posReward.setAgentId(map.get("agentId").toString());
             posReward.setApplyStatus("1");
             List<PosReward> posRewardList = iPosRewardService.selectByMonth(posReward);
             if(posRewardList == null || posRewardList.isEmpty()){
-                this.obtainRewardTemp(deductDate, posMap);
+                this.obtainRewardTemp(currentDate, posMap);
             } else {
-                this.specialRewardTemp(deductDate, posRewardList, posMap);
+                this.specialRewardTemp(currentDate, posRewardList, posMap);
             }
 
             posRewardList.forEach(posReward1 -> {
                 /** 到达考核月份，执行季度考核*/
-                if(Objects.equals(posReward1.getTotalEndMonth(), deductDate)){
+                if(Objects.equals(posReward1.getTotalEndMonth(), currentDate)){
                     quarterAssessment(posReward1, posMap);
                 }
             });
         } else if(Objects.equals(map.get("agentType"), AGENT_TYPE_3)){
             this.obtainParentAgentId(posMap);
-            this.obtainRewardTemp(deductDate, posMap);
+            this.obtainRewardTemp(currentDate, posMap);
             if(new BigDecimal(posMap.get("posRewardAmt").toString()).compareTo(BigDecimal.ZERO) > 0
                     && posMap.get("parentAgentId") != null){
                 LOG.info("POS奖励，代理商ID：{}，准备进行扣减上级代理商分润。",map.get("agentId"));
                 if(Objects.equals(posMap.get("computType"), "1")){
-                    this.deductParentAgentPosRewardAmt(deductDate, posMap);
+                    this.deductParentAgentPosRewardAmt(currentDate, posMap);
                 }
             }
         }
@@ -101,23 +102,24 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
     /**
      * 获取代理商特殊POS奖励模板
-     * @param deductDate
+     * @param currentDate
      * @param posRewardList
      * @param map
      */
-    private void specialRewardTemp(String deductDate, List<PosReward> posRewardList, Map<String, Object> map) {
+    private void specialRewardTemp(String currentDate, List<PosReward> posRewardList, Map<String, Object> map) {
         posRewardList.forEach(posReward1 -> {
             if(posReward1.getTotalConsMonth().contains("~")){
                 String[] spl = posReward1.getTotalConsMonth().trim().split("~");
-                for (int i = 0; i < spl.length; i++) {
-                    if(Objects.equals(spl[i], deductDate)){
-                        LOG.info("代理商ID：{}，代理商特殊奖励活动生效月份：{}", map.get("agentId"), deductDate);
-                        this.specialTranOrCreditAmt(posReward1, map, deductDate);
+                List<String> list = getMonthBetween(spl[0], spl[1]);
+                list.forEach(totalConsMonth -> {
+                    if(Objects.equals(totalConsMonth, currentDate)){
+                        LOG.info("代理商ID：{}，代理商特殊奖励活动生效月份：{}", map.get("agentId"), currentDate);
+                        this.specialTranOrCreditAmt(posReward1, map, currentDate);
                     }
-                }
+                });
             } else {
-                if(Objects.equals(posReward1.getTotalConsMonth(), deductDate)){
-                    this.specialTranOrCreditAmt(posReward1, map, deductDate);
+                if(Objects.equals(posReward1.getTotalConsMonth(), currentDate)){
+                    this.specialTranOrCreditAmt(posReward1, map, currentDate);
                 }
             }
         });
@@ -127,9 +129,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * 本月上送贷记交易金额+本月下级贷记交易金额 - 上月贷记对比月贷记交易金额+上月下级贷记对比月贷记交易金额 =POS奖励贷记交易金额 * 特殊奖励金额
      * @param posReward1 特殊奖励模板
      * @param map
-     * @param deductDate
+     * @param currentDate
      */
-    private void specialTranOrCreditAmt(PosReward posReward1, Map<String, Object> map, String deductDate) {
+    private void specialTranOrCreditAmt(PosReward posReward1, Map<String, Object> map, String currentDate) {
         LOG.info("代理商ID：{}，执行特殊POS奖励模板：{}", map.get("agentId"), JSONObject.toJSON(posReward1));
         String agentType = null;
         if(Objects.equals(AGENT_TYPE_2, map.get("agentType"))){
@@ -161,18 +163,18 @@ public class PosProfitComputeServiceImpl implements DeductService {
             LOG.info("代理商ID：{}，下级贷记对比月贷记交易总金额：{}", map.get("agentId"), oldChildPosCreditAmt);
             oldPosCreditAmt = oldPosCreditAmt.add(oldChildPosCreditAmt);
             LOG.info("代理商ID：{}，贷记对比月贷记交易汇总金额：{}", map.get("agentId"),  oldPosCreditAmt);
-            LOG.info("查询当前执行月下级贷记交易金额，代理商ID：{}，当前执行月：{}", map.get("agentId"), deductDate);
-            List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, deductDate.replace("-",""), agentType);
+            LOG.info("查询活动生效月下级贷记交易金额，代理商ID：{}，当前活动生效月：{}", map.get("agentId"), currentDate);
+            List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, currentDate.replace("-",""), agentType);
             BigDecimal newChildPosCreditAmt= BigDecimal.ZERO;
             if(newlist != null && !newlist.isEmpty()){
                 for(TransProfitDetail detail1 : newlist){
                     newChildPosCreditAmt = newChildPosCreditAmt.add(detail1.getPosCreditAmt());
                 }
             }
-            LOG.info("代理商ID：{}，当前执行月下级贷记交易总金额：{}", map.get("agentId"), newChildPosCreditAmt);
+            LOG.info("代理商ID：{}，当前活动生效月下级贷记交易总金额：{}", map.get("agentId"), newChildPosCreditAmt);
             newPosCreditAmt = newPosCreditAmt.add(newChildPosCreditAmt);
         }
-        LOG.info("代理商ID：{}，当前执行月贷记交易汇总金额：{}", map.get("agentId"),  newPosCreditAmt);
+        LOG.info("代理商ID：{}，当前活动生效月贷记交易汇总金额：{}", map.get("agentId"),  newPosCreditAmt);
         this.computeSpecialPosReward(oldPosCreditAmt, newPosCreditAmt, posReward1.getRewardScale(), map);
     }
 
@@ -197,10 +199,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
     /**
      * 获取POS通用奖励模板
-     * @param deductDate
+     * @param currentDate
      * @param map
      */
-    private void obtainRewardTemp(String deductDate, Map<String, Object> map) {
+    private void obtainRewardTemp(String currentDate, Map<String, Object> map) {
         List<PosRewardTemplate> posRewardTemplates =  this.getPosRewardTemplateList();
         if(posRewardTemplates == null || posRewardTemplates.isEmpty()){
             LOG.info("业务部门未配置通用奖励模板");
@@ -215,18 +217,20 @@ public class PosProfitComputeServiceImpl implements DeductService {
         for (PosRewardTemplate posRewardTemplate: posRewardTemplates){
             if(posRewardTemplate.getActivityValid().contains("~")) {
                 String[] spl = posRewardTemplate.getActivityValid().trim().split("~");
-                for (int i = 0; i < spl.length; i++) {
-                    if(Objects.equals(spl[i], deductDate)) {
-                        LOG.info("代理商ID：{}，通用POS奖励活动生效月份：{}", map.get("agentId"), deductDate);
-                        this.executcompute(deductDate, posRewardTemplate, map, agentType);
+                List<String> list = getMonthBetween(spl[0], spl[1]);
+                String finalAgentType = agentType;
+                list.forEach(activitDate -> {
+                    if(Objects.equals(activitDate, currentDate)){
+                        LOG.info("代理商ID：{}，通用POS奖励活动生效月份：{}", map.get("agentId"), currentDate);
+                        this.executcompute(currentDate, posRewardTemplate, map, finalAgentType);
                         if(new BigDecimal(map.get("posRewardAmt").toString()).compareTo(BigDecimal.ZERO) > 0){
                             return;
                         }
                     }
-                }
+                });
             } else {
-                if(Objects.equals(posRewardTemplate.getActivityValid(), deductDate)){
-                    this.executcompute(deductDate, posRewardTemplate, map, agentType);
+                if(Objects.equals(posRewardTemplate.getActivityValid(), currentDate)){
+                    this.executcompute(currentDate, posRewardTemplate, map, agentType);
                 }
             }
         }
@@ -252,10 +256,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
         }
     }
 
-    private void executcompute(String deductDate, PosRewardTemplate posRewardTemplate, Map<String, Object> map, String agentType) {
-        BigDecimal traninTransAmt = this.queryTranContrastMonthAmt(deductDate.replace("-",""), posRewardTemplate.getTranContrastMonth().replace("-", ""), map, agentType);
+    private void executcompute(String currentDate, PosRewardTemplate posRewardTemplate, Map<String, Object> map, String agentType) {
+        BigDecimal traninTransAmt = this.queryTranContrastMonthAmt(currentDate.replace("-",""), posRewardTemplate.getTranContrastMonth().replace("-", ""), map, agentType);
         if(tranCountThreshold(traninTransAmt, posRewardTemplate, map)){
-            BigDecimal creditposRewardAmt = this.queryCreditContrastMonthAmt(deductDate.replace("-",""), posRewardTemplate.getCreditTranContrastMonth().replace("-", ""), map, agentType);
+            BigDecimal creditposRewardAmt = this.queryCreditContrastMonthAmt(currentDate.replace("-",""), posRewardTemplate.getCreditTranContrastMonth().replace("-", ""), map, agentType);
             if(creditposRewardAmt.compareTo(BigDecimal.ZERO) > 0){
                 BigDecimal posRewardAmt = creditposRewardAmt.multiply(posRewardTemplate.getProportion()).setScale(2,BigDecimal.ROUND_HALF_UP);
                 LOG.info("代理商ID：{}，POS奖励金额：{}，奖励比例：{}", map.get("agentId"), posRewardAmt, posRewardTemplate.getProportion());
@@ -273,7 +277,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param tranContrastMonth
      * @param map
      */
-    private BigDecimal queryTranContrastMonthAmt(String deductDate, String tranContrastMonth, Map<String, Object> map, String agentType) {
+    private BigDecimal queryTranContrastMonthAmt(String currentDate, String tranContrastMonth, Map<String, Object> map, String agentType) {
         LOG.info("查询对比月交易金额，代理商ID：{}，交易对比月：{}", map.get("agentId"), tranContrastMonth);
         TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(map.get("agentId").toString(),
                 tranContrastMonth, map.get("agentType").toString());
@@ -284,7 +288,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
         BigDecimal oldInTransAmt = transProfitDetail.getPosRewardAmt() == null ? BigDecimal.ZERO :transProfitDetail.getPosRewardAmt();
         BigDecimal newInTransAmt = new BigDecimal(map.get("posTranAmt").toString());
         if(Objects.equals(map.get("agentType"), AGENT_TYPE_2) || Objects.equals(map.get("agentType"), AGENT_TYPE_6)){
-            LOG.info("代理商ID：{}，该代理商为机构或者标准一代，查询下级机构业务编码", map.get("agentId"));
+            LOG.info("代理商ID：{}，该代理商为机构或者标准一代，查询下级机构AG编码", map.get("agentId"));
             List<String> agentIdList = this.queryChildLevelByBusNum(map);
             if(agentIdList.size() > 0){
                 BigDecimal oldChildInTransAmt = BigDecimal.ZERO;
@@ -297,14 +301,14 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     oldInTransAmt = oldInTransAmt.add(oldChildInTransAmt);
                 }
 
-                LOG.info("查询当前执行月下级交易金额，代理商ID：{}，当前执行月：{}", map.get("agentId"), deductDate);
+                LOG.info("查询活动生效月下级交易金额，代理商ID：{}，当前执行月：{}", map.get("agentId"), currentDate);
                 BigDecimal newChildInTransAmt = BigDecimal.ZERO;
-                List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, deductDate, agentType);
+                List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, currentDate, agentType);
                 if(newlist != null && !newlist.isEmpty()){
                     for(TransProfitDetail detail1 : newlist){
                         newChildInTransAmt = newChildInTransAmt.add(detail1.getPosRewardAmt() == null ? BigDecimal.ZERO : detail1.getPosRewardAmt());
                     }
-                    LOG.info("代理商ID：{}，当前执行月下级商户交易汇总金额：{}", map.get("agentId"), newChildInTransAmt);
+                    LOG.info("代理商ID：{}，当前活动生效月下级商户交易汇总金额：{}", map.get("agentId"), newChildInTransAmt);
                     newInTransAmt = newInTransAmt.add(newChildInTransAmt);
                 }
             } else {
@@ -312,7 +316,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
             }
         }
         LOG.info("代理商ID：{}，交易对比月交易汇总金额：{}", map.get("agentId"),  oldInTransAmt);
-        LOG.info("代理商ID：{}，当前执行月交易汇总金额：{}", map.get("agentId"),  newInTransAmt);
+        LOG.info("代理商ID：{}，活动生效月月交易汇总金额：{}", map.get("agentId"),  newInTransAmt);
         BigDecimal inTransAmt = newInTransAmt.subtract(oldInTransAmt);
         LOG.info("代理商ID：{}，交易汇总金额差值：{}", map.get("agentId"),  inTransAmt);
         return  inTransAmt;
@@ -341,7 +345,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param creditTranContrastMonth
      * @param map
      */
-    private BigDecimal queryCreditContrastMonthAmt(String deductDate, String creditTranContrastMonth, Map<String, Object> map, String agentType) {
+    private BigDecimal queryCreditContrastMonthAmt(String currentDate, String creditTranContrastMonth, Map<String, Object> map, String agentType) {
         LOG.info("查询对比月贷记交易金额，代理商ID：{}，贷记交易对比月：{}", map.get("agentId"), creditTranContrastMonth);
         TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(map.get("agentId").toString(),
                 creditTranContrastMonth, map.get("agentType").toString());
@@ -365,14 +369,14 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     oldPosRewardAmt = oldPosRewardAmt.add(oldChildPosRewardAmt);
                 }
 
-                LOG.info("查询当前执行月下级贷记交易金额，代理商ID：{}，当前执行月：{}", map.get("agentId"), deductDate);
+                LOG.info("查询活动生效月下级贷记交易金额，代理商ID：{}，当前活动生效月：{}", map.get("agentId"), currentDate);
                 BigDecimal newChildPosRewardAmt = BigDecimal.ZERO;
-                List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, deductDate, agentType);
+                List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, currentDate, agentType);
                 if(newlist != null && !newlist.isEmpty()){
                     for(TransProfitDetail detail1 : newlist){
                         newChildPosRewardAmt = newChildPosRewardAmt.add(detail1.getPosCreditAmt() == null ? BigDecimal.ZERO : detail1.getPosCreditAmt());
                     }
-                    LOG.info("代理商ID：{}，当前执行月下级商户贷记交易汇总金额：{}", map.get("agentId"), newChildPosRewardAmt);
+                    LOG.info("代理商ID：{}，当前活动生效月下级商户贷记交易汇总金额：{}", map.get("agentId"), newChildPosRewardAmt);
                     newPosRewardAmt = newPosRewardAmt.add(newChildPosRewardAmt);
                 }
             }else {
@@ -380,27 +384,28 @@ public class PosProfitComputeServiceImpl implements DeductService {
             }
         }
         LOG.info("代理商ID：{}，贷记交易对比月贷记交易汇总金额：{}", map.get("agentId"),  oldPosRewardAmt);
-        LOG.info("代理商ID：{}，当前执行月贷记交易汇总金额：{}", map.get("agentId"),  newPosRewardAmt);
+        LOG.info("代理商ID：{}，当前活动生效月贷记交易汇总金额：{}", map.get("agentId"),  newPosRewardAmt);
         BigDecimal PosRewardAmt = newPosRewardAmt.subtract(oldPosRewardAmt);
         LOG.info("代理商ID：{}，贷记交易汇总金额差值：{}", map.get("agentId"),  PosRewardAmt);
         return  PosRewardAmt;
     }
 
     /**
-     * 查询下级商户业务编码
+     * 查询下级商户AG码
      * @param map
      * @return
      */
     private List<String> queryChildLevelByBusNum(Map<String, Object> map){
-        List<AgentBusInfo> busList = agentBusinfoService.queryChildLevelByBusNum(null, PLATFORM_CODE, map.get("agentId").toString());
+        List<AgentBusInfo> busList = agentBusinfoService.queryChildLevel(null, PLATFORM_CODE, map.get("agentId").toString());
         List<String> agentIdList = new ArrayList<String>();
         if(busList != null && !busList.isEmpty()) {
             busList.forEach(agentBusInfo -> {
-                if (agentBusInfo.getBusNum() != null) {
-                    agentIdList.add(agentBusInfo.getBusNum());
+                if (agentBusInfo.getAgentId() != null) {
+                    agentIdList.add(agentBusInfo.getAgentId());
                 }
             });
         }
+        LOG.info("代理商AG码：{}，下级代理商列表：{}", map.get("agentId"),  JSONObject.toJSON(agentIdList).toString());
         return agentIdList;
     }
 
@@ -474,12 +479,14 @@ public class PosProfitComputeServiceImpl implements DeductService {
         List<String> month = new ArrayList<String>();
         if(posReward1.getTotalConsMonth().contains("~")){
             String[] spl = posReward1.getTotalConsMonth().trim().split("~");
-            for (int i = 0; i < spl.length; i++) {
-                month.add(spl[i].replace("-",""));
-            }
+            List<String> list = getMonthBetween(spl[0], spl[1]);
+            list.forEach(s -> {
+                month.add(s.replace("-",""));
+            });
         } else {
             month.add(posReward1.getTotalConsMonth().replace("-",""));
         }
+        LOG.info("代理商ID：{}，特殊奖励参与活动的月份", JSONObject.toJSON(month).toString());
         //1、根据活动奖励月份，查询这个代理商活动月份交易总金额
         posTranAmt = posTranAmt.add(quarterAssessmentTranOrCreditAmt(assMap, month));
         LOG.info("代理商ID：{}，代理商季度考核活动总交易量：{}", assMap.get("agentId"), posTranAmt);
@@ -491,7 +498,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
         }
         LOG.info("代理商ID：{}，总交易额：{}，活动设定总交易额：{}，代理商季度交易量指标不合格，进行扣减奖励", assMap.get("agentId"),posTranAmt ,posReward1.getGrowAmt().multiply(new BigDecimal("10000")));
 
-        //3.按照通用奖励模板，重新计算代理活动月份奖励金额
+        //3.按照通用奖励模板，重新计算活动月份奖励金额
         BigDecimal posRewardAmt = this.afreshPosRewardAmt(posReward1, assMap);
 
         //4、查找当前代理商（机构、标准一代）下所有代理商业务编码
@@ -519,14 +526,15 @@ public class PosProfitComputeServiceImpl implements DeductService {
         BigDecimal posRewardAmt = BigDecimal.ZERO;
         if(posReward1.getTotalConsMonth().contains("~")){
             String[] spl = posReward1.getTotalConsMonth().trim().split("~");
-            for (int i = 0; i < spl.length; i++) {
+            List<String> list = getMonthBetween(spl[0], spl[1]);
+            for(String activeDate : list){
                 TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(assMap.get("agentId").toString(),
-                        spl[i].replace("-", ""), assMap.get("agentType").toString());
+                        activeDate.replace("-", ""), assMap.get("agentType").toString());
                 if(transProfitDetail != null){
-                    Map<String, Object> map = this.refurtComputePosReward(assMap, spl[i], transProfitDetail);
+                    Map<String, Object> map = this.refurtComputePosReward(assMap, activeDate, transProfitDetail);
                     BigDecimal refposRewardAmt = map.get("posRewardAmt") == null ? BigDecimal.ZERO : new BigDecimal(map.get("posRewardAmt").toString());
                     posRewardAmt = posRewardAmt.add(refposRewardAmt);
-                    LOG.info("代理商ID：{}，月份：{}，采用通用模板计算的POS奖励：{}", assMap.get("agentId"), spl[i], posRewardAmt);
+                    LOG.info("代理商ID：{}，月份：{}，采用通用模板计算的POS奖励：{}", assMap.get("agentId"), activeDate, posRewardAmt);
                 }
             }
         } else {
@@ -547,7 +555,6 @@ public class PosProfitComputeServiceImpl implements DeductService {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("agentType", assMap.get("agentType"));
         map.put("agentId", assMap.get("agentId"));
-        map.put("agentPid", assMap.get("agentPid"));
         map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
         map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
         map.put("posRewardAmt", BigDecimal.ZERO);
@@ -613,5 +620,38 @@ public class PosProfitComputeServiceImpl implements DeductService {
         }
         BigDecimal sumAmt = posTranAmt.add(childTranSumAmt);
         return sumAmt;
+    }
+
+    private static List<String> getMonthBetween(String minDate, String maxDate) {
+        try {
+            ArrayList<String> result = new ArrayList<String>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");//格式化为年月
+
+            Calendar min = Calendar.getInstance();
+            Calendar max = Calendar.getInstance();
+
+            min.setTime(sdf.parse(minDate));
+            min.set(min.get(Calendar.YEAR), min.get(Calendar.MONTH), 1);
+
+            max.setTime(sdf.parse(maxDate));
+            max.set(max.get(Calendar.YEAR), max.get(Calendar.MONTH), 2);
+
+            Calendar curr = min;
+            while (curr.before(max)) {
+                result.add(sdf.format(curr.getTime()));
+                curr.add(Calendar.MONTH, 1);
+            }
+            return result;
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        List<String> list = PosProfitComputeServiceImpl.getMonthBetween("2018-08", "2018-09");
+        list.forEach(s -> {
+            System.out.println(s);
+        });
     }
 }

@@ -13,7 +13,9 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.IProfitDirectService;
 import com.ryx.credit.profit.service.ProfitComputerService;
+import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentQueryService;
@@ -254,7 +256,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 }
                 supply = BigDecimal.ZERO;//给一代补款，然后清零
                 detailMonthMapper.updateByPrimaryKeySelective(detailMonth);*/
-
             }else{
                 //有被代扣历史，追溯补款
                 List<BuckleRun> buckleRuns = buckleRunMapper.selectListByAgentId(profitDirect.getAgentId());
@@ -338,7 +339,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         parentWhere.setAgentId(profitDirect.getParentAgentId());
         ProfitDirect parentDirect = directMapper.selectByAgentAndMon(parentWhere);//上级数据
         if(profitDirect.getFristAgentId().equals(profitDirect.getParentAgentId())){ //上级就是一级代理商
-
             //帮下级承担扣款
             ProfitDetailMonth where = new ProfitDetailMonth();
             where.setProfitDate(profitDirect.getTransMonth());
@@ -381,7 +381,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 buckleRunMapper.insertSelective(buckleRun);
                 buck = buck.subtract(bearAmt);//剩余扣款
                 computerSurplus(parentDirect,index++,oldAgrnt,buck);
-            }else {
+            }else{
                 parentDirect.setParentBuckle(buck);//替下级扣款
                 directMapper.updateByPrimaryKeySelective(parentDirect);
                 //记录代扣承担关系
@@ -396,7 +396,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 buckleRun.setRunStatus("0");
                 buckleRunMapper.insertSelective(buckleRun);
             }
-
         }
     }
 
@@ -410,7 +409,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         for(ProfitDirect profitDirect:profitDirects){
             BigDecimal total_day2 = totalP_day_ZF(profitDirect.getAgentId(),month);//直发日结分润
             BigDecimal profit = profitDirect.getProfitAmt()==null?BigDecimal.ZERO:profitDirect.getProfitAmt();//直发分润
-
             //BigDecimal sub = directMapper.getSubBuckleByMonth(where);//下级欠扣款
             BigDecimal supply = profitDirect.getSupplyAmt()==null?BigDecimal.ZERO:profitDirect.getSupplyAmt();//退单补款
             BigDecimal buckle = profitDirect.getBuckleAmt()==null?BigDecimal.ZERO:profitDirect.getBuckleAmt();//退单扣款
@@ -426,15 +424,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             //profitDirect.setParentBuckle(parent);
             directMapper.updateByPrimaryKeySelective(profitDirect);
         }
-
     }
-
-//    @Test
-//    public void test(){
-//        String transDate = "201809";
-//        BigDecimal tranAmount = synchroSSTotalTransAmt(transDate);
-//        System.out.println(tranAmount);
-//    }
 
     /**
      * 同步手刷月分润交易汇总
@@ -442,9 +432,20 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      */
     @Override
     public BigDecimal synchroSSTotalTransAmt(String transDate){
-        BigDecimal tranAmount = synchroAmt(transDate);
 
-        BigDecimal zfAmount = synchZFAmt(transDate);
+        //默认日期为上个月
+        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
+
+        //汇总手刷交易金额
+        BigDecimal tranAmount = transProfitDetailMapper.selectAmtBySummary(transDate);
+        System.out.println("手刷金额" + tranAmount);
+
+        //汇总直发交易金额
+        BigDecimal zfAmount = directMapper.selectAmtByDeal(transDate);
+        System.out.println("直发金额" + zfAmount);
+
+//        //手刷+直发
+//        BigDecimal total = tranAmount.add(zfAmount);
 
         return tranAmount.add(zfAmount);
     }
@@ -455,7 +456,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      */
     public BigDecimal synchroAmt(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
+        map.put("transDate",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
@@ -478,7 +479,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         BigDecimal wjrAmount = isDecimalNull(json.getBigDecimal("wjrAmount"));//未计入分润汇总
         BigDecimal wtbAmount = isDecimalNull(json.getBigDecimal("wtbAmount"));//未同步到分润
         return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
-
     }
 
     /**
@@ -488,7 +488,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      */
     public BigDecimal synchZFAmt(String transDate){
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("frmonth",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6):transDate);
+        map.put("frmonth",transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate);
         map.put("pageNumber",index++ +"");
         map.put("pageSize","50");
         String params = JsonUtil.objectToJson(map);
@@ -506,9 +506,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         if(list.size()>0){
             addZFTransAmt(list,transDate);//zhifa交易额汇总
         }
-
         return zfAmount;
-
     }
 
     public void addTransAmt(List<JSONObject> profitMonths,String transDate){
@@ -549,11 +547,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 for(AgentBusInfo sub:subs){
                     allSubs.add(sub.getAgentId());
                 }
-
                 if(null==me || me.getCloPayCompany()==null){//如果打款公司为空。轮番轰炸
                     me = businfoService.getByBusidAndCode(link.getDeptCode(),link.getAgentId());
                 }
-
             }
             List<Agent> agents = agentQueryService.queryAgentListByIds(allSubs);
             List<String> ids = new ArrayList<String>();
@@ -585,7 +581,6 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             updateDetail.setId(detailMonth.getId());
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
-
     }
 
     @Override

@@ -61,38 +61,38 @@ public interface ProfitDetailMonthService {
     List<TransProfitDetail> getTransProfitDetailList(String agentId, String agentPid, String profitDate);
 
     /**
-     * 根据业务编码、月份,机构类型查询明细
-     * @param busNum
+     * 根据AG编码、月份,机构类型查询明细
+     * @param agentId
      * @param profitDate
      * @param agentType
      * @return
      */
-    TransProfitDetail getTransProfitDetail(String busNum, String profitDate, String agentType);
+    TransProfitDetail getTransProfitDetail(String agentId, String profitDate, String agentType);
 
     /**
      * 根据业务编码、月份集合,机构类型查询明细
-     * @param busNum
+     * @param agentId
      * @param profitDate
      * @param agentType
      * @return
      */
-    List<TransProfitDetail> getChildTransProfitDetailList(String busNum, List<String> profitDate, String agentType);
+    List<TransProfitDetail> getChildTransProfitDetailList(String agentId, List<String> profitDate, String agentType);
 
     /**
-     * 根据业务编码集合、月份,机构类型查询明细
-     * @param busNum
+     * 根据AG编码集合、月份,机构类型查询明细
+     * @param agentId
      * @param profitDate
      * @param agentType
      * @return
      */
-    List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, String profitDate, String agentType);
+    List<TransProfitDetail> getChildTransProfitDetailList(List<String> agentId, String profitDate, String agentType);
 
     /**
-     * 根据业务编码集合、月份,机构类型查询明细
-     * @param busNum
+     * 根据AG编码集合、月份,机构类型查询明细
+     * @param agentId
      * @param profitDate
      * @param agentType
      * @return
      */
-    List<TransProfitDetail> getChildTransProfitDetailList(List<String> busNum, List<String> profitDate, String agentType);
+    List<TransProfitDetail> getChildTransProfitDetailList(List<String> agentId, List<String> profitDate, String agentType);
 }
