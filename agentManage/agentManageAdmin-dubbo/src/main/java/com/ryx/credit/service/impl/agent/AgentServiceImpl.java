@@ -310,6 +310,7 @@ public class AgentServiceImpl implements AgentService {
         db_agent.setAgDocDistrict(agent.getAgDocDistrict());
         db_agent.setAgRemark(agent.getAgRemark());
         db_agent.setStatus(agent.getStatus());
+        db_agent.setAgRegArea(agent.getAgRegArea());
         if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
             throw new ProcessException("代理商信息更新失败");
         }else{
