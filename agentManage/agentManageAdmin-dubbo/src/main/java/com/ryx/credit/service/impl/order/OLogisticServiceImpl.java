@@ -119,14 +119,22 @@ public class OLogisticServiceImpl implements OLogisticsService {
     public List<String> addList(List<List<Object>> data, String user) throws Exception {
         List<String> listRes = new ArrayList<>();
         for (List<Object> objectList : data) {
-            String id = "";
             try {
-                id =  oLogisticsService.addListItem(objectList,user);
-                logger.info("导入物流{}成功",objectList.toString());
-            } catch (Exception e) {
+                AgentResult agentResult =  oLogisticsService.addListItem(objectList,user);
+                if(agentResult.isOK()) {
+                    logger.info("导入物流{}成功", objectList.toString());
+                    listRes.add("物流[" + objectList.toString() + "]导入成功");
+                }else{
+                    listRes.add("物流[" + objectList.toString() + "]导入失败:"+agentResult.getData());
+                }
+            }catch (MessageException e) {
                 e.printStackTrace();
                 logger.info("导入物流{}抛出异常",objectList.toString());
-                listRes.add("导入物流["+objectList.toString()+"]抛出异常");
+                listRes.add("物流["+objectList.toString()+"]导入失败:"+e.getMsg());
+            }catch (Exception e) {
+                e.printStackTrace();
+                logger.info("导入物流{}抛出异常",objectList.toString());
+                listRes.add("物流["+objectList.toString()+"]导入失败:"+e.getMessage());
             }
         }
         logger.info("user{}导入物流抛出异常的数据有{}",user,listRes.toString());
@@ -135,7 +143,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public String  addListItem(List<Object> objectList, String user) throws Exception{
+    public AgentResult  addListItem(List<Object> objectList, String user) throws Exception{
         String planNum = "";
         String orderId = "";
         String proCode = "";
@@ -393,7 +401,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     //流量卡不进行下发操作
                     if(oActivity!=null && StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
                         logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
-                        return oLogistics.getId();
+                        return AgentResult.ok("流量卡不进行下发操作");
                     }
 
                     //进行入库、机具划拨操作 POS下发业务系统
@@ -524,8 +532,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
                     }
                 }
+            }else{
+                return AgentResult.fail(resultVO.getResInfo());
             }
-        return oLogistics.getId();
+        return AgentResult.ok();
     }
 
     /**
