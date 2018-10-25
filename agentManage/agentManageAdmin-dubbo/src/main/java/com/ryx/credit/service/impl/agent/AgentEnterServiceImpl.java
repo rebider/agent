@@ -3,7 +3,6 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtils;
@@ -88,8 +87,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentQueryService agentQueryService;
     @Autowired
     private AssProtoColMapper assProtoColMapper;
-    @Autowired
-    private RedisService redisService;
 
     /**
      * 商户入网
