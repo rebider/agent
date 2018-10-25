@@ -74,6 +74,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private TermMachineService termMachineService;
     @Autowired
     private OLogisticsService oLogisticsService;
+    @Autowired
+    private OActivityMapper oActivityMapper;
 
     /**
      * 物流信息:
@@ -232,6 +234,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("订单["+orderId+"]的商品["+proId+"]数量大于1");
             }
             OSubOrder subOrderItem = subOrders.get(0);
+
+
+
             //校验文档不能更改
             List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
             if(listItem.size()>0){
@@ -245,12 +250,37 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("排单信息未找到");
             }
 
+            //IDlist检查
+            List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
+            if (Integer.valueOf(sendProNum) != stringList.size()) {
+                logger.info("请仔细核对发货数量");
+                throw new MessageException("请仔细核对发货数量");
+            }
+
+            //商品活动
+            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+            OSubOrderActivityExample.Criteria oSubOrderActivityExample_criteria = oSubOrderActivityExample.createCriteria();
+            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+            if(null==oSubOrderActivities){
+                logger.info("查询活动数据错误1");
+                throw new MessageException("查询活动数据错误");
+            }
+            if(0==oSubOrderActivities.size()){
+                logger.info("查询活动数据错误2");
+                throw new MessageException("查询活动数据错误");
+            }
+            //商品活动临时表
+            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+            OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
+
+            //物流检查
             OLogisticsExample oLogisticsExample = new OLogisticsExample();
-            OLogisticsExample.Criteria criteria1 = oLogisticsExample.createCriteria();
-            criteria1.andSnBeginNumEqualTo(beginSn);
-            criteria1.andSnEndNumEqualTo(endSn);
-            criteria1.andWNumberEqualTo(wNumber);
-            criteria1.andLogComEqualTo(logCom);
+            OLogisticsExample.Criteria OLogisticsExample_criteria1 = oLogisticsExample.createCriteria();
+            OLogisticsExample_criteria1.andSnBeginNumEqualTo(beginSn);
+            OLogisticsExample_criteria1.andSnEndNumEqualTo(endSn);
+            OLogisticsExample_criteria1.andWNumberEqualTo(wNumber);
+            OLogisticsExample_criteria1.andLogComEqualTo(logCom);
             List<OLogistics> oLogistics1 = oLogisticsMapper.selectByExample(oLogisticsExample);
             if(null==oLogistics1){
                 logger.info("该商品已发货请勿重复提交1");
@@ -261,12 +291,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 throw new MessageException("该商品已发货请勿重复提交");
             }
 
-            //IDlist检查
-            List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
-            if (Integer.valueOf(sendProNum) != stringList.size()) {
-                logger.info("请仔细核对发货数量");
-                throw new MessageException("请仔细核对发货数量");
-            }
+
 
             //物流信息
             OLogistics oLogistics = new OLogistics();
@@ -315,17 +340,17 @@ public class OLogisticServiceImpl implements OLogisticsService {
             if (1 != insertImportData(oLogistics)) {
                 throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败,事物回滚");
             }else{
-                logger.info("导入物流数据={}==========================================={}" ,oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                logger.info("导入物流数据,活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
             }
             //调用明细接口之前需要先去数据库进行查询是否已有数据
             if (null != stringList && stringList.size() > 0) {
                 for (String snNum : stringList) {
                     //检查sn是否存在物流状态和记录状态
                     OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-                    OLogisticsDetailExample.Criteria criteria = oLogisticsDetailExample.createCriteria();
-                    criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
-                    criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                    criteria.andSnNumEqualTo(snNum);
+                    OLogisticsDetailExample.Criteria oLogisticsDetailExample_criteria = oLogisticsDetailExample.createCriteria();
+                    oLogisticsDetailExample_criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
+                    oLogisticsDetailExample_criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    oLogisticsDetailExample_criteria.andSnNumEqualTo(snNum);
                     List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                     if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
                         //说明已经存在数据
@@ -364,20 +389,12 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
                         System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                     }
-                    //商品活动
-                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                    OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
-                    criteria.andSubOrderIdEqualTo(subOrderItem.getId());
-                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                    if(null==oSubOrderActivities){
-                        logger.info("查询活动数据错误1");
-                        throw new MessageException("查询活动数据错误");
+
+                    //流量卡不进行下发操作
+                    if(oActivity!=null && StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
+                        logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                        return oLogistics.getId();
                     }
-                    if(0==oSubOrderActivities.size()){
-                        logger.info("查询活动数据错误2");
-                        throw new MessageException("查询活动数据错误");
-                    }
-                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
 
                     //进行入库、机具划拨操作 POS下发业务系统
                     if (!proType.equals(PlatformType.MPOS.msg)){
