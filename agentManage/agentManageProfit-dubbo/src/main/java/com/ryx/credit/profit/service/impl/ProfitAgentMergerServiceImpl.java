@@ -151,6 +151,8 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(String.valueOf(userId));
         record.setBusType(BusActRelBusType.MERGE.name());
+        record.setAgentId(pAgentMerge.getMainAgentId());
+        record.setAgentName(pAgentMerge.getMainAgentName());
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("代理商合并申请审批流启动成功");

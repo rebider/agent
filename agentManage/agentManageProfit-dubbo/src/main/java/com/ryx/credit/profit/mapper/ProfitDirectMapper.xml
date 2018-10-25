@@ -497,4 +497,12 @@
       </if>
     </where>
   </select>
+
+  <select id="selectAmtByDeal" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
+    select
+    SUM(TRANS_AMT)
+    from P_PROFIT_DIRECT
+    where
+    TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
 </mapper>

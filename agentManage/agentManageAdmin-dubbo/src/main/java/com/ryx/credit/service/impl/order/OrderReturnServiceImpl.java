@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
@@ -128,6 +129,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private IOrderReturnService iOrderReturnService;
+    @Autowired
+    private AgentMapper agentMapper;
+    @Autowired
+    private OActivityMapper oActivityMapper;
 
 
 
@@ -694,6 +699,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.refund.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(agentId);
+        Agent agent = agentMapper.selectByPrimaryKey(agentId);
+        if(agent!=null)
+        record.setAgentName(agent.getAgName());
+
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
@@ -1217,7 +1227,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         String wNumber = "";
         String proType="";
 
-            List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+            List col = Arrays.asList(ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.col);
             planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
             orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
             proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
@@ -1282,14 +1292,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请填写物流单号");
                 throw new MessageException("请填写物流单号");
             }
-            OSubOrderExample example = new OSubOrderExample();
-            example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
-            List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
-            if(subOrders.size()!=1){
-                log.info("请填写物流单号");
-                throw new MessageException("订单["+orderId+"]的商品["+proId+"]数量大于1");
-            }
-            OSubOrder subOrderItem = subOrders.get(0);
+
+
             //校验文档不能更改
             List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
             if(listItem.size()>0){
@@ -1309,6 +1313,32 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请仔细核对发货数量");
                 throw new MessageException("请仔细核对发货数量");
             }
+
+            //子订单查询
+            OSubOrderExample example = new OSubOrderExample();
+            example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
+            List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
+            if(subOrders.size()!=1){
+                log.info("请填写物流单号");
+                throw new MessageException("订单["+orderId+"]的商品["+proId+"]数量大于1");
+            }
+            OSubOrder subOrderItem = subOrders.get(0);
+            //商品活动
+            OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+            OSubOrderActivityExample.Criteria oSubOrderActivityExample_criteria = oSubOrderActivityExample.createCriteria();
+            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+            List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+            if(null==oSubOrderActivities){
+                log.info("查询活动数据错误1");
+                throw new MessageException("查询活动数据错误");
+            }
+            if(0==oSubOrderActivities.size()){
+                log.info("查询活动数据错误2");
+                throw new MessageException("查询活动数据错误");
+            }
+            //商品活动临时表
+            OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+            OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
 
             //物流信息
             OLogistics oLogistics = new OLogistics();
@@ -1357,7 +1387,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oLogistics.setwNumber(wNumber);      // 物流单号
             oLogistics.setSnBeginNum(beginSn);   // 起始SN序列号
             oLogistics.setSnEndNum(endSn);     // 结束SN序列号
-
+            oLogistics.setSendStatus(Status.STATUS_0.status);
             log.info("导入物流数据============================================{}" , JSONObject.toJSON(oLogistics));
             if (1 != oLogisticsService.insertImportData(oLogistics)) {
                 throw new MessageException("排单编号为:"+planNum+"处理，插入物流信息失败");
@@ -1409,24 +1439,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         System.out.println("更新排单数据============================================" + JSONObject.toJSON(receiptPlan));
                     }
-                    //商品活动
-                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                    OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
-                    criteria.andSubOrderIdEqualTo(subOrderItem.getId());
-                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                    if(null==oSubOrderActivities){
-                        log.info("查询活动数据错误1");
-                        throw new MessageException("查询活动数据错误");
-                    }
-                    if(0==oSubOrderActivities.size()){
-                        log.info("查询活动数据错误2");
-                        throw new MessageException("查询活动数据错误");
-                    }
-                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
 
+                    //流量卡不进行下发操作
+                    if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
+                        log.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                        return oLogistics.getId();
+                    }
                     //===============================================================================
                     //进行机具调整操作
-                    if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg)){
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
@@ -1461,7 +1482,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
-                    }else if(proType.equals(PlatformType.MPOS.msg)){
+                    }else{
 
 
                         //起始sn
@@ -1528,9 +1549,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                             }
                         }
-                    }else{
-                        log.info("导入物流：平台类型错误{}",JSONObject.toJSONString(oLogistics));
-                        throw new MessageException("平台类型错误");
                     }
                 }
             }else{
@@ -1547,8 +1565,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
-        String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
-        String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
+        String [] col= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.code.split(",");
+        String [] title= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_title.code.split(",");
         for (int i=0;i<18;i++){
             if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
                 continue;

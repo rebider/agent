@@ -185,12 +185,14 @@
     where P_CODE = #{pCode,jdbcType=VARCHAR}
   </select>
 
-  <select id="findCountByPcode" resultType="java.lang.Integer" parameterType="java.lang.String" >
+  <select id="findCountByPcode" resultType="java.lang.Integer" parameterType="map" >
     select
     count(*)
     from D_REGION
-    where P_CODE = #{pCode,jdbcType=VARCHAR}
-    and t_type in(1,2)
+    where P_CODE = #{map.pCode,jdbcType=VARCHAR}
+    <if test="map.showArea!='true'">
+      and t_type in(1,2)
+    </if>
   </select>
 
   <select id="selectAll" resultMap="BaseResultMap">

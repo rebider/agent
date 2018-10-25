@@ -171,6 +171,19 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+				if (null!=agentBusInfoVo.getBusPlatform()){
+					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
+					if (null!=platformType){
+						if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+							if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
+								if (StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
+									logger.info("请填写平台登录账号");
+									throw new MessageException("请填写平台登录账号");
+								}
+							}
+						}
+					}
+				}
 				agentBusInfoVo.setcUser(agent.getcUser());
 				agentBusInfoVo.setAgentId(agent.getId());
 				if(StringUtils.isEmpty(agentBusInfoVo.getId())) {

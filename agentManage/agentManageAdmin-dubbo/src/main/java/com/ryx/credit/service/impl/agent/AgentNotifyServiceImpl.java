@@ -335,6 +335,22 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         //通知对象
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+        //注册区域
+        if(agent.getAgRegArea()!=null){
+            List<String> regionList = getParent(agent.getAgRegArea());
+            if(regionList!=null){
+                if(regionList.size()==3){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                    agentNotifyVo.setCityArea(regionList.get(2));
+                }else if(regionList.size()==2){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                }else if(regionList.size()==1){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                }
+            }
+        }
         agentNotifyVo.setBusiAreas(split);
 
         agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
@@ -654,7 +670,21 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
             agentNotifyVo.setBusiAreas(split);
         }
-
+        if(agent.getAgRegArea()!=null){
+            List<String> regionList = getParent(agent.getAgRegArea());
+            if(regionList!=null){
+                if(regionList.size()==3){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                    agentNotifyVo.setCityArea(regionList.get(2));
+                }else if(regionList.size()==2){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                }else if(regionList.size()==1){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                }
+            }
+        }
         agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
         agentNotifyVo.setOrgName(agent.getAgName());
         agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
@@ -875,18 +905,19 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             data.put("orgName",agentNotifyVo.getOrgName());
             data.put("busiAreas",agentNotifyVo.getBusiAreas());
             data.put("hasS0",agentNotifyVo.getHasS0());
+            data.put("busiType",agentNotifyVo.getBusiType());
             if(StringUtils.isNotBlank(agentNotifyVo.getOrgId())){
                 data.put("orgId",agentNotifyVo.getOrgId());
             }
             if(StringUtils.isNotBlank(agentNotifyVo.getLoginName())){
                 data.put("loginName",agentNotifyVo.getLoginName());
             }
-//            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
-//                data.put("province",agentNotifyVo.getProvince());
-//            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-//                data.put("city",agentNotifyVo.getCity());
-//            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-//                data.put("cityArea",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
+                data.put("province",agentNotifyVo.getProvince());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                data.put("city",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                data.put("cityArea",agentNotifyVo.getCity());
             data.put("orgType",agentNotifyVo.getOrgType());
             if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
                 data.put("supDorgId",agentNotifyVo.getSupDorgId());

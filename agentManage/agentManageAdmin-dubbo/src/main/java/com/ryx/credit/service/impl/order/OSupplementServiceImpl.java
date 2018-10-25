@@ -390,6 +390,9 @@ public class OSupplementServiceImpl implements OSupplementService {
                 //审批通过还需要更新srcId,srcType,实际付款时间
                 oPaymentDetail.setSrcId(supplement.getId());
                 oPaymentDetail.setSrcType(PamentSrcType.XXBK.code);
+                if (null != supplement && null != supplement.getRemitTime())
+                oPaymentDetail.setPayTime(supplement.getRemitTime());
+                else
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
@@ -464,15 +467,22 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO updateAmount(AgentVo agentVo) throws MessageException {
-        if (StringUtils.isNotBlank(agentVo.getSupplementId()) && null != agentVo.getRealPayAmount()) {
+        if (StringUtils.isBlank(agentVo.getSupplementId())){
+            logger.info("补款id为空");
+            throw new MessageException("补款id为空");
+        }
+        if (null == agentVo.getRealPayAmount()){
+            logger.info("请填写实际付款金额");
+            throw new MessageException("请填写实际付款金额");
+        }
             OSupplement oSupplement = new OSupplement();
             oSupplement.setId(agentVo.getSupplementId());
             oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
+            oSupplement.setRemitTime(agentVo.getRemitTime());
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("实际金额保存失败");
                 throw new MessageException("实际金额保存失败");
             }
-        }
         return ResultVO.success("");
     }
 }
