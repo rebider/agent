@@ -380,7 +380,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
 
                     //进行入库、机具划拨操作 POS下发业务系统
-                    if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg)){
 
                         List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
@@ -429,7 +429,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
 
                         //首刷下发业务系统
-                    }else if(proType.equals(PlatformType.MPOS.msg)){
+                    }else{
 
                         List<OLogisticsDetail> forsendSns = (List<OLogisticsDetail>)resultVO.getObj();
                         logger.info("物流下发发货数量sn查询获取数据：{}", JSONObject.toJSONString(forsendSns));
@@ -505,9 +505,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                                 logger.info("pos下发物流更新记录Exception失败{}",JSONObject.toJSONString(oLogistics));
                             }
                         }
-                    }else{
-                        logger.info("导入物流：平台类型错误");
-                        throw new MessageException("平台类型错误");
                     }
                 }
             }

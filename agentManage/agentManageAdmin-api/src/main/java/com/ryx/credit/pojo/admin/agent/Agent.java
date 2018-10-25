@@ -81,6 +81,8 @@ public class Agent extends AgentExtends implements Serializable {
 
     private BigDecimal caStatus;
 
+    private String agRegArea;
+
     public String getId() {
         return id;
     }
@@ -319,5 +321,13 @@ public class Agent extends AgentExtends implements Serializable {
 
     public void setCaStatus(BigDecimal caStatus) {
         this.caStatus = caStatus;
+    }
+
+    public String getAgRegArea() {
+        return agRegArea;
+    }
+
+    public void setAgRegArea(String agRegArea) {
+        this.agRegArea = agRegArea;
     }
 }

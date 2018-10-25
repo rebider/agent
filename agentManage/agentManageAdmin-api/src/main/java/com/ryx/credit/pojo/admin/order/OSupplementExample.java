@@ -1,7 +1,6 @@
 package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1045,6 +1044,66 @@ public class OSupplementExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeIsNull() {
+            addCriterion("REMIT_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeIsNotNull() {
+            addCriterion("REMIT_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeEqualTo(Date value) {
+            addCriterion("REMIT_TIME =", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeNotEqualTo(Date value) {
+            addCriterion("REMIT_TIME <>", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeGreaterThan(Date value) {
+            addCriterion("REMIT_TIME >", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("REMIT_TIME >=", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeLessThan(Date value) {
+            addCriterion("REMIT_TIME <", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeLessThanOrEqualTo(Date value) {
+            addCriterion("REMIT_TIME <=", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeIn(List<Date> values) {
+            addCriterion("REMIT_TIME in", values, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeNotIn(List<Date> values) {
+            addCriterion("REMIT_TIME not in", values, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeBetween(Date value1, Date value2) {
+            addCriterion("REMIT_TIME between", value1, value2, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeNotBetween(Date value1, Date value2) {
+            addCriterion("REMIT_TIME not between", value1, value2, "remitTime");
             return (Criteria) this;
         }
     }

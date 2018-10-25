@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
@@ -128,7 +129,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private IOrderReturnService iOrderReturnService;
-
+    @Autowired
+    private AgentMapper agentMapper;
 
 
 
@@ -694,6 +696,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.refund.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(agentId);
+        Agent agent = agentMapper.selectByPrimaryKey(agentId);
+        if(agent!=null)
+        record.setAgentName(agent.getAgName());
+
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("退货提交审批，启动审批异常，添加审批关系失败{}:{}", returnId, proce);
             throw new ProcessException("退货审批流启动失败:添加审批关系失败");
@@ -1217,7 +1224,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         String wNumber = "";
         String proType="";
 
-            List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+            List col = Arrays.asList(ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.col);
             planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
             orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
             proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
@@ -1426,7 +1433,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     //===============================================================================
                     //进行机具调整操作
-                    if (proType.equals(PlatformType.POS.msg) || proType.equals(PlatformType.ZPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg)){
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
@@ -1461,7 +1468,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         //===============================================================================
                         //cxinfo 机具退货调整首刷接口调用
-                    }else if(proType.equals(PlatformType.MPOS.msg)){
+                    }else{
 
 
                         //起始sn
@@ -1528,9 +1535,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                 log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                             }
                         }
-                    }else{
-                        log.info("导入物流：平台类型错误{}",JSONObject.toJSONString(oLogistics));
-                        throw new MessageException("平台类型错误");
                     }
                 }
             }else{
@@ -1547,8 +1551,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
-        String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
-        String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
+        String [] col= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.code.split(",");
+        String [] title= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_title.code.split(",");
         for (int i=0;i<18;i++){
             if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
                 continue;

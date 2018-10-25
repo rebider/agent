@@ -726,10 +726,12 @@ public class OrderServiceImpl implements OrderService {
         oPayment_db.setDownPayment(oPayment.getDownPayment());
         oPayment_db.setDownPaymentCount(oPayment.getDownPaymentCount());
         oPayment_db.setDownPaymentDate(oPayment.getDownPaymentDate());
+        oPayment_db.setDownPaymentUser(oPayment.getDownPaymentUser());
         oPayment_db.setActualReceipt(oPayment.getActualReceipt());
         oPayment_db.setCollectCompany(oPayment.getCollectCompany());
         oPayment_db.setRemark(oPayment.getRemark());
         oPayment_db.setActualReceiptDate(oPayment.getActualReceiptDate());
+        oPayment_db.setIsCloInvoice(oPayment.getIsCloInvoice());
         if(StringUtils.isNotBlank(oPayment.getDeductionType())){
             oPayment_db.setDeductionType(oPayment.getDeductionType());
         }
@@ -2901,5 +2903,19 @@ public class OrderServiceImpl implements OrderService {
         Double res = oPaymentMapper.queryAgentDebt(agentId);
         if(res==null)return BigDecimal.ZERO;
         return BigDecimal.valueOf(res);
+    }
+
+    @Override
+    public AgentResult updateStatus(String id, String user) {
+        if (null == user) return AgentResult.fail("操作用户不能为空");
+        if (StringUtils.isBlank(id)) return AgentResult.fail("ID不能为空");
+        OOrder oOrder = new OOrder();
+        oOrder.setId(id);
+        oOrder.setuUser(user);
+        oOrder.setStatus(Status.STATUS_0.status);
+        if (1==orderMapper.updateByPrimaryKeySelective(oOrder)){
+            return AgentResult.ok("成功");
+        }
+        return AgentResult.fail();
     }
 }
