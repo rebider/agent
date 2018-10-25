@@ -1224,7 +1224,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         String wNumber = "";
         String proType="";
 
-            List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
+            List col = Arrays.asList(ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.col);
             planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
             orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
             proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
@@ -1551,8 +1551,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
-        String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
-        String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
+        String [] col= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.code.split(",");
+        String [] title= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_title.code.split(",");
         for (int i=0;i<18;i++){
             if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
                 continue;
