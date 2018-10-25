@@ -467,7 +467,14 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO updateAmount(AgentVo agentVo) throws MessageException {
-        if (StringUtils.isNotBlank(agentVo.getSupplementId()) && null != agentVo.getRealPayAmount()) {
+        if (StringUtils.isBlank(agentVo.getSupplementId())){
+            logger.info("补款id为空");
+            throw new MessageException("补款id为空");
+        }
+        if (null == agentVo.getRealPayAmount()){
+            logger.info("请填写实际付款金额");
+            throw new MessageException("请填写实际付款金额");
+        }
             OSupplement oSupplement = new OSupplement();
             oSupplement.setId(agentVo.getSupplementId());
             oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
@@ -476,7 +483,6 @@ public class OSupplementServiceImpl implements OSupplementService {
                 logger.info("实际金额保存失败");
                 throw new MessageException("实际金额保存失败");
             }
-        }
         return ResultVO.success("");
     }
 }
