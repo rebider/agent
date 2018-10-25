@@ -916,8 +916,8 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 data.put("province",agentNotifyVo.getProvince());
             if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
                 data.put("city",agentNotifyVo.getCity());
-            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-                data.put("cityArea",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCityArea()))
+                data.put("cityArea",agentNotifyVo.getCityArea());
             data.put("orgType",agentNotifyVo.getOrgType());
             if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
                 data.put("supDorgId",agentNotifyVo.getSupDorgId());
