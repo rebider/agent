@@ -22,7 +22,7 @@ public interface CompensateService {
 
     ORefundPriceDiff selectByPrimaryKey(String id);
 
-    PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page);
+    PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page, String dataRole ,long userId);
 
     List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException;
 

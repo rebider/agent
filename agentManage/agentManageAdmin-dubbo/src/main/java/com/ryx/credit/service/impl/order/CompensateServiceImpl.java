@@ -96,7 +96,8 @@ public class CompensateServiceImpl implements CompensateService {
     private OSubOrderMapper subOrderMapper;
     @Autowired
     private OSubOrderActivityMapper subOrderActivityMapper;
-
+    @Autowired
+    private IUserService iUserService;
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -109,27 +110,41 @@ public class CompensateServiceImpl implements CompensateService {
 
 
     @Override
-    public PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page){
+    public PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page, String dataRole,long userId){
 
-        ORefundPriceDiffExample example = new ORefundPriceDiffExample();
-        ORefundPriceDiffExample.Criteria criteria = example.createCriteria();
+        Map<String, Object> reqMap = new HashMap<>();
+        if(null!=refundPriceDiff.getReviewStatus()){
+            reqMap.put("reviewStatus",refundPriceDiff.getReviewStatus());
+        }
         if(StringUtils.isNotBlank(refundPriceDiff.getApplyBeginTime())){
-            criteria.andSTimeGreaterThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyBeginTime(),DateUtil.DATE_FORMAT_1));
+            reqMap.put("applyBeginTime",refundPriceDiff.getApplyBeginTime());
         }
         if(StringUtils.isNotBlank(refundPriceDiff.getApplyEndTime())){
-            criteria.andSTimeLessThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyEndTime(),DateUtil.DATE_FORMAT_1));
+            reqMap.put("applyEndTime",refundPriceDiff.getApplyEndTime());
         }
-        if(null!=refundPriceDiff.getReviewStatus()){
-            criteria.andReviewStatusEqualTo(refundPriceDiff.getReviewStatus());
+        if(StringUtils.isNotBlank(refundPriceDiff.getAgentId())){
+            reqMap.put("agentId",refundPriceDiff.getAgentId());
         }
-        criteria.andCUserEqualTo(refundPriceDiff.getcUser());
-        example.setPage(page);
-        example.setOrderByClause("c_time desc");
-        List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
+        if(StringUtils.isNotBlank(refundPriceDiff.getAgentName())){
+            reqMap.put("agentName",refundPriceDiff.getAgentName());
+        }
+        if(StringUtils.isBlank(dataRole)){
+            reqMap.put("cUser",userId);
+        }else{
+            if(dataRole.equals("below")){
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                    return null;
+                }
+                Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+                reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+                reqMap.put("cUser",userId);
+            }
+        }
+        List<Map<String,Object>> refundPriceDiffs = refundPriceDiffMapper.selectByAgent(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(refundPriceDiffs);
-        long count = refundPriceDiffMapper.countByExample(example);
-        pageInfo.setTotal(new Long(count).intValue());
+        pageInfo.setTotal(refundPriceDiffMapper.selectByAgentCount(reqMap));
         return pageInfo;
     }
 
@@ -176,7 +191,9 @@ public class CompensateServiceImpl implements CompensateService {
         }
         String logisticsId = String.valueOf(compensateLList.get(0).get("LOGISTICS_ID"));
         OLogistics oLogistics = logisticsMapper.selectByPrimaryKey(logisticsId);
+        Set<String> agentIdSet = new HashSet<>();
         for (Map<String, Object> stringObjectMap : compensateLList) {
+            agentIdSet.add(String.valueOf(stringObjectMap.get("AGENT_ID")));
             Agent agent = agentService.getAgentById(String.valueOf(stringObjectMap.get("AGENT_ID")));
             if(!orgId.equals(agent.getAgDocPro())){
                 log.info("不能提交其他省区的退补差价");
@@ -193,6 +210,10 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("商品活动超出保价时间");
                 }
             }
+        }
+        if(agentIdSet.size()>1){
+            log.info("退补差价代理商不唯一");
+            throw new ProcessException("代理商不唯一");
         }
         return compensateLList;
     }
@@ -264,6 +285,7 @@ public class CompensateServiceImpl implements CompensateService {
         String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
         oRefundPriceDiff.setId(priceDiffId);
         Date nowDate = new Date();
+        oRefundPriceDiff.setAgentId(refundPriceDiffDetailList.get(0).getAgentId());
         oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
         oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
         oRefundPriceDiff.setMachOweAmt(new BigDecimal(0));
@@ -798,12 +820,12 @@ public class CompensateServiceImpl implements CompensateService {
             }
             oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
             if(null==oLogisticsDetails){
-                log.info("calculatePriceDiff数据有误异常返回1");
-                throw new ProcessException("查询活动异常");
+                log.info("calculatePriceDiff查询Sn失败请检查Sn有效性1");
+                throw new ProcessException("查询Sn失败请检查Sn有效性");
             }
             if(oLogisticsDetails.size()!=1){
-                log.info("calculatePriceDiff数据有误异常返回2");
-                throw new ProcessException("查询活动异常");
+                log.info("calculatePriceDiff查询Sn失败请检查Sn有效性2");
+                throw new ProcessException("查询Sn失败请检查Sn有效性");
             }
             Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
             oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);

@@ -1200,9 +1200,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         for (List<Object> objectList : data) {
             try {
                 String id =   iOrderReturnService.addListItem(objectList,user);
-                list.add(id);
+                log.info("导入物流{}成功",objectList.toString());
+                list.add("物流["+objectList.toString()+"]导入成功");
             } catch (Exception e) {
                 e.printStackTrace();
+                log.info("导入物流{}抛出异常",objectList.toString());
+                list.add("物流["+objectList.toString()+"]导入失败");
             }
         }
         return list;

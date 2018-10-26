@@ -150,6 +150,14 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款添加:{}", "源数据不能为空");
             return ResultVO.fail("源数据不能为空");
         }
+        if (StringUtils.isEmpty(oSupplement.getRemitTime())) {
+            logger.info("补款添加:{}", "打款时间不能为空");
+            return ResultVO.fail("打款时间不能为空");
+        }
+        if (StringUtils.isEmpty(oSupplement.getRemitPeople())) {
+            logger.info("补款添加:{}", "打款人不能为空");
+            return ResultVO.fail("打款人不能为空");
+        }
         //去查询是否已经在审批
         String srcId = oSupplement.getSrcId();
         String pkType = oSupplement.getPkType();
@@ -466,7 +474,11 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAmount(AgentVo agentVo) throws MessageException {
+    public ResultVO updateAmount(AgentVo agentVo,Long userId) throws MessageException {
+        if(null==userId){
+            logger.info("无法获取当前登录用户");
+            throw new MessageException("无法获取当前登录用户");
+        }
         if (StringUtils.isBlank(agentVo.getSupplementId())){
             logger.info("补款id为空");
             throw new MessageException("补款id为空");
@@ -475,10 +487,20 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("请填写实际付款金额");
             throw new MessageException("请填写实际付款金额");
         }
+        if(null==agentVo.getRemitTime()){
+            logger.info("请填写打款时间");
+            throw new MessageException("请填写打款时间");
+        }
+        if(null==agentVo.getCheckTime()){
+            logger.info("请填写核款时间");
+            throw new MessageException("请填写核款时间");
+        }
             OSupplement oSupplement = new OSupplement();
             oSupplement.setId(agentVo.getSupplementId());
             oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
             oSupplement.setRemitTime(agentVo.getRemitTime());
+            oSupplement.setCheckTime(agentVo.getCheckTime());
+            oSupplement.setCheckPeople(String.valueOf(userId));
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("实际金额保存失败");
                 throw new MessageException("实际金额保存失败");

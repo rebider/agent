@@ -426,9 +426,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
         AgentColinfo upColinfo = new AgentColinfo();
         upColinfo.setId(aColinfoPayment.getColinfoId());
-        if(String.valueOf(resultMap.get("flag")).equals(TransFlag.B.getValue())){
+        if(String.valueOf(resultMap.get("flag")).equals(TransFlag.CG.getValue())){
             upColinfo.setPayStatus(ColinfoPayStatus.C.getValue());
-        }else if(String.valueOf(resultMap.get("flag")).equals(TransFlag.C.getValue())){
+        }else if(String.valueOf(resultMap.get("flag")).equals(TransFlag.SB.getValue())){
             upColinfo.setPayStatus(ColinfoPayStatus.D.getValue());
         }else {
             upColinfo.setPayStatus(ColinfoPayStatus.E.getValue());
