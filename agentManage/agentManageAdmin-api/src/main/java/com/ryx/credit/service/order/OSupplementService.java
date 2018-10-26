@@ -73,5 +73,5 @@ public interface OSupplementService {
     /**
      * 更新实际付款金额
      */
-    public ResultVO updateAmount(AgentVo agentVo) throws MessageException;
+    public ResultVO updateAmount(AgentVo agentVo,Long userId) throws MessageException;
 }
