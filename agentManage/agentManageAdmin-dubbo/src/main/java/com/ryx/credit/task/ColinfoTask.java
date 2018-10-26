@@ -175,6 +175,8 @@ public class ColinfoTask {
             List<String> flagList = new ArrayList<>();
             flagList.add(TransFlag.CG.getValue());
             flagList.add(TransFlag.SB.getValue());
+            flagList.add(TransFlag.YCX.getValue());
+            flagList.add(TransFlag.FXLJ.getValue());
             criteria.andFlagNotIn(flagList);
             List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
             if(null==aColinfoPayments){
