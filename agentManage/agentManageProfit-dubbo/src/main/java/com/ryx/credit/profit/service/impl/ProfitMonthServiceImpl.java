@@ -788,6 +788,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             Map<String, Object> map = new HashMap<>(10);
             map.put("agentType", detail.getAgentType());
             map.put("agentId", detail.getAgentId());
+            map.put("busNum", detail.getBusNum());
             map.put("posTranAmt", detail.getPosRewardAmt());
             map.put("posJlTranAmt", detail.getPosCreditAmt());
             try {

@@ -65,8 +65,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
         String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         if(Objects.equals(map.get("agentType"), AGENT_TYPE_2) || Objects.equals(map.get("agentType"), AGENT_TYPE_6)){
-            LOG.info("POS奖励，代理商AG：{}，POS交易金额：{}，POS贷记交易金额：{}",
-                    map.get("agentId"), map.get("posTranAmt"), map.get("posJlTranAmt"));
+            LOG.info("POS奖励，代理商唯一码：{}，业务码：{}，POS交易金额：{}，POS贷记交易金额：{}",
+                    map.get("agentId"), map.get("busNum"),map.get("posTranAmt"), map.get("posJlTranAmt"));
             PosReward posReward = new PosReward();
             posReward.setAgentId(map.get("agentId").toString());
             posReward.setApplyStatus("1");
@@ -113,7 +113,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 List<String> list = getMonthBetween(spl[0], spl[1]);
                 list.forEach(totalConsMonth -> {
                     if(Objects.equals(totalConsMonth, currentDate)){
-                        LOG.info("代理商ID：{}，代理商特殊奖励活动生效月份：{}", map.get("agentId"), currentDate);
+                        LOG.info("代理商唯一码：{}，代理商特殊奖励活动生效月份：{}", map.get("agentId"), currentDate);
                         this.specialTranOrCreditAmt(posReward1, map, currentDate);
                     }
                 });
@@ -132,7 +132,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param currentDate
      */
     private void specialTranOrCreditAmt(PosReward posReward1, Map<String, Object> map, String currentDate) {
-        LOG.info("代理商ID：{}，执行特殊POS奖励模板：{}", map.get("agentId"), JSONObject.toJSON(posReward1));
+        LOG.info("代理商唯一码：{}，执行特殊POS奖励模板：{}", map.get("agentId"), JSONObject.toJSON(posReward1));
         String agentType = null;
         if(Objects.equals(AGENT_TYPE_2, map.get("agentType"))){
             agentType = AGENT_TYPE_3;
@@ -140,16 +140,16 @@ public class PosProfitComputeServiceImpl implements DeductService {
             agentType = map.get("agentType").toString();
         }
 
-        LOG.info("查询贷记对比月贷记交易金额，代理商ID：{}，贷记对比月：{}", map.get("agentId"), posReward1.getCreditConsMonth());
+        LOG.info("查询贷记对比月贷记交易金额，代理商唯一码：{}，贷记对比月：{}", map.get("agentId"), posReward1.getCreditConsMonth());
         TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(map.get("agentId").toString(),
                 posReward1.getCreditConsMonth().replace("-", ""), map.get("agentType").toString());
         if(transProfitDetail == null){
-            LOG.info("代理商ID：{}，未查询贷记对比月交易明细，暂不计算POS奖励", map.get("agentId"));
+            LOG.info("代理商唯一码：{}，未查询贷记对比月交易明细，暂不计算POS奖励", map.get("agentId"));
             return;
         }
         BigDecimal oldPosCreditAmt = transProfitDetail.getPosCreditAmt() == null ? BigDecimal.ZERO : transProfitDetail.getPosCreditAmt();
         BigDecimal newPosCreditAmt = new BigDecimal(map.get("posJlTranAmt").toString());
-        LOG.info("代理商ID：{}，贷记对比月贷记交易金额：{}", map.get("agentId"), oldPosCreditAmt);
+        LOG.info("代理商唯一码：{}，贷记对比月贷记交易金额：{}", map.get("agentId"), oldPosCreditAmt);
 
         List<String> agentIdList = this.queryChildLevelByBusNum(map);
         if(agentIdList.size() > 0){
@@ -160,9 +160,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     oldChildPosCreditAmt = oldChildPosCreditAmt.add(detail1.getPosCreditAmt());
                 }
             }
-            LOG.info("代理商ID：{}，下级贷记对比月贷记交易总金额：{}", map.get("agentId"), oldChildPosCreditAmt);
+            LOG.info("代理商唯一码：{}，下级贷记对比月贷记交易总金额：{}", map.get("agentId"), oldChildPosCreditAmt);
             oldPosCreditAmt = oldPosCreditAmt.add(oldChildPosCreditAmt);
-            LOG.info("代理商ID：{}，贷记对比月贷记交易汇总金额：{}", map.get("agentId"),  oldPosCreditAmt);
+            LOG.info("代理商唯一码：{}，贷记对比月贷记交易汇总金额：{}", map.get("agentId"),  oldPosCreditAmt);
             LOG.info("查询活动生效月下级贷记交易金额，代理商ID：{}，当前活动生效月：{}", map.get("agentId"), currentDate);
             List<TransProfitDetail> newlist = profitDetailMonthServiceImpl.getChildTransProfitDetailList(agentIdList, currentDate.replace("-",""), agentType);
             BigDecimal newChildPosCreditAmt= BigDecimal.ZERO;
@@ -171,10 +171,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     newChildPosCreditAmt = newChildPosCreditAmt.add(detail1.getPosCreditAmt());
                 }
             }
-            LOG.info("代理商ID：{}，当前活动生效月下级贷记交易总金额：{}", map.get("agentId"), newChildPosCreditAmt);
+            LOG.info("代理商唯一码：{}，当前活动生效月下级贷记交易总金额：{}", map.get("agentId"), newChildPosCreditAmt);
             newPosCreditAmt = newPosCreditAmt.add(newChildPosCreditAmt);
         }
-        LOG.info("代理商ID：{}，当前活动生效月贷记交易汇总金额：{}", map.get("agentId"),  newPosCreditAmt);
+        LOG.info("代理商唯一码：{}，当前活动生效月贷记交易汇总金额：{}", map.get("agentId"),  newPosCreditAmt);
         this.computeSpecialPosReward(oldPosCreditAmt, newPosCreditAmt, posReward1.getRewardScale(), map);
     }
 
@@ -188,12 +188,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private void computeSpecialPosReward(BigDecimal oldPosCreditAmt, BigDecimal newPosCreditAmt, BigDecimal rewardScale, Map<String, Object> map) {
         if(newPosCreditAmt.compareTo(oldPosCreditAmt) > 0){
             BigDecimal posCreditAmt = newPosCreditAmt.subtract(oldPosCreditAmt);
-            LOG.info("代理商ID：{}，计算后贷记交易额：{}，特殊奖励比例：{}", map.get("agentId"), posCreditAmt, rewardScale);
+            LOG.info("代理商唯一码：{}，计算后贷记交易额：{}，特殊奖励比例：{}", map.get("agentId"), posCreditAmt, rewardScale);
             BigDecimal posRewardAmt = posCreditAmt.multiply(rewardScale).setScale(2,BigDecimal.ROUND_HALF_UP);
-            LOG.info("代理商ID：{}，POS奖励金额：{}", map.get("agentId"), posRewardAmt);
+            LOG.info("代理商唯一码：{}，POS奖励金额：{}", map.get("agentId"), posRewardAmt);
             map.put("posRewardAmt", posRewardAmt);
         } else {
-            LOG.info("代理商ID：{}，本月贷记交易+本月下级商户贷记交易金额 < 贷记对比月贷记交易金额+下级商户贷记交易金额，没有POS奖励", map.get("agentId"));
+            LOG.info("代理商唯一码：{}，本月贷记交易+本月下级商户贷记交易金额 < 贷记对比月贷记交易金额+下级商户贷记交易金额，没有POS奖励", map.get("agentId"));
         }
     }
 
@@ -280,7 +280,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private BigDecimal queryTranContrastMonthAmt(String currentDate, String tranContrastMonth, Map<String, Object> map, String agentType) {
         LOG.info("查询对比月交易金额，代理商ID：{}，交易对比月：{}", map.get("agentId"), tranContrastMonth);
         TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(map.get("agentId").toString(),
-                tranContrastMonth, map.get("agentType").toString());
+                tranContrastMonth, agentType);
         if(transProfitDetail == null){
             LOG.info("代理商ID：{}，没有找到交易对比月信息。暂不计算POS奖励", map.get("agentId"));
             return BigDecimal.ZERO;
@@ -348,7 +348,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private BigDecimal queryCreditContrastMonthAmt(String currentDate, String creditTranContrastMonth, Map<String, Object> map, String agentType) {
         LOG.info("查询对比月贷记交易金额，代理商ID：{}，贷记交易对比月：{}", map.get("agentId"), creditTranContrastMonth);
         TransProfitDetail transProfitDetail = profitDetailMonthServiceImpl.getTransProfitDetail(map.get("agentId").toString(),
-                creditTranContrastMonth, map.get("agentType").toString());
+                creditTranContrastMonth, agentType);
         if(transProfitDetail == null){
             LOG.info("代理商ID：{}，没有找到贷记交易对比月信息。暂不计算POS奖励", map.get("agentId"));
             return BigDecimal.ZERO;
@@ -396,16 +396,15 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @return
      */
     private List<String> queryChildLevelByBusNum(Map<String, Object> map){
-        List<AgentBusInfo> busList = agentBusinfoService.queryChildLevel(null, PLATFORM_CODE, map.get("agentId").toString());
+        List<AgentBusInfo> busList = agentBusinfoService.queryChildLevelByBusNum(null, PLATFORM_CODE, map.get("busNum").toString());
         List<String> agentIdList = new ArrayList<String>();
         if(busList != null && !busList.isEmpty()) {
             busList.forEach(agentBusInfo -> {
-                if (agentBusInfo.getAgentId() != null) {
-                    agentIdList.add(agentBusInfo.getAgentId());
-                }
+                String agentId = agentBusInfo.getAgZbh() == null ? agentBusInfo.getAgentId() : agentBusInfo.getAgZbh();
+                agentIdList.add(agentId);
             });
         }
-        LOG.info("代理商AG码：{}，下级代理商列表：{}", map.get("agentId"),  JSONObject.toJSON(agentIdList).toString());
+        LOG.info("代理商唯一码：{}，下级代理商唯一码列表：{}", map.get("agentId"),  JSONObject.toJSON(agentIdList).toString());
         return agentIdList;
     }
 
@@ -414,10 +413,11 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param posMap
      */
     private void obtainParentAgentId(Map<String, Object> posMap){
-        List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), PLATFORM_CODE, posMap.get("agentId").toString());
+        List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), PLATFORM_CODE, posMap.get("busNum").toString());
         if(agentBusInfo != null && !agentBusInfo.isEmpty()){
-            posMap.put("parentAgentId", agentBusInfo.get(0).getAgentId());
-            LOG.info("代理商ID：{}，上级代理商ID：{}", posMap.get("agentId"), agentBusInfo.get(0).getAgentId());
+            String parentAgentId = agentBusInfo.get(0).getAgZbh() == null ? agentBusInfo.get(0).getAgentId() : agentBusInfo.get(0).getAgZbh();
+            posMap.put("parentAgentId", parentAgentId);
+            LOG.info("代理商唯一码：{}，上级代理商唯一码：{}", posMap.get("agentId"), parentAgentId);
         }
     }
 
@@ -472,7 +472,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * @param map
      */
     private void quarterAssessment(PosReward posReward1, Map<String, Object> map) {
-        LOG.info("代理商ID：{}，到达活动考核月份", map.get("agentId"));
+        LOG.info("代理商唯一码：{}，业务码：{}， 到达活动考核月份", map.get("agentId"), map.get("busNum"));
         Map<String, Object> assMap = new HashMap<String, Object>();
         assMap.putAll(map);
         BigDecimal posTranAmt = BigDecimal.ZERO;
@@ -555,6 +555,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("agentType", assMap.get("agentType"));
         map.put("agentId", assMap.get("agentId"));
+        map.put("busNum", assMap.get("busNum"));
         map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
         map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
         map.put("posRewardAmt", BigDecimal.ZERO);
@@ -578,6 +579,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
             criteria.andAgentIdEqualTo(assMap.get("agentId").toString());
         } else {
             criteria.andAgentIdIn(agentIdList);
+            criteria.andParentAgentIdEqualTo(assMap.get("agentId").toString());
         }
         criteria.andProfitDateIn(month);
         List<ProfitDetailMonth> list = profitDetailMonthServiceImpl.selectByExample(example);
