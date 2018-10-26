@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.order.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ public class AgentVo implements Serializable {
     private String agentBusId;
     private BigDecimal realPayAmount;
     private String supplementId;
-
+    private Date remitTime;
     //订单审批下个审批部门参数
     private String orderAprDept;
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
@@ -59,6 +60,7 @@ public class AgentVo implements Serializable {
     private String payMethod;
     //退货单
     private OReturnOrder oReturnOrder;
+
 
     public OReturnOrder getoReturnOrder() {
         return oReturnOrder;
@@ -338,5 +340,13 @@ public class AgentVo implements Serializable {
 
     public void setReceiptPlanList(List<ReceiptPlan> receiptPlanList) {
         this.receiptPlanList = receiptPlanList;
+    }
+
+    public Date getRemitTime() {
+        return remitTime;
+    }
+
+    public void setRemitTime(Date remitTime) {
+        this.remitTime = remitTime;
     }
 }

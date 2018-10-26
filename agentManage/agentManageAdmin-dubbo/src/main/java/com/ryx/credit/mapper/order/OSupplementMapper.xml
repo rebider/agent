@@ -2,26 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ryx.credit.dao.order.OSupplementMapper">
     <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OSupplement">
-        <id column="ID" property="id" jdbcType="VARCHAR"/>
-        <result column="SRC_ID" property="srcId" jdbcType="VARCHAR"/>
-        <result column="PK_TYPE" property="pkType" jdbcType="VARCHAR"/>
-        <result column="PAY_METHOD" property="payMethod" jdbcType="VARCHAR"/>
-        <result column="PAY_AMOUNT" property="payAmount" jdbcType="DECIMAL"/>
-        <result column="REAL_PAY_AMOUNT" property="realPayAmount" jdbcType="DECIMAL"/>
-        <result column="REMARK" property="remark" jdbcType="VARCHAR"/>
-        <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR"/>
-        <result column="C_USER" property="cUser" jdbcType="VARCHAR"/>
-        <result column="C_TIME" property="cTime" jdbcType="TIMESTAMP"/>
-        <result column="REVIEW_STATUS" property="reviewStatus" jdbcType="DECIMAL"/>
-        <result column="SCHSTATUS" property="schstatus" jdbcType="DECIMAL"/>
-        <result column="STATUS" property="status" jdbcType="DECIMAL"/>
-        <result column="VERSION" property="version" jdbcType="DECIMAL"/>
+        <id column="ID" jdbcType="VARCHAR" property="id" />
+        <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
+        <result column="PK_TYPE" jdbcType="VARCHAR" property="pkType" />
+        <result column="PAY_METHOD" jdbcType="VARCHAR" property="payMethod" />
+        <result column="PAY_AMOUNT" jdbcType="DECIMAL" property="payAmount" />
+        <result column="REAL_PAY_AMOUNT" jdbcType="DECIMAL" property="realPayAmount" />
+        <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+        <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+        <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+        <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+        <result column="REVIEW_STATUS" jdbcType="DECIMAL" property="reviewStatus" />
+        <result column="SCHSTATUS" jdbcType="DECIMAL" property="schstatus" />
+        <result column="STATUS" jdbcType="DECIMAL" property="status" />
+        <result column="VERSION" jdbcType="DECIMAL" property="version" />
+        <result column="REMIT_TIME" jdbcType="TIMESTAMP" property="remitTime" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
             <foreach collection="oredCriteria" item="criteria" separator="or">
                 <if test="criteria.valid">
-                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                    <trim prefix="(" prefixOverrides="and" suffix=")">
                         <foreach collection="criteria.criteria" item="criterion">
                             <choose>
                                 <when test="criterion.noValue">
@@ -35,8 +36,7 @@
                                 </when>
                                 <when test="criterion.listValue">
                                     and ${criterion.condition}
-                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
-                                             separator=",">
+                                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                                         #{listItem}
                                     </foreach>
                                 </when>
@@ -48,50 +48,51 @@
         </where>
     </sql>
     <sql id="Base_Column_List">
-    ID, SRC_ID, PK_TYPE, PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT, REMARK, AGENT_ID, C_USER, 
-    C_TIME, REVIEW_STATUS, SCHSTATUS, STATUS, VERSION
-  </sql>
-    <select id="selectByExample" resultMap="BaseResultMap"
-            parameterType="com.ryx.credit.pojo.admin.order.OSupplementExample">
-        <include refid="OracleDialectPrefix"/>
+        ID, SRC_ID, PK_TYPE, PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT, REMARK, AGENT_ID, C_USER,
+        C_TIME, REVIEW_STATUS, SCHSTATUS, STATUS, VERSION, REMIT_TIME
+    </sql>
+    <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OSupplementExample" resultMap="BaseResultMap">
+        <include refid="OracleDialectPrefix" />
         select
         <if test="distinct">
             distinct
         </if>
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from O_SUPPLEMENT
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
         <if test="orderByClause != null">
             order by ${orderByClause}
         </if>
-        <include refid="OracleDialectSuffix"/>
+        <include refid="OracleDialectSuffix" />
     </select>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List" />
         from O_SUPPLEMENT
         where ID = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OSupplementExample">
         delete from O_SUPPLEMENT
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
     </delete>
     <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OSupplement">
-    insert into O_SUPPLEMENT (ID, SRC_ID, PK_TYPE, 
-      PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT, 
-      REMARK, AGENT_ID, C_USER, 
-      C_TIME, REVIEW_STATUS, SCHSTATUS, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, #{pkType,jdbcType=VARCHAR}, 
-      #{payMethod,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, #{realPayAmount,jdbcType=DECIMAL}, 
-      #{remark,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{reviewStatus,jdbcType=DECIMAL}, #{schstatus,jdbcType=DECIMAL}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
-  </insert>
+        insert into O_SUPPLEMENT (ID, SRC_ID, PK_TYPE,
+        PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT,
+        REMARK, AGENT_ID, C_USER,
+        C_TIME, REVIEW_STATUS, SCHSTATUS,
+        STATUS, VERSION, REMIT_TIME
+        )
+        values (#{id,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, #{pkType,jdbcType=VARCHAR},
+        #{payMethod,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, #{realPayAmount,jdbcType=DECIMAL},
+        #{remark,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR},
+        #{cTime,jdbcType=TIMESTAMP}, #{reviewStatus,jdbcType=DECIMAL}, #{schstatus,jdbcType=DECIMAL},
+        #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{remitTime,jdbcType=TIMESTAMP}
+        )
+    </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSupplement">
         insert into O_SUPPLEMENT
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -137,6 +138,9 @@
             <if test="version != null">
                 VERSION,
             </if>
+            <if test="remitTime != null">
+                REMIT_TIME,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -181,13 +185,15 @@
             <if test="version != null">
                 #{version,jdbcType=DECIMAL},
             </if>
+            <if test="remitTime != null">
+                #{remitTime,jdbcType=TIMESTAMP},
+            </if>
         </trim>
     </insert>
-    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OSupplementExample"
-            resultType="java.lang.Integer">
+    <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OSupplementExample" resultType="java.lang.Long">
         select count(*) from O_SUPPLEMENT
         <if test="_parameter != null">
-            <include refid="Example_Where_Clause"/>
+            <include refid="Example_Where_Clause" />
         </if>
     </select>
     <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OSupplement">
@@ -232,26 +238,30 @@
             <if test="version != null">
                 VERSION = #{version,jdbcType=DECIMAL},
             </if>
+            <if test="remitTime != null">
+                REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OSupplement">
-    update O_SUPPLEMENT
-    set SRC_ID = #{srcId,jdbcType=VARCHAR},
-      PK_TYPE = #{pkType,jdbcType=VARCHAR},
-      PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
-      PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
-      REAL_PAY_AMOUNT = #{realPayAmount,jdbcType=DECIMAL},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
-      SCHSTATUS = #{schstatus,jdbcType=DECIMAL},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
+        update O_SUPPLEMENT
+        set SRC_ID = #{srcId,jdbcType=VARCHAR},
+        PK_TYPE = #{pkType,jdbcType=VARCHAR},
+        PAY_METHOD = #{payMethod,jdbcType=VARCHAR},
+        PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
+        REAL_PAY_AMOUNT = #{realPayAmount,jdbcType=DECIMAL},
+        REMARK = #{remark,jdbcType=VARCHAR},
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+        C_USER = #{cUser,jdbcType=VARCHAR},
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+        REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
+        SCHSTATUS = #{schstatus,jdbcType=DECIMAL},
+        STATUS = #{status,jdbcType=DECIMAL},
+        VERSION = #{version,jdbcType=DECIMAL},
+        REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
     <sql id="OracleDialectPrefix">
         <if test="page != null">
             select * from ( select row_.*, rownum rownum_ from (
@@ -262,7 +272,6 @@
             <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
         </if>
     </sql>
-
     <select id="selectAll" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
         select

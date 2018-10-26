@@ -87,6 +87,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentQueryService agentQueryService;
     @Autowired
     private AssProtoColMapper assProtoColMapper;
+    @Autowired
+    private PlatFormService platFormService;
 
     /**
      * 商户入网
@@ -129,6 +131,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     throw new ProcessException("开通(" + item.getBusPlatform() + ")业务平台重复");
                 } else {
                     hav.add(item.getBusPlatform());
+                }
+                if (null!=item.getBusPlatform()){
+                    PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                    if (null!=platformType){
+                        if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+                            if (StringUtils.isNotBlank(item.getBusNum())){
+                                if (StringUtils.isBlank(item.getBusLoginNum())){
+                                    logger.info("请填写平台登录账号");
+                                    throw new ProcessException("请填写平台登录账号");
+                                }
+                            }
+                        }
+                    }
                 }
             }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
@@ -269,7 +284,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             record.setStatus(Status.STATUS_1.status);
             record.setBusType(BusActRelBusType.Agent.name());
             record.setActivStatus(AgStatus.Approving.name());
-            record.setAgentId(agentId);
+            record.setAgentId(agent.getId());
             record.setAgentName(agent.getAgName());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);

@@ -2107,6 +2107,76 @@ public class AgentExample {
             addCriterion("CA_STATUS not between", value1, value2, "caStatus");
             return (Criteria) this;
         }
+
+        public Criteria andAgRegAreaIsNull() {
+            addCriterion("AG_REG_AREA is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaIsNotNull() {
+            addCriterion("AG_REG_AREA is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaEqualTo(String value) {
+            addCriterion("AG_REG_AREA =", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaNotEqualTo(String value) {
+            addCriterion("AG_REG_AREA <>", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaGreaterThan(String value) {
+            addCriterion("AG_REG_AREA >", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaGreaterThanOrEqualTo(String value) {
+            addCriterion("AG_REG_AREA >=", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaLessThan(String value) {
+            addCriterion("AG_REG_AREA <", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaLessThanOrEqualTo(String value) {
+            addCriterion("AG_REG_AREA <=", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaLike(String value) {
+            addCriterion("AG_REG_AREA like", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaNotLike(String value) {
+            addCriterion("AG_REG_AREA not like", value, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaIn(List<String> values) {
+            addCriterion("AG_REG_AREA in", values, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaNotIn(List<String> values) {
+            addCriterion("AG_REG_AREA not in", values, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaBetween(String value1, String value2) {
+            addCriterion("AG_REG_AREA between", value1, value2, "agRegArea");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgRegAreaNotBetween(String value1, String value2) {
+            addCriterion("AG_REG_AREA not between", value1, value2, "agRegArea");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

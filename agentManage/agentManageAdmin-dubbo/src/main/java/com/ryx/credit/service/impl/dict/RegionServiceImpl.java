@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 地区树实现类
@@ -36,30 +38,33 @@ public class RegionServiceImpl implements RegionService {
     private RedisService redisService;
 
     @Override
-    public List<Tree> selectAllRegion(String pCode) {
+    public List<Tree> selectAllRegion(String pCode,String showArea) {
         if (StringUtils.isBlank(pCode)) {
             pCode = "0";
         }
         List<Region> regionsList = regionMapper.findByPcode(pCode);
         List<Tree> rootTree = new ArrayList<>();
         for (Region region : regionsList) {
-            rootTree.add(regionToTree(region));
+            rootTree.add(regionToTree(region,showArea));
         }
-        String treeJson = JsonUtil.objectToJson(rootTree);
-        try {
-            redisService.setNx(REGIONS_KEY + ":" + pCode, treeJson);
-        } catch (Exception e) {
-            log.info("redis异常");
-        }
+//        String treeJson = JsonUtil.objectToJson(rootTree);
+//        try {
+//            redisService.setNx(REGIONS_KEY + ":" + pCode, treeJson);
+//        } catch (Exception e) {
+//            log.info("redis异常");
+//        }
         return rootTree;
     }
 
-    private Tree regionToTree(Region region) {
+    private Tree regionToTree(Region region,String showArea) {
         Tree tree = new Tree();
         tree.setId(Long.valueOf(region.getrCode()) + "");
         tree.setPid(Long.valueOf(region.getpCode()) + "");
         tree.setText(region.getrName());
-        tree.setState(regionMapper.findCountByPcode(region.getrCode()) == 0 ? 1 : 0);
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("pCode",region.getrCode());
+        reqMap.put("showArea",showArea);
+        tree.setState(regionMapper.findCountByPcode(reqMap) == 0 ? 1 : 0);
         tree.settType(region.gettType());
         return tree;
     }

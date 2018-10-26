@@ -22,6 +22,7 @@ import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DepartmentService;
 import com.ryx.credit.service.dict.IdService;
+import org.apache.commons.collections.FastHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,7 +242,16 @@ public class AgentServiceImpl implements AgentService {
             if(!agentDataHistoryService.saveDataHistory(agent,agent.getId(), DataHistoryType.BASICS.code,userId,agent.getVersion()).isOK()){
                 throw new ProcessException("添加是失败！请重试");
             }
+
             logger.info("代理商添加:成功");
+
+            try {
+                redisService.hSet(RedisCachKey.AGENTINFO.code, FastMap.fastMap(agent.getId(),agent.getAgName()));
+                logger.info("代理商添加:成功");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
             return agent;
         }
         logger.info("代理商添加:{}", "添加代理商失败");
@@ -310,6 +320,7 @@ public class AgentServiceImpl implements AgentService {
         db_agent.setAgDocDistrict(agent.getAgDocDistrict());
         db_agent.setAgRemark(agent.getAgRemark());
         db_agent.setStatus(agent.getStatus());
+        db_agent.setAgRegArea(agent.getAgRegArea());
         if (1 != agentMapper.updateByPrimaryKeySelective(db_agent)) {
             throw new ProcessException("代理商信息更新失败");
         }else{
@@ -415,14 +426,15 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setSalt(salt);
                 userVo.setPassword(pwd);
                 userVo.setName(agent.getAgName());
-                if (StringUtils.isNotBlank(agent.getAgLegalMobile())) {
-                    userVo.setLoginName(agent.getAgLegalMobile());
-                } else if (StringUtils.isNotBlank(agent.getAgUniqNum())) {
-                    userVo.setLoginName(agent.getAgUniqNum());
-                } else {
-                    userVo.setLoginName(agent.getId());
-                }
+//                if (StringUtils.isNotBlank(agent.getAgLegalMobile())) {
+//                    userVo.setLoginName(agent.getAgLegalMobile());
+//                } else if (StringUtils.isNotBlank(agent.getAgUniqNum())) {
+//                    userVo.setLoginName(agent.getAgUniqNum());
+//                } else {
+//                    userVo.setLoginName(agent.getId());
+//                }
 
+                userVo.setLoginName(agent.getId());
                 userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
                 userVo.setRoleIds(redisService.hGet("config", "role"));
                 userVo.setUserType(1);

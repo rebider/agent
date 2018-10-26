@@ -212,5 +212,9 @@ public interface OrderService {
 
     public BigDecimal queryAgentDebt(String agentId);
 
+    /**
+     * 刪除订单
+     */
+    AgentResult updateStatus(String id, String user);
 
 }

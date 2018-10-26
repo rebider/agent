@@ -2,8 +2,11 @@ package com.ryx.credit.dao.agent;
 
 import com.ryx.credit.pojo.admin.agent.Region;
 import com.ryx.credit.pojo.admin.agent.RegionExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface RegionMapper {
 
@@ -25,7 +28,7 @@ public interface RegionMapper {
 
     List<Region> findByPcode(String pCode);
 
-    int findCountByPcode(String pCode);
+    int findCountByPcode(@Param("map") Map<String, Object> map);
 
     List<Region> selectAll();
 }
