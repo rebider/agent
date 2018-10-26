@@ -96,7 +96,8 @@ public class CompensateServiceImpl implements CompensateService {
     private OSubOrderMapper subOrderMapper;
     @Autowired
     private OSubOrderActivityMapper subOrderActivityMapper;
-
+    @Autowired
+    private IUserService iUserService;
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -109,27 +110,35 @@ public class CompensateServiceImpl implements CompensateService {
 
 
     @Override
-    public PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page){
+    public PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page, String dataRole,long userId){
 
-        ORefundPriceDiffExample example = new ORefundPriceDiffExample();
-        ORefundPriceDiffExample.Criteria criteria = example.createCriteria();
+        Map<String, Object> reqMap = new HashMap<>();
+        if(null!=refundPriceDiff.getReviewStatus()){
+            reqMap.put("reviewStatus",refundPriceDiff.getReviewStatus());
+        }
         if(StringUtils.isNotBlank(refundPriceDiff.getApplyBeginTime())){
-            criteria.andSTimeGreaterThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyBeginTime(),DateUtil.DATE_FORMAT_1));
+            reqMap.put("applyBeginTime",refundPriceDiff.getApplyBeginTime());
         }
         if(StringUtils.isNotBlank(refundPriceDiff.getApplyEndTime())){
-            criteria.andSTimeLessThanOrEqualTo(DateUtil.getDateFromStr(refundPriceDiff.getApplyEndTime(),DateUtil.DATE_FORMAT_1));
+            reqMap.put("applyEndTime",refundPriceDiff.getApplyEndTime());
         }
-        if(null!=refundPriceDiff.getReviewStatus()){
-            criteria.andReviewStatusEqualTo(refundPriceDiff.getReviewStatus());
+        if(StringUtils.isBlank(dataRole)){
+            reqMap.put("cUser",userId);
+        }else{
+            if(dataRole.equals("below")){
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                    return null;
+                }
+                Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+                reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+                reqMap.put("cUser",userId);
+            }
         }
-        criteria.andCUserEqualTo(refundPriceDiff.getcUser());
-        example.setPage(page);
-        example.setOrderByClause("c_time desc");
-        List<ORefundPriceDiff> refundPriceDiffs = refundPriceDiffMapper.selectByExample(example);
+        List<Map<String,Object>> refundPriceDiffs = refundPriceDiffMapper.selectByAgent(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(refundPriceDiffs);
-        long count = refundPriceDiffMapper.countByExample(example);
-        pageInfo.setTotal(new Long(count).intValue());
+        pageInfo.setTotal(refundPriceDiffMapper.selectByAgentCount(reqMap));
         return pageInfo;
     }
 
@@ -264,6 +273,7 @@ public class CompensateServiceImpl implements CompensateService {
         String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
         oRefundPriceDiff.setId(priceDiffId);
         Date nowDate = new Date();
+        oRefundPriceDiff.setAgentId(refundPriceDiffDetailList.get(0).getAgentId());
         oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
         oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
         oRefundPriceDiff.setMachOweAmt(new BigDecimal(0));
