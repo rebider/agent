@@ -91,6 +91,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
+        if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
+            criteria.andAgentNameEqualTo(profitDeduction.getAgentName());
+        }
         example.setOrderByClause("CREATE_DATE_TIME DESC ");
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
