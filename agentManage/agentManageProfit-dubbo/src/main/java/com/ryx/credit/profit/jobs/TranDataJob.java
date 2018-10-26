@@ -62,17 +62,22 @@ public class TranDataJob {
                 if (json != null) {
                     BigDecimal tranAmt = BigDecimal.ZERO;
                     BigDecimal zyssAmt = BigDecimal.ZERO;
+                    BigDecimal posAmt = BigDecimal.ZERO;
                     JSONObject jsonObject = getTranData(settleMonth);
                     if (jsonObject != null && jsonObject.containsKey("info")) {
                         JSONObject tranData = jsonObject.getJSONObject("info");
                         zyssAmt = tranData.getBigDecimal("zyssAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyssAmt");;// 自营代理手刷总金额
-                        BigDecimal zydlPosAmt = tranData.getBigDecimal("zydlPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zydlPosAmt");;// 自营代理pos总金额
-                        BigDecimal zyPosAmt = tranData.getBigDecimal("zyPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyPosAmt");//自营交易总金额
-                        BigDecimal hyxJwAmt = tranData.getBigDecimal("hyxPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("hyxPosJwAmt");//汇银讯境外卡交易总金额
-                        BigDecimal orgJwAmt = tranData.getBigDecimal("dlPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("dlPosJwAmt");//代理商境外卡交易总金额
-                        tranAmt = zydlPosAmt.subtract(zyPosAmt).subtract(hyxJwAmt).subtract(orgJwAmt);
+                        BigDecimal zydlPosDjAmt = tranData.getBigDecimal("zydlPosDjAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zydlPosDjAmt");;// 贷记金额
+                        BigDecimal zydlPosJjAmt = tranData.getBigDecimal("zydlPosJjAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zydlPosJjAmt");//借记金额
+                        BigDecimal jgPosAmt = tranData.getBigDecimal("jgPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("jgPosAmt");//借记金额
+                        BigDecimal zyPosAmt = tranData.getBigDecimal("zyPosAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("zyPosAmt");//自营pos金额
+                        BigDecimal hyxPosJwAmt = tranData.getBigDecimal("hyxPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("hyxPosJwAmt");//汇银讯境外金额
+                        BigDecimal dlPosJwAmt = tranData.getBigDecimal("dlPosJwAmt")==null?BigDecimal.ZERO:tranData.getBigDecimal("dlPosJwAmt");//代理商境外
+                        tranAmt = zydlPosDjAmt.add(zydlPosJjAmt).add(jgPosAmt);
+                        //t.hyxpos_jw_amt+t.dlpos_jw_amt
+                        posAmt =zyPosAmt.add(hyxPosJwAmt).add(dlPosJwAmt);
                     }
-                    insertOrUpdate(json, settleMonth, tranAmt, zyssAmt);//新增二维码
+                    insertOrUpdate(json, settleMonth, tranAmt, zyssAmt, posAmt);//新增二维码
                 }else{
                     LOG.error("月份："+settleMonth+"，二维码提供的没有获取到数据");
                 }
@@ -94,11 +99,11 @@ public class TranDataJob {
     * @Author: zhaodw
     * @Date: 2018/8/3
     */
-    private void insertOrUpdate(JSONObject json, String settleMonth, BigDecimal tranAmt, BigDecimal zyssAmt) {
+    private void insertOrUpdate(JSONObject json, String settleMonth, BigDecimal tranAmt, BigDecimal zyssAmt, BigDecimal posAmt) {
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
         profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonthService.delete(profitOrganTranMonth);
-        addPos(json, settleMonth, tranAmt);
+        addPos(json, settleMonth, tranAmt,posAmt);
         addMpos(settleMonth, zyssAmt);
         addQr(json, settleMonth);
     }
@@ -153,14 +158,14 @@ public class TranDataJob {
      * @Author: zhaodw
      * @Date: 2018/8/1
      */
-    private void addPos(JSONObject json, String settleMonth, BigDecimal tranAmt) {
+    private void addPos(JSONObject json, String settleMonth, BigDecimal tranAmt, BigDecimal posAmt) {
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
         profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("01");
         profitOrganTranMonth.setProductName("POS");
-        profitOrganTranMonth.setSettleAmt(json.getBigDecimal("PFT_POS_TRAN_AMT"));
+        profitOrganTranMonth.setSettleAmt(json.getBigDecimal("PFT_POS_TRAN_AMT").add(posAmt));
         profitOrganTranMonth.setTranAmt(tranAmt);
         profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
         profitOrganTranMonthService.insert(profitOrganTranMonth);
