@@ -308,7 +308,8 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     @Override
-    public OPayment initPayment(OPayment payment) throws MessageException {
+    public OPayment initPayment(OrderFormVo agentVo) throws MessageException {
+        OPayment payment = agentVo.getoPayment();
         switch (payment.getPayMethod()) {
             case "SF1"://首付+分润分期
                 if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
@@ -329,6 +330,13 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getDownPayment() != null && payment.getPayAmount()!=null && payment.getDownPayment().compareTo(payment.getPayAmount()) >= 0) {
                     throw new MessageException("首付+分润分期支付方式，首付不能大于等于订单金额");
                 }
+                if (null==payment.getActualReceiptDate()) {
+                    throw new MessageException("打款日期不能为空");
+                }
+                if (agentVo.getAttachments().size()==0) {
+                    throw new MessageException("打款截图不能为空");
+                }
+
                 AgentResult SF1_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF1_checkDownPaymentDateres.isOK()) {
                     throw new MessageException(SF1_checkDownPaymentDateres.getMsg());
@@ -347,11 +355,17 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
                 }
-                if (payment.getDownPaymentUser() == null ) {
+                if (StringUtils.isBlank(payment.getDownPaymentUser()) ) {
                     throw new MessageException("打款人不能为空");
                 }
                 if (payment.getDownPayment() != null && payment.getPayAmount()!=null && payment.getDownPayment().compareTo(payment.getPayAmount()) >= 0) {
                     throw new MessageException("首付+打款分期支付方式，首付不能大于等于订单金额");
+                }
+                if (null==payment.getActualReceiptDate()) {
+                    throw new MessageException("打款日期不能为空");
+                }
+                if (agentVo.getAttachments().size()==0) {
+                    throw new MessageException("打款截图不能为空");
                 }
                 AgentResult SF2_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF2_checkDownPaymentDateres.isOK()) {
@@ -382,8 +396,14 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("请填实际打款金额");
                 }
-                if (payment.getDownPaymentUser() == null ) {
+                if (StringUtils.isBlank(payment.getDownPaymentUser()) ) {
                     throw new MessageException("打款人不能为空");
+                }
+                if (null==payment.getActualReceiptDate()) {
+                    throw new MessageException("打款日期不能为空");
+                }
+                if (agentVo.getAttachments().size()==0) {
+                    throw new MessageException("打款截图不能为空");
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setDownPaymentDate(null);
@@ -452,7 +472,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("付款方式不能为空");
         }
         //初始化数据
-        oPayment = initPayment(oPayment);
+        oPayment = initPayment(orderFormVo);
         //订单总金额
         BigDecimal forPayAmount = new BigDecimal(0);
         //订单应付金额
@@ -697,7 +717,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("订单添加失败");
         }
         //插入付款单
-        oPayment = initPayment(oPayment);
+        oPayment = initPayment(orderFormVo);
         if (1 != oPaymentMapper.insertSelective(oPayment)) {
             throw new MessageException("oPayment添加失败");
         }
@@ -764,7 +784,7 @@ public class OrderServiceImpl implements OrderService {
             throw new MessageException("付款方式不能为空");
         }
         //插入付款单
-        oPayment_db = initPayment(oPayment_db);
+        oPayment_db = initPayment(orderFormVo);
         //订单总金额
         BigDecimal forPayAmount = new BigDecimal(0);
         //订单应付金额
@@ -997,7 +1017,7 @@ public class OrderServiceImpl implements OrderService {
             //添加到数据历史表
             agentDataHistoryService.saveDataHistory(order_db,order_db.getId(),DataHistoryType.ORDER.code,userId,order_db.getVersion());
         }
-        oPayment_db = initPayment(oPayment_db);
+        oPayment_db = initPayment(orderFormVo);
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
             throw new MessageException("oPayment添加失败");

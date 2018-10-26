@@ -12,6 +12,8 @@ public class ORefundPriceDiffVo extends ORefundPriceDiff implements Serializable
 
     private String applyEndTime;
 
+    private String agentName;
+
     public String getGatherTimeStr() {
         return gatherTimeStr;
     }
@@ -34,5 +36,13 @@ public class ORefundPriceDiffVo extends ORefundPriceDiff implements Serializable
 
     public void setApplyEndTime(String applyEndTime) {
         this.applyEndTime = applyEndTime;
+    }
+
+    public String getAgentName() {
+        return agentName;
+    }
+
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
     }
 }

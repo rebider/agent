@@ -101,7 +101,7 @@ public class ColinfoTask {
                 payment.setBalanceRcvName(String.valueOf(row.get("CLO_BANK")));
                 payment.setBalanceRcvCode(String.valueOf(row.get("BRANCH_LINE_NUM")));
                 payment.setBalanceRcvType(cloTypeToPayment(String.valueOf(row.get("CLO_TYPE"))));
-                payment.setFlag(TransFlag.A.getValue());   //待处理
+                payment.setFlag(TransFlag.WCL.getValue());   //待处理
                 payment.setcUser(String.valueOf(row.get("C_USER")));
                 payment.setuUser(String.valueOf(row.get("C_USER")));
                 payment.setCreateTime(nowDate);
@@ -172,7 +172,12 @@ public class ColinfoTask {
             }
             AColinfoPaymentExample aColinfoPaymentExample = new AColinfoPaymentExample();
             AColinfoPaymentExample.Criteria criteria = aColinfoPaymentExample.createCriteria();
-            criteria.andFlagEqualTo(TransFlag.A.getValue());
+            List<String> flagList = new ArrayList<>();
+            flagList.add(TransFlag.CG.getValue());
+            flagList.add(TransFlag.SB.getValue());
+            flagList.add(TransFlag.YCX.getValue());
+            flagList.add(TransFlag.FXLJ.getValue());
+            criteria.andFlagNotIn(flagList);
             List<AColinfoPayment> aColinfoPayments = colinfoPaymentMapper.selectByExample(aColinfoPaymentExample);
             if(null==aColinfoPayments){
                 log.info("synColinfoToQueryPayment,aColinfoPayments is null");
@@ -197,9 +202,9 @@ public class ColinfoTask {
                 }
                 JSONArray jsonArray = JSONObject.parseArray(String.valueOf(resultMap.get("info")));
                 Map<String, Object> resultInfoMap = JsonUtil.jsonToMap(JsonUtil.objectToJson(jsonArray.get(0)));
-                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.A.getValue()) && StringUtils.isNotBlank(TransFlag.getContentByValue(String.valueOf(resultInfoMap.get("flag"))))){
+                if(!String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.WCL.getValue())){
                     agentColinfoService.updateByPaymentResult(aColinfoPayment,resultInfoMap);
-                    if(String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.B.getValue())){
+                    if(String.valueOf(resultInfoMap.get("flag")).equals(TransFlag.CG.getValue())){
                         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
                         AgentBusInfoExample.Criteria criteria1 = agentBusInfoExample.createCriteria();
                         criteria1.andAgentIdEqualTo(aColinfoPayment.getMerchId());

@@ -34,6 +34,7 @@ public class AgentVo implements Serializable {
     private BigDecimal realPayAmount;
     private String supplementId;
     private Date remitTime;
+    private Date checkTime;
     //订单审批下个审批部门参数
     private String orderAprDept;
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
@@ -348,5 +349,13 @@ public class AgentVo implements Serializable {
 
     public void setRemitTime(Date remitTime) {
         this.remitTime = remitTime;
+    }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
     }
 }
