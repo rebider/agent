@@ -376,12 +376,18 @@
        <if test="map.orgId!=null and map.orgId!=''">
          and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
        </if>
-      <if test="map.applyBeginTime!=null and map.applyBeginTime!=''">
+       <if test="map.applyBeginTime!=null and map.applyBeginTime!=''">
          and rp.s_time >= to_date(#{map.applyBeginTime}, 'yy-mm-dd hh24:mi:ss')
-      </if>
-      <if test="map.applyEndTime!=null and map.applyEndTime!=''">
+       </if>
+       <if test="map.applyEndTime!=null and map.applyEndTime!=''">
          and rp.s_time &lt;= to_date(#{map.applyEndTime}, 'yy-mm-dd hh24:mi:ss')
-      </if>
+       </if>
+       <if test="map.agentId != null">
+         and rp.agent_id = #{map.agentId,jdbcType=VARCHAR}
+       </if>
+       <if test="map.agentName != null">
+         and a.ag_name = #{map.agentName,jdbcType=VARCHAR}
+       </if>
     </where>
   </sql>
 
