@@ -480,26 +480,26 @@ public class OrderServiceImpl implements OrderService {
                 throw new MessageException("商品数量错误");
             }
             int proNum = oSubOrder.getProNum().intValue();
-            if (product.getProType().equals(PlatformType.POS.code)){
-//                POS必须是10的倍数
-                if(proNum%10!=0  && proNum!=0){
-                    logger.info("POS的商品数量必须是10的倍数");
-                    throw new MessageException("POS的商品数量必须是10的倍数");
-                }
-
-            }else if(product.getProType().equals(PlatformType.MPOS.code)){
-//                手刷必须是100的倍数
-                if(proNum%100!=0 && proNum!=0){
-                    logger.info("手刷的商品数量必须是100的倍数");
-                    throw new MessageException("手刷的商品数量必须是100的倍数");
-                }
-            }else if(null!=product.getProCode() && product.getProCode().equals("206")){
-//                 流量卡必须100张起订
-                if(proNum<100){
-                    logger.info("流量卡的商品数量必须100张起订");
-                    throw new MessageException("流量卡的商品数量必须100张起订");
-                }
-            }
+//            if (product.getProType().equals(PlatformType.POS.code)){
+////                POS必须是10的倍数
+//                if(proNum%10!=0  && proNum!=0){
+//                    logger.info("POS的商品数量必须是10的倍数");
+//                    throw new MessageException("POS的商品数量必须是10的倍数");
+//                }
+//
+//            }else if(product.getProType().equals(PlatformType.MPOS.code)){
+////                手刷必须是100的倍数
+//                if(proNum%100!=0 && proNum!=0){
+//                    logger.info("手刷的商品数量必须是100的倍数");
+//                    throw new MessageException("手刷的商品数量必须是100的倍数");
+//                }
+//            }else if(null!=product.getProCode() && product.getProCode().equals("206")){
+////                 流量卡必须100张起订
+//                if(proNum<100){
+//                    logger.info("流量卡的商品数量必须100张起订");
+//                    throw new MessageException("流量卡的商品数量必须100张起订");
+//                }
+//            }
             oSubOrder.setOrderId(orderFormVo.getId());
             oSubOrder.setProCode(product.getProCode());
             oSubOrder.setProName(product.getProName());
