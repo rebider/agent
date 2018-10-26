@@ -820,12 +820,12 @@ public class CompensateServiceImpl implements CompensateService {
             }
             oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
             if(null==oLogisticsDetails){
-                log.info("calculatePriceDiff数据有误异常返回1");
-                throw new ProcessException("查询活动异常");
+                log.info("calculatePriceDiff查询Sn失败请检查Sn有效性1");
+                throw new ProcessException("查询Sn失败请检查Sn有效性");
             }
             if(oLogisticsDetails.size()!=1){
-                log.info("calculatePriceDiff数据有误异常返回2");
-                throw new ProcessException("查询活动异常");
+                log.info("calculatePriceDiff查询Sn失败请检查Sn有效性2");
+                throw new ProcessException("查询Sn失败请检查Sn有效性");
             }
             Map<String, Object> oLogisticsDetailMap = oLogisticsDetails.get(0);
             oRefundPriceDiffDetail.setRefundPriceDiffDetailMap(oLogisticsDetailMap);
