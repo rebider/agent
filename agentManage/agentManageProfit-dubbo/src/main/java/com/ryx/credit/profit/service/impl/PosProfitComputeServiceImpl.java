@@ -449,6 +449,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
         } else {
             update.setPosRewardDeductionAmt(new BigDecimal(posMap.get("posRewardAmt").toString()).negate());
         }
+        profitDetailMonthServiceImpl.updateByPrimaryKeySelective(update);
         //新增扣款明细，
         ProfitDeduction deductDetail = new ProfitDeduction();
         deductDetail.setAgentId(profitDetailMonth.getAgentId());
@@ -462,7 +463,6 @@ public class PosProfitComputeServiceImpl implements DeductService {
         deductDetail.setId(profitDetailMonth.getId());
         if(Objects.equals(posMap.get("computType"), "1")){
             profitDeducttionDetailService.insertDeducttionDetail(deductDetail);
-            profitDetailMonthServiceImpl.updateByPrimaryKeySelective(update);
         }
     }
 
