@@ -503,7 +503,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             if (!hbList.isEmpty()) {
                 //POS考核扣款（新国都、瑞易送）-
                 Map<String, Object> param = new HashMap<>(5);
-                param.put("agentPid", profitDetailMonth.getAgentPid());
+                param.put("agentPid", profitDetailMonth.getAgentId());
                 param.put("computeType", computType);
                 param.put("parentAgentPid", profitDetailMonth.getParentAgentId());
                 param.put("remark", "POS考核扣款（新国都、瑞易送）");
@@ -531,7 +531,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     }
                     if (!((List)param.get("hbList")).isEmpty()) {
                         //保理扣款-
-                        BigDecimal bl = profitComputerService.total_factor(profitDetailMonth.getAgentPid(), null);
+                        BigDecimal bl = profitComputerService.total_factor(profitDetailMonth.getAgentId(), null);
                         BigDecimal diff = bl.subtract(profitDetailMonth.getBuDeductionAmt());
                         if (diff.doubleValue() !=0) {
                             hbList = ((List)param.get("hbList"));
@@ -692,7 +692,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt, computType);
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
-        param.put("agentPid",  profitDetailMonthTemp.getAgentPid());
+        param.put("agentPid",  profitDetailMonthTemp.getAgentId());
         param.put("computeType", computType);
         param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentId());
         param.put("remark", "POS考核扣款（新国都、瑞易送）");
@@ -706,7 +706,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
         //保理扣款-
-        profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentPid(), null));
+        profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentId(), null));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
 
         param.put("profitAmt", sumAmt);
