@@ -924,4 +924,19 @@
   <select id="getProAgent" parameterType="String" resultType="java.lang.String">
    SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID WHERE COR.ID =#{id}
   </select>
+
+  <!--导出数据-->
+  <select id="exportByFinance" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    <where>
+      1=1
+      <if test='null != agentId and agentId !="" '>AND AGENT_ID = #{agentId,jdbcType=VARCHAR}</if>
+      <if test='null != agentName and agentName !="" '>AND AGENT_NAME = #{agentName,jdbcType=VARCHAR}</if>
+      <if test='null != profitDateStart and profitDateStart !="" '>AND PROFIT_DATE &gt;= #{profitDateStart,jdbcType=VARCHAR}</if>
+      <if test='null != profitDateEnd and profitDateEnd !="" '>AND PROFIT_DATE &lt;= #{profitDateEnd,jdbcType=VARCHAR}</if>
+    </where>
+    order by PROFIT_DATE
+  </select>
 </mapper>

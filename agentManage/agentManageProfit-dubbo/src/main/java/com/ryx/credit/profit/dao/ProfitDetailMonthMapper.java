@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
+import com.ryx.credit.profit.pojo.ProfitDirect;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -62,4 +63,11 @@ public interface ProfitDetailMonthMapper {
     List<String> getDistrictAgent(String id);
 
     List<String> getProAgent(String id);
+
+    /**
+     * 导出数据
+     * @param profitDetailMonth
+     * @return
+     */
+    List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth);
 }
