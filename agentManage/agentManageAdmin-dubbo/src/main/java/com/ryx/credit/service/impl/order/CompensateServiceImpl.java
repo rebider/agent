@@ -8,10 +8,7 @@ import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AttachmentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
@@ -98,6 +95,8 @@ public class CompensateServiceImpl implements CompensateService {
     private OSubOrderActivityMapper subOrderActivityMapper;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private AgentMapper agentMapper;
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -403,6 +402,7 @@ public class CompensateServiceImpl implements CompensateService {
         }
 
         ORefundPriceDiff updateRefundPriceDiff = new ORefundPriceDiff();
+        updateRefundPriceDiff.setVersion(oRefundPriceDiff.getVersion());
         updateRefundPriceDiff.setId(id);
         updateRefundPriceDiff.setReviewStatus(AgStatus.Approving.status);
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updateRefundPriceDiff);
@@ -438,6 +438,10 @@ public class CompensateServiceImpl implements CompensateService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.COMPENSATE.name());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(oRefundPriceDiff.getAgentId());
+        Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
+        if(null!=agent)
+        record.setAgentName(agent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             log.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");
