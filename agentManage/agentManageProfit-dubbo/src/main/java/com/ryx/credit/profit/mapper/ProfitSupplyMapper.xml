@@ -291,6 +291,8 @@
         <if test="SUPPLY_TYPE != null and SUPPLY_TYPE != ''">AND SUPPLY_TYPE = #{SUPPLY_TYPE,jdbcType=CHAR}</if>
         <if test="SUPPLY_DATE_START != null and SUPPLY_DATE_START != ''">AND SOURCE_ID &gt;= #{SUPPLY_DATE_START,jdbcType=VARCHAR}</if>
         <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SOURCE_ID &lt;= #{SUPPLY_DATE_END,jdbcType=VARCHAR}</if>
+        <if test="SOURCE_ID != null and SOURCE_ID != ''">AND SOURCE_ID = #{SOURCE_ID,jdbcType=VARCHAR}</if>
+        <if test="SUPPLY_DATE != null and SUPPLY_DATE != ''">AND SUPPLY_DATE = #{SUPPLY_DATE,jdbcType=VARCHAR}</if>
       </trim>
     </where>
   </sql>
