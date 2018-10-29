@@ -358,7 +358,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Override
 	public List<Map> getParentListFromBusInfo(List<Map> list, String busId) {
 		if(list==null)list=new ArrayList<Map>();
-		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		FastMap par = FastMap.fastMap("id", busId)
+				.putKeyV("busStatus", 2);
+		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(par);
 		if(map.size()>0){
 			list.add(map.get(0));
 		}

@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.result.AgentResult;
@@ -8,7 +9,9 @@ import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
+import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.PlatForm;
 import com.ryx.credit.service.agent.PosOrgStatisticsService;
 import com.ryx.credit.util.Constants;
@@ -30,8 +33,11 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     private static Logger log = LoggerFactory.getLogger(PosOrgStatisticsServiceImpl.class);
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
-    public AgentResult posOrgStatistics(String busPlatform,String orgId)throws Exception{
+    @Override
+    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId)throws Exception{
         PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
         String platformType = platForm.getPlatformType();
         if(PlatformType.MPOS.getValue().equals(platformType)){
@@ -39,18 +45,20 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             agentResult.setMsg(platformType);
             return agentResult;
         }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
-            AgentResult agentResult = httpForPos(orgId);
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+            AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+            AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
             agentResult.setMsg(platformType);
             return agentResult;
         }
         return AgentResult.fail();
     }
 
-    private AgentResult httpForPos(String orgId)throws Exception{
+    public AgentResult httpForPos(String orgId,String supDorgId)throws Exception{
         try {
             String cooperator = com.ryx.credit.util.Constants.cooperator;
             String charset = "UTF-8"; // 字符集
-            String tranCode = "ORG005"; // 交易码
+            String tranCode = "ORG006"; // 交易码
             String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
             String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
@@ -60,6 +68,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             jsonParams.put("msgType", "01");
             jsonParams.put("reqDate", reqDate);
             data.put("orgId",orgId);
+            data.put("supDorgId",supDorgId);
 
             jsonParams.put("data", data);
             String plainXML = jsonParams.toString();
@@ -107,7 +116,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                     String respType = String.valueOf(respXMLMap.get("respType"));
                     Map<String, Object> resultMap = new HashMap<>();
                     if(respType.equals("S")){
-                        resultMap = JsonUtil.jsonToMap(String.valueOf(respXMLMap.get("data")));
+                        resultMap = JSONArray.parseObject(String.valueOf(respXMLMap.get("data")));
                     }
                     return AgentResult.ok(resultMap);
                 }
