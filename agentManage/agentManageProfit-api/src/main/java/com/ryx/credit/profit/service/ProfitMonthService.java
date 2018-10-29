@@ -2,10 +2,7 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitMonth;
-import com.ryx.credit.profit.pojo.ProfitUnfreeze;
-import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.pojo.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -171,4 +168,11 @@ public interface ProfitMonthService {
     * @Date: 2018/8/24
     */
     void payMoney();
+
+    /**
+     * 导出数据
+     * @param profitDetailMonth
+     * @return
+     */
+    List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth);
 }

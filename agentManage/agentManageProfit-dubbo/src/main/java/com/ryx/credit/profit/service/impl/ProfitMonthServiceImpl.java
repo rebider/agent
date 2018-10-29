@@ -944,4 +944,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return null;
     }
 
+    /**
+     * 导出数据
+     * @param profitDetailMonth
+     * @return
+     */
+    @Override
+    public List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth) {
+        return profitDetailMonthMapper.exportByFinance(profitDetailMonth);
+    }
+
 }
