@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.pojo;
 
-public class PosRewardDetail {
+import java.io.Serializable;
+
+public class PosRewardDetail implements Serializable{
     private String id;
 
     private String profitPosDate;
