@@ -48,12 +48,12 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
 
     @Override
     public AgentResult check(OCashReceivables oCashReceivables) throws Exception {
-        if(null==oCashReceivables)  return AgentResult.fail("内容不能为空");
-        if(StringUtils.isBlank(oCashReceivables.getCashpayType()))  return AgentResult.fail("付款对象类型不能为空");
-        if(StringUtils.isBlank(oCashReceivables.getSrcId()))  return AgentResult.fail("付款对象不能为空");
-        if(StringUtils.isBlank(oCashReceivables.getAgentId()))  return AgentResult.fail("代理商ID不能为空");
-        if(null==oCashReceivables.getAmount())  return AgentResult.fail("金额不能为空");
-        if(StringUtils.isBlank(oCashReceivables.getPayType()))  return AgentResult.fail("付款类型不能为空");
+        if(null==oCashReceivables)  return AgentResult.fail("现金付款内容不能为空");
+        if(StringUtils.isBlank(oCashReceivables.getCashpayType()))  return AgentResult.fail("现金付款付款对象类型不能为空");
+        if(StringUtils.isBlank(oCashReceivables.getSrcId()))  return AgentResult.fail("现金付款付款对象不能为空");
+        if(StringUtils.isBlank(oCashReceivables.getAgentId()))  return AgentResult.fail("现金付款代理商不能为空");
+        if(null==oCashReceivables.getAmount())  return AgentResult.fail("现金付款金额不能为空");
+        if(StringUtils.isBlank(oCashReceivables.getPayType()))  return AgentResult.fail("现金付款付款类型不能为空");
         return AgentResult.ok();
     }
 
