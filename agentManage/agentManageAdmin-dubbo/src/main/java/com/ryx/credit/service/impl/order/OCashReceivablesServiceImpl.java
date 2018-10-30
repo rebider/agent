@@ -100,6 +100,12 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         logger.info("操作人[{}]操作付款信息[{}]",user, JSONObject.toJSONString(oCashReceivablesList));
         Date date = new Date();
         BigDecimal total = BigDecimal.ZERO;
+        List<OCashReceivables> list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status));
+        for (OCashReceivables oCashReceivables : list) {
+            if(!dele(oCashReceivables,user).isOK()){
+                throw new MessageException("更新打开明细失败");
+            }
+        }
         if(oCashReceivablesList!=null){
             for (OCashReceivables oCashReceivables : oCashReceivablesList) {
                 oCashReceivables.setCashpayType(cpt.code);
@@ -176,17 +182,14 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         db.setRemark(oCashReceivables.getRemark());
         Calendar c = Calendar.getInstance();
         if(null==oCashReceivables.getcUser())
-        oCashReceivables.setcUser(user);
+            db.setcUser(user);
         if(null==oCashReceivables.getcTime())
-        oCashReceivables.setcTime(c.getTime());
-        if(null!=oCashReceivables.getStatus()) {
-           oCashReceivables.setStatus(oCashReceivables.getStatus());
-        }
-        oCashReceivables.setuTime(c.getTime());
-        oCashReceivables.setuUser(user);
-        oCashReceivables.setVersion(Status.STATUS_1.status);
-        oCashReceivables.setId(idService.genId(TabId.o_cash_receivables));
-        if(1==oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables)){
+            db.setcTime(c.getTime());
+        db.setuTime(c.getTime());
+        db.setuUser(user);
+        db.setVersion(Status.STATUS_1.status);
+        db.setStatus(Status.STATUS_1.status);
+        if(1==oCashReceivablesMapper.updateByPrimaryKeySelective(db)){
             return AgentResult.ok();
         }
         return AgentResult.fail();
