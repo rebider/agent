@@ -23,6 +23,7 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="REAL_REC_TIME" jdbcType="TIMESTAMP" property="realRecTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -56,7 +57,7 @@
   <sql id="Base_Column_List">
     ID, CASHPAY_TYPE, SRC_ID, AGENT_ID, AMOUNT, REAL_AMOUNT, PAY_USER, PAY_TIME, COLLECT_COMPANY,
     CHECK_USER, CHECK_DATE, PAY_TYPE, BILLNUM, REVIEW_STATUS, REMARK, C_TIME, U_TIME,
-    C_USER, U_USER, VERSION, STATUS
+    C_USER, U_USER, VERSION, STATUS, REAL_REC_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OCashReceivablesExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -93,16 +94,16 @@
     CHECK_USER, CHECK_DATE, PAY_TYPE,
     BILLNUM, REVIEW_STATUS, REMARK,
     C_TIME, U_TIME, C_USER,
-    U_USER, VERSION, STATUS
-    )
+    U_USER, VERSION, STATUS,
+    REAL_REC_TIME)
     values (#{id,jdbcType=VARCHAR}, #{cashpayType,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR},
     #{agentId,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL},
     #{payUser,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{collectCompany,jdbcType=VARCHAR},
     #{checkUser,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP}, #{payType,jdbcType=VARCHAR},
     #{billnum,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}
-    )
+    #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL},
+    #{realRecTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OCashReceivables">
     insert into O_CASH_RECEIVABLES
@@ -170,6 +171,9 @@
       <if test="status != null">
         STATUS,
       </if>
+      <if test="realRecTime != null">
+        REAL_REC_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -234,6 +238,9 @@
       </if>
       <if test="status != null">
         #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="realRecTime != null">
+        #{realRecTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -306,31 +313,35 @@
       <if test="status != null">
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
+      <if test="realRecTime != null">
+        REAL_REC_TIME = #{realRecTime,jdbcType=TIMESTAMP},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OCashReceivables">
     update O_CASH_RECEIVABLES
     set CASHPAY_TYPE = #{cashpayType,jdbcType=VARCHAR},
-      SRC_ID = #{srcId,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AMOUNT = #{amount,jdbcType=DECIMAL},
-      REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
-      PAY_USER = #{payUser,jdbcType=VARCHAR},
-      PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
-      COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
-      CHECK_USER = #{checkUser,jdbcType=VARCHAR},
-      CHECK_DATE = #{checkDate,jdbcType=TIMESTAMP},
-      PAY_TYPE = #{payType,jdbcType=VARCHAR},
-      BILLNUM = #{billnum,jdbcType=VARCHAR},
-      REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      VERSION = #{version,jdbcType=DECIMAL},
-      STATUS = #{status,jdbcType=DECIMAL}
+    SRC_ID = #{srcId,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AMOUNT = #{amount,jdbcType=DECIMAL},
+    REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
+    PAY_USER = #{payUser,jdbcType=VARCHAR},
+    PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
+    COLLECT_COMPANY = #{collectCompany,jdbcType=VARCHAR},
+    CHECK_USER = #{checkUser,jdbcType=VARCHAR},
+    CHECK_DATE = #{checkDate,jdbcType=TIMESTAMP},
+    PAY_TYPE = #{payType,jdbcType=VARCHAR},
+    BILLNUM = #{billnum,jdbcType=VARCHAR},
+    REVIEW_STATUS = #{reviewStatus,jdbcType=DECIMAL},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    VERSION = #{version,jdbcType=DECIMAL},
+    STATUS = #{status,jdbcType=DECIMAL},
+    REAL_REC_TIME = #{realRecTime,jdbcType=TIMESTAMP}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

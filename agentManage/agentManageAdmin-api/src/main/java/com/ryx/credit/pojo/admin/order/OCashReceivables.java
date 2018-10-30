@@ -62,6 +62,12 @@ public class OCashReceivables implements Serializable{
 
     private BigDecimal status;
 
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
+    private Date realRecTime;
+
     public String getId() {
         return id;
     }
@@ -228,5 +234,13 @@ public class OCashReceivables implements Serializable{
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public Date getRealRecTime() {
+        return realRecTime;
+    }
+
+    public void setRealRecTime(Date realRecTime) {
+        this.realRecTime = realRecTime;
     }
 }

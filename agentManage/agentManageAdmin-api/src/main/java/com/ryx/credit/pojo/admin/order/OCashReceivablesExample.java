@@ -1517,6 +1517,66 @@ public class OCashReceivablesExample {
             addCriterion("STATUS not between", value1, value2, "status");
             return (Criteria) this;
         }
+
+        public Criteria andRealRecTimeIsNull() {
+            addCriterion("REAL_REC_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeIsNotNull() {
+            addCriterion("REAL_REC_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeEqualTo(Date value) {
+            addCriterion("REAL_REC_TIME =", value, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeNotEqualTo(Date value) {
+            addCriterion("REAL_REC_TIME <>", value, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeGreaterThan(Date value) {
+            addCriterion("REAL_REC_TIME >", value, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("REAL_REC_TIME >=", value, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeLessThan(Date value) {
+            addCriterion("REAL_REC_TIME <", value, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeLessThanOrEqualTo(Date value) {
+            addCriterion("REAL_REC_TIME <=", value, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeIn(List<Date> values) {
+            addCriterion("REAL_REC_TIME in", values, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeNotIn(List<Date> values) {
+            addCriterion("REAL_REC_TIME not in", values, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeBetween(Date value1, Date value2) {
+            addCriterion("REAL_REC_TIME between", value1, value2, "realRecTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRealRecTimeNotBetween(Date value1, Date value2) {
+            addCriterion("REAL_REC_TIME not between", value1, value2, "realRecTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
