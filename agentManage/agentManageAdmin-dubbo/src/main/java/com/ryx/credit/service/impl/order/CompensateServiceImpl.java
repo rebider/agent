@@ -633,6 +633,12 @@ public class CompensateServiceImpl implements CompensateService {
         if(i!=1){
             throw new ProcessException("更新退补差价数据申请失败");
         }
+
+        AgentResult cashAgentResult = oCashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getuUser(),new Date());
+        if(!cashAgentResult.isOK()){
+            throw new ProcessException("更新收款人和时间失败");
+        }
+
         AgentResult agentResult = AgentResult.fail();
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             agentResult = oCashReceivablesService.refuseProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
@@ -642,10 +648,6 @@ public class CompensateServiceImpl implements CompensateService {
         }
         if(!agentResult.isOK()){
             throw new ProcessException("更新打款记录失败");
-        }
-        AgentResult cashAgentResult = oCashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getuUser(),new Date());
-        if(!cashAgentResult.isOK()){
-            throw new ProcessException("更新收款人和时间失败");
         }
 
         ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
