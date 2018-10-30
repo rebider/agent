@@ -124,7 +124,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                         logger.info("操作人[{}]检查异常[{}]",user,checkRes.getMsg());
                         throw new MessageException(checkRes.getMsg());
                     }
-                    total.add(oCashReceivables.getAmount());
+                    total = total.add(oCashReceivables.getAmount());
                 }else if(oCashReceivables!=null && StringUtils.isBlank(oCashReceivables.getId())){
                     logger.info("操作人[{}]添加付款信息[{}]",user, JSONObject.toJSONString(oCashReceivables));
                     checkRes = add(oCashReceivables,user);
@@ -132,7 +132,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                         logger.info("操作人[{}]检查异常[{}]",user,checkRes.getMsg());
                         throw new MessageException(checkRes.getMsg());
                     }
-                    total.add(oCashReceivables.getAmount());
+                    total = total.add(oCashReceivables.getAmount());
                 }else{
                     logger.info("操作人[{}]修改付款信息[{}]",user, JSONObject.toJSONString(oCashReceivables));
                     throw new MessageException("内容不能为空");

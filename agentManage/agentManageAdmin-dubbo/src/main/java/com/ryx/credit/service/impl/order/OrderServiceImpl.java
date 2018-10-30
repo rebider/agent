@@ -325,22 +325,17 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
-                if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new MessageException("请填实际打款金额");
-                }
-                if (StringUtils.isBlank(payment.getDownPaymentUser())) {
-                    throw new MessageException("打款人不能为空");
+                // cxinfo 修改为多条打款信息
+                List<OCashReceivablesVo> cash = agentVo.getoCashReceivables();
+                if (cash==null || cash.size()== 0) {
+                    throw new MessageException("首付+分润分期支付方式，必须添加打款项");
                 }
                 if (payment.getDownPayment() != null && payment.getPayAmount()!=null && payment.getDownPayment().compareTo(payment.getPayAmount()) >= 0) {
                     throw new MessageException("首付+分润分期支付方式，首付不能大于等于订单金额");
                 }
-                if (null==payment.getActualReceiptDate()) {
-                    throw new MessageException("打款日期不能为空");
-                }
                 if (agentVo.getAttachments().size()==0) {
                     throw new MessageException("打款截图不能为空");
                 }
-
                 AgentResult SF1_checkDownPaymentDateres = checkDownPaymentDate(payment.getDownPaymentDate());
                 if (!SF1_checkDownPaymentDateres.isOK()) {
                     throw new MessageException(SF1_checkDownPaymentDateres.getMsg());
@@ -356,18 +351,15 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
-                if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new MessageException("请填实际打款金额");
-                }
-                if (StringUtils.isBlank(payment.getDownPaymentUser()) ) {
-                    throw new MessageException("打款人不能为空");
+                // cxinfo 修改为多条打款信息
+                List<OCashReceivablesVo> cash_sf2 = agentVo.getoCashReceivables();
+                if (cash_sf2==null || cash_sf2.size()== 0) {
+                    throw new MessageException("首付+打款分期支付方式，必须添加打款项");
                 }
                 if (payment.getDownPayment() != null && payment.getPayAmount()!=null && payment.getDownPayment().compareTo(payment.getPayAmount()) >= 0) {
                     throw new MessageException("首付+打款分期支付方式，首付不能大于等于订单金额");
                 }
-                if (null==payment.getActualReceiptDate()) {
-                    throw new MessageException("打款日期不能为空");
-                }
+
                 if (agentVo.getAttachments().size()==0) {
                     throw new MessageException("打款截图不能为空");
                 }
@@ -377,6 +369,10 @@ public class OrderServiceImpl implements OrderService {
                 }
                 return payment;
             case "FKFQ"://打款分期
+                List<OCashReceivablesVo> cash_FKFQ = agentVo.getoCashReceivables();
+                if (cash_FKFQ==null || cash_FKFQ.size()> 0) {
+                    throw new MessageException("打款分期支付方式，不支持线下打款");
+                }
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("5号以后必须选择下个月");
                 }
@@ -387,6 +383,10 @@ public class OrderServiceImpl implements OrderService {
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "FRFQ"://分润分期
+                List<OCashReceivablesVo> cash_FRFQ = agentVo.getoCashReceivables();
+                if (cash_FRFQ==null || cash_FRFQ.size()> 0) {
+                    throw new MessageException("分润分期支付方式，不支持线下打款");
+                }
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("5号以后必须选择下个月");
                 }
@@ -397,14 +397,10 @@ public class OrderServiceImpl implements OrderService {
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "XXDK"://线下打款
-                if (payment.getActualReceipt() == null || payment.getActualReceipt().compareTo(BigDecimal.ZERO) <= 0) {
-                    throw new MessageException("请填实际打款金额");
-                }
-                if (StringUtils.isBlank(payment.getDownPaymentUser()) ) {
-                    throw new MessageException("打款人不能为空");
-                }
-                if (null==payment.getActualReceiptDate()) {
-                    throw new MessageException("打款日期不能为空");
+                // cxinfo 修改为多条打款信息
+                List<OCashReceivablesVo> cash_XXDK = agentVo.getoCashReceivables();
+                if (cash_XXDK==null || cash_XXDK.size()== 0) {
+                    throw new MessageException("线下打款支付方式，必须添加打款项");
                 }
                 if (agentVo.getAttachments().size()==0) {
                     throw new MessageException("打款截图不能为空");
@@ -414,6 +410,11 @@ public class OrderServiceImpl implements OrderService {
                 payment.setDownPaymentCount(BigDecimal.ZERO);
                 return payment;
             case "QT"://其他
+                // cxinfo 修改为多条打款信息
+                List<OCashReceivablesVo> cash_QT = agentVo.getoCashReceivables();
+                if (cash_QT==null || cash_QT.size()== 0) {
+                    throw new MessageException("其他打款支付方式，不支持线下打款");
+                }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setDownPaymentDate(null);
                 payment.setDownPaymentCount(BigDecimal.ZERO);
@@ -1037,8 +1038,9 @@ public class OrderServiceImpl implements OrderService {
         if(cashReceivables.isOK()){
             logger.info("下订单线下付款明细添加成功:{}", JSONArray.toJSONString(orderFormVo.getoCashReceivables()));
             //根据明细天剑实收金额
-            oPayment.setActualReceipt((BigDecimal)cashReceivables.getData());
+            oPayment_db.setActualReceipt((BigDecimal)cashReceivables.getData());
         }
+
 
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
