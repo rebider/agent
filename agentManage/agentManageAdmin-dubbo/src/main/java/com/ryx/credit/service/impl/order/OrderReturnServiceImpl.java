@@ -184,6 +184,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         OReturnOrderDetailExample example = new OReturnOrderDetailExample();
         example.or().andReturnIdEqualTo(returnId);
         List<OReturnOrderDetail> returnDetails = returnOrderDetailMapper.selectByExample(example);
+        for (OReturnOrderDetail returnDetail : returnDetails) {
+            Dict proComDict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),returnDetail.getProCom());
+            if(null!=proComDict)
+            returnDetail.setProCom(proComDict.getdItemname());
+            Dict modelTypeDict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),returnDetail.getProType());
+            if(null!=modelTypeDict)
+            returnDetail.setProType(modelTypeDict.getdItemname());
+        }
 
         //查询扣款款项
         ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
