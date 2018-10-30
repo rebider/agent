@@ -61,4 +61,8 @@ public interface BusinessPlatformService {
 
 
     List<Map<String,Object>> queryIsBZYDList(String agBusLic,List<AgentBusInfo> busInfoVoList);
+
+
+    AgentResult selectByAgentApproved(String id);
+
 }

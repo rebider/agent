@@ -1296,6 +1296,7 @@ public class OrderServiceImpl implements OrderService {
             //传递部门信息
             Map startPar = agentEnterService.startPar(userId);
             if (null != startPar) {
+                if(!agentVo.getApprovalResult().equals("back"))
                 reqMap.put("party", startPar.get("party"));
             }
             //完成任务
