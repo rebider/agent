@@ -1,10 +1,7 @@
 package com.ryx.credit.pojo.admin.vo;
 
 import com.ryx.credit.pojo.admin.agent.Attachment;
-import com.ryx.credit.pojo.admin.order.OOrder;
-import com.ryx.credit.pojo.admin.order.OPayment;
-import com.ryx.credit.pojo.admin.order.OReceiptOrder;
-import com.ryx.credit.pojo.admin.order.OSubOrder;
+import com.ryx.credit.pojo.admin.order.*;
 
 import java.util.List;
 
@@ -19,6 +16,8 @@ public class OrderFormVo extends OOrder{
     private List<OSubOrder> oSubOrder;
 
     private List<OReceiptOrderVo> oReceiptOrderList;
+
+    private List<OCashReceivables> oCashReceivables;
 
     private List<Attachment> attachments;
 
@@ -52,5 +51,13 @@ public class OrderFormVo extends OOrder{
 
     public void setAttachments(List<Attachment> attachments) {
         this.attachments = attachments;
+    }
+
+    public List<OCashReceivables> getoCashReceivables() {
+        return oCashReceivables;
+    }
+
+    public void setoCashReceivables(List<OCashReceivables> oCashReceivables) {
+        this.oCashReceivables = oCashReceivables;
     }
 }

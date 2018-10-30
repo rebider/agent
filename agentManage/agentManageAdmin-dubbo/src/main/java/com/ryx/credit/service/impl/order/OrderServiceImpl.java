@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
@@ -18,6 +19,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +93,8 @@ public class OrderServiceImpl implements OrderService {
     private AgentDataHistoryService agentDataHistoryService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private OCashReceivablesService oCashReceivablesService;
 
     /**
      * 根据ID查询订单
@@ -215,6 +219,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public AgentResult buildOrder(OrderFormVo orderFormVo, String userId) throws Exception {
+        logger.info("用户[{}]订单构建[{}]",userId, JSONObject.toJSONString(orderFormVo));
         if (StringUtils.isBlank(orderFormVo.getAgentId())) {
             return AgentResult.fail("请选择代理商");
         }
@@ -227,7 +232,6 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = setOrderFormValue(orderFormVo, userId);
-
         //添加到数据历史表
         agentDataHistoryService.saveDataHistory(orderFormVo, DataHistoryType.ORDER.getValue());
         return AgentResult.ok(orderFormVo.getId());
@@ -304,7 +308,7 @@ public class OrderServiceImpl implements OrderService {
     /**
      * 根据支付类型初始化付款单参数
      *
-     * @param payment
+     * @param agentVo
      * @return
      */
     @Override
@@ -484,7 +488,6 @@ public class OrderServiceImpl implements OrderService {
             logger.info("下订单:{}", "请选择商品");
             throw new MessageException("请选择商品");
         }
-
 
 
 
@@ -718,9 +721,19 @@ public class OrderServiceImpl implements OrderService {
         }
         //插入付款单
         oPayment = initPayment(orderFormVo);
+
+        //线下付款明细添加
+        AgentResult cashReceivables = oCashReceivablesService.addOCashReceivables(orderFormVo.getoCashReceivables(),userId,oPayment.getAgentId(),CashPayType.PAYMENT,oPayment.getId());
+        if(cashReceivables.isOK()){
+            logger.info("下订单线下付款明细添加成功:{}", JSONArray.toJSONString(orderFormVo.getoCashReceivables()));
+            //根据明细天剑实收金额
+            oPayment.setActualReceipt((BigDecimal)cashReceivables.getData());
+        }
+
         if (1 != oPaymentMapper.insertSelective(oPayment)) {
             throw new MessageException("oPayment添加失败");
         }
+
         return orderFormVo;
     }
 
@@ -1166,6 +1179,9 @@ public class OrderServiceImpl implements OrderService {
                     throw new MessageException("不可抵扣");
                 }
             }
+            //现付金额记录更新
+            AgentResult agentResult = oCashReceivablesService.startProcing(CashPayType.PAYMENT,oPayment.getId(),cuser);
+            logger.info("订单提交审批,提交审批现付金额记录更新结果orderid{},PaymentId{}:{}", id,oPayment.getId(), agentResult.getMsg());
         }
 
 
@@ -1197,6 +1213,9 @@ public class OrderServiceImpl implements OrderService {
             logger.info("订单提交审批，更新订单基本信息失败{}:{}", id, cuser);
             throw new MessageException("订单提交审批，更新订单基本信息失败");
         }
+
+
+
         //流程中的部门参数
         Map startPar = agentEnterService.startPar(cuser);
         if (null == startPar) {
@@ -1373,6 +1392,9 @@ public class OrderServiceImpl implements OrderService {
                         Date nuclearTime = DateUtil.format(agentVo.getoPayment().get("nuclearTime") + "", "yyyy-MM-dd");
                         oPayment.setNuclearTime(nuclearTime);
                         oPayment.setNuclearUser(userId);
+                        //审核人审核时间
+                        AgentResult ocash  = oCashReceivablesService.approveTashBusiness(CashPayType.PAYMENT,oPayment.getId(),userId,nuclearTime);
+                        logger.info("核款时间核款人更新成功order{}user{}date{}",oPayment.getOrderId(),userId,nuclearTime.getTime());
                     }catch (Exception e){
                         e.printStackTrace();
                         throw new MessageException("核款日期错误");
@@ -2060,6 +2082,11 @@ public class OrderServiceImpl implements OrderService {
             if (1 != orderMapper.updateByPrimaryKeySelective(order)) {
                 throw new MessageException("订单更新异常");
             }
+            //订单线下付款更新
+            AgentResult ocash = oCashReceivablesService.finishProcing(CashPayType.PAYMENT,oPayment.getId(),null);
+            if(!ocash.isOK()){
+                throw new MessageException("订单现金付款明细更新异常");
+            }
             //付款单处理
             if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
                 throw new MessageException("订单更新异常");
@@ -2169,6 +2196,11 @@ public class OrderServiceImpl implements OrderService {
             //订单更新
             if (1 != orderMapper.updateByPrimaryKeySelective(order)) {
                 throw new MessageException("订单更新异常");
+            }
+            //订单线下付款更新
+            AgentResult ocash = oCashReceivablesService.refuseProcing(CashPayType.PAYMENT,oPayment.getId(),null);
+            if(!ocash.isOK()){
+                throw new MessageException("订单现金付款明细更新异常");
             }
             //付款单处理
             if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment)) {
