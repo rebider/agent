@@ -16,6 +16,7 @@ import com.ryx.credit.machine.vo.ChangeActMachineVo;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.pojo.admin.vo.ORefundPriceDiffVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -25,6 +26,7 @@ import com.ryx.credit.service.agent.PlatFormService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
+import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +99,10 @@ public class CompensateServiceImpl implements CompensateService {
     private IUserService iUserService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private OCashReceivablesService cashReceivablesService;
+
+
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -279,7 +285,8 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser){
+    public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                         List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList){
 
         String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
         oRefundPriceDiff.setId(priceDiffId);
@@ -322,6 +329,22 @@ public class CompensateServiceImpl implements CompensateService {
                 }
             });
         }
+        //打款记录
+        oCashReceivablesVoList.forEach(oCashReceivables->{
+            try {
+                oCashReceivables.setSrcId(oRefundPriceDiff.getId());
+                oCashReceivables.setCashpayType(CashPayType.REFUNDPRICEDIFF.code);
+                oCashReceivables.setAgentId(oRefundPriceDiff.getAgentId());
+                AgentResult agentResult = cashReceivablesService.add(oCashReceivables, cUser);
+                if(!agentResult.isOK()){
+                    log.info("退补差价保存打款记录失败1");
+                    throw new ProcessException("保存打款记录失败");
+                }
+            } catch (Exception e) {
+                log.info("退补差价保存打款记录失败2");
+                throw new ProcessException("保存打款记录失败");
+            }
+        });
 
         refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
             Map<String, Object> logisticsDetail = null;
