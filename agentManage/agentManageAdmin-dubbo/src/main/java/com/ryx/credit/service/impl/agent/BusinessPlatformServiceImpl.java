@@ -561,4 +561,27 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         return resultList;
     }
 
+
+    @Override
+    public AgentResult selectByAgentApproved(String id) {
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if (StringUtils.isBlank(id)) {
+            return result;
+        }
+        AgentExample example = new AgentExample();
+        AgentExample.Criteria criteria = example.createCriteria();
+        criteria.andIdEqualTo(id);
+        criteria.andAgStatusEqualTo(AgStatus.Approved.name());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<Agent> agents = agentMapper.selectByExample(example);
+        if (null==agents) {
+            result.setMsg("代理商查询失败");
+            return result;
+        }
+        if(agents.size()==1){
+            return AgentResult.ok(agents.get(0));
+        }
+        return result;
+    }
+
 }
