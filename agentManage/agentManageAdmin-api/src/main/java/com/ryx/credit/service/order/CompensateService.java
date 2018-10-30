@@ -41,7 +41,7 @@ public interface CompensateService {
 
     ORefundPriceDiff queryRefDiffDetail(String id);
 
-    AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt);
+    AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId);
 
     AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
 }

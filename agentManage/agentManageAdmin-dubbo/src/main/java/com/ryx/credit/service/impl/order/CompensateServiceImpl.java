@@ -101,7 +101,8 @@ public class CompensateServiceImpl implements CompensateService {
     private AgentMapper agentMapper;
     @Autowired
     private OCashReceivablesService cashReceivablesService;
-
+    @Autowired
+    private OCashReceivablesService oCashReceivablesService;
 
 
     @Override
@@ -288,115 +289,110 @@ public class CompensateServiceImpl implements CompensateService {
     public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
                                          List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList){
 
-        String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
-        oRefundPriceDiff.setId(priceDiffId);
-        Date nowDate = new Date();
-        oRefundPriceDiff.setAgentId(refundPriceDiffDetailList.get(0).getAgentId());
-        oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
-        oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
-        oRefundPriceDiff.setMachOweAmt(new BigDecimal(0));
-        oRefundPriceDiff.setDeductAmt(new BigDecimal(0));
-        oRefundPriceDiff.setGatherAmt(new BigDecimal(0));
-        oRefundPriceDiff.setcTime(nowDate);
-        oRefundPriceDiff.setuTime(nowDate);
-        oRefundPriceDiff.setsTime(nowDate);
-        oRefundPriceDiff.setcUser(cUser);
-        oRefundPriceDiff.setuUser(cUser);
-        oRefundPriceDiff.setReviewStatus(AgStatus.Create.status);
-        oRefundPriceDiff.setStatus(Status.STATUS_1.status);
-        oRefundPriceDiff.setVersion(Status.STATUS_0.status);
-        int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
-        if(refundDiffInsert!=1){
-            log.info("插入补退差价申请表异常");
-            throw new ProcessException("保存失败");
-        }
+        try {
+            String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
+            oRefundPriceDiff.setId(priceDiffId);
+            Date nowDate = new Date();
+            oRefundPriceDiff.setAgentId(refundPriceDiffDetailList.get(0).getAgentId());
+            oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
+            oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
+            oRefundPriceDiff.setMachOweAmt(new BigDecimal(0));
+            oRefundPriceDiff.setDeductAmt(new BigDecimal(0));
+            oRefundPriceDiff.setGatherAmt(new BigDecimal(0));
+            oRefundPriceDiff.setcTime(nowDate);
+            oRefundPriceDiff.setuTime(nowDate);
+            oRefundPriceDiff.setsTime(nowDate);
+            oRefundPriceDiff.setcUser(cUser);
+            oRefundPriceDiff.setuUser(cUser);
+            oRefundPriceDiff.setReviewStatus(AgStatus.Create.status);
+            oRefundPriceDiff.setStatus(Status.STATUS_1.status);
+            oRefundPriceDiff.setVersion(Status.STATUS_0.status);
+            int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
+            if(refundDiffInsert!=1){
+                log.info("插入补退差价申请表异常");
+                throw new ProcessException("保存失败");
+            }
 
-        //添加新的附件
-        if (refundPriceDiffFile != null) {
-            refundPriceDiffFile.forEach(fileId->{
-                AttachmentRel record = new AttachmentRel();
-                record.setAttId(fileId);
-                record.setSrcId(priceDiffId);
-                record.setcUser(cUser);
-                record.setcTime(Calendar.getInstance().getTime());
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.ActivityEdit.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                int i = attachmentRelMapper.insertSelective(record);
-                if (1 != i) {
-                    log.info("活动变更附件关系失败");
+            //添加新的附件
+            if (refundPriceDiffFile != null) {
+                refundPriceDiffFile.forEach(fileId->{
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(fileId);
+                    record.setSrcId(priceDiffId);
+                    record.setcUser(cUser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.ActivityEdit.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int i = attachmentRelMapper.insertSelective(record);
+                    if (1 != i) {
+                        log.info("活动变更附件关系失败");
+                        throw new ProcessException("保存失败");
+                    }
+                });
+            }
+            //打款记录
+            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivablesVoList,cUser,oRefundPriceDiff.getAgentId(),CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId());
+            if(!agentResult.isOK()){
+                log.info("退补差价保存打款记录失败1");
+                throw new ProcessException("保存打款记录失败");
+            }
+
+            refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
+                Map<String, Object> logisticsDetail = null;
+                if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
+                    Map<String, Object> reqParam = new HashMap<>();
+                    reqParam.put("snBegin",refundPriceDiffDetail.getBeginSn());
+                    reqParam.put("snEnd",refundPriceDiffDetail.getEndSn());
+                    reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+                    ArrayList<Object> recordStatusList = new ArrayList<>();
+                    recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                    reqParam.put("recordStatusList",recordStatusList);
+                    reqParam.put("activityId",refundPriceDiffDetail.getActivityFrontId());
+                    List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
+                    if(null==oLogisticsDetails){
+                        log.info("calculatePriceDiff数据有误异常返回1");
+                        throw new ProcessException("保存失败");
+                    }
+                    if(oLogisticsDetails.size()!=1){
+                        log.info("calculatePriceDiff数据有误异常返回2");
+                        throw new ProcessException("保存失败");
+                    }
+                    logisticsDetail = oLogisticsDetails.get(0);
+                }
+                //变更后活动实体
+                OActivity oActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                if(null==oActivity){
+                    log.info("查询oActivity异常");
+                    throw new ProcessException("保存失败");
+                }
+                refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
+                refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
+                refundPriceDiffDetail.setFrontPrice(logisticsDetail!=null?new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()):new BigDecimal(0));
+                refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
+                refundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
+                refundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
+                refundPriceDiffDetail.setPrice(oActivity.getPrice());
+                refundPriceDiffDetail.setVender(oActivity.getVender());
+                refundPriceDiffDetail.setProModel(oActivity.getProModel());
+                refundPriceDiffDetail.setcTime(nowDate);
+                refundPriceDiffDetail.setuTime(nowDate);
+                refundPriceDiffDetail.setsTime(nowDate);
+                refundPriceDiffDetail.setcUser(cUser);
+                refundPriceDiffDetail.setuUser(cUser);
+                refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
+                refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
+                int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
+                if(priceDiffDetailInsert!=1){
+                    log.info("插入补退差价详情表异常");
                     throw new ProcessException("保存失败");
                 }
             });
+            return AgentResult.ok(priceDiffId);
+        } catch (Exception e) {
+            log.info("退补差价保存失败");
+            throw new ProcessException("退补差价保存失败");
         }
-        //打款记录
-        oCashReceivablesVoList.forEach(oCashReceivables->{
-            try {
-                oCashReceivables.setSrcId(oRefundPriceDiff.getId());
-                oCashReceivables.setCashpayType(CashPayType.REFUNDPRICEDIFF.code);
-                oCashReceivables.setAgentId(oRefundPriceDiff.getAgentId());
-                AgentResult agentResult = cashReceivablesService.add(oCashReceivables, cUser);
-                if(!agentResult.isOK()){
-                    log.info("退补差价保存打款记录失败1");
-                    throw new ProcessException("保存打款记录失败");
-                }
-            } catch (Exception e) {
-                log.info("退补差价保存打款记录失败2");
-                throw new ProcessException("保存打款记录失败");
-            }
-        });
-
-        refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
-            Map<String, Object> logisticsDetail = null;
-            if(StringUtils.isNotBlank(refundPriceDiffDetail.getActivityFrontId()) && !refundPriceDiffDetail.getActivityFrontId().equals("undefined")){
-                Map<String, Object> reqParam = new HashMap<>();
-                reqParam.put("snBegin",refundPriceDiffDetail.getBeginSn());
-                reqParam.put("snEnd",refundPriceDiffDetail.getEndSn());
-                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
-                ArrayList<Object> recordStatusList = new ArrayList<>();
-                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                reqParam.put("recordStatusList",recordStatusList);
-                reqParam.put("activityId",refundPriceDiffDetail.getActivityFrontId());
-                List<Map<String, Object>> oLogisticsDetails = logisticsDetailMapper.queryCompensateLList(reqParam);
-                if(null==oLogisticsDetails){
-                    log.info("calculatePriceDiff数据有误异常返回1");
-                    throw new ProcessException("保存失败");
-                }
-                if(oLogisticsDetails.size()!=1){
-                    log.info("calculatePriceDiff数据有误异常返回2");
-                    throw new ProcessException("保存失败");
-                }
-                logisticsDetail = oLogisticsDetails.get(0);
-            }
-            //变更后活动实体
-            OActivity oActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
-            if(null==oActivity){
-                log.info("查询oActivity异常");
-                throw new ProcessException("保存失败");
-            }
-            refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
-            refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
-            refundPriceDiffDetail.setFrontPrice(logisticsDetail!=null?new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()):new BigDecimal(0));
-            refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
-            refundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
-            refundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
-            refundPriceDiffDetail.setPrice(oActivity.getPrice());
-            refundPriceDiffDetail.setVender(oActivity.getVender());
-            refundPriceDiffDetail.setProModel(oActivity.getProModel());
-            refundPriceDiffDetail.setcTime(nowDate);
-            refundPriceDiffDetail.setuTime(nowDate);
-            refundPriceDiffDetail.setsTime(nowDate);
-            refundPriceDiffDetail.setcUser(cUser);
-            refundPriceDiffDetail.setuUser(cUser);
-            refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
-            refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
-            int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
-            if(priceDiffDetailInsert!=1){
-                log.info("插入补退差价详情表异常");
-                throw new ProcessException("保存失败");
-            }
-        });
-        return AgentResult.ok(priceDiffId);
     }
 
 
@@ -492,6 +488,11 @@ public class CompensateServiceImpl implements CompensateService {
                 throw new MessageException("已锁定请核对补差价信息!");
             }
         }
+        AgentResult agentResult = oCashReceivablesService.startProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),cuser);
+        if(!agentResult.isOK()){
+            log.info("插入补退差价更新打款信息失败");
+            throw new MessageException("补退差价更新打款信息失败");
+        }
         return AgentResult.ok();
     }
 
@@ -550,7 +551,7 @@ public class CompensateServiceImpl implements CompensateService {
                     agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
                     deductAmt = oRefundPriceDiff.getDeductAmt().add(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                 }
-                AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt);
+                AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt,userId);
                 if(!agentResult.isOK()){
                     throw new ProcessException("更新退补差价主表异常");
                 }
@@ -573,7 +574,7 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt){
+    public AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId){
         ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
         ORefundPriceDiffVo updatePriceDiff = new ORefundPriceDiffVo();
         updatePriceDiff.setId(oRefundPriceDiff.getId());
@@ -595,6 +596,7 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setDeductAmt(deductAmt);
         }
         updatePriceDiff.setuTime(new Date());
+        updatePriceDiff.setuUser(userId);
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(updatePriceDiff);
         if(i!=1){
             return AgentResult.fail("更新异常");
@@ -630,6 +632,20 @@ public class CompensateServiceImpl implements CompensateService {
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
         if(i!=1){
             throw new ProcessException("更新退补差价数据申请失败");
+        }
+        AgentResult agentResult = AgentResult.fail();
+        if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+            agentResult = oCashReceivablesService.refuseProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
+        }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            agentResult = oCashReceivablesService.finishProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getcUser());
+        }
+        if(!agentResult.isOK()){
+            throw new ProcessException("更新打款记录失败");
+        }
+        AgentResult cashAgentResult = oCashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getuUser(),new Date());
+        if(!cashAgentResult.isOK()){
+            throw new ProcessException("更新收款人和时间失败");
         }
 
         ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
@@ -765,9 +781,9 @@ public class CompensateServiceImpl implements CompensateService {
             cav.setLogisticsDetailList(oLogisticsDetails);
             //cxinfo 调用活动变更接口进行活动的变更
             try {
-                AgentResult agentResult = termMachineService.changeActMachine(cav);
-                row.setSendMsg(agentResult.getMsg());
-                if(agentResult.isOK()){
+                AgentResult chAgentResult = termMachineService.changeActMachine(cav);
+                row.setSendMsg(chAgentResult.getMsg());
+                if(chAgentResult.isOK()){
                     row.setSendStatus(Status.STATUS_1.status);
                 }else{
                     row.setSendStatus(Status.STATUS_2.status);
