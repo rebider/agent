@@ -1031,6 +1031,15 @@ public class OrderServiceImpl implements OrderService {
             agentDataHistoryService.saveDataHistory(order_db,order_db.getId(),DataHistoryType.ORDER.code,userId,order_db.getVersion());
         }
         oPayment_db = initPayment(orderFormVo);
+
+        //线下付款明细添加
+        AgentResult cashReceivables = oCashReceivablesService.addOCashReceivables(orderFormVo.getoCashReceivables(),userId,oPayment.getAgentId(),CashPayType.PAYMENT,oPayment.getId());
+        if(cashReceivables.isOK()){
+            logger.info("下订单线下付款明细添加成功:{}", JSONArray.toJSONString(orderFormVo.getoCashReceivables()));
+            //根据明细天剑实收金额
+            oPayment.setActualReceipt((BigDecimal)cashReceivables.getData());
+        }
+
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
             throw new MessageException("oPayment添加失败");
@@ -1100,6 +1109,10 @@ public class OrderServiceImpl implements OrderService {
         }
         OPayment oPayment = oPaymentList.get(0);
         f.putKeyV("oPayment", oPayment);
+
+        //实付打款分条明细
+        List<OCashReceivables> listoCashReceivables = oCashReceivablesService.query(null,oPayment.getAgentId(),CashPayType.PAYMENT,oPayment.getId(),Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status,AgStatus.Approved.status));
+        f.putKeyV("oCashReceivables", listoCashReceivables);
 
         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
         oPaymentDetailExample.or()
