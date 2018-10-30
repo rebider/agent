@@ -61,6 +61,7 @@ public class AgentVo implements Serializable {
     private String payMethod;
     //退货单
     private OReturnOrder oReturnOrder;
+    private List<OCashReceivablesVo> oCashReceivablesVoList;
 
 
     public OReturnOrder getoReturnOrder() {
@@ -357,5 +358,13 @@ public class AgentVo implements Serializable {
 
     public void setCheckTime(Date checkTime) {
         this.checkTime = checkTime;
+    }
+
+    public List<OCashReceivablesVo> getoCashReceivablesVoList() {
+        return oCashReceivablesVoList;
+    }
+
+    public void setoCashReceivablesVoList(List<OCashReceivablesVo> oCashReceivablesVoList) {
+        this.oCashReceivablesVoList = oCashReceivablesVoList;
     }
 }
