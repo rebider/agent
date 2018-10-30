@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.CashPayType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.order.OCashReceivables;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -42,7 +43,7 @@ public interface OCashReceivablesService {
      * @param oCashReceivablesList
      * @return
      */
-    public AgentResult addOCashReceivables(List<OCashReceivables> oCashReceivablesList,String user,String agentId, CashPayType cpt,String srcId)throws Exception;
+    public AgentResult addOCashReceivables(List<OCashReceivablesVo> oCashReceivablesList, String user, String agentId, CashPayType cpt, String srcId)throws Exception;
 
 
     /**

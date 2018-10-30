@@ -17,7 +17,7 @@ public class OrderFormVo extends OOrder{
 
     private List<OReceiptOrderVo> oReceiptOrderList;
 
-    private List<OCashReceivables> oCashReceivables;
+    private List<OCashReceivablesVo> oCashReceivables;
 
     private List<Attachment> attachments;
 
@@ -53,11 +53,11 @@ public class OrderFormVo extends OOrder{
         this.attachments = attachments;
     }
 
-    public List<OCashReceivables> getoCashReceivables() {
+    public List<OCashReceivablesVo> getoCashReceivables() {
         return oCashReceivables;
     }
 
-    public void setoCashReceivables(List<OCashReceivables> oCashReceivables) {
+    public void setoCashReceivables(List<OCashReceivablesVo> oCashReceivables) {
         this.oCashReceivables = oCashReceivables;
     }
 }

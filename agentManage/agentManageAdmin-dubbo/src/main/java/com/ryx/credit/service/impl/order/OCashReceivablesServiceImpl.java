@@ -11,6 +11,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.OCashReceivablesMapper;
 import com.ryx.credit.pojo.admin.order.OCashReceivables;
 import com.ryx.credit.pojo.admin.order.OCashReceivablesExample;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import org.slf4j.Logger;
@@ -96,7 +97,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
      */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public AgentResult addOCashReceivables(List<OCashReceivables> oCashReceivablesList, String user,String agentId, CashPayType cpt, String srcId)throws Exception {
+    public  AgentResult addOCashReceivables(List<OCashReceivablesVo> oCashReceivablesList, String user,String agentId, CashPayType cpt, String srcId)throws Exception {
         logger.info("操作人[{}]操作付款信息[{}]",user, JSONObject.toJSONString(oCashReceivablesList));
         Date date = new Date();
         BigDecimal total = BigDecimal.ZERO;
@@ -107,7 +108,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             }
         }
         if(oCashReceivablesList!=null){
-            for (OCashReceivables oCashReceivables : oCashReceivablesList) {
+            for (OCashReceivablesVo oCashReceivables : oCashReceivablesList) {
                 oCashReceivables.setCashpayType(cpt.code);
                 oCashReceivables.setSrcId(srcId);
                 oCashReceivables.setAgentId(agentId);
