@@ -371,7 +371,7 @@ public class OrderServiceImpl implements OrderService {
             case "FKFQ"://打款分期
                 List<OCashReceivablesVo> cash_FKFQ = agentVo.getoCashReceivables();
                 if (cash_FKFQ==null || cash_FKFQ.size()> 0) {
-                    throw new MessageException("打款分期支付方式，不支持线下打款");
+                    agentVo.setoCashReceivables(new ArrayList<>());
                 }
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("5号以后必须选择下个月");
@@ -385,7 +385,7 @@ public class OrderServiceImpl implements OrderService {
             case "FRFQ"://分润分期
                 List<OCashReceivablesVo> cash_FRFQ = agentVo.getoCashReceivables();
                 if (cash_FRFQ==null || cash_FRFQ.size()> 0) {
-                    throw new MessageException("分润分期支付方式，不支持线下打款");
+                    agentVo.setoCashReceivables(new ArrayList<>());
                 }
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
                     throw new MessageException("5号以后必须选择下个月");
@@ -413,7 +413,7 @@ public class OrderServiceImpl implements OrderService {
                 // cxinfo 修改为多条打款信息
                 List<OCashReceivablesVo> cash_QT = agentVo.getoCashReceivables();
                 if (cash_QT==null || cash_QT.size()== 0) {
-                    throw new MessageException("其他打款支付方式，不支持线下打款");
+                    agentVo.setoCashReceivables(new ArrayList<>());
                 }
                 payment.setDownPayment(BigDecimal.ZERO);
                 payment.setDownPaymentDate(null);
@@ -1355,41 +1355,44 @@ public class OrderServiceImpl implements OrderService {
                 oPayment.setId(db.getId());
                 oPayment.setVersion(db.getVersion());
 
-                //收款时间
-                if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))
-                        || StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
-                    //收款金额
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
-                        if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(BigDecimal.ZERO)<0){
-                            throw new MessageException("实收金额不能小于0");
-                        }
-                        if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(db.getOutstandingAmount())>0){
-                            throw new MessageException("实收不能大于待付");
-                        }
-                        oPayment.setActualReceipt(new BigDecimal(agentVo.getoPayment().get("actualReceipt")));
-                    }else{
-                        throw new MessageException("实收金额不能为空");
-                    }
-                    //收款公司
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("collectCompany"))){
-                        oPayment.setCollectCompany(agentVo.getoPayment().get("collectCompany"));
-                    }else{
-                        throw new MessageException("收款公司不能为空");
-                    }
+                //收款时间 迁移到打款明细当中
+//                if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))
+//                        || StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
+//                    //收款金额
+//                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceipt"))){
+//                        if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(BigDecimal.ZERO)<0){
+//                            throw new MessageException("实收金额不能小于0");
+//                        }
+//                        if(new BigDecimal(agentVo.getoPayment().get("actualReceipt")).compareTo(db.getOutstandingAmount())>0){
+//                            throw new MessageException("实收不能大于待付");
+//                        }
+//                        if(0!=oPayment.getActualReceipt().compareTo(new BigDecimal(agentVo.getoPayment().get("actualReceipt")))){
+//                            throw new MessageException("核款金额必须等于打款金额");
+//                        }
+//                    }else{
+//                        throw new MessageException("实收金额不能为空");
+//                    }
+                    //收款公司 迁移到打款明细当中
+//                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("collectCompany"))){
+//                        oPayment.setCollectCompany(agentVo.getoPayment().get("collectCompany"));
+//                    }else{
+//                        throw new MessageException("收款公司不能为空");
+//                    }
                     //收款时间
-                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))){
-                        oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
-                    } else{
-                        if (StringUtils.isNotBlank(agentVo.getPayMethod())){
-                              if (agentVo.getPayMethod().equals(SettlementType.XXDK.code) || agentVo.getPayMethod().equals(SettlementType.SF1.code)
-                                      || agentVo.getPayMethod().equals(SettlementType.SF2.code)  || agentVo.getPayMethod().equals(SettlementType.QT.code)){
-                                  throw new MessageException("收款时间不能为空");
-                              }
-                        }
+//                    if(StringUtils.isNotBlank(agentVo.getoPayment().get("actualReceiptDate"))){
+//                        oPayment.setActualReceiptDate(DateUtil.format(agentVo.getoPayment().get("actualReceiptDate"),"yyyy-MM-dd"));
+//                    } else{
+//                        if (StringUtils.isNotBlank(agentVo.getPayMethod())){
+//                              if (agentVo.getPayMethod().equals(SettlementType.XXDK.code) || agentVo.getPayMethod().equals(SettlementType.SF1.code)
+//                                      || agentVo.getPayMethod().equals(SettlementType.SF2.code)  || agentVo.getPayMethod().equals(SettlementType.QT.code)){
+//                                  throw new MessageException("收款时间不能为空");
+//                              }
+//                        }
+//
+//                    }
 
-                    }
 
-                }
+//                }
                 //结算价
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("settlementPrice"))){
                     oPayment.setSettlementPrice(new BigDecimal(agentVo.getoPayment().get("settlementPrice")));
