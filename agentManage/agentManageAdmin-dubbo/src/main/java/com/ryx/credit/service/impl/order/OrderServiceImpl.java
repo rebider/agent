@@ -729,6 +729,9 @@ public class OrderServiceImpl implements OrderService {
             logger.info("下订单线下付款明细添加成功:{}", JSONArray.toJSONString(orderFormVo.getoCashReceivables()));
             //根据明细天剑实收金额
             oPayment.setActualReceipt((BigDecimal)cashReceivables.getData());
+            if(oPayment.getActualReceipt().compareTo(oPayment.getPayAmount())>0){
+                throw new MessageException("实付金额不能大于订单金额");
+            }
         }
 
         if (1 != oPaymentMapper.insertSelective(oPayment)) {
@@ -1039,7 +1042,11 @@ public class OrderServiceImpl implements OrderService {
             logger.info("下订单线下付款明细添加成功:{}", JSONArray.toJSONString(orderFormVo.getoCashReceivables()));
             //根据明细天剑实收金额
             oPayment_db.setActualReceipt((BigDecimal)cashReceivables.getData());
+            if(oPayment_db.getActualReceipt().compareTo(oPayment_db.getPayAmount())>0){
+                throw new MessageException("实付金额不能大于订单金额");
+            }
         }
+
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
             throw new MessageException("oPayment添加失败");
