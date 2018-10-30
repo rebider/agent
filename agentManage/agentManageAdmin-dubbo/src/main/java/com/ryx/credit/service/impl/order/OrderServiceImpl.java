@@ -1040,8 +1040,6 @@ public class OrderServiceImpl implements OrderService {
             //根据明细天剑实收金额
             oPayment_db.setActualReceipt((BigDecimal)cashReceivables.getData());
         }
-
-
         //插入付款单
         if (1 != oPaymentMapper.updateByPrimaryKeySelective(oPayment_db)) {
             throw new MessageException("oPayment添加失败");
