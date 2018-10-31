@@ -77,6 +77,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             oCashReceivables.setCheckDate(checkDate);
             oCashReceivables.setCheckUser(userId);
             oCashReceivables.setuUser(userId);
+            oCashReceivables.setRealAmount(oCashReceivables.getAmount());
             oCashReceivables.setuTime(c.getTime());
             if(list!=null && list.size()>0){
                 for (OCashReceivablesVo oCashReceivablesVo : list) {

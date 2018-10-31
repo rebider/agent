@@ -631,7 +631,7 @@ public class CompensateServiceImpl implements CompensateService {
             throw new ProcessException("更新退补差价数据申请失败");
         }
 
-        AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getuUser(),new Date());
+        AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getuUser(),new Date(),null);
         if(!cashAgentResult.isOK()){
             throw new ProcessException("更新收款人和时间失败");
         }
