@@ -88,7 +88,7 @@
     sum(case when d.deduction_Status = '0' then d.MUST_DEDUCTION_AMT else d.NOT_DEDUCTION_AMT end) MUST_DEDUCTION_AMT
     from  p_deduction d
     where   d.deduction_type In ('01','03') and d.deduction_date =#{deductionDate}
-    and d.agent_pid=#{agentPid,jdbcType=VARCHAR}
+    and d.agent_id=#{agentId,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample">
     delete from P_DEDUCTION
@@ -396,7 +396,7 @@
   <select id="getSettleErrDeductionAmt" parameterType="com.ryx.credit.profit.pojo.ProfitDeduction" resultType="java.math.BigDecimal">
     SELECT SUM(MUST_DEDUCTION_AMT)
     FROM P_DEDUCTION
-    WHERE DEDUCTION_DATE = #{deductionDate} AND  AGENT_PID = #{agentPid} AND DEDUCTION_TYPE = '01' AND source_id = #{sourceId}
+    WHERE DEDUCTION_DATE = #{deductionDate} AND  AGENT_ID = #{agentId} AND DEDUCTION_TYPE = '01' AND source_id = #{sourceId}
     and DEDUCTION_STATUS IS NULL
   </select>
   <delete id="deleteById">

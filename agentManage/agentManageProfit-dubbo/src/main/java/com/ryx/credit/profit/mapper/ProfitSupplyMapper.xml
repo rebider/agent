@@ -265,6 +265,9 @@
     where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE='退单补款'
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
+    <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+    <if test="parentAgentId == null ">AND PARENT_AGENT_ID is null </if>
+    <if test="sourceId != null and sourceId != ''">AND SOURCE_ID = #{sourceId}</if>
   </select>
 
   <select id="getProfitSupplyList" parameterType="java.util.Map" resultType="java.util.Map">

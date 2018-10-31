@@ -115,17 +115,6 @@ public interface ProfitDeductionService {
      */
     public List<ProfitDeduction> getProfitDeduction(ProfitDeduction profitDeduction);
 
-    /***
-    * @Description: 获取代理商补分润
-    * @Param:  agentId 代理商
-    * @Param:  bussType 业务类型
-    * @Param:  parentAgentId 上级agentId
-    * @return:  补款总金额
-    * @Author: zhaodw
-    * @Date: 2018/8/9
-    */
-    BigDecimal  getSupplyAmt(String agentId, String bussType , String parentAgentId);
-
     BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
 
     /***
