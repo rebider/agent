@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
+import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
@@ -47,6 +48,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private static Logger logger = LoggerFactory.getLogger(ProfitDeductionServiceImpl.class);
 
     @Autowired
+    private ProfitDetailMonthMapper profitDetailMonthMapper;
+    @Autowired
     private ProfitDeductionMapper profitDeductionMapper;
     @Autowired
     private StagingService stagingServiceImpl;
@@ -60,7 +63,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private RedisService redisService;
 
     @Override
-    public PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page) {
+    public PageInfo getProfitDeductionList(Map<String, Object> department, ProfitDeduction profitDeduction, Page page) {
         ProfitDeductionExample example = new ProfitDeductionExample();
         example.setPage(page);
         ProfitDeductionExample.Criteria criteria = example.createCriteria();
@@ -89,12 +92,29 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
             criteria.andAgentNameEqualTo(profitDeduction.getAgentName());
         }
+        if(department != null){
+            List<String> agentList = departmentAgentList(department);
+            criteria.andAgentIdIn(agentList);
+        }
         example.setOrderByClause("CREATE_DATE_TIME DESC ");
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
         pageInfo.setTotal(profitDeductionMapper.countByExample(example));
         return pageInfo;
+    }
+
+    /**
+     * 根据当前部门信息查询分润信息
+     * @param department
+     */
+    private List<String> departmentAgentList(Map<String, Object> department) {
+        if(Objects.equals("south", department.get("ORGANIZATIONCODE")) || Objects.equals("north", department.get("ORGANIZATIONCODE"))){
+            return profitDetailMonthMapper.getDistrictAgent(department.get("ORGID").toString());
+        } else if(department.get("ORGANIZATIONCODE").toString().contains("south") || department.get("ORGANIZATIONCODE").toString().contains("north")){
+            return profitDetailMonthMapper.getProAgent(department.get("ORGID").toString());
+        }
+        return null;
     }
 
     @Override

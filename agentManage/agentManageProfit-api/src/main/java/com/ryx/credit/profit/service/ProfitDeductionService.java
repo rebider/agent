@@ -24,7 +24,7 @@ public interface ProfitDeductionService {
      * @param page 分页信息
      * @return 分页列表
      */
-    PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page);
+    PageInfo getProfitDeductionList(Map<String, Object> map, ProfitDeduction profitDeduction, Page page);
 
     /**
      * 获取扣款信息
