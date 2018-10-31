@@ -1,6 +1,7 @@
 package com.ryx.credit.common.enumc;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -51,7 +52,7 @@ public enum  PayType {
     }
 
     public static Map<String,Object> getAllOption(){
-        Map<String,Object> resultMap = new HashMap<>();
+        Map<String,Object> resultMap = new LinkedHashMap<>();
         PayType[] payType = PayType.values();
         for(PayType type : payType){
             resultMap.put(type.code,type.msg);
