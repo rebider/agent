@@ -77,6 +77,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Autowired
     private PAgentMergeMapper agentMergeMapper;
+    @Autowired
+    private ProfitSupplyMapper profitSupplyMapper;
 
     public final static Map<String, Map<String, Object>>  temp = new HashMap<>();
 
@@ -388,7 +390,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate, String parentAgentId) {
+    public List<ProfitDetailMonth> getAgentProfit(String agentId, String profitDate, String parentAgentId) {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
@@ -398,17 +400,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 criteria.andParentAgentIdEqualTo(parentAgentId);
             }
             List<ProfitDetailMonth> list = profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
-            if(list != null && !list.isEmpty()){
-                ProfitDetailMonth profitMonth = list.get(0);
-                return profitMonth;
-            }
+            return list;
         }
         return null;
     }
 
     @Override
     public void computeProfitAmt() {
+        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        profitDetailMonthMapper.clearComputData(profitDate);
         comput("1");
+        profitToolsDeductService.otherOperate();
     }
 
     public Map<String, Object> getDbProfitAmt(String agentId, String parentAgentId, String computType) {
@@ -438,31 +440,33 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             List<ProfitDetailMonth> notDeductionList = new ArrayList<>(10);
             Map<String, List<Map<String, Object>>> profitAmtMap = new HashMap<>();
-            profitDetailMonthList.stream().forEach(profitDetailMonthTemp -> {
-                BigDecimal basicAmt = BigDecimal.ZERO;
-                Map<String, Object> idMap = null;
-                if (temp.containsKey(profitDetailMonthTemp.getId())) {
-                    idMap = temp.get(profitDetailMonthTemp.getId());
-                    basicAmt = (BigDecimal) idMap.get("basicAmt");
-                }else {
-                    basicAmt = getComputAmt(profitDetailMonthTemp, computType);
-                }
-                if (basicAmt.doubleValue() == 0 ){
-                        notDeductionList.add(profitDetailMonthTemp);
-                }else{
-                    if (idMap==null) {
-                        idMap = new HashMap<>(5);
-                        idMap.put("id", profitDetailMonthTemp.getId());
-                        idMap.put("basicAmt", basicAmt);
+            profitDetailMonthList.parallelStream().forEach(profitDetailMonthTemp -> {
+                if (profitDetailMonthTemp.getAgentId() !=null) {
+                    BigDecimal basicAmt = BigDecimal.ZERO;
+                    Map<String, Object> idMap = null;
+                    if (temp.containsKey(profitDetailMonthTemp.getId())) {
+                        idMap = temp.get(profitDetailMonthTemp.getId());
+                        basicAmt = (BigDecimal) idMap.get("basicAmt");
+                    } else {
+                        basicAmt = getComputAmt(profitDetailMonthTemp, computType);
                     }
-                    if (profitAmtMap.containsKey(profitDetailMonthTemp.getAgentId())) {
-                        profitAmtMap.get(profitDetailMonthTemp.getAgentId()).add(idMap);
-                    }else{
-                        List<Map<String, Object>> list = new ArrayList<>(1);
-                        list.add(idMap);
-                        profitAmtMap.put(profitDetailMonthTemp.getAgentId(), list);
-                        list = null;
-                        idMap = null;
+                    if (basicAmt.doubleValue() == 0) {
+                        notDeductionList.add(profitDetailMonthTemp);
+                    } else {
+                        if (idMap == null) {
+                            idMap = new HashMap<>(5);
+                            idMap.put("id", profitDetailMonthTemp.getId());
+                            idMap.put("basicAmt", basicAmt);
+                        }
+                        if (profitAmtMap.containsKey(profitDetailMonthTemp.getAgentId())) {
+                            profitAmtMap.get(profitDetailMonthTemp.getAgentId()).add(idMap);
+                        } else {
+                            List<Map<String, Object>> list = new ArrayList<>(1);
+                            list.add(idMap);
+                            profitAmtMap.put(profitDetailMonthTemp.getAgentId(), list);
+                            list = null;
+                            idMap = null;
+                        }
                     }
                 }
             });
@@ -475,7 +479,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             });
             // 计算税点及实发分润
             try {
-                profitComputerService.new_computerTax();
+                long sstart = System.currentTimeMillis();
+                profitComputerService.new_computerTax(computType);
+                long send = System.currentTimeMillis();
+                System.out.println("实发处理时间"+(send-sstart));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -499,21 +506,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (!hbList.isEmpty()) {
             // 机具扣款
             hbList = doHbToolDeduction(profitDetailMonth, computType, hbList);
-            BigDecimal realDeductionAmt = BigDecimal.ZERO;
             if (!hbList.isEmpty()) {
                 //POS考核扣款（新国都、瑞易送）-
                 Map<String, Object> param = new HashMap<>(5);
-                param.put("agentPid", profitDetailMonth.getAgentId());
+                param.put("agentId", profitDetailMonth.getAgentId());
                 param.put("computeType", computType);
-                param.put("parentAgentPid", profitDetailMonth.getParentAgentId());
+                param.put("parentAgentId", profitDetailMonth.getParentAgentId());
                 param.put("remark", "POS考核扣款（新国都、瑞易送）");
                 param.put("hbList", hbList);     //代理商分润
                 param.put("deductionStatus","1");
                 //POS考核扣款（新国都、瑞易送）-
                 param = profitDeductionServiceImpl.otherDeductionHbByType(param);
-                realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                profitDetailMonth.setPosKhDeductionAmt(profitDetailMonth.getPosKhDeductionAmt().subtract(realDeductionAmt));
-
                 List<Map<String, Object>> delList = ((List)param.get("delList"));
                 if (!delList.isEmpty()) {
                     delHb(delList);
@@ -522,9 +525,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     //手刷考核扣款（小蓝牙、MPOS）-
                     param.put("remark", "手刷考核扣款（小蓝牙、MPOS）");
                     param = profitDeductionServiceImpl.otherDeductionHbByType(param);
-                    realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                    profitDetailMonth.setMposKhDeductionAmt(profitDetailMonth.getMposKhDeductionAmt().subtract(realDeductionAmt));
-
                     delList = ((List)param.get("delList"));
                     if (!delList.isEmpty()) {
                         delHb(delList);
@@ -556,8 +556,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                                     break;
                                 }
                             }
-                            realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                            profitDetailMonth.setBuDeductionAmt(profitDetailMonth.getBuDeductionAmt().subtract(diff));
                             delList = ((List)param.get("delList"));
                             if (!delList.isEmpty()) {
                                 delHb(delList);
@@ -568,9 +566,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                         //其他扣款-
                         param.put("remark", "1");
                         param = profitDeductionServiceImpl.otherDeductionHbByType(param);
-                        realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                        profitDetailMonth.setOtherDeductionAmt(profitDetailMonth.getOtherDeductionAmt().subtract(realDeductionAmt));
-
                         delList = ((List)param.get("delList"));
                         if (!delList.isEmpty()) {
                             delHb(delList);
@@ -586,18 +581,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
     private List<Map<String, Object>> doHbTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, String computeType, List<Map<String, Object>>  hbList) {
         Map<String, Object> param = new HashMap<>(5);
-        param.put("agentPid",  profitDetailMonthTemp.getAgentId());
+        param.put("agentId",  profitDetailMonthTemp.getAgentId());
         param.put("computeType", computeType);
-        param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentId());
+        param.put("parentAgentId",  profitDetailMonthTemp.getParentAgentId());
         param.put("hbList", hbList);     //代理商分润
         param.put("deductionStatus","1");
-        BigDecimal realDeductionAmt = BigDecimal.ZERO;
         //退单扣款-pos 未扣足
         if (!profitDetailMonthTemp.getPosTdMustDeductionAmt().equals(profitDetailMonthTemp.getPosTdRealDeductionAmt())) {
             param.put("sourceId", "02");
             param  = profitDeductionServiceImpl.settleErrHbDeduction(param);
-            realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-            profitDetailMonthTemp.setPosTdRealDeductionAmt(profitDetailMonthTemp.getPosTdRealDeductionAmt().subtract(realDeductionAmt));
             List<Map<String, Object>> delList = ((List)param.get("delList"));
             if (!delList.isEmpty()) {
                 delHb(delList);
@@ -606,8 +598,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (!((List)param.get("hbList")).isEmpty() && !profitDetailMonthTemp.getMposTdMustDeductionAmt().equals(profitDetailMonthTemp.getMposTdRealDeductionAmt())) {
             param.put("sourceId", "01");
             param = profitDeductionServiceImpl.settleErrHbDeduction(param);
-            realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-            profitDetailMonthTemp.setMposTdRealDeductionAmt(profitDetailMonthTemp.getMposTdRealDeductionAmt().subtract(realDeductionAmt));
             List<Map<String, Object>> delList = ((List)param.get("delList"));
             if (!delList.isEmpty()) {
                 delHb(delList);
@@ -681,38 +671,58 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
         sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
         // POS考核奖励
+        long khstart = System.currentTimeMillis();
         getPosReward(profitDetailMonthTemp);
         sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
-
+        long khend = System.currentTimeMillis();
+        System.out.println("考核处理时间"+(khend-khstart));
         //退单扣款-
         if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
+            long tdkstart = System.currentTimeMillis();
             sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt, computType);
+            long tdkend = System.currentTimeMillis();
+            System.out.println("退单扣款处理时间"+(tdkend-tdkstart));
         }
         // 机具扣款-
+        long jkstart = System.currentTimeMillis();
         sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt, computType);
+        long jkend = System.currentTimeMillis();
+        System.out.println("机具扣款处理时间"+(jkend-jkstart));
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
-        param.put("agentPid",  profitDetailMonthTemp.getAgentId());
+        param.put("agentId",  profitDetailMonthTemp.getAgentId());
         param.put("computeType", computType);
-        param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentId());
+        param.put("parentAgentId",  profitDetailMonthTemp.getParentAgentId());
         param.put("remark", "POS考核扣款（新国都、瑞易送）");
         //POS考核扣款（新国都、瑞易送）-
+        long poskstart = System.currentTimeMillis();
         profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+        long poskend = System.currentTimeMillis();
+        System.out.println("pos扣款处理时间"+(poskend-poskstart));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());
 
         param.put("profitAmt", sumAmt);
         param.put("remark", "手刷考核扣款（小蓝牙、MPOS）");
         //手刷考核扣款（小蓝牙、MPOS）-
+        long mposkstart = System.currentTimeMillis();
         profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+        long mposkend = System.currentTimeMillis();
+        System.out.println("mpos扣款处理时间"+(mposkend-mposkstart));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
         //保理扣款-
+        long blkstart = System.currentTimeMillis();
         profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentId(), null));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
+        long blkend = System.currentTimeMillis();
+        System.out.println("保理扣款处理时间"+(blkend-blkstart));
 
         param.put("profitAmt", sumAmt);
         param.put("remark", "1");
         //其他扣款-
+        long qkstart = System.currentTimeMillis();
         profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+        long qkend = System.currentTimeMillis();
+        System.out.println("其他扣款处理时间"+(qkend-qkstart));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getOtherDeductionAmt());
         //基础分润
         profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
@@ -722,6 +732,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public void testComputeProfitAmt() {
+        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        profitDetailMonthMapper.clearComputData(profitDate);
         comput("2");
     }
 
@@ -736,7 +748,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null,null, detailMonth);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             String paytDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
-            profitDetailMonthList.forEach(profitDetailMonth -> {
+            profitDetailMonthList.parallelStream().forEach(profitDetailMonth -> {
                 insertBalaceSerial(profitDetailMonth, paytDate);
             });
         }
@@ -793,8 +805,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             map.put("posJlTranAmt", detail.getPosCreditAmt());
             try {
                 map = posProfitComputeServiceImpl.execut(map);
-                BigDecimal oldAmt = profitDetailMonthTemp.getPosRewardAmt()==null?BigDecimal.ZERO: profitDetailMonthTemp.getPosRewardAmt();
-                profitDetailMonthTemp.setPosRewardAmt(oldAmt.add((BigDecimal) map.get("posRewardAmt")));
+                profitDetailMonthTemp.setPosRewardAmt((BigDecimal) map.get("posRewardAmt"));
                 profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -857,13 +868,19 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @Date: 2018/8/12
      */
     private BigDecimal getTdSupplyAmt(ProfitDetailMonth profitDetailMonthTemp) {
+        ProfitSupply profitSupply = new ProfitSupply();
+        profitSupply.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
+        profitSupply.setAgentId(profitDetailMonthTemp.getAgentId());
+        profitSupply.setSupplyDate(profitDetailMonthTemp.getProfitDate());
+        profitSupply.setSourceId("02");
         // pos退单补款
-        BigDecimal posSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentId(),"02", profitDetailMonthTemp.getParentAgentId());
-        profitDetailMonthTemp.setPosTdSupplyAmt(posSupply);
+        BigDecimal posSupply = profitSupplyMapper.getBuckleByMonthAndPid(profitSupply);
+        profitDetailMonthTemp.setPosTdSupplyAmt(posSupply==null?BigDecimal.ZERO:posSupply);
         // mpos退单补款
-        BigDecimal mposSupply = profitDeductionServiceImpl.getSupplyAmt(profitDetailMonthTemp.getAgentId(),"01", profitDetailMonthTemp.getParentAgentId());
-        profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply);
-        return posSupply.add(mposSupply);
+        profitSupply.setSourceId("01");
+        BigDecimal mposSupply = profitSupplyMapper.getBuckleByMonthAndPid(profitSupply);
+        profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply==null?BigDecimal.ZERO:mposSupply);
+        return profitDetailMonthTemp.getPosTdSupplyAmt().add(profitDetailMonthTemp.getMposTdSupplyAmt());
     }
 
     /***
@@ -875,8 +892,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      */
     private BigDecimal doTdDeductionAmt(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String type) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentPid(profitDetailMonthTemp.getAgentId());
-        profitDeduction.setParentAgentPid(profitDetailMonthTemp.getParentAgentId());
+        profitDeduction.setAgentId(profitDetailMonthTemp.getAgentId());
+        profitDeduction.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
         profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitDeduction.setSourceId("02");
         // pos退单应扣款
@@ -886,9 +903,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "02");
-        param.put("agentPid",  profitDetailMonthTemp.getAgentId());
+        param.put("agentId",  profitDetailMonthTemp.getAgentId());
         param.put("computeType", type);
-        param.put("parentAgentPid",  profitDetailMonthTemp.getParentAgentId());
+        param.put("parentAgentId",  profitDetailMonthTemp.getParentAgentId());
         BigDecimal realDeductionAmt = BigDecimal.ZERO;
         if (posMustDeductionAmt.doubleValue() > 0) {
             realDeductionAmt = profitDeductionServiceImpl.settleErrDeduction(param);

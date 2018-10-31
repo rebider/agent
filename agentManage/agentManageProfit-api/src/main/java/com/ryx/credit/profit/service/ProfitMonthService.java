@@ -137,7 +137,7 @@ public interface ProfitMonthService {
      * @param profitDate
      * @return
      */
-    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate, String parentAgentId);
+    public List<ProfitDetailMonth> getAgentProfit(String agentId, String profitDate, String parentAgentId);
 
     /*** 
     * @Description: 获取担保代理商信息

@@ -45,7 +45,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         ProfitDeducttionDetail profitDeducttionDetail = new ProfitDeducttionDetail();
         profitDeducttionDetail.setAgentId(profitDeduction.getAgentId());
         profitDeducttionDetail.setAgentName(profitDeduction.getAgentName());
-        profitDeducttionDetail.setAgentPid(profitDeduction.getAgentPid());
+        profitDeducttionDetail.setAgentPid(profitDeduction.getAgentId());
         profitDeducttionDetail.setCreateDateTime(new Date());
         profitDeducttionDetail.setDeductionDate(profitDeduction.getDeductionDate());
         profitDeducttionDetail.setDeductionDesc(profitDeduction.getDeductionDesc());
@@ -57,7 +57,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         profitDeducttionDetail.setNotDeductionAmt(profitDeduction.getNotDeductionAmt());
         profitDeducttionDetail.setParentAgentName(profitDeduction.getParentAgentName());
         profitDeducttionDetail.setParentAgentId(profitDeduction.getParentAgentId());
-        profitDeducttionDetail.setParentAgentPid(profitDeduction.getParentAgentPid());
+        profitDeducttionDetail.setParentAgentPid(profitDeduction.getParentAgentId());
         profitDeducttionDetail.setRemark(profitDeduction.getRemark());
         profitDeducttionDetail.setUserId(profitDeduction.getUserId());
         profitDeducttionDetailMapper.insertSelective(profitDeducttionDetail);

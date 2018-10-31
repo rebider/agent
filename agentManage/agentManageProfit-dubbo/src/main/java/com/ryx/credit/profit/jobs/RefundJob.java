@@ -139,11 +139,12 @@ public class RefundJob {
         profitSupply.setSupplyType(SUPPLY_DESC);
         profitSupply.setRemerk(SUPPLY_DESC);
         if (agentMap !=null){
-            profitSupply.setAgentPid((String)agentMap.get("AG_UNIQ_NUM"));
+            profitSupply.setAgentId((String)agentMap.get("AGENT_ID"));
             profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
-            profitSupply.setParentAgentId((String)agentMap.get("parentAgentPid"));
+            profitSupply.setParentAgentId((String)agentMap.get("parentAgentId"));
+        }else {
+            profitSupply.setAgentId(jsonObject.getString("instId"));
         }
-        profitSupply.setAgentId(jsonObject.getString("instId"));
         profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));
         profitSupply.setSupplyDate(supplyDate);
         profitSupply.setSourceId(bussType);
@@ -205,21 +206,19 @@ public class RefundJob {
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         if (agentMap!=null) {
-            deduction.setAgentPid((String) agentMap.get("AGENT_ID"));
-            deduction.setParentAgentPid((String) agentMap.get("parentAgentPid"));
+            deduction.setAgentId((String) agentMap.get("AGENT_ID"));
             deduction.setParentAgentId((String) agentMap.get("parentAgentId"));
             deduction.setAgentName((String) agentMap.get("AG_NAME"));
         }else{
-            deduction.setAgentPid(agentId);
+            deduction.setAgentId(agentId);
         }
-        deduction.setAgentId(agentId);
         deduction.setId(deductionIdMap.get(agentId));
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setDeductionDesc(DEDUCTION_DESC);
         // 获取本月后面分期未扣完金额
         Map<String, Object> param = new HashMap<>(2);
-        param.put("agentPid", deduction.getAgentPid());
-        param.put("parentAgentPid",deduction.getParentAgentPid());
+        param.put("agentId", deduction.getAgentId());
+        param.put("parentAgentId",deduction.getParentAgentId());
         BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(param);
         stagNotDeductionSumAmt = stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt;
         // 获取本月总应扣
@@ -245,9 +244,9 @@ public class RefundJob {
         // 获取本月退单扣款信息
         ProfitDeduction query = new ProfitDeduction();
         query.setDeductionDate(deduction.getDeductionDate());
-        query.setAgentPid(deduction.getAgentPid());
+        query.setAgentId(deduction.getAgentId());
         query.setDeductionType(DeductionType.SETTLE_ERR.getType());
-        query.setParentAgentPid(deduction.getParentAgentPid());
+        query.setParentAgentId(deduction.getParentAgentId());
         query.setActualDeductionAmt(BigDecimal.ZERO);
         List<ProfitDeduction> profitDeductions = profitDeductionService.getProfitDeduction(query);
         if (profitDeductions != null && profitDeductions.size() > 0) {
@@ -352,8 +351,7 @@ public class RefundJob {
     private void getParentAgentId(Map<String, Object> posMap) throws Exception{
         List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), (String)posMap.get("BUS_PLATFORM"), (String)posMap.get("BUS_NUM"));
         if(agentBusInfo != null && !agentBusInfo.isEmpty()){
-            posMap.put("parentAgentId", agentBusInfo.get(0).getBusNum());
-            posMap.put("parentAgentPid", agentBusInfo.get(0).getAgentId());
+            posMap.put("parentAgentId", agentBusInfo.get(0).getAgentId());
         }
     }
 }

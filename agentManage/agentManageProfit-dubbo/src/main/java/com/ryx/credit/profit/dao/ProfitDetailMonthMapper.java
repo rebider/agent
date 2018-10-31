@@ -75,4 +75,13 @@ public interface ProfitDetailMonthMapper {
      * 修改分润展示补款
      * */
     int updateProfitMonthDetail(ProfitDetailMonth profitDetailMonth);
+
+    /***
+    * @Description: 计算数据清零
+    * @Param:
+    * @return:
+    * @Author: zhaodw
+    * @Date: 2018/10/31
+    */
+    void clearComputData(String profitDate);
 }
