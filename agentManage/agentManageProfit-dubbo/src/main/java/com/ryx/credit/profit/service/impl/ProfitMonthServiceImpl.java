@@ -954,4 +954,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitDetailMonthMapper.exportByFinance(profitDetailMonth);
     }
 
+    /*@Override
+    public void updateProfitMonthDetail(ProfitDetailMonth profitDetailMonth) {
+
+        profitDetailMonthMapper.updateProfitMonthDetail(profitDetailMonth);
+    }*/
+
 }

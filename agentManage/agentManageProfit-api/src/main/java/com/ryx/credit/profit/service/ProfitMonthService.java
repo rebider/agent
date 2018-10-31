@@ -175,4 +175,9 @@ public interface ProfitMonthService {
      * @return
      */
     List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth);
+
+    /**
+     * 修改分润展示补款
+     * */
+    //public void updateProfitMonthDetail(ProfitDetailMonth  profitDetailMonth);
 }

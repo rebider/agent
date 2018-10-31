@@ -70,4 +70,9 @@ public interface ProfitDetailMonthMapper {
      * @return
      */
     List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth);
+
+    /**
+     * 修改分润展示补款
+     * */
+    int updateProfitMonthDetail(ProfitDetailMonth profitDetailMonth);
 }
