@@ -19,7 +19,7 @@ public interface PTaxAdjustMapper {
 
     PTaxAdjust selectByPrimaryKey(String id);
 
-    PTaxAdjust selectByAgentPid(String agentPid);
+    PTaxAdjust selectByAgentId(String agentId);
 
     int updateByPrimaryKeySelective(PTaxAdjust record);
 

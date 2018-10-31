@@ -93,8 +93,8 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     }
 
     @Override
-    public PTaxAdjust selectByAgentPid(String agentPid) {
-        return adjustMapper.selectByAgentPid(agentPid);
+    public PTaxAdjust selectByAgentId(String agentId) {
+        return adjustMapper.selectByAgentId(agentId);
     }
 
     @Override

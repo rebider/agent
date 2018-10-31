@@ -475,7 +475,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             });
             // 计算税点及实发分润
             try {
-                profitComputerService.new_computerTax();
+//                profitComputerService.new_computerTax();
             } catch (Exception e) {
                 e.printStackTrace();
             }

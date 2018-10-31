@@ -88,6 +88,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     private int index = 1;
     private BigDecimal tranAmount = BigDecimal.ZERO;
     private BigDecimal zfAmount = BigDecimal.ZERO;
+    private String applyType;
 
     @Override
     public BigDecimal totalP_day_RHB(String agentPid,String month) {
@@ -598,7 +599,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             }
             logger.info("历史欠税转移："+history);
             detail.setDeductionTaxMonthAgoAmt(history);
-            inserHistory(transDate,agentPid,history);
+            if(null!=applyType && applyType.equals("1")){
+                inserHistory(transDate,agentPid,history);
+            }
             return detail;
         }
         //-------------------本月税额计算-------------------
@@ -660,7 +663,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         // ------------------不足后，需记录本月之前欠税额-------------------
         BigDecimal must = profitA.subtract(detail.getDeductionTaxMonthAgoAmt())
                 .add(detail.getSupplyTaxAmt());
-        if(must.compareTo(BigDecimal.ZERO)<0){//分润不足扣上月欠税
+        if(must.compareTo(BigDecimal.ZERO)<0 && null!=applyType && applyType.equals("1")){//分润不足扣上月欠税
             inserHistory(transDate,agentPid,must.multiply(new BigDecimal("-1")));
             must = BigDecimal.ZERO;
         }
@@ -724,7 +727,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * 每月12号下午14点执行一次：@Scheduled(cron = "0 0 12 14 * ?")
      */
 //    @Scheduled(cron = "0 0 12 14 * ?")
-    public void new_computerTax() throws Exception {
+    public void new_computerTax(String type) throws Exception {
+        this.applyType = type;
         String profitDate = null;
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;
         List<ProfitDetailMonth> detailMonths1 = detailMonthMapper.selectByGreaDate(profitDate);
@@ -885,7 +889,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             }
             logger.info("历史欠税转移："+history);
             detail.setDeductionTaxMonthAgoAmt(history);
-            inserHistory(transDate,detailMonth.getAgentId(),detailMonth.getParentAgentId(),history);
+            if(null!=applyType && applyType.equals("1")){
+                inserHistory(transDate,detailMonth.getAgentId(),detailMonth.getParentAgentId(),history);
+            }
             return detail;
         }
         //-------------------本月税额计算-------------------
@@ -953,7 +959,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         // ------------------不足后，需记录本月之前欠税额-------------------
         BigDecimal must = profitAmt.subtract(detail.getDeductionTaxMonthAgoAmt())
                 .add(detail.getSupplyTaxAmt());
-        if(must.compareTo(BigDecimal.ZERO)<0){//分润不足扣上月欠税
+        if(must.compareTo(BigDecimal.ZERO)<0 && null!=applyType && applyType.equals("1")){//分润不足扣上月欠税
             inserHistory(transDate,detailMonth.getAgentPid(),detailMonth.getParentAgentId(),must.multiply(new BigDecimal("-1")));
             must = BigDecimal.ZERO;
         }
