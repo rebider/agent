@@ -1577,6 +1577,66 @@ public class OCashReceivablesExample {
             addCriterion("REAL_REC_TIME not between", value1, value2, "realRecTime");
             return (Criteria) this;
         }
+
+        public Criteria andPayStatusIsNull() {
+            addCriterion("PAY_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusIsNotNull() {
+            addCriterion("PAY_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS =", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusNotEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS <>", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusGreaterThan(BigDecimal value) {
+            addCriterion("PAY_STATUS >", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS >=", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusLessThan(BigDecimal value) {
+            addCriterion("PAY_STATUS <", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PAY_STATUS <=", value, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusIn(List<BigDecimal> values) {
+            addCriterion("PAY_STATUS in", values, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusNotIn(List<BigDecimal> values) {
+            addCriterion("PAY_STATUS not in", values, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PAY_STATUS between", value1, value2, "payStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PAY_STATUS not between", value1, value2, "payStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

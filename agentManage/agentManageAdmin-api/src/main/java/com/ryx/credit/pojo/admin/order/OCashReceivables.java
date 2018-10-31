@@ -68,6 +68,8 @@ public class OCashReceivables implements Serializable{
     @JsonSerialize(using = DateJsonSerializer.class)
     private Date realRecTime;
 
+    private BigDecimal payStatus;
+
     public String getId() {
         return id;
     }
@@ -242,5 +244,13 @@ public class OCashReceivables implements Serializable{
 
     public void setRealRecTime(Date realRecTime) {
         this.realRecTime = realRecTime;
+    }
+
+    public BigDecimal getPayStatus() {
+        return payStatus;
+    }
+
+    public void setPayStatus(BigDecimal payStatus) {
+        this.payStatus = payStatus;
     }
 }
