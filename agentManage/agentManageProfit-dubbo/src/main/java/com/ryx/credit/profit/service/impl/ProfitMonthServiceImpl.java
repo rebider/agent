@@ -482,7 +482,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 计算税点及实发分润
             try {
                 long sstart = System.currentTimeMillis();
-                profitComputerService.new_computerTax();
+                profitComputerService.new_computerTax(computType);
                 long send = System.currentTimeMillis();
                 System.out.println("实发处理时间"+(send-sstart));
             } catch (Exception e) {
