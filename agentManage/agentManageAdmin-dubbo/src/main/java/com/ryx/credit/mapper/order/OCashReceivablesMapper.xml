@@ -24,6 +24,7 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="REAL_REC_TIME" jdbcType="TIMESTAMP" property="realRecTime" />
+    <result column="PAY_STATUS" jdbcType="DECIMAL" property="payStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -57,7 +58,7 @@
   <sql id="Base_Column_List">
     ID, CASHPAY_TYPE, SRC_ID, AGENT_ID, AMOUNT, REAL_AMOUNT, PAY_USER, PAY_TIME, COLLECT_COMPANY,
     CHECK_USER, CHECK_DATE, PAY_TYPE, BILLNUM, REVIEW_STATUS, REMARK, C_TIME, U_TIME,
-    C_USER, U_USER, VERSION, STATUS, REAL_REC_TIME
+    C_USER, U_USER, VERSION, STATUS, REAL_REC_TIME, PAY_STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OCashReceivablesExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,7 +96,7 @@
     BILLNUM, REVIEW_STATUS, REMARK,
     C_TIME, U_TIME, C_USER,
     U_USER, VERSION, STATUS,
-    REAL_REC_TIME)
+    REAL_REC_TIME, PAY_STATUS)
     values (#{id,jdbcType=VARCHAR}, #{cashpayType,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR},
     #{agentId,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{realAmount,jdbcType=DECIMAL},
     #{payUser,jdbcType=VARCHAR}, #{payTime,jdbcType=TIMESTAMP}, #{collectCompany,jdbcType=VARCHAR},
@@ -103,7 +104,7 @@
     #{billnum,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL},
-    #{realRecTime,jdbcType=TIMESTAMP})
+    #{realRecTime,jdbcType=TIMESTAMP}, #{payStatus,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OCashReceivables">
     insert into O_CASH_RECEIVABLES
@@ -174,6 +175,9 @@
       <if test="realRecTime != null">
         REAL_REC_TIME,
       </if>
+      <if test="payStatus != null">
+        PAY_STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -241,6 +245,9 @@
       </if>
       <if test="realRecTime != null">
         #{realRecTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payStatus != null">
+        #{payStatus,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -316,6 +323,9 @@
       <if test="realRecTime != null">
         REAL_REC_TIME = #{realRecTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="payStatus != null">
+        PAY_STATUS = #{payStatus,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -341,7 +351,8 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     VERSION = #{version,jdbcType=DECIMAL},
     STATUS = #{status,jdbcType=DECIMAL},
-    REAL_REC_TIME = #{realRecTime,jdbcType=TIMESTAMP}
+    REAL_REC_TIME = #{realRecTime,jdbcType=TIMESTAMP},
+    PAY_STATUS = #{payStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

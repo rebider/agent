@@ -10,6 +10,7 @@ import com.ryx.credit.pojo.admin.order.OCashReceivables;
 import com.ryx.credit.pojo.admin.order.OCashReceivablesExample;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +42,16 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
     private OCashReceivablesMapper oCashReceivablesMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private IPaymentDetailService iPaymentDetailService;
 
 
+    /**
+     * 检查参数
+     * @param oCashReceivables
+     * @return
+     * @throws Exception
+     */
     @Override
     public AgentResult check(OCashReceivables oCashReceivables) throws Exception {
         if(null==oCashReceivables)  return AgentResult.fail("现金付款内容不能为空");
@@ -74,8 +83,9 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             oCashReceivables.setCheckDate(checkDate);
             oCashReceivables.setCheckUser(userId);
             oCashReceivables.setuUser(userId);
-            oCashReceivables.setRealAmount(oCashReceivables.getAmount());
+            oCashReceivables.setRealAmount(BigDecimal.ZERO);
             oCashReceivables.setuTime(c.getTime());
+            //实际到账时间审批时候填写
             if(list!=null && list.size()>0){
                 for (OCashReceivablesVo oCashReceivablesVo : list) {
                     if(oCashReceivables.getId().equals(oCashReceivablesVo.getId())){
@@ -169,6 +179,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         oCashReceivables.setuUser(user);
         oCashReceivables.setStatus(Status.STATUS_1.status);
         oCashReceivables.setVersion(Status.STATUS_1.status);
+        oCashReceivables.setPayStatus(PaymentStatus.DS.code);
         oCashReceivables.setId(idService.genId(TabId.o_cash_receivables));
         if(1==oCashReceivablesMapper.insertSelective(oCashReceivables)){
             return AgentResult.ok();
@@ -184,7 +195,6 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         db.setSrcId(oCashReceivables.getSrcId());
         db.setAgentId(oCashReceivables.getAgentId());
         db.setAmount(oCashReceivables.getAmount());
-        db.setRealAmount(oCashReceivables.getRealAmount());
         db.setPayUser(oCashReceivables.getPayUser());
         db.setPayTime(oCashReceivables.getPayTime());
         db.setCollectCompany(oCashReceivables.getCollectCompany());
@@ -206,6 +216,8 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         }
         return AgentResult.fail();
     }
+
+
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentResult dele(OCashReceivables oCashReceivables, String user)throws Exception {
@@ -243,6 +255,15 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         }
         return AgentResult.ok();
     }
+
+    /**
+     * 审批拒绝
+     * @param cpt
+     * @param srcId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentResult refuseProcing(CashPayType cpt, String srcId,String userId) throws Exception {
@@ -253,25 +274,62 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             if(StringUtils.isNotBlank(userId))
             oCashReceivables.setuUser(userId);
             oCashReceivables.setuTime(c.getTime());
+            oCashReceivables.setRealAmount(BigDecimal.ZERO);
+            oCashReceivables.setPayStatus(PaymentStatus.DS.code);
             if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables)){
                 throw new MessageException("更新现款付款明细失败");
             }
         }
         return AgentResult.ok();
     }
+
+    /**
+     * 审批通过
+     * @param cpt
+     * @param srcId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentResult finishProcing(CashPayType cpt, String srcId,String userId) throws Exception {
         List<OCashReceivables>  ocashList =  query(null,null,cpt,srcId, Arrays.asList(AgStatus.Approving.status));
         Calendar c = Calendar.getInstance();
+        int i = 0;
+        String batcheCode = iPaymentDetailService.createBatchCode();
         for (OCashReceivables oCashReceivables : ocashList) {
+            if(oCashReceivables.getPayType().equals(PayType.YHHK.code)) {
+                oCashReceivables.setPayStatus(PaymentStatus.JQ.code);
+                oCashReceivables.setRealAmount(oCashReceivables.getAmount());
+            }else if(oCashReceivables.getPayType().equals(PayType.FRDK.code)){
+                //如果是分润抵扣 添加分润抵扣
+                AgentResult payDetail =   iPaymentDetailService.createPayMentDetail(
+                        batcheCode,
+                        oCashReceivables.getId(),
+                        PamentIdType.ORDER_XX,
+                        oCashReceivables.getSrcId(),
+                        PaymentType.FRFQ,
+                        oCashReceivables.getAmount(),
+                        BigDecimal.ZERO,
+                        new Date(),
+                        new BigDecimal(i),
+                        PaymentStatus.DF,
+                        oCashReceivables.getAgentId(),
+                        oCashReceivables.getcUser()
+                );
+                i++;
+                oCashReceivables.setPayStatus(PaymentStatus.DF.code);
+                oCashReceivables.setRealAmount(BigDecimal.ZERO);
+            }
             oCashReceivables.setReviewStatus(AgStatus.Approved.status);
             if(StringUtils.isNotBlank(userId))
-            oCashReceivables.setuUser(userId);
+                oCashReceivables.setuUser(userId);
             oCashReceivables.setuTime(c.getTime());
             if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables)){
                 throw new MessageException("更新现款付款明细失败");
             }
+
         }
         return AgentResult.ok();
     }
