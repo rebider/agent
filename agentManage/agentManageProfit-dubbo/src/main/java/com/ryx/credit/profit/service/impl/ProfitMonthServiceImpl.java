@@ -390,7 +390,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate, String parentAgentId) {
+    public List<ProfitDetailMonth> getAgentProfit(String agentId, String profitDate, String parentAgentId) {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
@@ -400,10 +400,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 criteria.andParentAgentIdEqualTo(parentAgentId);
             }
             List<ProfitDetailMonth> list = profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
-            if(list != null && !list.isEmpty()){
-                ProfitDetailMonth profitMonth = list.get(0);
-                return profitMonth;
-            }
+            return list;
         }
         return null;
     }
@@ -413,6 +410,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.clearComputData(profitDate);
         comput("1");
+        profitToolsDeductService.noticeOrderSystem();
     }
 
     public Map<String, Object> getDbProfitAmt(String agentId, String parentAgentId, String computType) {

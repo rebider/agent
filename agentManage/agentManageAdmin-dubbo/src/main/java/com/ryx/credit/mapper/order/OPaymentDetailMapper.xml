@@ -359,6 +359,7 @@
         detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,o.ORDER_PLATFORM
         from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
         on detail.AGENT_ID=agent.id
+
         left join O_ORDER o on detail.ORDER_ID=o.id where
         detail.status=1 and payment.status=1 and agent.status=1 and detail.PAYMENT_STATUS=1 and detail.PAY_TYPE='FRFQ'
 
