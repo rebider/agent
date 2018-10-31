@@ -508,7 +508,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (!hbList.isEmpty()) {
             // 机具扣款
             hbList = doHbToolDeduction(profitDetailMonth, computType, hbList);
-            BigDecimal realDeductionAmt = BigDecimal.ZERO;
             if (!hbList.isEmpty()) {
                 //POS考核扣款（新国都、瑞易送）-
                 Map<String, Object> param = new HashMap<>(5);
@@ -520,9 +519,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 param.put("deductionStatus","1");
                 //POS考核扣款（新国都、瑞易送）-
                 param = profitDeductionServiceImpl.otherDeductionHbByType(param);
-                realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                profitDetailMonth.setPosKhDeductionAmt(profitDetailMonth.getPosKhDeductionAmt().subtract(realDeductionAmt));
-
                 List<Map<String, Object>> delList = ((List)param.get("delList"));
                 if (!delList.isEmpty()) {
                     delHb(delList);
@@ -531,9 +527,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     //手刷考核扣款（小蓝牙、MPOS）-
                     param.put("remark", "手刷考核扣款（小蓝牙、MPOS）");
                     param = profitDeductionServiceImpl.otherDeductionHbByType(param);
-                    realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                    profitDetailMonth.setMposKhDeductionAmt(profitDetailMonth.getMposKhDeductionAmt().subtract(realDeductionAmt));
-
                     delList = ((List)param.get("delList"));
                     if (!delList.isEmpty()) {
                         delHb(delList);
@@ -565,8 +558,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                                     break;
                                 }
                             }
-                            realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                            profitDetailMonth.setBuDeductionAmt(profitDetailMonth.getBuDeductionAmt().subtract(diff));
                             delList = ((List)param.get("delList"));
                             if (!delList.isEmpty()) {
                                 delHb(delList);
@@ -577,9 +568,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                         //其他扣款-
                         param.put("remark", "1");
                         param = profitDeductionServiceImpl.otherDeductionHbByType(param);
-                        realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-                        profitDetailMonth.setOtherDeductionAmt(profitDetailMonth.getOtherDeductionAmt().subtract(realDeductionAmt));
-
                         delList = ((List)param.get("delList"));
                         if (!delList.isEmpty()) {
                             delHb(delList);
@@ -600,13 +588,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("parentAgentId",  profitDetailMonthTemp.getParentAgentId());
         param.put("hbList", hbList);     //代理商分润
         param.put("deductionStatus","1");
-        BigDecimal realDeductionAmt = BigDecimal.ZERO;
         //退单扣款-pos 未扣足
         if (!profitDetailMonthTemp.getPosTdMustDeductionAmt().equals(profitDetailMonthTemp.getPosTdRealDeductionAmt())) {
             param.put("sourceId", "02");
             param  = profitDeductionServiceImpl.settleErrHbDeduction(param);
-            realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-            profitDetailMonthTemp.setPosTdRealDeductionAmt(profitDetailMonthTemp.getPosTdRealDeductionAmt().subtract(realDeductionAmt));
             List<Map<String, Object>> delList = ((List)param.get("delList"));
             if (!delList.isEmpty()) {
                 delHb(delList);
@@ -615,8 +600,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (!((List)param.get("hbList")).isEmpty() && !profitDetailMonthTemp.getMposTdMustDeductionAmt().equals(profitDetailMonthTemp.getMposTdRealDeductionAmt())) {
             param.put("sourceId", "01");
             param = profitDeductionServiceImpl.settleErrHbDeduction(param);
-            realDeductionAmt = (BigDecimal) param.get("actualDeductionAmtSum");
-            profitDetailMonthTemp.setMposTdRealDeductionAmt(profitDetailMonthTemp.getMposTdRealDeductionAmt().subtract(realDeductionAmt));
             List<Map<String, Object>> delList = ((List)param.get("delList"));
             if (!delList.isEmpty()) {
                 delHb(delList);
