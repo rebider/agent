@@ -70,4 +70,13 @@ public interface ProfitDetailMonthMapper {
      * @return
      */
     List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth);
+
+    /*** 
+    * @Description: 计算数据清零
+    * @Param:  
+    * @return:  
+    * @Author: zhaodw 
+    * @Date: 2018/10/31 
+    */ 
+    void clearComputData(String profitDate);
 }
