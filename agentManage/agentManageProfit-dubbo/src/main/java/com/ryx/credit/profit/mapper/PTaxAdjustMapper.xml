@@ -66,11 +66,11 @@
     where ID = #{id,jdbcType=VARCHAR}
   </select>
 
-  <select id="selectByAgentPid" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from P_TAX_ADJUST
-    where AGENT_PID = #{agentPid,jdbcType=VARCHAR} and TAX_STATUS='0'
+    where AGENT_ID = #{agentId,jdbcType=VARCHAR} and TAX_STATUS='0'
   </select>
 
   <select id="getTax" parameterType="string" resultType="java.math.BigDecimal">
