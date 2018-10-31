@@ -1,10 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.CashPayType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -86,8 +83,11 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                     }
                 }
             }
-            if(oCashReceivables.getRealRecTime()==null){
-                throw new MessageException("实际到账时间不能为空");
+            //银行汇款实际到账时间不能为空
+            if(oCashReceivables.getPayType().equals(PayType.YHHK.code)) {
+                if (oCashReceivables.getRealRecTime() == null) {
+                    throw new MessageException("实际到账时间不能为空");
+                }
             }
             if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables)){
                 throw new MessageException("更新现款付款明细失败");
