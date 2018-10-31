@@ -21,6 +21,8 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="BELOW_PAY_AMT" jdbcType="DECIMAL" property="belowPayAmt" />
+    <result column="SHARE_DEDUCT_AMT" jdbcType="DECIMAL" property="shareDeductAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -54,7 +56,7 @@
   <sql id="Base_Column_List">
     ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, MACH_OWE_AMT, GATHER_TIME,
     GATHER_AMT, REVIEW_STATUS, S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, VERSION, AGENT_ID
+    U_USER, STATUS, VERSION, AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -91,14 +93,16 @@
     S_TIME, APPLY_REMARK, DEDUCT_AMT,
     C_TIME, U_TIME, C_USER,
     U_USER, STATUS, VERSION,
-    AGENT_ID)
+    AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT
+    )
     values (#{id,jdbcType=VARCHAR}, #{applyCompType,jdbcType=VARCHAR}, #{applyCompAmt,jdbcType=DECIMAL},
     #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, #{machOweAmt,jdbcType=DECIMAL},
     #{gatherTime,jdbcType=TIMESTAMP}, #{gatherAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
     #{sTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{deductAmt,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{agentId,jdbcType=VARCHAR})
+    #{agentId,jdbcType=VARCHAR}, #{belowPayAmt,jdbcType=DECIMAL}, #{shareDeductAmt,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     insert into O_REFUND_PRICE_DIFF
@@ -160,6 +164,12 @@
       <if test="agentId != null">
         AGENT_ID,
       </if>
+      <if test="belowPayAmt != null">
+        BELOW_PAY_AMT,
+      </if>
+      <if test="shareDeductAmt != null">
+        SHARE_DEDUCT_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -218,6 +228,12 @@
       </if>
       <if test="agentId != null">
         #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="belowPayAmt != null">
+        #{belowPayAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shareDeductAmt != null">
+        #{shareDeductAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -284,6 +300,12 @@
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
       </if>
+      <if test="belowPayAmt != null">
+        BELOW_PAY_AMT = #{belowPayAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shareDeductAmt != null">
+        SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -306,7 +328,9 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
-    AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    BELOW_PAY_AMT = #{belowPayAmt,jdbcType=DECIMAL},
+    SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -323,7 +347,7 @@
   <sql id="B_Base_Column_List">
     rp.ID, rp.APPLY_COMP_TYPE, rp.APPLY_COMP_AMT, rp.REL_COMP_TYPE, rp.REL_COMP_AMT, rp.MACH_OWE_AMT, rp.GATHER_TIME,
     rp.GATHER_AMT, rp.REVIEW_STATUS, rp.S_TIME, rp.APPLY_REMARK, rp.DEDUCT_AMT, rp.C_TIME, rp.U_TIME, rp.C_USER,
-    rp.U_USER, rp.STATUS, rp.VERSION, rp.AGENT_ID
+    rp.U_USER, rp.STATUS, rp.VERSION, rp.AGENT_ID, rp.BELOW_PAY_AMT, rp.SHARE_DEDUCT_AMT
   </sql>
   <sql id="D_Base_Column_List">
     rpd.ID, rpd.SUB_ORDER_ID, rpd.AGENT_ID, rpd.ACTIVITY_FRONT_ID, rpd.ACTIVITY_REAL_ID, rpd.REFUND_PRICE_DIFF_ID,
