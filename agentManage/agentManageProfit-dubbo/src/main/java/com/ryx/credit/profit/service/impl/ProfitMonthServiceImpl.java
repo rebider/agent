@@ -410,7 +410,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.clearComputData(profitDate);
         comput("1");
-        profitToolsDeductService.noticeOrderSystem();
+        profitToolsDeductService.otherOperate();
     }
 
     public Map<String, Object> getDbProfitAmt(String agentId, String parentAgentId, String computType) {

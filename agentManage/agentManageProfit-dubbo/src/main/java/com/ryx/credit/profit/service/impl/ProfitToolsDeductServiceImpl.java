@@ -410,10 +410,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     }
 
     /**
-     * 新增一个方法，在终审后调用，查询所有本月所有机具订单，扣款未扣足的订单，通知告诉订单中心。
+     * 终审后，查询机具未扣款订单，通知订单系统，未扣款订单与金额
      */
     @Override
-    public void noticeOrderSystem(){
+    public void otherOperate(){
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setDeductionDate(deductDate);

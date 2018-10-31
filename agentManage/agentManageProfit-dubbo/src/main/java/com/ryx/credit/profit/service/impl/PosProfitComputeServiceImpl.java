@@ -649,7 +649,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
         });
     }
 
+    /**
+     *
+     */
     @Override
-    public void noticeOrderSystem() {
+    public void otherOperate() {
+
+
     }
 }
