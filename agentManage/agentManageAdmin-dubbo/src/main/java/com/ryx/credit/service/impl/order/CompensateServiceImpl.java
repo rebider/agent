@@ -304,6 +304,17 @@ public class CompensateServiceImpl implements CompensateService {
             oRefundPriceDiff.setReviewStatus(AgStatus.Create.status);
             oRefundPriceDiff.setStatus(Status.STATUS_1.status);
             oRefundPriceDiff.setVersion(Status.STATUS_0.status);
+            BigDecimal belowPayAmt = new BigDecimal(0);
+            BigDecimal shareDeductAmt = new BigDecimal(0);
+            for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
+                if(oCashReceivablesVo.getPayType().equals(PayType.YHHK.code)){
+                    belowPayAmt = belowPayAmt.add(oCashReceivablesVo.getAmount());
+                }else if(oCashReceivablesVo.getPayType().equals(PayType.FRDK.code)){
+                    shareDeductAmt = shareDeductAmt.add(oCashReceivablesVo.getAmount());
+                }
+            }
+            oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
+            oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
             int refundDiffInsert = refundPriceDiffMapper.insert(oRefundPriceDiff);
             if(refundDiffInsert!=1){
                 log.info("插入补退差价申请表异常");
@@ -538,6 +549,7 @@ public class CompensateServiceImpl implements CompensateService {
                         }
                     });
                 }
+                //1表示机具欠款已抵扣
                 if(agentVo.getFlag().equals("1")){
                     ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
                     BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
@@ -548,7 +560,7 @@ public class CompensateServiceImpl implements CompensateService {
                     agentVo.getoRefundPriceDiffVo().setRelCompAmt(subtractStr.contains("-")?new BigDecimal(0):subtract);
                     deductAmt = oRefundPriceDiff.getDeductAmt().add(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                 }
-                AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt,userId);
+                AgentResult agentResult = compensateService.updateTask(agentVo, deductAmt,userId,agentVo.getoCashReceivablesVoList());
                 if(!agentResult.isOK()){
                     throw new ProcessException("更新退补差价主表异常");
                 }
@@ -571,10 +583,11 @@ public class CompensateServiceImpl implements CompensateService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId){
+    public AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId,List<OCashReceivablesVo> cashReceivablesVoList)throws Exception{
         ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
         ORefundPriceDiffVo updatePriceDiff = new ORefundPriceDiffVo();
         updatePriceDiff.setId(oRefundPriceDiff.getId());
+        //业务审批
         if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0) {
             updatePriceDiff.setDeductAmt(deductAmt);
             BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
@@ -583,9 +596,14 @@ public class CompensateServiceImpl implements CompensateService {
             updatePriceDiff.setRelCompAmt(relCompAmtStr.contains("-") ? new BigDecimal(relCompAmtStr.substring(1)) : new BigDecimal(relCompAmtStr));
         }
         if(null!=agentVo.getoRefundPriceDiffVo())
+        //财务审批
         if(StringUtils.isNotBlank(agentVo.getoRefundPriceDiffVo().getGatherTimeStr())){
             updatePriceDiff.setGatherTime(DateUtil.getDateFromStr(agentVo.getoRefundPriceDiffVo().getGatherTimeStr(),DateUtil.DATE_FORMAT_1));
             updatePriceDiff.setGatherAmt(agentVo.getoRefundPriceDiffVo().getGatherAmt());
+            AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),userId,new Date(),cashReceivablesVoList);
+            if(!cashAgentResult.isOK()){
+                throw new ProcessException("更新收款信息失败");
+            }
         }
         if(agentVo.getFlag().equals("1")){
             updatePriceDiff.setRelCompAmt(agentVo.getoRefundPriceDiffVo().getRelCompAmt());
@@ -629,11 +647,6 @@ public class CompensateServiceImpl implements CompensateService {
         int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
         if(i!=1){
             throw new ProcessException("更新退补差价数据申请失败");
-        }
-
-        AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),oRefundPriceDiff.getuUser(),new Date(),null);
-        if(!cashAgentResult.isOK()){
-            throw new ProcessException("更新收款人和时间失败");
         }
 
         AgentResult agentResult = AgentResult.fail();
@@ -905,6 +918,17 @@ public class CompensateServiceImpl implements CompensateService {
             if(null==oRefundPriceDiff.getId()){
                 throw new ProcessException("退补差价数据id为空");
             }
+            BigDecimal belowPayAmt = new BigDecimal(0);
+            BigDecimal shareDeductAmt = new BigDecimal(0);
+            for (OCashReceivablesVo oCashReceivablesVo : cashReceivablesVoList) {
+                if(oCashReceivablesVo.getPayType().equals(PayType.YHHK.code)){
+                    belowPayAmt = belowPayAmt.add(oCashReceivablesVo.getAmount());
+                }else if(oCashReceivablesVo.getPayType().equals(PayType.FRDK.code)){
+                    shareDeductAmt = shareDeductAmt.add(oCashReceivablesVo.getAmount());
+                }
+            }
+            oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
+            oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
             int k = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
             if(k!=1){
                 throw new ProcessException("更新退补差价数据失败");
