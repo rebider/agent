@@ -36,7 +36,7 @@ public interface OCashReceivablesService {
     public AgentResult approveTashBusiness(CashPayType cpt,
                                            String srcId,
                                            String userId,
-                                           Date checkDate)throws Exception;
+                                           Date checkDate,List<OCashReceivablesVo> list)throws Exception;
 
     /**
      * 添加或修改现款收款明细

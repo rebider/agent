@@ -69,7 +69,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
      */
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
-    public AgentResult approveTashBusiness(CashPayType cpt, String srcId, String userId,Date checkDate) throws Exception{
+    public AgentResult approveTashBusiness(CashPayType cpt, String srcId, String userId,Date checkDate,List<OCashReceivablesVo> list) throws Exception{
         List<OCashReceivables>  ocashList =  query(null,null,cpt,srcId, Arrays.asList(AgStatus.Approving.status));
         Calendar c = Calendar.getInstance();
         for (OCashReceivables oCashReceivables : ocashList) {
@@ -78,6 +78,16 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             oCashReceivables.setCheckUser(userId);
             oCashReceivables.setuUser(userId);
             oCashReceivables.setuTime(c.getTime());
+            if(list!=null && list.size()>0){
+                for (OCashReceivablesVo oCashReceivablesVo : list) {
+                    if(oCashReceivables.getId().equals(oCashReceivablesVo.getId())){
+                        oCashReceivables.setRealRecTime(oCashReceivablesVo.getRealRecTime());
+                    }
+                }
+            }
+            if(oCashReceivables.getRealRecTime()==null){
+                throw new MessageException("实际到账时间不能为空");
+            }
             if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables)){
                 throw new MessageException("更新现款付款明细失败");
             }

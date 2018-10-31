@@ -1409,15 +1409,16 @@ public class OrderServiceImpl implements OrderService {
                 if(StringUtils.isNotBlank(agentVo.getoPayment().get("guaranteeAgent"))){
                     oPayment.setGuaranteeAgent(agentVo.getoPayment().get("guaranteeAgent"));
                 }
-
+                //实际到账时间
+                List<OCashReceivablesVo> oCashReceivablesVoList = agentVo.getoCashReceivablesVoList();
                 //核款时间
-                if(StringUtils.isNotBlank(agentVo.getoPayment().get("nuclearTime"))){
+                if(StringUtils.isNotBlank(agentVo.getoPayment().get("nuclearTime")) || ( oCashReceivablesVoList!=null && oCashReceivablesVoList.size()>0 )){
                     try {
                         Date nuclearTime = DateUtil.format(agentVo.getoPayment().get("nuclearTime") + "", "yyyy-MM-dd");
                         oPayment.setNuclearTime(nuclearTime);
                         oPayment.setNuclearUser(userId);
                         //审核人审核时间
-                        AgentResult ocash  = oCashReceivablesService.approveTashBusiness(CashPayType.PAYMENT,oPayment.getId(),userId,nuclearTime);
+                        AgentResult ocash  = oCashReceivablesService.approveTashBusiness(CashPayType.PAYMENT,oPayment.getId(),userId,nuclearTime,oCashReceivablesVoList);
                         logger.info("核款时间核款人更新成功order{}user{}date{}",oPayment.getOrderId(),userId,nuclearTime.getTime());
                     }catch (Exception e){
                         e.printStackTrace();
