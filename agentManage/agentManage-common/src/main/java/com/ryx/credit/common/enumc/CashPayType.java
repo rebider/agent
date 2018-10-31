@@ -29,4 +29,14 @@ public enum CashPayType {
         }
         return null;
     }
+
+    public static CashPayType getContentEnum(String value){
+        CashPayType[] fundType = CashPayType.values();
+        for(CashPayType cc : fundType){
+            if(cc.code.equals(value)){
+                return cc;
+            }
+        }
+        return null;
+    }
 }
