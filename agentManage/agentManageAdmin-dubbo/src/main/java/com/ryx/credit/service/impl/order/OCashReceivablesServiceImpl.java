@@ -5,9 +5,8 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.order.OCashReceivablesMapper;
-import com.ryx.credit.pojo.admin.order.OCashReceivables;
-import com.ryx.credit.pojo.admin.order.OCashReceivablesExample;
+import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -44,6 +43,12 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
     private IdService idService;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+    @Autowired
+    private ORefundPriceDiffMapper oRefundPriceDiffMapper;
+    @Autowired
+    private OPaymentMapper oPaymentMapper;
+    @Autowired
+    private OOrderMapper oOrderMapper;
 
 
     /**
@@ -122,13 +127,17 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         logger.info("操作人[{}]操作付款信息[{}]",user, JSONObject.toJSONString(oCashReceivablesList));
         Date date = new Date();
         BigDecimal total = BigDecimal.ZERO;
-        List<OCashReceivables> list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status));
+
+        //先更新成删除状态
+        List<OCashReceivables> list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
         for (OCashReceivables oCashReceivables : list) {
             if(!dele(oCashReceivables,user).isOK()){
                 throw new MessageException("更新打开明细失败");
             }
         }
+        //处理提交的数据
         if(oCashReceivablesList!=null){
+
             for (OCashReceivablesVo oCashReceivables : oCashReceivablesList) {
                 oCashReceivables.setCashpayType(cpt.code);
                 oCashReceivables.setSrcId(srcId);
@@ -159,6 +168,35 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                     throw new MessageException("内容不能为空");
                 }
             }
+
+            //cxinfo 更具库里的数据 检查具体的数据是否是审批状态
+            //补差价审批中修改
+            if(cpt.code.equals(CashPayType.REFUNDPRICEDIFF) && StringUtils.isNotBlank(srcId)){
+                ORefundPriceDiff diff = oRefundPriceDiffMapper.selectByPrimaryKey(srcId);
+                if(diff.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
+                    List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
+                    for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
+                        oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
+                        if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables_app)){
+                            throw new MessageException("审批状态调整失败");
+                        }
+                    }
+                }
+            //订单审批中修改
+            }else if(cpt.code.equals(CashPayType.PAYMENT) && StringUtils.isNotBlank(srcId)){
+                OPayment oPayment = oPaymentMapper.selectByPrimaryKey(srcId);
+                OOrder order = oOrderMapper.selectByPrimaryKey(oPayment.getOrderId());
+                if(order.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
+                    List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
+                    for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
+                        oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
+                        if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables_app)){
+                            throw new MessageException("审批状态调整失败");
+                        }
+                    }
+                }
+            }
+
         }
         total = total.setScale(2,BigDecimal.ROUND_HALF_UP);
         return AgentResult.ok(total);
@@ -298,6 +336,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         Calendar c = Calendar.getInstance();
         int i = 0;
         String batcheCode = iPaymentDetailService.createBatchCode();
+        Date planPayTime = new Date();
         for (OCashReceivables oCashReceivables : ocashList) {
             if(oCashReceivables.getPayType().equals(PayType.YHHK.code)) {
                 oCashReceivables.setPayStatus(PaymentStatus.JQ.code);
@@ -312,7 +351,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                         PaymentType.FRFQ,
                         oCashReceivables.getAmount(),
                         BigDecimal.ZERO,
-                        new Date(),
+                        planPayTime,
                         new BigDecimal(i),
                         PaymentStatus.DF,
                         oCashReceivables.getAgentId(),
