@@ -43,6 +43,6 @@ public interface CompensateService {
 
     AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId);
 
-    AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
+    AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList);
 }
 
