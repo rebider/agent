@@ -15,6 +15,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,13 +51,23 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computeToolsDeduct() throws Exception {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         Map<String, Object> map = new HashMap<>(10);
-        map.put("agentType", "3");
-        map.put("agentId", "AG20180726000000000001230");
-        map.put("posTranAmt", "8056974.83");
-        map.put("posJlTranAmt", "8048081.83");
-        map = profitToolsDeductService.execut(map);
-        System.out.println(map.toString());
+        map.put("computType", "1");
+        map.put("agentPid", "AG20180726000000000002140");
+        map.put("paltformNo", "100003");
+        map.put("agentProfitAmt", "20000");
+        list.add(map);
+        Map<String, Object> map1 = new HashMap<>(10);
+        map1.put("computType", "1");
+        map1.put("agentPid", "AG20180726000000000002140");
+        map1.put("paltformNo", "100003");
+        map1.put("agentProfitAmt", "20000");
+        list.add(map1);
+        for(Map<String, Object> maps : list){
+            Map<String, Object> sss = profitToolsDeductService.execut(maps);
+            System.out.println(sss.toString());
+        }
 
 
 //        Map<String, Object> map = new HashMap<String, Object>(10);
@@ -79,29 +91,48 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computePosreWard() throws Exception {
-        List<String> busNum = new ArrayList<String>();
-        busNum.add("O00000000000221");
-        busNum.add("O00000000000718");
-        String profitDate = "201807";
-        String agentType = "2";
-        List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getChildTransProfitDetailList(busNum, profitDate, agentType);
-        List<Object> listadd = new ArrayList<Object>();
-        transProfitDetails.stream().forEach(transProfitDetail -> {
-            Map<String, Object> map = new HashMap<String, Object>(10);
-            map.put("agentType", transProfitDetail.getAgentType());//机构一代
-            map.put("agentId", transProfitDetail.getBusNum());
-            map.put("agentPid", transProfitDetail.getAgentId());
-            map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
-            map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
-            try {
-                map = posProfitComputeServiceImpl.execut(map);
-                System.out.println(map.toString());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            listadd.add(map);
-        });
-        System.out.println("+====="+ JSONObject.toJSONString(listadd));
+
+//        Map<String, Object> map = new HashMap<String, Object>(10);
+//        map.put("agentType", "2");//机构一代
+//        map.put("agentId", "JS00000228");
+//        map.put("busNum", "O00000000000165");
+//        map.put("posTranAmt", "3622154621.84");
+//        map.put("posJlTranAmt", "3355858697.04");
+//        map.put("computType", "0");
+
+        Map<String, Object> map = new HashMap<String, Object>(10);
+        map.put("agentType", "3");//机构一代
+        map.put("agentId", "AG20180726000000000002429");
+        map.put("busNum", "O00000000151376");
+        map.put("posTranAmt", "621164756.08");
+        map.put("posJlTranAmt", "560013657.32");
+        map.put("computType", "0");
+        map = posProfitComputeServiceImpl.execut(map);
+        System.out.println(map.toString());
+
+//        List<String> busNum = new ArrayList<String>();
+//        busNum.add("O00000000000221");
+//        busNum.add("O00000000000718");
+//        String profitDate = "201807";
+//        String agentType = "2";
+//        List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getChildTransProfitDetailList(busNum, profitDate, agentType);
+//        List<Object> listadd = new ArrayList<Object>();
+//        transProfitDetails.stream().forEach(transProfitDetail -> {
+//            Map<String, Object> map = new HashMap<String, Object>(10);
+//            map.put("agentType", transProfitDetail.getAgentType());//机构一代
+//            map.put("agentId", transProfitDetail.getBusNum());
+//            map.put("agentPid", transProfitDetail.getAgentId());
+//            map.put("posTranAmt", transProfitDetail.getPosRewardAmt());
+//            map.put("posJlTranAmt", transProfitDetail.getPosCreditAmt());
+//            try {
+//                map = posProfitComputeServiceImpl.execut(map);
+//                System.out.println(map.toString());
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//            listadd.add(map);
+//        });
+//        System.out.println("+====="+ JSONObject.toJSONString(listadd));
     }
 
     @Test
@@ -154,5 +185,10 @@ public class ToolsDeductJobTest {
                 System.out.println(posRewardTemplate.getId());
             });
         }
+    }
+
+    @Test
+    public void test(){
+        profitToolsDeductService.otherOperate();
     }
 }
