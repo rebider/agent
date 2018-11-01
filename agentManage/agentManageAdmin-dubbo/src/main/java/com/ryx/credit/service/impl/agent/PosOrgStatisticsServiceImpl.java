@@ -40,13 +40,13 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId)throws Exception{
         PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
         String platformType = platForm.getPlatformType();
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
         if(PlatformType.MPOS.getValue().equals(platformType)){
-            AgentResult agentResult = httpForMpos(orgId);
+            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum());
             agentResult.setMsg(platformType);
             return agentResult;
         }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
-            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
-            AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
             AgentResult agentResult = httpForPos(orgId,parentBusInfo.getBusNum());
             agentResult.setMsg(platformType);
             return agentResult;
@@ -89,7 +89,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             map.put("tranCode", tranCode);
             map.put("reqMsgId", reqMsgId);
 
-            log.info("机构统计信息查询请求参数:{}",map);
+            log.info("POS机构统计信息查询请求参数:{}",map);
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
@@ -103,7 +103,7 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
                 byte[] decodeBase64DataBytes = Base64.decodeBase64(resEncryptData.getBytes(charset));
                 byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
                 String respXML = new String(merchantXmlDataBytes, charset);
-                log.info("机构统计信息查询返回参数：{}",respXML);
+                log.info("POS机构统计信息查询返回参数：{}",respXML);
 
                 // 报文验签
                 String resSignData = jsonObject.getString("signData");
@@ -128,12 +128,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
-    private AgentResult httpForMpos(String orgId)throws Exception{
+    private AgentResult httpForMpos(String orgId,String parentAgencyId)throws Exception{
         try {
             Map<String, String> map = new HashMap<>();
             map.put("agencyId",orgId);
+            map.put("parentAgencyId",parentAgencyId);
             String toJson = JsonUtil.objectToJson(map);
+            log.info("手刷机构统计信息查询请求参数:{}",toJson);
             String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("pos_org_statistics_url"), toJson);
+            log.info("手刷机构统计信息查询请求参数:{}",httpResult);
             Map<String, Object> stringObjectMap = JsonUtil.jsonToMap(httpResult);
             String data = String.valueOf(stringObjectMap.get("data"));
             List<Map> dataMap = JsonUtil.jsonToList(data, Map.class);

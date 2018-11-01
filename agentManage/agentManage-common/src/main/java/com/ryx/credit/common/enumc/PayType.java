@@ -1,13 +1,17 @@
 package com.ryx.credit.common.enumc;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * @Auther: RYX
  * @Date: 2018/9/20 10:54
- * @Description:缴纳款项的打款方式
+ * @Description:订单线下打款方式
  */
 public enum  PayType {
-    FRDK("FRDK", "分润抵扣"),
-    YHHK("YHHK", "银行汇款");
+    YHHK("YHHK", "银行汇款"),
+    FRDK("FRDK", "分润抵扣");
     public String code;
 
     public String msg;
@@ -47,4 +51,23 @@ public enum  PayType {
         return "";
     }
 
+    public static Map<String,Object> getAllOption(){
+        Map<String,Object> resultMap = new LinkedHashMap<>();
+        PayType[] payType = PayType.values();
+        for(PayType type : payType){
+            resultMap.put(type.code,type.msg);
+        }
+        return resultMap;
     }
+
+    public static Map<String,Object> getYHHKOption(){
+        Map<String,Object> resultMap = new HashMap<>();
+        PayType[] payType = PayType.values();
+        for(PayType type : payType){
+            if(type.code.equals("YHHK"))
+            resultMap.put(type.code,type.msg);
+        }
+        return resultMap;
+    }
+
+}
