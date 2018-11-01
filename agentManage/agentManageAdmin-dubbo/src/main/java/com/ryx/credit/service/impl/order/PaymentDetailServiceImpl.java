@@ -112,7 +112,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         }
 
         c.andPayTypeIn(payTypeList);
-
+        c.andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
         example.setOrderByClause("plan_num asc");
         return oPaymentDetailMapper.selectByExample(example);
     }
