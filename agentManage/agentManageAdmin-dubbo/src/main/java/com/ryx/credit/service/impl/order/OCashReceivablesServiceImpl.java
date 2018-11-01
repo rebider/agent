@@ -171,7 +171,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
 
             //cxinfo 更具库里的数据 检查具体的数据是否是审批状态
             //补差价审批中修改
-            if(cpt.code.equals(CashPayType.REFUNDPRICEDIFF) && StringUtils.isNotBlank(srcId)){
+            if(cpt.code.equals(CashPayType.REFUNDPRICEDIFF.code) && StringUtils.isNotBlank(srcId)){
                 ORefundPriceDiff diff = oRefundPriceDiffMapper.selectByPrimaryKey(srcId);
                 if(diff.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
                     List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
@@ -183,7 +183,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                     }
                 }
             //订单审批中修改
-            }else if(cpt.code.equals(CashPayType.PAYMENT) && StringUtils.isNotBlank(srcId)){
+            }else if(cpt.code.equals(CashPayType.PAYMENT.code) && StringUtils.isNotBlank(srcId)){
                 OPayment oPayment = oPaymentMapper.selectByPrimaryKey(srcId);
                 OOrder order = oOrderMapper.selectByPrimaryKey(oPayment.getOrderId());
                 if(order.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
