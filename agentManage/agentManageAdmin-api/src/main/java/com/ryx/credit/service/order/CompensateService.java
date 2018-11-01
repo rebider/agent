@@ -29,7 +29,7 @@ public interface CompensateService {
 
     BigDecimal calculateTotalPrice(String activityId, BigDecimal count);
 
-    BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum);
+    BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum,ORefundPriceDiff oRefundPriceDiff);
 
     AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser ,List<OCashReceivablesVo> oCashReceivablesVoList);
 
