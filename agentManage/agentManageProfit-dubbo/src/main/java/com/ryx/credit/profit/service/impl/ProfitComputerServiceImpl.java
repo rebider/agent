@@ -88,11 +88,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     private int index = 1;
     private BigDecimal tranAmount = BigDecimal.ZERO;
     private BigDecimal zfAmount = BigDecimal.ZERO;
+    private String applyType;
 
     @Override
     public BigDecimal totalP_day_RHB(String agentPid,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         ProfitDay day = new ProfitDay();
@@ -109,7 +110,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal totalR_day(String agentPid,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         ProfitDay day = new ProfitDay();
@@ -126,7 +127,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal totalP_day(String agentPid,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         ProfitDay day = new ProfitDay();
@@ -143,7 +144,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal totalP_day_ZF(String agentId,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         ProfitDay day = new ProfitDay();
@@ -160,7 +161,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal total_factor(String agentPid,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         PProfitFactor factor = new PProfitFactor();
@@ -177,7 +178,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal new_total_factor(String agentId,String parentId,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         PProfitFactor factor = new PProfitFactor();
@@ -195,7 +196,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal total_supply(String agentPid,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         ProfitSupply supply = new ProfitSupply();
@@ -212,7 +213,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public BigDecimal new_total_supply(String agentId,String parentId,String month) {
         if(null==month || "".equals(month)){
-            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2));
+            month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
         ProfitSupply supply = new ProfitSupply();
@@ -235,7 +236,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     @Override
     public void computer_Supply_ZhiFa() {
         List<ProfitDirect> profitDirects = directMapper.selectBySupply();//存在补款的记录，追溯上级补款
-        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-2)).substring(0,6);
+        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6);
         for(ProfitDirect profitDirect:profitDirects){
             ProfitSupply supplyWhere = new ProfitSupply();
             supplyWhere.setAgentId(profitDirect.getAgentId());
@@ -401,7 +402,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     @Override
     public void computer_ZhiFa() {
-        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -2));
+        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1));
         month = month.substring(0,6);//计算上月。YYYYMM
         ProfitDirect where = new ProfitDirect();
         where.setTransMonth(month);
@@ -426,27 +427,41 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
     }
 
+
+    @Test
+    public void test(){
+        String transDate = "201809";
+        BigDecimal amt = synchroSSTotalTransAmt(transDate);
+        System.out.println(amt);
+    }
+
     /**
      * 同步手刷月分润交易汇总
      * @param transDate 交易日期（空则为上一月）
      */
     @Override
     public BigDecimal synchroSSTotalTransAmt(String transDate){
+//        //汇总手刷交易金额
+//        BigDecimal synchroAmt = synchroAmt(transDate);
+//        System.out.println("手刷：" + synchroAmt);
+//        //汇总直发交易金额
+//        BigDecimal synchZFAmt = synchZFAmt(transDate);
+//        System.out.println("直发：" + synchZFAmt);
+//        //手刷+直发
+//        BigDecimal total = synchroAmt.add(synchZFAmt);
+//        System.out.println("总金额：" + total);
+//        return total;
 
         //默认日期为上个月
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
-
         //汇总手刷交易金额
         BigDecimal tranAmount = transProfitDetailMapper.selectAmtBySummary(transDate);
         System.out.println("手刷金额" + tranAmount);
-
         //汇总直发交易金额
         BigDecimal zfAmount = directMapper.selectAmtByDeal(transDate);
         System.out.println("直发金额" + zfAmount);
-
 //        //手刷+直发
 //        BigDecimal total = tranAmount.add(zfAmount);
-
         return tranAmount.add(zfAmount);
     }
 
@@ -476,8 +491,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
         index = 1;
         BigDecimal fxAmount = isDecimalNull(json.getBigDecimal("fxAmount"));//分销系统交易汇总
+        System.out.println("分销系统交易汇总：" + fxAmount);
         BigDecimal wjrAmount = isDecimalNull(json.getBigDecimal("wjrAmount"));//未计入分润汇总
+        System.out.println("未计入分润汇总：" + wjrAmount);
         BigDecimal wtbAmount = isDecimalNull(json.getBigDecimal("wtbAmount"));//未同步到分润
+        System.out.println("未同步到分润：" + wtbAmount);
+        System.out.println("总计：" + tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount));
         return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
     }
 
@@ -514,7 +533,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             BigDecimal transAmt = isDecimalNull(json.getBigDecimal("SAMOUNT"));
             tranAmount = tranAmount.add(transAmt);
         }
-        synchroSSTotalTransAmt(transDate);
+        synchroAmt(transDate);
     }
 
     public void addZFTransAmt(List<JSONObject> profitMonths,String transDate){
@@ -527,7 +546,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
     @Override
     public void computerTax(String profitDate){
-        profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -2)).substring(0,6):profitDate;
+        profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date() , -1)).substring(0,6):profitDate;
         List<ProfitDetailMonth> detailMonths = detailMonthMapper.selectByDate(profitDate);
         for(ProfitDetailMonth detailMonth:detailMonths){
             boolean isJieYin = false;//是否所属捷步、银点
@@ -603,7 +622,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             }
             logger.info("历史欠税转移："+history);
             detail.setDeductionTaxMonthAgoAmt(history);
-            inserHistory(transDate,agentPid,history);
+            if(null!=applyType && applyType.equals("1")){
+                inserHistory(transDate,agentPid,history);
+            }
             return detail;
         }
         //-------------------本月税额计算-------------------
@@ -665,7 +686,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         // ------------------不足后，需记录本月之前欠税额-------------------
         BigDecimal must = profitA.subtract(detail.getDeductionTaxMonthAgoAmt())
                 .add(detail.getSupplyTaxAmt());
-        if(must.compareTo(BigDecimal.ZERO)<0){//分润不足扣上月欠税
+        if(must.compareTo(BigDecimal.ZERO)<0 && null!=applyType && applyType.equals("1")){//分润不足扣上月欠税
             inserHistory(transDate,agentPid,must.multiply(new BigDecimal("-1")));
             must = BigDecimal.ZERO;
         }
@@ -729,7 +750,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * 每月12号下午14点执行一次：@Scheduled(cron = "0 0 12 14 * ?")
      */
 //    @Scheduled(cron = "0 0 12 14 * ?")
-    public void new_computerTax() throws Exception {
+    public void new_computerTax(String type) throws Exception {
+        this.applyType = type;
         String profitDate = null;
         profitDate = profitDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):profitDate;
         List<ProfitDetailMonth> detailMonths1 = detailMonthMapper.selectByGreaDate(profitDate);
@@ -890,7 +912,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             }
             logger.info("历史欠税转移："+history);
             detail.setDeductionTaxMonthAgoAmt(history);
-            inserHistory(transDate,detailMonth.getAgentId(),detailMonth.getParentAgentId(),history);
+            if(null!=applyType && applyType.equals("1")){
+                inserHistory(transDate,detailMonth.getAgentId(),detailMonth.getParentAgentId(),history);
+            }
             return detail;
         }
         //-------------------本月税额计算-------------------
@@ -958,7 +982,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         // ------------------不足后，需记录本月之前欠税额-------------------
         BigDecimal must = profitAmt.subtract(detail.getDeductionTaxMonthAgoAmt())
                 .add(detail.getSupplyTaxAmt());
-        if(must.compareTo(BigDecimal.ZERO)<0){//分润不足扣上月欠税
+        if(must.compareTo(BigDecimal.ZERO)<0 && null!=applyType && applyType.equals("1")){//分润不足扣上月欠税
             inserHistory(transDate,detailMonth.getAgentPid(),detailMonth.getParentAgentId(),must.multiply(new BigDecimal("-1")));
             must = BigDecimal.ZERO;
         }

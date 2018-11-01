@@ -28,8 +28,8 @@ public class ProfitDeductionServiceTest {
     @Test
     public void testgetProfitDeductionList(){
         ProfitDeduction deduction = new ProfitDeduction();
-        PageInfo pageInfo =  profitDeductionServiceImpl.getProfitDeductionList(deduction,null);
-        logger.info("返回查询结果。。。。。"+pageInfo.getRows());
+//        PageInfo pageInfo =  profitDeductionServiceImpl.getProfitDeductionList(deduction,null);
+//        logger.info("返回查询结果。。。。。"+pageInfo.getRows());
     }
     
 

@@ -21,6 +21,7 @@
     <dubbo:service interface="com.ryx.credit.profit.service.StagingService" ref="stagingServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.ProfitSettleErrLsService" ref="profitSettleErrLsServiceImpl"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.PosRewardTemplateService" ref="posRewardTemplateService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.PosRewardSDetailService" ref="posRewardSDetailService"  timeout="1200000" registry="${zk.group}" />
 
     <dubbo:service interface="com.ryx.credit.profit.service.IPosRewardService" ref="iPosRewardService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.profit.service.IPosCheckService" ref="iPosCheckService"  timeout="1200000" registry="${zk.group}"/>

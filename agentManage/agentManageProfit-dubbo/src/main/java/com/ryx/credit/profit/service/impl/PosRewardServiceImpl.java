@@ -175,7 +175,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(userId);
         record.setBusType(BusActRelBusType.POSREWARD.name());
-        record.setAgentId(posReward.getAgentPid());
+        record.setAgentId(posReward.getAgentId());
         record.setAgentName(posReward.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);

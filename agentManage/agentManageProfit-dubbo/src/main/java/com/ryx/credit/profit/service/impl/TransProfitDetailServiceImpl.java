@@ -49,6 +49,9 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
         }else{
             criteria.andParentAgentIdIsNull();
         }
+        if (StringUtils.isNotBlank(transProfitDetail.getProfitDate())) {
+            criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
+        }
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(example);
         return transProfitDetails==null?Collections.EMPTY_LIST:transProfitDetails;
     }

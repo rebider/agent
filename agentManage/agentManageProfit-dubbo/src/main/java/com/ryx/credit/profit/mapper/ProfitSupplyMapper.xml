@@ -253,9 +253,10 @@
   <select id="getTotalByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_CODE != '0'
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE != '退单补款'
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+      /*AND SUPPLY_CODE != '0'*/
   </select>
 
   <select id="getBuckleByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
@@ -264,6 +265,9 @@
     where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE='退单补款'
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
+    <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+    <if test="parentAgentId == null ">AND PARENT_AGENT_ID is null </if>
+    <if test="sourceId != null and sourceId != ''">AND SOURCE_ID = #{sourceId}</if>
   </select>
 
   <select id="getProfitSupplyList" parameterType="java.util.Map" resultType="java.util.Map">
@@ -286,10 +290,12 @@
     <where>
       <trim prefixOverrides="and">
         <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}</if>
-        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID,jdbcType=VARCHAR}</if>
+        <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}</if>
         <if test="SUPPLY_TYPE != null and SUPPLY_TYPE != ''">AND SUPPLY_TYPE = #{SUPPLY_TYPE,jdbcType=CHAR}</if>
         <if test="SUPPLY_DATE_START != null and SUPPLY_DATE_START != ''">AND SOURCE_ID &gt;= #{SUPPLY_DATE_START,jdbcType=VARCHAR}</if>
         <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SOURCE_ID &lt;= #{SUPPLY_DATE_END,jdbcType=VARCHAR}</if>
+        <if test="SOURCE_ID != null and SOURCE_ID != ''">AND SOURCE_ID = #{SOURCE_ID,jdbcType=VARCHAR}</if>
+        <if test="SUPPLY_DATE != null and SUPPLY_DATE != ''">AND SUPPLY_DATE = #{SUPPLY_DATE,jdbcType=VARCHAR}</if>
       </trim>
     </where>
   </sql>

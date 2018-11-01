@@ -93,8 +93,8 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     }
 
     @Override
-    public PTaxAdjust selectByAgentPid(String agentPid) {
-        return adjustMapper.selectByAgentPid(agentPid);
+    public PTaxAdjust selectByAgentId(String agentId) {
+        return adjustMapper.selectByAgentId(agentId);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         //启动审批流
         String proceId = activityService.createDeloyFlow(null, "taxPoint", null, null, null);
         if (proceId == null) {
-            logger.error("税点调整审批流启动失败，代理商ID：{}", tax.getAgentPid());
+            logger.error("税点调整审批流启动失败，代理商ID：{}", tax.getAgentId());
             throw new ProcessException("代理商合并审批流启动失败!");
         }
         BusActRel record = new BusActRel();
@@ -114,7 +114,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(tax.getUserId());
         record.setBusType(BusActRelBusType.POSTAX.name());
-        record.setAgentId(tax.getAgentPid());
+        record.setAgentId(tax.getAgentId());
         record.setAgentName(tax.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);
@@ -143,7 +143,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
                 logger.info("审批通过，原税点：{},现税点：{}",taxAdjust.getTaxOld(),taxAdjust.getTaxIng());
                 adjustMapper.updateByPrimaryKeySelective(taxAdjust);
 
-                String agentId = taxAdjust.getAgentPid();//代理商唯一码
+                String agentId = taxAdjust.getAgentId();//代理商编码
 
                 //更新收款账户表的 税点值
                 AgentColinfo colinfo = new AgentColinfo();
@@ -156,7 +156,6 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
                         throw new MessageException("更新收款账户税点值失败！");
                     }
                 }
-
                 // 更新代理商表的 税点值
                 Agent agent = agentService.getAgentById(agentId);//查询数据
                 if (agent != null) {
@@ -244,8 +243,8 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         if(StringUtils.isNotBlank(adjust.getAgentName())){
             criteria.andAgentNameEqualTo(adjust.getAgentName());
         }
-        if(StringUtils.isNotBlank(adjust.getAgentPid())){
-            criteria.andAgentPidEqualTo(adjust.getAgentPid());
+        if(StringUtils.isNotBlank(adjust.getAgentId())){
+            criteria.andAgentIdEqualTo(adjust.getAgentId());
         }
         return PTaxAdjustExample;
     }

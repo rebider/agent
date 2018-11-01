@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PosRewardDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosRewardDetail">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PROFIT_POS_DATE" jdbcType="VARCHAR" property="profitPosDate" />
+    <result column="POS_AGENT_ID" jdbcType="VARCHAR" property="posAgentId" />
+    <result column="POS_AGENT_NAME" jdbcType="VARCHAR" property="posAgentName" />
+    <result column="POS_MECHANISM_TYPE" jdbcType="VARCHAR" property="posMechanismType" />
+    <result column="POS_MECHANISM_ID" jdbcType="VARCHAR" property="posMechanismId" />
+    <result column="POS_COMPARE_COUNT" jdbcType="VARCHAR" property="posCompareCount" />
+    <result column="POS_CURRENT_COUNT" jdbcType="VARCHAR" property="posCurrentCount" />
+    <result column="POS_COMPARE_LOAN_COUNT" jdbcType="VARCHAR" property="posCompareLoanCount" />
+    <result column="POS_CURRENT_LOAN_COUNT" jdbcType="VARCHAR" property="posCurrentLoanCount" />
+    <result column="POS_AMT" jdbcType="VARCHAR" property="posAmt" />
+    <result column="POS_STANDARD" jdbcType="VARCHAR" property="posStandard" />
+    <result column="POS_OWN_REWARD" jdbcType="VARCHAR" property="posOwnReward" />
+    <result column="POS_DOWN_REWARD" jdbcType="VARCHAR" property="posDownReward" />
+    <result column="POS_REAWRD_PROFIT" jdbcType="VARCHAR" property="posReawrdProfit" />
+    <result column="POS_REMARK" jdbcType="VARCHAR" property="posRemark" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PROFIT_POS_DATE, POS_AGENT_ID, POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID, 
+    POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, POS_CURRENT_LOAN_COUNT, 
+    POS_AMT, POS_STANDARD, POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, POS_REMARK
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from POS_REWARD_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardDetailExample">
+    delete from POS_REWARD_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
+    insert into POS_REWARD_DETAIL (ID, PROFIT_POS_DATE, POS_AGENT_ID, 
+      POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID, 
+      POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, 
+      POS_CURRENT_LOAN_COUNT, POS_AMT, POS_STANDARD, 
+      POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, 
+      POS_REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR}, 
+      #{posAgentName,jdbcType=VARCHAR}, #{posMechanismType,jdbcType=VARCHAR}, #{posMechanismId,jdbcType=VARCHAR}, 
+      #{posCompareCount,jdbcType=VARCHAR}, #{posCurrentCount,jdbcType=VARCHAR}, #{posCompareLoanCount,jdbcType=VARCHAR}, 
+      #{posCurrentLoanCount,jdbcType=VARCHAR}, #{posAmt,jdbcType=VARCHAR}, #{posStandard,jdbcType=VARCHAR}, 
+      #{posOwnReward,jdbcType=VARCHAR}, #{posDownReward,jdbcType=VARCHAR}, #{posReawrdProfit,jdbcType=VARCHAR}, 
+      #{posRemark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
+    insert into POS_REWARD_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="profitPosDate != null">
+        PROFIT_POS_DATE,
+      </if>
+      <if test="posAgentId != null">
+        POS_AGENT_ID,
+      </if>
+      <if test="posAgentName != null">
+        POS_AGENT_NAME,
+      </if>
+      <if test="posMechanismType != null">
+        POS_MECHANISM_TYPE,
+      </if>
+      <if test="posMechanismId != null">
+        POS_MECHANISM_ID,
+      </if>
+      <if test="posCompareCount != null">
+        POS_COMPARE_COUNT,
+      </if>
+      <if test="posCurrentCount != null">
+        POS_CURRENT_COUNT,
+      </if>
+      <if test="posCompareLoanCount != null">
+        POS_COMPARE_LOAN_COUNT,
+      </if>
+      <if test="posCurrentLoanCount != null">
+        POS_CURRENT_LOAN_COUNT,
+      </if>
+      <if test="posAmt != null">
+        POS_AMT,
+      </if>
+      <if test="posStandard != null">
+        POS_STANDARD,
+      </if>
+      <if test="posOwnReward != null">
+        POS_OWN_REWARD,
+      </if>
+      <if test="posDownReward != null">
+        POS_DOWN_REWARD,
+      </if>
+      <if test="posReawrdProfit != null">
+        POS_REAWRD_PROFIT,
+      </if>
+      <if test="posRemark != null">
+        POS_REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="profitPosDate != null">
+        #{profitPosDate,jdbcType=VARCHAR},
+      </if>
+      <if test="posAgentId != null">
+        #{posAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="posAgentName != null">
+        #{posAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="posMechanismType != null">
+        #{posMechanismType,jdbcType=VARCHAR},
+      </if>
+      <if test="posMechanismId != null">
+        #{posMechanismId,jdbcType=VARCHAR},
+      </if>
+      <if test="posCompareCount != null">
+        #{posCompareCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posCurrentCount != null">
+        #{posCurrentCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posCompareLoanCount != null">
+        #{posCompareLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posCurrentLoanCount != null">
+        #{posCurrentLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posAmt != null">
+        #{posAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="posStandard != null">
+        #{posStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="posOwnReward != null">
+        #{posOwnReward,jdbcType=VARCHAR},
+      </if>
+      <if test="posDownReward != null">
+        #{posDownReward,jdbcType=VARCHAR},
+      </if>
+      <if test="posReawrdProfit != null">
+        #{posReawrdProfit,jdbcType=VARCHAR},
+      </if>
+      <if test="posRemark != null">
+        #{posRemark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardDetailExample" resultType="java.lang.Long">
+    select count(*) from POS_REWARD_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="getRewardDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM POS_REWARD_DETAIL
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      1=1
+      <if test="PROFIT_POS_DATE != null and PROFIT_POS_DATE !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE} </if>
+      <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' "> and POS_AGENT_ID = #{POS_AGENT_ID} </if>
+      <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+      <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
+      <if test="POS_MECHANISM_ID != null and POS_MECHANISM_ID !='' "> and POS_MECHANISM_ID = #{POS_MECHANISM_ID} </if>
+      <if test="POS_COMPARE_COUNT != null and POS_COMPARE_COUNT !='' "> and POS_COMPARE_COUNT = #{POS_COMPARE_COUNT} </if>
+      <if test="POS_CURRENT_COUNT != null and POS_CURRENT_COUNT !='' "> and POS_CURRENT_COUNT = #{POS_CURRENT_COUNT} </if>
+      <if test="POS_COMPARE_LOAN_COUNT != null and POS_COMPARE_LOAN_COUNT !='' "> and POS_COMPARE_LOAN_COUNT = #{POS_COMPARE_LOAN_COUNT} </if>
+      <if test="POS_CURRENT_LOAN_COUNT != null and POS_CURRENT_LOAN_COUNT !='' "> and POS_CURRENT_LOAN_COUNT = #{POS_CURRENT_LOAN_COUNT} </if>
+      <if test="POS_AMT != null and POS_AMT !='' "> and POS_AMT = #{POS_AMT} </if>
+      <if test="POS_STANDARD != null and POS_STANDARD !='' "> and POS_STANDARD = #{POS_STANDARD} </if>
+      <if test="POS_OWN_REWARD != null and POS_OWN_REWARD !='' "> and POS_OWN_REWARD = #{POS_OWN_REWARD} </if>
+      <if test="POS_DOWN_REWARD != null and POS_DOWN_REWARD !='' "> and POS_DOWN_REWARD = #{POS_DOWN_REWARD} </if>
+      <if test="POS_REAWRD_PROFIT != null and POS_REAWRD_PROFIT !='' "> and POS_REAWRD_PROFIT = #{POS_REAWRD_PROFIT} </if>
+      <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
+    </where>
+  </sql>
+
+  <select id="getRewardDetailList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM POS_REWARD_DETAIL
+    <include refid="BASE_WHERE_SQL" />
+    <include refid="PAGING_END" />
+  </select>
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+  <sql id="PAGING_END">
+  <if test="begin != null  and end != null and end &gt;0">
+    ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+  </if>
+  </sql>
+</mapper>

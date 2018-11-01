@@ -61,8 +61,9 @@ public class ProfitMposDiffDataJob {
      * month 交易日期（空则为上一月）
      * 每月5号上午8点：@Scheduled(cron = "0 0 5 8 * ?")
      */
-//    @Scheduled(cron = "0 0 5 8 * ?")
+//    @Scheduled(cron = "0 46 16 22 * ?")
     public void synchroProfitDiff(){
+//        String month = "201809";
         String month = null;
         HashMap<String,String> map = new HashMap<String,String>();
         month = month==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):month;
