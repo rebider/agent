@@ -231,15 +231,19 @@ public class CompensateServiceImpl implements CompensateService {
     @Override
     public BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum, ORefundPriceDiff oRefundPriceDiff){
         BigDecimal resultPrice = new BigDecimal(0);
-        oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(oRefundPriceDiff.getId());
 
         Map<String, Object> reqParam = new HashMap<>();
         reqParam.put("snBegin",beginSn);
         reqParam.put("snEnd",endSn);
         reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
         ArrayList<Object> recordStatusList = new ArrayList<>();
-        if(oRefundPriceDiff.getReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
-            recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+        if(null!=oRefundPriceDiff && null!=oRefundPriceDiff.getId()){
+            oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(oRefundPriceDiff.getId());
+            if(oRefundPriceDiff.getReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
+            }else{
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+            }
         }else{
             recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
         }
