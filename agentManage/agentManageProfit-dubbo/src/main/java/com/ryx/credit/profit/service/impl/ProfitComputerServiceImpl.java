@@ -427,12 +427,31 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
     }
 
+
+    @Test
+    public void test(){
+        String transDate = "201809";
+        BigDecimal amt = synchroSSTotalTransAmt(transDate);
+        System.out.println(amt);
+    }
+
     /**
      * 同步手刷月分润交易汇总
      * @param transDate 交易日期（空则为上一月）
      */
     @Override
     public BigDecimal synchroSSTotalTransAmt(String transDate){
+//        //汇总手刷交易金额
+//        BigDecimal synchroAmt = synchroAmt(transDate);
+//        System.out.println("手刷：" + synchroAmt);
+//        //汇总直发交易金额
+//        BigDecimal synchZFAmt = synchZFAmt(transDate);
+//        System.out.println("直发：" + synchZFAmt);
+//        //手刷+直发
+//        BigDecimal total = synchroAmt.add(synchZFAmt);
+//        System.out.println("总金额：" + total);
+//        return total;
+
         //默认日期为上个月
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
         //汇总手刷交易金额
@@ -472,8 +491,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
         index = 1;
         BigDecimal fxAmount = isDecimalNull(json.getBigDecimal("fxAmount"));//分销系统交易汇总
+        System.out.println("分销系统交易汇总：" + fxAmount);
         BigDecimal wjrAmount = isDecimalNull(json.getBigDecimal("wjrAmount"));//未计入分润汇总
+        System.out.println("未计入分润汇总：" + wjrAmount);
         BigDecimal wtbAmount = isDecimalNull(json.getBigDecimal("wtbAmount"));//未同步到分润
+        System.out.println("未同步到分润：" + wtbAmount);
+        System.out.println("总计：" + tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount));
         return tranAmount.add(fxAmount).add(wjrAmount).add(wtbAmount);
     }
 
@@ -510,7 +533,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             BigDecimal transAmt = isDecimalNull(json.getBigDecimal("SAMOUNT"));
             tranAmount = tranAmount.add(transAmt);
         }
-        synchroSSTotalTransAmt(transDate);
+        synchroAmt(transDate);
     }
 
     public void addZFTransAmt(List<JSONObject> profitMonths,String transDate){

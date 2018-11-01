@@ -68,12 +68,13 @@ public class NewProfitMonthMposDataJob {
    }
 
     /**
-     * 同步手刷月分润明细数据
+     * 同步手刷月分润明细数据(TransProfitDetail)
      * transDate 交易日期（空则为上一月）
      * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
      */
-//    @Scheduled(cron = "0 0 5 12 * ?")
+//    @Scheduled(cron = "0 38 14 24 * ?")
     public void synchroProfitMonth(){
+//        String transDate = "201809";
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
@@ -108,10 +109,10 @@ public class NewProfitMonthMposDataJob {
             String parentAgentId = null;
             TransProfitDetail detail = new TransProfitDetail();
             AgentBusInfo Busime = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"), json.getString("AGENCYID"));
-            if(null==Busime){
-                logger.info(json.getString("PLATFORMNUM")+"------"+json.getString("AGENCYID"));
-                continue;
-            }
+//            if(null==Busime){
+//                logger.info(json.getString("PLATFORMNUM")+"------"+json.getString("AGENCYID"));
+//                continue;
+//            }
             AgentBusInfo parent = businfoService.getByBusidAndCode(json.getString("PLATFORMNUM"), json.getString("ONLINEAGENCYID"));
             if(null == parent || "6000".equals(json.getString("PLATFORMNUM"))){
                 //直发一代或者上级为空，则无上级
@@ -133,13 +134,14 @@ public class NewProfitMonthMposDataJob {
                     logger.info("所属捷步、银点");
                     logger.info("日结分润：" + totalDay);
                 }
-            }else{
-                if(Busime.getAgentId().equals("JS00001159") || Busime.getAgentId().equals("JS00001160")) {//捷步、银点只算日结
-                    totalDay = dayMapper.totalRPByAgentId(day);
-                    logger.info("所属捷步、银点");
-                    logger.info("日结分润：" + totalDay);
-                }
             }
+//            else{
+//                if(Busime.getAgentId().equals("JS00001159") || Busime.getAgentId().equals("JS00001160")) {//捷步、银点只算日结
+//                    totalDay = dayMapper.totalRPByAgentId(day);
+//                    logger.info("所属捷步、银点");
+//                    logger.info("日结分润：" + totalDay);
+//                }
+//            }
 
             String platFormNum = json.getString("PLATFORMNUM")==null?"":json.getString("PLATFORMNUM");
             if(!"0001".equals(platFormNum) && !"2000".equals(platFormNum) && !"5000".equals(platFormNum)
@@ -154,13 +156,13 @@ public class NewProfitMonthMposDataJob {
             detail.setParentBusNum(json.getString("ONLINEAGENCYID"));//上级机构号
             detail.setBusCode(platFormNum);//平台号
             detail.setParentAgentId(parentAgentId);//上级AG码
-            detail.setAgentId(Busime.getAgentId());//AG码
+            detail.setAgentId(null==Busime?"AG01":Busime.getAgentId());//AG码
             detail.setAgentName(json.getString("COMPANYNAME"));//代理商名称
             detail.setInTransAmt(json.getBigDecimal("SAMOUNT")==null?BigDecimal.ZERO:json.getBigDecimal("SAMOUNT"));//付款交易额
             detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
             detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
             detail.setProfitAmt(json.getBigDecimal("PROFIT")==null?BigDecimal.ZERO:json.getBigDecimal("PROFIT"));//分润金额
-            detail.setPayCompany(Busime.getCloPayCompany());//打款公司
+            detail.setPayCompany(null==Busime?"3":Busime.getCloPayCompany());//打款公司
             detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
             detail.setSourceInfo("MPOS");
 

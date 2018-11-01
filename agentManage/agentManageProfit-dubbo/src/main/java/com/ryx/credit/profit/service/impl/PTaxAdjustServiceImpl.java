@@ -156,7 +156,6 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
                         throw new MessageException("更新收款账户税点值失败！");
                     }
                 }
-
                 // 更新代理商表的 税点值
                 Agent agent = agentService.getAgentById(agentId);//查询数据
                 if (agent != null) {

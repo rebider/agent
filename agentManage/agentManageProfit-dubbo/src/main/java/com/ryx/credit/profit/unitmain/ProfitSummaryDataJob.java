@@ -68,10 +68,11 @@ public class ProfitSummaryDataJob {
      * transDate 交易月份（空则为上一月）
      * 每月12号上午12点：@Scheduled(cron = "0 0 12 12 * ?")
      */
-    @Scheduled(cron = "0 48 16 22 * ?")
+//    @Scheduled(cron = "0 48 16 22 * ?")
     public void MPos_Summary(){
-        String transDate = "201809";
-//        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
+//        String transDate = "201809";
+        String transDate = null;
+        transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
         List<TransProfitDetail> details = transProfitDetailMapper.selectListByDate(transDate);//手刷同步过来的小汇数据
         for(TransProfitDetail detail : details){
             boolean isAdd = false;
