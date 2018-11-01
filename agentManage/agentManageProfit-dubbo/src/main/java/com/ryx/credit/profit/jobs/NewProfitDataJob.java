@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.service.DeductService;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
@@ -21,6 +22,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +71,9 @@ public class NewProfitDataJob {
 
     @Autowired
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
-
+    @Autowired
+    @Qualifier("posProfitComputeServiceImpl")
+    private DeductService posProfitComputeServiceImpl;
 
     @Scheduled(cron = "0 0 11 10 * ?")
     public void deal() {
@@ -94,6 +98,7 @@ public class NewProfitDataJob {
                         }
                     }
                     doSum(profitDate);
+                    posProfitComputeServiceImpl.otherOperate();
                 }else{
                     LOG.error("月份："+profitDate+"，二维码提供的没有获取到数据");
                 }

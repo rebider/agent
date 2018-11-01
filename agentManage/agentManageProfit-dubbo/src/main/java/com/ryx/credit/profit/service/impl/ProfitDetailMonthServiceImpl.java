@@ -143,7 +143,9 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
         TransProfitDetailExample.Criteria criteria = transProfitDetailExample.createCriteria();
         criteria.andProfitDateEqualTo(profitDate);
         criteria.andAgentIdIn(agentId);
-        criteria.andAgentTypeEqualTo(agentType);
+        if(StringUtils.isNotBlank(agentType)){
+            criteria.andAgentTypeEqualTo(agentType);
+        }
         criteria.andBusCodeEqualTo("100003");
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(transProfitDetailExample);
         return transProfitDetails;

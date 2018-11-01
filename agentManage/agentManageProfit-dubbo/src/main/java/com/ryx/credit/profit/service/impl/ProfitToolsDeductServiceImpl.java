@@ -427,6 +427,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                     map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());
                     map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());
                     map.put("notDeductionAmt", deduction.getMustDeductionAmt());
+                    map.put("deductTime", "增加扣款时间");
                     map.put("detailId", deduction.getSourceId());
                     map.put("srcId", deduction.getId());
                     noticeList.add(map);
@@ -434,13 +435,14 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                     map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());
                     map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());
                     map.put("notDeductionAmt", deduction.getNotDeductionAmt());
+                    map.put("deductTime", "增加扣款时间");
                     map.put("detailId", deduction.getSourceId());
                     map.put("srcId", deduction.getId());
                     noticeList.add(map);
                 }
             }
             LOG.info("系统已经终审，通知告诉订单系统，机具款未扣足部分订单：{}",JSONObject.toJSON(noticeList));
-//        iPaymentDetailService.uploadStatus(noticeList);
+//        iPaymentDetailService.uploadStatus(noticeList,"");
         }
     }
 }
