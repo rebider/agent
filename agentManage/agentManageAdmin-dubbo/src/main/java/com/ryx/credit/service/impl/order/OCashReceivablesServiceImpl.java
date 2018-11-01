@@ -173,7 +173,8 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             //补差价审批中修改
             if(cpt.code.equals(CashPayType.REFUNDPRICEDIFF.code) && StringUtils.isNotBlank(srcId)){
                 ORefundPriceDiff diff = oRefundPriceDiffMapper.selectByPrimaryKey(srcId);
-                if(diff.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
+
+                if(diff != null && diff.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
                     List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
                     for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
                         oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
@@ -185,13 +186,15 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             //订单审批中修改
             }else if(cpt.code.equals(CashPayType.PAYMENT.code) && StringUtils.isNotBlank(srcId)){
                 OPayment oPayment = oPaymentMapper.selectByPrimaryKey(srcId);
-                OOrder order = oOrderMapper.selectByPrimaryKey(oPayment.getOrderId());
-                if(order.getReviewStatus().compareTo(AgStatus.Approving.status)==0){
-                    List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
-                    for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
-                        oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
-                        if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables_app)){
-                            throw new MessageException("审批状态调整失败");
+                if(oPayment!=null) {
+                    OOrder order = oOrderMapper.selectByPrimaryKey(oPayment.getOrderId());
+                    if (order!=null && order.getReviewStatus().compareTo(AgStatus.Approving.status) == 0) {
+                        List<OCashReceivables> OCashReceivables_list = query(null, agentId, cpt, srcId, Arrays.asList(AgStatus.Create.status, AgStatus.Approving.status));
+                        for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
+                            oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
+                            if (1 != oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables_app)) {
+                                throw new MessageException("审批状态调整失败");
+                            }
                         }
                     }
                 }

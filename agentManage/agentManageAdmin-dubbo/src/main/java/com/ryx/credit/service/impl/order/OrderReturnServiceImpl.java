@@ -1384,6 +1384,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
             if(planVo==null)throw new MessageException("排单信息未找到");
             if (null==planVo.getReturnOrderDetailId())throw new MessageException("退货明细未找到");
+
             OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
             String firstSn = returnOrderDetail.getBeginSn();
             String lastSn = returnOrderDetail.getEndSn();
@@ -1533,6 +1534,32 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
                         vo.setOldBusNum(returnbusInfo.getBusNum());
                         vo.setPlatformNum(returnbusInfo.getBusPlatform());
+
+                        //新活动
+                        vo.setNewAct(oSubOrderActivity.getBusProCode());
+
+                        //老活动查询
+                        OSubOrderExample old_OSubOrder = new OSubOrderExample();
+                        old_OSubOrder.or()
+                                .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
+                                .andProIdEqualTo(oReturnOrderDetail.getProId())
+                                .andStatusEqualTo(Status.STATUS_1.status);
+                        List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
+
+                        if(list_osub_old.size()==0){
+                            throw new MessageException("退货机具活动信息未找到");
+                        }
+                        OSubOrder old_suborder  = list_osub_old.get(0);
+                        OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
+                        example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                        List<OSubOrderActivity>  list_old_act = oSubOrderActivityMapper.selectByExample(example_old_activity);
+                        if(list_old_act.size()==0){
+                            throw new MessageException("退货机具活动信息未找到");
+                        }
+                        OSubOrderActivity old_act = list_old_act.get(0);
+                        vo.setOldAct(old_act.getBusProCode());
+
+
 
                         //cxinfo 机具退货调整首刷接口调用
                         OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
