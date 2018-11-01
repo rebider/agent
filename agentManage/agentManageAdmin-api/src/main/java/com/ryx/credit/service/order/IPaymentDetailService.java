@@ -51,7 +51,7 @@ public interface IPaymentDetailService {
     /**
      * 更新状态
      */
-    ResultVO uploadStatus(List<Map<String, Object>> maps );
+    ResultVO uploadStatus(List<Map<String, Object>> maps,BigDecimal payStatus );
 
     /**
      * 生成付款明细
