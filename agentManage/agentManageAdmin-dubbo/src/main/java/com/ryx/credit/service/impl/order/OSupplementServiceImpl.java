@@ -430,6 +430,9 @@ public class OSupplementServiceImpl implements OSupplementService {
                     throw new MessageException("无此数据!!!");
                 }
                 OPayment oPayment = oPayments.get(0);
+                if(null==oPaymentDetail.getRealPayAmount()){
+                    oPaymentDetail.setRealPayAmount(new BigDecimal(0));
+                }
                 oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
                 if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
                     logger.info("金额数据有误");

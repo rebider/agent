@@ -403,6 +403,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("approvalPerson", userId);
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
         reqMap.put("taskId", agentVo.getTaskId());
+        reqMap.put("dept", agentVo.getDept());
 
         //传递部门信息
         Map startPar = startPar(userId);
