@@ -1,15 +1,19 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
+import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +46,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     OOrderMapper oOrderMapper;
     @Autowired
     CapitalMapper capitalMapper;
+    @Autowired
+    private IdService idService;
 
     /**
      * @Author: Zhang Lei
@@ -63,7 +69,11 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         paymentStatusList.add(PaymentStatus.BF.code);
         paymentStatusList.add(PaymentStatus.YQ.code);
 
-        example.or().andAgentIdEqualTo(agentId).andPayTypeIn(payTypeList).andPaymentStatusIn(paymentStatusList);
+        example.or()
+                .andAgentIdEqualTo(agentId)
+                .andPayTypeIn(payTypeList)
+                .andPaymentStatusIn(paymentStatusList)
+                .andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
         //example.setOrderByClause("Payment_type asc");
         //example.setOrderByClause("order_id asc");
         example.setOrderByClause("plan_pay_time asc");
@@ -106,7 +116,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         }
 
         c.andPayTypeIn(payTypeList);
-
+        c.andPaymentTypeEqualTo(PamentIdType.ORDER_FKD.code);
         example.setOrderByClause("plan_num asc");
         return oPaymentDetailMapper.selectByExample(example);
     }
@@ -257,4 +267,76 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
         }
         return ResultVO.success("");
     }
+
+
+    /**
+     * 生成付款明细
+     * @param srcId
+     * @param pamentIdType
+     * @param orderId
+     * @param paymentType
+     * @param payAmount
+     * @param RealPayAmount
+     * @param planPayTime
+     * @param planNum
+     * @param paymentStatus
+     * @param agentId
+     * @param cuser
+     * @return
+     * @throws Exception
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Override
+    public AgentResult createPayMentDetail(String batchCode,String srcId,PamentIdType pamentIdType,String orderId,PaymentType paymentType,BigDecimal payAmount,BigDecimal RealPayAmount, Date planPayTime,BigDecimal planNum,PaymentStatus paymentStatus,String agentId,String cuser) throws Exception {
+        Calendar c = Calendar.getInstance();
+        if(StringUtils.isNotBlank(batchCode)) {
+             batchCode = c.getTime().getTime() + "";
+         }
+        OPaymentDetail record = new OPaymentDetail();
+        record.setId(idService.genId(TabId.o_payment_detail));
+        record.setBatchCode(batchCode);
+        record.setPaymentId(srcId);
+        record.setPaymentType(pamentIdType.code);
+        record.setOrderId(orderId);
+        record.setPayType(paymentType.code);
+        record.setPayAmount(payAmount);
+        record.setRealPayAmount(RealPayAmount);
+        record.setPlanPayTime(planPayTime);
+        record.setPlanNum(planNum);
+        record.setAgentId(agentId);
+        record.setPaymentStatus(paymentStatus.code);
+        record.setcUser(cuser);
+        record.setcDate(c.getTime());
+        record.setStatus(Status.STATUS_1.status);
+        record.setVersion(Status.STATUS_1.status);
+        if (1 != oPaymentDetailMapper.insert(record)) {
+            logger.info("OPaymentDetail:明细生成失败:srcid:{},pamentIdType:{},paymentType:{}，明细ID:{},金额{},已付金额{},状态{}",
+                    srcId,
+                    pamentIdType.msg,
+                    paymentType.msg,
+                    record.getId(),
+                    record.getPayAmount(),
+                    record.getRealPayAmount(),
+                    paymentStatus.msg);
+            throw new MessageException("分期处理");
+        }
+        logger.info("OPaymentDetail:明细生成成功:srcid:{},pamentIdType:{},paymentType:{}，明细ID:{},金额{},已付金额{},状态{}",
+                srcId,
+                pamentIdType.msg,
+                paymentType.msg,
+                record.getId(),
+                record.getPayAmount(),
+                record.getRealPayAmount(),
+                paymentStatus.msg);
+        return AgentResult.ok(record);
+
+    }
+
+
+    @Override
+    public String createBatchCode() {
+          return Calendar.getInstance().getTime().getTime() + "";
+    }
+
+
 }

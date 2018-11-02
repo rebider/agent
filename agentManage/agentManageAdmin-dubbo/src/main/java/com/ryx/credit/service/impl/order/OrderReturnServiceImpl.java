@@ -184,6 +184,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         OReturnOrderDetailExample example = new OReturnOrderDetailExample();
         example.or().andReturnIdEqualTo(returnId);
         List<OReturnOrderDetail> returnDetails = returnOrderDetailMapper.selectByExample(example);
+        for (OReturnOrderDetail returnDetail : returnDetails) {
+            Dict proComDict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),returnDetail.getProCom());
+            if(null!=proComDict)
+            returnDetail.setProCom(proComDict.getdItemname());
+            Dict modelTypeDict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),returnDetail.getProType());
+            if(null!=modelTypeDict)
+            returnDetail.setProType(modelTypeDict.getdItemname());
+        }
 
         //查询扣款款项
         ODeductCapitalExample deductCapitalExample = new ODeductCapitalExample();
@@ -1199,13 +1207,18 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         List<String> list = new ArrayList<>();
         for (List<Object> objectList : data) {
             try {
-                String id =   iOrderReturnService.addListItem(objectList,user);
+                AgentResult result =   iOrderReturnService.addListItem(objectList,user);
                 log.info("导入物流{}成功",objectList.toString());
-                list.add("物流["+objectList.toString()+"]导入成功");
-            } catch (Exception e) {
+                list.add("物流["+objectList.toString()+"]"+result.getMsg());
+            }catch (MessageException e) {
+                e.printStackTrace();
+                log.info("导入物流{}抛出异常{}",objectList.toString(),e.getMsg());
+                list.add("物流["+objectList.toString()+"]"+e.getMsg());
+            }
+            catch (Exception e) {
                 e.printStackTrace();
                 log.info("导入物流{}抛出异常",objectList.toString());
-                list.add("物流["+objectList.toString()+"]导入失败");
+                list.add("物流["+objectList.toString()+"]导入异常"+e.getMessage());
             }
         }
         return list;
@@ -1213,7 +1226,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public String addListItem(List<Object> objectList, String user) throws Exception {
+    public AgentResult addListItem(List<Object> objectList, String user) throws Exception {
 
         String planNum = "";
         String orderId = "";
@@ -1371,6 +1384,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
             if(planVo==null)throw new MessageException("排单信息未找到");
             if (null==planVo.getReturnOrderDetailId())throw new MessageException("退货明细未找到");
+
             OReturnOrderDetail returnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
             String firstSn = returnOrderDetail.getBeginSn();
             String lastSn = returnOrderDetail.getEndSn();
@@ -1446,11 +1460,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     //流量卡不进行下发操作
                     if(oActivity!=null && com.ryx.credit.commons.utils.StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
                         log.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
-                        return oLogistics.getId();
+                        return AgentResult.ok("流量卡不进行下发操作");
                     }
+
                     //===============================================================================
                     //进行机具调整操作
                     if (!proType.equals(PlatformType.MPOS.msg)){
+
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
@@ -1493,6 +1509,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
                         List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
                         OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+
                         //结束sn
                         OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
                         exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(oLogistics.getSnEndNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
@@ -1504,6 +1521,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
                         vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
                         vo.setSnNum(oLogistics.getSendNum().toString());
+
                         //发货订单的业务编号
                         OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
                         AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
@@ -1516,6 +1534,33 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
                         vo.setOldBusNum(returnbusInfo.getBusNum());
                         vo.setPlatformNum(returnbusInfo.getBusPlatform());
+
+                        //新活动
+                        vo.setNewAct(oSubOrderActivity.getBusProCode());
+
+                        //老活动查询
+                        OSubOrderExample old_OSubOrder = new OSubOrderExample();
+                        old_OSubOrder.or()
+                                .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
+                                .andProIdEqualTo(oReturnOrderDetail.getProId())
+                                .andStatusEqualTo(Status.STATUS_1.status);
+                        List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
+
+                        if(list_osub_old.size()==0){
+                            throw new MessageException("退货机具活动信息未找到");
+                        }
+                        OSubOrder old_suborder  = list_osub_old.get(0);
+                        OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
+                        example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                        List<OSubOrderActivity>  list_old_act = oSubOrderActivityMapper.selectByExample(example_old_activity);
+                        if(list_old_act.size()==0){
+                            throw new MessageException("退货机具活动信息未找到");
+                        }
+                        OSubOrderActivity old_act = list_old_act.get(0);
+                        vo.setOldAct(old_act.getBusProCode());
+
+
+
                         //cxinfo 机具退货调整首刷接口调用
                         OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         //同平台下发，不同平台不下发
@@ -1555,9 +1600,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     }
                 }
             }else{
-                log.info("调用明细接口 插入物流明细：失败{}",resultVO.getResInfo());
+                    return AgentResult.fail(resultVO.getResInfo());
             }
-        return oLogistics.getId();
+        return AgentResult.ok();
     }
 
     /**

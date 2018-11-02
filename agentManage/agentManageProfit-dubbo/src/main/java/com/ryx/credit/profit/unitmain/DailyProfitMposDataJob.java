@@ -54,44 +54,44 @@ public class DailyProfitMposDataJob {
     /**
      * 2018.9.10 11:10："0 10 11 10 * ?"
      */
-//    @Scheduled(cron = "0 54 14 10 * ?")
-//    public void excute(){
-//        List<String> dates = new ArrayList<String>();
-//        dates.add("20180701");
-//        dates.add("20180702");
-//        dates.add("20180703");
-//        dates.add("20180704");
-//        dates.add("20180705");
-//        dates.add("20180706");
-//        dates.add("20180707");
-//        dates.add("20180708");
-//        dates.add("20180709");
-//        dates.add("20180710");
-//        dates.add("20180711");
-//        dates.add("20180712");
-//        dates.add("20180713");
-//        dates.add("20180714");
-//        dates.add("20180715");
-//        dates.add("20180716");
-//        dates.add("20180717");
-//        dates.add("20180718");
-//        dates.add("20180719");
-//        dates.add("20180720");
-//        dates.add("20180721");
-//        dates.add("20180722");
-//        dates.add("20180723");
-//        dates.add("20180724");
-//        dates.add("20180725");
-//        dates.add("20180726");
-//        dates.add("20180727");
-//        dates.add("20180728");
-//        dates.add("20180729");
-//        dates.add("20180730");
-//        dates.add("20180731");
-//        for(int i=0;i<dates.size();i++){
-//            synchroProfitDay(dates.get(i));
-//        }
-//    }
+//    @Scheduled(cron = "0 44 16 22 * ?")
+    public void excute(){
+        List<String> dates = new ArrayList<String>();
+        dates.add("20180901");
+        dates.add("20180902");
+        dates.add("20180903");
+        dates.add("20180904");
+        dates.add("20180905");
+        dates.add("20180906");
+        dates.add("20180907");
+        dates.add("20180908");
+        dates.add("20180909");
+        dates.add("20180910");
+        dates.add("20180911");
+        dates.add("20180912");
+        dates.add("20180913");
+        dates.add("20180914");
+        dates.add("20180915");
+        dates.add("20180916");
+        dates.add("20180917");
+        dates.add("20180918");
+        dates.add("20180919");
+        dates.add("20180920");
+        dates.add("20180921");
+        dates.add("20180922");
+        dates.add("20180923");
+        dates.add("20180924");
+        dates.add("20180925");
+        dates.add("20180926");
+        dates.add("20180927");
+        dates.add("20180928");
+        dates.add("20180929");
+        dates.add("20180930");
+//        dates.add("20180831");
+        for(int i=0;i<dates.size();i++){
+            synchroProfitDay(dates.get(i));
+        }
+    }
 
     /**
      * 同步日结分润数据
@@ -99,8 +99,8 @@ public class DailyProfitMposDataJob {
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
 //    @Scheduled(cron = "0 0 5 * * ?")
-    public void synchroProfitDay(){
-        String frDate = "20180705";
+    public void synchroProfitDay(String frDate){
+//        String frDate = "20180705";
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("frDate", frDate==null?frDate:frDate);
         map.put("pageNumber", index++ +"");
@@ -144,7 +144,7 @@ public class DailyProfitMposDataJob {
             profitD.setPlatformNum(json.getString("PLATFORMNUM"));//平台编号
             profitDService.insertSelective(profitD);
         }
-        synchroProfitDay();
+        synchroProfitDay(frDate);
     }
 
 }

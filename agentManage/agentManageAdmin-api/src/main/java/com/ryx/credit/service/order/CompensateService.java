@@ -9,6 +9,7 @@ import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
 import com.ryx.credit.pojo.admin.order.ORefundPriceDiffDetail;
 import com.ryx.credit.pojo.admin.order.OSubOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.pojo.admin.vo.ORefundPriceDiffVo;
 
 import java.math.BigDecimal;
@@ -28,9 +29,9 @@ public interface CompensateService {
 
     BigDecimal calculateTotalPrice(String activityId, BigDecimal count);
 
-    BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum);
+    BigDecimal calculatePriceDiff(String beginSn,String endSn,String oldActivityId,String activityId,BigDecimal proNum,ORefundPriceDiff oRefundPriceDiff);
 
-    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
+    AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser ,List<OCashReceivablesVo> oCashReceivablesVoList);
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 
@@ -40,8 +41,8 @@ public interface CompensateService {
 
     ORefundPriceDiff queryRefDiffDetail(String id);
 
-    AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt);
+    AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId,List<OCashReceivablesVo> cashReceivablesVoList)throws Exception;
 
-    AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser);
+    AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList);
 }
 

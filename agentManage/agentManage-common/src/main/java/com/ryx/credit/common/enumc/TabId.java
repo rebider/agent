@@ -47,6 +47,7 @@ public enum TabId {
     o_account_adjust("AJ%s%014d"),
     o_receipt_plan("ORP%s%015d"),
     o_account_adjust_detail("AJD%s%014d"),
+    o_cash_receivables("CAS%s%014d"),
     P_ORGAN_TRAN_MONTH("P_ORGAN_TRAN_MONTH%s%015d"),
     PIDD("PIDD%s%015d"),
     P_STAGING_DETAIL("PSD%s%015d"),
