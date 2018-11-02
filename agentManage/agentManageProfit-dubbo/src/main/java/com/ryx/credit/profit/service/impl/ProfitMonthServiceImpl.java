@@ -795,13 +795,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         TransProfitDetail detail = new TransProfitDetail();
         detail.setAgentId(profitDetailMonthTemp.getAgentId());
         detail.setBusCode("100003");
+        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        detail.setProfitDate(currentDate);
         List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
         if (transProfitDetails.size() > 0) {
             detail = transProfitDetails.get(0);
             Map<String, Object> map = new HashMap<>(10);
             map.put("agentType", detail.getAgentType());
             map.put("agentId", detail.getAgentId());
-            map.put("currentDate", detail.getProfitDate());
+            map.put("currentDate", currentDate);
             map.put("computType", computType);
             try {
                 map = posProfitComputeServiceImpl.execut(map);
