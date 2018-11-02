@@ -11,7 +11,6 @@ import com.ryx.credit.dao.agent.AgentPlatFormSynMapper;
 import com.ryx.credit.pojo.admin.agent.AgentPlatFormSyn;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.pay.LivenessDetectionService;
-import com.ryx.credit.util.EnvironmentUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
