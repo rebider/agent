@@ -12,7 +12,8 @@ public enum PaymentStatus {
     BF("2","部分付款"),
     YQ("3","逾期"),
     JQ("4","结清"),
-    FKING("5","付款中");
+    FKING("5","付款中"),
+    YF("6","已付款");
 
     public BigDecimal code;
 
