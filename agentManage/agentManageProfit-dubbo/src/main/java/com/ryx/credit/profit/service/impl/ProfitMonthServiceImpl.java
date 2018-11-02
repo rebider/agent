@@ -394,7 +394,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
-            criteria.andAgentPidEqualTo(agentId);
+            criteria.andAgentIdEqualTo(agentId);
             criteria.andProfitDateEqualTo(profitDate);
             if(StringUtils.isNotBlank(parentAgentId)){
                 criteria.andParentAgentIdEqualTo(parentAgentId);
