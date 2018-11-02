@@ -2,9 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.profit.dao.PAgentMergeMapper;
 import com.ryx.credit.profit.dao.PosRewardDetailMapper;
 import com.ryx.credit.profit.pojo.PosRewardDetail;
 import com.ryx.credit.profit.pojo.PosRewardDetailExample;
@@ -13,7 +11,6 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +49,6 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
 
     @Override
     public void updatePosRewardDetail(PosRewardDetail posRewardDetail) {
-//        posRewardDetailMapper.
+        posRewardDetailMapper.updateByPrimaryKeySelective(posRewardDetail);
     }
 }
