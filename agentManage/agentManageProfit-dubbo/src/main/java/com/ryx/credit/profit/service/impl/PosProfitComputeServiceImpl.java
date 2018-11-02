@@ -66,7 +66,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
         posMap.put("posRewardAmt", BigDecimal.ZERO);//POS奖励
         posMap.put("posAssDeductAmt", BigDecimal.ZERO);//POS奖励考核扣款
         String computType = map.get("computType").toString();
-        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String currentDate = map.get("currentDate").toString();
+
+        //试算、终审，初始化奖励明细数据
+
         //根据代理唯一AG码，查询POS奖励明细
         if(Objects.equals(posMap.get("agentType"), AGENT_TYPE_2)
                 || Objects.equals(posMap.get("agentType"), AGENT_TYPE_6)
@@ -75,16 +78,21 @@ public class PosProfitComputeServiceImpl implements DeductService {
             posRewardDetail.setPosAgentId(posMap.get("agentId").toString());
             posRewardDetail.setProfitPosDate(currentDate);
             PosRewardDetail detail = posRewardSDetailService.getPosRewardDetail(posRewardDetail);
+            if(detail == null){
+                LOG.info("POS奖励计算，响应参数：{}", map);
+                return posMap;
+            }
             String standard = detail.getPosStandard() == null ? "0" : detail.getPosStandard();
             String posAmt = detail.getPosAmt() == null ? "0" : detail.getPosAmt();
             LOG.info("代理商唯一码：{}，POS奖励交易量：{}，奖励标准：{}", detail.getPosAgentId(), posAmt, standard);
             BigDecimal posRoward = new BigDecimal(posAmt).multiply(new BigDecimal(standard)).setScale(2, BigDecimal.ROUND_HALF_UP);
             LOG.info("代理商唯一码：{}，POS奖励：{}", detail.getPosAgentId(), posRoward);
+            detail.setPosOwnReward(posRoward.toString());
             String posDowdReward = detail.getPosDownReward() == null ? "0" : detail.getPosDownReward();
             BigDecimal roward = posRoward.subtract(new BigDecimal(posDowdReward));
             detail.setPosReawrdProfit(roward.toString());
             posRewardSDetailService.updatePosRewardDetail(detail);
-            map.put("posRewardAmt", roward.toString());
+            posMap.put("posRewardAmt", roward.toString());
             if(Objects.equals(posMap.get("agentType"), AGENT_TYPE_3)){
                 //找到他的上级POS奖励明细，进行扣减奖励
                 String parentAgentId = this.obtainParentAgentId(detail.getPosMechanismId());
@@ -95,6 +103,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     parentDetail.setProfitPosDate(currentDate);
                     PosRewardDetail parentPosRewardDetail = posRewardSDetailService.getPosRewardDetail(parentDetail);
                     if(parentPosRewardDetail != null){
+                        ////扣减上级POS奖励明细中奖励分润值
                         String parentPosDowdReward = parentPosRewardDetail.getPosDownReward() == null ? "0" : parentPosRewardDetail.getPosDownReward();
                         BigDecimal parentDowdReward = new BigDecimal(parentPosDowdReward).add(posRoward);
                         BigDecimal profitAmt = new BigDecimal(parentPosRewardDetail.getPosOwnReward()).subtract(parentDowdReward);
@@ -112,11 +121,21 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 }
             }
         }
-
         //季度奖励考核
+        if(Objects.equals(posMap.get("agentType"), AGENT_TYPE_2)
+                || Objects.equals(posMap.get("agentType"), AGENT_TYPE_6)) {
+            this.rewardAssessment();
+        }
+        LOG.info("POS奖励计算，响应参数：{}", posMap);
+        return posMap;
+    }
 
-        LOG.info("POS奖励计算，响应参数：{}", map);
-        return map;
+    /**
+     * POS季度奖励考核
+     */
+    private void rewardAssessment() {
+
+
     }
 
     /**
@@ -146,10 +165,13 @@ public class PosProfitComputeServiceImpl implements DeductService {
         BigDecimal posRewardAmt = praentPosRewardAmt.subtract(profitAmt);
         ProfitDetailMonth update = new ProfitDetailMonth();
         update.setId(profitDetailMonth.getId());
-        if(praentBasicsProfitAmt.compareTo(BigDecimal.ZERO) > 0){
+        if(praentBasicsProfitAmt.compareTo(profitAmt) > 0){
             update.setPosRewardAmt(posRewardAmt);
             update.setBasicsProfitAmt(praentBasicsProfitAmt.subtract(profitAmt));
-        } else {
+        } else if(profitAmt.compareTo(praentBasicsProfitAmt) > 0){
+            update.setPosRewardAmt(posRewardAmt);
+            update.setBasicsProfitAmt(BigDecimal.ZERO);
+        } else if(praentBasicsProfitAmt.compareTo(BigDecimal.ZERO) <= 0) {
             update.setPosRewardDeductionAmt(profitAmt);
         }
         profitDetailMonthServiceImpl.updateByPrimaryKeySelective(update);
@@ -169,15 +191,15 @@ public class PosProfitComputeServiceImpl implements DeductService {
         }
     }
 
+
     /**
      * 初始化POS奖励的基础数据
      */
     @Override
     public void otherOperate() {
-//        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,7);
-        String currentDate= "201809";
+        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         TransProfitDetail detail = new TransProfitDetail();
-        detail.setProfitDate("201809");
+        detail.setProfitDate(currentDate);
         detail.setBusCode(PLATFORM_CODE);
         List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
         list.forEach(transProfitDetail -> {
@@ -454,9 +476,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
     }
 
     public static void main(String[] args) throws Exception {
-        List<String> list = PosProfitComputeServiceImpl.getMonthBetween("2018-06", "2018-09");
-        list.forEach(s -> {
-            System.out.println(s);
-        });
+//        List<String> list = PosProfitComputeServiceImpl.getMonthBetween("2018-06", "2018-09");
+//        list.forEach(s -> {
+//            System.out.println(s);
+//        });
+
+        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        System.out.println(currentDate);
     }
 }

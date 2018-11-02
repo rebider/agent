@@ -413,6 +413,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitToolsDeductService.otherOperate();
     }
 
+    @Override
     public Map<String, Object> getDbProfitAmt(String agentId, String parentAgentId, String computType) {
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setAgentId(agentId);
@@ -672,7 +673,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
         // POS考核奖励
         long khstart = System.currentTimeMillis();
-        getPosReward(profitDetailMonthTemp);
+        getPosReward(profitDetailMonthTemp,computType);
         sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
         long khend = System.currentTimeMillis();
         System.out.println("考核处理时间"+(khend-khstart));
@@ -790,7 +791,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @Author: zhaodw
      * @Date: 2018/8/14
      */
-    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp) {
+    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, String computType) {
         TransProfitDetail detail = new TransProfitDetail();
         detail.setAgentId(profitDetailMonthTemp.getAgentId());
         detail.setBusCode("100003");
@@ -800,9 +801,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             Map<String, Object> map = new HashMap<>(10);
             map.put("agentType", detail.getAgentType());
             map.put("agentId", detail.getAgentId());
-            map.put("busNum", detail.getBusNum());
-            map.put("posTranAmt", detail.getPosRewardAmt());
-            map.put("posJlTranAmt", detail.getPosCreditAmt());
+            map.put("currentDate", detail.getProfitDate());
+            map.put("computType", computType);
             try {
                 map = posProfitComputeServiceImpl.execut(map);
                 profitDetailMonthTemp.setPosRewardAmt((BigDecimal) map.get("posRewardAmt"));

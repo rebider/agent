@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ryx.credit.profit.dao.PosRewardDetailMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosRewardDetail">
-    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <id column="ID" jdbcType="VARCHAR" property="id" />
     <result column="PROFIT_POS_DATE" jdbcType="VARCHAR" property="profitPosDate" />
     <result column="POS_AGENT_ID" jdbcType="VARCHAR" property="posAgentId" />
     <result column="POS_AGENT_NAME" jdbcType="VARCHAR" property="posAgentName" />
@@ -22,6 +22,35 @@
   <sql id="Example_Where_Clause">
     <where>
       <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
         <if test="criteria.valid">
           <trim prefix="(" prefixOverrides="and" suffix=")">
             <foreach collection="criteria.criteria" item="criterion">
@@ -68,6 +97,12 @@
       order by ${orderByClause}
     </if>
     <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from POS_REWARD_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardDetailExample">
     delete from POS_REWARD_DETAIL
@@ -198,6 +233,154 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update POS_REWARD_DETAIL
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitPosDate != null">
+        PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAgentId != null">
+        POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAgentName != null">
+        POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posMechanismType != null">
+        POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posMechanismId != null">
+        POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCompareCount != null">
+        POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCurrentCount != null">
+        POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCompareLoanCount != null">
+        POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posCurrentLoanCount != null">
+        POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAmt != null">
+        POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posStandard != null">
+        POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posOwnReward != null">
+        POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posDownReward != null">
+        POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posReawrdProfit != null">
+        POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posRemark != null">
+        POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update POS_REWARD_DETAIL
+    set ID = #{record.id,jdbcType=VARCHAR},
+      PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+      POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+      POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+      POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+      POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+      POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+      POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+      POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+      POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+      POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+      POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+      POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+      POS_REMARK = #{record.posRemark,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
+    update POS_REWARD_DETAIL
+    <set>
+      <if test="profitPosDate != null">
+        PROFIT_POS_DATE = #{profitPosDate,jdbcType=VARCHAR},
+      </if>
+      <if test="posAgentId != null">
+        POS_AGENT_ID = #{posAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="posAgentName != null">
+        POS_AGENT_NAME = #{posAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="posMechanismType != null">
+        POS_MECHANISM_TYPE = #{posMechanismType,jdbcType=VARCHAR},
+      </if>
+      <if test="posMechanismId != null">
+        POS_MECHANISM_ID = #{posMechanismId,jdbcType=VARCHAR},
+      </if>
+      <if test="posCompareCount != null">
+        POS_COMPARE_COUNT = #{posCompareCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posCurrentCount != null">
+        POS_CURRENT_COUNT = #{posCurrentCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posCompareLoanCount != null">
+        POS_COMPARE_LOAN_COUNT = #{posCompareLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posCurrentLoanCount != null">
+        POS_CURRENT_LOAN_COUNT = #{posCurrentLoanCount,jdbcType=VARCHAR},
+      </if>
+      <if test="posAmt != null">
+        POS_AMT = #{posAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="posStandard != null">
+        POS_STANDARD = #{posStandard,jdbcType=VARCHAR},
+      </if>
+      <if test="posOwnReward != null">
+        POS_OWN_REWARD = #{posOwnReward,jdbcType=VARCHAR},
+      </if>
+      <if test="posDownReward != null">
+        POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
+      </if>
+      <if test="posReawrdProfit != null">
+        POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
+      </if>
+      <if test="posRemark != null">
+        POS_REMARK = #{posRemark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
+    update POS_REWARD_DETAIL
+    set PROFIT_POS_DATE = #{profitPosDate,jdbcType=VARCHAR},
+      POS_AGENT_ID = #{posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{posAgentName,jdbcType=VARCHAR},
+      POS_MECHANISM_TYPE = #{posMechanismType,jdbcType=VARCHAR},
+      POS_MECHANISM_ID = #{posMechanismId,jdbcType=VARCHAR},
+      POS_COMPARE_COUNT = #{posCompareCount,jdbcType=VARCHAR},
+      POS_CURRENT_COUNT = #{posCurrentCount,jdbcType=VARCHAR},
+      POS_COMPARE_LOAN_COUNT = #{posCompareLoanCount,jdbcType=VARCHAR},
+      POS_CURRENT_LOAN_COUNT = #{posCurrentLoanCount,jdbcType=VARCHAR},
+      POS_AMT = #{posAmt,jdbcType=VARCHAR},
+      POS_STANDARD = #{posStandard,jdbcType=VARCHAR},
+      POS_OWN_REWARD = #{posOwnReward,jdbcType=VARCHAR},
+      POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
+      POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
+      POS_REMARK = #{posRemark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
       select * from ( select row_.*, rownum rownum_ from ( 
@@ -208,7 +391,6 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
   <select id="getRewardDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM POS_REWARD_DETAIL
@@ -249,8 +431,8 @@
     </if>
   </sql>
   <sql id="PAGING_END">
-  <if test="begin != null  and end != null and end &gt;0">
-    ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
-  </if>
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
   </sql>
 </mapper>

@@ -424,12 +424,12 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             for (ProfitDeduction deduction : list){
                 Map<String, Object> map = new HashMap<String, Object>(5);
                 if(deduction.getActualDeductionAmt().compareTo(BigDecimal.ZERO) == 0){
-                    map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());
-                    map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());
-                    map.put("notDeductionAmt", deduction.getMustDeductionAmt());
-                    map.put("deductTime", "增加扣款时间");
-                    map.put("detailId", deduction.getSourceId());
-                    map.put("srcId", deduction.getId());
+                    map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());//应扣
+                    map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());//实扣
+                    map.put("notDeductionAmt", deduction.getMustDeductionAmt());//未扣足
+                    map.put("deductTime", "增加扣款时间");//扣款时间
+                    map.put("detailId", deduction.getSourceId());//订单号
+                    map.put("srcId", deduction.getId());//分润系统扣款ID
                     noticeList.add(map);
                 } else if(deduction.getMustDeductionAmt().compareTo(deduction.getActualDeductionAmt()) > 0){
                     map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());
