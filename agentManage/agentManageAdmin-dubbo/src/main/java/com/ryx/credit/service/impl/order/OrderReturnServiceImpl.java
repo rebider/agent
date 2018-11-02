@@ -1041,6 +1041,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             if(planCount==0){
                 throw new MessageException("排单数量不能为0");
             }
+
+            //退货排单数量检查
             OReturnOrderDetailExample example = new OReturnOrderDetailExample();
             example.or().andIdIn(details).andStatusEqualTo(Status.STATUS_1.status);
             List<OReturnOrderDetail> detailsList = returnOrderDetailMapper.selectByExample(example);

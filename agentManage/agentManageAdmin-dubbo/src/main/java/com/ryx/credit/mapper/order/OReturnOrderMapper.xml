@@ -455,10 +455,18 @@
   </sql>
 
   <select id="selectByReturnDeId" parameterType="string" resultType="map">
-    select subact.activity_id,subact.pro_id,orderdetail.id as O_RETURN_ORDER_DETAIL_ID,orderdetail.return_count,oa.act_code
+    select
+      subact.activity_id,
+      subact.pro_id,
+      orderdetail.id as O_RETURN_ORDER_DETAIL_ID,
+      orderdetail.return_count,
+      oa.act_code,
+      suborder.pro_type,
+      subact.pro_model,
+      subact.vender
     from o_return_order_detail orderdetail
-      left join o_sub_order suborder on orderdetail.order_id=suborder.order_id and orderdetail.pro_id=suborder.pro_id
-      left join o_sub_order_activity subact on subact.sub_order_id=suborder.id
+      left join o_sub_order suborder on orderdetail.order_id=suborder.order_id and orderdetail.pro_id=suborder.pro_id and suborder.status=1
+      left join o_sub_order_activity subact on subact.sub_order_id=suborder.id and subact.status=1
       left join o_activity oa on subact.activity_id = oa.id
       where orderdetail.id=#{returnDetailsId}
   </select>

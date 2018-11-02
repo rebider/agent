@@ -158,10 +158,14 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO uploadStatus(List<Map<String, Object>> maps) {
+    public ResultVO uploadStatus(List<Map<String, Object>> maps,BigDecimal payStatus) {
         if (null == maps && maps.size() < 0) {
             logger.info("更新数据为空:{}", maps);
             return ResultVO.fail("更新数据为空");
+        }
+        if (null==payStatus) {
+            logger.info("支付状态为空:{}", maps);
+            return ResultVO.fail("支付状态为空");
         }
         for (Map<String, Object> map : maps) {
             String detailId = (String) map.get("detailId");//付款明细id
@@ -185,7 +189,19 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
             oPaymentDetail.setRealPayAmount(oPaymentDetail.getPayAmount());
             oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
-            oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+
+            if (payStatus.compareTo(PaymentStatus.FKING.code)==0){//付款中
+                oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+            }else if(payStatus.compareTo(PaySign.JQ.code)==0){//已结清
+
+
+
+
+
+
+
+            }
+
             oPaymentDetail.setSrcId(srcId);
             oPaymentDetail.setSrcType(PamentSrcType.FENRUN_DIKOU.code);
 

@@ -65,11 +65,24 @@ public class PlannerServiceImpl implements PlannerService {
         if (StringUtils.isNotBlank(receiptOrder.getAddrRealname())) {
             reqMap.put("addrRealname", receiptOrder.getAddrRealname());
         }
-        if (null!=map.get("ACT_CODE") && StringUtils.isNotBlank(map.get("ACT_CODE")+"")){
-            reqMap.put("actCode", map.get("ACT_CODE"));
+        //同活动去掉
+        //        if (null!=map.get("ACT_CODE") && StringUtils.isNotBlank(map.get("ACT_CODE")+"")){
+        //            reqMap.put("actCode", map.get("ACT_CODE"));
+        //        }
+                //同商品去掉
+        //        if (null!=map.get("PRO_ID") && StringUtils.isNotBlank(map.get("PRO_ID")+"")){
+        //            reqMap.put("proId", map.get("PRO_ID"));
+        //        }
+        //增加增加厂家和机型
+        if (null!=map.get("VENDER") && StringUtils.isNotBlank(map.get("VENDER")+"")){
+            reqMap.put("vender", map.get("VENDER"));
         }
-        if (null!=map.get("PRO_ID") && StringUtils.isNotBlank(map.get("PRO_ID")+"")){
-            reqMap.put("proId", map.get("PRO_ID"));
+        if (null!=map.get("PRO_MODEL") && StringUtils.isNotBlank(map.get("PRO_MODEL")+"")){
+            reqMap.put("proModel", map.get("PRO_MODEL"));
+        }
+        //增加机具类型
+        if (null!=map.get("PRO_TYPE") && StringUtils.isNotBlank(map.get("PRO_TYPE")+"")){
+            reqMap.put("proType", map.get("PRO_TYPE"));
         }
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
