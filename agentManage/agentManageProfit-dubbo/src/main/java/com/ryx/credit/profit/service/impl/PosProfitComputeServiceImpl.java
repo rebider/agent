@@ -68,8 +68,6 @@ public class PosProfitComputeServiceImpl implements DeductService {
         String computType = map.get("computType").toString();
         String currentDate = map.get("currentDate").toString();
 
-        //试算、终审，初始化奖励明细数据
-
         //根据代理唯一AG码，查询POS奖励明细
         if(Objects.equals(posMap.get("agentType"), AGENT_TYPE_2)
                 || Objects.equals(posMap.get("agentType"), AGENT_TYPE_6)
@@ -129,6 +127,15 @@ public class PosProfitComputeServiceImpl implements DeductService {
         }
         LOG.info("POS奖励计算，响应参数：{}", posMap);
         return posMap;
+    }
+
+    /**
+     * 奖励数据重置
+     */
+    @Override
+    public void clearDetail(){
+        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        posRewardSDetailService.clearPosRewardDetail(currentDate);
     }
 
     /**

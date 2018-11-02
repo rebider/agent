@@ -445,4 +445,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
 //        iPaymentDetailService.uploadStatus(noticeList,"");
         }
     }
+
+    @Override
+    public void clearDetail(){
+
+    }
 }

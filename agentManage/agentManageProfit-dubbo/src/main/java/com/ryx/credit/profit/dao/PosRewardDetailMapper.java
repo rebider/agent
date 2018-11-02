@@ -26,4 +26,6 @@ public interface PosRewardDetailMapper {
     long getRewardDetailCount(Map<String, Object> param);
 
     List<Map<String, Object>> getRewardDetailList(Map<String, Object> param);
+
+    void updateRewradData(String profitDate);
 }
