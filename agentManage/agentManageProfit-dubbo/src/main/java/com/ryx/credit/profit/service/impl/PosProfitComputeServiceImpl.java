@@ -106,7 +106,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
                         ////扣减上级POS奖励明细中奖励分润值
                         String parentPosDowdReward = parentPosRewardDetail.getPosDownReward() == null ? "0" : parentPosRewardDetail.getPosDownReward();
                         BigDecimal parentDowdReward = new BigDecimal(parentPosDowdReward).add(posRoward);
-                        BigDecimal profitAmt = new BigDecimal(parentPosRewardDetail.getPosOwnReward()).subtract(parentDowdReward);
+                        String parentOwnReward= parentPosRewardDetail.getPosOwnReward() == null ? "0" : parentPosRewardDetail.getPosOwnReward();
+                        BigDecimal profitAmt = new BigDecimal(parentOwnReward).subtract(parentDowdReward);
                         parentPosRewardDetail.setPosDownReward(parentDowdReward.toString());
                         parentPosRewardDetail.setPosReawrdProfit(profitAmt.toString());
                         posRewardSDetailService.updatePosRewardDetail(parentPosRewardDetail);
