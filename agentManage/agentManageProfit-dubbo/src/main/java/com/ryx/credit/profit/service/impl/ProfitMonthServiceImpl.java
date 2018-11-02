@@ -394,7 +394,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if(StringUtils.isNotBlank(agentId) && StringUtils.isNotBlank(profitDate)){
             ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
             ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
-            criteria.andAgentPidEqualTo(agentId);
+            criteria.andAgentIdEqualTo(agentId);
             criteria.andProfitDateEqualTo(profitDate);
             if(StringUtils.isNotBlank(parentAgentId)){
                 criteria.andParentAgentIdEqualTo(parentAgentId);
@@ -628,7 +628,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentPid", profitDetailMonthTemp.getAgentId()); //业务平台编号
         map.put("paltformNo", "5000");      //瑞和宝
-        map.put("agentProfitAmt", "0");
+        map.put("agentProfitAmt", profitDetailMonthTemp.getBasicsProfitAmt());
         map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0,7));   //扣款月份
         map.put("hbList", hbList);     //代理商分润
         map.put("computType", computType);
@@ -795,13 +795,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         TransProfitDetail detail = new TransProfitDetail();
         detail.setAgentId(profitDetailMonthTemp.getAgentId());
         detail.setBusCode("100003");
+        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+        detail.setProfitDate(currentDate);
         List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
         if (transProfitDetails.size() > 0) {
             detail = transProfitDetails.get(0);
             Map<String, Object> map = new HashMap<>(10);
             map.put("agentType", detail.getAgentType());
             map.put("agentId", detail.getAgentId());
-            map.put("currentDate", detail.getProfitDate());
+            map.put("currentDate", currentDate);
             map.put("computType", computType);
             try {
                 map = posProfitComputeServiceImpl.execut(map);

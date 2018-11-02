@@ -81,6 +81,11 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult approveTashBusiness(CashPayType cpt, String srcId, String userId,Date checkDate,List<OCashReceivablesVo> list) throws Exception{
+
+        if(checkDate==null)throw new MessageException("核款时间不能为空");
+
+        if(userId==null)throw new MessageException("核款人不能为空");
+
         List<OCashReceivables>  ocashList =  query(null,null,cpt,srcId, Arrays.asList(AgStatus.Approving.status));
         Calendar c = Calendar.getInstance();
         for (OCashReceivables oCashReceivables : ocashList) {

@@ -355,21 +355,59 @@
   </update>
 
     <select id="selectShareMoney" parameterType="map" resultType="map">
-        select detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
+        select * from
+        ( select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
         detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,o.ORDER_PLATFORM
         from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
         on detail.AGENT_ID=agent.id
 
         left join O_ORDER o on detail.ORDER_ID=o.id where
-        detail.status=1 and payment.status=1 and agent.status=1 and detail.PAYMENT_STATUS=1 and detail.PAY_TYPE='FRFQ'
-
+        detail.status=1 and payment.status=1 and agent.status=1 and (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
+        and detail.PAYMENT_TYPE='ORDER_FKD'
         <if test="map.agentId != null and map.agentId != '' ">
             and detail.AGENT_ID = #{map.agentId}
         </if>
         <if test="map.time != null and map.time != '' ">
             and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
         </if>
-        ORDER BY detail.C_DATE DESC
+        union
+        select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,capital.c_agent_id,detail.ORDER_ID,
+        detail.PAYMENT_TYPE,'' as GUARANTEE_AGENT,'' as AG_NAME ,'' as ORDER_PLATFORM
+        from O_PAYMENT_DETAIL detail left join A_capital capital on capital.id=detail.Payment_id
+        where detail.status=1 and  (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ' and detail.PAYMENT_TYPE='ORDER_BZJ'
+        <if test="map.agentId != null and map.agentId != '' ">
+            and detail.AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.time != null and map.time != '' ">
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
+        </if>
+        union
+        select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,cash.agent_id,detail.ORDER_ID,
+        detail.PAYMENT_TYPE,'' as GUARANTEE_AGENT,'' as AG_NAME ,'' as ORDER_PLATFORM
+        from O_PAYMENT_DETAIL detail left join o_Cash_Receivables cash on cash.id=detail.Payment_id
+        where detail.status=1 and  (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
+        and detail.PAYMENT_TYPE='ORDER_XX'
+        <if test="map.agentId != null and map.agentId != '' ">
+        and detail.AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.time != null and map.time != '' ">
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
+        </if>
+        union
+        select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
+        detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,o.ORDER_PLATFORM
+        from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
+        on detail.AGENT_ID=agent.id
+        left join O_ORDER o on detail.ORDER_ID=o.id where
+        detail.status=1 and payment.status=1 and agent.status=1 and  (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
+        and detail.PAYMENT_TYPE='ORDER_PDT'
+        <if test="map.agentId != null and map.agentId != '' ">
+            and detail.AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.time != null and map.time != '' ">
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
+        </if>)a
+        ORDER BY a.C_DATE DESC
     </select>
 
     <select id="querySupplementXXDK" parameterType="map" resultType="java.math.BigDecimal">
