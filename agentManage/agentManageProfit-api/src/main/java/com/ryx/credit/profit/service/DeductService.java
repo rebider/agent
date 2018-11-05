@@ -22,4 +22,9 @@ public interface DeductService {
      * 2、Pos奖励：初始化POS奖励的基础数据
      */
     void otherOperate();
+
+    /**
+     *
+     */
+    void clearDetail();
 }

@@ -51,4 +51,9 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
     public void updatePosRewardDetail(PosRewardDetail posRewardDetail) {
         posRewardDetailMapper.updateByPrimaryKeySelective(posRewardDetail);
     }
+
+    @Override
+    public void clearPosRewardDetail(String profitDate) {
+        posRewardDetailMapper.updateRewradData(profitDate);
+    }
 }

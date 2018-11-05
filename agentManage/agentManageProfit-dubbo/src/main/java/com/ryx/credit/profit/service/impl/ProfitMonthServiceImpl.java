@@ -735,6 +735,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public void testComputeProfitAmt() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.clearComputData(profitDate);
+        posProfitComputeServiceImpl.clearDetail();
         comput("2");
     }
 
