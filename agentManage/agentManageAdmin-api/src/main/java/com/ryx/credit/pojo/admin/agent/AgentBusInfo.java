@@ -83,6 +83,8 @@ public class AgentBusInfo implements Serializable {
 
     private Map<String,Object> assProtocolMap;
 
+    private String busRegionName;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -385,5 +387,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setAssProtocolMap(Map<String, Object> assProtocolMap) {
         this.assProtocolMap = assProtocolMap;
+    }
+
+    public String getBusRegionName() {
+        return busRegionName;
+    }
+
+    public void setBusRegionName(String busRegionName) {
+        this.busRegionName = busRegionName;
     }
 }
