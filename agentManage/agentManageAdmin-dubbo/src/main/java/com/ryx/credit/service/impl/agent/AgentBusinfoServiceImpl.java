@@ -601,7 +601,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		list.addAll(child_plat);
 		//把孩子节点也加到list
 		for (AgentBusInfo agentBusInfo : child_plat) {
-			queryChildLevel(list,platformCode,agentBusInfo.getBusNum());
+			queryChildLevelByBusNum(list,platformCode,agentBusInfo.getBusNum());
 		}
 		return list;
 	}
