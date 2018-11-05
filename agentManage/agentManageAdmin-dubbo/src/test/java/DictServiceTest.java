@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.ryx.credit.common.enumc.TabId;
@@ -92,6 +93,13 @@ public class DictServiceTest extends BaseSpringTest {
         logger.info("=======testImPortAgent=====");
     }
 
+    @Test
+    public void testChildLevel(){
+        List<AgentBusInfo> list  = new ArrayList<>();
+        list = agentBusinfoService.queryChildLevelByBusNum(list,"100003","O00000000151369");
+        System.out.println("==================="+ JSONArray.toJSONString(list));
+        System.out.println(list.size());
+    }
     @Test
     public void loadCach(){
         agentQueryService.loadCach();
