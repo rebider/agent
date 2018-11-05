@@ -88,4 +88,5 @@ public interface AgentBusinfoService {
     /**根据代理商id查询业务类型*/
     public List<AgentBusInfo> selectByAgenId(String agentId);
 
+    AgentBusInfo selectBusInfo(String busNum);
 }
