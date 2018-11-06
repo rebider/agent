@@ -157,6 +157,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", agentVo.getOrderAprDept());
         }
+
+        if(Objects.equals("pass",agentVo.getApprovalResult())
+                && StringUtils.isBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", "finish");
+        }
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
         reqMap.put("approvalPerson", userId);
