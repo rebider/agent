@@ -82,7 +82,7 @@
         where ID = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetailExample">
-        delete from O_PAYMENT_DETAILd
+        delete from O_PAYMENT_DETAIL
         <if test="_parameter != null">
             <include refid="Example_Where_Clause"/>
         </if>
