@@ -150,14 +150,15 @@ public class PosProfitComputeServiceImpl implements DeductService {
         PosReward posReward = new PosReward();
         posReward.setAgentId(detail.getPosAgentId());
         posReward.setApplyStatus("1");
-        List<PosReward> posRewardList = iPosRewardService.selectByMonth(posReward);
+        List<PosReward> posRewardList = iPosRewardService.selectRewardByMonth(posReward);
         List<String> month = new ArrayList<String>();
+        String assessDate = null;
         PosReward posRewardTemp = null;
         if(posRewardList != null || !posRewardList.isEmpty()){
             for(PosReward rewardTemp:posRewardList){
                 if(Objects.equals(rewardTemp.getTotalEndMonth(), currentDate)){
                     LOG.info("代理商唯一码：{}，考核月份:{}", detail.getPosAgentId(), currentDate);
-
+                    assessDate = rewardTemp.getTotalEndMonth();
                     posRewardTemp = rewardTemp;
                     if(posReward.getTotalConsMonth().contains("~")){
                         String[] spl = posReward.getTotalConsMonth().trim().split("~");
@@ -173,15 +174,25 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
         }
         LOG.info("代理商唯一码：{}，特殊奖励预发周期月份:{}", detail.getPosAgentId(), JSONObject.toJSON(month).toString());
+        if(assessDate != null && posRewardTemp != null){
+            PosRewardDetail posRewardDetail = new PosRewardDetail();
+            posRewardDetail.setPosAgentId(detail.getPosAgentId());
+            posRewardDetail.setProfitPosDate(assessDate);
+            PosRewardDetail assessDetail = posRewardSDetailService.getPosRewardDetail(posRewardDetail);
+            if(new BigDecimal(assessDetail.getPosCurrentCount()).compareTo(posRewardTemp.getGrowAmt().multiply(new BigDecimal("10000"))) >= 0){
+                LOG.info("代理商唯一码：{}，考核交易量达到活动指标，不进行扣减奖励", detail.getPosAgentId());
+                return;
+            }
+        }
 
         if(month.size() > 0){
             BigDecimal currentTranSum = BigDecimal.ZERO;
             BigDecimal compareTranSum = BigDecimal.ZERO;
             BigDecimal currentCreditSum = BigDecimal.ZERO;
             BigDecimal compareCreditSum = BigDecimal.ZERO;
+            PosRewardDetail posRewardDetail = new PosRewardDetail();
+            posRewardDetail.setPosAgentId(detail.getPosAgentId());
             for(String totalConsMonth : month){
-                PosRewardDetail posRewardDetail = new PosRewardDetail();
-                posRewardDetail.setPosAgentId(detail.getPosAgentId());
                 posRewardDetail.setProfitPosDate(totalConsMonth);
                 PosRewardDetail totalConsMonthDetail = posRewardSDetailService.getPosRewardDetail(posRewardDetail);
                 currentTranSum = currentTranSum.add(new BigDecimal(totalConsMonthDetail.getPosCurrentCount()==null ? "0" : totalConsMonthDetail.getPosCurrentCount()));
@@ -189,17 +200,13 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 currentCreditSum = currentCreditSum.add(new BigDecimal(totalConsMonthDetail.getPosCurrentLoanCount()==null ? "0" : totalConsMonthDetail.getPosCurrentLoanCount()));
                 compareCreditSum = compareCreditSum.add(new BigDecimal(totalConsMonthDetail.getPosCompareLoanCount()==null ? "0" : totalConsMonthDetail.getPosCompareLoanCount()));
             }
-            //2、交易总金额与特殊奖励活动模板的总金额比较,累计交易量不满足奖励条件，按照通用POS奖励模板重新计算奖励
             BigDecimal tranSum = currentTranSum.subtract(compareTranSum);
             LOG.info("代理商唯一码：{}，特殊模板，交易总额-对比月交易总额：{}", detail.getPosAgentId(), tranSum);
-            if(tranSum.compareTo(posRewardTemp.getGrowAmt().multiply(new BigDecimal("10000"))) >= 0){
-                LOG.info("代理商唯一码：{}，代理商季度交易量达到活动指标，不进行扣减奖励", detail.getPosAgentId());
-                return;
-            }
-            LOG.info("代理商唯一码：{}，总交易额：{}，活动设定总交易额：{}万，代理商季度交易量指标不合格，进行扣减奖励", detail.getPosAgentId(), posRewardTemp.getGrowAmt());
+
+            //按照通用奖励模板，重新计算奖励
+
             BigDecimal creditSum = currentCreditSum.subtract(compareCreditSum);
             LOG.info("代理商唯一码：{}，特殊模板，贷记交易总额-对比月贷记交易总额：{}", detail.getPosAgentId(), creditSum);
-            //按照通用奖励模板，重新计算奖励
 
         }
     }
@@ -319,7 +326,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 PosReward posReward = new PosReward();
                 posReward.setAgentId(transProfitDetail.getAgentId());
                 posReward.setApplyStatus("1");
-                List<PosReward> posRewardList = iPosRewardService.selectByMonth(posReward);
+                List<PosReward> posRewardList = iPosRewardService.selectRewardByMonth(posReward);
                 if(posRewardList == null || posRewardList.isEmpty()){
                     this.computRewardStandard(posrewardDetail, currentDate);
                 } else {
