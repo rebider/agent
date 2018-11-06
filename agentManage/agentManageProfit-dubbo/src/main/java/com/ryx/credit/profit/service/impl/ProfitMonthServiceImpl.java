@@ -409,8 +409,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public void computeProfitAmt() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.clearComputData(profitDate);
+        profitToolsDeductService.clearDetail();
         comput("1");
-        profitToolsDeductService.otherOperate();
     }
 
     @Override
@@ -735,7 +735,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public void testComputeProfitAmt() {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         profitDetailMonthMapper.clearComputData(profitDate);
-        posProfitComputeServiceImpl.clearDetail();
+        posProfitComputeServiceImpl.otherOperate();
         comput("2");
     }
 
