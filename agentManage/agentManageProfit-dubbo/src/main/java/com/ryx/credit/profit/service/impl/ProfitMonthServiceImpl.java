@@ -808,8 +808,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             map.put("computType", computType);
             try {
                 map = posProfitComputeServiceImpl.execut(map);
-                profitDetailMonthTemp.setPosRewardAmt((BigDecimal) map.get("posRewardAmt"));
-                profitDetailMonthTemp.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
+                BigDecimal posReward = profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt();
+                profitDetailMonthTemp.setPosRewardAmt(posReward.add((BigDecimal) map.get("posRewardAmt")));
+                profitDetailMonthTemp.setPosRewardDeductionAmt((BigDecimal) map.get("posAssDeductAmt"));
             } catch (Exception e) {
                 e.printStackTrace();
                 LOG.error("获取pos奖励失败");
