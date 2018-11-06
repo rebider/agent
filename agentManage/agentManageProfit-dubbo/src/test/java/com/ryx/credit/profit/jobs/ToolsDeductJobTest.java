@@ -2,12 +2,17 @@ package com.ryx.credit.profit.jobs;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.dao.PosRewardTemplateMapper;
+import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.pojo.PosRewardTemplate;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.pojo.TransProfitDetailExample;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
+import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.profit.service.impl.PosProfitComputeServiceImpl;
 import com.ryx.credit.profit.service.impl.ProfitToolsDeductServiceImpl;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -43,10 +49,17 @@ public class ToolsDeductJobTest {
     protected RedisTemplate<String, String> redisTemplate;
     @Autowired
     private PosRewardTemplateMapper posRewardTemplateMapper;
-
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private TransProfitDetailService transProfitDetailService;
+    @Autowired
+    private TransProfitDetailMapper transProfitDetailMapper;
     @Test
     public void execut() throws Exception {
-        toolsDeductJob.execut();
+//        toolsDeductJob.execut();
+        System.out.println(LocalDate.now().plusMonths(-1).toString().substring(0,7));
+
     }
 
     @Test
@@ -55,15 +68,10 @@ public class ToolsDeductJobTest {
         Map<String, Object> map = new HashMap<>(10);
         map.put("computType", "1");
         map.put("agentPid", "AG20180726000000000002140");
-        map.put("paltformNo", "100003");
-        map.put("agentProfitAmt", "20000");
+        map.put("paltformNo", "5000");
+        map.put("agentProfitAmt", "1000000");
+        map.put("deductDate", "2018-10");
         list.add(map);
-        Map<String, Object> map1 = new HashMap<>(10);
-        map1.put("computType", "1");
-        map1.put("agentPid", "AG20180726000000000002140");
-        map1.put("paltformNo", "100003");
-        map1.put("agentProfitAmt", "20000");
-        list.add(map1);
         for(Map<String, Object> maps : list){
             Map<String, Object> sss = profitToolsDeductService.execut(maps);
             System.out.println(sss.toString());
@@ -91,7 +99,7 @@ public class ToolsDeductJobTest {
 
     @Test
     public void computePosreWard() throws Exception {
-
+//        posProfitComputeServiceImpl.otherOperate();
 //        Map<String, Object> map = new HashMap<String, Object>(10);
 //        map.put("agentType", "2");//机构一代
 //        map.put("agentId", "JS00000228");
@@ -101,12 +109,10 @@ public class ToolsDeductJobTest {
 //        map.put("computType", "0");
 
         Map<String, Object> map = new HashMap<String, Object>(10);
-        map.put("agentType", "3");//机构一代
-        map.put("agentId", "AG20180726000000000002429");
-        map.put("busNum", "O00000000151376");
-        map.put("posTranAmt", "621164756.08");
-        map.put("posJlTranAmt", "560013657.32");
-        map.put("computType", "0");
+        map.put("agentType", "2");//机构一代
+        map.put("agentId", "AG20180726000000000002140");
+        map.put("computType", "1");
+        map.put("currentDate", "201810");
         map = posProfitComputeServiceImpl.execut(map);
         System.out.println(map.toString());
 
@@ -188,7 +194,121 @@ public class ToolsDeductJobTest {
     }
 
     @Test
-    public void test(){
-        profitToolsDeductService.otherOperate();
+    public void test1() throws InterruptedException {
+//                posProfitComputeServiceImpl.clearDetail();
+        TransProfitDetail detaila = new TransProfitDetail();
+        detaila.setProfitDate("201810");
+        List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detaila);
+        list.forEach(transProfitDetail -> {
+
+            TransProfitDetail detail = new TransProfitDetail();
+            detail.setAgentId(transProfitDetail.getAgentId());
+            detail.setBusCode("100003");
+            List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
+            if (transProfitDetails.size() > 0) {
+                detail = transProfitDetails.get(0);
+                Map<String, Object> map = new HashMap<>(10);
+                map.put("agentType", detail.getAgentType());
+                map.put("agentId", detail.getAgentId());
+                map.put("currentDate", "201810");
+                map.put("computType", "1");
+                try {
+                    map = posProfitComputeServiceImpl.execut(map);
+                    BigDecimal sss=(BigDecimal) map.get("posRewardAmt");
+                    System.out.println(sss);
+                } catch (Exception e) {
+                    e.printStackTrace();
+//                    LOG.error("获取pos奖励失败");
+                    throw new RuntimeException("获取pos奖励失败");
+                }
+            }else{
+            }
+        });
+
+//        Map<String, Object> map = new HashMap<>(10);
+//        map.put("agentType", "3");
+//        map.put("agentId", "AG20180726000000000002659");
+//        map.put("currentDate", "201810");
+//        map.put("computType", "1");
+//        try {
+//            map = posProfitComputeServiceImpl.execut(map);
+//            BigDecimal sss=(BigDecimal) map.get("posRewardAmt");
+//            System.out.println(sss);
+////                    transProfitDetail.setPosRewardDeductionAmt( (BigDecimal) map.get("posAssDeductAmt"));
+//        } catch (Exception e) {
+//            e.printStackTrace();
+////                    LOG.error("获取pos奖励失败");
+//            throw new RuntimeException("获取pos奖励失败");
+//        }
     }
+
+    @Test
+    public void testCreidTranAmt() throws InterruptedException {
+        TransProfitDetail detail = new TransProfitDetail();
+        detail.setProfitDate("201810");
+        List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
+        list.forEach(transProfitDetail -> {
+            int number=(int)((Math.random()*9+1)*100000);
+            System.out.println(String.valueOf(number));
+            transProfitDetail.setId(String.valueOf(number));
+            transProfitDetail.setProfitDate("201710");
+            transProfitDetail.setPosRewardAmt(BigDecimal.ZERO);
+            transProfitDetail.setPosCreditAmt(BigDecimal.ZERO);
+            transProfitDetail.setInTransAmt(BigDecimal.ZERO);
+            transProfitDetail.setOutTransAmt(BigDecimal.ZERO);
+            transProfitDetail.setInProfitAmt(BigDecimal.ZERO);
+            transProfitDetail.setOutProfitAmt(BigDecimal.ZERO);
+            transProfitDetailMapper.insert(transProfitDetail);
+        });
+    }
+
+    @Test
+    public void test() throws InterruptedException {
+        String str[] = {"2000","4000","100004","100005","5000","100006","6000","1111"
+                ,"100008","100009","0000","3000","100007","0001","1001","100002","100001"};
+        String currentDate= "201809";
+        TransProfitDetail detail = new TransProfitDetail();
+        detail.setProfitDate("201810");
+        List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
+        list.forEach(transProfitDetail -> {
+            if(transProfitDetail.getAgentId() == null ){
+                for (int i = 0; i < str.length; i++) {
+                    AgentBusInfo ss = agentBusinfoService.getByBusidAndCode( String.valueOf(str[i]), transProfitDetail.getBusNum());
+                    if(ss == null ){
+                        continue;
+                    } else {
+                        transProfitDetail.setAgentId(ss.getAgentId());
+                        transProfitDetail.setBusCode(ss.getBusPlatform());
+                        transProfitDetail.setAgentType(ss.getBusType());
+                        TransProfitDetailExample sss = new TransProfitDetailExample() ;
+                        sss.createCriteria().andIdEqualTo(transProfitDetail.getId());
+                        transProfitDetailMapper.deleteByExample(sss);
+                        transProfitDetailMapper.insert(transProfitDetail);
+                        break;
+                    }
+                }
+            } else {
+                AgentBusInfo ss = agentBusinfoService.getByBusidAndCode("100003", transProfitDetail.getBusNum());
+                if(ss != null){
+                    if(transProfitDetail.getAgentId() ==null){
+                        transProfitDetail.setAgentId(ss.getAgentId());
+                    }
+                    transProfitDetail.setBusCode(ss.getBusPlatform());
+                    transProfitDetail.setAgentType(ss.getBusType());
+                    TransProfitDetailExample sss = new TransProfitDetailExample() ;
+                    sss.createCriteria().andIdEqualTo(transProfitDetail.getId());
+                    transProfitDetailMapper.deleteByExample(sss);
+                    transProfitDetailMapper.insert(transProfitDetail);
+                }
+            }
+        });
+    }
+
+    @Test
+    public void tes1111t() throws InterruptedException {
+        posProfitComputeServiceImpl.otherOperate();
+//        profitToolsDeductService.otherOperate();
+//        posProfitComputeServiceImpl.clearDetail();
+    }
+
 }
