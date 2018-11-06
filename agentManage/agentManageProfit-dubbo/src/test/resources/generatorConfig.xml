@@ -35,6 +35,8 @@
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
 		<table tableName="POS_REWARD_DETAIL" domainObjectName="PosRewardDetail" enableUpdateByExample="true"
 			   enableDeleteByPrimaryKey="false" />
+		<table tableName="PROFIT_SUPPLY_TAX" domainObjectName="ProfitSupplyTax" enableUpdateByExample="true"
+			   enableDeleteByPrimaryKey="true"/>
 		<!--<table tableName="O_ACTIVITY" domainObjectName="OActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_ADDRESS" domainObjectName="OAddress" enableUpdateByExample="false"-->

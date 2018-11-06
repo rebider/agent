@@ -8,6 +8,7 @@
     <result column="SUPPLY_TAX_AGENT_NAME" jdbcType="VARCHAR" property="supplyTaxAgentName" />
     <result column="SUPPLY_TAX_SUB_ID" jdbcType="VARCHAR" property="supplyTaxSubId" />
     <result column="SUPPLY_TAX_SUB_NAME" jdbcType="VARCHAR" property="supplyTaxSubName" />
+    <result column="SUPPLY_TAX_AMT" jdbcType="DECIMAL" property="supplyTaxAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +70,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, 
-    SUPPLY_TAX_SUB_NAME
+    SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,10 +96,11 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     insert into PROFIT_SUPPLY_TAX (ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, 
-      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME
+      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
       )
     values (#{id,jdbcType=VARCHAR}, #{supplyTaxDate,jdbcType=VARCHAR}, #{supplyTaxAgentId,jdbcType=VARCHAR}, 
-      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}
+      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}, #{supplyTaxAmt,jdbcType=DECIMAL}
+
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
@@ -122,6 +124,9 @@
       <if test="supplyTaxSubName != null">
         SUPPLY_TAX_SUB_NAME,
       </if>
+      <if test="supplyTaxAmt != null">
+        SUPPLY_TAX_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -141,6 +146,9 @@
       </if>
       <if test="supplyTaxSubName != null">
         #{supplyTaxSubName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxAmt != null">
+        #{supplyTaxAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -171,6 +179,9 @@
       <if test="record.supplyTaxSubName != null">
         SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
       </if>
+      <if test="record.supplyTaxAmt != null">
+        SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -183,7 +194,8 @@
       SUPPLY_TAX_AGENT_ID = #{record.supplyTaxAgentId,jdbcType=VARCHAR},
       SUPPLY_TAX_AGENT_NAME = #{record.supplyTaxAgentName,jdbcType=VARCHAR},
       SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
-      SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR}
+      SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
+      SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -197,5 +209,46 @@
     <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
+  </sql>
+
+  <select id="getProfitSupplyTaxCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM PROFIT_SUPPLY_TAX
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      1=1
+      <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+      <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
+      <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
+      <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
+      <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
+      <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
+    </where>
+  </sql>
+
+  <select id="getProfitSupplyTaxList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM PROFIT_SUPPLY_TAX
+    <include refid="BASE_WHERE_SQL" />
+    <include refid="SORT" />
+    <include refid="PAGING_END" />
+  </select>
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
+  <sql id='SORT'>
+    ORDER BY SUPPLY_TAX_DATE DESC
   </sql>
 </mapper>
