@@ -36,7 +36,6 @@ public class ToolsDeductJob {
     @Scheduled(cron = "0 0 10 * * ?")
     public void execut(){
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             if(list!= null && !list.isEmpty()){
@@ -50,7 +49,7 @@ public class ToolsDeductJob {
                     e.printStackTrace();
                 }
             }
-            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail("2018-11");
+            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
             if(detailList != null && !detailList.isEmpty()){
                 LOG.info("上月存在调整成功的机具扣款，新增一条到本月扣款中，：{} 条", detailList.size());
                 toolsDeductService.deductCompletionInfo(detailList);
