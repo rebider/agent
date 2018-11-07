@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.jobs;
 
 import com.ryx.credit.common.enumc.GetMethod;
+import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
@@ -44,7 +45,7 @@ public class ToolsDeductJob {
                 LOG.info("机具扣款分期入库成功：{} 条", successList.size());
                 try {
                     //通知订单系统，订单付款中
-//                iPaymentDetailService.uploadStatus(successList);
+                iPaymentDetailService.uploadStatus(successList, PaySign.FKING.code);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

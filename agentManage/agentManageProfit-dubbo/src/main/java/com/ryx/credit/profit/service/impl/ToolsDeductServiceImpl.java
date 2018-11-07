@@ -76,7 +76,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
         profitStagingDetail.setMustAmt(mustDeductionAmt);
         profitStagingDetail.setRealAmt(BigDecimal.ZERO);
-        profitStagingDetail.setRemark("机具扣款分期调整下月还款计划");
+        profitStagingDetail.setRemark("机具扣款分期调整下月扣款明细");
         profitStagingDetail.setSourceId(profitDeduction.getSourceId());
         profitStagingDetail.setStagId(profitDeduction.getId());
         profitStagingDetail.setStatus(StagingDetailStatus.N.getStatus());

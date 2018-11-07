@@ -90,7 +90,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
         if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
-            criteria.andAgentNameEqualTo(profitDeduction.getAgentName());
+            criteria.andAgentNameLike("%"+profitDeduction.getAgentName()+"%");
         }
         if(department != null){
             List<String> agentList = departmentAgentList(department);
