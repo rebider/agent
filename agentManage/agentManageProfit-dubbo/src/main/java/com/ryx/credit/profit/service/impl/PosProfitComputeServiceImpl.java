@@ -400,7 +400,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     BigDecimal posAmt = new BigDecimal(posrewardDetail.getPosCurrentLoanCount()).subtract(new BigDecimal(posrewardDetail.getPosCompareLoanCount()));
                     LOG.info("代理商唯一码：{}，POS奖励交易金额 = 本月贷记交易量- 对比月贷记交易量：{}", posrewardDetail.getPosAgentId(), posAmt);
                     posrewardDetail.setPosAmt(posAmt.toString());
-                    posrewardDetail.setPosStandard(posRewardList.get(0).getGrowAmt().toString());
+                    posrewardDetail.setPosStandard(posRewardList.get(0).getRewardScale().toString());
                     posrewardDetail.setPosRemark("TS_Template");
                 }
             } else if(Objects.equals(transProfitDetail.getAgentType(), AGENT_TYPE_3))  {
