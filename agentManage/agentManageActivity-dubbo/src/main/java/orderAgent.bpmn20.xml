@@ -15,7 +15,7 @@
       </extensionElements>
     </endEvent>
     <exclusiveGateway id="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28"></exclusiveGateway>
-    <userTask id="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673" name="市场部" activiti:candidateGroups="market">
+    <userTask id="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673" name="于华" activiti:candidateGroups="manage">
       <extensionElements>
         <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
         <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
@@ -66,9 +66,6 @@
     <sequenceFlow id="sid-6632BF3B-2217-469C-91CB-A3D57DAF9BA8" name="市场部拒绝" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='reject'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-4A14F4E7-777A-468E-A45E-E8BD43ECF32E" sourceRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C" targetRef="sid-2EA7796E-4176-4E89-A17C-90ED82D86A1C">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='south'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-3B103A37-C8A9-4167-900D-A9C1C3529FC5" sourceRef="sid-32130601-AB69-4F02-80A6-E62BDF8D5CBC" targetRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C"></sequenceFlow>
     <sequenceFlow id="sid-C3939104-980F-4DFD-B1F1-6EA9578EAAD2" sourceRef="sid-B47A8C68-664B-4C70-8B40-4C7A7D6808FA" targetRef="sid-32130601-AB69-4F02-80A6-E62BDF8D5CBC"></sequenceFlow>
     <sequenceFlow id="sid-D10B85BA-0E8F-4E86-A8E0-DE87E30153A4" name="完成" sourceRef="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD" targetRef="sid-32130601-AB69-4F02-80A6-E62BDF8D5CBC">
@@ -84,9 +81,6 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-70F11DC8-E92B-400D-8A43-4BEEB0F7F0BE" sourceRef="sid-C911F512-9E63-44CC-9E6E-763484FA0E5B" targetRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28"></sequenceFlow>
-    <sequenceFlow id="sid-FB1D3771-9984-4E62-8659-1DC164A5B375" name="业务部退回" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='back'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-38AA1B79-98CE-4F28-9E1E-5D4F9B6B4DC2" name="业务部拒绝" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-7B64D6F6-3583-4B8D-B550-1EB6AAB53ADE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='reject'}]]></conditionExpression>
     </sequenceFlow>
@@ -109,9 +103,6 @@
     <sequenceFlow id="sid-62638D2E-91ED-4BEB-9830-EE1F85271FDC" name="财务部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finance'}]]></conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-6DD0FF91-57AB-4CE5-BB46-B77E81033F2A" name="市场部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='market'}]]></conditionExpression>
-    </sequenceFlow>
     <sequenceFlow id="sid-4191C6FE-EA3F-4D79-AA11-D13E68354647" name="财务部审批" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='finance'}]]></conditionExpression>
     </sequenceFlow>
@@ -130,6 +121,18 @@
     <sequenceFlow id="sid-599BBFAD-5E0E-41CB-A0D6-D6C15AF46B01" sourceRef="sid-759710DF-1116-473B-818B-D326CDD2DD2E" targetRef="sid-C911F512-9E63-44CC-9E6E-763484FA0E5B"></sequenceFlow>
     <sequenceFlow id="sid-EF5AC809-C450-4DEC-AE78-B3638797F7DD" sourceRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C" targetRef="sid-C911F512-9E63-44CC-9E6E-763484FA0E5B">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='beijing'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-FB1D3771-9984-4E62-8659-1DC164A5B375" name="业务部退回" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='back'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-178BEB5D-82F3-497C-9E61-3D7083780AD9" sourceRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C" targetRef="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='back'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-4A14F4E7-777A-468E-A45E-E8BD43ECF32E" sourceRef="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C" targetRef="sid-2EA7796E-4176-4E89-A17C-90ED82D86A1C">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${party=='south'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-6DD0FF91-57AB-4CE5-BB46-B77E81033F2A" name="市场部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='manage'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_orderAgent">
@@ -262,6 +265,11 @@
         <omgdi:waypoint x="1299.8099268893327" y="344.05769803187025"></omgdi:waypoint>
         <omgdi:waypoint x="1299.530750807273" y="514.6801842526877"></omgdi:waypoint>
         <omgdi:waypoint x="1083.8425978509017" y="514.6801842526877"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-178BEB5D-82F3-497C-9E61-3D7083780AD9" id="BPMNEdge_sid-178BEB5D-82F3-497C-9E61-3D7083780AD9">
+        <omgdi:waypoint x="581.0307508072731" y="304.5903689934393"></omgdi:waypoint>
+        <omgdi:waypoint x="581.0307508072731" y="63.0"></omgdi:waypoint>
+        <omgdi:waypoint x="491.4828670396383" y="63.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="sid-C3939104-980F-4DFD-B1F1-6EA9578EAAD2" id="BPMNEdge_sid-C3939104-980F-4DFD-B1F1-6EA9578EAAD2">
         <omgdi:waypoint x="315.0" y="324.0903689934393"></omgdi:waypoint>
