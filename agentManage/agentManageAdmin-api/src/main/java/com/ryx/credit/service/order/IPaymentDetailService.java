@@ -1,11 +1,17 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.enumc.PamentIdType;
+import com.ryx.credit.common.enumc.PaymentStatus;
+import com.ryx.credit.common.enumc.PaymentType;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,5 +51,14 @@ public interface IPaymentDetailService {
     /**
      * 更新状态
      */
-    ResultVO uploadStatus(List<Map<String, Object>> maps );
+    ResultVO uploadStatus(List<Map<String, Object>> maps,BigDecimal payStatus );
+
+    /**
+     * 生成付款明细
+     * @return
+     * @throws Exception
+     */
+    AgentResult createPayMentDetail(String batchCode,String srcId, PamentIdType pamentIdType, String orderId, PaymentType paymentType, BigDecimal payAmount, BigDecimal RealPayAmount,Date planPayTime, BigDecimal planNum, PaymentStatus paymentStatus, String agentId, String cuser)throws Exception;
+
+    String createBatchCode();
 }

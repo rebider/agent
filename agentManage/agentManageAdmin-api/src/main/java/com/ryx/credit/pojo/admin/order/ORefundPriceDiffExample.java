@@ -1277,6 +1277,196 @@ public class ORefundPriceDiffExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andAgentIdIsNull() {
+            addCriterion("AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIsNotNull() {
+            addCriterion("AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdEqualTo(String value) {
+            addCriterion("AGENT_ID =", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotEqualTo(String value) {
+            addCriterion("AGENT_ID <>", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThan(String value) {
+            addCriterion("AGENT_ID >", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID >=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThan(String value) {
+            addCriterion("AGENT_ID <", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_ID <=", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdLike(String value) {
+            addCriterion("AGENT_ID like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotLike(String value) {
+            addCriterion("AGENT_ID not like", value, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdIn(List<String> values) {
+            addCriterion("AGENT_ID in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotIn(List<String> values) {
+            addCriterion("AGENT_ID not in", values, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdBetween(String value1, String value2) {
+            addCriterion("AGENT_ID between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentIdNotBetween(String value1, String value2) {
+            addCriterion("AGENT_ID not between", value1, value2, "agentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtIsNull() {
+            addCriterion("BELOW_PAY_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtIsNotNull() {
+            addCriterion("BELOW_PAY_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtEqualTo(BigDecimal value) {
+            addCriterion("BELOW_PAY_AMT =", value, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtNotEqualTo(BigDecimal value) {
+            addCriterion("BELOW_PAY_AMT <>", value, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtGreaterThan(BigDecimal value) {
+            addCriterion("BELOW_PAY_AMT >", value, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("BELOW_PAY_AMT >=", value, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtLessThan(BigDecimal value) {
+            addCriterion("BELOW_PAY_AMT <", value, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("BELOW_PAY_AMT <=", value, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtIn(List<BigDecimal> values) {
+            addCriterion("BELOW_PAY_AMT in", values, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtNotIn(List<BigDecimal> values) {
+            addCriterion("BELOW_PAY_AMT not in", values, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BELOW_PAY_AMT between", value1, value2, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBelowPayAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("BELOW_PAY_AMT not between", value1, value2, "belowPayAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtIsNull() {
+            addCriterion("SHARE_DEDUCT_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtIsNotNull() {
+            addCriterion("SHARE_DEDUCT_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtEqualTo(BigDecimal value) {
+            addCriterion("SHARE_DEDUCT_AMT =", value, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtNotEqualTo(BigDecimal value) {
+            addCriterion("SHARE_DEDUCT_AMT <>", value, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtGreaterThan(BigDecimal value) {
+            addCriterion("SHARE_DEDUCT_AMT >", value, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SHARE_DEDUCT_AMT >=", value, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtLessThan(BigDecimal value) {
+            addCriterion("SHARE_DEDUCT_AMT <", value, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SHARE_DEDUCT_AMT <=", value, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtIn(List<BigDecimal> values) {
+            addCriterion("SHARE_DEDUCT_AMT in", values, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtNotIn(List<BigDecimal> values) {
+            addCriterion("SHARE_DEDUCT_AMT not in", values, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SHARE_DEDUCT_AMT between", value1, value2, "shareDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShareDeductAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SHARE_DEDUCT_AMT not between", value1, value2, "shareDeductAmt");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

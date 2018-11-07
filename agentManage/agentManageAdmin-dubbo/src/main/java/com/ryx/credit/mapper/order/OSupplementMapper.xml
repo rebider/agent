@@ -17,6 +17,9 @@
         <result column="STATUS" jdbcType="DECIMAL" property="status" />
         <result column="VERSION" jdbcType="DECIMAL" property="version" />
         <result column="REMIT_TIME" jdbcType="TIMESTAMP" property="remitTime" />
+        <result column="REMIT_PEOPLE" jdbcType="VARCHAR" property="remitPeople" />
+        <result column="CHECK_TIME" jdbcType="TIMESTAMP" property="checkTime" />
+        <result column="CHECK_PEOPLE" jdbcType="VARCHAR" property="checkPeople" />
     </resultMap>
     <sql id="Example_Where_Clause">
         <where>
@@ -49,7 +52,8 @@
     </sql>
     <sql id="Base_Column_List">
         ID, SRC_ID, PK_TYPE, PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT, REMARK, AGENT_ID, C_USER,
-        C_TIME, REVIEW_STATUS, SCHSTATUS, STATUS, VERSION, REMIT_TIME
+        C_TIME, REVIEW_STATUS, SCHSTATUS, STATUS, VERSION, REMIT_TIME, REMIT_PEOPLE, CHECK_TIME,
+        CHECK_PEOPLE
     </sql>
     <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OSupplementExample" resultMap="BaseResultMap">
         <include refid="OracleDialectPrefix" />
@@ -84,13 +88,15 @@
         PAY_METHOD, PAY_AMOUNT, REAL_PAY_AMOUNT,
         REMARK, AGENT_ID, C_USER,
         C_TIME, REVIEW_STATUS, SCHSTATUS,
-        STATUS, VERSION, REMIT_TIME
+        STATUS, VERSION, REMIT_TIME,
+        REMIT_PEOPLE, CHECK_TIME, CHECK_PEOPLE
         )
         values (#{id,jdbcType=VARCHAR}, #{srcId,jdbcType=VARCHAR}, #{pkType,jdbcType=VARCHAR},
         #{payMethod,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, #{realPayAmount,jdbcType=DECIMAL},
         #{remark,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{cUser,jdbcType=VARCHAR},
         #{cTime,jdbcType=TIMESTAMP}, #{reviewStatus,jdbcType=DECIMAL}, #{schstatus,jdbcType=DECIMAL},
-        #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{remitTime,jdbcType=TIMESTAMP}
+        #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{remitTime,jdbcType=TIMESTAMP},
+        #{remitPeople,jdbcType=VARCHAR}, #{checkTime,jdbcType=TIMESTAMP}, #{checkPeople,jdbcType=VARCHAR}
         )
     </insert>
     <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSupplement">
@@ -141,6 +147,15 @@
             <if test="remitTime != null">
                 REMIT_TIME,
             </if>
+            <if test="remitPeople != null">
+                REMIT_PEOPLE,
+            </if>
+            <if test="checkTime != null">
+                CHECK_TIME,
+            </if>
+            <if test="checkPeople != null">
+                CHECK_PEOPLE,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -187,6 +202,15 @@
             </if>
             <if test="remitTime != null">
                 #{remitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remitPeople != null">
+                #{remitPeople,jdbcType=VARCHAR},
+            </if>
+            <if test="checkTime != null">
+                #{checkTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="checkPeople != null">
+                #{checkPeople,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
@@ -241,6 +265,15 @@
             <if test="remitTime != null">
                 REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="remitPeople != null">
+                REMIT_PEOPLE = #{remitPeople,jdbcType=VARCHAR},
+            </if>
+            <if test="checkTime != null">
+                CHECK_TIME = #{checkTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="checkPeople != null">
+                CHECK_PEOPLE = #{checkPeople,jdbcType=VARCHAR},
+            </if>
         </set>
         where ID = #{id,jdbcType=VARCHAR}
     </update>
@@ -259,7 +292,10 @@
         SCHSTATUS = #{schstatus,jdbcType=DECIMAL},
         STATUS = #{status,jdbcType=DECIMAL},
         VERSION = #{version,jdbcType=DECIMAL},
-        REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP}
+        REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
+        REMIT_PEOPLE = #{remitPeople,jdbcType=VARCHAR},
+        CHECK_TIME = #{checkTime,jdbcType=TIMESTAMP},
+        CHECK_PEOPLE = #{checkPeople,jdbcType=VARCHAR}
         where ID = #{id,jdbcType=VARCHAR}
     </update>
     <sql id="OracleDialectPrefix">

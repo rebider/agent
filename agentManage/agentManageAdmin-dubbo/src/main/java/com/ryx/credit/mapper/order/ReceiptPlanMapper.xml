@@ -351,7 +351,7 @@
     LEFT JOIN  o_order orders  on R.order_id=orders.id
     left join a_agent agent on agent.id=orders.agent_id
     left join a_platform c on c.platform_num = orders.order_platform
-    left join o_sub_order os on os.order_id =orders.id and os.status=1
+    left join o_sub_order os on os.order_id =orders.id and os.status=1 AND OS.PRO_ID = R.PRO_ID
     LEFT JOIN D_DICT DICT ON DICT.D_GROUP='ORDER' AND DICT.D_ARTIFACT='MODEL_TYPE' AND DICT.D_ITEMVALUE=os.pro_type
     left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
     left join o_payment d on d.order_id = R.order_id
@@ -372,7 +372,7 @@
     LEFT JOIN  o_order orders  on R.order_id=orders.id
     left join a_agent agent on agent.id=orders.agent_id
     left join a_platform c on c.platform_num = orders.order_platform
-    left join o_sub_order os on os.order_id =orders.id and os.status=1
+    left join o_sub_order os on os.order_id =orders.id and os.status=1 AND OS.PRO_ID = R.PRO_ID
     LEFT JOIN D_DICT DICT ON DICT.D_GROUP='ORDER' AND DICT.D_ARTIFACT='MODEL_TYPE' AND DICT.D_ITEMVALUE=os.pro_type
     left join o_sub_order_activity oso on oso.sub_order_id=os.id and oso.status=1
     left join o_payment d on d.order_id = R.order_id

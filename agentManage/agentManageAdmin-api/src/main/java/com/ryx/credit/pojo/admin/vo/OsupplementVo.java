@@ -15,6 +15,7 @@ import java.util.List;
 public class OsupplementVo implements Serializable{
     private OSupplement supplement;
     private List<String> agentTableFile;
+    private List<OCashReceivablesVo> oCashReceivablesVos;
 
     public OSupplement getSupplement() {
         return supplement;
@@ -30,5 +31,13 @@ public class OsupplementVo implements Serializable{
 
     public void setAgentTableFile(List<String> agentTableFile) {
         this.agentTableFile = agentTableFile;
+    }
+
+    public List<OCashReceivablesVo> getoCashReceivablesVos() {
+        return oCashReceivablesVos;
+    }
+
+    public void setoCashReceivablesVos(List<OCashReceivablesVo> oCashReceivablesVos) {
+        this.oCashReceivablesVos = oCashReceivablesVos;
     }
 }

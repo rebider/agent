@@ -370,7 +370,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             }else  if(agentColinfo.getCloInvoice().compareTo(new BigDecimal(1))==0){ //开票
                 //税点检查
                 if(!"0.06".equals(agentColinfo.getCloTaxPoint().toString()) && !"0.03".equals(agentColinfo.getCloTaxPoint().toString()) ){ //对私
-                    throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择6%或3%");
+                    throw new ProcessException("对公户进行打款，且代理商是否开票为是，那么扣税点在代理商填写时只能选择0.06或0.03");
                 }
             }
         }
@@ -426,9 +426,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
         AgentColinfo upColinfo = new AgentColinfo();
         upColinfo.setId(aColinfoPayment.getColinfoId());
-        if(String.valueOf(resultMap.get("flag")).equals(TransFlag.B.getValue())){
+        if(String.valueOf(resultMap.get("flag")).equals(TransFlag.CG.getValue())){
             upColinfo.setPayStatus(ColinfoPayStatus.C.getValue());
-        }else if(String.valueOf(resultMap.get("flag")).equals(TransFlag.C.getValue())){
+        }else if(String.valueOf(resultMap.get("flag")).equals(TransFlag.SB.getValue())){
             upColinfo.setPayStatus(ColinfoPayStatus.D.getValue());
         }else {
             upColinfo.setPayStatus(ColinfoPayStatus.E.getValue());

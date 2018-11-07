@@ -335,6 +335,22 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         //通知对象
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+        //注册区域
+        if(agent.getAgRegArea()!=null){
+            List<String> regionList = getParent(agent.getAgRegArea());
+            if(regionList!=null){
+                if(regionList.size()==3){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                    agentNotifyVo.setCityArea(regionList.get(2));
+                }else if(regionList.size()==2){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                }else if(regionList.size()==1){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                }
+            }
+        }
         agentNotifyVo.setBusiAreas(split);
 
         agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
@@ -354,7 +370,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
         //如果是直签 就传02：直签机构  否则就传递 01：普通机构
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
             agentNotifyVo.setSupDorgId(agentParent.getBusNum());
         }
@@ -654,7 +670,21 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             }
             agentNotifyVo.setBusiAreas(split);
         }
-
+        if(agent.getAgRegArea()!=null){
+            List<String> regionList = getParent(agent.getAgRegArea());
+            if(regionList!=null){
+                if(regionList.size()==3){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                    agentNotifyVo.setCityArea(regionList.get(2));
+                }else if(regionList.size()==2){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                    agentNotifyVo.setCity(regionList.get(1));
+                }else if(regionList.size()==1){
+                    agentNotifyVo.setProvince(regionList.get(0));
+                }
+            }
+        }
         agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
         agentNotifyVo.setOrgName(agent.getAgName());
         agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
@@ -671,7 +701,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
         }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
-        agentNotifyVo.setOrgType(dictByValue.getdItemname().equals(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+        agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
         if(null!=agentParent){
             agentNotifyVo.setSupDorgId(agentParent.getBusNum());
         }
@@ -882,12 +912,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if(StringUtils.isNotBlank(agentNotifyVo.getLoginName())){
                 data.put("loginName",agentNotifyVo.getLoginName());
             }
-//            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
-//                data.put("province",agentNotifyVo.getProvince());
-//            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-//                data.put("city",agentNotifyVo.getCity());
-//            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
-//                data.put("cityArea",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getProvince()))
+                data.put("province",agentNotifyVo.getProvince());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCity()))
+                data.put("city",agentNotifyVo.getCity());
+            if(StringUtils.isNotBlank(agentNotifyVo.getCityArea()))
+                data.put("cityArea",agentNotifyVo.getCityArea());
             data.put("orgType",agentNotifyVo.getOrgType());
             if(agentNotifyVo.getOrgType().equals(OrgType.STR.getValue()))
                 data.put("supDorgId",agentNotifyVo.getSupDorgId());

@@ -22,6 +22,15 @@ public class AdjustmentMachineVo implements Serializable{
      */
     public String snStart;
     public String snEnd;
+
+    /**
+     * 老活动编号
+     */
+    public String oldAct;
+    /**
+     * 新活动编号
+     */
+    public String newAct;
     /**
      * sn数量
      */
@@ -92,5 +101,21 @@ public class AdjustmentMachineVo implements Serializable{
 
     public void setPlatformNum(String platformNum) {
         this.platformNum = platformNum;
+    }
+
+    public String getOldAct() {
+        return oldAct;
+    }
+
+    public void setOldAct(String oldAct) {
+        this.oldAct = oldAct;
+    }
+
+    public String getNewAct() {
+        return newAct;
+    }
+
+    public void setNewAct(String newAct) {
+        this.newAct = newAct;
     }
 }

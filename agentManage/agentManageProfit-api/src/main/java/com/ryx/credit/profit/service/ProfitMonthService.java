@@ -2,10 +2,7 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitMonth;
-import com.ryx.credit.profit.pojo.ProfitUnfreeze;
-import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.pojo.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -140,7 +137,7 @@ public interface ProfitMonthService {
      * @param profitDate
      * @return
      */
-    public ProfitDetailMonth getAgentProfit(String agentId, String profitDate, String parentAgentId);
+    public List<ProfitDetailMonth> getAgentProfit(String agentId, String profitDate, String parentAgentId);
 
     /*** 
     * @Description: 获取担保代理商信息
@@ -171,4 +168,16 @@ public interface ProfitMonthService {
     * @Date: 2018/8/24
     */
     void payMoney();
+
+    /**
+     * 导出数据
+     * @param profitDetailMonth
+     * @return
+     */
+    List<ProfitDirect> exportByFinance(ProfitDetailMonth profitDetailMonth);
+
+    /**
+     * 修改分润展示补款
+     * */
+    //public void updateProfitMonthDetail(ProfitDetailMonth  profitDetailMonth);
 }

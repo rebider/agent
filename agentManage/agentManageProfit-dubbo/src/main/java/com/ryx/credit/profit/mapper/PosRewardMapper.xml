@@ -62,38 +62,12 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-
-  <!--<select id="selectByMonth" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">-->
-    <!--<include refid="OracleDialectPrefix" />-->
-    <!--select-->
-    <!--<if test="distinct">-->
-      <!--distinct-->
-    <!--</if>-->
-    <!--<include refid="Base_Column_List" />-->
-    <!--from P_POS_REWARD-->
-    <!--<if test="_parameter != null">-->
-      <!--<include refid="Example_Where_Clause" />-->
-    <!--</if>-->
-    <!--<if test="orderByClause != null">-->
-      <!--order by ${orderByClause}-->
-    <!--</if>-->
-    <!--<include refid="OracleDialectSuffix" />-->
-  <!--</select>-->
-
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from P_POS_REWARD
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-
-  <!--<select id="selectByVerifyMonth" parameterType="java.lang.String" resultMap="BaseResultMap">-->
-    <!--SELECT-->
-    <!--<include refid="Base_Column_List" />-->
-    <!--FROM P_POS_REWARD-->
-    <!--WHERE AGENT_PID = #{agentPid,jdbcType=VARCHAR} AND TOTAL_CONS_MONTH LIKE '%'||#{totalConsMonth,jdbcType=VARCHAR}||'%'-->
-  <!--</select>-->
-
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample">
     delete from P_POS_REWARD
     <if test="_parameter != null">

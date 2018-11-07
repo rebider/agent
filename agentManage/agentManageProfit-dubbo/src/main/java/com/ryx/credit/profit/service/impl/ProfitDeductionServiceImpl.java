@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
+import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
@@ -47,6 +48,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private static Logger logger = LoggerFactory.getLogger(ProfitDeductionServiceImpl.class);
 
     @Autowired
+    private ProfitDetailMonthMapper profitDetailMonthMapper;
+    @Autowired
     private ProfitDeductionMapper profitDeductionMapper;
     @Autowired
     private StagingService stagingServiceImpl;
@@ -60,7 +63,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private RedisService redisService;
 
     @Override
-    public PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page) {
+    public PageInfo getProfitDeductionList(Map<String, Object> department, ProfitDeduction profitDeduction, Page page) {
         ProfitDeductionExample example = new ProfitDeductionExample();
         example.setPage(page);
         ProfitDeductionExample.Criteria criteria = example.createCriteria();
@@ -79,17 +82,19 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())){
             criteria.andAgentIdEqualTo(profitDeduction.getParentAgentId());
         }
-        if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
-            criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
-        }
-        if (StringUtils.isNotBlank(profitDeduction.getParentAgentPid())){
-            criteria.andAgentPidEqualTo(profitDeduction.getParentAgentPid());
-        }
+
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
+        }
+        if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
+            criteria.andAgentNameEqualTo(profitDeduction.getAgentName());
+        }
+        if(department != null){
+            List<String> agentList = departmentAgentList(department);
+            criteria.andAgentIdIn(agentList);
         }
         example.setOrderByClause("CREATE_DATE_TIME DESC ");
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
@@ -97,6 +102,19 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         pageInfo.setRows(profitDeductions);
         pageInfo.setTotal(profitDeductionMapper.countByExample(example));
         return pageInfo;
+    }
+
+    /**
+     * 根据当前部门信息查询分润信息
+     * @param department
+     */
+    private List<String> departmentAgentList(Map<String, Object> department) {
+        if(Objects.equals("south", department.get("ORGANIZATIONCODE")) || Objects.equals("north", department.get("ORGANIZATIONCODE"))){
+            return profitDetailMonthMapper.getDistrictAgent(department.get("ORGID").toString());
+        } else if(department.get("ORGANIZATIONCODE").toString().contains("south") || department.get("ORGANIZATIONCODE").toString().contains("north")){
+            return profitDetailMonthMapper.getProAgent(department.get("ORGID").toString());
+        }
+        return null;
     }
 
     @Override
@@ -152,8 +170,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setMustDeductionAmt(amt);
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) );
-        deduction.setAgentPid(list.get(0).toString());
-        deduction.setParentAgentPid(list.get(1).toString());
+        deduction.setAgentId(list.get(0).toString());
+        deduction.setParentAgentId(list.get(1).toString());
         deduction.setAgentName(list.get(2).toString());
         deduction.setRemark(list.get(3).toString());
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
@@ -190,11 +208,15 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getDeductionDate())){
             criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
         }
+        if (StringUtils.isNotBlank(profitDeduction.getAgentId())){
+            criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
+        }
         if (StringUtils.isNotBlank(profitDeduction.getAgentPid())){
             criteria.andAgentPidEqualTo(profitDeduction.getAgentPid());
         }
-        if (StringUtils.isNotBlank(profitDeduction.getParentAgentPid())){
-                criteria.andParentAgentPidEqualTo(profitDeduction.getParentAgentPid());
+
+        if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())){
+                criteria.andParentAgentIdEqualTo(profitDeduction.getParentAgentId());
         }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionStatus())){
             criteria.andDeductionStatusEqualTo(profitDeduction.getDeductionStatus());
@@ -227,22 +249,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return null;
     }
 
-    @Override
-    public BigDecimal getSupplyAmt(String agentPid, String bussType, String parentAgentId) {
-        Map<String, Object> param = new HashMap<>(3);
-        String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
-        param.put("AGENT_PID", agentPid);
-        param.put("SUPPLY_TYPE", RefundJob.SUPPLY_DESC);
-        param.put("SUPPLY_DATE", supplyDate);
-        param.put("PARENT_AGENT_ID", parentAgentId);
-        PageInfo pageInfo = new PageInfo();
-        pageInfo = profitSupplyServiceImpl.getProfitSupplyList(param, pageInfo);
-        if (pageInfo != null && pageInfo.getTotal() > 0) {
-            List<Map<String, Object>> supplys = pageInfo.getRows();
-            return supplys.stream().map(supply->new BigDecimal(supply.get("SUPPLY_AMT")==null?"0":supply.get("SUPPLY_AMT").toString())).reduce(BigDecimal::add).get();
-        }
-        return BigDecimal.ZERO;
-    }
 
     @Override
     public BigDecimal otherDeductionByType(Map<String, Object> param) throws DeductionException {
@@ -369,12 +375,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     */ 
     private List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentPid((String)param.get("agentPid"));
+        profitDeduction.setAgentId((String)param.get("agentId"));
         profitDeduction.setDeductionType((String)param.get("type"));
         profitDeduction.setDeductionDate((String)param.get("deductionDate"));
         profitDeduction.setSourceId((String)param.get("sourceId"));
         profitDeduction.setRemark((String)param.get("remark"));
-        profitDeduction.setParentAgentPid((String)param.get("parentAgentPid"));
+        profitDeduction.setParentAgentId((String)param.get("parentAgentId"));
         profitDeduction.setDeductionStatus((String)param.get("deductionStatus"));
         return this.getProfitDeduction(profitDeduction);
     }
@@ -602,13 +608,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     public BigDecimal getNotDeductionSum(String agentId) {
         // 获取代理商未扣足分期总金额
         Map<String, Object> param = new HashMap<>(2);
-        param.put("agentPid", agentId);
+        param.put("agentId", agentId);
         BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(param);
 
         // 获取本月新增
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentPid(agentId);
+        profitDeduction.setAgentId(agentId);
         profitDeduction.setDeductionDate(deductionDate);
         BigDecimal deductionAmt = profitDeductionMapper.getCurrentDeductionAmtSum(profitDeduction);
         return (stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt).add((deductionAmt==null?BigDecimal.ZERO:deductionAmt));

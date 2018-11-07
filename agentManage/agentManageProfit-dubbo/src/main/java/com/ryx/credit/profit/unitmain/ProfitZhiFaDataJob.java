@@ -83,8 +83,9 @@ public class ProfitZhiFaDataJob {
      * 交易月份（空则为上一月）
      * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
     */
-//    @Scheduled(cron = "0 0 5 10 * ?")
+//    @Scheduled(cron = "0 35 16 22 * ?")
     public void synchroProfitDirect(){
+//        String transDate = "201809";
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6);

@@ -23,6 +23,7 @@ import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OSupplementService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ public class OSupplementServiceImpl implements OSupplementService {
     private OPaymentMapper oPaymentMapper;
     @Autowired
     private AgentService agentService;
+    @Autowired
+    private OCashReceivablesService oCashReceivablesService;
 
     @Override
     public PageInfo selectAll(Page page, OSupplement oSupplement, String time, String userId) {
@@ -133,7 +136,7 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public ResultVO supplementSave(OsupplementVo osupplementVo) throws Exception {
-        OSupplement oSupplement = osupplementVo.getSupplement();
+       OSupplement oSupplement = osupplementVo.getSupplement();
         if (oSupplement == null) {
             logger.info("补款添加:{}", "补款添加信息为空");
             return ResultVO.fail("补款添加信息为空");
@@ -174,6 +177,8 @@ public class OSupplementServiceImpl implements OSupplementService {
         oSupplement.setSchstatus(SchStatus.ONE.getValue());//补款状态
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
+        AgentResult result = oCashReceivablesService.addOCashReceivables(osupplementVo.getoCashReceivablesVos(), String.valueOf(oSupplement.getcUser()), osupplementVo.getSupplement().getAgentId(), CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), osupplementVo.getSupplement().getId());
+        oSupplement.setRealPayAmount((BigDecimal) result.getData());
         if (1 == oSupplementMapper.insertSelective(oSupplement)) {
             osupplementVo.setSupplement(oSupplement);
             List<String> file = osupplementVo.getAgentTableFile();
@@ -194,6 +199,7 @@ public class OSupplementServiceImpl implements OSupplementService {
                     }
                 }
             }
+            startSuppActivity(osupplementVo.getSupplement().getId(), oSupplement.getcUser() + "");
             logger.info("补款添加:成功");
         }
         return ResultVO.success(osupplementVo);
@@ -211,6 +217,7 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款审批,操作用户为空{}:{}", id, userId);
             throw new MessageException("补款审批中，操作用户为空");
         }
+        oCashReceivablesService.startProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),id,userId);
         OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(id);
 
 
@@ -360,6 +367,12 @@ public class OSupplementServiceImpl implements OSupplementService {
                 logger.info("补款状态修改失败{}:", busActRel.getActivId());
                 throw new MessageException("补款状态修改失败");
             }
+
+            try {
+                oCashReceivablesService.refuseProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),oSupplement.getId(),null);
+            } catch (Exception e) {
+                throw new MessageException("审批通过失败");
+            }
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(supplement.getSrcId());
@@ -381,6 +394,14 @@ public class OSupplementServiceImpl implements OSupplementService {
                 logger.info("补款状态修改失败{}:", busActRel.getActivId());
                 throw new MessageException("补款状态修改失败");
             }
+
+            try {
+                oCashReceivablesService.finishProcing(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),oSupplement.getId(),null);
+            } catch (Exception e) {
+                throw new MessageException("拒绝审批失败");
+            }
+
+
             //修改订单明细付款状态
             OSupplement supplement = selectOSupplement(oSupplement.getId());
             if (supplement.getPkType().equals(PkType.FQBK.code)) {
@@ -409,6 +430,9 @@ public class OSupplementServiceImpl implements OSupplementService {
                     throw new MessageException("无此数据!!!");
                 }
                 OPayment oPayment = oPayments.get(0);
+                if(null==oPaymentDetail.getRealPayAmount()){
+                    oPaymentDetail.setRealPayAmount(new BigDecimal(0));
+                }
                 oPayment.setRealAmount(oPayment.getRealAmount().add(oPaymentDetail.getRealPayAmount()));
                 if (null == oPayment.getOutstandingAmount() || oPayment.getOutstandingAmount().compareTo(new BigDecimal(0)) == 0) {
                     logger.info("金额数据有误");
@@ -466,17 +490,31 @@ public class OSupplementServiceImpl implements OSupplementService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAmount(AgentVo agentVo) throws MessageException {
-        if (StringUtils.isNotBlank(agentVo.getSupplementId()) && null != agentVo.getRealPayAmount()) {
+    public ResultVO updateAmount(AgentVo agentVo,Long userId) throws Exception {
+
+        if(null==userId){
+            logger.info("无法获取当前登录用户");
+            throw new MessageException("无法获取当前登录用户");
+        }
+        if (StringUtils.isBlank(agentVo.getSupplementId())){
+            logger.info("补款id为空");
+            throw new MessageException("补款id为空");
+        }
+        if(null==agentVo.getCheckTime()){
+            logger.info("请填写核款时间");
+            throw new MessageException("请填写核款时间");
+        }
             OSupplement oSupplement = new OSupplement();
             oSupplement.setId(agentVo.getSupplementId());
             oSupplement.setRealPayAmount(agentVo.getRealPayAmount());
-            oSupplement.setRemitTime(agentVo.getRemitTime());
+            oSupplement.setCheckTime(agentVo.getCheckTime());
+            oSupplement.setCheckPeople(String.valueOf(userId));
             if (1 != oSupplementMapper.updateByPrimaryKeySelective(oSupplement)) {
                 logger.info("实际金额保存失败");
                 throw new MessageException("实际金额保存失败");
             }
-        }
+         oCashReceivablesService.approveTashBusiness(CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code),agentVo.getSupplementId(),String.valueOf(userId),agentVo.getCheckTime(),agentVo.getoCashReceivablesVoList());
+        logger.info("更新实际付款金额成功");
         return ResultVO.success("");
     }
 }

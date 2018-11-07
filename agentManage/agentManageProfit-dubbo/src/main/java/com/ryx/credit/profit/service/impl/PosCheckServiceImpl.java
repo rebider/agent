@@ -157,7 +157,7 @@ public class PosCheckServiceImpl implements IPosCheckService {
             PosCheckExample posCheckExample = new PosCheckExample();
             posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
             checkMapper.deleteByExample(posCheckExample);
-            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentPid());
+            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentId());
             throw new ProcessException("分润比例考核审批流启动失败!");
         }
         BusActRel record = new BusActRel();
@@ -166,7 +166,7 @@ public class PosCheckServiceImpl implements IPosCheckService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(userId);
         record.setBusType(BusActRelBusType.POSCHECK.name());
-        record.setAgentId(posCheck.getAgentPid());
+        record.setAgentId(posCheck.getAgentId());
         record.setAgentName(posCheck.getAgentName());
         try {
             taskApprovalService.addABusActRel(record);
@@ -187,6 +187,10 @@ public class PosCheckServiceImpl implements IPosCheckService {
         Map<String, Object> reqMap = new HashMap<>();
         if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", agentVo.getOrderAprDept());
+        }
+        if(Objects.equals("pass",agentVo.getApprovalResult())
+                && StringUtils.isBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", "finish");
         }
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());

@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface RegionService {
 
-    List<Tree> selectAllRegion(String pCode);
+    List<Tree> selectAllRegion(String pCode,String showArea);
 
     Region queryByCode(String code);
 

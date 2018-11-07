@@ -48,6 +48,12 @@ public class ORefundPriceDiff implements Serializable{
 
     private BigDecimal version;
 
+    private String agentId;
+
+    private BigDecimal belowPayAmt;
+
+    private BigDecimal shareDeductAmt;
+
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
 
     private List<Attachment> attachmentList;
@@ -246,5 +252,29 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setAttachmentFianceList(List<Attachment> attachmentFianceList) {
         this.attachmentFianceList = attachmentFianceList;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
+    }
+
+    public BigDecimal getBelowPayAmt() {
+        return belowPayAmt;
+    }
+
+    public void setBelowPayAmt(BigDecimal belowPayAmt) {
+        this.belowPayAmt = belowPayAmt;
+    }
+
+    public BigDecimal getShareDeductAmt() {
+        return shareDeductAmt;
+    }
+
+    public void setShareDeductAmt(BigDecimal shareDeductAmt) {
+        this.shareDeductAmt = shareDeductAmt;
     }
 }

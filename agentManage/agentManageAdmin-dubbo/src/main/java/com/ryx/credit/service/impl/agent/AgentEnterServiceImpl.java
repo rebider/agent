@@ -87,6 +87,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AgentQueryService agentQueryService;
     @Autowired
     private AssProtoColMapper assProtoColMapper;
+    @Autowired
+    private PlatFormService platFormService;
 
     /**
      * 商户入网
@@ -129,6 +131,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     throw new ProcessException("开通(" + item.getBusPlatform() + ")业务平台重复");
                 } else {
                     hav.add(item.getBusPlatform());
+                }
+                if (null!=item.getBusPlatform()){
+                    PlatformType platformType = platFormService.byPlatformCode(item.getBusPlatform());
+                    if (null!=platformType){
+                        if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+                            if (StringUtils.isNotBlank(item.getBusNum())){
+                                if (StringUtils.isBlank(item.getBusLoginNum())){
+                                    logger.info("请填写平台登录账号");
+                                    throw new ProcessException("请填写平台登录账号");
+                                }
+                            }
+                        }
+                    }
                 }
             }
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
@@ -252,7 +267,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 logger.info("========用户{}{}启动部门参数为空", agentId, cuser);
                 throw new ProcessException("启动部门参数为空!");
             }
-
+            startPar.put("rs","pass");
             //启动审批
             String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
             if (proce == null) {
@@ -388,6 +403,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("approvalPerson", userId);
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
         reqMap.put("taskId", agentVo.getTaskId());
+        reqMap.put("dept", agentVo.getDept());
 
         //传递部门信息
         Map startPar = startPar(userId);

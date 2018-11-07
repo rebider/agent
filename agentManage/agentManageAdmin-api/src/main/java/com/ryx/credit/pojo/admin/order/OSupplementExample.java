@@ -1106,6 +1106,206 @@ public class OSupplementExample {
             addCriterion("REMIT_TIME not between", value1, value2, "remitTime");
             return (Criteria) this;
         }
+
+        public Criteria andRemitPeopleIsNull() {
+            addCriterion("REMIT_PEOPLE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleIsNotNull() {
+            addCriterion("REMIT_PEOPLE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleEqualTo(String value) {
+            addCriterion("REMIT_PEOPLE =", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleNotEqualTo(String value) {
+            addCriterion("REMIT_PEOPLE <>", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleGreaterThan(String value) {
+            addCriterion("REMIT_PEOPLE >", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleGreaterThanOrEqualTo(String value) {
+            addCriterion("REMIT_PEOPLE >=", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleLessThan(String value) {
+            addCriterion("REMIT_PEOPLE <", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleLessThanOrEqualTo(String value) {
+            addCriterion("REMIT_PEOPLE <=", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleLike(String value) {
+            addCriterion("REMIT_PEOPLE like", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleNotLike(String value) {
+            addCriterion("REMIT_PEOPLE not like", value, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleIn(List<String> values) {
+            addCriterion("REMIT_PEOPLE in", values, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleNotIn(List<String> values) {
+            addCriterion("REMIT_PEOPLE not in", values, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleBetween(String value1, String value2) {
+            addCriterion("REMIT_PEOPLE between", value1, value2, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPeopleNotBetween(String value1, String value2) {
+            addCriterion("REMIT_PEOPLE not between", value1, value2, "remitPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeIsNull() {
+            addCriterion("CHECK_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeIsNotNull() {
+            addCriterion("CHECK_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeEqualTo(Date value) {
+            addCriterion("CHECK_TIME =", value, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeNotEqualTo(Date value) {
+            addCriterion("CHECK_TIME <>", value, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeGreaterThan(Date value) {
+            addCriterion("CHECK_TIME >", value, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("CHECK_TIME >=", value, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeLessThan(Date value) {
+            addCriterion("CHECK_TIME <", value, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeLessThanOrEqualTo(Date value) {
+            addCriterion("CHECK_TIME <=", value, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeIn(List<Date> values) {
+            addCriterion("CHECK_TIME in", values, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeNotIn(List<Date> values) {
+            addCriterion("CHECK_TIME not in", values, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeBetween(Date value1, Date value2) {
+            addCriterion("CHECK_TIME between", value1, value2, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckTimeNotBetween(Date value1, Date value2) {
+            addCriterion("CHECK_TIME not between", value1, value2, "checkTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleIsNull() {
+            addCriterion("CHECK_PEOPLE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleIsNotNull() {
+            addCriterion("CHECK_PEOPLE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleEqualTo(String value) {
+            addCriterion("CHECK_PEOPLE =", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleNotEqualTo(String value) {
+            addCriterion("CHECK_PEOPLE <>", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleGreaterThan(String value) {
+            addCriterion("CHECK_PEOPLE >", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleGreaterThanOrEqualTo(String value) {
+            addCriterion("CHECK_PEOPLE >=", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleLessThan(String value) {
+            addCriterion("CHECK_PEOPLE <", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleLessThanOrEqualTo(String value) {
+            addCriterion("CHECK_PEOPLE <=", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleLike(String value) {
+            addCriterion("CHECK_PEOPLE like", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleNotLike(String value) {
+            addCriterion("CHECK_PEOPLE not like", value, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleIn(List<String> values) {
+            addCriterion("CHECK_PEOPLE in", values, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleNotIn(List<String> values) {
+            addCriterion("CHECK_PEOPLE not in", values, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleBetween(String value1, String value2) {
+            addCriterion("CHECK_PEOPLE between", value1, value2, "checkPeople");
+            return (Criteria) this;
+        }
+
+        public Criteria andCheckPeopleNotBetween(String value1, String value2) {
+            addCriterion("CHECK_PEOPLE not between", value1, value2, "checkPeople");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

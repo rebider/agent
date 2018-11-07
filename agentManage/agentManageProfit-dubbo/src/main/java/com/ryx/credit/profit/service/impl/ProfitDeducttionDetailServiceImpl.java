@@ -33,6 +33,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         if(profitDeduction != null){
             if(StringUtils.isNotBlank(profitDeduction.getId())){
                 criteria.andDeductionIdEqualTo(profitDeduction.getId());
+                example.setOrderByClause("CREATE_DATE_TIME DESC");
                 List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
                 return list != null && !list.isEmpty() ? list.get(0) : null;
             }
@@ -45,7 +46,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         ProfitDeducttionDetail profitDeducttionDetail = new ProfitDeducttionDetail();
         profitDeducttionDetail.setAgentId(profitDeduction.getAgentId());
         profitDeducttionDetail.setAgentName(profitDeduction.getAgentName());
-        profitDeducttionDetail.setAgentPid(profitDeduction.getAgentPid());
+        profitDeducttionDetail.setAgentPid(profitDeduction.getAgentId());
         profitDeducttionDetail.setCreateDateTime(new Date());
         profitDeducttionDetail.setDeductionDate(profitDeduction.getDeductionDate());
         profitDeducttionDetail.setDeductionDesc(profitDeduction.getDeductionDesc());
@@ -57,7 +58,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         profitDeducttionDetail.setNotDeductionAmt(profitDeduction.getNotDeductionAmt());
         profitDeducttionDetail.setParentAgentName(profitDeduction.getParentAgentName());
         profitDeducttionDetail.setParentAgentId(profitDeduction.getParentAgentId());
-        profitDeducttionDetail.setParentAgentPid(profitDeduction.getParentAgentPid());
+        profitDeducttionDetail.setParentAgentPid(profitDeduction.getParentAgentId());
         profitDeducttionDetail.setRemark(profitDeduction.getRemark());
         profitDeducttionDetail.setUserId(profitDeduction.getUserId());
         profitDeducttionDetailMapper.insertSelective(profitDeducttionDetail);

@@ -74,7 +74,7 @@ public interface OrderService {
      * @param payment
      * @return
      */
-    public OPayment initPayment(OPayment payment) throws MessageException;
+    public OPayment initPayment(OrderFormVo agentVo) throws MessageException;
 
 
     public AgentResult checkDownPaymentDate(Date date);

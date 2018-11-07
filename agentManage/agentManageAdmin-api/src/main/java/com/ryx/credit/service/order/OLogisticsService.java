@@ -2,6 +2,7 @@ package com.ryx.credit.service.order;
 
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 
@@ -28,7 +29,7 @@ public interface OLogisticsService {
 
     public List<String> addList(List<List<Object>> data, String user)throws Exception;
 
-    public String addListItem(List<Object> data, String user) throws Exception;
+    public AgentResult addListItem(List<Object> data, String user) throws Exception;
 
     public int insertImportData(OLogistics oLogistics);
 

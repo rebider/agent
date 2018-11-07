@@ -171,6 +171,19 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
 
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+				if (null!=agentBusInfoVo.getBusPlatform()){
+					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
+					if (null!=platformType){
+						if(platformType.code.equals(PlatformType.POS.code) || platformType.code.equals(PlatformType.ZPOS.code)){
+							if (StringUtils.isNotBlank(agentBusInfoVo.getBusNum())){
+								if (StringUtils.isBlank(agentBusInfoVo.getBusLoginNum())){
+									logger.info("请填写平台登录账号");
+									throw new MessageException("请填写平台登录账号");
+								}
+							}
+						}
+					}
+				}
 				agentBusInfoVo.setcUser(agent.getcUser());
 				agentBusInfoVo.setAgentId(agent.getId());
 				if(StringUtils.isEmpty(agentBusInfoVo.getId())) {
@@ -345,7 +358,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Override
 	public List<Map> getParentListFromBusInfo(List<Map> list, String busId) {
 		if(list==null)list=new ArrayList<Map>();
-		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("id",busId));
+		FastMap par = FastMap.fastMap("id", busId)
+				.putKeyV("busStatus", 2);
+		List<Map>  map = agentBusInfoMapper.queryTreeByBusInfo(par);
 		if(map.size()>0){
 			list.add(map.get(0));
 		}
@@ -586,7 +601,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		list.addAll(child_plat);
 		//把孩子节点也加到list
 		for (AgentBusInfo agentBusInfo : child_plat) {
-			queryChildLevel(list,platformCode,agentBusInfo.getBusNum());
+			queryChildLevelByBusNum(list,platformCode,agentBusInfo.getBusNum());
 		}
 		return list;
 	}
@@ -595,4 +610,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public List<AgentBusInfo> selectByAgenId(String agentId) {
 		return agentBusInfoMapper.selectByAgenId(agentId);
 	}
+
+	@Override
+	public AgentBusInfo selectBusInfo(String busNum){
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andBusNumEqualTo(busNum);
+		criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+		criteria.andBusStatusEqualTo(AgentInStatus.IN.status);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		if(null==agentBusInfos){
+			return null;
+		}
+		if(agentBusInfos.size()==1){
+			return agentBusInfos.get(0);
+		}
+		return null;
+	}
 }
+

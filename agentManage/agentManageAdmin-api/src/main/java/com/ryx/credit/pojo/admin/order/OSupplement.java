@@ -35,6 +35,12 @@ public class OSupplement implements Serializable {
 
     private Date remitTime;
 
+    private String remitPeople;
+
+    private Date checkTime;
+
+    private String checkPeople;
+
     public String getId() {
         return id;
     }
@@ -153,5 +159,29 @@ public class OSupplement implements Serializable {
 
     public void setRemitTime(Date remitTime) {
         this.remitTime = remitTime;
+    }
+
+    public String getRemitPeople() {
+        return remitPeople;
+    }
+
+    public void setRemitPeople(String remitPeople) {
+        this.remitPeople = remitPeople == null ? null : remitPeople.trim();
+    }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
+    }
+
+    public String getCheckPeople() {
+        return checkPeople;
+    }
+
+    public void setCheckPeople(String checkPeople) {
+        this.checkPeople = checkPeople == null ? null : checkPeople.trim();
     }
 }

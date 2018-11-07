@@ -24,7 +24,7 @@ public interface ProfitDeductionService {
      * @param page 分页信息
      * @return 分页列表
      */
-    PageInfo getProfitDeductionList(ProfitDeduction profitDeduction, Page page);
+    PageInfo getProfitDeductionList(Map<String, Object> map, ProfitDeduction profitDeduction, Page page);
 
     /**
      * 获取扣款信息
@@ -114,17 +114,6 @@ public interface ProfitDeductionService {
      * @return
      */
     public List<ProfitDeduction> getProfitDeduction(ProfitDeduction profitDeduction);
-
-    /***
-    * @Description: 获取代理商补分润
-    * @Param:  agentId 代理商
-    * @Param:  bussType 业务类型
-    * @Param:  parentAgentId 上级agentId
-    * @return:  补款总金额
-    * @Author: zhaodw
-    * @Date: 2018/8/9
-    */
-    BigDecimal  getSupplyAmt(String agentId, String bussType , String parentAgentId);
 
     BigDecimal totalBuckleByMonth(ProfitDeduction profitDeduction);
 

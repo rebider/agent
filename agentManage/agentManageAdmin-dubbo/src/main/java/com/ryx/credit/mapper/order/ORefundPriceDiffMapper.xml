@@ -20,6 +20,9 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="BELOW_PAY_AMT" jdbcType="DECIMAL" property="belowPayAmt" />
+    <result column="SHARE_DEDUCT_AMT" jdbcType="DECIMAL" property="shareDeductAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -53,7 +56,7 @@
   <sql id="Base_Column_List">
     ID, APPLY_COMP_TYPE, APPLY_COMP_AMT, REL_COMP_TYPE, REL_COMP_AMT, MACH_OWE_AMT, GATHER_TIME,
     GATHER_AMT, REVIEW_STATUS, S_TIME, APPLY_REMARK, DEDUCT_AMT, C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, VERSION
+    U_USER, STATUS, VERSION, AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiffExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -89,14 +92,16 @@
     GATHER_TIME, GATHER_AMT, REVIEW_STATUS,
     S_TIME, APPLY_REMARK, DEDUCT_AMT,
     C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, VERSION
+    U_USER, STATUS, VERSION,
+    AGENT_ID, BELOW_PAY_AMT, SHARE_DEDUCT_AMT
     )
     values (#{id,jdbcType=VARCHAR}, #{applyCompType,jdbcType=VARCHAR}, #{applyCompAmt,jdbcType=DECIMAL},
     #{relCompType,jdbcType=VARCHAR}, #{relCompAmt,jdbcType=DECIMAL}, #{machOweAmt,jdbcType=DECIMAL},
     #{gatherTime,jdbcType=TIMESTAMP}, #{gatherAmt,jdbcType=DECIMAL}, #{reviewStatus,jdbcType=DECIMAL},
     #{sTime,jdbcType=TIMESTAMP}, #{applyRemark,jdbcType=VARCHAR}, #{deductAmt,jdbcType=DECIMAL},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{agentId,jdbcType=VARCHAR}, #{belowPayAmt,jdbcType=DECIMAL}, #{shareDeductAmt,jdbcType=DECIMAL}
     )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
@@ -156,6 +161,15 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="belowPayAmt != null">
+        BELOW_PAY_AMT,
+      </if>
+      <if test="shareDeductAmt != null">
+        SHARE_DEDUCT_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -211,6 +225,15 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="belowPayAmt != null">
+        #{belowPayAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shareDeductAmt != null">
+        #{shareDeductAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -274,6 +297,15 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="belowPayAmt != null">
+        BELOW_PAY_AMT = #{belowPayAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="shareDeductAmt != null">
+        SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -295,7 +327,10 @@
     C_USER = #{cUser,jdbcType=VARCHAR},
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL}
+    VERSION = #{version,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    BELOW_PAY_AMT = #{belowPayAmt,jdbcType=DECIMAL},
+    SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -312,7 +347,7 @@
   <sql id="B_Base_Column_List">
     rp.ID, rp.APPLY_COMP_TYPE, rp.APPLY_COMP_AMT, rp.REL_COMP_TYPE, rp.REL_COMP_AMT, rp.MACH_OWE_AMT, rp.GATHER_TIME,
     rp.GATHER_AMT, rp.REVIEW_STATUS, rp.S_TIME, rp.APPLY_REMARK, rp.DEDUCT_AMT, rp.C_TIME, rp.U_TIME, rp.C_USER,
-    rp.U_USER, rp.STATUS, rp.VERSION
+    rp.U_USER, rp.STATUS, rp.VERSION, rp.AGENT_ID, rp.BELOW_PAY_AMT, rp.SHARE_DEDUCT_AMT
   </sql>
   <sql id="D_Base_Column_List">
     rpd.ID, rpd.SUB_ORDER_ID, rpd.AGENT_ID, rpd.ACTIVITY_FRONT_ID, rpd.ACTIVITY_REAL_ID, rpd.REFUND_PRICE_DIFF_ID,
@@ -334,5 +369,50 @@
       #{item}
     </foreach>
   </select>
+
+  <select id="selectByAgent" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select
+      <include refid="B_Base_Column_List"/>,
+      a.AG_NAME
+    from
+    o_refund_price_diff rp left join a_agent a on a.id = rp.agent_id
+    <include refid="selectByAgentWhere"/>
+    order by rp.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="selectByAgentCount" parameterType="map" resultType="int">
+    select count(*) from
+    o_refund_price_diff rp left join a_agent a on a.id = rp.agent_id
+    <include refid="selectByAgentWhere"/>
+  </select>
+
+  <sql id="selectByAgentWhere">
+    <where>
+       1=1
+       <if test="map.reviewStatus != null">
+         and rp.REVIEW_STATUS = #{map.reviewStatus,jdbcType=VARCHAR}
+       </if>
+       <if test="map.cUser != null">
+         and rp.c_user = #{map.cUser,jdbcType=VARCHAR}
+       </if>
+       <if test="map.orgId!=null and map.orgId!=''">
+         and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
+       </if>
+       <if test="map.applyBeginTime!=null and map.applyBeginTime!=''">
+         and rp.s_time >= to_date(#{map.applyBeginTime}, 'yy-mm-dd hh24:mi:ss')
+       </if>
+       <if test="map.applyEndTime!=null and map.applyEndTime!=''">
+         and rp.s_time &lt;= to_date(#{map.applyEndTime}, 'yy-mm-dd hh24:mi:ss')
+       </if>
+       <if test="map.agentId != null">
+         and rp.agent_id = #{map.agentId,jdbcType=VARCHAR}
+       </if>
+       <if test="map.agentName != null">
+         and a.ag_name = #{map.agentName,jdbcType=VARCHAR}
+       </if>
+    </where>
+  </sql>
 
 </mapper>

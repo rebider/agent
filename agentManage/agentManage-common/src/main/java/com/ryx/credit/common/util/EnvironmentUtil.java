@@ -1,6 +1,4 @@
-package com.ryx.credit.util;
-
-import com.ryx.credit.common.util.AppConfig;
+package com.ryx.credit.common.util;
 
 /**
  *

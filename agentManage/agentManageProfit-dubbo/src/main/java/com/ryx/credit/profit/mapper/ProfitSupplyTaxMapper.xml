@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitSupplyTaxMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitSupplyTax">
+    <result column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="SUPPLY_TAX_DATE" jdbcType="VARCHAR" property="supplyTaxDate" />
+    <result column="SUPPLY_TAX_AGENT_ID" jdbcType="VARCHAR" property="supplyTaxAgentId" />
+    <result column="SUPPLY_TAX_AGENT_NAME" jdbcType="VARCHAR" property="supplyTaxAgentName" />
+    <result column="SUPPLY_TAX_SUB_ID" jdbcType="VARCHAR" property="supplyTaxSubId" />
+    <result column="SUPPLY_TAX_SUB_NAME" jdbcType="VARCHAR" property="supplyTaxSubName" />
+    <result column="SUPPLY_TAX_AMT" jdbcType="DECIMAL" property="supplyTaxAmt" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, 
+    SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from PROFIT_SUPPLY_TAX
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample">
+    delete from PROFIT_SUPPLY_TAX
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
+    insert into PROFIT_SUPPLY_TAX (ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, 
+      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
+      )
+    values (#{id,jdbcType=VARCHAR}, #{supplyTaxDate,jdbcType=VARCHAR}, #{supplyTaxAgentId,jdbcType=VARCHAR}, 
+      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}, #{supplyTaxAmt,jdbcType=DECIMAL}
+
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
+    insert into PROFIT_SUPPLY_TAX
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="supplyTaxDate != null">
+        SUPPLY_TAX_DATE,
+      </if>
+      <if test="supplyTaxAgentId != null">
+        SUPPLY_TAX_AGENT_ID,
+      </if>
+      <if test="supplyTaxAgentName != null">
+        SUPPLY_TAX_AGENT_NAME,
+      </if>
+      <if test="supplyTaxSubId != null">
+        SUPPLY_TAX_SUB_ID,
+      </if>
+      <if test="supplyTaxSubName != null">
+        SUPPLY_TAX_SUB_NAME,
+      </if>
+      <if test="supplyTaxAmt != null">
+        SUPPLY_TAX_AMT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxDate != null">
+        #{supplyTaxDate,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxAgentId != null">
+        #{supplyTaxAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxAgentName != null">
+        #{supplyTaxAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxSubId != null">
+        #{supplyTaxSubId,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxSubName != null">
+        #{supplyTaxSubName,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxAmt != null">
+        #{supplyTaxAmt,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultType="java.lang.Long">
+    select count(*) from PROFIT_SUPPLY_TAX
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update PROFIT_SUPPLY_TAX
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxDate != null">
+        SUPPLY_TAX_DATE = #{record.supplyTaxDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxAgentId != null">
+        SUPPLY_TAX_AGENT_ID = #{record.supplyTaxAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxAgentName != null">
+        SUPPLY_TAX_AGENT_NAME = #{record.supplyTaxAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxSubId != null">
+        SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxSubName != null">
+        SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxAmt != null">
+        SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update PROFIT_SUPPLY_TAX
+    set ID = #{record.id,jdbcType=VARCHAR},
+      SUPPLY_TAX_DATE = #{record.supplyTaxDate,jdbcType=VARCHAR},
+      SUPPLY_TAX_AGENT_ID = #{record.supplyTaxAgentId,jdbcType=VARCHAR},
+      SUPPLY_TAX_AGENT_NAME = #{record.supplyTaxAgentName,jdbcType=VARCHAR},
+      SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
+      SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
+      SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="getProfitSupplyTaxCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    SELECT COUNT(1)
+    FROM PROFIT_SUPPLY_TAX
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      1=1
+      <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+      <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
+      <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
+      <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
+      <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
+      <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
+    </where>
+  </sql>
+
+  <select id="getProfitSupplyTaxList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM PROFIT_SUPPLY_TAX
+    <include refid="BASE_WHERE_SQL" />
+    <include refid="SORT" />
+    <include refid="PAGING_END" />
+  </select>
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
+  <sql id='SORT'>
+    ORDER BY SUPPLY_TAX_DATE DESC
+  </sql>
+</mapper>

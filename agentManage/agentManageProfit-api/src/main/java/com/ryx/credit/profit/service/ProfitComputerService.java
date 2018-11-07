@@ -122,6 +122,6 @@ public interface ProfitComputerService {
      */
     void computerTax(String profitDate);
 
-    void new_computerTax() throws Exception;
+    void new_computerTax(String type) throws Exception;
 
 }
