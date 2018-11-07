@@ -21,6 +21,7 @@ public interface OLogisticsService {
 
     PageInfo getOLogisticsList(Map<String, Object> param, PageInfo pageInfo);
 
+
     List<Map<String, Object>> getLogisticsBySn(String startSn, String endSn, String agentId) throws ProcessException;
 
     ResultVO insertLogisticsDetail(String startSn, String endSn, Integer begins, Integer finish,String logisticsId, String cUser, String planId) throws MessageException;
@@ -39,4 +40,6 @@ public interface OLogisticsService {
 
 //    List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException;
     public List<String> addSn(List<List<String>>  data, String user)throws Exception;
+
+    PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo);
 }
