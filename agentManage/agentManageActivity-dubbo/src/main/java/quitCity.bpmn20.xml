@@ -4,47 +4,47 @@
     <startEvent id="sid-B47A8C68-664B-4C70-8B40-4C7A7D6808FA"></startEvent>
     <userTask id="sid-B0DE20B2-FE81-4057-B397-9517A1B9990B" name="北大区" activiti:candidateGroups="north">
       <extensionElements>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28"></exclusiveGateway>
     <userTask id="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673" name="市场部" activiti:candidateGroups="market">
       <extensionElements>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0"></exclusiveGateway>
-    <userTask id="sid-F315F787-E98B-40FA-A6DC-6A962201075D" name="于华" activiti:candidateGroups="market">
+    <userTask id="sid-F315F787-E98B-40FA-A6DC-6A962201075D" name="于华" activiti:candidateGroups="manage">
       <extensionElements>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-A8979428-5A3A-4946-88E8-CCE5A69D9F4F"></exclusiveGateway>
     <endEvent id="sid-5420F48A-05A3-4D8D-8BCD-5AF50CBEB28B" name="finish_end">
       <extensionElements>
-        <activiti:executionListener event="end" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:executionListener>
+        <activiti:executionListener event="end" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:executionListener>
       </extensionElements>
     </endEvent>
     <userTask id="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE" name="退出信息修改" activiti:candidateGroups="city">
       <extensionElements>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD"></exclusiveGateway>
     <exclusiveGateway id="sid-F6936BB1-86BC-4BB2-8EB2-97115D0D228C"></exclusiveGateway>
     <userTask id="sid-2EA7796E-4176-4E89-A17C-90ED82D86A1C" name="南大区" activiti:candidateGroups="south">
       <extensionElements>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-D9D610A3-E692-419B-9D5E-BE1C17CEEF73" sourceRef="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE" targetRef="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD"></sequenceFlow>
@@ -54,9 +54,9 @@
     <exclusiveGateway id="sid-759710DF-1116-473B-818B-D326CDD2DD2E"></exclusiveGateway>
     <userTask id="sid-C911F512-9E63-44CC-9E6E-763484FA0E5B" name="财务部" activiti:candidateGroups="finance">
       <extensionElements>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-BF09486E-10F4-48D3-A7B2-C42F2877BC14" name="未完成" sourceRef="sid-85923AD7-998A-47BC-8F9A-E6BDFCC4A4AD" targetRef="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE">
@@ -87,9 +87,9 @@
     </sequenceFlow>
     <userTask id="sid-4993B5F8-6545-4FF8-8BA9-440940C4FA7F" name="业务部" activiti:candidateGroups="business">
       <extensionElements>
-        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
-        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.OrderTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="sid-24BCD5FC-AAD6-4C8F-910D-C2936C037B07"></exclusiveGateway>
@@ -100,14 +100,17 @@
     <sequenceFlow id="sid-8E1704C0-F886-4DD6-BC76-F6F2F6A3DAF1" sourceRef="sid-24BCD5FC-AAD6-4C8F-910D-C2936C037B07" targetRef="sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='back'}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="sid-D3D0DE5F-820F-4A38-B620-0372ACBD60CC" name="财务部" activiti:candidateGroups="finance"></userTask>
+    <userTask id="sid-D3D0DE5F-820F-4A38-B620-0372ACBD60CC" name="财务部" activiti:candidateGroups="finance">
+      <extensionElements>
+        <activiti:taskListener event="create" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="assignment" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+        <activiti:taskListener event="complete" class="com.ryx.credit.activity.task.QuitTaskExecutionListener"></activiti:taskListener>
+      </extensionElements>
+    </userTask>
     <sequenceFlow id="sid-70F11DC8-E92B-400D-8A43-4BEEB0F7F0BE" sourceRef="sid-C911F512-9E63-44CC-9E6E-763484FA0E5B" targetRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28"></sequenceFlow>
     <sequenceFlow id="sid-26952416-D30E-42C9-9F1F-6C59CF9DCADD" sourceRef="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673" targetRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0"></sequenceFlow>
     <sequenceFlow id="sid-822E2811-0B4C-4729-9AA1-98F3B47B87FB" name="跳业务部审" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-4993B5F8-6545-4FF8-8BA9-440940C4FA7F">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='business'}]]></conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="sid-4191C6FE-EA3F-4D79-AA11-D13E68354647" name="于华审批" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='market'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-343A0AEF-5529-4898-975F-06F9EA6524C9" sourceRef="sid-A8979428-5A3A-4946-88E8-CCE5A69D9F4F" targetRef="sid-4993B5F8-6545-4FF8-8BA9-440940C4FA7F">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
@@ -126,6 +129,9 @@
     <sequenceFlow id="sid-427AF64D-E062-4D19-AE37-AB4DA9983C3A" sourceRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D" targetRef="sid-A8979428-5A3A-4946-88E8-CCE5A69D9F4F"></sequenceFlow>
     <sequenceFlow id="sid-6DD0FF91-57AB-4CE5-BB46-B77E81033F2A" name="市场部审批" sourceRef="sid-4BDB6F4B-3299-44F7-B4CD-4F96039BEB28" targetRef="sid-ECD4C817-99C4-4F9B-92A2-748BB554D673">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-4191C6FE-EA3F-4D79-AA11-D13E68354647" name="于华审批" sourceRef="sid-3C375D73-B184-4E44-98D1-E5298AC8CAB0" targetRef="sid-F315F787-E98B-40FA-A6DC-6A962201075D">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${rs=='pass'&&dept=='manage'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_quitCity">

@@ -64,7 +64,7 @@
     sum(sd.must_amt) STAG_AMT
     from P_STAGING_DETAIL  sd
     inner join p_deduction d on d.id = sd.source_id
-    where  sd.deduction_date > to_char(sysdate,'yyyy-mm') and d.deduction_type='01' and d.deduction_date =to_char(add_months(trunc(sysdate),-1),'yyyy-mm')
+    where  sd.deduction_date >= to_char(sysdate,'yyyy-mm') and d.deduction_type='01' and d.deduction_date =to_char(add_months(trunc(sysdate),-1),'yyyy-mm')
     and d.agent_pid=#{agentPid,jdbcType=VARCHAR} and d.staging_status='3'
     <if test="parentAgentPid != null" >
       and d.parent_agent_pid=#{parentAgentPid,jdbcType=VARCHAR}

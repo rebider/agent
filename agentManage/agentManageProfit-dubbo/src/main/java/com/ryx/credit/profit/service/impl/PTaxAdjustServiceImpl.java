@@ -100,6 +100,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Override
     public ResultVO posTaxEnterIn(PTaxAdjust tax) throws ProcessException {
         tax.setId(idService.genId(TabId.p_profit_adjust));
+        System.out.println("序列ID---------------------"+idService.genId(TabId.p_profit_adjust));
         adjustMapper.insertSelective(tax);
 
         //启动审批流
@@ -130,7 +131,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void completeTaskEnterActivity(String insid, String status) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
         try {

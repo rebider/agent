@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
@@ -420,7 +421,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         if(list != null && !list.isEmpty()){
             List<Map<String, Object>> noticeList = new ArrayList<Map<String, Object>>();
             for (ProfitDeduction deduction : list){
-
                 Map<String, Object> map = new HashMap<String, Object>(5);
                 ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
                 if(detail == null){
@@ -428,17 +428,19 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 } else {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
                     String updateTime = sdf.format(detail.getCreateDateTime());
-                    map.put("deductTime", updateTime);//扣款时间
+                    map.put("deductTime", updateTime);//最后扣款时间
                 }
-                map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt() == null ? "0" : deduction.getMustDeductionAmt().toString());//应扣
-                map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt()== null ? "0" : deduction.getActualDeductionAmt().toString());//实扣
-                map.put("notDeductionAmt", deduction.getNotDeductionAmt()== null ? "0" : deduction.getNotDeductionAmt().toString());//未扣足
+                BigDecimal mustDeductionAmtSum = deduction.getMustDeductionAmt() == null ? BigDecimal.ZERO : deduction.getMustDeductionAmt();
+                map.put("mustDeductionAmtSum", mustDeductionAmtSum.toString());//应扣
+                BigDecimal actualDeductionAmtSum = deduction.getActualDeductionAmt() == null ? BigDecimal.ZERO : deduction.getActualDeductionAmt();
+                map.put("actualDeductionAmtSum", actualDeductionAmtSum.toString());//实扣
+                map.put("notDeductionAmt", mustDeductionAmtSum.subtract(actualDeductionAmtSum).toString());//未扣足
                 map.put("detailId", deduction.getSourceId());//订单号
                 map.put("srcId", deduction.getId());//分润系统扣款ID
                 noticeList.add(map);
             }
             LOG.info("系统已经终审，通知订单系统，机具款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
-//        iPaymentDetailService.uploadStatus(noticeList,"");
+            iPaymentDetailService.uploadStatus(noticeList, PaySign.JQ.code);
         }
     }
 

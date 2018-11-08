@@ -154,10 +154,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
     public void applyPosReward(PosReward posReward, String userId, String workId) throws ProcessException {
         posReward.setId((idService.genId(TabId.p_pos_reward)));
         System.out.println("序列ID---------------------"+idService.genId(TabId.p_pos_reward));
-        String templateMonth = "";
-        String month = templateMapper.selectCreditMonth(templateMonth);
-        posReward.setCreditConsMonth(month);
-        System.out.println("赋值贷记交易对比月---------------------"+ JSONObject.toJSON(month));
         rewardMapper.insertSelective(posReward);
 
         //启动审批流
@@ -185,7 +181,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
             logger.error("POS奖励审批流启动失败{}");
             throw new ProcessException("POS奖励审批流启动失败!:{}",e.getMessage());
         }
-        posReward.setApplyStatus(RewardStatus.REVIEWING.getStatus());   // REVIEWING 0:审核中
+        posReward.setApplyStatus(RewardStatus.REVIEWING.getStatus());//REVIEWING 0:审核中
         rewardMapper.updateByPrimaryKeySelective(posReward);
     }
 
@@ -196,6 +192,10 @@ public class PosRewardServiceImpl implements IPosRewardService {
         Map<String, Object> reqMap = new HashMap<>();
         if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", agentVo.getOrderAprDept());
+        }
+        if(Objects.equals("pass",agentVo.getApprovalResult())
+                && StringUtils.isBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", "finish");
         }
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
@@ -268,12 +268,20 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
     }
 
+    /**
+     * 查询此交易月份是否已申请
+     * @param posReward
+     * @return
+     */
     @Override
-    public List<PosReward> selectByMonth(PosReward posReward) {
+    public List<PosReward> selectRewardByMonth(PosReward posReward) {
         PosRewardExample example = new PosRewardExample();
         PosRewardExample.Criteria criteria = example.createCriteria();
         if(StringUtils.isNotBlank(posReward.getTotalConsMonth())){
             criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
+        }
+        if(StringUtils.isNotBlank(posReward.getCreditConsMonth())){
+            criteria.andCreditConsMonthLike("%"+posReward.getCreditConsMonth()+"%");
         }
         if(StringUtils.isNotBlank(posReward.getAgentPid())){
             criteria.andAgentPidEqualTo(posReward.getAgentPid());
@@ -286,10 +294,5 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         return rewardMapper.selectByExample(example);
     }
-
-//    @Override
-//    public PosReward selectByVerifyMonth(String totalConsMonth) {
-//        return rewardMapper.selectByVerifyMonth(totalConsMonth);
-//    }
 
 }

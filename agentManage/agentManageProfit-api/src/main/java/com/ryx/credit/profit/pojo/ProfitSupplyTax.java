@@ -1,5 +1,7 @@
 package com.ryx.credit.profit.pojo;
 
+import java.math.BigDecimal;
+
 public class ProfitSupplyTax {
     private String id;
 
@@ -12,6 +14,8 @@ public class ProfitSupplyTax {
     private String supplyTaxSubId;
 
     private String supplyTaxSubName;
+
+    private BigDecimal supplyTaxAmt;
 
     public String getId() {
         return id;
@@ -59,5 +63,13 @@ public class ProfitSupplyTax {
 
     public void setSupplyTaxSubName(String supplyTaxSubName) {
         this.supplyTaxSubName = supplyTaxSubName == null ? null : supplyTaxSubName.trim();
+    }
+
+    public BigDecimal getSupplyTaxAmt() {
+        return supplyTaxAmt;
+    }
+
+    public void setSupplyTaxAmt(BigDecimal supplyTaxAmt) {
+        this.supplyTaxAmt = supplyTaxAmt;
     }
 }

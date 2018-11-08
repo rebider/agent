@@ -80,7 +80,7 @@ public class RefundJob {
 
 
 
-    @Scheduled(cron = "0 0 12 10 * ?")
+    @Scheduled(cron = "0 0 0 1 * ?")
     public void deal() {
         // 上月的开始及结束日期
         JSONObject param = new JSONObject();
@@ -307,6 +307,8 @@ public class RefundJob {
         settleErrLs.setOffsetLossAmt(jsonObject.getBigDecimal("offsetLossAmt"));
         settleErrLs.setYswsAmt(jsonObject.getBigDecimal("ingshou"));
         synchronized (object) {
+
+            //TODO 获取一级代理商业务码
             if (orgMap.containsKey(jsonObject.getString("instId"))) {
                 orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt").abs()));
             }else {
@@ -315,6 +317,7 @@ public class RefundJob {
             }
         }
         settleErrLs.setSourceId(deductionIdMap.get(jsonObject.getString("instId")));
+        settleErrLs.setInstId(jsonObject.getString("instId"));
         profitSettleErrLsService.inset(settleErrLs);
     }
     /***

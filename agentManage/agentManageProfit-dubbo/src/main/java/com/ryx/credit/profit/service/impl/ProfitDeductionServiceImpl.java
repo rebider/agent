@@ -90,7 +90,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
         }
         if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
-            criteria.andAgentNameEqualTo(profitDeduction.getAgentName());
+            criteria.andAgentNameLike(profitDeduction.getAgentName());
         }
         if(department != null){
             List<String> agentList = departmentAgentList(department);
@@ -509,7 +509,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     */
     private BigDecimal getNextStagAmt(ProfitDeduction profitDeductionTemp) {
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
-        profitStagingDetail.setDeductionDate(LocalDate.now().plusMonths(1).toString().substring(0,7));
+        profitStagingDetail.setDeductionDate(LocalDate.now().toString().substring(0,7));
         profitStagingDetail.setSourceId(profitDeductionTemp.getId());
         PageInfo pageInfo = stagingServiceImpl.getStagingDetailList(profitStagingDetail,null);
         if (pageInfo != null && pageInfo.getTotal()>0) {
@@ -529,7 +529,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private void updateStagingDetail(BigDecimal profitAmt, ProfitDeduction profitDeductionTemp) {
         // 获取代理商本月分期
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
-        profitStagingDetail.setDeductionDate(LocalDate.now().toString().substring(0,7));
+        profitStagingDetail.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
         profitStagingDetail.setSourceId(profitDeductionTemp.getId());
         PageInfo pageInfo = stagingServiceImpl.getStagingDetailList(profitStagingDetail,null);
         if (pageInfo != null && pageInfo.getTotal()>0) {
