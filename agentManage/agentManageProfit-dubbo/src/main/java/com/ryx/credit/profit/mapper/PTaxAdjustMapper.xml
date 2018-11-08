@@ -10,6 +10,7 @@
     <result column="TAX_ING" jdbcType="DECIMAL" property="taxIng" />
     <result column="VALID_DATE" jdbcType="VARCHAR" property="validDate" />
     <result column="TAX_STATUS" jdbcType="CHAR" property="taxStatus" />
+    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -41,7 +42,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TAX_OLD, TAX_ING, VALID_DATE, TAX_STATUS
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TAX_OLD, TAX_ING, VALID_DATE, TAX_STATUS, PROFIT_MONTH
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PTaxAdjustExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -89,10 +90,10 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PTaxAdjust">
     insert into P_TAX_ADJUST (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, TAX_OLD, TAX_ING, 
-      VALID_DATE, TAX_STATUS)
+      VALID_DATE, TAX_STATUS, PROFIT_MONTH)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{taxOld,jdbcType=DECIMAL}, #{taxIng,jdbcType=DECIMAL}, 
-      #{validDate,jdbcType=VARCHAR}, #{taxStatus,jdbcType=CHAR})
+      #{validDate,jdbcType=VARCHAR}, #{taxStatus,jdbcType=CHAR}, #{profitMonth,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PTaxAdjust">
     insert into P_TAX_ADJUST
@@ -121,6 +122,9 @@
       <if test="taxStatus != null">
         TAX_STATUS,
       </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -146,6 +150,9 @@
       </if>
       <if test="taxStatus != null">
         #{taxStatus,jdbcType=CHAR},
+      </if>
+      <if test="profitMonth != null">
+        #{profitMonth,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -179,6 +186,9 @@
       <if test="taxStatus != null">
         TAX_STATUS = #{taxStatus,jdbcType=CHAR},
       </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -190,7 +200,8 @@
       TAX_OLD = #{taxOld,jdbcType=DECIMAL},
       TAX_ING = #{taxIng,jdbcType=DECIMAL},
       VALID_DATE = #{validDate,jdbcType=VARCHAR},
-      TAX_STATUS = #{taxStatus,jdbcType=CHAR}
+      TAX_STATUS = #{taxStatus,jdbcType=CHAR},
+      PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
