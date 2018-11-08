@@ -601,7 +601,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		list.addAll(child_plat);
 		//把孩子节点也加到list
 		for (AgentBusInfo agentBusInfo : child_plat) {
-			queryChildLevel(list,platformCode,agentBusInfo.getBusNum());
+			queryChildLevelByBusNum(list,platformCode,agentBusInfo.getBusNum());
 		}
 		return list;
 	}
@@ -610,4 +610,22 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public List<AgentBusInfo> selectByAgenId(String agentId) {
 		return agentBusInfoMapper.selectByAgenId(agentId);
 	}
+
+	@Override
+	public AgentBusInfo selectBusInfo(String busNum){
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andBusNumEqualTo(busNum);
+		criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+		criteria.andBusStatusEqualTo(AgentInStatus.IN.status);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		if(null==agentBusInfos){
+			return null;
+		}
+		if(agentBusInfos.size()==1){
+			return agentBusInfos.get(0);
+		}
+		return null;
+	}
 }
+

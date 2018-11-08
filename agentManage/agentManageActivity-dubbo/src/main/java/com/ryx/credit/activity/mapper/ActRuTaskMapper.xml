@@ -334,10 +334,11 @@
   <select id="queryMyTask" parameterType="map" resultType="map">
     select
     rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, br.C_TIME, br.C_USER, br.ACTIV_STATUS, br.STATUS,ri.group_id_
-    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri
+    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
     <where>
       rt.EXECUTION_ID_ = br.activ_id
       and ri.task_id_  = rt.id_
+      and br.agent_id = a.id
       <include refid="queryMyTaskWhere" />
     </where>
   </select>
@@ -346,9 +347,11 @@
     <include refid="OracleDialectPrefix" />
     select
     rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, br.C_TIME, br.C_USER, br.ACTIV_STATUS, br.STATUS,ri.group_id_
-    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri
+    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
     <where>
       rt.EXECUTION_ID_ = br.activ_id
+      and ri.task_id_  = rt.id_
+      and br.agent_id = a.id
       <include refid="queryMyTaskWhere" />
     </where>
     <include refid="OracleDialectSuffix" />
@@ -361,14 +364,19 @@
     <if test="params.group != null and params.group!='' " >
       and ri.group_id_ = #{params.group}
     </if>
+    <if test="params.group = 'city' " >
+      and (a.ag_doc_pro = #{params.orgId} or a.ag_doc_district = #{params.orgId})
+    </if>
   </sql>
 
   <select id="queryMyTaskCount" parameterType="map" resultType="int">
     select
       count(*)
-    from ACT_RU_TASK rt, A_bus_act_rel br
+    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
     <where>
       rt.EXECUTION_ID_ = br.activ_id
+      and ri.task_id_  = rt.id_
+      and br.agent_id = a.id
       <include refid="queryMyTaskWhere" />
     </where>
   </select>

@@ -56,4 +56,11 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
     public void clearPosRewardDetail(String profitDate) {
         posRewardDetailMapper.updateRewradData(profitDate);
     }
+
+    @Override
+    public void deleteCurrentDate(String currentDate) {
+        PosRewardDetailExample example = new PosRewardDetailExample();
+        example.createCriteria().andProfitPosDateEqualTo(currentDate);
+        posRewardDetailMapper.deleteByExample(example);
+    }
 }

@@ -438,7 +438,7 @@
 
   <update id="updateRewradData">
       UPDATE POS_REWARD_DETAIL  SET
-      POS_OWN_REWARD = 0, POS_DOWN_REWARD = 0, POS_REAWRD_PROFIT = 0,
+      POS_OWN_REWARD = 0, POS_DOWN_REWARD = 0, POS_REAWRD_PROFIT = 0
     where PROFIT_POS_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
 </mapper>

@@ -1,6 +1,7 @@
 import com.ryx.credit.common.enumc.AdjustType;
 import com.ryx.credit.common.enumc.GetMethod;
 import com.ryx.credit.common.enumc.PamentSrcType;
+import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.PayComp;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
@@ -61,13 +62,17 @@ public class PayCompServiceImplTest extends BaseSpringTest {
 
     @Test
     public void update() {
-   /*     Map map = new HashMap<String, String>();
-        map.put("detailId", "OPD2018081300000000001455");
-        map.put("srcId", "OS2018081700000000000444");
+      Map map = new HashMap<String, String>();
+        map.put("detailId", "OPD2018101700000000001834");
+        map.put("srcId", "RO20181018000000000000467");
+        map.put("mustDeductionAmtSum", "1000");
+        map.put("actualDeductionAmtSum", "100");
+        map.put("notDeductionAmt", "900");
+        map.put("deductTime", "900");
         List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         list.add(map);
-        ResultVO resultVO = paymentDetailService.uploadStatus(list);
-        System.out.println(resultVO);*/
+        ResultVO resultVO = paymentDetailService.uploadStatus(list, PaySign.JQ.code);
+        System.out.println(resultVO);
     }
 
     @Test

@@ -23,6 +23,7 @@ import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import org.apache.poi.util.SystemOutLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,11 +72,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
         profitStagingDetail.setId(idService.genId(TabId.P_STAGING_DETAIL));
         profitStagingDetail.setCurrentStagCount(1);
-        profitStagingDetail.setDeductionDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM")));
+        profitStagingDetail.setDeductionDate(date.getYear()+"-"+date.getMonthValue());
         BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
         profitStagingDetail.setMustAmt(mustDeductionAmt);
         profitStagingDetail.setRealAmt(BigDecimal.ZERO);
-        profitStagingDetail.setRemark("机具扣款分期调整下月还款计划");
+        profitStagingDetail.setRemark("机具扣款分期调整下月扣款明细");
         profitStagingDetail.setSourceId(profitDeduction.getSourceId());
         profitStagingDetail.setStagId(profitDeduction.getId());
         profitStagingDetail.setStatus(StagingDetailStatus.N.getStatus());
@@ -156,6 +157,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         Map<String, Object> reqMap = new HashMap<>();
         if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", agentVo.getOrderAprDept());
+        }
+
+        if(Objects.equals("pass",agentVo.getApprovalResult())
+                && StringUtils.isBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", "finish");
         }
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());

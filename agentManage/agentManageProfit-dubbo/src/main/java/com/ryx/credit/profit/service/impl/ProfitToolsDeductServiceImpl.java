@@ -1,10 +1,12 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.agent.AgentBusinfoService;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -125,10 +128,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                     basicsProfitAmt = new BigDecimal(newMap.get("basicsProfitAmt").toString());
                 }
                 LOG.info("机具扣款流水号：{}，代理商编号：{}，代理商剩余的基础分润：{}", profitDeductionList.getSourceId(), agentPid, basicsProfitAmt);
-
-                if(basicsProfitAmt.compareTo(BigDecimal.ZERO) == 0){
-                    break;
-                }
             }
         }
         map.put("mustDeductionAmtSum", mustDeductionAmtSum);
@@ -164,8 +163,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 profitDeduction.getDeductionDate().replaceAll("-", ""), null);
         if(profitMonth != null && !profitMonth.isEmpty()){
             Map<String, Object> newMap = new HashMap<String, Object>();
-            newMap.put("basicsProfitAmt", BigDecimal.ZERO);
             BigDecimal notDeductionAmt = mustAmt.subtract(basicsProfitAmt);//未扣足的部分
+            newMap.put("basicsProfitAmt", BigDecimal.ZERO);
             LOG.info("应扣金额：{}，基础分润扣款：{}，扣减后应扣：{}：", mustAmt, basicsProfitAmt,notDeductionAmt);
             BigDecimal actualDeductionAmt = basicsProfitAmt; //已扣的部分
             profitDeduction.setActualDeductionAmt(profitDeduction.getActualDeductionAmt().add(basicsProfitAmt));//截止目前实扣
@@ -423,26 +422,25 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             List<Map<String, Object>> noticeList = new ArrayList<Map<String, Object>>();
             for (ProfitDeduction deduction : list){
                 Map<String, Object> map = new HashMap<String, Object>(5);
-                if(deduction.getActualDeductionAmt().compareTo(BigDecimal.ZERO) == 0){
-                    map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());//应扣
-                    map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());//实扣
-                    map.put("notDeductionAmt", deduction.getMustDeductionAmt());//未扣足
-                    map.put("deductTime", "增加扣款时间");//扣款时间
-                    map.put("detailId", deduction.getSourceId());//订单号
-                    map.put("srcId", deduction.getId());//分润系统扣款ID
-                    noticeList.add(map);
-                } else if(deduction.getMustDeductionAmt().compareTo(deduction.getActualDeductionAmt()) > 0){
-                    map.put("mustDeductionAmtSum", deduction.getMustDeductionAmt());
-                    map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());
-                    map.put("notDeductionAmt", deduction.getNotDeductionAmt());
-                    map.put("deductTime", "增加扣款时间");
-                    map.put("detailId", deduction.getSourceId());
-                    map.put("srcId", deduction.getId());
-                    noticeList.add(map);
+                ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
+                if(detail == null){
+                    map.put("deductTime", "");//扣款时间
+                } else {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+                    String updateTime = sdf.format(detail.getCreateDateTime());
+                    map.put("deductTime", updateTime);//最后扣款时间
                 }
+                BigDecimal mustDeductionAmtSum = deduction.getMustDeductionAmt() == null ? BigDecimal.ZERO : deduction.getMustDeductionAmt();
+                map.put("mustDeductionAmtSum", mustDeductionAmtSum.toString());//应扣
+                BigDecimal actualDeductionAmtSum = deduction.getActualDeductionAmt() == null ? BigDecimal.ZERO : deduction.getActualDeductionAmt();
+                map.put("actualDeductionAmtSum", actualDeductionAmtSum.toString());//实扣
+                map.put("notDeductionAmt", mustDeductionAmtSum.subtract(actualDeductionAmtSum).toString());//未扣足
+                map.put("detailId", deduction.getSourceId());//订单号
+                map.put("srcId", deduction.getId());//分润系统扣款ID
+                noticeList.add(map);
             }
-            LOG.info("系统已经终审，通知告诉订单系统，机具款未扣足部分订单：{}",JSONObject.toJSON(noticeList));
-//        iPaymentDetailService.uploadStatus(noticeList,"");
+            LOG.info("系统已经终审，通知订单系统，机具款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
+            iPaymentDetailService.uploadStatus(noticeList, PaySign.JQ.code);
         }
     }
 
