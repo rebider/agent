@@ -33,6 +33,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         if(profitDeduction != null){
             if(StringUtils.isNotBlank(profitDeduction.getId())){
                 criteria.andDeductionIdEqualTo(profitDeduction.getId());
+                example.setOrderByClause("CREATE_DATE_TIME DESC");
                 List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
                 return list != null && !list.isEmpty() ? list.get(0) : null;
             }

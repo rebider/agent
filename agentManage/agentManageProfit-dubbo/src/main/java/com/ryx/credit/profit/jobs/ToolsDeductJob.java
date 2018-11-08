@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.jobs;
 
 import com.ryx.credit.common.enumc.GetMethod;
+import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
@@ -36,7 +37,6 @@ public class ToolsDeductJob {
     @Scheduled(cron = "0 0 10 * * ?")
     public void execut(){
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
-        String beforeDeductDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);;
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             if(list!= null && !list.isEmpty()){
@@ -45,12 +45,12 @@ public class ToolsDeductJob {
                 LOG.info("机具扣款分期入库成功：{} 条", successList.size());
                 try {
                     //通知订单系统，订单付款中
-//                iPaymentDetailService.uploadStatus(successList);
+                iPaymentDetailService.uploadStatus(successList, PaySign.FKING.code);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail("2018-11");
+            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
             if(detailList != null && !detailList.isEmpty()){
                 LOG.info("上月存在调整成功的机具扣款，新增一条到本月扣款中，：{} 条", detailList.size());
                 toolsDeductService.deductCompletionInfo(detailList);
