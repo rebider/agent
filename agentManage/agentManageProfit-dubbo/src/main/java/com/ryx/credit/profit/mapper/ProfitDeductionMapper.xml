@@ -430,6 +430,6 @@
 
   <delete id="resetDataDeduction">
     delete from P_DEDUCTION
-    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyymm')
+    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyy-MM')
   </delete>
 </mapper>
