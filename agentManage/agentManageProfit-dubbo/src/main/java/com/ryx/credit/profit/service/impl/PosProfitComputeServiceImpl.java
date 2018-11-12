@@ -212,7 +212,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 String[] spl = posRewardTemplate.getActivityValid().trim().split("~");
                 List<String> list = getMonthBetween(spl[0], spl[1]);
                 for(String activitDate : list){
-                    if(Objects.equals(activitDate, previewDate)){
+                    if(Objects.equals(activitDate.replaceAll("-", ""), previewDate)){
                         BigDecimal deductAmt = this.againComputeReward(posRewardTemplate, posRewardDetail, previewDate);
                         deductRewardAmt = deductRewardAmt.add(deductAmt);
                         if(deductAmt.compareTo(BigDecimal.ZERO) > 0){
@@ -225,7 +225,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     break;
                 }
             } else {
-                if(Objects.equals(posRewardTemplate.getActivityValid(), previewDate)){
+                if(Objects.equals(posRewardTemplate.getActivityValid().replaceAll("-", ""), previewDate)){
                     BigDecimal deductAmt = this.againComputeReward(posRewardTemplate, posRewardDetail, previewDate);
                     deductRewardAmt = deductRewardAmt.add(deductAmt);
                     if(deductAmt.compareTo(BigDecimal.ZERO) > 0){
