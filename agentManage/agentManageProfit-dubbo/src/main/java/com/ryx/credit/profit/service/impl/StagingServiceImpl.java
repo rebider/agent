@@ -83,6 +83,9 @@ public class StagingServiceImpl implements StagingService {
         if (StringUtils.isNotBlank(profitStagingDetail.getDeductionDate())){
             criteria.andDeductionDateEqualTo(profitStagingDetail.getDeductionDate());
         }
+        if (StringUtils.isNotBlank(profitStagingDetail.getStatus())){
+            criteria.andDeductionDateEqualTo(profitStagingDetail.getStatus());
+        }
         example.setOrderByClause("DEDUCTION_DATE");
         profitDeductions = profitStagingDetailMapper.selectByExample(example);
         total = profitStagingDetailMapper.countByExample(example);

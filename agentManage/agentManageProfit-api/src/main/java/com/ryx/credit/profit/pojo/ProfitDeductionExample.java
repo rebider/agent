@@ -1542,6 +1542,10 @@ public class ProfitDeductionExample {
             addCriterion("DEDUCTION_STATUS =", value, "userId");
             return (Criteria) this;
         }
+        public Criteria andDeductionStatusNotEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS <>", value, "userId");
+            return (Criteria) this;
+        }
 
 
         public Criteria andDeductionStatusIsNull() {

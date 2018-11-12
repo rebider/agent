@@ -3,6 +3,7 @@ package com.ryx.credit.profit.dao;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLsExample;
 import java.util.List;
+import java.util.Map;
 
 public interface ProfitSettleErrLsMapper {
     int countByExample(ProfitSettleErrLsExample example);
@@ -20,4 +21,6 @@ public interface ProfitSettleErrLsMapper {
     int updateByPrimaryKeySelective(ProfitSettleErrLs record);
 
     int updateByPrimaryKey(ProfitSettleErrLs record);
+
+    List<ProfitSettleErrLs> getNotDeductionProfitSettleErrLsList(Map<String, Object> param);
 }

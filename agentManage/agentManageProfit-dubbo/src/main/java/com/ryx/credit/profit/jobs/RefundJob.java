@@ -165,8 +165,14 @@ public class RefundJob {
         JSONObject result = getRefundList(param);
         if (result.containsKey("info") ) {
             JSONArray array = result.getJSONArray("info");
+            // 获取现有未扣完数据
+            String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+            Map<String, Object> query = new HashMap<>();
+            query.put("deductionDate", deductionDate);
+            query.put("bussType", (String)param.get("bussType"));
+            List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotDeductionProfitSettleErrLsList(query);
             LOG.info("对数据汇总并生成退单明细。");
-            insertSettleErrList(array, orgMap, deductionIdMap);
+            insertSettleErrList(array, orgMap, deductionIdMap, settleErrLs);
             LOG.info("对数据汇总并生成扣款信息。");
             if (orgMap.size() > 0) {
                 Set<String> keys = orgMap.keySet();
@@ -219,13 +225,7 @@ public class RefundJob {
         Map<String, Object> param = new HashMap<>(2);
         param.put("agentId", deduction.getAgentId());
         param.put("parentAgentId",deduction.getParentAgentId());
-        BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(param);
-        stagNotDeductionSumAmt = stagNotDeductionSumAmt==null?BigDecimal.ZERO:stagNotDeductionSumAmt;
-        // 获取本月总应扣
-        BigDecimal mustSumAmt = getCurrentMonthDeductionAmt(deduction);
-        mustSumAmt = mustSumAmt==null? BigDecimal.ZERO: mustSumAmt;
-        // 计算本月新增
-        addAmt = addAmt.subtract(stagNotDeductionSumAmt).subtract(mustSumAmt);
+
         deduction.setAddDeductionAmt(addAmt);
         deduction.setSumDeductionAmt(addAmt);
         deduction.setMustDeductionAmt(addAmt);
@@ -263,8 +263,53 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/7/30 
     */ 
-    private void insertSettleErrList(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
-       array.stream().
+    private void insertSettleErrList(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap, List<ProfitSettleErrLs> settleErrLs) {
+
+        if (settleErrLs != null && settleErrLs.size() > 0) {
+            String sourceId = null;
+            Map<String , BigDecimal> sourceIdMap = new HashMap<>();
+            JSONArray delArray = new JSONArray();
+            for (ProfitSettleErrLs profitSettleErrLs : settleErrLs) {
+                boolean hasNode = false;
+                sourceId = profitSettleErrLs.getSourceId();
+                // 匹配退单是否有轧差或已追回的
+                if (profitSettleErrLs.getHostLs() != null) {
+                    for (Object obj : array) {
+                        JSONObject json = (JSONObject) obj;
+                        if (profitSettleErrLs.getHostLs().equals(json.getString("hostLs"))) {
+                            BigDecimal result = profitSettleErrLs.getMustDeductionAmt().subtract(json.getBigDecimal("shouldDeductAmt").abs());
+                            if (result.doubleValue() > 0) {
+                                if (sourceIdMap.containsKey(sourceId)) {
+                                    sourceIdMap.put(sourceId, sourceIdMap.get(sourceId).add(result));
+                                } else {
+                                    sourceIdMap.put(sourceId, result);
+                                }
+                            }
+                            hasNode = true;
+                            delArray.add(obj);
+                            break;
+                        }
+                    }
+                }else{
+                    hasNode = true;
+                }
+                if (!hasNode) {
+                    if (sourceIdMap.containsKey(sourceId)) {
+                        sourceIdMap.put(sourceId, sourceIdMap.get(sourceId).add(profitSettleErrLs.getMustDeductionAmt()));
+                    }else{
+                        sourceIdMap.put(sourceId, profitSettleErrLs.getMustDeductionAmt());
+                    }
+                }
+            }
+            array.removeAll(delArray);// 删除重复的退单
+            // 异步处理已变更退单
+            if (!sourceIdMap.isEmpty()) {
+                new Thread(() -> {
+                    profitDeductionService.updateProfitDeductionByMap(sourceIdMap);
+                }).start();
+            }
+        }
+        array.stream().
                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
                        ((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()< 0  )
                .forEach(json->{

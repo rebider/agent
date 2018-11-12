@@ -685,4 +685,9 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="getNotDeductionProfitSettleErrLsList" resultMap="BaseResultMap">
+     select    s.* from P_SETTLE_ERR_LS S
+     inner join p_deduction d on d.id = S.Source_Id and d.deduction_type='01' and d.deduction_date=#{deductionDate} and BUSINESS_TYPE=#{bussType}
+     where d.not_deduction_amt is null order by s.source_id
+  </select>
 </mapper>
