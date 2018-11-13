@@ -307,6 +307,7 @@ public class AimportServiceImpl implements AimportService {
                     //添加
                     }else{
                         ag.setcUser(userid);
+                        ag.setImport(true);
                         Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid);
                         //todo 生成后台用户
                         agentService.createBackUserbyAgent(ag_db.getId());
