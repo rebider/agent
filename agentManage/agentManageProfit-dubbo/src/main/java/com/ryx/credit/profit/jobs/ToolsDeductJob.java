@@ -42,13 +42,6 @@ public class ToolsDeductJob {
             if(list!= null && !list.isEmpty()){
                 LOG.info("接口获取机具扣款分期数据：{} 条", list.size());
                 List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
-                LOG.info("机具扣款分期入库成功：{} 条", successList.size());
-                try {
-                    //通知订单系统，订单付款中
-                iPaymentDetailService.uploadStatus(successList, PaySign.FKING.code);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
             List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
             if(detailList != null && !detailList.isEmpty()){
