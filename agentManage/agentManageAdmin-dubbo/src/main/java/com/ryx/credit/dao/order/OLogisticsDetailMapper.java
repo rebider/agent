@@ -33,4 +33,8 @@ public interface OLogisticsDetailMapper {
     int querySnCount(Map<String, Object> param);
 
     Map  selectSn(OLogisticsDetail oLogisticsDetail);
+
+    Long getOLogisticsDetailCount(Map<String, Object> param);
+
+    List<Map<String,Object>> getOLogisticsDetailList(Map<String, Object> param);
 }

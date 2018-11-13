@@ -15,4 +15,8 @@ public interface PosRewardSDetailService {
     PosRewardDetail getPosRewardDetail(PosRewardDetail posRewardDetail);
 
     void updatePosRewardDetail(PosRewardDetail posRewardDetail);
+
+    void clearPosRewardDetail(String currentDate);
+
+    void deleteCurrentDate(String currentDate);
 }

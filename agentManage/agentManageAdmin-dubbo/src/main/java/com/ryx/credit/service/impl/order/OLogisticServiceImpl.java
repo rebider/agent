@@ -669,7 +669,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return snList;
     }
 
-
     /**
      * @Author: Zhang Lei
      * @Description: 更新状态
@@ -879,4 +878,28 @@ public class OLogisticServiceImpl implements OLogisticsService {
         return list;
     }
 
+    /**
+     * 查詢物流明细
+     * @param param
+     * @param pageInfo
+     * @return
+     */
+    @Override
+    public PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = oLogisticsDetailMapper.getOLogisticsDetailCount(param);
+        List<Map<String, Object>> list = oLogisticsDetailMapper.getOLogisticsDetailList(param);
+    /*    for (Map<String, Object> stringObjectMap : list) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),String.valueOf(stringObjectMap.get("PRO_COM")));
+            if(dict!=null){
+                stringObjectMap.put("PRO_COM",dict.getdItemname());
+            }
+            Dict modelType = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),String.valueOf(stringObjectMap.get("PRO_TYPE")));
+            if (null!=modelType){
+                stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
+            }
+        }*/
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
 }

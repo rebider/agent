@@ -45,8 +45,7 @@ public class RoleServiceImpl extends ServiceImpl<CRoleMapper, CRole> implements 
         selectPage(page, wrapper);
         
         pageInfo.setRows((ArrayList) page.getRecords());
-       // pageInfo.setTotal(page.getTotal());
-        pageInfo.setTotal(Integer.valueOf(page.getRecords().size()));
+        pageInfo.setTotal(selectAll().size());
         return pageInfo;
     }
 
