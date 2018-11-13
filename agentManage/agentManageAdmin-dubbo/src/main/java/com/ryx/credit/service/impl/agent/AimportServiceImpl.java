@@ -559,46 +559,53 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setBusRegion(busItem.getBusRegion());
                             db_agentBusInfo.setBusScope(busItem.getBusScope());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
-                            break;
+                            busItem.setId(db_agentBusInfo.getId());
+                        }else{
+                            busItem.setcUser(userid);
+                            busItem =  agentBusinfoService.agentBusInfoInsert(busItem);
                         }
-
-                         busItem.setcUser(userid);
-                         busItem =  agentBusinfoService.agentBusInfoInsert(busItem);
                         List<AgentColinfo> colinfos = busItem.getAgentColinfoList();
                         if(colinfos.size()>0){
-                            AgentColinfo colinfo = colinfos.get(0);
-                            colinfo.setcUser(userid);
-                            AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
-                            agentColinfoExample.or().andAgentIdEqualTo(busItem.getAgentId()).andCloRealnameEqualTo(colinfo.getCloRealname())
-                                    .andCloBankAccountEqualTo(colinfo.getCloBankAccount()).andCloBankEqualTo(colinfo.getCloBank());
-                            //添加收款账户
-                            AgentColinfo ac = null;
-                            List<AgentColinfo>  colinfodb = agentColinfoMapper.selectByExample(agentColinfoExample);
-                            if(colinfodb.size()==0){
-                                //添加收款账户
-                                ac =  agentColinfoService.agentColinfoInsert(colinfo,Arrays.asList());
-                            }else{
-                                ac = colinfodb.get(0);
-                            }
-                            AgentColinfoRelExample agentColinfoRelExample = new AgentColinfoRelExample();
-                            agentColinfoRelExample.or().andAgentbusidEqualTo(busItem.getId()).andAgentidEqualTo(busItem.getAgentId())
-                                    .andAgentColinfoidEqualTo(ac.getId()).andBusPlatformEqualTo(busItem.getBusPlatform()).andStatusEqualTo(Status.STATUS_1.status);
-                            List<AgentColinfoRel>  listRel_db = agentColinfoRelMapper.selectByExample(agentColinfoRelExample);
+                            AgentColinfoExample agentColinfoExample_uniq  = new AgentColinfoExample();
+                            agentColinfoExample_uniq.or().andAgentIdEqualTo(busItem.getAgentId()).andStatusEqualTo(Status.STATUS_1.status);
+                            if(agentColinfoMapper.countByExample(agentColinfoExample_uniq)==0){
+                                    AgentColinfo colinfo = colinfos.get(0);
+                                    colinfo.setcUser(userid);
+                                    AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+                                    agentColinfoExample.or().andAgentIdEqualTo(busItem.getAgentId()).andCloRealnameEqualTo(colinfo.getCloRealname())
+                                            .andCloBankAccountEqualTo(colinfo.getCloBankAccount()).andCloBankEqualTo(colinfo.getCloBank());
+                                    //添加收款账户
+                                    AgentColinfo ac = null;
+                                    List<AgentColinfo>  colinfodb = agentColinfoMapper.selectByExample(agentColinfoExample);
+                                    if(colinfodb.size()==0){
+                                        //添加收款账户
+                                        colinfo.setImport(true);
+                                        colinfo.setCloTaxPoint(busItem.getCloTaxPoint());
+                                        ac =  agentColinfoService.agentColinfoInsert(colinfo,Arrays.asList());
+                                    }else{
+                                        ac = colinfodb.get(0);
+                                    }
+                                    AgentColinfoRelExample agentColinfoRelExample = new AgentColinfoRelExample();
+                                    agentColinfoRelExample.or().andAgentbusidEqualTo(busItem.getId()).andAgentidEqualTo(busItem.getAgentId())
+                                            .andAgentColinfoidEqualTo(ac.getId()).andBusPlatformEqualTo(busItem.getBusPlatform()).andStatusEqualTo(Status.STATUS_1.status);
+                                    List<AgentColinfoRel>  listRel_db = agentColinfoRelMapper.selectByExample(agentColinfoRelExample);
 
-                            //没有建立关系就建立关系
-                            if(listRel_db.size()==0) {
-                                //添加收款账户关系
-                                AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
-                                agentColinfoRel.setcUse(userid);
-                                agentColinfoRel.setAgentid(ac.getAgentId());
-                                agentColinfoRel.setAgentColinfoid(ac.getId());
-                                agentColinfoRel.setBusPlatform(busItem.getBusPlatform());
-                                agentColinfoRel.setAgentbusid(busItem.getId());
-                                AgentResult rel = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userid);
-                                logger.info("代理商导入收款账户业务关系{}",busItem.getId(),rel.getMsg());
-                            }else{
-                                logger.info("代理商导入收款账户业务关系已存在{}",busItem.getId(),listRel_db.get(0).getId());
+                                    //没有建立关系就建立关系
+                                    if(listRel_db.size()==0) {
+                                        //添加收款账户关系
+                                        AgentColinfoRel agentColinfoRel = new AgentColinfoRel();
+                                        agentColinfoRel.setcUse(userid);
+                                        agentColinfoRel.setAgentid(ac.getAgentId());
+                                        agentColinfoRel.setAgentColinfoid(ac.getId());
+                                        agentColinfoRel.setBusPlatform(busItem.getBusPlatform());
+                                        agentColinfoRel.setAgentbusid(busItem.getId());
+                                        AgentResult rel = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userid);
+                                        logger.info("代理商导入收款账户业务关系{}",busItem.getId(),rel.getMsg());
+                                    }else{
+                                        logger.info("代理商导入收款账户业务关系已存在{}",busItem.getId(),listRel_db.get(0).getId());
+                                    }
                             }
+
                         }
                     }
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
@@ -645,7 +652,7 @@ public class AimportServiceImpl implements AimportService {
         } catch (Exception e) {
             logger.info("代理商导入业务失败{}",e.getMessage());
             e.printStackTrace();
-            throw e;
+            return ResultVO.fail("代理商导入业务失败");
         }
 
     }
