@@ -98,7 +98,6 @@ public class NewProfitDataJob {
                         }
                     }
                     doSum(profitDate);
-                    posProfitComputeServiceImpl.otherOperate();
                 }else{
                     LOG.error("月份："+profitDate+"，二维码提供的没有获取到数据");
                 }
