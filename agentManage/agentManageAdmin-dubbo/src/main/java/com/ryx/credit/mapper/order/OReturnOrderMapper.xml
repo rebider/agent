@@ -436,6 +436,7 @@
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(odetail.return_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="agentId !=null and agentId !='' "> and ro.AGENT_ID=#{agentId}</if>
+      <if test="agName !=null and agName !='' "> and agent.ag_name like concat(concat( '%', #{agName}),'%')</if>
     </where>
   </sql>
 

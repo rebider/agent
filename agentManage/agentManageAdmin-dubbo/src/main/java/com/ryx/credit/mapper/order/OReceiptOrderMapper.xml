@@ -404,6 +404,27 @@
     left join a_agent ag on ag.id = ro.agent_id
     <where>
       and ro.status=1 and ag.status=1
+      <if test="par.proType != null and par.proType!=''" >
+        and suborder.pro_type=#{par.proType}
+      </if>
+      <if test="par.agentName != null and par.agentName!=''" >
+        and ag.AG_NAME like '${par.agentName}'
+      </if>
+      <if test="par.proName != null and par.proName!=''" >
+        and suborder.pro_name like '${par.proName}'
+      </if>
+      <if test="par.vender != null and par.vender!=''" >
+        and
+        exists(
+        select in_oa.id
+        from o_activity in_oa
+        where in_oa.pro_type=suborder.pro_type
+        and in_oa.act_code =oa.act_code
+        and in_oa.vender=#{par.vender}
+        and in_oa.pro_model=#{par.proModel}
+        and in_oa.status=1
+        )
+      </if>
       <if test="par.actCode != null and par.actCode!=''" >
         and oa.act_code=#{par.actCode}
       </if>
@@ -451,6 +472,12 @@
     <if test="par.proType != null and par.proType!=''" >
         and suborder.pro_type=#{par.proType}
     </if>
+      <if test="par.agentName != null and par.agentName!=''" >
+        and ag.AG_NAME like '${par.agentName}'
+      </if>
+      <if test="par.proName != null and par.proName!=''" >
+        and suborder.pro_name like '${par.proName}'
+      </if>
     <if test="par.vender != null and par.vender!=''" >
         and
          exists(
