@@ -129,7 +129,7 @@ public class TranDataJob {
             e.printStackTrace();
             throw  new RuntimeException("获取手刷分润交易数据失败");
         }
-        profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
+        profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(profitOrganTranMonth.getTranAmt()));
         profitOrganTranMonthService.insert(profitOrganTranMonth);
     }
 
