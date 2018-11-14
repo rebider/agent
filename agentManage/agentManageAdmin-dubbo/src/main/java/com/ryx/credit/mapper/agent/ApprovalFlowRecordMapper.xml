@@ -19,6 +19,7 @@
     <result column="ERROR_MSG" jdbcType="VARCHAR" property="errorMsg" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="SUBMITDATE" jdbcType="VARCHAR" property="subMitDate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -295,4 +296,114 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+
+
+  <select id="selectByExampleWithBusActRel" parameterType="map" resultMap="BaseResultMap">
+    <if test="ApprovalFlowRecordExample.page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    A_APPROVAL_FLOW_RECORD.ID,
+    A_APPROVAL_FLOW_RECORD.TASK_ID,
+    A_APPROVAL_FLOW_RECORD.EXECUTION_ID,
+    A_APPROVAL_FLOW_RECORD.TASK_NAME,
+    A_APPROVAL_FLOW_RECORD.BUS_ID,
+    A_APPROVAL_FLOW_RECORD.BUS_TYPE,
+    A_APPROVAL_FLOW_RECORD.APPROVAL_PERSON,
+    A_APPROVAL_FLOW_RECORD.APPROVAL_DEP,
+    A_APPROVAL_FLOW_RECORD.APPROVAL_TIME,
+    A_APPROVAL_FLOW_RECORD.APPROVAL_RESULT,
+    A_APPROVAL_FLOW_RECORD.APPROVAL_OPINION,
+    A_APPROVAL_FLOW_RECORD.STATUS,
+    A_APPROVAL_FLOW_RECORD.VERSION,
+    A_APPROVAL_FLOW_RECORD.ACTIVITY_STATUS,
+    A_APPROVAL_FLOW_RECORD.ERROR_MSG,
+    A_APPROVAL_FLOW_RECORD.AGENT_ID,
+    A_APPROVAL_FLOW_RECORD.AGENT_NAME,
+    TO_CHAR(a_bus_act_rel.c_time,'yyyy-MM-dd') as SUBMITDATE
+    from A_APPROVAL_FLOW_RECORD
+    left join a_bus_act_rel on A_APPROVAL_FLOW_RECORD.EXECUTION_ID = a_bus_act_rel.activ_id
+    <if test="ApprovalFlowRecordExample != null">
+      <where>
+        <foreach collection="ApprovalFlowRecordExample.oredCriteria" item="criteria" separator="or">
+          <if test="criteria.valid">
+            <trim prefix="(" prefixOverrides="and" suffix=")">
+              <foreach collection="criteria.criteria" item="criterion">
+                <choose>
+                  <when test="criterion.noValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition}
+                  </when>
+                  <when test="criterion.singleValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition} #{criterion.value}
+                  </when>
+                  <when test="criterion.betweenValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                  </when>
+                  <when test="criterion.listValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition}
+                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                      #{listItem}
+                    </foreach>
+                  </when>
+                </choose>
+              </foreach>
+            </trim>
+          </if>
+        </foreach>
+        <if test="subMitDateSta!=null and subMitDateEnd!=null and subMitDateSta!='' and subMitDateEnd!=''">
+          and to_char(a_bus_act_rel.c_time,'yyyy-MM-dd') &gt;= #{subMitDateSta} and to_char(a_bus_act_rel.c_time,'yyyy-MM-dd') &lt;= #{subMitDateEnd}
+        </if>
+      </where>
+    </if>
+    <if test="ApprovalFlowRecordExample.orderByClause != null">
+      order by ${ApprovalFlowRecordExample.orderByClause}
+    </if>
+    <if test="ApprovalFlowRecordExample.page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{ApprovalFlowRecordExample.page.begin} and rownum_ <= #{ApprovalFlowRecordExample.page.end} ]]>
+    </if>
+  </select>
+  <select id="selectByExampleWithBusActRelCount" parameterType="map" resultType="long">
+    select
+    count(*)
+    from A_APPROVAL_FLOW_RECORD
+    left join a_bus_act_rel on A_APPROVAL_FLOW_RECORD.EXECUTION_ID = a_bus_act_rel.activ_id
+    <if test="ApprovalFlowRecordExample != null">
+      <where>
+        <foreach collection="ApprovalFlowRecordExample.oredCriteria" item="criteria" separator="or">
+          <if test="criteria.valid">
+            <trim prefix="(" prefixOverrides="and" suffix=")">
+              <foreach collection="criteria.criteria" item="criterion">
+                <choose>
+                  <when test="criterion.noValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition}
+                  </when>
+                  <when test="criterion.singleValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition} #{criterion.value}
+                  </when>
+                  <when test="criterion.betweenValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                  </when>
+                  <when test="criterion.listValue">
+                    and A_APPROVAL_FLOW_RECORD.${criterion.condition}
+                    <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                      #{listItem}
+                    </foreach>
+                  </when>
+                </choose>
+              </foreach>
+            </trim>
+          </if>
+        </foreach>
+        <if test="subMitDateSta!=null and subMitDateEnd!=null and subMitDateSta!='' and subMitDateEnd!=''">
+          and to_char(a_bus_act_rel.c_time,'yyyy-MM-dd') &gt;= #{subMitDateSta} and to_char(a_bus_act_rel.c_time,'yyyy-MM-dd') &lt;= #{subMitDateEnd}
+        </if>
+      </where>
+    </if>
+
+  </select>
+
 </mapper>

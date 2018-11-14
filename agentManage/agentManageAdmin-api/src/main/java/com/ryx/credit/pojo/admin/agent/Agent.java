@@ -83,6 +83,8 @@ public class Agent extends AgentExtends implements Serializable {
 
     private String agRegArea;
 
+    private boolean isImport = false;
+
     public String getId() {
         return id;
     }
@@ -329,5 +331,13 @@ public class Agent extends AgentExtends implements Serializable {
 
     public void setAgRegArea(String agRegArea) {
         this.agRegArea = agRegArea;
+    }
+
+    public boolean isImport() {
+        return isImport;
+    }
+
+    public void setImport(boolean anImport) {
+        isImport = anImport;
     }
 }

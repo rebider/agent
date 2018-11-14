@@ -45,6 +45,10 @@ public class ApprovalFlowRecord implements Serializable{
 
     private String endTime;
 
+    private String subMitDate;//审批流程提交日期
+
+    private String subMitDateSta;//审批流程提交開始
+    private String subMitDateEnd;//审批流程提交结束
 
     public String getId() {
         return id;
@@ -205,5 +209,29 @@ public class ApprovalFlowRecord implements Serializable{
 
     public void setAgentName(String agentName) {
         this.agentName = agentName;
+    }
+
+    public String getSubMitDate() {
+        return subMitDate;
+    }
+
+    public void setSubMitDate(String subMitDate) {
+        this.subMitDate = subMitDate;
+    }
+
+    public String getSubMitDateSta() {
+        return subMitDateSta;
+    }
+
+    public void setSubMitDateSta(String subMitDateSta) {
+        this.subMitDateSta = subMitDateSta;
+    }
+
+    public String getSubMitDateEnd() {
+        return subMitDateEnd;
+    }
+
+    public void setSubMitDateEnd(String subMitDateEnd) {
+        this.subMitDateEnd = subMitDateEnd;
     }
 }

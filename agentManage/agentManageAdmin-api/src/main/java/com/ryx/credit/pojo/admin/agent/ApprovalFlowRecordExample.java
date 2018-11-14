@@ -1287,6 +1287,8 @@ public class ApprovalFlowRecordExample {
             addCriterion("AGENT_NAME not between", value1, value2, "agentName");
             return (Criteria) this;
         }
+
+
     }
 
     public static class Criteria extends GeneratedCriteria {

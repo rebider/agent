@@ -425,6 +425,8 @@
                 <if test="agUniqNum!=null and agUniqNum!=''"> and AGENT.AG_UNIQ_NUM=#{agUniqNum} </if>
                 <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
                 <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
+                <if test="agName!=null and agName!=''"> and AGENT.ag_name like concat(concat( '%', #{agName} ),'%')</if>
+                <if test="proName!=null and proName!=''"> and os.pro_name like concat(concat( '%', #{proName}),'%')</if>
         </where>
     </sql>
 

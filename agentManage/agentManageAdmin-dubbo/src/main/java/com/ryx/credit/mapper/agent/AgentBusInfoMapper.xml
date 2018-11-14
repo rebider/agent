@@ -538,10 +538,14 @@
     (
     select
     b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
-    from A_agent a,A_agent_businfo b
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
+    from A_agent_businfo b
+    left join A_agent a on b.agent_id = a.id
+    left join A_agent_businfo c on c.id = b.bus_risk_parent
+    left join A_agent d on d.id = c.agent_id
+    left join c_organization e on e.id = a.ag_doc_pro
     where a.id=b.agent_id
-    and ag_status = #{reqMap.agStatus}
+    and a.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
@@ -559,6 +563,9 @@
     </if>
     <if test="reqMap.id != null and reqMap.id != '' " >
       and b.id = #{reqMap.id}
+    </if>
+    <if test="reqMap.busType != null and reqMap.busType != '' " >
+      and b.bus_type = #{reqMap.busType}
     </if>
     <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
@@ -575,10 +582,14 @@
     UNION
     select
     b.id,b.agent_id,b.bus_num,b.bus_platform,b.bus_type,a.ag_uniq_num,a.ag_name,a.ag_nature,a.ag_head,
-    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company
-    from A_agent a,A_agent_businfo b
+    a.ag_head_mobile,b.bus_status,b.status,b.clo_review_status,a.ag_status,b.c_time,b.clo_pay_company,b.bus_Inde_ass,d.ag_name as risk_parent,e.name as ag_doc_pro
+    from A_agent_businfo b
+    left join A_agent a on b.agent_id = a.id
+    left join A_agent_businfo c on c.id = b.bus_risk_parent
+    left join A_agent d on d.id = c.agent_id
+    left join c_organization e on e.id = a.ag_doc_pro
     <where> a.id=b.agent_id
-    and ag_status = #{reqMap.agStatus}
+    and a.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
@@ -597,6 +608,9 @@
     <if test="reqMap.id != null and reqMap.id != '' " >
       and b.id = #{reqMap.id}
     </if>
+      <if test="reqMap.busType != null and reqMap.busType != '' " >
+        and b.bus_type = #{reqMap.busType}
+      </if>
     <if test="reqMap.userId!=null and reqMap.userId!=''">
       and a.C_USER = #{reqMap.userId}
     </if>
@@ -620,9 +634,13 @@
     select count(*) from(
     select
     b.id
-    from A_agent a,A_agent_businfo b
+    from A_agent_businfo b
+    left join A_agent a on b.agent_id = a.id
+    left join A_agent_businfo c on c.id = b.bus_risk_parent
+    left join A_agent d on d.id = c.agent_id
+    left join c_organization e on e.id = a.ag_doc_pro
     where a.id=b.agent_id
-    and ag_status = #{reqMap.agStatus}
+    and a.ag_status = #{reqMap.agStatus}
     <if test="reqMap.agName != null and reqMap.agName != '' " >
       and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
     </if>
@@ -641,6 +659,9 @@
     <if test="reqMap.id != null and reqMap.id != '' " >
       and b.id = #{reqMap.id}
     </if>
+    <if test="reqMap.busType != null and reqMap.busType != '' " >
+      and b.bus_type = #{reqMap.busType}
+    </if>
     <if test="reqMap.orgId!=null and reqMap.orgId!=''">
       and (a.AG_DOC_PRO = #{reqMap.orgId} or a.AG_DOC_DISTRICT = #{reqMap.orgId})
     </if>
@@ -656,9 +677,13 @@
     UNION
     select
     b.id
-    from A_agent a,A_agent_businfo b
+    from A_agent_businfo b
+    left join A_agent a on b.agent_id = a.id
+    left join A_agent_businfo c on c.id = b.bus_risk_parent
+    left join A_agent d on d.id = c.agent_id
+    left join c_organization e on e.id = a.ag_doc_pro
     <where> a.id=b.agent_id
-      and ag_status = #{reqMap.agStatus}
+      and a.ag_status = #{reqMap.agStatus}
       <if test="reqMap.agName != null and reqMap.agName != '' " >
         and a.ag_name  like CONCAT(CONCAT('%',#{reqMap.agName}),'%')
       </if>
@@ -676,6 +701,9 @@
       </if>
       <if test="reqMap.id != null and reqMap.id != '' " >
         and b.id = #{reqMap.id}
+      </if>
+      <if test="reqMap.busType != null and reqMap.busType != '' " >
+        and b.bus_type = #{reqMap.busType}
       </if>
       <if test="reqMap.userId!=null and reqMap.userId!=''">
         and a.C_USER = #{reqMap.userId}

@@ -474,8 +474,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode)
 				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andStatusEqualTo(Status.STATUS_1.status)
-				.andBusNumIsNotNull();
+				.andStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0)
 			return list;
@@ -486,7 +485,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 				if(parent.getBusStatus()!=null && parent.getBusStatus().equals(Status.STATUS_1.status)){
 					list.add(parent);
 					if (StringUtils.isNotEmpty(parent.getAgentId())) {
-						return queryParenFourLevel(list, platformCode, parent.getBusNum());
+						return queryParenFourLevel(list, platformCode, parent.getAgentId());
 					}else{
 						return list;
 					}
@@ -577,8 +576,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		example.or().andBusNumEqualTo(busNum)
 				.andBusPlatformEqualTo(platformCode)
 				.andStatusEqualTo(Status.STATUS_1.status)
-				.andBusStatusEqualTo(Status.STATUS_1.status)
-				.andBusNumIsNotNull();
+				.andBusStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> plats = agentBusInfoMapper.selectByExample(example);
 		if(plats.size()==0) {
 			return list;
