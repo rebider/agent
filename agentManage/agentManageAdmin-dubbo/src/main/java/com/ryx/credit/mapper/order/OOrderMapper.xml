@@ -456,7 +456,7 @@
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -529,7 +529,7 @@
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -571,7 +571,7 @@
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -608,7 +608,7 @@
       <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -670,6 +670,7 @@
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
     </where>
@@ -693,6 +694,7 @@
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
     </where>
