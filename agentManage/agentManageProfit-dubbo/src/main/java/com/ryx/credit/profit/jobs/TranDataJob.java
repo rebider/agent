@@ -104,7 +104,7 @@ public class TranDataJob {
         profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonthService.delete(profitOrganTranMonth);
         addPos(json, settleMonth, tranAmt,posAmt);
-        addMpos(settleMonth, zyssAmt);
+        addMpos(json, settleMonth, zyssAmt);
         addQr(json, settleMonth);
     }
 
@@ -114,14 +114,14 @@ public class TranDataJob {
      * @Author: zhaodw
      * @Date: 2018/8/1
      */
-    private void addMpos(String settleMonth, BigDecimal tranAmt) {
+    private void addMpos(JSONObject json, String settleMonth, BigDecimal tranAmt) {
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
         profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("02");
         profitOrganTranMonth.setProductName("MPOS");
-        profitOrganTranMonth.setTranAmt(tranAmt);
+        profitOrganTranMonth.setTranAmt(tranAmt.add(json.getBigDecimal("QR_SS_TOTAL_AMT")));
         try {
             BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(null);
             profitOrganTranMonth.setSettleAmt(settleAmt);
@@ -129,7 +129,7 @@ public class TranDataJob {
             e.printStackTrace();
             throw  new RuntimeException("获取手刷分润交易数据失败");
         }
-        profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
+        profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(profitOrganTranMonth.getTranAmt()));
         profitOrganTranMonthService.insert(profitOrganTranMonth);
     }
 
@@ -140,15 +140,22 @@ public class TranDataJob {
     * @Date: 2018/8/1
     */
     private void addQr(JSONObject json, String settleMonth) {
+        BigDecimal tranAmt = json.getBigDecimal("QR_POS_TOTAL_AMT");
+        BigDecimal qrPos886 = json.getBigDecimal("QR_POS_886_WXZFB_AMT")==null?BigDecimal.ZERO: json.getBigDecimal("QR_POS_886_WXZFB_AMT");
+        BigDecimal qrNpos886 = json.getBigDecimal("QR_NPOS_886_WXZFB_AMT")==null?BigDecimal.ZERO: json.getBigDecimal("QR_NPOS_886_WXZFB_AMT");
+        BigDecimal qrPosUp886 = json.getBigDecimal("QR_POS_886_UPZF_AMT")==null?BigDecimal.ZERO: json.getBigDecimal("QR_POS_886_UPZF_AMT");
+        BigDecimal qrNposUp886 = json.getBigDecimal("QR_NPOS_886_UPZF_AMT")==null?BigDecimal.ZERO: json.getBigDecimal("QR_NPOS_886_UPZF_AMT");
+        BigDecimal qrPos885 = json.getBigDecimal("QR_POS_885_WXZFB_AMT")==null?BigDecimal.ZERO: json.getBigDecimal("QR_POS_885_WXZFB_AMT");
+        BigDecimal qrPosUp885 = json.getBigDecimal("QR_POS_885_UPZF_AMT")==null?BigDecimal.ZERO: json.getBigDecimal("QR_POS_885_UPZF_AMT");
         ProfitOrganTranMonth profitOrganTranMonth = new ProfitOrganTranMonth();
         profitOrganTranMonth.setProfitDate(settleMonth);
         profitOrganTranMonth.setCheckDate(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("03");
         profitOrganTranMonth.setProductName("二维码");
-        profitOrganTranMonth.setTranAmt(json.getBigDecimal("QR_TRAN_AMT"));
-        profitOrganTranMonth.setSettleAmt(json.getBigDecimal("PFT_QR_TRAN_AMT"));
-        profitOrganTranMonth.setDifferenceAmt(json.getBigDecimal("PFT_QR_TRAN_AMT").subtract(json.getBigDecimal("QR_TRAN_AMT")));
+        profitOrganTranMonth.setTranAmt(tranAmt);
+        profitOrganTranMonth.setSettleAmt(qrPos886.add(qrNpos886).add(qrPosUp886).add(qrNposUp886).add(qrPos885).add(qrPosUp885));
+        profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getTranAmt().subtract(profitOrganTranMonth.getSettleAmt()));
         profitOrganTranMonthService.insert(profitOrganTranMonth);
     }
 
@@ -165,7 +172,7 @@ public class TranDataJob {
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("01");
         profitOrganTranMonth.setProductName("POS");
-        profitOrganTranMonth.setSettleAmt(json.getBigDecimal("PFT_POS_TRAN_AMT").add(posAmt));
+        profitOrganTranMonth.setSettleAmt(json.getBigDecimal("POS_TOTAL_AMT"));
         profitOrganTranMonth.setTranAmt(tranAmt);
         profitOrganTranMonth.setDifferenceAmt(profitOrganTranMonth.getSettleAmt().subtract(tranAmt));
         profitOrganTranMonthService.insert(profitOrganTranMonth);

@@ -84,6 +84,12 @@ public class PlannerServiceImpl implements PlannerService {
         if (null!=map.get("PRO_TYPE") && StringUtils.isNotBlank(map.get("PRO_TYPE")+"")){
             reqMap.put("proType", map.get("PRO_TYPE"));
         }
+        if (null!=map.get("par_agentName") && StringUtils.isNotBlank(map.get("par_agentName")+"")){
+            reqMap.put("agentName", "%"+map.get("par_agentName")+"%");
+        }
+        if (null!=map.get("par_proName") && StringUtils.isNotBlank(map.get("par_proName")+"")){
+            reqMap.put("proName", "%"+map.get("par_proName")+"%");
+        }
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){

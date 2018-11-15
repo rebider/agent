@@ -169,7 +169,7 @@ public class RefundJob {
             String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
             Map<String, Object> query = new HashMap<>();
             query.put("deductionDate", deductionDate);
-            query.put("bussType", (String)param.get("bussType"));
+            query.put("bussType", ((String)param.get("bussType")).equals("02")?"POS":"MPOS");
             List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotDeductionProfitSettleErrLsList(query);
             LOG.info("对数据汇总并生成退单明细。");
             insertSettleErrList(array, orgMap, deductionIdMap, settleErrLs);
@@ -290,6 +290,7 @@ public class RefundJob {
                             break;
                         }
                     }
+                    array.removeAll(delArray);// 删除重复的退单
                 }else{
                     hasNode = true;
                 }
@@ -301,7 +302,7 @@ public class RefundJob {
                     }
                 }
             }
-            array.removeAll(delArray);// 删除重复的退单
+
             // 异步处理已变更退单
             if (!sourceIdMap.isEmpty()) {
                 new Thread(() -> {
@@ -311,7 +312,8 @@ public class RefundJob {
         }
         array.stream().
                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
-                       ((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()< 0  )
+                       ((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()< 0 &&
+                       ((JSONObject)json).getString("hostLs") != null   )
                .forEach(json->{
                    insertSettleErr((JSONObject)json, orgMap, deductionIdMap);
             }

@@ -113,12 +113,14 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
             }
         }
 
-
+        if(!ac.isImport())
         if("2".equals(ac.getCloType())) {//对私
             if (!isHaveYHKSMJ) {
                 throw new ProcessException("请添加银行卡扫描件");
             }
         }
+
+        if(!ac.isImport())
         if("1".equals(ac.getCloType())) {//对公
             if (!isHaveKHXUZ) {
                 throw new ProcessException("请添加开户许可证");
@@ -344,6 +346,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     @Override
     public AgentResult checkColInfo(AgentColinfo agentColinfo) {
+        if(agentColinfo.isImport())return AgentResult.ok();
         /**
          * cxinfo 系统对开票和税点进行系统控制
          * 2、如果前面是对私户进行打款，那么是否开票默认为否且不可修改

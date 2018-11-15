@@ -54,6 +54,8 @@ public class AgentColinfo implements Serializable {
 
     private String accountName;
 
+    private boolean isImport = false;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -244,5 +246,13 @@ public class AgentColinfo implements Serializable {
 
     public void setAccountName(String accountName) {
         this.accountName = accountName;
+    }
+
+    public boolean isImport() {
+        return isImport;
+    }
+
+    public void setImport(boolean anImport) {
+        isImport = anImport;
     }
 }
