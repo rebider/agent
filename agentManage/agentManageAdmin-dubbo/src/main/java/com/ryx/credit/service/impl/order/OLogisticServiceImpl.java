@@ -334,6 +334,17 @@ public class OLogisticServiceImpl implements OLogisticsService {
             ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
             if(planVo==null)throw new MessageException("排单信息未找到");
 
+            //查询排单数量和已发送数量。如果
+            if(planVo.getSendProNum()!=null){
+                if(planVo.getSendProNum().add(new BigDecimal(sendProNum)).compareTo(planVo.getPlanProNum())>0){
+                    throw new MessageException("发货数量已大于排单数量");
+                }
+            }else{
+                if(new BigDecimal(sendProNum).compareTo(planVo.getPlanProNum())>0){
+                    throw new MessageException("发货数量已大于排单数量");
+                }
+            }
+
             //商品信息从排单表里查
             oLogistics.setProCom(planVo.getProCom());// 厂家
             oLogistics.setProType(planVo.getProType());//排单添加商品类型
