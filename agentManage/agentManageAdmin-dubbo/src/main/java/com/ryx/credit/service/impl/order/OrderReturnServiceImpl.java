@@ -1310,7 +1310,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请填写物流单号");
                 throw new MessageException("请填写物流单号");
             }
-
+            if (com.ryx.credit.commons.utils.StringUtils.isBlank(proType)) {
+                log.info("商品类型不能为空");
+                throw new MessageException("商品类型不能为空");
+            }
 
             //校验文档不能更改
             List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
@@ -1467,8 +1470,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     //===============================================================================
                     //进行机具调整操作
-                    if (!proType.equals(PlatformType.MPOS.msg)){
-
+                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+                        log.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
@@ -1505,7 +1508,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         //cxinfo 机具退货调整首刷接口调用
                     }else{
 
-
+                        log.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
                         //起始sn
                         OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
                         exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
