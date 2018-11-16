@@ -364,7 +364,7 @@
     <if test="params.group != null and params.group!='' " >
       and ri.group_id_ = #{params.group}
     </if>
-    <if test="params.group = 'city' " >
+    <if test="params.group == 'city' " >
       and (a.ag_doc_pro = #{params.orgId} or a.ag_doc_district = #{params.orgId})
     </if>
   </sql>
