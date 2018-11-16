@@ -223,6 +223,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写物流单号");
                 throw new MessageException("请填写物流单号");
             }
+            if (StringUtils.isBlank(proType)) {
+                logger.info("商品类型不能为空");
+                throw new MessageException("商品类型不能为空");
+            }
             //需要验证截取sn前面的字符是否一致
             String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
             String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
@@ -382,9 +386,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //遍历查询库里是否存在sn码
             if (proType.equals(PlatformType.MPOS.msg) || proType.equals(PlatformType.MPOS.code)){
                 //首刷发货 更新库存记录
+                logger.info("首刷发货 更新库存记录:{}:{}",proType,stringList);
                 resultVO = updateLogisticsDetail(stringList, oLogistics.getId(), user, planVo.getId());
             }else{
                 //POS发货生成物流明细
+                logger.info("POS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
                 resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
             }
 
