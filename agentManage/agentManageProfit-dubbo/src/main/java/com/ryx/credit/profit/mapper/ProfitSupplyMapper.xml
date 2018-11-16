@@ -14,6 +14,7 @@
     <result column="SUPPLY_CODE" property="supplyCode" jdbcType="VARCHAR" />
     <result column="PARENT_AGENT_ID" property="parentAgentId" jdbcType="VARCHAR" />
     <result column="PARENT_AGENT_NAME" property="parentAgentName" jdbcType="VARCHAR" />
+    <result column="BUS_TYPE" property="busType" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -46,7 +47,7 @@
   </sql>
   <sql id="Base_Column_List" >
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, SUPPLY_DATE, REMERK, 
-    SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID,PARENT_AGENT_NAME
+    SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID, PARENT_AGENT_NAME, BUS_TYPE
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyExample" >
     <include refid="OracleDialectPrefix" />
@@ -95,12 +96,14 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
     insert into P_PROFIT_SUPPLY (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, SUPPLY_TYPE, SUPPLY_AMT, 
-      SUPPLY_DATE, REMERK, SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID,PARENT_AGENT_NAME
+      SUPPLY_DATE, REMERK, SOURCE_ID, SUPPLY_CODE, PARENT_AGENT_ID,
+      PARENT_AGENT_NAME, BUS_TYPE
       )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{supplyType,jdbcType=CHAR}, #{supplyAmt,jdbcType=DECIMAL}, 
       #{supplyDate,jdbcType=VARCHAR}, #{remerk,jdbcType=VARCHAR}, #{sourceId,jdbcType=VARCHAR},
-      #{supplyCode,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}
+      #{supplyCode,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR},
+      #{parentAgentName,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
@@ -142,6 +145,9 @@
       <if test="parentAgentName != null" >
         PARENT_AGENT_NAME,
       </if>
+      <if test="busType != null" >
+        BUS_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -179,6 +185,9 @@
       </if>
       <if test="parentAgentName != null" >
         #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null" >
+        #{busType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -221,6 +230,9 @@
       <if test="parentAgentName != null" >
         PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
       </if>
+      <if test="busType != null" >
+        BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -236,7 +248,8 @@
       SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
       SUPPLY_CODE = #{supplyCode,jdbcType=VARCHAR},
       PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
-      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      BUS_TYPE = #{busType,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix" >
