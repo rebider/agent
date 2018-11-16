@@ -416,7 +416,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
 
                     //进行入库、机具划拨操作 POS下发业务系统
-                    if (!proType.equals(PlatformType.MPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
 
                         List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();

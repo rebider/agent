@@ -391,7 +391,10 @@
       <if test="par.addrRealname != null and par.addrRealname!=''" >
         and ro.ADDR_REALNAME = #{par.addrRealname}
       </if>
+      order by suborder.c_time desc
+
     <include refid="OracleDialectSuffix" />
+
   </select>
 
   <select id="queryPlannerCount" parameterType="map" resultType="java.lang.Integer">
@@ -512,6 +515,9 @@
       and ro.ADDR_REALNAME = #{par.addrRealname}
     </if>
     </where>
+     order by suborder.c_time desc
+
     <include refid="OracleDialectSuffix" />
+
   </select>
 </mapper>

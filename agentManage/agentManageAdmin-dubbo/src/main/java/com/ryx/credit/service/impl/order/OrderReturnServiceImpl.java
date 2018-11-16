@@ -1467,7 +1467,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     //===============================================================================
                     //进行机具调整操作
-                    if (!proType.equals(PlatformType.MPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
 
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
