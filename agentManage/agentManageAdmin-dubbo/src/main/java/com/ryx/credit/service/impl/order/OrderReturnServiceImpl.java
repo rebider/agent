@@ -1310,7 +1310,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请填写物流单号");
                 throw new MessageException("请填写物流单号");
             }
-
+            if (com.ryx.credit.commons.utils.StringUtils.isBlank(proType)) {
+                log.info("商品类型不能为空");
+                throw new MessageException("商品类型不能为空");
+            }
 
             //校验文档不能更改
             List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
