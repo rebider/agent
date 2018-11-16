@@ -149,6 +149,7 @@ public class ProfitZhiFaDataJob {
             profitDirect.setFristAgentName(json.getString("FRISTAGENTID"));//一级代理商名称
             //profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
             profitDirect.setFristAgentPid(fristAgent.getAgentId());//一级代理商唯一码
+            profitDirect.setPaycompanyNum(fristAgent.getCloPayCompany());//一级代理商打款公司
             profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
             profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
             profitDirect.setTransFee(json.getBigDecimal("TRANSFEE"));//直发交易手续费
