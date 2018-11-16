@@ -380,7 +380,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
             ResultVO resultVO=new ResultVO();
             //遍历查询库里是否存在sn码
-            if (proType.equals(PlatformType.MPOS.msg)){
+            if (proType.equals(PlatformType.MPOS.msg) || proType.equals(PlatformType.MPOS.code)){
                 //首刷发货 更新库存记录
                 resultVO = updateLogisticsDetail(stringList, oLogistics.getId(), user, planVo.getId());
             }else{
