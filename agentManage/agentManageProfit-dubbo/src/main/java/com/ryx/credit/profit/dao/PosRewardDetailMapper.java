@@ -28,4 +28,8 @@ public interface PosRewardDetailMapper {
     List<Map<String, Object>> getRewardDetailList(Map<String, Object> param);
 
     void updateRewradData(String profitDate);
+
+    List<String> queryChildLevelByAgentId(String agentId);
+
+    int batchInsert(List<PosRewardDetail> list);
 }

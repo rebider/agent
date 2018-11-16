@@ -99,7 +99,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from POS_REWARD_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -111,13 +111,13 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
-    insert into POS_REWARD_DETAIL (ID, PROFIT_POS_DATE, POS_AGENT_ID, 
+    insert into POS_REWARD_DETAIL (ID, PROFIT_POS_DATE, POS_AGENT_ID,
       POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID, 
       POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, 
       POS_CURRENT_LOAN_COUNT, POS_AMT, POS_STANDARD, 
       POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, 
       POS_REMARK)
-    values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR},
       #{posAgentName,jdbcType=VARCHAR}, #{posMechanismType,jdbcType=VARCHAR}, #{posMechanismId,jdbcType=VARCHAR}, 
       #{posCompareCount,jdbcType=VARCHAR}, #{posCurrentCount,jdbcType=VARCHAR}, #{posCompareLoanCount,jdbcType=VARCHAR}, 
       #{posCurrentLoanCount,jdbcType=VARCHAR}, #{posAmt,jdbcType=VARCHAR}, #{posStandard,jdbcType=VARCHAR}, 
@@ -383,7 +383,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -441,4 +441,63 @@
       POS_OWN_REWARD = 0, POS_DOWN_REWARD = 0, POS_REAWRD_PROFIT = 0
     where PROFIT_POS_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
+
+  <select id="queryChildLevelByAgentId" resultType="java.lang.String">
+    SELECT AGENT_ID
+      FROM A_AGENT_BUSINFO
+     WHERE BUS_PARENT IN (SELECT ID
+                            FROM A_AGENT_BUSINFO
+                           WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
+                             AND BUS_PLATFORM = '100003')
+       AND BUS_PLATFORM = '100003'
+       AND STATUS = '1'
+       AND BUS_STATUS = '1'
+    UNION
+    SELECT AGENT_ID
+      FROM A_AGENT_BUSINFO
+     WHERE BUS_PLATFORM = '100003'
+       AND STATUS = '1'
+       AND BUS_STATUS = '1'
+       AND BUS_PARENT IN
+           (SELECT ID
+              FROM A_AGENT_BUSINFO
+             WHERE BUS_PARENT IN (SELECT ID
+                                    FROM A_AGENT_BUSINFO
+                                   WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
+                                     AND BUS_PLATFORM = '100003'))
+    UNION
+    SELECT AGENT_ID
+      FROM A_AGENT_BUSINFO
+     WHERE BUS_PLATFORM = '100003'
+       AND STATUS = '1'
+       AND BUS_STATUS = '1'
+       AND BUS_PARENT IN
+           (SELECT ID
+              FROM A_AGENT_BUSINFO
+             WHERE BUS_PARENT IN
+                   (SELECT ID
+                      FROM A_AGENT_BUSINFO
+                     WHERE BUS_PARENT IN
+                           (SELECT ID
+                              FROM A_AGENT_BUSINFO
+                             WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
+                               AND BUS_PLATFORM = '100003')))
+  </select>
+  <insert id="batchInsert" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
+    insert into POS_REWARD_DETAIL (ID, PROFIT_POS_DATE, POS_AGENT_ID,
+    POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID,
+    POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT,
+    POS_CURRENT_LOAN_COUNT, POS_AMT, POS_STANDARD,
+    POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT,
+    POS_REMARK)
+    values
+    <foreach collection ="list" item="detail" separator =",">
+      (#{detail.id,jdbcType=VARCHAR}, #{detail.profitPosDate,jdbcType=VARCHAR}, #{detail.posAgentId,jdbcType=VARCHAR},
+      #{detail.posAgentName,jdbcType=VARCHAR}, #{detail.posMechanismType,jdbcType=VARCHAR}, #{detail.posMechanismId,jdbcType=VARCHAR},
+      #{detail.posCompareCount,jdbcType=VARCHAR}, #{detail.posCurrentCount,jdbcType=VARCHAR}, #{detail.posCompareLoanCount,jdbcType=VARCHAR},
+      #{detail.posCurrentLoanCount,jdbcType=VARCHAR}, #{detail.posAmt,jdbcType=VARCHAR}, #{detail.posStandard,jdbcType=VARCHAR},
+      #{detail.posOwnReward,jdbcType=VARCHAR}, #{detail.posDownReward,jdbcType=VARCHAR}, #{detail.posReawrdProfit,jdbcType=VARCHAR},
+      #{detail.posRemark,jdbcType=VARCHAR})
+    </foreach >
+  </insert>
 </mapper>
