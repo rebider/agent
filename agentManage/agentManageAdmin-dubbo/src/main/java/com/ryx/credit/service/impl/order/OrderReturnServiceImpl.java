@@ -1444,8 +1444,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     OReturnOrderDetail returnOrderDetail1Info = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
-                    if(returnOrderDetail1Info.getAgentId().equals(subOrderItem.getAgentId())){
-                        throw new MessageException("发货退货不能是同一个代理商！");
+                    if(!returnOrderDetail1Info.getAgentId().equals(subOrderItem.getAgentId())){
+                        throw new MessageException("发货代理商退货代理商不是同一个代理商！");
                     }
 
                     if (receiptPlan != null) {
