@@ -165,6 +165,7 @@ public class PlannerServiceImpl implements PlannerService {
             if(venderModeActivity.size()!=1){
                 throw new MessageException(activity.getVender()+"厂商和"+activity.getProModel()+"活动确定不了具体的活动");
             }
+            //cxinfo  保存排单 确定具体活动 价格计算采用活动中的价格 xx
             //确定活动
             OActivity real_activity = venderModeActivity.get(0);
             OSubOrderActivityItem.setActivityId(real_activity.getId());
@@ -179,6 +180,8 @@ public class PlannerServiceImpl implements PlannerService {
             OSubOrderActivityItem.setTermBatchname(real_activity.getTermBatchname());
             OSubOrderActivityItem.setTermtype(real_activity.getTermtype());
             OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
+            OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
+            OSubOrderActivityItem.setPrice(real_activity.getPrice());
             if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
                 throw new MessageException("更新活动失败!");
             }

@@ -61,6 +61,8 @@ public class OActivity implements Serializable{
 
     private String actCode;
 
+    private BigDecimal originalPrice;
+
     private String proTypeName;
 
     public String getProTypeName() {
@@ -302,5 +304,13 @@ public class OActivity implements Serializable{
 
     public void setActCode(String actCode) {
         this.actCode = actCode == null ? null : actCode.trim();
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
     }
 }

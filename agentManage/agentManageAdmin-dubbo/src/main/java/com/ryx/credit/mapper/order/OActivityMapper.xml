@@ -30,6 +30,7 @@
     <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
     <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
     <result column="ACT_CODE" jdbcType="VARCHAR" property="actCode" />
+    <result column="ORIGINAL_PRICE" jdbcType="DECIMAL" property="originalPrice" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -64,7 +65,7 @@
     ID, PRODUCT_ID, RULE_ID, ACTIVITY_NAME, PRO_TYPE, ACTIVITY_WAY, ACTIVITY_RULE, PLATFORM,
     PRICE, BEGIN_TIME, END_TIME, VENDER, PRO_MODEL, C_TIME, U_TIME, C_USER, U_USER, STATUS,
     VERSION, G_TIME, ACTIVITY_CONDITION, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
-    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, ACT_CODE
+    TERM_BATCHNAME, TERMTYPE, TERMTYPENAME, ACT_CODE, ORIGINAL_PRICE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -104,7 +105,7 @@
     VERSION, G_TIME, ACTIVITY_CONDITION,
     BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE,
     TERM_BATCHNAME, TERMTYPE, TERMTYPENAME,
-    ACT_CODE)
+    ACT_CODE, ORIGINAL_PRICE)
     values (#{id,jdbcType=VARCHAR}, #{productId,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{proType,jdbcType=VARCHAR}, #{activityWay,jdbcType=VARCHAR},
     #{activityRule,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL},
@@ -114,7 +115,7 @@
     #{version,jdbcType=DECIMAL}, #{gTime,jdbcType=DECIMAL}, #{activityCondition,jdbcType=VARCHAR},
     #{busProCode,jdbcType=VARCHAR}, #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR},
     #{termBatchname,jdbcType=VARCHAR}, #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR},
-    #{actCode,jdbcType=VARCHAR})
+    #{actCode,jdbcType=VARCHAR}, #{originalPrice,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OActivity">
     insert into O_ACTIVITY
@@ -203,6 +204,9 @@
       <if test="actCode != null">
         ACT_CODE,
       </if>
+      <if test="originalPrice != null">
+        ORIGINAL_PRICE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -288,6 +292,9 @@
       </if>
       <if test="actCode != null">
         #{actCode,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPrice != null">
+        #{originalPrice,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -381,6 +388,9 @@
       <if test="actCode != null">
         ACT_CODE = #{actCode,jdbcType=VARCHAR},
       </if>
+      <if test="originalPrice != null">
+        ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -412,7 +422,8 @@
     TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
     TERMTYPE = #{termtype,jdbcType=VARCHAR},
     TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
-    ACT_CODE = #{actCode,jdbcType=VARCHAR}
+    ACT_CODE = #{actCode,jdbcType=VARCHAR},
+    ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

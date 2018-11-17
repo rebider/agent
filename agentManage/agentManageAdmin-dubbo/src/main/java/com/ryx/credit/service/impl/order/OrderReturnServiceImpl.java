@@ -1347,7 +1347,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //商品活动
             OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
             OSubOrderActivityExample.Criteria oSubOrderActivityExample_criteria = oSubOrderActivityExample.createCriteria();
-            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
             if(null==oSubOrderActivities){
                 log.info("查询活动数据错误1");
@@ -1744,6 +1744,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
