@@ -272,7 +272,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //商品活动
             OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
             OSubOrderActivityExample.Criteria oSubOrderActivityExample_criteria = oSubOrderActivityExample.createCriteria();
-            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
             if(null==oSubOrderActivities){
                 logger.info("查询活动数据错误1");
@@ -758,6 +758,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
@@ -839,6 +840,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
                 }
                 detail.setAgentId(order.getAgentId());
                 detail.setcUser(cUser);

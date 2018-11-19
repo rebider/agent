@@ -124,7 +124,8 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
-            throw e;
+            e.printStackTrace();
+            throw new Exception(e);
         }
     }
 
@@ -136,14 +137,15 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
             String toJson = JsonUtil.objectToJson(map);
             log.info("手刷机构统计信息查询请求参数:{}",toJson);
             String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("pos_org_statistics_url"), toJson);
-            log.info("手刷机构统计信息查询请求参数:{}",httpResult);
+            log.info("手刷机构统计信息查询返回参数:{}",httpResult);
             Map<String, Object> stringObjectMap = JsonUtil.jsonToMap(httpResult);
             String data = String.valueOf(stringObjectMap.get("data"));
             List<Map> dataMap = JsonUtil.jsonToList(data, Map.class);
             return AgentResult.ok(dataMap);
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
-            throw e;
+            e.printStackTrace();
+            throw new Exception(e);
         }
     }
 
