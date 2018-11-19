@@ -12,12 +12,10 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 import com.ryx.credit.profit.pojo.ProfitSupply;
-import com.ryx.credit.profit.service.ProfitDeductionService;
-import com.ryx.credit.profit.service.ProfitSettleErrLsService;
-import com.ryx.credit.profit.service.ProfitSupplyService;
-import com.ryx.credit.profit.service.StagingService;
+import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
@@ -78,8 +76,6 @@ public class RefundJob {
     @Autowired
     private AgentBusinfoService agentBusinfoService;
 
-
-
     @Scheduled(cron = "0 0 0 1 * ?")
     public void deal() {
         // 上月的开始及结束日期
@@ -116,13 +112,19 @@ public class RefundJob {
     }
 
     private void insertSupplyList(JSONArray array, String bussType) {
-        array.stream().
-                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
-                                ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0)
-                .forEach(json->{
-                            insertSupply((JSONObject) json, bussType);
-                        }
-                );
+        // 获取现有补款数据
+        String supplyDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        Map<String, BigDecimal> orgMap = new HashMap<>(10);
+        Map<String, String> supplyIdMap = new HashMap<>(10);
+        LOG.info("对数据汇总并生成补款明细。");
+        insertSettleErrList(array, orgMap, supplyIdMap, null);
+
+        if (orgMap.size() > 0) {
+            Set<String> keys = orgMap.keySet();
+            for (String key : keys) {
+                insertSupply(key, orgMap.get(key), supplyIdMap, bussType);
+            }
+        }
     }
 
     /***
@@ -131,8 +133,8 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/8/7
     */
-    private void insertSupply(JSONObject jsonObject, String bussType) {
-        Map<String,Object> agentMap = getAgentId(jsonObject.getString("instId"));
+    private void insertSupply(String instId, BigDecimal supplyAmt, Map<String, String> supplyIdMap,  String bussType) {
+        Map<String,Object> agentMap = getAgentId(instId);
         String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitSupply profitSupply = new ProfitSupply();
         profitSupply.setId(idService.genId(TabId.p_profit_supply));
@@ -143,12 +145,13 @@ public class RefundJob {
             profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
             profitSupply.setParentAgentId((String)agentMap.get("parentAgentId"));
         }else {
-            profitSupply.setAgentId(jsonObject.getString("instId"));
+            profitSupply.setAgentId(instId);
         }
-        profitSupply.setSupplyAmt(jsonObject.getBigDecimal("shouldMakeAmt"));
+        profitSupply.setSupplyAmt(supplyAmt);
         profitSupply.setSupplyDate(supplyDate);
         profitSupply.setSourceId(bussType);
         profitSupplyServiceImpl.insert(profitSupply);
+
     }
 
     /***
@@ -206,9 +209,9 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/7/30
     */
-    private void insertProfitDeduction(String agentId, BigDecimal addAmt, Map<String, String> deductionIdMap, String bussType) {
+    private void insertProfitDeduction(String instId, BigDecimal addAmt, Map<String, String> deductionIdMap, String bussType) {
         String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
-        Map<String,Object> agentMap = getAgentId(agentId);
+        Map<String,Object> agentMap = getAgentId(instId);
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         if (agentMap!=null) {
@@ -216,9 +219,9 @@ public class RefundJob {
             deduction.setParentAgentId((String) agentMap.get("parentAgentId"));
             deduction.setAgentName((String) agentMap.get("AG_NAME"));
         }else{
-            deduction.setAgentId(agentId);
+            deduction.setAgentId(instId);
         }
-        deduction.setId(deductionIdMap.get(agentId));
+        deduction.setId(deductionIdMap.get(instId));
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setDeductionDesc(DEDUCTION_DESC);
         // 获取本月后面分期未扣完金额
@@ -312,7 +315,8 @@ public class RefundJob {
         }
         array.stream().
                filter(json->(StringUtils.isNotBlank(((JSONObject)json).getString("instId"))) &&
-                       ((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()< 0 &&
+                       (((JSONObject)json).getBigDecimal("shouldDeductAmt").doubleValue()< 0 ||
+                               ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0) &&
                        ((JSONObject)json).getString("hostLs") != null   )
                .forEach(json->{
                    insertSettleErr((JSONObject)json, orgMap, deductionIdMap);

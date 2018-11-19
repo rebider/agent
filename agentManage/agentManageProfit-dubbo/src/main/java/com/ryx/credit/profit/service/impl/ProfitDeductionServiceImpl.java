@@ -182,6 +182,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
         deduction.setCreateDateTime(new Date());
         deduction.setUserId(userId);
+        if ("POS考核扣款（新国都、瑞易送）".equals(deduction.getRemark())) {
+            deduction.setSourceId("1");
+        }else  if ("手刷考核扣款（小蓝牙、MPOS）".equals(deduction.getRemark())) {
+            deduction.setSourceId("2");
+        }else{
+            deduction.setSourceId("3");
+        }
         this.insert(deduction);
     }
 
@@ -522,13 +529,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
         profitStagingDetail.setDeductionDate(LocalDate.now().toString().substring(0,7));
         profitStagingDetail.setSourceId(profitDeductionTemp.getId());
-        profitStagingDetail.setStatus(StagingDetailStatus.N.getStatus());
-        PageInfo pageInfo = stagingServiceImpl.getStagingDetailList(profitStagingDetail,null);
-        if (pageInfo != null && pageInfo.getTotal()>0) {
-           List<ProfitStagingDetail> profitStagingDetailList = pageInfo.getRows();
-            return profitStagingDetailList.stream().map(profitStagingDetailTemp->profitStagingDetailTemp.getMustAmt()).reduce(BigDecimal::add).get();//((ProfitStagingDetail)pageInfo.getRows().get(0)).getMustAmt();
-        }
-        return null;
+        return stagingServiceImpl.getNextStagAmt(profitStagingDetail);
     }
 
     /***
@@ -605,7 +606,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         // 创建一条历史扣款记录
         ProfitDeduction deduction = new ProfitDeduction();
         BeanUtils.copy(profitDeductionTemp, deduction);
-        deduction.setId(idService.genId(TabId.P_DEDUCTION));
+//        deduction.setId(idService.genId(TabId.P_DEDUCTION));
+        deduction.setId(StringUtils.getUUId());
         deduction.setStagingStatus("5");
         deduction.setNextId(profitDeductionTemp.getId());
         profitDeductionMapper.insert(deduction);

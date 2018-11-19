@@ -139,8 +139,7 @@
     MPOS_TD_MUST_DEDUCTION_AMT=0, MPOS_TD_REAL_DEDUCTION_AMT=0, RHB_DG_MUST_DEDUCTION_AMT=0,
     RHB_DG_REAL_DEDUCTION_AMT=0, POS_DG_MUST_DEDUCTION_AMT=0, POS_DG_REAL_DEDUCTION_AMT=0,
     ZPOS_DG_MUST_DEDUCTION_AMT=0, ZPOS_TD_REAL_DEDUCTION_AMT=0, POS_KH_DEDUCTION_AMT=0, MPOS_KH_DEDUCTION_AMT=0,
-    BU_DEDUCTION_AMT=0, OTHER_DEDUCTION_AMT=0, POS_TD_SUPPLY_AMT=0, MPOS_TD_SUPPLY_AMT=0, OTHER_SUPPLY_AMT=0,
-    DEDUCTION_TAX_MONTH_AGO_AMT=0, DEDUCTION_TAX_MONTH_AMT=0, SUPPLY_TAX_AMT=0,REAL_PROFIT_AMT=0, PROFIT_MONTH_AMT=0,
+    BU_DEDUCTION_AMT=0, OTHER_DEDUCTION_AMT=0, DEDUCTION_TAX_MONTH_AGO_AMT=0, DEDUCTION_TAX_MONTH_AMT=0, SUPPLY_TAX_AMT=0,REAL_PROFIT_AMT=0, PROFIT_MONTH_AMT=0,
     BASICS_PROFIT_AMT=0
     where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
@@ -659,21 +658,7 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     update P_PROFIT_DETAIL_M
     <set >
-      <if test="agentPid != null" >
-        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null" >
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="agentName != null" >
-        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      </if>
-      <if test="profitId != null" >
-        PROFIT_ID = #{profitId,jdbcType=VARCHAR},
-      </if>
-      <if test="profitDate != null" >
-        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
-      </if>
+
       <if test="tranAmt != null" >
         TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
       </if>
@@ -955,4 +940,9 @@
     set OTHER_SUPPLY_AMT = #{otherSupplyAmt,jdbcType=DECIMAL}
     where AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </update>
+  <select id="getProfitDetailMonthListByParam" resultMap="BaseResultMap">
+      select * from ( select row_.*, rownum rownum_ from (
+        select * from   P_PROFIT_DETAIL_M where PROFIT_DATE = #{profitDate}
+      <![CDATA[ ) row_ ) where rownum_ > #{start} and rownum_ <= #{end} ]]>
+  </select>
 </mapper>

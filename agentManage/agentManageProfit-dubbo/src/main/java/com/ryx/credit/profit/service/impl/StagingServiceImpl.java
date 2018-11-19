@@ -291,6 +291,15 @@ public class StagingServiceImpl implements StagingService {
         return BigDecimal.ZERO;
     }
 
+    @Override
+    public BigDecimal getNextStagAmt(ProfitStagingDetail profitStagingDetail) {
+        ProfitStagingDetail profitStagingDetailTemp = profitStagingDetailMapper.getNextStagAmt(profitStagingDetail);
+        if (profitStagingDetailTemp != null) {
+            return profitStagingDetailTemp.getMustAmt();
+        }
+        return BigDecimal.ZERO;
+    }
+
     /**
      * 审批流与业务关联对象
      * @param profitStaging 分期对象
