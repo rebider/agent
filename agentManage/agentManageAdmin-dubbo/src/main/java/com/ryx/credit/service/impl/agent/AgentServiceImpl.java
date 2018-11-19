@@ -525,6 +525,10 @@ public class AgentServiceImpl implements AgentService {
         if(StringUtils.isNotBlank(agent.getAgName())){
             reqMap.put("agName",agent.getAgName());
         }
+        List<String> agStatusList = new ArrayList<>();
+        agStatusList.add(AgStatus.Approving.name());
+        agStatusList.add(AgStatus.Approved.name());
+        reqMap.put("agStatusList",agStatusList);
         List<Agent> list = agentMapper.queryAgentTierList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(list);
