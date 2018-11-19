@@ -497,4 +497,43 @@ public class AgentServiceImpl implements AgentService {
         return AgentResult.fail();
     }
 
+    /**
+     * 查看自己下的代理商
+     * @param page
+     * @param agent
+     * @return
+     */
+    @Override
+    public PageInfo queryAgentTierList(Page page, Agent agent, Long userId) {
+
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+        if(orgCodeRes==null && orgCodeRes.size()!=1){
+            return null;
+        }
+        Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+        String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put("orgId",orgId);
+        reqMap.put("userId",userId);
+        reqMap.put("status",Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(agent.getAgStatus())){
+            reqMap.put("agStatus",agent.getAgStatus());
+        }
+        if(StringUtils.isNotBlank(agent.getAgUniqNum())){
+            reqMap.put("agUniqNum",agent.getAgUniqNum());
+        }
+        if(StringUtils.isNotBlank(agent.getAgName())){
+            reqMap.put("agName",agent.getAgName());
+        }
+        List<String> agStatusList = new ArrayList<>();
+        agStatusList.add(AgStatus.Approving.name());
+        agStatusList.add(AgStatus.Approved.name());
+        reqMap.put("agStatusList",agStatusList);
+        List<Agent> list = agentMapper.queryAgentTierList(reqMap,page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(list);
+        pageInfo.setTotal(agentMapper.queryAgentTierCount(reqMap));
+        return pageInfo;
+    }
+
 }

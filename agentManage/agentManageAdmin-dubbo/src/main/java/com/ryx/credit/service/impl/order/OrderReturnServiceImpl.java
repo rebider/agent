@@ -1310,7 +1310,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请填写物流单号");
                 throw new MessageException("请填写物流单号");
             }
-
+            if (com.ryx.credit.commons.utils.StringUtils.isBlank(proType)) {
+                log.info("商品类型不能为空");
+                throw new MessageException("商品类型不能为空");
+            }
 
             //校验文档不能更改
             List<Map<String,Object>> listItem = receiptPlanMapper.getReceipPlanList(FastMap.fastMap("PLAN_NUM",planNum));
@@ -1344,7 +1347,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //商品活动
             OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
             OSubOrderActivityExample.Criteria oSubOrderActivityExample_criteria = oSubOrderActivityExample.createCriteria();
-            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
             if(null==oSubOrderActivities){
                 log.info("查询活动数据错误1");
@@ -1441,8 +1444,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     OReturnOrderDetail returnOrderDetail1Info = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
-                    if(returnOrderDetail1Info.getAgentId().equals(subOrderItem.getAgentId())){
-                        throw new MessageException("发货退货不能是同一个代理商！");
+                    if(!returnOrderDetail1Info.getAgentId().equals(subOrderItem.getAgentId())){
+                        throw new MessageException("发货代理商退货代理商不是同一个代理商！");
                     }
 
                     if (receiptPlan != null) {
@@ -1467,8 +1470,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     //===============================================================================
                     //进行机具调整操作
-                    if (!proType.equals(PlatformType.MPOS.msg)){
-
+                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+                        log.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
                         List<OLogisticsDetail> snList = (List<OLogisticsDetail>)resultVO.getObj();
                         OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
                         if(null==oOrder){
@@ -1505,7 +1508,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         //cxinfo 机具退货调整首刷接口调用
                     }else{
 
-
+                        log.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
                         //起始sn
                         OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
                         exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(oLogistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
@@ -1741,6 +1744,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());

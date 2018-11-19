@@ -34,7 +34,7 @@ public class ToolsDeductJob {
     @Autowired
     private ProfitDeductionService profitDeductionService;
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/5 9 * * ?")
     public void execut(){
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         try {

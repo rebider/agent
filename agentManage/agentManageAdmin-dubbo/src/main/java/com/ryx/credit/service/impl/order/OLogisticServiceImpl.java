@@ -223,6 +223,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写物流单号");
                 throw new MessageException("请填写物流单号");
             }
+            if (StringUtils.isBlank(proType)) {
+                logger.info("商品类型不能为空");
+                throw new MessageException("商品类型不能为空");
+            }
             //需要验证截取sn前面的字符是否一致
             String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
             String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
@@ -268,7 +272,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             //商品活动
             OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
             OSubOrderActivityExample.Criteria oSubOrderActivityExample_criteria = oSubOrderActivityExample.createCriteria();
-            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId());
+            oSubOrderActivityExample_criteria.andSubOrderIdEqualTo(subOrderItem.getId()).andStatusEqualTo(Status.STATUS_1.status);
             List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
             if(null==oSubOrderActivities){
                 logger.info("查询活动数据错误1");
@@ -334,6 +338,17 @@ public class OLogisticServiceImpl implements OLogisticsService {
             ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(oLogistics.getReceiptPlanId());
             if(planVo==null)throw new MessageException("排单信息未找到");
 
+            //查询排单数量和已发送数量。如果
+            if(planVo.getSendProNum()!=null){
+                if(planVo.getSendProNum().add(new BigDecimal(sendProNum)).compareTo(planVo.getPlanProNum())>0){
+                    throw new MessageException("发货数量已大于排单数量");
+                }
+            }else{
+                if(new BigDecimal(sendProNum).compareTo(planVo.getPlanProNum())>0){
+                    throw new MessageException("发货数量已大于排单数量");
+                }
+            }
+
             //商品信息从排单表里查
             oLogistics.setProCom(planVo.getProCom());// 厂家
             oLogistics.setProType(planVo.getProType());//排单添加商品类型
@@ -369,11 +384,13 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
             ResultVO resultVO=new ResultVO();
             //遍历查询库里是否存在sn码
-            if (proType.equals(PlatformType.MPOS.msg)){
+            if (proType.equals(PlatformType.MPOS.msg) || proType.equals(PlatformType.MPOS.code)){
                 //首刷发货 更新库存记录
+                logger.info("首刷发货 更新库存记录:{}:{}",proType,stringList);
                 resultVO = updateLogisticsDetail(stringList, oLogistics.getId(), user, planVo.getId());
             }else{
                 //POS发货生成物流明细
+                logger.info("POS发货生成物流明细:{},{},{}",proType,oLogistics.getSnBeginNum(),oLogistics.getSnEndNum());
                 resultVO = insertLogisticsDetail(oLogistics.getSnBeginNum(), oLogistics.getSnEndNum(),Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount), oLogistics.getId(), user, planVo.getId());
             }
 
@@ -405,7 +422,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     }
 
                     //进行入库、机具划拨操作 POS下发业务系统
-                    if (!proType.equals(PlatformType.MPOS.msg)){
+                    if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
 
                         List<String> snList = JsonUtil.jsonToPojo(JsonUtil.objectToJson(resultVO.getObj()), List.class);
                         ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
@@ -741,6 +758,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
@@ -822,6 +840,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setTermBatchname(oSubOrderActivity.getTermBatchname());
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
+                    detail.setSettlementPrice(oSubOrderActivity.getPrice());
                 }
                 detail.setAgentId(order.getAgentId());
                 detail.setcUser(cUser);

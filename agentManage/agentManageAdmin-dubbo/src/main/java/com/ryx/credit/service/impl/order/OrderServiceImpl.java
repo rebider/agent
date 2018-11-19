@@ -496,10 +496,9 @@ public class OrderServiceImpl implements OrderService {
         for (OSubOrder oSubOrder : OSubOrders) {
             oSubOrder.setId(idService.genId(TabId.o_sub_order));
             OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
-            if (oSubOrder.getProPrice() == null || oSubOrder.getProPrice().compareTo(product.getProPrice()) != 0) {
-                logger.info("下订单:{}", "商品价格数据错误");
-                throw new MessageException("商品价格数据错误");
-            }
+
+            //cxinfo 订单添加 添加原价字段变更 价格计算采用活动中的价格 xx
+
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
                 throw new MessageException("商品数量错误");
@@ -529,7 +528,6 @@ public class OrderServiceImpl implements OrderService {
             oSubOrder.setProCode(product.getProCode());
             oSubOrder.setProName(product.getProName());
             oSubOrder.setProType(product.getProType());
-            oSubOrder.setProPrice(product.getProPrice());
             oSubOrder.setSendNum(Status.STATUS_0.status);
             oSubOrder.setIsDeposit(product.getIsDeposit());
             oSubOrder.setDeposit(product.getDeposit());
@@ -546,7 +544,15 @@ public class OrderServiceImpl implements OrderService {
             if (StringUtils.isNotBlank(oActivity)) {
                 OActivity activity = oActivityMapper.selectByPrimaryKey(oActivity);
                 if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
+
+                    if (activity.getOriginalPrice()==null || activity.getOriginalPrice().compareTo(BigDecimal.ZERO) < 0) {
+                        logger.info("下订单:{}", "活动原价不能小于0");
+                        throw new MessageException("活动原价不能小于0");
+                    }
+
+                    oSubOrder.setProPrice(activity.getOriginalPrice());
                     oSubOrder.setProRelPrice(activity.getPrice());
+                    //cxinfo 订单添加  添加原价字段变更 活动商品临时表同步商品 原价 xx
                     OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
                     oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
                     oSubOrderActivity.setActivityId(activity.getId());
@@ -558,6 +564,7 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setActivityRule(activity.getActivityRule());
                     oSubOrderActivity.setActivityWay(activity.getActivityWay());
                     oSubOrderActivity.setPrice(activity.getPrice());
+                    oSubOrderActivity.setOriginalPrice(activity.getOriginalPrice());
                     oSubOrderActivity.setProModel(activity.getProModel());
                     oSubOrderActivity.setVender(activity.getVender());
                     oSubOrderActivity.setPlatform(activity.getPlatform());
@@ -830,16 +837,10 @@ public class OrderServiceImpl implements OrderService {
 
             OProduct product = oProductMapper.selectByPrimaryKey(oSubOrder.getProId());
 
-            if (oSubOrder.getProPrice() == null || oSubOrder.getProPrice().compareTo(product.getProPrice()) != 0) {
-                logger.info("下订单:{}", "商品价格数据错误");
-                throw new MessageException("商品价格数据错误");
-            }
-
             if (oSubOrder.getProNum() == null || oSubOrder.getProNum().compareTo(BigDecimal.ZERO) <= 0) {
                 logger.info("下订单:{}", "商品数量错误");
                 throw new MessageException("商品数量错误");
             }
-
             //商品参加的活动
             String oActivity = oSubOrder.getActivity();
             //商品活动对象
@@ -856,9 +857,11 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("下订单:{}{}", "删除活动有误", subOrderActivity.getId());
                         throw new MessageException("删除活动有误");
                     }
+
                 }
             }
 
+            //cxinfo 订单修改 添加原价字段变更 价格计算采用活动中的价格 xx
             //参与活动
             if (StringUtils.isNotBlank(oActivity)) {
                 //查询活动
@@ -866,6 +869,7 @@ public class OrderServiceImpl implements OrderService {
                 //活动存在
                 if (activity != null && activity.getPrice() != null && activity.getPrice().compareTo(BigDecimal.ZERO) > 0) {
                     //设置商品实际单价
+                    oSubOrder.setProPrice(activity.getOriginalPrice());
                     oSubOrder.setProRelPrice(activity.getPrice());
                     //缓存活动信息
                     oSubOrderActivity = new OSubOrderActivity();
@@ -879,6 +883,7 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setActivityRule(activity.getActivityRule());
                     oSubOrderActivity.setActivityWay(activity.getActivityWay());
                     oSubOrderActivity.setPrice(activity.getPrice());
+                    oSubOrderActivity.setOriginalPrice(activity.getOriginalPrice());
                     oSubOrderActivity.setProModel(activity.getProModel());
                     oSubOrderActivity.setVender(activity.getVender());
                     oSubOrderActivity.setPlatform(activity.getPlatform());
@@ -897,19 +902,17 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setTermtypename(activity.getTermtypename());
                 } else {
                     //设置商品实际单价
-                    oSubOrder.setProRelPrice(product.getProPrice());
+                    throw new MessageException("商品必须选择指定的活动");
                 }
             } else {
                 //设置商品实际单价
-                oSubOrder.setProRelPrice(product.getProPrice());
+                throw new MessageException("商品必须选择指定的活动");
             }
-
             //添加订购单
             oSubOrder.setOrderId(order_db.getId());
             oSubOrder.setProCode(product.getProCode());
             oSubOrder.setProName(product.getProName());
             oSubOrder.setProType(product.getProType());
-            oSubOrder.setProPrice(product.getProPrice());
             oSubOrder.setSendNum(Status.STATUS_0.status);
             oSubOrder.setIsDeposit(product.getIsDeposit());
             oSubOrder.setDeposit(product.getDeposit());
@@ -1090,7 +1093,7 @@ public class OrderServiceImpl implements OrderService {
             }
             if (ids.size() > 0) {
                 OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                oSubOrderActivityExample.or().andSubOrderIdIn(ids);
+                oSubOrderActivityExample.or().andSubOrderIdIn(ids).andStatusEqualTo(Status.STATUS_1.status);
                 List<OSubOrderActivity> sSubOrderActivitys = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
                 f.putKeyV("sSubOrderActivitys", sSubOrderActivitys);
                 f.putKeyV("sSubOrderActivitysJson", JSONArray.toJSONString(sSubOrderActivitys));

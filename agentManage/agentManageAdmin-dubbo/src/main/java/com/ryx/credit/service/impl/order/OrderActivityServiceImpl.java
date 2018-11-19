@@ -108,6 +108,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("活动价格不能为空");
             throw new MessageException("活动价格不能为空");
         }
+        if (activity.getOriginalPrice()==null) {
+            logger.info("商品原价格不能为空");
+            throw new MessageException("商品原价格不能为空");
+        }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
@@ -143,6 +147,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         }
         if (StringUtils.isBlank(activity.getId())) {
             return result;
+        }
+        if (activity.getOriginalPrice()==null) {
+            return new AgentResult(500, "商品原价不能为空", "");
+        }
+        if (activity.getPrice()==null) {
+            return new AgentResult(500, "活动价格不能为空", "");
         }
         String platFormType= platFormMapper.selectPlatType(activity.getPlatform());
 

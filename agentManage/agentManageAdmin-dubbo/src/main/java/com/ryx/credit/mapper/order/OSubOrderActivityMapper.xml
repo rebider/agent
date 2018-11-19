@@ -28,6 +28,7 @@
     <result column="TERM_BATCHNAME" jdbcType="VARCHAR" property="termBatchname" />
     <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
     <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
+    <result column="ORIGINAL_PRICE" jdbcType="DECIMAL" property="originalPrice" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -62,7 +63,7 @@
     ID, ACTIVITY_ID, SUB_ORDER_ID, ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, ACTIVITY_WAY,
     PRICE, PRO_MODEL, VENDER, PLATFORM, G_TIME, C_TIME, U_TIME, C_USER, U_USER, VERSION,
     PRO_ID, PRO_NAME, STATUS, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
-    TERMTYPE, TERMTYPENAME
+    TERMTYPE, TERMTYPENAME, ORIGINAL_PRICE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -101,7 +102,8 @@
     U_USER, VERSION, PRO_ID,
     PRO_NAME, STATUS, BUS_PRO_CODE,
     BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
-    TERMTYPE, TERMTYPENAME)
+    TERMTYPE, TERMTYPENAME, ORIGINAL_PRICE
+    )
     values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR},
     #{activityWay,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{proModel,jdbcType=VARCHAR},
@@ -110,7 +112,8 @@
     #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{proId,jdbcType=VARCHAR},
     #{proName,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{busProCode,jdbcType=VARCHAR},
     #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, #{termBatchname,jdbcType=VARCHAR},
-    #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR})
+    #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, #{originalPrice,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
     insert into O_SUB_ORDER_ACTIVITY
@@ -193,6 +196,9 @@
       <if test="termtypename != null">
         TERMTYPENAME,
       </if>
+      <if test="originalPrice != null">
+        ORIGINAL_PRICE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -272,6 +278,9 @@
       </if>
       <if test="termtypename != null">
         #{termtypename,jdbcType=VARCHAR},
+      </if>
+      <if test="originalPrice != null">
+        #{originalPrice,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -359,6 +368,9 @@
       <if test="termtypename != null">
         TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
       </if>
+      <if test="originalPrice != null">
+        ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -388,7 +400,8 @@
     TERM_BATCHCODE = #{termBatchcode,jdbcType=VARCHAR},
     TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
     TERMTYPE = #{termtype,jdbcType=VARCHAR},
-    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR}
+    TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
+    ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

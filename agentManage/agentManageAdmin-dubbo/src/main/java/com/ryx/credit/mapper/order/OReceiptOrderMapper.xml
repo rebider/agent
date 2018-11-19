@@ -391,7 +391,10 @@
       <if test="par.addrRealname != null and par.addrRealname!=''" >
         and ro.ADDR_REALNAME = #{par.addrRealname}
       </if>
+      order by suborder.c_time desc
+
     <include refid="OracleDialectSuffix" />
+
   </select>
 
   <select id="queryPlannerCount" parameterType="map" resultType="java.lang.Integer">
@@ -401,7 +404,7 @@
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
-    left join a_agent ag on ag.id = ro.agent_id
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus}
     <where>
       and ro.status=1 and ag.status=1
       <if test="par.proType != null and par.proType!=''" >
@@ -466,7 +469,7 @@
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
-    left join a_agent ag on ag.id = ro.agent_id
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus}
     <where>
       and ro.status=1 and ag.status=1
     <if test="par.proType != null and par.proType!=''" >
@@ -512,6 +515,9 @@
       and ro.ADDR_REALNAME = #{par.addrRealname}
     </if>
     </where>
+     order by suborder.c_time desc
+
     <include refid="OracleDialectSuffix" />
+
   </select>
 </mapper>

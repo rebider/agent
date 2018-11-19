@@ -36,4 +36,8 @@ public interface AgentMapper {
     int queryAgentListViewCount(@Param("map") Map<String,Object> map);
 
     List<Map<String,Object>> queryAgentListView(@Param("map") Map<String,Object> map,@Param("page") Page page);
+
+    List<Agent> queryAgentTierList(@Param("map") Map<String,Object> map,@Param("page") Page page);
+
+    int queryAgentTierCount(@Param("map") Map<String,Object> map);
 }
