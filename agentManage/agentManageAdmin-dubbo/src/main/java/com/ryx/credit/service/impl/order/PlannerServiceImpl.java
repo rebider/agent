@@ -88,6 +88,7 @@ public class PlannerServiceImpl implements PlannerService {
             reqMap.put("proName", "%"+map.get("par_proName")+"%");
         }
         reqMap.put("agStatus", AgStatus.Approved.name());
+        reqMap.put("cIncomStatus", AgentInStatus.IN.status);
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){
