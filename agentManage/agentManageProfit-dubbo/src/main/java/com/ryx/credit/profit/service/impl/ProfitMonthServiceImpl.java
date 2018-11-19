@@ -41,6 +41,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private static final ForkJoinPool FORK_JOIN_POOL = new ForkJoinPool();
     private static Runtime RUN = Runtime.getRuntime();
     private static Map<String, List<Map<String, Object>>> profitAmtMap = new ConcurrentHashMap<>();
+    private static List<ProfitDetailMonth> notDeductionList = new ArrayList<>(10);
     private ProfitMonthMapper profitMonthMapper;
     @Autowired
     private ProfitDetailMonthMapper profitDetailMonthMapper;
@@ -447,12 +448,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         if (count > 0) {
             FORK_JOIN_POOL.invoke(new ProfitMonthServiceImpl.ComputStep(0, count, profitDetailMonth, computType));
             //合并代理商扣分润计算
-//            notDeductionList.stream().forEach(profitDetailMonthTemp -> {
-//                List<Map<String, Object>>  hbList = getAgentIdProfitAmt(profitDetailMonthTemp.getAgentId(), profitAmtMap);
-//                if (hbList != null && hbList.size() > 0) {
-//                    doHbDeduction(profitDetailMonthTemp, computType, hbList);
-//                }
-//            });
+            notDeductionList.stream().forEach(profitDetailMonthTemp -> {
+                List<Map<String, Object>>  hbList = getAgentIdProfitAmt(profitDetailMonthTemp.getAgentId(), profitAmtMap);
+                if (hbList != null && hbList.size() > 0) {
+                    doHbDeduction(profitDetailMonthTemp, computType, hbList);
+                }
+            });
             LOG.error("执行完毕");
             temp.clear();
             profitAmtMap.clear();
@@ -638,17 +639,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     private BigDecimal getComputAmt(ProfitDetailMonth profitDetailMonthTemp, String computType) {
         BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
-//        // 退单补款+
-//        sumAmt = sumAmt.add(getTdSupplyAmt(profitDetailMonthTemp));
-        // 其他补款+
-//        profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
-//        sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
-        // POS考核奖励
-//        long khstart = System.currentTimeMillis();
-//        getPosReward(profitDetailMonthTemp,computType);
-//        sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
-//        long khend = System.currentTimeMillis();
-//        System.out.println("考核处理时间"+(khend-khstart));
+//         POS考核奖励
+        long khstart = System.currentTimeMillis();
+        getPosReward(profitDetailMonthTemp,computType);
+        sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
+        long khend = System.currentTimeMillis();
+        System.out.println("考核处理时间"+(khend-khstart));
         //退单扣款-
         if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
             long tdkstart = System.currentTimeMillis();
@@ -758,43 +754,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
 
-    /***
-     /***
-     * @Description: 获取pos奖励
-     * @Param:
-     * @return:
-     * @Author: zhaodw
-     * @Date: 2018/8/14
-     */
-//    private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, String computType) {
-//        TransProfitDetail detail = new TransProfitDetail();
-//        detail.setAgentId(profitDetailMonthTemp.getAgentId());
-//        detail.setBusCode("100003");
-//        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
-//        detail.setProfitDate(currentDate);
-//        List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
-//        if (transProfitDetails.size() > 0) {
-//            detail = transProfitDetails.get(0);
-//            Map<String, Object> map = new HashMap<>(10);
-//            map.put("agentType", detail.getAgentType());
-//            map.put("agentId", detail.getAgentId());
-//            map.put("currentDate", currentDate);
-//            map.put("computType", computType);
-//            try {
-//                map = posProfitComputeServiceImpl.execut(map);
-//                BigDecimal posReward = profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt();
-//                profitDetailMonthTemp.setPosRewardAmt(posReward.add((BigDecimal) map.get("posRewardAmt")));
-//                profitDetailMonthTemp.setPosRewardDeductionAmt((BigDecimal) map.get("posAssDeductAmt"));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                LOG.error("获取pos奖励失败");
-//                throw new RuntimeException("获取pos奖励失败");
-//            }
-//        }else{
-//            profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
-//            profitDetailMonthTemp.setPosRewardDeductionAmt(BigDecimal.ZERO);
-//        }
-//    }
     private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, String computType) {
         String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         try {
@@ -810,34 +769,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             LOG.error("获取pos奖励失败");
             throw new RuntimeException("获取pos奖励失败");
         }
-
-//        TransProfitDetail detail = new TransProfitDetail();
-//        detail.setAgentId(profitDetailMonthTemp.getAgentId());
-//        detail.setBusCode("100003");
-//        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
-//        detail.setProfitDate(currentDate);
-//        List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
-//        if (transProfitDetails.size() > 0) {
-//            detail = transProfitDetails.get(0);
-//            Map<String, Object> map = new HashMap<>(10);
-//            map.put("agentType", detail.getAgentType());
-//            map.put("agentId", detail.getAgentId());
-//            map.put("currentDate", currentDate);
-//            map.put("computType", computType);
-//            try {
-//                map = posProfitComputeServiceImpl.execut(map);
-//                BigDecimal posReward = profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt();
-//                profitDetailMonthTemp.setPosRewardAmt(posReward.add((BigDecimal) map.get("posRewardAmt")));
-//                profitDetailMonthTemp.setPosRewardDeductionAmt((BigDecimal) map.get("posAssDeductAmt"));
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                LOG.error("获取pos奖励失败");
-//                throw new RuntimeException("获取pos奖励失败");
-//            }
-//        }else{
-//            profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
-//            profitDetailMonthTemp.setPosRewardDeductionAmt(BigDecimal.ZERO);
-//        }
     }
 
     /***
@@ -1022,7 +953,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 param.put("end", end);
                 List<ProfitDetailMonth> profitDetailMonthList = profitDetailMonthMapper.getProfitDetailMonthListByParam(param);
                 if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
-                    List<ProfitDetailMonth> notDeductionList = new ArrayList<>(10);
                     profitDetailMonthList.parallelStream().forEach(profitDetailMonthTemp -> {
                         if (profitDetailMonthTemp.getAgentId() != null) {
                             BigDecimal basicAmt = BigDecimal.ZERO;

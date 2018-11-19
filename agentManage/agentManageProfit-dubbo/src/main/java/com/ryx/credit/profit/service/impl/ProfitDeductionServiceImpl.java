@@ -297,8 +297,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         param.put("deductionStatus", "N6");
         List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
         if (deductionList != null && deductionList.size() > 0) {
-            BigDecimal profitAmt = (BigDecimal)param.get("profitAmt");
-            return getDeductionAmt(deductionList, profitAmt, (String) param.get("computeType"));
+            return getDeductionAmt(deductionList, param);
         }
         return  BigDecimal.ZERO;
     }
@@ -416,7 +415,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         // 获取代理商所有其它扣款信息
         param.put("type", DeductionType.OTHER.getType());
         List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
-        return getDeductionAmt(deductionList, (BigDecimal) param.get("profitAmt"), (String) param.get("computeType"));
+        return getDeductionAmt(deductionList, param);
     }
 
     /***
@@ -427,11 +426,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/8/9
     */
-    private BigDecimal getDeductionAmt( List<ProfitDeduction> deductionList, BigDecimal profitAmt, String computeType) {
+    private BigDecimal getDeductionAmt( List<ProfitDeduction> deductionList, Map<String, Object> param) {
         BigDecimal result =  BigDecimal.ZERO;
         if (deductionList != null && deductionList.size() > 0) {
             for (ProfitDeduction profitDeductionTemp : deductionList) {
-                result = deduction(result, profitAmt, profitDeductionTemp, computeType);
+                result = deduction(result,  profitDeductionTemp, param);
             }
         }
         return  result;
@@ -445,8 +444,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @return:
     * @Author: zhaodw
     * @Date: 2018/8/9
-    */
-    private BigDecimal deduction(BigDecimal result, BigDecimal profitAmt, ProfitDeduction profitDeductionTemp, String computeType) {
+    *///
+    private BigDecimal deduction(BigDecimal result, ProfitDeduction profitDeductionTemp, Map<String, Object> param) {
+        BigDecimal profitAmt = (BigDecimal) param.get("profitAmt");
+        String computeType = (String) param.get("computeType");
         BigDecimal currentProfit = null;
         if (profitAmt.doubleValue() > 0) {
             currentProfit = profitAmt;
@@ -468,6 +469,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 generalDeal(currentProfit, profitAmt, profitDeductionTemp);
             }
         }
+        param.put("profitAmt" , profitAmt);
         return result;
     }
 
