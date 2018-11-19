@@ -224,7 +224,7 @@
   </select>
 
     <select id="totalRPByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
-        SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1)
+        SELECT SUM(TOTAL_PROFIT)
         FROM P_PROFIT_D
         where
         to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
@@ -232,7 +232,7 @@
     </select>
 
   <select id="totalRPByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
-    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1)
+    SELECT SUM(TOTAL_PROFIT)
     FROM P_PROFIT_D
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
@@ -248,7 +248,7 @@
   </select>
 
   <select id="totalMonthByAgentId" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
-    SELECT SUM(TOTAL_PROFIT1)
+    SELECT SUM(TOTAL_PROFIT)
     FROM P_PROFIT_D
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
@@ -256,7 +256,7 @@
   </select>
 
   <select id="totalProfitAndReturn" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
-    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1+RETURN_MONEY)
+    SELECT SUM(TOTAL_PROFIT+RETURN_MONEY)
     FROM P_PROFIT_D
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
@@ -264,7 +264,7 @@
   </select>
 
   <select id="totalProfitAndReturnById" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
-    SELECT SUM(TOTAL_PROFIT+TOTAL_PROFIT1+RETURN_MONEY)
+    SELECT SUM(TOTAL_PROFIT+RETURN_MONEY)
     FROM P_PROFIT_D
     where
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
