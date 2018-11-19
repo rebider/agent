@@ -147,11 +147,11 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 profitSupply.setSupplyType(null!=supply.get(5)?String.valueOf(supply.get(5)):"");//补款类型
                 profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(6))));//补款金额
                 profitSupply.setSupplyCode(null!=supply.get(7)?String.valueOf(supply.get(7)):"");//补款码
+//                profitSupply.setBusType(null!=supply.get(8)?String.valueOf(supply.get(8)):"");//补款类型
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;
             }
-
             logger.info("补款数据信息-------------------------------------" , JSONObject.toJSON(supply));
             if (1 != insertSelective(profitSupply)) {
                 logger.info("插入失败！");

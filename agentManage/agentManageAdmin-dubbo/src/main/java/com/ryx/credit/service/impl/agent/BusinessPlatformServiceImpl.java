@@ -97,6 +97,9 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (agentBusInfo.getCloReviewStatus() != null) {
             reqMap.put("cloReviewStatus", agentBusInfo.getCloReviewStatus());
         }
+        if (agentBusInfo.getBusType() != null) {
+            reqMap.put("busType", agentBusInfo.getBusType());
+        }
         if (StringUtils.isNotBlank(flag) && flag.equals("1")){
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(agentBusInfo.getcUser()));
             if(orgCodeRes==null && orgCodeRes.size()!=1){

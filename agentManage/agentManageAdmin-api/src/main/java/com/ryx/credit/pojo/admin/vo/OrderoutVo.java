@@ -34,6 +34,7 @@ public class OrderoutVo implements Serializable{
     private String nuclearUser;
     private Date nuclearTime;
     private String nuclearTimeString;
+    private String agDocPpro;
 
     public BigDecimal getMoney() {
         return money;
@@ -211,5 +212,13 @@ public class OrderoutVo implements Serializable{
 
     public void setNuclearTimeString(String nuclearTimeString) {
         this.nuclearTimeString = nuclearTimeString;
+    }
+
+    public String getAgDocPpro() {
+        return agDocPpro;
+    }
+
+    public void setAgDocPpro(String agDocPpro) {
+        this.agDocPpro = agDocPpro;
     }
 }

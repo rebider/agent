@@ -61,6 +61,27 @@ public class ProfitDirect implements Serializable {
 
     private String status;
 
+    //新增字段
+    private String paycompanyName;
+
+    private String paycompanyNum;
+
+    public String getPaycompanyName() {
+        return paycompanyName;
+    }
+
+    public void setPaycompanyName(String paycompanyName) {
+        this.paycompanyName = paycompanyName;
+    }
+
+    public String getPaycompanyNum() {
+        return paycompanyNum;
+    }
+
+    public void setPaycompanyNum(String paycompanyNum) {
+        this.paycompanyNum = paycompanyNum;
+    }
+
     public String getStatus() {
         return status;
     }

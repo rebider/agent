@@ -232,11 +232,13 @@ public class AgentServiceImpl implements AgentService {
                 }
 
             }
-            if(!isHaveYYZZ){
-                throw new ProcessException("请添加营业执照附件");
-            }
-            if(!isHaveFRSFZ){
-                throw new ProcessException("请添加法人身份证附件");
+            if(!agent.isImport()) {
+                if (!isHaveYYZZ) {
+                    throw new ProcessException("请添加营业执照附件");
+                }
+                if (!isHaveFRSFZ) {
+                    throw new ProcessException("请添加法人身份证附件");
+                }
             }
             //保存数据历史
             if(!agentDataHistoryService.saveDataHistory(agent,agent.getId(), DataHistoryType.BASICS.code,userId,agent.getVersion()).isOK()){

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -51,47 +52,45 @@ public class DailyProfitMposDataJob {
         System.out.println("输出================================" + data);
     }
 
-    /**
-     * 2018.9.10 11:10："0 10 11 10 * ?"
-     */
-//    @Scheduled(cron = "0 44 16 22 * ?")
-    public void excute(){
-        List<String> dates = new ArrayList<String>();
-        dates.add("20180901");
-        dates.add("20180902");
-        dates.add("20180903");
-        dates.add("20180904");
-        dates.add("20180905");
-        dates.add("20180906");
-        dates.add("20180907");
-        dates.add("20180908");
-        dates.add("20180909");
-        dates.add("20180910");
-        dates.add("20180911");
-        dates.add("20180912");
-        dates.add("20180913");
-        dates.add("20180914");
-        dates.add("20180915");
-        dates.add("20180916");
-        dates.add("20180917");
-        dates.add("20180918");
-        dates.add("20180919");
-        dates.add("20180920");
-        dates.add("20180921");
-        dates.add("20180922");
-        dates.add("20180923");
-        dates.add("20180924");
-        dates.add("20180925");
-        dates.add("20180926");
-        dates.add("20180927");
-        dates.add("20180928");
-        dates.add("20180929");
-        dates.add("20180930");
-//        dates.add("20180831");
-        for(int i=0;i<dates.size();i++){
-            synchroProfitDay(dates.get(i));
-        }
-    }
+//    @Scheduled(cron = "0 43 13 15 * ?")
+//    public void excute(){
+//        List<String> dates = new ArrayList<String>();
+//        dates.add("20181001");
+//        dates.add("20181002");
+//        dates.add("20181003");
+//        dates.add("20181004");
+//        dates.add("20181005");
+//        dates.add("20181006");
+//        dates.add("20181007");
+//        dates.add("20181008");
+//        dates.add("20181009");
+//        dates.add("20181010");
+//        dates.add("20181011");
+//        dates.add("20181012");
+//        dates.add("20181013");
+//        dates.add("20181014");
+//        dates.add("20181015");
+//        dates.add("20181016");
+//        dates.add("20181017");
+//        dates.add("20181018");
+//        dates.add("20181019");
+//        dates.add("20181020");
+//        dates.add("20181021");
+//        dates.add("20181022");
+//        dates.add("20181023");
+//        dates.add("20181024");
+//        dates.add("20181025");
+//        dates.add("20181026");
+//        dates.add("20181027");
+//        dates.add("20181028");
+//        dates.add("20181029");
+//        dates.add("20181030");
+//        dates.add("20181031");
+//        for(int i = 0; i < dates.size(); i++){
+//            synchroProfitDay(dates.get(i));
+//            index = 1;
+//        }
+//    }
 
     /**
      * 同步日结分润数据
@@ -100,7 +99,6 @@ public class DailyProfitMposDataJob {
      */
 //    @Scheduled(cron = "0 0 5 * * ?")
     public void synchroProfitDay(String frDate){
-//        String frDate = "20180705";
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("frDate", frDate==null?frDate:frDate);
         map.put("pageNumber", index++ +"");

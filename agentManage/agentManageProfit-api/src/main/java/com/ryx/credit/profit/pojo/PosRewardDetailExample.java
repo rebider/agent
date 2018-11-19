@@ -1,7 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1253,6 +1252,76 @@ public class PosRewardDetailExample {
 
         public Criteria andPosRemarkNotBetween(String value1, String value2) {
             addCriterion("POS_REMARK not between", value1, value2, "posRemark");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtIsNull() {
+            addCriterion("POS_CHECK_DEDUCT_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtIsNotNull() {
+            addCriterion("POS_CHECK_DEDUCT_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtEqualTo(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT =", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtNotEqualTo(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT <>", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtGreaterThan(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT >", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtGreaterThanOrEqualTo(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT >=", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtLessThan(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT <", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtLessThanOrEqualTo(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT <=", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtLike(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT like", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtNotLike(String value) {
+            addCriterion("POS_CHECK_DEDUCT_AMT not like", value, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtIn(List<String> values) {
+            addCriterion("POS_CHECK_DEDUCT_AMT in", values, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtNotIn(List<String> values) {
+            addCriterion("POS_CHECK_DEDUCT_AMT not in", values, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtBetween(String value1, String value2) {
+            addCriterion("POS_CHECK_DEDUCT_AMT between", value1, value2, "posCheckDeductAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosCheckDeductAmtNotBetween(String value1, String value2) {
+            addCriterion("POS_CHECK_DEDUCT_AMT not between", value1, value2, "posCheckDeductAmt");
             return (Criteria) this;
         }
     }

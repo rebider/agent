@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.BusActRelBusType;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -13,8 +14,10 @@ import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecordExample;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.ApprovalFlowRecordService;
+import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,8 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     private COrganizationMapper cOrganizationMapper;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private BusActRelService busActRelService;
 
     @Override
     public String insert(ApprovalFlowRecord record)throws Exception{
@@ -103,8 +108,16 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
 
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setPage(page);
-        example.setOrderByClause("APPROVAL_TIME desc");
-        List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(example);
+        example.setOrderByClause("A_APPROVAL_FLOW_RECORD.APPROVAL_TIME desc");
+
+        FastMap par = FastMap.fastMap("ApprovalFlowRecordExample",example);
+
+        if(StringUtils.isNotBlank(approvalFlowRecord.getSubMitDateSta()) && StringUtils.isNotBlank(approvalFlowRecord.getSubMitDateEnd()) ){
+            par.putKeyV("subMitDateSta",approvalFlowRecord.getSubMitDateSta());
+            par.putKeyV("subMitDateEnd",approvalFlowRecord.getSubMitDateEnd());
+        }
+
+        List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExampleWithBusActRel(par);
         approvalFlowRecords.forEach(row->{
             row.setBusTypeName(BusActRelBusType.getItemString(row.getBusType()));
             COrganization cOrganization = cOrganizationMapper.selectById(Integer.valueOf(row.getApprovalDep()));
@@ -115,10 +128,13 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
             if(null!=cUser){
                 row.setApprovalPerson(cUser.getName());
             }
+            BusActRel busActRel = busActRelService.findById(row.getExecutionId());
+            if(null!=busActRel.getcTime())
+            row.setSubMitDate(DateUtil.format(busActRel.getcTime(),"yyyy-MM-dd"));
         });
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(approvalFlowRecords);
-        pageInfo.setTotal((int)approvalFlowRecordMapper.countByExample(example));
+        pageInfo.setTotal((int)approvalFlowRecordMapper.selectByExampleWithBusActRelCount(par));
         return pageInfo;
     }
 }

@@ -422,6 +422,9 @@
     b.ag_doc_pro ,
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
+    e.bus_num,
+    f.name as ag_doc_district_name ,
+    g.name as ag_doc_pro_name ,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -435,8 +438,11 @@
     c.platform_name
     from o_order o
     left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
+    left join c_organization f on f.id= b.ag_doc_district
+    left join c_organization g on g.id= b.ag_doc_pro
     <where>
       o.user_id=#{userId}
       <if test="1==1"> and  o.status = 1 </if>
@@ -446,9 +452,11 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -486,6 +494,9 @@
     b.ag_doc_pro ,
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
+    e.bus_num,
+    f.name as ag_doc_district_name ,
+    g.name as ag_doc_pro_name ,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -499,8 +510,11 @@
     c.platform_name
     from  o_order o
     left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
+    left join c_organization f on f.id= b.ag_doc_district
+    left join c_organization g on g.id= b.ag_doc_pro
     <where>
       <if test="doc==null"> and 1=2 </if>
       <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
@@ -511,9 +525,11 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -537,8 +553,11 @@
     o.id
     from o_order o
     left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
+    left join c_organization f on f.id= b.ag_doc_district
+    left join c_organization g on g.id= b.ag_doc_pro
     <where>
       o.user_id=#{userId}
       <if test="1==1"> and  o.status = 1 </if>
@@ -548,9 +567,11 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -568,8 +589,11 @@
     o.id
     from o_order o
     left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
+    left join c_organization f on f.id= b.ag_doc_district
+    left join c_organization g on g.id= b.ag_doc_pro
     <where>
       <if test="doc==null"> and 1=2 </if>
       <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
@@ -580,9 +604,11 @@
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
+      <if test="agDocDistrict!=null and agDocDistrict!=''"> and b.AG_DOC_DISTRICT like  #{agDocDistrict} </if>
+      <if test="agDocPro!=null and agDocPro!=''"> and b.AG_DOC_PRO like  #{agDocPro} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD')  between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
-      <if test="agUniqNum!=null and agUniqNum!=''"> and b.AG_UNIQ_NUM=#{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
         and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
       <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
@@ -644,6 +670,7 @@
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
     </where>
@@ -667,6 +694,7 @@
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
       <if test="orderPlatform!=null and orderPlatform!=''"> and o.order_platform =  #{orderPlatform} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and b.ag_uniq_num = #{agUniqNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
     </where>
@@ -796,12 +824,14 @@
     c.platform_name,
     d.nuclear_user,
     d.nuclear_time,
-    NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string
+    NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string,
+    org.name as AGDOCPPRO
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
     left join a_pay_comp comp on comp.id=d.COLLECT_COMPANY
+    left join c_organization org on org.id = b.ag_doc_pro
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="nuclearUser!=null and nuclearUser!=''"> and  d.nuclear_user = #{nuclearUser} </if>
@@ -852,6 +882,7 @@
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="nuclear_user_string" property="nuclearTimeString" jdbcType="VARCHAR"/>
     <result column="nuclear_time" property="nuclearTime" jdbcType="TIMESTAMP"/>
+    <result column="AGDOCPPRO" property="agDocPpro" jdbcType="VARCHAR"/>
 
   </resultMap>
 </mapper>
