@@ -1,7 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PosRewardDetailMapper;
@@ -9,7 +8,6 @@ import com.ryx.credit.profit.pojo.PosRewardDetail;
 import com.ryx.credit.profit.pojo.PosRewardDetailExample;
 import com.ryx.credit.profit.service.PosRewardSDetailService;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.commons.collections4.ListUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

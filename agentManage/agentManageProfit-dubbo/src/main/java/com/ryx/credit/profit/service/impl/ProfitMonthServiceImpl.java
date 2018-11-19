@@ -793,33 +793,48 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @Date: 2018/8/14
      */
     private void getPosReward(ProfitDetailMonth profitDetailMonthTemp, String computType) {
-        TransProfitDetail detail = new TransProfitDetail();
-        detail.setAgentId(profitDetailMonthTemp.getAgentId());
-        detail.setBusCode("100003");
         String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
-        detail.setProfitDate(currentDate);
-        List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
-        if (transProfitDetails.size() > 0) {
-            detail = transProfitDetails.get(0);
+        try {
             Map<String, Object> map = new HashMap<>(10);
-            map.put("agentType", detail.getAgentType());
-            map.put("agentId", detail.getAgentId());
+            map.put("agentId", profitDetailMonthTemp.getAgentId());
             map.put("currentDate", currentDate);
-            map.put("computType", computType);
-            try {
-                map = posProfitComputeServiceImpl.execut(map);
-                BigDecimal posReward = profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt();
-                profitDetailMonthTemp.setPosRewardAmt(posReward.add((BigDecimal) map.get("posRewardAmt")));
-                profitDetailMonthTemp.setPosRewardDeductionAmt((BigDecimal) map.get("posAssDeductAmt"));
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOG.error("获取pos奖励失败");
-                throw new RuntimeException("获取pos奖励失败");
-            }
-        }else{
-            profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
-            profitDetailMonthTemp.setPosRewardDeductionAmt(BigDecimal.ZERO);
+            map = posProfitComputeServiceImpl.execut(map);
+            BigDecimal posReward = profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt();
+            profitDetailMonthTemp.setPosRewardAmt(posReward.add((BigDecimal) map.get("posRewardAmt")));
+            profitDetailMonthTemp.setPosRewardDeductionAmt((BigDecimal) map.get("posAssDeductAmt"));
+        } catch (Exception e){
+            e.printStackTrace();
+            LOG.error("获取pos奖励失败");
+            throw new RuntimeException("获取pos奖励失败");
         }
+
+//        TransProfitDetail detail = new TransProfitDetail();
+//        detail.setAgentId(profitDetailMonthTemp.getAgentId());
+//        detail.setBusCode("100003");
+//        String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
+//        detail.setProfitDate(currentDate);
+//        List<TransProfitDetail> transProfitDetails = transProfitDetailService.getTransProfitDetailList(detail);
+//        if (transProfitDetails.size() > 0) {
+//            detail = transProfitDetails.get(0);
+//            Map<String, Object> map = new HashMap<>(10);
+//            map.put("agentType", detail.getAgentType());
+//            map.put("agentId", detail.getAgentId());
+//            map.put("currentDate", currentDate);
+//            map.put("computType", computType);
+//            try {
+//                map = posProfitComputeServiceImpl.execut(map);
+//                BigDecimal posReward = profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt();
+//                profitDetailMonthTemp.setPosRewardAmt(posReward.add((BigDecimal) map.get("posRewardAmt")));
+//                profitDetailMonthTemp.setPosRewardDeductionAmt((BigDecimal) map.get("posAssDeductAmt"));
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                LOG.error("获取pos奖励失败");
+//                throw new RuntimeException("获取pos奖励失败");
+//            }
+//        }else{
+//            profitDetailMonthTemp.setPosRewardAmt(BigDecimal.ZERO);
+//            profitDetailMonthTemp.setPosRewardDeductionAmt(BigDecimal.ZERO);
+//        }
     }
 
     /***
