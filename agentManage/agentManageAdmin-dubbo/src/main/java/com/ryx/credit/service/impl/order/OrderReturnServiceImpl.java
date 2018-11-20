@@ -781,6 +781,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 if(null==agentVo.getoReturnOrder().getRefundtime()) {
                     throw new ProcessException("核款时间不能为空");
                 }
+                if(null==agentVo.getoReturnOrder().getRefundpeople()) {
+                    throw new ProcessException("核款人不能为空");
+                }
                 returnOrder.setAuditor(userId);
                 returnOrder.setRefundpeople(agentVo.getoReturnOrder().getRefundpeople());
                 returnOrder.setRefundtime(agentVo.getoReturnOrder().getRefundtime());
