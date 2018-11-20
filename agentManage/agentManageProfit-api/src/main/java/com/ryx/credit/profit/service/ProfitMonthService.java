@@ -180,4 +180,9 @@ public interface ProfitMonthService {
      * 修改分润展示补款
      * */
     //public void updateProfitMonthDetail(ProfitDetailMonth  profitDetailMonth);
+
+    /**
+     * 初始化Pos奖励明细数据
+     */
+    void initPosRowardDetail()throws Exception;
 }

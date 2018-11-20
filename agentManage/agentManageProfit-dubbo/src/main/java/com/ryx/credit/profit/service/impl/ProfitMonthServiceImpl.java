@@ -1004,4 +1004,20 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             }
         }
     }
+
+    @Override
+    public void initPosRowardDetail() throws Exception {
+        ProfitDetailMonth month = new ProfitDetailMonth();
+        month.setProfitDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6));
+        int count = this.getProfitDetailMonthCount(null, month);
+        if(count > 0 ){
+            try{
+                posProfitComputeServiceImpl.otherOperate();
+            } catch (Exception e){
+                throw new Exception("初始化POS奖励基础数据失败，"+e.getMessage());
+            }
+        } else {
+            throw new Exception("请先初始化基础分润数据");
+        }
+    }
 }
