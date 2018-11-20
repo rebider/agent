@@ -523,6 +523,7 @@
     <include refid="Base_Column_List" />
     FROM POS_REWARD_DETAIL
     <include refid="BASE_WHERE_SQL" />
+    order by POS_REMARK,POS_MECHANISM_TYPE
     <include refid="PAGING_END" />
   </select>
   <sql id="PAGING_START">
