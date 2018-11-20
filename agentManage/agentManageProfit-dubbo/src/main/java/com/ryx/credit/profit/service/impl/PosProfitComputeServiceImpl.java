@@ -41,22 +41,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
     @Override
     public Map<String, Object> execut(Map<String, Object> map) throws Exception {
-        LOG.info("POS奖励计算，请求参数：{}", map);
         map.put("posRewardAmt", BigDecimal.ZERO);//POS奖励
         map.put("posAssDeductAmt", BigDecimal.ZERO);//POS奖励考核扣款
-        PosRewardDetail posRewardDetail = new PosRewardDetail();
-        posRewardDetail.setPosAgentId(map.get("agentId").toString());
-        posRewardDetail.setProfitPosDate(map.get("currentDate").toString());
-        PosRewardDetail detail = posRewardSDetailService.getPosRewardDetail(posRewardDetail);
-        if(detail == null){
-            LOG.info("POS奖励计算，响应参数：{}", map);
-            return map;
-        } else {
-            map.put("posRewardAmt", new BigDecimal(detail.getPosReawrdProfit()));
-            map.put("posAssDeductAmt", new BigDecimal(detail.getPosCheckDeductAmt()));
-            LOG.info("POS奖励计算，响应参数：{}", map);
-            return map;
-        }
+        return map;
     }
 
     /**
