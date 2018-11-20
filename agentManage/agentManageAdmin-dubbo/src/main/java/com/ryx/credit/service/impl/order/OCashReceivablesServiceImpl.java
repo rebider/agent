@@ -65,7 +65,12 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
         if(StringUtils.isBlank(oCashReceivables.getAgentId()))  return AgentResult.fail("现金付款代理商不能为空");
         if(null==oCashReceivables.getAmount())  return AgentResult.fail("现金付款金额不能为空");
         if(StringUtils.isBlank(oCashReceivables.getPayType()))  return AgentResult.fail("现金付款付款类型不能为空");
-        return AgentResult.ok();
+        if(oCashReceivables.getPayType().equals(PayType.YHHK.code)) {
+            if(StringUtils.isBlank(oCashReceivables.getPayUser()))  return AgentResult.fail("打款人不能为空");
+            if(oCashReceivables.getPayTime()==null)  return AgentResult.fail("打款时间不能为空");
+            if(oCashReceivables.getAmount()==null)  return AgentResult.fail("打款金额不能为空");
+        }
+            return AgentResult.ok();
     }
 
 

@@ -703,7 +703,6 @@ public class CompensateServiceImpl implements CompensateService {
                     oLogisticsDetail.setActivityId(row.getActivityRealId());
                     oLogisticsDetail.setActivityName(row.getActivityName());
 
-
                     oLogisticsDetail.setgTime(activity.getgTime());
                     oLogisticsDetail.setSettlementPrice(row.getPrice());
                     oLogisticsDetail.setcTime(new Date());
@@ -736,12 +735,18 @@ public class CompensateServiceImpl implements CompensateService {
                 OSubOrderExample.Criteria criteria2 = oSubOrderExample.createCriteria();
                 criteria2.andProIdEqualTo(oRefundPriceDiffDetail.getProId());
                 criteria2.andOrderIdEqualTo(oRefundPriceDiffDetail.getOrderId());
+                criteria2.andStatusEqualTo(Status.STATUS_1.status);
                 List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
+                if(oSubOrders.size()!=1){
+                    throw new ProcessException("退补差价:"+oRefundPriceDiffDetail.getOrderId()+":"+oRefundPriceDiffDetail.getProId()+"采购单查询数量不唯一");
+                }
                 OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
                 OSubOrderActivityExample.Criteria criteria3 = oSubOrderActivityExample.createCriteria();
-                criteria3.andSubOrderIdEqualTo(oSubOrders.get(0).getId());
+                criteria3.andSubOrderIdEqualTo(oSubOrders.get(0).getId()).andStatusEqualTo(Status.STATUS_1.status);
                 List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-
+                if(oSubOrderActivities.size()!=1){
+                    throw new ProcessException("退补差价:"+oRefundPriceDiffDetail.getOrderId()+":"+oRefundPriceDiffDetail.getProId()+"采购单活动查询数量不唯一");
+                }
                 OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
                 OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityRealId());
                 oSubOrderActivity.setActivityId(oActivity.getId());
@@ -761,6 +766,8 @@ public class CompensateServiceImpl implements CompensateService {
                 oSubOrderActivity.setTermBatchname(oActivity.getTermBatchname());
                 oSubOrderActivity.setTermtype(oActivity.getTermtype());
                 oSubOrderActivity.setTermtypename(oActivity.getTermtypename());
+                oSubOrderActivity.setOriginalPrice(oActivity.getOriginalPrice());
+                oSubOrderActivity.setPrice(oActivity.getPrice());
                 int j = subOrderActivityMapper.updateByPrimaryKeySelective(oSubOrderActivity);
                 if(1!=j){
                     throw new ProcessException("退补差价数据更新活动失败");

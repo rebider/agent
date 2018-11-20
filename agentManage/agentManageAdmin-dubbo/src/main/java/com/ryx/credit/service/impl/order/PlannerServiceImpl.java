@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.OReceiptStatus;
-import com.ryx.credit.common.enumc.PlannerStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -90,6 +87,8 @@ public class PlannerServiceImpl implements PlannerService {
         if (null!=map.get("par_proName") && StringUtils.isNotBlank(map.get("par_proName")+"")){
             reqMap.put("proName", "%"+map.get("par_proName")+"%");
         }
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        reqMap.put("cIncomStatus", AgentInStatus.NO.status);
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){
@@ -165,6 +164,7 @@ public class PlannerServiceImpl implements PlannerService {
             if(venderModeActivity.size()!=1){
                 throw new MessageException(activity.getVender()+"厂商和"+activity.getProModel()+"活动确定不了具体的活动");
             }
+            //cxinfo  保存排单 确定具体活动 价格计算采用活动中的价格 xx
             //确定活动
             OActivity real_activity = venderModeActivity.get(0);
             OSubOrderActivityItem.setActivityId(real_activity.getId());
@@ -179,6 +179,8 @@ public class PlannerServiceImpl implements PlannerService {
             OSubOrderActivityItem.setTermBatchname(real_activity.getTermBatchname());
             OSubOrderActivityItem.setTermtype(real_activity.getTermtype());
             OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
+            OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
+            OSubOrderActivityItem.setPrice(real_activity.getPrice());
             if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
                 throw new MessageException("更新活动失败!");
             }

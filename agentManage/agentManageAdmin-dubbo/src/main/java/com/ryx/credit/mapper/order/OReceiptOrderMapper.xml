@@ -404,7 +404,7 @@
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
-    left join a_agent ag on ag.id = ro.agent_id
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus} and c_incom_status!=#{par.cIncomStatus}
     <where>
       and ro.status=1 and ag.status=1
       <if test="par.proType != null and par.proType!=''" >
@@ -469,7 +469,7 @@
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
-    left join a_agent ag on ag.id = ro.agent_id
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus} and c_incom_status!=#{par.cIncomStatus}
     <where>
       and ro.status=1 and ag.status=1
     <if test="par.proType != null and par.proType!=''" >

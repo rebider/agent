@@ -57,6 +57,8 @@ public class OSubOrderActivity implements Serializable{
 
     private String termtypename;
 
+    private BigDecimal originalPrice;
+
     public String getId() {
         return id;
     }
@@ -263,5 +265,13 @@ public class OSubOrderActivity implements Serializable{
 
     public void setTermtypename(String termtypename) {
         this.termtypename = termtypename == null ? null : termtypename.trim();
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
     }
 }

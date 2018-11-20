@@ -1,6 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
 import com.ryx.credit.common.util.Page;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1894,6 +1895,66 @@ public class OSubOrderActivityExample {
 
         public Criteria andTermtypenameNotBetween(String value1, String value2) {
             addCriterion("TERMTYPENAME not between", value1, value2, "termtypename");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceIsNull() {
+            addCriterion("ORIGINAL_PRICE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceIsNotNull() {
+            addCriterion("ORIGINAL_PRICE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceEqualTo(BigDecimal value) {
+            addCriterion("ORIGINAL_PRICE =", value, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceNotEqualTo(BigDecimal value) {
+            addCriterion("ORIGINAL_PRICE <>", value, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceGreaterThan(BigDecimal value) {
+            addCriterion("ORIGINAL_PRICE >", value, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORIGINAL_PRICE >=", value, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceLessThan(BigDecimal value) {
+            addCriterion("ORIGINAL_PRICE <", value, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORIGINAL_PRICE <=", value, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceIn(List<BigDecimal> values) {
+            addCriterion("ORIGINAL_PRICE in", values, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceNotIn(List<BigDecimal> values) {
+            addCriterion("ORIGINAL_PRICE not in", values, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORIGINAL_PRICE between", value1, value2, "originalPrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andOriginalPriceNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORIGINAL_PRICE not between", value1, value2, "originalPrice");
             return (Criteria) this;
         }
     }
