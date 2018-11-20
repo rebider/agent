@@ -82,11 +82,9 @@ public class ProfitAmtSumJob {
                     BigDecimal mposZqSupplyProfitAmt = profitDetailMonthTemp.getMposZqSupplyProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getMposZqSupplyProfitAmt();
                     BigDecimal rhbProfitAmt = profitDetailMonthTemp.getRhbProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getRhbProfitAmt();
 
-                    BigDecimal supplyTdAmt = getTdSupplyAmt(profitDetailMonthTemp);
+                    getTdSupplyAmt(profitDetailMonthTemp);
                     profitDetailMonthTemp.setProfitSumAmt(payProfitAmt.add(tranProfitAmt).add(ryxProfitAmt).add(ryxHdProfitAmt).add(tpProfitAmt)
-                            .add(rsProfitAmt).add(rsHdProfitAmt).add(zfProfitAmt).add(posZqSupplyProfitAmt).add(mposZqSupplyProfitAmt).add(rhbProfitAmt)
-
-                    .add(supplyTdAmt));
+                            .add(rsProfitAmt).add(rsHdProfitAmt).add(zfProfitAmt).add(posZqSupplyProfitAmt).add(mposZqSupplyProfitAmt).add(rhbProfitAmt));
 
                     profitDetailMonthServiceImpl.update(profitDetailMonthTemp);
                     payProfitAmt = null;

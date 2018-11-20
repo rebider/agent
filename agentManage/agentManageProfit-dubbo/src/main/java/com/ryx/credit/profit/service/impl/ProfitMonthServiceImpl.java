@@ -454,6 +454,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     doHbDeduction(profitDetailMonthTemp, computType, hbList);
                 }
             });
+            // 计算税点及实发分润
+            try {
+                long sstart = System.currentTimeMillis();
+                profitComputerService.new_computerTax(computType);
+                long send = System.currentTimeMillis();
+                System.out.println("实发处理时间"+(send-sstart));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             LOG.error("执行完毕");
             temp.clear();
             profitAmtMap.clear();
@@ -639,12 +648,16 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     private BigDecimal getComputAmt(ProfitDetailMonth profitDetailMonthTemp, String computType) {
         BigDecimal sumAmt = profitDetailMonthTemp.getProfitSumAmt();
-//         POS考核奖励
-        long khstart = System.currentTimeMillis();
-        getPosReward(profitDetailMonthTemp,computType);
-        sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt()).subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
-        long khend = System.currentTimeMillis();
-        System.out.println("考核处理时间"+(khend-khstart));
+
+        // pos退单补款
+        sumAmt = sumAmt.add(profitDetailMonthTemp.getPosTdSupplyAmt());
+        // mpos退单补款
+        sumAmt = sumAmt.add(profitDetailMonthTemp.getMposTdSupplyAmt());
+        // 其他补款
+        sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
+        // 考核奖励
+        sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt());
+                //.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt())
         //退单扣款-
         if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
             long tdkstart = System.currentTimeMillis();
@@ -653,10 +666,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             System.out.println("退单扣款处理时间" + (tdkend - tdkstart));
         }
         // 机具扣款-
-//        long jkstart = System.currentTimeMillis();
-//        sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt, computType);
-//        long jkend = System.currentTimeMillis();
-//        System.out.println("机具扣款处理时间"+(jkend-jkstart));
+        long jkstart = System.currentTimeMillis();
+        sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt, computType);
+        long jkend = System.currentTimeMillis();
+        System.out.println("机具扣款处理时间"+(jkend-jkstart));
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
         param.put("agentId", profitDetailMonthTemp.getAgentId());
