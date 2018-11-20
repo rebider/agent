@@ -2,14 +2,12 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PaySign;
-import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.service.*;
-import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,10 +40,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     @Autowired
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
     @Autowired
-    private ProfitStagingDetailMapper profitStagingDetailMapper;
-    @Autowired
-    private AgentBusinfoService agentBusinfoService;
-    @Autowired
     private IPaymentDetailService iPaymentDetailService;
 
     /**
@@ -77,7 +71,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      */
     private Map<String, Object> fristRound(Map<String, Object> map, String agentPid, String computType) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
-        profitDeduction.setAgentPid(agentPid);
+        profitDeduction.setAgentId(agentPid);
         profitDeduction.setDeductionDesc(map.get("paltformNo").toString());
         profitDeduction.setDeductionDate(map.get("deductDate").toString());
         profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
@@ -88,7 +82,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         BigDecimal actualDeductionAmtSum = BigDecimal.ZERO;
         //基础分润
         BigDecimal basicsProfitAmt = new BigDecimal(map.get("agentProfitAmt").toString());
-        List<Map<String, Object>> respList = new ArrayList<Map<String, Object>>();
         if (list != null && !list.isEmpty()) {
             for (ProfitDeduction profitDeductionList : list) {
                 mustDeductionAmtSum = mustDeductionAmtSum.add(profitDeductionList.getMustDeductionAmt());
@@ -137,6 +130,25 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         return map;
     }
 
+    private void updateDeductionInfo(ProfitDeduction profitDeductionList, String computType) throws Exception {
+        try {
+            if(Objects.equals(computType, "1")){
+                if(profitDeductionList != null){
+                    ProfitDeduction update = new ProfitDeduction();
+                    update.setId(profitDeductionList.getId());
+                    update.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                    update.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
+                    update.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
+                    profitDeductionService.updateProfitDeduction(update);
+                    profitDeducttionDetailService.insertDeducttionDetail(profitDeductionList);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("机具扣款更新失败。");
+        }
+    }
+
     /**
      * 没有担保代理商，分润剩多少口多少。
      */
@@ -172,7 +184,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 BigDecimal parentBasicsProfitAmt = detail.getBasicsProfitAmt() == null ? BigDecimal.ZERO : detail.getBasicsProfitAmt();
                 if(notDeductionAmt.compareTo(BigDecimal.ZERO) == 0){//应扣的机具款为0，已经扣完
                     break;
-                } else if(parentBasicsProfitAmt.compareTo(BigDecimal.ZERO) <= 0 ){//担保代理商分润为0，循环下个代理商进行扣款
+                } else if(parentBasicsProfitAmt.compareTo(BigDecimal.ZERO) <= 0 ){//担保代理商分润为0，循环下个基础分润进行扣款
                     continue;
                 } else {
                     Map<String, Object> respMap = this.deductParentAgentProfit(profitDeduction, detail, computType, notDeductionAmt);
@@ -288,22 +300,17 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                     profitDeducttionDetailService.insertDeducttionDetail(danbaoDeduct);
                 }
                 if(profitDetailMonth != null){
-                    profitDetailMonthServiceImpl.updateByPrimaryKeySelective(profitDetailMonth);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("机具扣款更新失败。");
-        }
-    }
-
-    private void updateDeductionInfo(ProfitDeduction profitDeductionList, String computType) throws Exception {
-        try {
-            if(Objects.equals(computType, "1")){
-                if(profitDeductionList != null){
-                    profitDeductionList.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-                    profitDeductionService.updateProfitDeduction(profitDeductionList);
-                    profitDeducttionDetailService.insertDeducttionDetail(profitDeductionList);
+                    ProfitDetailMonth detatil = new ProfitDetailMonth();
+                    detatil.setId(profitDetailMonth.getId());
+                    detatil.setPosDgMustDeductionAmt(profitDetailMonth.getPosDgMustDeductionAmt());
+                    detatil.setPosDgRealDeductionAmt(profitDetailMonth.getPosDgRealDeductionAmt());
+                    detatil.setZposDgMustDeductionAmt(profitDetailMonth.getZposDgMustDeductionAmt());
+                    detatil.setZposTdRealDeductionAmt(profitDetailMonth.getZposTdRealDeductionAmt());
+                    detatil.setRhbDgMustDeductionAmt(profitDetailMonth.getRhbDgMustDeductionAmt());
+                    detatil.setRhbDgRealDeductionAmt(profitDetailMonth.getRhbDgRealDeductionAmt());
+                    detatil.setBasicsProfitAmt(profitDetailMonth.getBasicsProfitAmt());
+                    detatil.setProfitSumAmt(profitDetailMonth.getProfitSumAmt());
+                    profitDetailMonthServiceImpl.updateByPrimaryKeySelective(detatil);
                 }
             }
         } catch (Exception e) {
@@ -419,7 +426,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
         List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
         if(list != null && !list.isEmpty()){
-            List<Map<String, Object>> noticeList = new ArrayList<Map<String, Object>>();
+            List<Map<String, Object>> noticeList = new ArrayList<Map<String, Object>>(list.size());
             for (ProfitDeduction deduction : list){
                 Map<String, Object> map = new HashMap<String, Object>(5);
                 ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
@@ -447,5 +454,18 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     @Override
     public void clearDetail(){
 
+    }
+
+    public static void main(String[] args) {
+        BigDecimal ss = new BigDecimal("1000");
+        dd(ss);
+        System.out.println(ss);
+    }
+
+    public static void dd(BigDecimal amt){
+        for (int i = 0; i < 10; i++) {
+            amt = amt.add(new BigDecimal(i));
+        }
+        System.out.println(amt);
     }
 }
