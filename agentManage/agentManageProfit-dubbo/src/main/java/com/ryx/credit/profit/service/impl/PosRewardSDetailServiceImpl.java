@@ -70,6 +70,11 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
     }
 
     @Override
+    public String getSuperAgentId(String agentId) {
+        return posRewardDetailMapper.querySuperAgentId(agentId);
+    }
+
+    @Override
     public List<PosRewardDetail> getPosRewardDetailList(PosRewardDetail posRewardDetail, List<String> type, List<String> childAgentList) {
         PosRewardDetailExample posRewardDetailExample = new PosRewardDetailExample();
         PosRewardDetailExample.Criteria create = posRewardDetailExample.createCriteria();

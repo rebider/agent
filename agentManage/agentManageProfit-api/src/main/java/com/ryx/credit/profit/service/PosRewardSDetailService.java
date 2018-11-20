@@ -29,6 +29,13 @@ public interface PosRewardSDetailService {
      */
     List<String> queryChildLevelByAgentId(String agentId);
 
+    /**
+     * 获取上级代理商agentId
+     * @param agentId
+     * @return
+     */
+    String getSuperAgentId(String agentId);
+
     List<PosRewardDetail> getPosRewardDetailList(PosRewardDetail posRewardDetail, List<String> type, List<String> childAgentList);
 
 }

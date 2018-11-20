@@ -583,4 +583,10 @@
     WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
     AND BUS_PLATFORM = '100003')))
   </select>
+  <select id="querySuperAgentId" resultType="java.lang.String">
+    SELECT AGENT_ID FROM A_AGENT_BUSINFO WHERE ID = (    SELECT BUS_PARENT
+    FROM A_AGENT_BUSINFO
+    WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    AND BUS_PLATFORM = '100003' AND STATUS = '1'  AND BUS_STATUS = '1' ) AND  BUS_PLATFORM = '100003' AND STATUS = '1'  AND BUS_STATUS = '1'
+  </select>
 </mapper>

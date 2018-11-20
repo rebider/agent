@@ -40,4 +40,6 @@ public interface PosRewardDetailMapper {
     void updateRewradData(String profitDate);
 
     List<String> queryChildLevelByAgentId(String agentId);
+
+    String querySuperAgentId(String agentId);
 }
