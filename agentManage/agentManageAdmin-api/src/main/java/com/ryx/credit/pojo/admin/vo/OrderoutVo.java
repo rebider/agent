@@ -22,6 +22,7 @@ public class OrderoutVo implements Serializable{
     private String downPaymentUser;//付款人
     private String comName;//收款地方
     private BigDecimal actualReceipt;//付款金额
+    private BigDecimal xxAmount;//付款金额
     private Date actualReceiptDate;//收款日期
     private String actualTime;
     private String oinuretime;
@@ -220,5 +221,13 @@ public class OrderoutVo implements Serializable{
 
     public void setAgDocPpro(String agDocPpro) {
         this.agDocPpro = agDocPpro;
+    }
+
+    public BigDecimal getXxAmount() {
+        return xxAmount;
+    }
+
+    public void setXxAmount(BigDecimal xxAmount) {
+        this.xxAmount = xxAmount;
     }
 }

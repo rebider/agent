@@ -805,12 +805,12 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') ),0) as money,
+    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') <if test="id!=null and id!=''"> and  o.id = #{id} </if>),0) as money,
 
     nvl((select COUNT(o_payment_detail.plan_num)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') ),0) as planNum,
+    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') <if test="id!=null and id!=''"> and  o.id = #{id} </if>),0) as planNum,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -825,12 +825,13 @@
     d.nuclear_user,
     d.nuclear_time,
     NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string,
-    org.name as AGDOCPPRO
+    org.name as AGDOCPPRO,
+    cr.amount as xxAmount
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
-    inner join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT'
+    inner join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status=1
     left join a_pay_comp comp on comp.id=cr.COLLECT_COMPANY
     left join c_organization org on org.id = b.ag_doc_pro
     <where>
@@ -877,13 +878,14 @@
 
     <result column="DEDUCTION_TYPE" property="deductionType" jdbcType="VARCHAR"/>
     <result column="DEDUCTION_AMOUNT" property="deductionAmount" jdbcType="DECIMAL"/>
-    <result column="PAY_AMOUNT" property="money" jdbcType="DECIMAL"/>
+    <result column="money" property="money" jdbcType="DECIMAL"/>
     <result column="PLAN_NUM" property="planNum" jdbcType="DECIMAL"/>
 
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="nuclear_user_string" property="nuclearTimeString" jdbcType="VARCHAR"/>
     <result column="nuclear_time" property="nuclearTime" jdbcType="TIMESTAMP"/>
     <result column="AGDOCPPRO" property="agDocPpro" jdbcType="VARCHAR"/>
+    <result column="xxAmount" property="xxAmount" jdbcType="DECIMAL"/>
 
   </resultMap>
 </mapper>
