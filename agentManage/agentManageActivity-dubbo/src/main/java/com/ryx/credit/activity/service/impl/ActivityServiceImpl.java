@@ -108,6 +108,7 @@ public class ActivityServiceImpl implements ActivityService {
         }
         taskList.addAll(taskListGroup);
         taskList.sort(Comparator.comparing(TaskInfo::getCreateTime));
+        Collections.reverse(taskList);
 //        for (Task task : taskList) {
 //            logger.info("待办" + task.getId());
 //            logger.info("任务名" + task.getName());
