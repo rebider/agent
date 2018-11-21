@@ -1301,9 +1301,12 @@ public class OrderServiceImpl implements OrderService {
         try {
             //处理审批数据
             logger.info("订单提交审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
-            AgentResult busres = orderService.approvalTaskBussiData(agentVo,userId);
-            if(!busres.isOK()){
-                return busres;
+            //只有通过才处理业务
+            if(agentVo.getApprovalResult().equals("pass")){
+                AgentResult busres = orderService.approvalTaskBussiData(agentVo,userId);
+                if(!busres.isOK()){
+                    return busres;
+                }
             }
             //完成任务
             AgentResult result = new AgentResult(500, "系统异常", "");
