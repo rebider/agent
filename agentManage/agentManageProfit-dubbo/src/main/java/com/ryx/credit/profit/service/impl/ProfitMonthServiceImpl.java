@@ -1,34 +1,33 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.ProfitStatus;
+import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
-import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
-import com.sun.scenario.effect.Merge;
-import javassist.runtime.Inner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.text.Bidi;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
 
 /**
  * @author yangmx
@@ -147,11 +146,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     //月分润
     @Override
     public List<ProfitDetailMonth> getProfitDetailMonthList(Map<String, Object> department, Page page, ProfitDetailMonth profitDetailMonth) {
-        List<String> agentList = null;
-        if (department != null) {
-            agentList = departmentAgentList(department);
-        }
-        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(agentList, profitDetailMonth);
+        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(department, profitDetailMonth);
         profitDetailMonthExample.setOrderByClause(" AGENT_ID ");
         if (page != null) {
             profitDetailMonthExample.setPage(page);
@@ -159,28 +154,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitDetailMonthMapper.selectByExample(profitDetailMonthExample);
     }
 
-    /**
-     * 根据当前部门信息查询分润信息
-     *
-     * @param department
-     */
-    private List<String> departmentAgentList(Map<String, Object> department) {
-        if (Objects.equals("south", department.get("ORGANIZATIONCODE")) || Objects.equals("north", department.get("ORGANIZATIONCODE"))) {
-            return profitDetailMonthMapper.getDistrictAgent(department.get("ORGID").toString());
-        } else if (department.get("ORGANIZATIONCODE").toString().contains("south") || department.get("ORGANIZATIONCODE").toString().contains("north")) {
-            return profitDetailMonthMapper.getProAgent(department.get("ORGID").toString());
-        }
-        return null;
-    }
-
-    private ProfitDetailMonthExample profitDetailMonthEqualsTo(List<String> agentList, ProfitDetailMonth profitDetailMonth) {
+    private ProfitDetailMonthExample profitDetailMonthEqualsTo(Map<String, Object> department, ProfitDetailMonth profitDetailMonth) {
         ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
         if (profitDetailMonth == null) {
             return profitDetailMonthExample;
         }
         ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
-        if (agentList != null && !agentList.isEmpty()) {
-            criteria.andAgentIdIn(agentList);
+        if(department != null){
+            profitDetailMonthExample.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
         }
         if (StringUtils.isNotBlank(profitDetailMonth.getAgentId())) {
             criteria.andAgentIdEqualTo(profitDetailMonth.getAgentId());
@@ -218,11 +199,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     //月分润
     @Override
     public int getProfitDetailMonthCount(Map<String, Object> department, ProfitDetailMonth profitDetailMonth) {
-        List<String> agentList = null;
-        if (department != null) {
-            agentList = departmentAgentList(department);
-        }
-        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(agentList, profitDetailMonth);
+        ProfitDetailMonthExample profitDetailMonthExample = profitDetailMonthEqualsTo(department, profitDetailMonth);
         return profitDetailMonthMapper.countByExample(profitDetailMonthExample);
     }
 

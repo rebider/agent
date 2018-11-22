@@ -87,6 +87,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())){
             criteria.andAgentIdEqualTo(profitDeduction.getParentAgentId());
         }
+        if(department != null){
+            example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
+        }
 
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
@@ -97,29 +100,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
             criteria.andAgentNameLike(profitDeduction.getAgentName());
         }
-        if(department != null){
-            List<String> agentList = departmentAgentList(department);
-            criteria.andAgentIdIn(agentList);
-        }
         example.setOrderByClause("CREATE_DATE_TIME DESC ");
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
         pageInfo.setTotal(profitDeductionMapper.countByExample(example));
         return pageInfo;
-    }
-
-    /**
-     * 根据当前部门信息查询分润信息
-     * @param department
-     */
-    private List<String> departmentAgentList(Map<String, Object> department) {
-        if(Objects.equals("south", department.get("ORGANIZATIONCODE")) || Objects.equals("north", department.get("ORGANIZATIONCODE"))){
-            return profitDetailMonthMapper.getDistrictAgent(department.get("ORGID").toString());
-        } else if(department.get("ORGANIZATIONCODE").toString().contains("south") || department.get("ORGANIZATIONCODE").toString().contains("north")){
-            return profitDetailMonthMapper.getProAgent(department.get("ORGID").toString());
-        }
-        return null;
     }
 
     @Override
