@@ -776,14 +776,17 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             String returnId = agentVo.getReturnId();
             OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            if(null==agentVo.getoReturnOrder()){
+                throw new ProcessException("退货单失败");
+            }
+            if(null==agentVo.getoReturnOrder().getRefundtime()) {
+                throw new ProcessException("核款时间不能为空");
+            }
+            if(null==agentVo.getoReturnOrder().getRefundpeople()) {
+                throw new ProcessException("核款人不能为空");
+            }
             //独立事物更新
-            if(null!=agentVo.getoReturnOrder() && StringUtils.isNotEmpty(agentVo.getoReturnOrder().getRefundpeople())) {
-                if(null==agentVo.getoReturnOrder().getRefundtime()) {
-                    throw new ProcessException("核款时间不能为空");
-                }
-                if(null==agentVo.getoReturnOrder().getRefundpeople()) {
-                    throw new ProcessException("核款人不能为空");
-                }
+            if(StringUtils.isNotEmpty(agentVo.getoReturnOrder().getRefundpeople())) {
                 returnOrder.setAuditor(userId);
                 returnOrder.setRefundpeople(agentVo.getoReturnOrder().getRefundpeople());
                 returnOrder.setRefundtime(agentVo.getoReturnOrder().getRefundtime());
