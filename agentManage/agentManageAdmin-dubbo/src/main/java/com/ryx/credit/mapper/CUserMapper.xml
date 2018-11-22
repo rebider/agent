@@ -63,6 +63,7 @@
     </select>
 
     <select id="selectUserPage" resultType="Map">
+        <include refid="OracleDialectPrefix" />
         SELECT 
         t.id, t.login_name AS loginName, t.name, t.phone, t.password, 
         t.sex, t.age, t.create_time AS createTime, t.user_type AS userType, 
@@ -72,6 +73,23 @@
         LEFT JOIN C_USER_role r ON t.id = r.user_id
         LEFT JOIN c_role o ON r.role_id = o.id
         LEFT JOIN c_organization s ON s.id = t.organization_id
+        <include refid="select_user_where" />
+        GROUP BY t.id, t.login_name, t.name, t.phone, t.password, 
+		t.sex, t.age, t.create_time, t.user_type, t.status, 
+		t.organization_id, s.name
+        <include refid="OracleDialectSuffix" />
+    </select>
+    <select id="selectUserCount" resultType="int">
+        SELECT
+        count(*)
+        FROM C_USER t
+        LEFT JOIN C_USER_role r ON t.id = r.user_id
+        LEFT JOIN c_role o ON r.role_id = o.id
+        LEFT JOIN c_organization s ON s.id = t.organization_id
+        <include refid="select_user_where" />
+    </select>
+
+    <sql id="select_user_where">
         <where>
             <if test=" name != null and name != '' ">
                 t.name = #{name}
@@ -86,10 +104,7 @@
                 <![CDATA[ and t.create_time <= #{endTime} ]]>
             </if>
         </where>
-        GROUP BY t.id, t.login_name, t.name, t.phone, t.password, 
-		t.sex, t.age, t.create_time, t.user_type, t.status, 
-		t.organization_id, s.name
-    </select>
+    </sql>
 
 	<select id="selectbyName" resultType="com.ryx.credit.pojo.admin.vo.UserVo" parameterType="java.lang.String">
 		select * from C_USER where name = #{name}
@@ -127,4 +142,14 @@
         from C_USER where name like #{name}
     </select>
 
+    <sql id="OracleDialectPrefix">
+        <if test="page != null">
+            select * from ( select row_.*, rownum rownum_ from (
+        </if>
+    </sql>
+    <sql id="OracleDialectSuffix">
+        <if test="page != null">
+            <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+        </if>
+    </sql>
 </mapper>
