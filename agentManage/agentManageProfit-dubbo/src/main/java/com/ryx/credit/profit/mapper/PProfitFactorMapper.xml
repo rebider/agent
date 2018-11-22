@@ -246,7 +246,7 @@
     <include refid="Base_Column_List" />
     FROM P_PROFIT_FACTOR
     WHERE FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
-    AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
 
   <select id="getProfitFactorList" parameterType="java.util.Map" resultType="java.util.Map">
