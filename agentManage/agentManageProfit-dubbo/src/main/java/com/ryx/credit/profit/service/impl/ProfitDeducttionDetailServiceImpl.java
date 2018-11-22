@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @author yangmx
@@ -52,7 +53,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         profitDeducttionDetail.setDeductionDesc(profitDeduction.getDeductionDesc());
         profitDeducttionDetail.setDeductionId(profitDeduction.getId());
         profitDeducttionDetail.setDeductionType(profitDeduction.getDeductionType());
-        profitDeducttionDetail.setId(idService.genId(TabId.P_DEDUCTION_DETAIL));
+        profitDeducttionDetail.setId(UUID.randomUUID().toString());
         profitDeducttionDetail.setDeductionAmt(profitDeduction.getActualDeductionAmt());
         profitDeducttionDetail.setMustDeductionAmt(profitDeduction.getMustDeductionAmt());
         profitDeducttionDetail.setNotDeductionAmt(profitDeduction.getNotDeductionAmt());
