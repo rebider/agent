@@ -118,6 +118,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         }
 
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExampleWithBusActRel(par);
+        if(null!=approvalFlowRecords && approvalFlowRecords.size()!=0)
         approvalFlowRecords.forEach(row->{
             row.setBusTypeName(BusActRelBusType.getItemString(row.getBusType()));
             COrganization cOrganization = cOrganizationMapper.selectById(Integer.valueOf(row.getApprovalDep()));
