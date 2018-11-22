@@ -109,12 +109,12 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
             for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 //上级不为空判断是否与上级打款公司一致
-                if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-                    AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-                    if(!agentBusInfoVo.getCloPayCompany().equals(parentBusInfo.getCloPayCompany())){
-                        throw new ProcessException(Platform.getContentByValue(agentBusInfo.getBusPlatform())+"上级打款公司不一致");
-                    }
-                }
+//                if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+//                    AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+//                    if(!agentBusInfoVo.getCloPayCompany().equals(parentBusInfo.getCloPayCompany())){
+//                        throw new ProcessException(Platform.getContentByValue(agentBusInfo.getBusPlatform())+"上级打款公司不一致");
+//                    }
+//                }
 
                 agentBusInfoVo.setId(agentBusInfoVo.getId());
                 agentBusInfoVo.setVersion(agentBusInfo.getVersion());

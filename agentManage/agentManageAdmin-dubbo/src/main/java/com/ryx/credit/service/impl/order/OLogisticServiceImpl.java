@@ -144,20 +144,21 @@ public class OLogisticServiceImpl implements OLogisticsService {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
     public AgentResult  addListItem(List<Object> objectList, String user) throws Exception{
-        String planNum = "";
-        String orderId = "";
-        String proCode = "";
-        String proId = "";
-        String proName = "";
-        String sendDate = "";
-        String sendProNum = "";
-        String beginSn = "";
-        String endSn = "";
-        String beginSnCount = "";
-        String endSnCount = "";
-        String logCom = "";
-        String wNumber = "";
-        String proType="";
+            String planNum = "";
+            String orderId = "";
+            String proCode = "";
+            String proId = "";
+            String proName = "";
+            String sendDate = "";
+            String sendProNum = "";
+            String beginSn = "";
+            String endSn = "";
+            String beginSnCount = "";
+            String endSnCount = "";
+            String logCom = "";
+            String wNumber = "";
+            String proType="";
+            String planProNum="";
             List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
             planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
             orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
@@ -174,6 +175,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             beginSnCount = String.valueOf(objectList.get(col.indexOf("e")));
             endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
             proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE")));
+            planProNum = String.valueOf(objectList.get(col.indexOf("PLAN_PRO_NUM")));
 
             if (StringUtils.isBlank(sendDate)) {
                 logger.info("发货日期不能为空");
@@ -227,6 +229,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("商品类型不能为空");
                 throw new MessageException("商品类型不能为空");
             }
+            if (new BigDecimal(sendProNum).compareTo(new BigDecimal(planProNum))==1) {
+                logger.info("发货数量不能大于排单数量");
+                throw new MessageException("发货数量不能大于排单数量");
+            }
             //需要验证截取sn前面的字符是否一致
             String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
             String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
@@ -237,7 +243,6 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
                 throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
             }
-
             OSubOrderExample example = new OSubOrderExample();
             example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
             List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
