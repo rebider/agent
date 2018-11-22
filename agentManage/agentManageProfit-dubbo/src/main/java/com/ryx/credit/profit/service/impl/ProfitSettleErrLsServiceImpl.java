@@ -64,4 +64,9 @@ public class ProfitSettleErrLsServiceImpl implements ProfitSettleErrLsService {
 
     }
 
+    @Override
+    public void update(ProfitSettleErrLs profitSettleErrLs) {
+        profitSettleErrLsMapper.updateByPrimaryKey(profitSettleErrLs);
+    }
+
 }

@@ -688,6 +688,6 @@
   <select id="getNotDeductionProfitSettleErrLsList" resultMap="BaseResultMap">
      select    s.* from P_SETTLE_ERR_LS S
      inner join p_deduction d on d.id = S.Source_Id and d.deduction_type='01' and d.deduction_date=#{deductionDate}
-     where d.not_deduction_amt is null  and s.BUSINESS_TYPE=#{bussType} order by s.source_id
+     where d.not_deduction_amt is null  and s.BUSINESS_TYPE=#{bussType} and S.ERR_FLAG is null order by s.source_id
   </select>
 </mapper>

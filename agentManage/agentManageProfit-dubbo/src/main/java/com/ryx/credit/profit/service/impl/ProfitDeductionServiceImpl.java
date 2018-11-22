@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.dubbo.common.threadpool.support.fixed.FixedThreadPool;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
@@ -15,27 +16,24 @@ import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
 import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.exceptions.StagingException;
-import com.ryx.credit.profit.jobs.RefundJob;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDeductionExample;
-import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
-import com.ryx.credit.profit.pojo.ProfitStagingDetail;
-import com.ryx.credit.profit.service.ProfitDeductionService;
-import com.ryx.credit.profit.service.ProfitDeducttionDetailService;
-import com.ryx.credit.profit.service.ProfitSupplyService;
-import com.ryx.credit.profit.service.StagingService;
+import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.dict.IdService;
+import javafx.concurrent.ScheduledService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author zhaodw
@@ -67,6 +65,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private ProfitSettleErrLsService profitSettleErrLsServiceImpl;
+
+    private static final ExecutorService service = Executors.newFixedThreadPool(10);
+
     @Override
     public PageInfo getProfitDeductionList(Map<String, Object> department, ProfitDeduction profitDeduction, Page page) {
         ProfitDeductionExample example = new ProfitDeductionExample();
@@ -87,6 +90,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())){
             criteria.andAgentIdEqualTo(profitDeduction.getParentAgentId());
         }
+        if(department != null){
+            example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
+        }
 
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
@@ -97,29 +103,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(StringUtils.isNotBlank(profitDeduction.getAgentName())){
             criteria.andAgentNameLike(profitDeduction.getAgentName());
         }
-        if(department != null){
-            List<String> agentList = departmentAgentList(department);
-            criteria.andAgentIdIn(agentList);
-        }
         example.setOrderByClause("CREATE_DATE_TIME DESC ");
         List<ProfitDeduction> profitDeductions = profitDeductionMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitDeductions);
         pageInfo.setTotal(profitDeductionMapper.countByExample(example));
         return pageInfo;
-    }
-
-    /**
-     * 根据当前部门信息查询分润信息
-     * @param department
-     */
-    private List<String> departmentAgentList(Map<String, Object> department) {
-        if(Objects.equals("south", department.get("ORGANIZATIONCODE")) || Objects.equals("north", department.get("ORGANIZATIONCODE"))){
-            return profitDetailMonthMapper.getDistrictAgent(department.get("ORGID").toString());
-        } else if(department.get("ORGANIZATIONCODE").toString().contains("south") || department.get("ORGANIZATIONCODE").toString().contains("north")){
-            return profitDetailMonthMapper.getProAgent(department.get("ORGID").toString());
-        }
-        return null;
     }
 
     @Override
@@ -186,6 +175,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             deduction.setSourceId("1");
         }else  if ("手刷考核扣款（小蓝牙、MPOS）".equals(deduction.getRemark())) {
             deduction.setSourceId("2");
+        }else  if ("罚款".equals(deduction.getRemark())) {
+            deduction.setSourceId("4");
+        }else  if ("预发分润".equals(deduction.getRemark())) {
+            deduction.setSourceId("5");
         }else{
             deduction.setSourceId("3");
         }
@@ -449,19 +442,26 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         BigDecimal profitAmt = (BigDecimal) param.get("profitAmt");
         String computeType = (String) param.get("computeType");
         BigDecimal currentProfit = null;
+        BigDecimal realDeductionAmt = BigDecimal.ZERO;
         if (profitAmt.doubleValue() > 0) {
             currentProfit = profitAmt;
             profitAmt = profitAmt.subtract(profitDeductionTemp.getMustDeductionAmt());
             if (profitAmt.doubleValue() > 0) {
-                result = result.add(profitDeductionTemp.getMustDeductionAmt());
+                realDeductionAmt = profitDeductionTemp.getMustDeductionAmt();
             } else {
-                result = result.add(currentProfit);
+                realDeductionAmt = currentProfit;
             }
+            result = result.add(realDeductionAmt);
         } else if (profitAmt.doubleValue() <= 0) {
             currentProfit = BigDecimal.ZERO;
             profitAmt = BigDecimal.ZERO;
         }
         if ("1".equals(computeType)) {
+            // 更新退单明细
+            if (realDeductionAmt.doubleValue() > 0) {
+                BigDecimal finalRealDeductionAmt = realDeductionAmt;
+                service.submit(()->{updateTdDetail(profitDeductionTemp, finalRealDeductionAmt);});
+            }
             // 申请分期
             if ("3".equals(profitDeductionTemp.getStagingStatus())) {
                 stagingDeal(currentProfit, profitAmt, profitDeductionTemp);
@@ -471,6 +471,33 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         param.put("profitAmt" , profitAmt);
         return result;
+    }
+
+    /***
+    * @Description: 更新退单明细
+    * @Author: zhaodw
+    * @Date: 2018/11/20
+    */
+    private void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt) {
+        ProfitSettleErrLs settleErr = new ProfitSettleErrLs();
+        settleErr.setSourceId(profitDeductionTemp.getId());
+        PageInfo pageInfo = profitSettleErrLsServiceImpl.getProfitSettleErrList(settleErr, null);
+        if (pageInfo != null && pageInfo.getTotal() > 0) {
+            List<ProfitSettleErrLs> settleErrLs = pageInfo.getRows();
+            for(ProfitSettleErrLs settleErrTemp : settleErrLs) {
+                realDeductionAmt = realDeductionAmt.subtract(settleErrTemp.getMustDeductionAmt());
+                if (realDeductionAmt.doubleValue() >=0) {
+                    settleErrTemp.setErrFlag("Y");
+                    settleErrTemp.setRealDeductAmt(settleErrTemp.getMustDeductionAmt());
+                }else{
+                    settleErrTemp.setRealDeductAmt(settleErrTemp.getMustDeductionAmt().add(realDeductionAmt));
+                }
+                profitSettleErrLsServiceImpl.update(settleErrTemp);
+                if (realDeductionAmt.doubleValue() <=0) {
+                    break;
+                }
+            };
+        }
     }
 
     /***

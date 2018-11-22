@@ -60,10 +60,6 @@ public interface ProfitDetailMonthMapper {
 
     void payMoney(String profitDate);
 
-    List<String> getDistrictAgent(String id);
-
-    List<String> getProAgent(String id);
-
     /**
      * 导出数据
      * @param profitDetailMonth

@@ -36,4 +36,6 @@ public interface ICuserAgentService {
     int updateByPrimaryKey(CuserAgent record);
 
     Map configExample(Page page, CuserAgent cuserAgent);
+
+    CuserAgent selectByUserId(String userId);
 }

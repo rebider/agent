@@ -33,4 +33,6 @@ public interface ProfitSettleErrLsService {
     * @Date: 2018/7/30 
     */ 
     void inset(ProfitSettleErrLs profitSettleErrLs);
+
+    void update(ProfitSettleErrLs profitSettleErrLs);
 }

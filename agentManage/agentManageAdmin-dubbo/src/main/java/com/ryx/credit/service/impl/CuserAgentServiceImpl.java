@@ -1,5 +1,6 @@
 package com.ryx.credit.service.impl;
 
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.pojo.admin.CuserAgent;
@@ -10,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,5 +90,21 @@ public class CuserAgentServiceImpl implements ICuserAgentService {
         }else{
             return  null;
         }
+    }
+
+    @Override
+    public CuserAgent selectByUserId(String userId) {
+        CuserAgentExample example = new CuserAgentExample();
+        CuserAgentExample.Criteria criteria = example.createCriteria();
+        criteria.andUseridEqualTo(userId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<CuserAgent> cuserAgents = cuserAgentMapper.selectByExample(example);
+        if(null==cuserAgents){
+            return null;
+        }
+        if(cuserAgents.size()!=1){
+            return null;
+        }
+        return cuserAgents.get(0);
     }
 }
