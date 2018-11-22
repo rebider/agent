@@ -61,7 +61,7 @@ public class ProfitMposDiffDataJob {
      * month 交易日期（空则为上一月）
      * 每月5号上午8点：@Scheduled(cron = "0 0 5 8 * ?")
      */
-//    @Scheduled(cron = "0 13 18 13 * ?")
+//    @Scheduled(cron = "0 11 10 22 * ?")
     public void synchroProfitDiff(){
         String month = null;
         HashMap<String,String> map = new HashMap<String,String>();
