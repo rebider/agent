@@ -130,7 +130,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
                 row.setApprovalPerson(cUser.getName());
             }
             BusActRel busActRel = busActRelService.findById(row.getExecutionId());
-            if(null!=busActRel.getcTime())
+            if(null!=busActRel && null!=busActRel.getcTime())
             row.setSubMitDate(DateUtil.format(busActRel.getcTime(),"yyyy-MM-dd"));
         });
         PageInfo pageInfo = new PageInfo();
