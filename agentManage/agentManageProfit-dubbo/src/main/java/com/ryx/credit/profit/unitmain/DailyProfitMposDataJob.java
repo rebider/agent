@@ -52,7 +52,7 @@ public class DailyProfitMposDataJob {
         System.out.println("输出================================" + data);
     }
 
-//    @Scheduled(cron = "0 43 13 15 * ?")
+//    @Scheduled(cron = "0 20 10 22 * ?")
 //    public void excute(){
 //        List<String> dates = new ArrayList<String>();
 //        dates.add("20181001");

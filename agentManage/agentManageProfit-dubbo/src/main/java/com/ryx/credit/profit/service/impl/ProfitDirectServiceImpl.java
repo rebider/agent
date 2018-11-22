@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Author Lihl
+ * @Author
  * @Date 2018/08/02
- * 分润管理：商业保理
+ * 分润管理：直发分润
  */
 @Service("profitDirectService")
 public class ProfitDirectServiceImpl implements IProfitDirectService {
