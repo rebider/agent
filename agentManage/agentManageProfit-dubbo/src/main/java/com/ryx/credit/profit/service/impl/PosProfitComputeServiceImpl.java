@@ -244,7 +244,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
         posRewardList.forEach(posReward -> {
             List<String> list = getMonthBetween(posReward.getTotalConsMonth(), posReward.getCreditConsMonth());
             for (String date : list){
-                if(Objects.equals(date, currentDate)){
+                if(Objects.equals(date.replaceAll("-",""), currentDate)){
                     BigDecimal posAmt = new BigDecimal(posrewardDetail.getPosCurrentLoanCount()).subtract(new BigDecimal(posrewardDetail.getPosCompareLoanCount()));
                     LOG.info("代理商唯一码：{}，预发周期内，POS奖励交易金额 = 本月贷记交易量- 对比月贷记交易量：{}", posrewardDetail.getPosAgentId(), posAmt);
                     posrewardDetail.setPosAmt(posAmt.toString());
