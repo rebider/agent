@@ -117,7 +117,7 @@ public class RefundJob {
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
         Map<String, String> supplyIdMap = new HashMap<>(10);
         LOG.info("对数据汇总并生成补款明细。");
-        insertSettleErrList(array, orgMap, supplyIdMap, null);
+        insertSettleErrList(array, orgMap, supplyIdMap, null, "2");
 
         if (orgMap.size() > 0) {
             Set<String> keys = orgMap.keySet();
@@ -175,7 +175,7 @@ public class RefundJob {
             query.put("bussType", ((String)param.get("bussType")).equals("02")?"POS":"MPOS");
             List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotDeductionProfitSettleErrLsList(query);
             LOG.info("对数据汇总并生成退单明细。");
-            insertSettleErrList(array, orgMap, deductionIdMap, settleErrLs);
+            insertSettleErrList(array, orgMap, deductionIdMap, settleErrLs, "1");
             LOG.info("对数据汇总并生成扣款信息。");
             if (orgMap.size() > 0) {
                 Set<String> keys = orgMap.keySet();
@@ -267,7 +267,9 @@ public class RefundJob {
     * @Author: zhaodw
     * @Date: 2018/7/30 
     */ 
-    private void insertSettleErrList(JSONArray array,  Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap, List<ProfitSettleErrLs> settleErrLs) {
+    private void insertSettleErrList(JSONArray array,  Map<String, BigDecimal> orgMap,
+                                     Map<String, String> deductionIdMap, List<ProfitSettleErrLs> settleErrLs,
+                                     String operate) {
 
         if (settleErrLs != null && settleErrLs.size() > 0) {
             String sourceId = null;
@@ -320,7 +322,7 @@ public class RefundJob {
                                ((JSONObject)json).getBigDecimal("shouldMakeAmt").doubleValue()> 0) &&
                        ((JSONObject)json).getString("hostLs") != null   )
                .forEach(json->{
-                   insertSettleErr((JSONObject)json, orgMap, deductionIdMap);
+                   insertSettleErr((JSONObject)json, orgMap, deductionIdMap, operate);
             }
         );
     }
@@ -333,7 +335,7 @@ public class RefundJob {
     * @Author: zhaodw 
     * @Date: 2018/7/30 
     */ 
-    private void insertSettleErr( JSONObject jsonObject, Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap) {
+    private void insertSettleErr( JSONObject jsonObject, Map<String, BigDecimal> orgMap, Map<String, String> deductionIdMap, String operate) {
         ProfitSettleErrLs settleErrLs = new ProfitSettleErrLs();
         settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
         settleErrLs.setChargebackDate(jsonObject.getString("chargebackDate"));
@@ -362,9 +364,19 @@ public class RefundJob {
 
             //TODO 获取一级代理商业务码
             if (orgMap.containsKey(jsonObject.getString("instId"))) {
-                orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt").abs()));
+                if ("1".equals(operate)) {
+                    orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt").abs()));
+                }else{
+                    orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldMakeAmt")));
+                }
+
             }else {
-                orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt").abs());
+                if ("1".equals(operate)) {
+                    orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt").abs());
+                }else{
+                    orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldMakeAmt"));
+                }
+
                 deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
             }
         }
