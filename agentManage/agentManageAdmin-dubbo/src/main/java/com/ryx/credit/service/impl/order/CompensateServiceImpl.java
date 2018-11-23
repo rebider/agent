@@ -152,7 +152,7 @@ public class CompensateServiceImpl implements CompensateService {
     }
 
     @Override
-    public List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException{
+    public List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId,String agentId)throws ProcessException{
         String snBegin = "";
         String snEnd = "";
         String count = "";
@@ -198,9 +198,15 @@ public class CompensateServiceImpl implements CompensateService {
         for (Map<String, Object> stringObjectMap : compensateLList) {
             agentIdSet.add(String.valueOf(stringObjectMap.get("AGENT_ID")));
             Agent agent = agentService.getAgentById(String.valueOf(stringObjectMap.get("AGENT_ID")));
-            if(!orgId.equals(agent.getAgDocPro())){
-                log.info("不能提交其他省区的退补差价");
-                throw new ProcessException("不能提交其他省区的退补差价");
+            if(null==agent){
+                log.info("代理商信息不存在");
+                throw new ProcessException("代理商信息不存在");
+            }
+            if(!agent.getId().equals(agentId)){
+                if(!orgId.equals(agent.getAgDocPro())){
+                    log.info("不能提交其他省区的退补差价");
+                    throw new ProcessException("不能提交其他省区的退补差价");
+                }
             }
             String gTime = String.valueOf(stringObjectMap.get("G_TIME"));
             if(StringUtils.isNotBlank(gTime) && gTime!="null"){
@@ -452,12 +458,15 @@ public class CompensateServiceImpl implements CompensateService {
             log.info("========用户{}{}启动部门参数为空", id, cuser);
             throw new MessageException("启动部门参数为空!");
         }
-
+        Object party = startPar.get("party");
         //不同的业务类型找到不同的启动流程
         List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.ACT_COMPENSATE.name());
         String workId = null;
         for (Dict dict : actlist) {
-            workId = dict.getdItemvalue();
+            //根据不同的部门信息启动不同的流程
+            if(party.equals(dict.getdItemvalue())) {
+                workId = dict.getdItemname();
+            }
         }
         //启动审批
         String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
