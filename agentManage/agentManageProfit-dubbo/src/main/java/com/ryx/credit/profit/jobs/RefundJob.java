@@ -235,6 +235,7 @@ public class RefundJob {
         deduction.setSourceId(bussType);
         deduction.setDeductionDate(deductionDate);
         deduction.setCreateDateTime(new Date());
+        deduction.setDeductionStatus("0");
         profitDeductionService.insert(deduction);
     }
 
