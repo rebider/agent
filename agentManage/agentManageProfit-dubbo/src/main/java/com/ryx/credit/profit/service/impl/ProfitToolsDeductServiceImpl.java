@@ -72,7 +72,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 return map;
             }
         }
-        LOG.info("机具分润扣款响应参数：{}", map);
         return map;
     }
 
@@ -131,6 +130,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             map.put("ZposTdRealDeductionAmt", ZposRealOptional.get());
         }
         map.put("agentProfitAmt", profitSumAmt);
+        LOG.info("机具分润扣款响应参数：{}", map);
         return map;
     }
 
@@ -427,6 +427,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             }
         }
         map.put("hbList", mergeAgentList);
+        LOG.info("机具分润扣款响应参数：{}", map);
         return map;
     }
 
