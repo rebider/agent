@@ -137,13 +137,11 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
         LOG.info("POS奖励明细基础数据导入、基础奖励金额计算结束");
 
-        LOG.info("开始扣减机构一代、标准一代（包含下级）POS奖励");
+        LOG.info("开始扣减机构POS奖励");
         PosRewardDetail posDetatil = new PosRewardDetail();
         posDetatil.setProfitPosDate(currentDate);
         detailList.parallelStream().forEach(posRewardDetail -> {
-            if(Objects.equals(AGENT_TYPE_2,posRewardDetail.getPosMechanismType())
-                    ||Objects.equals(AGENT_TYPE_3,posRewardDetail.getPosMechanismType())
-                    ||Objects.equals(AGENT_TYPE_6,posRewardDetail.getPosMechanismType())) {
+            if(Objects.equals(AGENT_TYPE_2,posRewardDetail.getPosMechanismType())) {
                 List childAgentList = JSONObject.parseObject(posRewardDetail.getChildAgentIdList(), List.class);
                 BigDecimal downReward = BigDecimal.ZERO;
                 if(childAgentList.size() > 0 ){
@@ -152,69 +150,72 @@ public class PosProfitComputeServiceImpl implements DeductService {
                         downReward = downReward.add(new BigDecimal(detail1.getPosReawrdProfit()));
                     }
                 }
-                LOG.info("代理商唯一码：{}，扣减机构一代、标准一代（包含下级）POS奖励：{}",posRewardDetail.getPosAgentId(), downReward);
-                if(downReward.compareTo(BigDecimal.ZERO) != 0 ){
+                LOG.info("代理商唯一码：{}，扣减机构一代POS奖励：{}",posRewardDetail.getPosAgentId(), downReward);
+                if(downReward.compareTo(BigDecimal.ZERO) > 0){
                     PosRewardDetail updateDetail = new PosRewardDetail();
                     updateDetail.setId(posRewardDetail.getId());
-                    updateDetail.setPosDownReward(downReward.toString());
-                    BigDecimal posReawrdProfit = new BigDecimal(posRewardDetail.getPosReawrdProfit()).subtract(downReward);
-                    updateDetail.setPosReawrdProfit(posReawrdProfit.toString());
+                    if(new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) == 0){
+                        return;
+                    } else if(new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(downReward) >= 0){
+                        updateDetail.setPosDownReward(downReward.toString());
+                        BigDecimal posReawrdProfit = new BigDecimal(posRewardDetail.getPosReawrdProfit()).subtract(downReward);
+                        updateDetail.setPosReawrdProfit(posReawrdProfit.toString());
+                    } else if(downReward.compareTo(new BigDecimal(posRewardDetail.getPosReawrdProfit())) > 0){
+                        updateDetail.setPosDownReward("0");
+                        updateDetail.setPosReawrdProfit("0");
+                    }
                     posRewardSDetailService.updatePosRewardDetail(updateDetail);
                 }
             }
         });
-        LOG.info("扣减机构一代、标准一代（包含下级）POS奖励结束");
+        LOG.info("扣减机构POS奖励结束");
 
         LOG.info("开始计算申请特殊奖励的代理商，考核奖励扣款部分");
-        detailList.parallelStream().forEach(posRewardDetail -> {
-            if(Objects.equals(AGENT_TYPE_2,posRewardDetail.getPosMechanismType())
-                    ||Objects.equals(AGENT_TYPE_3,posRewardDetail.getPosMechanismType())
-                    ||Objects.equals(AGENT_TYPE_6,posRewardDetail.getPosMechanismType())) {
-                PosReward posReward = new PosReward();
-                posReward.setAgentId(posRewardDetail.getPosAgentId());
-                posReward.setApplyStatus("1");
-                List<PosReward> posRewardList = iPosRewardService.selectRewardByMonth(posReward);
-                if(posRewardList != null || !posRewardList.isEmpty()){
-                    for(PosReward rewardTemp : posRewardList){
-                        if(Objects.equals(rewardTemp.getTotalEndMonth().replaceAll("-",""), currentDate)){
-                            LOG.info("考核代理商唯一码：{}，到达考核月份:{}", posRewardDetail.getPosAgentId(), currentDate);
-                            if(new BigDecimal(posRewardDetail.getPosCurrentCount()).compareTo(rewardTemp.getGrowAmt().multiply(new BigDecimal("10000"))) >= 0){
-                                LOG.info("考核代理商唯一码：{}，考核交易量达到活动指标，不进行扣减奖励", posRewardDetail.getPosAgentId());
-                                break;
-                            } else {
-                                LOG.info("考核代理商唯一码：{}，考核未达标，对预发周期得月份按照通用奖励计算进行扣款", posRewardDetail.getPosAgentId());
-                                List<String> previewDateList = getMonthBetween(rewardTemp.getTotalConsMonth(), rewardTemp.getCreditConsMonth());
-                                BigDecimal deductAmt = BigDecimal.ZERO;
-                                for(String previewDate: previewDateList){
-                                    posDetatil.setProfitPosDate(previewDate);
-                                    posDetatil.setPosAgentId(posRewardDetail.getPosAgentId());
-                                    PosRewardDetail previewRewardDetail = posRewardSDetailService.getPosRewardDetail(posDetatil);
-                                    if(previewRewardDetail != null){
-                                        BigDecimal deductRewardAmt = this.obtainGlobalTemp(previewRewardDetail, previewDate, posRewardTemplates);
-                                        deductAmt = deductAmt.add(deductRewardAmt);
-                                        LOG.info("考核代理商唯一码：{}，特殊奖励预发周期月份:{}，考核奖励扣款金额：{}", posRewardDetail.getPosAgentId(), previewDate, deductRewardAmt);
-                                    }
-                                }
-                                LOG.info("考核代理商唯一码：{}，考核总扣款金额：{}", posRewardDetail.getPosAgentId(), deductAmt);
-                                if(deductAmt.compareTo(BigDecimal.ZERO) != 0){
-                                    posRewardDetail.setPosCheckDeductAmt(deductAmt.abs().toString());
-                                    PosRewardDetail updateDetail = new PosRewardDetail();
-                                    updateDetail.setId(posRewardDetail.getId());
-                                    updateDetail.setPosCheckDeductAmt(deductAmt.abs().toString());
-                                    posRewardSDetailService.updatePosRewardDetail(updateDetail);
-                                }
-                            }
-                        }
-                    }
+
+        PosReward posReward = new PosReward();
+        posReward.setApplyStatus("1");
+        posReward.setTotalEndMonth(currentDate);
+        List<PosReward> posRewardList = iPosRewardService.selectRewardByMonth(posReward);
+        PosRewardDetail deductPosDetatil =  new PosRewardDetail();
+        deductPosDetatil.setProfitPosDate(currentDate);
+        posRewardList.parallelStream().forEach(posReward1 -> {
+            deductPosDetatil.setPosAgentId(posReward1.getAgentId());
+            PosRewardDetail assRewardDetail = posRewardSDetailService.getPosRewardDetail(deductPosDetatil);
+            if(assRewardDetail == null){
+                return;
+            }
+            if(new BigDecimal(assRewardDetail.getPosCurrentCount()).compareTo(posReward1.getGrowAmt().multiply(new BigDecimal("10000"))) >= 0){
+                LOG.info("考核代理商唯一码：{}，考核交易量达到活动指标，不进行扣减奖励", assRewardDetail.getPosAgentId());
+                return;
+            }
+
+            LOG.info("考核代理商唯一码：{}，考核未达标，对预发周期得月份按照通用奖励计算进行扣款", assRewardDetail.getPosAgentId());
+            List<String> previewDateList = getMonthBetween(posReward1.getTotalConsMonth(), posReward1.getCreditConsMonth());
+            BigDecimal deductAmt = BigDecimal.ZERO;
+            for(String previewDate: previewDateList){
+                deductPosDetatil.setProfitPosDate(previewDate);
+                PosRewardDetail previewRewardDetail = posRewardSDetailService.getPosRewardDetail(deductPosDetatil);
+                if(previewRewardDetail != null){
+                    BigDecimal deductRewardAmt = this.obtainGlobalTemp(previewRewardDetail, previewDate, posRewardTemplates);
+                    deductAmt = deductAmt.add(deductRewardAmt);
+                    LOG.info("考核代理商唯一码：{}，特殊奖励预发周期月份:{}，考核奖励扣款金额：{}", previewRewardDetail.getPosAgentId(), previewDate, deductRewardAmt);
                 }
             }
+            LOG.info("考核代理商唯一码：{}，考核总扣款金额：{}", assRewardDetail.getPosAgentId(), deductAmt);
+            if(deductAmt.compareTo(BigDecimal.ZERO) != 0){
+                PosRewardDetail updateDetail = new PosRewardDetail();
+                updateDetail.setId(assRewardDetail.getId());
+                updateDetail.setPosCheckDeductAmt(deductAmt.abs().toString());
+                posRewardSDetailService.updatePosRewardDetail(updateDetail);
+            }
         });
+
         LOG.info("计算申请特殊奖励的代理商，考核奖励扣款，结束");
 
         LOG.info("更新基础分润中，POS奖励、考核扣款金额，开始");
         detailList.parallelStream().forEach(posRewardDetail -> {
-            if(new BigDecimal(posRewardDetail.getPosCheckDeductAmt()).compareTo(BigDecimal.ZERO) > 0 ||
-                    new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) > 0 ){
+            if(new BigDecimal(posRewardDetail.getPosCheckDeductAmt()).compareTo(BigDecimal.ZERO) != 0  ||
+                    new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) != 0 ){
                 LOG.info("代理商唯一码：{}，更新基础分润POS奖励信息",posRewardDetail.getPosAgentId());
                 String superAgentId = posRewardSDetailService.getSuperAgentId(posRewardDetail.getPosAgentId());
                 List<ProfitDetailMonth> profitMonth = profitMonthService.getAgentProfit(posRewardDetail.getPosAgentId(),
