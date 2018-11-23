@@ -64,7 +64,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 return this.fristRound(map, agentPid, computType, list);
             } else if(Objects.equals("2", map.get("rotation"))){
                 LOG.info("第二轮机具扣款（合并商户基础分润扣款）：代理商编号：{}", agentPid);
-                return this.secondRound(agentPid, map, list);
+                return this.secondRound(agentPid, map, list, computType);
             } else {
                 map.put("agentProfitAmt", BigDecimal.ZERO);
                 LOG.info("第三轮机具扣款（担保代理商扣款）：代理商编号：{}", agentPid);
@@ -333,7 +333,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      * @param map
      * @return
      */
-    private Map<String, Object> secondRound(String agentPid, Map<String, Object> map, List<ProfitDeduction> list) {
+    private Map<String, Object> secondRound(String agentPid, Map<String, Object> map, List<ProfitDeduction> list, String computType) {
         List<Map<String, Object>> mergeAgentList= (List<Map<String, Object>>)map.get("hbList");
         for (ProfitDeduction profitDeductionList : list){
             if(profitDeductionList.getNotDeductionAmt().compareTo(BigDecimal.ZERO) == 0){
@@ -377,16 +377,18 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 }
 
                 try {
-                    insert.setAgentPid(profitMonth.getAgentId());
-                    insert.setAgentId(profitMonth.getAgentId());
-                    insert.setAgentName(profitMonth.getAgentName());
-                    insert.setDeductionType(DeductionType.MACHINE.getType());
-                    insert.setDeductionDesc(profitDeductionList.getDeductionDesc());
-                    insert.setDeductionDate(profitDeductionList.getDeductionDate());
-                    insert.setId(profitDeductionList.getId());
-                    insert.setRemark("合并代理商代扣，扣款明细："+profitDeductionList.getSourceId());
-                    insert.setUserId(profitDeductionList.getAgentId());
-                    profitDeducttionDetailService.insertDeducttionDetail(insert);
+                    if(Objects.equals(computType, "1")){
+                        insert.setAgentPid(profitMonth.getAgentId());
+                        insert.setAgentId(profitMonth.getAgentId());
+                        insert.setAgentName(profitMonth.getAgentName());
+                        insert.setDeductionType(DeductionType.MACHINE.getType());
+                        insert.setDeductionDesc(profitDeductionList.getDeductionDesc());
+                        insert.setDeductionDate(profitDeductionList.getDeductionDate());
+                        insert.setId(profitDeductionList.getId());
+                        insert.setRemark("合并代理商代扣，扣款明细："+profitDeductionList.getSourceId());
+                        insert.setUserId(profitDeductionList.getAgentId());
+                        profitDeducttionDetailService.insertDeducttionDetail(insert);
+                    }
 
                     ProfitDetailMonth update = new ProfitDetailMonth();
                     update.setId((String)mergeMap.get("id"));
@@ -402,12 +404,14 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                     }
                     profitMonthService.updateByPrimaryKeySelective(update);
 
-                    ProfitDeduction updateDeduct = new ProfitDeduction();
-                    updateDeduct.setId(profitDeductionList.getId());
-                    updateDeduct.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
-                    updateDeduct.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
-                    updateDeduct.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
-                    profitDeductionService.updateProfitDeduction(updateDeduct);
+                    if(Objects.equals(computType, "1")){
+                        ProfitDeduction updateDeduct = new ProfitDeduction();
+                        updateDeduct.setId(profitDeductionList.getId());
+                        updateDeduct.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                        updateDeduct.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
+                        updateDeduct.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
+                        profitDeductionService.updateProfitDeduction(updateDeduct);
+                    }
                 } catch (Exception e) {e.printStackTrace();}
 
                 if(profitDeductionList.getMustDeductionAmt().compareTo(profitDeductionList.getActualDeductionAmt()) == 0){
