@@ -193,7 +193,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
             List<String> previewDateList = getMonthBetween(posReward1.getTotalConsMonth(), posReward1.getCreditConsMonth());
             BigDecimal deductAmt = BigDecimal.ZERO;
             for(String previewDate: previewDateList){
-                deductPosDetatil.setProfitPosDate(previewDate);
+                deductPosDetatil.setProfitPosDate(previewDate.replaceAll("-",""));
                 PosRewardDetail previewRewardDetail = posRewardSDetailService.getPosRewardDetail(deductPosDetatil);
                 if(previewRewardDetail != null){
                     BigDecimal deductRewardAmt = this.obtainGlobalTemp(previewRewardDetail, previewDate, posRewardTemplates);
@@ -421,8 +421,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
             String[] spl = posRewardTemplate.getActivityValid().trim().split("~");
             List<String> list = getMonthBetween(spl[0], spl[1]);
             for(String activitDate : list){
-                if(Objects.equals(activitDate.replaceAll("-", ""), previewDate)){
-                    BigDecimal deductAmt = this.againComputeReward(posRewardTemplate, previewRewardDetail, previewDate);
+                if(Objects.equals(activitDate, previewDate)){
+                    BigDecimal deductAmt = this.againComputeReward(posRewardTemplate, previewRewardDetail);
                     deductRewardAmt = deductRewardAmt.add(deductAmt);
                     if(deductAmt.compareTo(BigDecimal.ZERO) > 0){
                         end = true;
@@ -441,7 +441,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * 按照通用模板重新计算奖励，然后用特殊奖励-通用奖励=考核扣款
      * @param posRewardTemplate
      */
-    private BigDecimal againComputeReward(PosRewardTemplate posRewardTemplate, PosRewardDetail previewRewardDetail, String previewDate) {
+    private BigDecimal againComputeReward(PosRewardTemplate posRewardTemplate, PosRewardDetail previewRewardDetail) {
         BigDecimal tranAmt = new BigDecimal(previewRewardDetail.getPosCurrentCount()).subtract(new BigDecimal(previewRewardDetail.getPosCompareCount()));
         if(tranAmt.compareTo(posRewardTemplate.getTranTotalStart().multiply(new BigDecimal("10000"))) > 0
                 && tranAmt.compareTo(posRewardTemplate.getTranTotalEnd().multiply(new BigDecimal("10000"))) <= 0 ){
