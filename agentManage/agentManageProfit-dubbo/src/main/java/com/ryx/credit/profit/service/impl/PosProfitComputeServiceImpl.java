@@ -213,7 +213,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
         LOG.info("计算申请特殊奖励的代理商，考核奖励扣款，结束");
 
         LOG.info("更新基础分润中，POS奖励、考核扣款金额，开始");
-        detailList.parallelStream().forEach(posRewardDetail -> {
+        PosRewardDetail queryDetail =  new PosRewardDetail();
+        queryDetail.setProfitPosDate(currentDate);
+        List<PosRewardDetail> queryList = posRewardSDetailService.getPosRewardDetailList(queryDetail, null, null);
+        queryList.parallelStream().forEach(posRewardDetail -> {
             if(new BigDecimal(posRewardDetail.getPosCheckDeductAmt()).compareTo(BigDecimal.ZERO) != 0  ||
                     new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) != 0 ){
                 LOG.info("代理商唯一码：{}，更新基础分润POS奖励信息",posRewardDetail.getPosAgentId());
