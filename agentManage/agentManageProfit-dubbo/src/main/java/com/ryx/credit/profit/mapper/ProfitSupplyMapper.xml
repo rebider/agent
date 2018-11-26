@@ -90,7 +90,7 @@
 
   <delete id="resetData" >
     delete from P_PROFIT_SUPPLY
-    where SUPPLY_DATE = to_char(sysdate-30 ,'yyyymm')
+    where SUPPLY_DATE = to_char(sysdate-30 ,'yyyymm') and SUPPLY_TYPE != '退单补款'
   </delete>
 
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
