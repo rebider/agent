@@ -114,12 +114,12 @@ public class ProfitAmtSumJob {
         profitSupply.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
         profitSupply.setAgentId(profitDetailMonthTemp.getAgentId());
         profitSupply.setSupplyDate(profitDetailMonthTemp.getProfitDate());
-        profitSupply.setSourceId("02");
+        profitSupply.setBusType("02");
         // pos退单补款
         BigDecimal posSupply = profitSupplyMapper.getBuckleByMonthAndPid(profitSupply);
         profitDetailMonthTemp.setPosTdSupplyAmt(posSupply==null?BigDecimal.ZERO:posSupply);
         // mpos退单补款
-        profitSupply.setSourceId("01");
+        profitSupply.setBusType("01");
         BigDecimal mposSupply = profitSupplyMapper.getBuckleByMonthAndPid(profitSupply);
         profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply==null?BigDecimal.ZERO:mposSupply);
         return profitDetailMonthTemp.getPosTdSupplyAmt().add(profitDetailMonthTemp.getMposTdSupplyAmt());

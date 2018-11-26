@@ -149,7 +149,7 @@ public class RefundJob {
         }
         profitSupply.setSupplyAmt(supplyAmt);
         profitSupply.setSupplyDate(supplyDate);
-        profitSupply.setSourceId(bussType);
+        profitSupply.setBusType(bussType);
         profitSupplyServiceImpl.insert(profitSupply);
 
     }
