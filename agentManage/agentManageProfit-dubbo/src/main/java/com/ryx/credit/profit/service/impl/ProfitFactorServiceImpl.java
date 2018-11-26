@@ -117,9 +117,9 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
                 logger.info(profitFactor.getAgentId() + "此条数据已存在！");
                 throw new MessageException(profitFactor.getAgentId() + "此条数据已存在！");
             } else {
-                if (1 != insertImportData(profitFactor)) {
+                if (insertImportData(profitFactor)==0) {
                     logger.info("导入失败！");
-                    throw new MessageException("代理商编号为:<" + profitFactor.getAgentId() + ">插入保理数据失败！");
+                    throw new MessageException(factor.toString() + "导入失败！");
                 }
                 logger.info("保理数据信息：" + JSONObject.toJSON(profitFactor));
             }

@@ -53,7 +53,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         List<Map<String, Object>> list = pProfitSupplyMapper.getProfitSupplyList(param);
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
-        System.out.println("查询============================================" + JSONObject.toJSON(list));
+//        System.out.println("查询============================================" + JSONObject.toJSON(list));
         return pageInfo;
     }
 
@@ -150,17 +150,17 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 profitSupply.setSupplyDate(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//月份
                 profitSupply.setSupplyType(null!=supply.get(5)?String.valueOf(supply.get(5)):"");//补款类型
                 profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(6))));//补款金额
-                profitSupply.setSupplyCode(null!=supply.get(7)?String.valueOf(supply.get(7)):"");//补款码
+//                profitSupply.setSupplyCode(supply.get(7)!=null?"":String.valueOf(supply.get(7)));//补款码
+                if (pProfitSupplyMapper.insertSelective(profitSupply)==0) {
+                    logger.info("导入失败！");
+                    throw new MessageException(supply.toString() + "导入失败！");
+                }
+                logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
+                list.add(profitSupply.getId());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;
             }
-            if (1 != pProfitSupplyMapper.insertSelective(profitSupply)) {
-                logger.info("导入失败！");
-                throw new MessageException("代理商编号为:<" + profitSupply.getAgentId() + ">插入补款数据失败");
-            }
-            logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
-            list.add(profitSupply.getId());
         }
         return list;
     }
