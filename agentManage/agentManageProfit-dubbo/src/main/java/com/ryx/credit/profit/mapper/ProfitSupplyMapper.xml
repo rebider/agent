@@ -281,6 +281,7 @@
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
     <if test="parentAgentId == null ">AND PARENT_AGENT_ID is null </if>
     <if test="sourceId != null and sourceId != ''">AND SOURCE_ID = #{sourceId}</if>
+    <if test="busType != null and busType != ''">AND BUS_TYPE = #{busType}</if>
   </select>
 
   <select id="getProfitSupplyList" parameterType="java.util.Map" resultType="java.util.Map">
