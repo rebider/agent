@@ -229,8 +229,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             }else {
                 criteria.andDeductionStatusEqualTo(profitDeduction.getDeductionStatus());
             }
-        }else {
-            criteria.andDeductionStatusIsNull();
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())){
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
