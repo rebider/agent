@@ -40,7 +40,7 @@ public class ProfitDeducttionDetail implements Serializable{
 
     private String userId;
 
-    private Date createDateTime;
+    private String createDateTime;
 
     private String deductionId;
 
@@ -164,14 +164,12 @@ public class ProfitDeducttionDetail implements Serializable{
         this.userId = userId == null ? null : userId.trim();
     }
 
-    public Date getCreateDateTime() {
+    public String getCreateDateTime() {
         return createDateTime;
     }
-
-    public void setCreateDateTime(Date createDateTime) {
+    public void setCreateDateTime(String createDateTime) {
         this.createDateTime = createDateTime;
     }
-
     public String getDeductionId() {
         return deductionId;
     }

@@ -447,13 +447,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             for (ProfitDeduction deduction : list){
                 Map<String, Object> map = new HashMap<String, Object>(5);
                 ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
-                if(detail == null){
-                    map.put("deductTime", "");//扣款时间
-                } else {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
-                    String updateTime = sdf.format(detail.getCreateDateTime());
-                    map.put("deductTime", updateTime);//最后扣款时间
-                }
+                map.put("deductTime", detail != null ? detail.getCreateDateTime() : "");//最后扣款时间
                 BigDecimal mustDeductionAmtSum = deduction.getMustDeductionAmt() == null ? BigDecimal.ZERO : deduction.getMustDeductionAmt();
                 map.put("mustDeductionAmtSum", mustDeductionAmtSum.toString());//应扣
                 BigDecimal actualDeductionAmtSum = deduction.getActualDeductionAmt() == null ? BigDecimal.ZERO : deduction.getActualDeductionAmt();
