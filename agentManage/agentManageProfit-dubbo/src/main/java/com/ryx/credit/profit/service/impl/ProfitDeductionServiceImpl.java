@@ -140,7 +140,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
         if(deductionist != null && deductionist.size() > 0 ) {
-            deductionist.stream().filter(list->list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null).forEach(list->{
+            deductionist.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null).forEach(list->{
                 insertDeduction(list, userId);
             });
 
