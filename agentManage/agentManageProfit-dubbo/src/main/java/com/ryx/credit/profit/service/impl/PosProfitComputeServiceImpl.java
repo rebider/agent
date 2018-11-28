@@ -176,9 +176,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
         posReward.setApplyStatus("1");
         posReward.setTotalEndMonth(currentDate);
         List<PosReward> posRewardList = iPosRewardService.selectRewardByMonth(posReward);
-        PosRewardDetail deductPosDetatil =  new PosRewardDetail();
-        deductPosDetatil.setProfitPosDate(currentDate);
         posRewardList.parallelStream().forEach(posReward1 -> {
+            PosRewardDetail deductPosDetatil =  new PosRewardDetail();
+            deductPosDetatil.setProfitPosDate(currentDate);
             deductPosDetatil.setPosAgentId(posReward1.getAgentId());
             PosRewardDetail assRewardDetail = posRewardSDetailService.getPosRewardDetail(deductPosDetatil);
             if(assRewardDetail == null){
