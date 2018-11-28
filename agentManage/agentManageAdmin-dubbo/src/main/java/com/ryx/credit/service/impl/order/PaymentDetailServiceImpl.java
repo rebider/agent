@@ -168,7 +168,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             logger.info("支付状态为空:{}", maps);
             return ResultVO.fail("支付状态为空");
         }
-        for (Map<String, Object> map : maps) {
+        if(payStatus.compareTo(PaySign.JQ.code)==0){
+            for (Map<String, Object> map : maps) {
             String detailId = (String) map.get("detailId");//付款明细id
             String srcId = (String) map.get("srcId");//付款源id
             String payAmount = (String) map.get("mustDeductionAmtSum");//应扣
@@ -314,7 +315,38 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 logger.info("付款明细更新数据失败");
                 throw new ProcessException("付款明细更新数据失败");
             }
+        } }
+
+        if (payStatus.compareTo(PaySign.FKING.code)==0){//付款中
+            for (Map<String, Object> map : maps) {
+                String detailId = (String) map.get("detailId");//付款明细id
+                String srcId = (String) map.get("srcId");//付款源id
+                if (StringUtils.isBlank(detailId)) {
+                    logger.info("付款明细ID为空:{}", detailId);
+                    throw new ProcessException("付款明细ID为空");
+                }
+                if (StringUtils.isBlank(srcId)) {
+                    logger.info("付款源ID为空:{}", srcId);
+                    throw new ProcessException("付款源ID为空");
+                }
+                //分别去查询付款单数据  和    付款明细的数据
+                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+                criteria.andIdEqualTo(detailId);
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                if (1 != oPaymentDetails.size())
+                    throw new ProcessException("没有查找到相关数据");
+                OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
+                oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
+                oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                    logger.info("付款明细更新数据失败");
+                    throw new ProcessException("付款明细更新数据失败");
+                }
+            }
         }
+
         return ResultVO.success("");
     }
 
