@@ -17,4 +17,13 @@ public interface PosOrganDataService {
     * @Date: 2018/8/10 
     */ 
     AgentResult getAllChild(String orgId) throws ProcessException;
+
+
+    /***
+     * @Description: 获取一级代理商
+     * @return:  结果
+     * @Author: zhaodw
+     * @Date: 2018/8/10
+     */
+    AgentResult getFirstAgent(String orgId) throws ProcessException;
 }
