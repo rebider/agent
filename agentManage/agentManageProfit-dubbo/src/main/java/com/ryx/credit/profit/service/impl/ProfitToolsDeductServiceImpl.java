@@ -448,11 +448,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 Map<String, Object> map = new HashMap<String, Object>(5);
                 ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
                 map.put("deductTime", detail != null ? detail.getCreateDateTime() : "");//最后扣款时间
-                BigDecimal mustDeductionAmtSum = deduction.getMustDeductionAmt() == null ? BigDecimal.ZERO : deduction.getMustDeductionAmt();
-                map.put("mustDeductionAmtSum", mustDeductionAmtSum.toString());//应扣
-                BigDecimal actualDeductionAmtSum = deduction.getActualDeductionAmt() == null ? BigDecimal.ZERO : deduction.getActualDeductionAmt();
-                map.put("actualDeductionAmtSum", actualDeductionAmtSum.toString());//实扣
-                map.put("notDeductionAmt", mustDeductionAmtSum.subtract(actualDeductionAmtSum).toString());//未扣足
+                map.put("mustDeductionAmtSum", deduction.getSumDeductionAmt().toString());//应扣
+                map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());//实扣
+                map.put("notDeductionAmt", deduction.getNotDeductionAmt());//未扣足
                 map.put("detailId", deduction.getSourceId());//订单号
                 map.put("srcId", deduction.getId());//分润系统扣款ID
                 noticeList.add(map);

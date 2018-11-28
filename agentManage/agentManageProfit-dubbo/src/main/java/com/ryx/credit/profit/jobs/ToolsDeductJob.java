@@ -39,13 +39,13 @@ public class ToolsDeductJob {
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
+            LOG.info("从订单系统，获取到需要扣款的机具欠款总计：{} 条", list  != null && !list.isEmpty() ? list.size() : 0);
             if(list!= null && !list.isEmpty()){
-                LOG.info("接口获取机具扣款分期数据：{} 条", list.size());
-                List<Map<String, Object>> successList = toolsDeductService.batchInsertDeduct(list, deductDate);
+                toolsDeductService.batchInsertDeduct(list, deductDate);
             }
             List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
+            LOG.info("上月调整成功的机具分期，新增到本月代理商机具扣款，总计调整成功：{} 条", detailList != null && !detailList.isEmpty() ? detailList.size() : 0);
             if(detailList != null && !detailList.isEmpty()){
-                LOG.info("上月存在调整成功的机具扣款，新增一条到本月扣款中，：{} 条", detailList.size());
                 toolsDeductService.deductCompletionInfo(detailList);
             }
         } catch (Exception e){
