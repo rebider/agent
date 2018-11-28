@@ -3,6 +3,7 @@ package com.ryx.credit.profit.jobs;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.PageInfo;
@@ -19,6 +20,7 @@ import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.profit.PosOrganDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -75,6 +77,9 @@ public class RefundJob {
 
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+
+    @Autowired
+    private PosOrganDataService posOrganDataServiceImpl;
 
     @Scheduled(cron = "0 0 0 1 * ?")
     public void deal() {
@@ -137,7 +142,7 @@ public class RefundJob {
         Map<String,Object> agentMap = getAgentId(instId);
         String supplyDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         ProfitSupply profitSupply = new ProfitSupply();
-        profitSupply.setId(idService.genId(TabId.p_profit_supply));
+        profitSupply.setId(supplyIdMap.get(instId));
         profitSupply.setSupplyType(SUPPLY_DESC);
         profitSupply.setRemerk(SUPPLY_DESC);
         if (agentMap !=null){
@@ -153,6 +158,7 @@ public class RefundJob {
         profitSupplyServiceImpl.insert(profitSupply);
 
     }
+
 
     /***
     * @Description: 获取退单应扣分润并做处理
@@ -360,28 +366,40 @@ public class RefundJob {
         settleErrLs.setRealDeductAmt(jsonObject.getBigDecimal("realDeductAmt"));
         settleErrLs.setOffsetLossAmt(jsonObject.getBigDecimal("offsetLossAmt"));
         settleErrLs.setYswsAmt(jsonObject.getBigDecimal("ingshou"));
-        synchronized (object) {
+        String orgId = jsonObject.getString("instId");
 
-            //TODO 获取一级代理商业务码
-            if (orgMap.containsKey(jsonObject.getString("instId"))) {
+        synchronized (object) {
+            if ("POS".equals(jsonObject.getString("businessType"))){
+                //TODO 获取一级代理商业务码
+                AgentResult result = posOrganDataServiceImpl.getFirstAgent(orgId);
+                if (result != null ) {
+                    JSONObject json = JSONObject.parseObject(result.getData().toString());
+                    if (json != null && json.containsKey("PFT_ORG_ID")) {
+                        orgId = json.getString("PFT_ORG_ID");
+                    }
+                }
+            }
+            if (orgMap.containsKey(orgId)) {
                 if ("1".equals(operate)) {
-                    orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldDeductAmt").abs()));
+                    orgMap.put(orgId, orgMap.get(orgId).add(jsonObject.getBigDecimal("shouldDeductAmt").abs()));
                 }else{
-                    orgMap.put(jsonObject.getString("instId"), orgMap.get(jsonObject.getString("instId")).add(jsonObject.getBigDecimal("shouldMakeAmt")));
+                    orgMap.put(orgId, orgMap.get(orgId).add(jsonObject.getBigDecimal("shouldMakeAmt")));
                 }
 
             }else {
                 if ("1".equals(operate)) {
-                    orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldDeductAmt").abs());
+                    orgMap.put(orgId, jsonObject.getBigDecimal("shouldDeductAmt").abs());
+                    deductionIdMap.put(orgId,  idService.genId(TabId.P_DEDUCTION));
                 }else{
-                    orgMap.put(jsonObject.getString("instId"), jsonObject.getBigDecimal("shouldMakeAmt"));
+                    orgMap.put(orgId, jsonObject.getBigDecimal("shouldMakeAmt"));
+                    deductionIdMap.put(orgId,  idService.genId(TabId.p_profit_supply));
                 }
 
-                deductionIdMap.put(jsonObject.getString("instId"),  idService.genId(TabId.P_DEDUCTION));
+
             }
         }
-        settleErrLs.setSourceId(deductionIdMap.get(jsonObject.getString("instId")));
-        settleErrLs.setInstId(jsonObject.getString("instId"));
+        settleErrLs.setSourceId(deductionIdMap.get(orgId));
+        settleErrLs.setInstId(orgId);
         profitSettleErrLsService.inset(settleErrLs);
     }
     /***
