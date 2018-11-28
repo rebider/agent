@@ -11,6 +11,8 @@ import com.ryx.credit.service.dict.IdService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -48,7 +50,7 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         profitDeducttionDetail.setAgentId(profitDeduction.getAgentId());
         profitDeducttionDetail.setAgentName(profitDeduction.getAgentName());
         profitDeducttionDetail.setAgentPid(profitDeduction.getAgentId());
-        profitDeducttionDetail.setCreateDateTime(new Date());
+        profitDeducttionDetail.setCreateDateTime(LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE));
         profitDeducttionDetail.setDeductionDate(profitDeduction.getDeductionDate());
         profitDeducttionDetail.setDeductionDesc(profitDeduction.getDeductionDesc());
         profitDeducttionDetail.setDeductionId(profitDeduction.getId());
@@ -63,5 +65,16 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         profitDeducttionDetail.setRemark(profitDeduction.getRemark());
         profitDeducttionDetail.setUserId(profitDeduction.getUserId());
         profitDeducttionDetailMapper.insertSelective(profitDeducttionDetail);
+    }
+
+    @Override
+    public List<ProfitDeducttionDetail> getDeducttionDetailList(ProfitDeduction profitDeduction) {
+        ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
+        ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(profitDeduction.getId())){
+                criteria.andDeductionIdEqualTo(profitDeduction.getId());
+        }
+        example.setOrderByClause("MUST_DEDUCTION_AMT ");
+        return  profitDeducttionDetailMapper.selectByExample(example) ;
     }
 }

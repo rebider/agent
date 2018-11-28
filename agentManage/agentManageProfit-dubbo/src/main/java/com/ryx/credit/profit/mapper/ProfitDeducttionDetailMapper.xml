@@ -52,7 +52,7 @@
   <sql id="Base_Column_List">
     ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME, 
     DEDUCTION_DATE, DEDUCTION_TYPE, DEDUCTION_DESC, MUST_DEDUCTION_AMT, DEDUCTION_AMT, 
-    NOT_DEDUCTION_AMT, REMARK, USER_ID, CREATE_DATE_TIME, DEDUCTION_ID
+    NOT_DEDUCTION_AMT, REMARK, USER_ID, to_char(CREATE_DATE_TIME , 'yyyy-MM-dd HH24:mm:ss') CREATE_DATE_TIME, DEDUCTION_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -94,7 +94,7 @@
       #{agentName,jdbcType=VARCHAR}, #{deductionDate,jdbcType=VARCHAR}, #{deductionType,jdbcType=CHAR}, 
       #{deductionDesc,jdbcType=VARCHAR}, #{mustDeductionAmt,jdbcType=DECIMAL}, #{deductionAmt,jdbcType=DECIMAL}, 
       #{notDeductionAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, 
-      #{createDateTime,jdbcType=TIMESTAMP}, #{deductionId,jdbcType=VARCHAR})
+      sysdate, #{deductionId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDeducttionDetail">
     insert into P_DEDUCTION_DETAIL
@@ -198,7 +198,7 @@
         #{userId,jdbcType=VARCHAR},
       </if>
       <if test="createDateTime != null">
-        #{createDateTime,jdbcType=TIMESTAMP},
+        sysdate,
       </if>
       <if test="deductionId != null">
         #{deductionId,jdbcType=VARCHAR},
@@ -257,7 +257,7 @@
         USER_ID = #{userId,jdbcType=VARCHAR},
       </if>
       <if test="createDateTime != null">
-        CREATE_DATE_TIME = #{createDateTime,jdbcType=TIMESTAMP},
+        CREATE_DATE_TIME = sysdate,
       </if>
       <if test="deductionId != null">
         DEDUCTION_ID = #{deductionId,jdbcType=VARCHAR},
@@ -281,7 +281,7 @@
       NOT_DEDUCTION_AMT = #{notDeductionAmt,jdbcType=DECIMAL},
       REMARK = #{remark,jdbcType=VARCHAR},
       USER_ID = #{userId,jdbcType=VARCHAR},
-      CREATE_DATE_TIME = #{createDateTime,jdbcType=TIMESTAMP},
+      CREATE_DATE_TIME = sysdate,
       DEDUCTION_ID = #{deductionId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>

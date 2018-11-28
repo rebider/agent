@@ -3,6 +3,8 @@ package com.ryx.credit.profit.service;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 
+import java.util.List;
+
 /**
  * @author yangmx
  * @desc 分润扣款明细
@@ -21,4 +23,11 @@ public interface ProfitDeducttionDetailService {
      * @param profitDeduction
      */
     public void insertDeducttionDetail(ProfitDeduction profitDeduction);
+
+    /**
+     * 查询扣款明细
+     * @param profitDeduction
+     * @return
+     */
+    public List<ProfitDeducttionDetail> getDeducttionDetailList(ProfitDeduction profitDeduction);
 }
