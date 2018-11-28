@@ -445,14 +445,15 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         if(list != null && !list.isEmpty()){
             List<Map<String, Object>> noticeList = new ArrayList<Map<String, Object>>(list.size());
             for (ProfitDeduction deduction : list){
-                Map<String, Object> map = new HashMap<String, Object>(5);
+                Map<String, Object> map = new HashMap<String, Object>(8);
                 ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
-                map.put("deductTime", detail != null ? detail.getCreateDateTime() : "");//最后扣款时间
-                map.put("mustDeductionAmtSum", deduction.getSumDeductionAmt().toString());//应扣
-                map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt());//实扣
-                map.put("notDeductionAmt", deduction.getNotDeductionAmt());//未扣足
-                map.put("detailId", deduction.getSourceId());//订单号
-                map.put("srcId", deduction.getId());//分润系统扣款ID
+                map.put("deductTime", detail != null ? detail.getCreateDateTime() : "");
+                map.put("mustDeductionAmtSum", deduction.getSumDeductionAmt().toString());
+                map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt().toString());
+                BigDecimal notDeductionAmt = deduction.getSumDeductionAmt().subtract(deduction.getActualDeductionAmt());
+                map.put("notDeductionAmt", notDeductionAmt.toString());
+                map.put("detailId", deduction.getSourceId());
+                map.put("srcId", deduction.getId());
                 noticeList.add(map);
             }
             LOG.info("系统已经终审，通知订单系统，机具款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));

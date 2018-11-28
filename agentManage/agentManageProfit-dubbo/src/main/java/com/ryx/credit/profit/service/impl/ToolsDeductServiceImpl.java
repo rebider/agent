@@ -270,7 +270,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 }
             });
 
-            LOG.info("机具扣款分期入库成功：{} 条", successList.size());
+            LOG.info("通知订单系统，付款中订单信息：{} ", JSONObject.toJSON(successList));
             try {
                 if(successList.size() > 0){
                     //通知订单系统，订单付款中
