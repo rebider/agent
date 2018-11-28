@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * @author yangmx
- * @desc 机具分润扣款、机具扣款分期数据导入
+ * @desc 机具扣款分期数据导入
  */
 @Service
 public class ToolsDeductJob {
@@ -31,8 +31,6 @@ public class ToolsDeductJob {
     private IPaymentDetailService iPaymentDetailService;
     @Autowired
     private ToolsDeductService toolsDeductService;
-    @Autowired
-    private ProfitDeductionService profitDeductionService;
 
     @Scheduled(cron = "0 0/5 * * * ?")
     public void execut(){
@@ -43,11 +41,11 @@ public class ToolsDeductJob {
             if(list!= null && !list.isEmpty()){
                 toolsDeductService.batchInsertDeduct(list, deductDate);
             }
-            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
-            LOG.info("上月调整成功的机具分期，新增到本月代理商机具扣款，总计调整成功：{} 条", detailList != null && !detailList.isEmpty() ? detailList.size() : 0);
-            if(detailList != null && !detailList.isEmpty()){
-                toolsDeductService.deductCompletionInfo(detailList);
-            }
+//            List<Map<String, Object>> detailList = profitDeductionService.getDeductDetail(deductDate);
+//            LOG.info("上月调整成功的机具分期，新增到本月代理商机具扣款，总计调整成功：{} 条", detailList != null && !detailList.isEmpty() ? detailList.size() : 0);
+//            if(detailList != null && !detailList.isEmpty()){
+//                toolsDeductService.deductCompletionInfo(detailList);
+//            }
         } catch (Exception e){
             LOG.error("初始化机具扣款数据失败");
             e.printStackTrace();
