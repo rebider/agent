@@ -350,4 +350,8 @@
         </if>
         order by C_TIME desc
     </select>
+
+    <select id="selectPayAmout" parameterType="string" resultType="BigDecimal">
+     select nvl(SUM(REAL_PAY_AMOUNT),0)  from O_SUPPLEMENT  where  STATUS=1 and SRC_ID=#{srcid} and PK_TYPE=#{pkType} and REVIEW_STATUS =2
+    </select>
 </mapper>

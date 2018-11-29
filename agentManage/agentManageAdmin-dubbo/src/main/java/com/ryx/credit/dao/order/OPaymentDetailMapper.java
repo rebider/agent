@@ -35,4 +35,5 @@ public interface OPaymentDetailMapper {
 
     BigDecimal querySupplementXXDK(@Param("map") Map<String, Object> map);
 
+    OPaymentDetail selectMoney(@Param("id") String srcid);
 }

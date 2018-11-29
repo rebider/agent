@@ -7,6 +7,7 @@ import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.pojo.admin.order.OSupplementExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -30,4 +31,6 @@ public interface OSupplementMapper {
     List<Map<String,Object>> selectAll(@Param("map") Map<String, Object> map, @Param("page") Page page);
 
     int getCount(@Param("map")Map<String, Object> map);
+
+    BigDecimal selectPayAmout(@Param("srcid")String srcid, @Param("pkType")String pkType);
 }
