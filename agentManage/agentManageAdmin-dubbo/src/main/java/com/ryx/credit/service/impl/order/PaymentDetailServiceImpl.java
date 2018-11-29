@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.CapitalMapper;
+import com.ryx.credit.dao.order.OCashReceivablesMapper;
 import com.ryx.credit.dao.order.OOrderMapper;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
 import com.ryx.credit.dao.order.OPaymentMapper;
@@ -49,6 +50,8 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
     CapitalMapper capitalMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private OCashReceivablesMapper oCashReceivablesMapper;
 
     /**
      * @Author: Zhang Lei
@@ -260,7 +263,6 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                     }
                     //付款单分期抵扣处理
                 }else if (PamentIdType.ORDER_FKD.code.equals(oPaymentDetail.getPaymentType())) {
-
                     OPaymentExample oPaymentExample = new OPaymentExample();
                     OPaymentExample.Criteria criteri = oPaymentExample.createCriteria();
                     criteri.andStatusEqualTo(Status.STATUS_1.status);
@@ -306,6 +308,30 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                         if (1 != oOrderMapper.updateByPrimaryKeySelective(oOrder)) {
                             logger.info("订单更新数据失败");
                             throw new ProcessException("订单更新数据失败");
+                        }
+                    }
+                }else if(PamentIdType.ORDER_XX.code.equals(oPaymentDetail.getPaymentType())){
+                    OPaymentDetail oPaymentDe = oPaymentDetailMapper.selectById(detailId);
+                    if (null==oPaymentDe){
+                        logger.info("无付款明细数据");
+                        throw new ProcessException("无付款明细数据");
+                    }
+                    OCashReceivables oCashReceivables = oCashReceivablesMapper.selectByPrimaryKey(oPaymentDe.getPaymentId());
+                    OCashReceivables receivables = new OCashReceivables();
+                    if(oCashReceivables.getAmount().compareTo(oCashReceivables.getRealAmount())==0){
+                        receivables.setId(oPaymentDe.getPaymentId());
+                        receivables.setPayStatus(PaySign.JQ.code);
+                        if (1!=oCashReceivablesMapper.updateByPrimaryKeySelective(receivables)){
+                            logger.info("更新现款明细数据失败");
+                            throw new ProcessException("更新现款明细数据失败");
+                        }
+                    }else{
+                        receivables.setId(oPaymentDe.getPaymentId());
+                        receivables.setPayStatus(PaySign.FKING.code);
+                        receivables.setRealAmount(receivables.getRealAmount().add(oPaymentDe.getRealPayAmount()));
+                        if (1!=oCashReceivablesMapper.updateByPrimaryKeySelective(receivables)){
+                            logger.info("更新现款明细数据失败");
+                            throw new ProcessException("更新现款明细数据失败");
                         }
                     }
                 }
