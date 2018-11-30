@@ -1,9 +1,6 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.ProfitStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -365,6 +362,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     //解冻下级所有代理商
                     directMapper.updateFristAgentStatus(profitUnfreeze.getAgentId());
                     LOG.info("3更新审批流与业务对象");
+                    rel.setActivStatus(AgStatus.Approved.name());
                     taskApprovalService.updateABusActRel(rel);
                 }
             }

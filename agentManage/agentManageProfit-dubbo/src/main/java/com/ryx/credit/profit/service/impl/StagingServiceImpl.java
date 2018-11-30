@@ -244,6 +244,7 @@ public class StagingServiceImpl implements StagingService {
 //                    deduction.setRemark(remark);
                     profitDeductionServiceImpl.updateProfitDeduction(deduction);
                     LOG.info("更新审批流与业务对象");
+                    rel.setActivStatus(AgStatus.Approved.name());
                     taskApprovalService.updateABusActRel(rel);
                 }
             }
