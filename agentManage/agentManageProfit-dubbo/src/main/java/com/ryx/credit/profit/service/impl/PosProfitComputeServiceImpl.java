@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.profit.jobs.ProfitAmtSumJob;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import org.slf4j.Logger;
@@ -42,6 +43,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private PosRewardSDetailService posRewardSDetailService;
     @Autowired
     private ProfitMonthService profitMonthService;
+    @Autowired
+    private ProfitAmtSumJob profitAmtSumJob;
     private static final String PLATFORM_CODE = "100003";
     /**
      * 2:机构 3:机构一代 6:标准一代
@@ -70,23 +73,18 @@ public class PosProfitComputeServiceImpl implements DeductService {
      * 初始化POS奖励的基础数据
      */
     @Override
-    @Transactional
-    public void otherOperate() throws Exception {
+    public void otherOperate() {
         try {
             long khstart = System.currentTimeMillis();
             String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
-            LOG.info("=========={}月核算Pos奖励开始=========", currentDate);
-
-            LOG.info("清除数据");
             posRewardSDetailService.deleteCurrentDate(currentDate);
-
             Supplier<TransProfitDetail> details = TransProfitDetail::new;
             TransProfitDetail detail = details.get();
             detail.setProfitDate(currentDate);
             detail.setBusCode(PLATFORM_CODE);
             //交易分润月度明细
             List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
-            LOG.info("查询POS平台交易分润月度明细，总条数：{}", list.size());
+            LOG.info("总条数：{}", list.size());
 
             //通用奖励模板
             List<PosRewardTemplate> posRewardTemplates = this.getPosRewardTemplateList();
@@ -118,10 +116,11 @@ public class PosProfitComputeServiceImpl implements DeductService {
 
                 //找代理商下级AG码list
                 List<String> childAgentList = this.queryChildLevelByBusNum(transProfitDetail.getAgentId());
+                childAgentList.add(posrewardDetail.getPosAgentId());
                 posrewardDetail.setChildAgentIdList(JSONObject.toJSONString(childAgentList));
+
                 //根据当前时间获取通用奖励模板
                 PosRewardTemplate template = this.obtainCurrencyRewardTemp(currentDate, posRewardTemplates);
-                childAgentList.add(posrewardDetail.getPosAgentId());
                 //根据通用奖励模板补充，对比月交易量、对比月贷记交易量
                 this.obtainContrastMonthTrans(currentDate, template, posrewardDetail, childAgentList);
 
@@ -140,6 +139,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     } else {
                         this.computSpecialStandard(posrewardDetail, currentDate, posRewardList);
                     }
+
                     //计算分润奖励
                     LOG.info("代理商唯一码：{}，POS奖励交易量：{}，奖励标准：{}", posrewardDetail.getPosAgentId(), posrewardDetail.getPosAmt(), posrewardDetail.getPosStandard());
                     if (new BigDecimal(posrewardDetail.getPosAmt()).compareTo(BigDecimal.ZERO) > 0) {
@@ -280,6 +280,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
             LOG.info("更新基础分润中，POS奖励、考核扣款金额，结束");
             long khend = System.currentTimeMillis();
             LOG.info("考核处理时间" + (khend - khstart));
+
+            //触发基础分润汇总计算
+            profitAmtSumJob.deal();
+
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
@@ -388,10 +392,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
         String creditTranContrastMonth = posRewardTemplate.getCreditTranContrastMonth().replaceAll("-", "");
         date.add(creditTranContrastMonth);
         List<TransProfitDetail> list = profitDetailMonthServiceImpl.getChildTransProfitDetailList(childAgentList, date, null);
-        BigDecimal tranContrastMonthAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), tranContrastMonth)).map(TransProfitDetail::getPosRewardAmt).reduce(BigDecimal::add).orElseGet(()->new BigDecimal("0")) : BigDecimal.ZERO;
-        BigDecimal childInTransAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), currentDate)).map(TransProfitDetail::getPosRewardAmt).reduce(BigDecimal::add).orElseGet(()->new BigDecimal("0")) : BigDecimal.ZERO;
-        BigDecimal childCreditTransAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), currentDate)).map(TransProfitDetail::getPosCreditAmt).reduce(BigDecimal::add).orElseGet(()->new BigDecimal("0")) : BigDecimal.ZERO;
-        BigDecimal creditTranContrastMonthAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), creditTranContrastMonth)).map(TransProfitDetail::getPosCreditAmt).reduce(BigDecimal::add).orElseGet(()->new BigDecimal("0")) : BigDecimal.ZERO;
+        BigDecimal tranContrastMonthAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), tranContrastMonth)).map(TransProfitDetail::getPosRewardAmt).reduce(BigDecimal::add).orElseGet(() -> new BigDecimal("0")) : BigDecimal.ZERO;
+        BigDecimal childInTransAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), currentDate)).map(TransProfitDetail::getPosRewardAmt).reduce(BigDecimal::add).orElseGet(() -> new BigDecimal("0")) : BigDecimal.ZERO;
+        BigDecimal childCreditTransAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), currentDate)).map(TransProfitDetail::getPosCreditAmt).reduce(BigDecimal::add).orElseGet(() -> new BigDecimal("0")) : BigDecimal.ZERO;
+        BigDecimal creditTranContrastMonthAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1 -> Objects.equals(detail1.getProfitDate(), creditTranContrastMonth)).map(TransProfitDetail::getPosCreditAmt).reduce(BigDecimal::add).orElseGet(() -> new BigDecimal("0")) : BigDecimal.ZERO;
         LOG.info("代理商唯一码：{}，当月交易总量：{}", posrewardDetail.getPosAgentId(), childInTransAmt);
         LOG.info("代理商唯一码：{}，当月贷记交易总量：{}", posrewardDetail.getPosAgentId(), childCreditTransAmt);
         LOG.info("代理商唯一码：{}，交易对比月：{}，交易对比月交易总量：{}", posrewardDetail.getPosAgentId(), tranContrastMonth, tranContrastMonthAmt);

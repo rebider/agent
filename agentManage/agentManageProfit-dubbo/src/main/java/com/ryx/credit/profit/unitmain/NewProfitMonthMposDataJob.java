@@ -171,12 +171,18 @@ public class NewProfitMonthMposDataJob {
             detail.setInTransAmt(json.getBigDecimal("SAMOUNT") == null ? BigDecimal.ZERO : json.getBigDecimal("SAMOUNT"));//付款交易额
             detail.setTransFee(json.getBigDecimal("FEEAMT"));//交易手续费
             detail.setUnicode(json.getString("UNIQUECODE"));//财务自编码
-            detail.setProfitAmt(json.getBigDecimal("PROFIT") == null ? BigDecimal.ZERO : json.getBigDecimal("PROFIT"));//分润金额
+
             detail.setPayCompany(null == Busime ? "3" : Busime.getCloPayCompany());//打款公司
             detail.setAgentType(null == Busime ? "3" : Busime.getBusType());
 
             //detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
-            detail.setNotaxAmt(json.getBigDecimal("DAILYMONEY") == null ? BigDecimal.ZERO : json.getBigDecimal("DAILYMONEY"));//日结金额
+            BigDecimal dailyMoney = json.getBigDecimal("DAILYMONEY") == null ? BigDecimal.ZERO : json.getBigDecimal("DAILYMONEY");//日结金额
+            detail.setNotaxAmt(dailyMoney);
+
+            BigDecimal profitTotal = json.getBigDecimal("PROFIT") == null ? BigDecimal.ZERO : json.getBigDecimal("PROFIT");//分润汇总金额
+            BigDecimal monthMoney = profitTotal.subtract(dailyMoney);    //月结金额 = 分润汇总金额 - 日结金额
+            detail.setProfitAmt(monthMoney);
+
             detail.setSourceInfo("MPOS");
 
             ProfitSupplyDiff where = new ProfitSupplyDiff();
