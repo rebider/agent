@@ -27,6 +27,6 @@ public class ProfitZhiFaDataJobTest {
 
     @Test
     public void testDeal() {
-        profitZhiFaDataJob.excute("201810");
+        profitZhiFaDataJob.excute("201811");
     }
 }
