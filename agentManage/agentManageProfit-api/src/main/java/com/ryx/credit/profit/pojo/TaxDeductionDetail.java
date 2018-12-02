@@ -62,6 +62,8 @@ public class TaxDeductionDetail implements Serializable {
 
     private String updateTime;
 
+    private String busPlatform;
+
     public String getId() {
         return id;
     }
@@ -292,5 +294,13 @@ public class TaxDeductionDetail implements Serializable {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime == null ? null : updateTime.trim();
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform == null ? null : busPlatform.trim();
     }
 }

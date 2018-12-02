@@ -56,20 +56,19 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         logger.info("清除数据");
         taxDeductionDetailMapper.deleteByMonth(profitMonth);
 
+        //直签代理商扣税
         List<Map<String, Object>> agentList = taxDeductionDetailMapper.queryTaxDeductionAgentList(params);
         if (agentList == null) {
-            throw new RuntimeException("查询扣税代理商失败");
+            throw new RuntimeException("查询直签扣税代理商失败");
         }
 
-        //agentList.parallelStream().forEach(map -> {
-        for (Map<String, Object> map : agentList) {
+        agentList.parallelStream().forEach(map -> {
             try {
-                logger.info("=====================================1");
                 String agentId = (String) map.get("AGENT_ID");
                 String agentName = map.get("AGENT_NAME") == null ? "" : (String) map.get("AGENT_NAME");
-                String parentAgentId = (String) map.get("PARENT_AGENT_ID") == null ? "" : (String) map.get("PARENT_AGENT_ID");
+                String parentAgentId = map.get("PARENT_AGENT_ID") == null ? "" : (String) map.get("PARENT_AGENT_ID");
                 String parentAgentName = map.get("PARENT_AGENT_NAME") == null ? "" : (String) map.get("PARENT_AGENT_NAME");
-                logger.info("计算扣税,{}，{}", agentId, parentAgentId);
+                logger.info("直签代理商计算扣税,{}，{}", agentId, parentAgentId);
                 BigDecimal blAmt = (BigDecimal) map.get("BL_AMT");  //保理
                 BigDecimal daysProfitAmt = (BigDecimal) map.get("DAYS_PROFIT_AMT"); //日结
                 BigDecimal returnMoney = (BigDecimal) map.get("RETURN_MONEY");  //机具返现
@@ -80,19 +79,16 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 BigDecimal preNotDeductionTaxAmt = (BigDecimal) map.get("PRE_NOT_DEDUCTION_TAX_AMT");   //上月未扣
                 BigDecimal tax = new BigDecimal((String) map.get("TAX"));   //税率
                 BigDecimal machinAmt = (BigDecimal) map.get("MACHIN_AMT");  //机具实收货款
-                logger.info("=====================================2");
+                String busPlatform = (String) map.get("BUS_PLATFORM");
                 //扣税明细
                 TaxDeductionDetail taxDeductionDetail = new TaxDeductionDetail();
-                logger.info("=====================================2.1");
                 taxDeductionDetail.setId(idService.genId(TabId.P_TAX_DEDUCTION_DETAIL));
-                logger.info("=====================================2.2");
                 taxDeductionDetail.setAgentId(agentId);
                 taxDeductionDetail.setAgentName(agentName);
                 taxDeductionDetail.setProfitMonth(profitMonth);
                 taxDeductionDetail.setAgentPid("");
                 taxDeductionDetail.setParentAgentId(parentAgentId);
                 taxDeductionDetail.setParentAgentName(parentAgentName);
-                logger.info("=====================================2.3");
                 taxDeductionDetail.setPreLdAmt(preTaxBase);
                 taxDeductionDetail.setDayProfitAmt(daysProfitAmt);
                 taxDeductionDetail.setDayBackAmt(returnMoney);
@@ -106,9 +102,8 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 taxDeductionDetail.setAddTaxAmt(BigDecimal.ZERO);
                 taxDeductionDetail.setRealTaxAmt(BigDecimal.ZERO);
                 taxDeductionDetail.setNotDeductionTaxAmt(BigDecimal.ZERO);
-                logger.info("=====================================4");
+                taxDeductionDetail.setBusPlatform(busPlatform);
                 //计算扣税
-                logger.debug(JSONObject.toJSONString(taxDeductionDetail));
                 doTaxDeduction(taxDeductionDetail, "I");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -116,14 +111,70 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 throw e;
             }
 
+        });
+
+        //直发代理商扣税
+        List<Map<String, Object>> agentList2 = taxDeductionDetailMapper.queryTaxDeductionZFAgentList(params);
+        if (agentList2 == null) {
+            throw new RuntimeException("查询直发扣税代理商失败");
         }
-        //});
+
+        agentList2.parallelStream().forEach(map -> {
+            try {
+                String agentId = (String) map.get("AGENT_ID");
+                String agentName = map.get("AGENT_NAME") == null ? "" : (String) map.get("AGENT_NAME");
+                String parentAgentId = map.get("PARENT_AGENT_ID") == null ? "" : (String) map.get("PARENT_AGENT_ID");
+                String parentAgentName = map.get("PARENT_AGENT_NAME") == null ? "" : (String) map.get("PARENT_AGENT_NAME");
+                logger.info("直发代理商计算扣税,{}，{}", agentId, parentAgentId);
+                BigDecimal payDailyAmt = (BigDecimal) map.get("PAY_DAILY_AMT");  //打款成功日分润
+                BigDecimal tranDailyAmt = (BigDecimal) map.get("TRAN_DAILY_AMT"); //交易日分润汇总
+                BigDecimal parentBuckle = (BigDecimal) map.get("PARENT_BUCKLE");  //代下级扣款
+                BigDecimal profitAmt = (BigDecimal) map.get("PROFIT_AMT"); //月分润
+                BigDecimal supplyAmt = (BigDecimal) map.get("SUPPLY_AMT");  //退单补款
+                BigDecimal buckleAmt = (BigDecimal) map.get("BUCKLE_AMT");//退单扣款
+                BigDecimal preTaxBase = (BigDecimal) map.get("PRE_TAX_BASE");   //上月留底基数
+                BigDecimal preNotDeductionTaxAmt = (BigDecimal) map.get("PRE_NOT_DEDUCTION_TAX_AMT");   //上月未扣
+                BigDecimal tax = (BigDecimal) map.get("TAX");   //税率
+                BigDecimal adjustAmt = (BigDecimal) map.get("ADJUST_AMT");   //调整金额
+                String busPlatform = (String) map.get("BUS_PLATFORM");
+                //扣税明细
+                TaxDeductionDetail taxDeductionDetail = new TaxDeductionDetail();
+                taxDeductionDetail.setId(idService.genId(TabId.P_TAX_DEDUCTION_DETAIL));
+                taxDeductionDetail.setAgentId(agentId);
+                taxDeductionDetail.setAgentName(agentName);
+                taxDeductionDetail.setProfitMonth(profitMonth);
+                taxDeductionDetail.setAgentPid("");
+                taxDeductionDetail.setParentAgentId(parentAgentId);
+                taxDeductionDetail.setParentAgentName(parentAgentName);
+                taxDeductionDetail.setPreLdAmt(preTaxBase);
+                taxDeductionDetail.setDayProfitAmt(payDailyAmt);//已打款日分润
+                taxDeductionDetail.setDayBackAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setBasicProfitAmt(profitAmt.subtract(tranDailyAmt).add(supplyAmt).subtract(buckleAmt).subtract(parentBuckle));//涉税前月分润=月份润-交易日期的日分润 +退单补款-退单扣款
+                taxDeductionDetail.setBlAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setMerchanOrderAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setAgentDfAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setAdjustAmt(adjustAmt);
+                taxDeductionDetail.setTaxRate(tax);
+                taxDeductionDetail.setPreNotDeductionAmt1(preNotDeductionTaxAmt);
+                taxDeductionDetail.setAddTaxAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setRealTaxAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setNotDeductionTaxAmt(BigDecimal.ZERO);
+                taxDeductionDetail.setBusPlatform(busPlatform);
+                //计算扣税
+                doTaxDeduction_zf(taxDeductionDetail, "I");
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.error("扣税计算异常：{},{}", map.get("AGENT_ID"), map.get("PARENT_AGENT_ID"));
+                throw e;
+            }
+
+        });
 
     }
 
     /**
      * @Author: Zhang Lei
-     * @Description: 计算扣税
+     * @Description: 计算扣税-直签代理商
      * @Date: 19:29 2018/12/20
      */
     private void doTaxDeduction(TaxDeductionDetail tdd, String type) {
@@ -182,6 +233,55 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         profitDetailMonth.setDeductionTaxMonthAmt(realAmt);
         //profitDetailMonth.setBasicsProfitAmt(basickProfitAmt.subtract(realAmt));
         profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonth);
+
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 计算扣税-直发代理商
+     * @Date: 19:29 2018/12/20
+     */
+    private void doTaxDeduction_zf(TaxDeductionDetail tdd, String type) {
+
+        //本月扣税基数
+        BigDecimal taxBase = tdd.getPreLdAmt().add(tdd.getDayProfitAmt()).add(tdd.getDayBackAmt()).add(tdd.getBasicProfitAmt())
+                .add(tdd.getBlAmt()).subtract(tdd.getMerchanOrderAmt()).add(tdd.getAgentDfAmt())
+                .add(tdd.getAdjustAmt());
+
+        //本月扣税基数小于等于0时，表示代理商给1我司款项多，不进行扣税计算，基数留底到下月
+        if (taxBase.compareTo(BigDecimal.ZERO) > 0) {
+            //本月新增扣税
+            BigDecimal addTaxAmt = taxBase.multiply(tdd.getTaxRate());
+            tdd.setAddTaxAmt(addTaxAmt);
+        }
+
+        //本月应扣 = 上月未扣足 + 本月新增
+        BigDecimal supposedTaxAmt = tdd.getAddTaxAmt().add(tdd.getPreNotDeductionAmt1());
+        tdd.setSupposedTaxAmt(supposedTaxAmt);
+
+
+        //涉税前月分润
+        BigDecimal basickProfitAmt = tdd.getBasicProfitAmt() == null ? BigDecimal.ZERO : tdd.getBasicProfitAmt();
+
+        //实扣
+        BigDecimal realAmt = BigDecimal.ZERO;
+        if (basickProfitAmt.compareTo(supposedTaxAmt) >= 0) {
+            realAmt = supposedTaxAmt;
+        } else {
+            realAmt = basickProfitAmt;
+        }
+
+        //本月未扣足 = 本月应扣 - 本月实扣
+        BigDecimal notDeductionAmt = supposedTaxAmt.subtract(realAmt);
+
+        tdd.setSupposedTaxAmt(supposedTaxAmt);
+        tdd.setRealTaxAmt(realAmt);
+        tdd.setNotDeductionTaxAmt(notDeductionAmt);
+        if ("I".equals(type)) {
+            taxDeductionDetailMapper.insertSelective(tdd);
+        } else if ("U".equals(type)) {
+            taxDeductionDetailMapper.updateByPrimaryKeySelective(tdd);
+        }
 
     }
 }

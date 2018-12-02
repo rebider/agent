@@ -132,6 +132,7 @@ public class ProfitSummaryDataJob {
                 detailMonth.setAgentId(detail.getAgentId());
                 detailMonth.setParentAgentId(detail.getParentAgentId());
                 detailMonth.setAgentPid(detail.getAgentId());
+                detailMonth.setBusPlatform(detail.getBusCode());
                 detailMonthMapper.insertSelective(detailMonth);
             } else {//更新汇总
                 detailMonthMapper.updateByPrimaryKeySelective(detailMonth);

@@ -110,8 +110,7 @@ public class ProfitZhiFaDataJob {
             where.setAgentId(json.getString("AGENTID"));
             where.setDeductionType("01");
             where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date(), -1)).substring(0, 7));
-            BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
-            */
+            BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款*/
 
             logger.info("{}月手刷直发分润数据同步，代理商：{}", transDate, json.getString("AGENTID"));
 
@@ -122,9 +121,9 @@ public class ProfitZhiFaDataJob {
             profitDirect.setAgentId(json.getString("AGENTID"));//代理商编号
             profitDirect.setParentAgentId(json.getString("PARENTAGENTID"));//上级代理商编号
             profitDirect.setParentAgentName(json.getString("PARENTAGENTNAME"));//上级代理商名称
-            profitDirect.setFristAgentId(json.getString("FRISTAGENTNAME"));//一级代理商编号
-            profitDirect.setFristAgentName(json.getString("FRISTAGENTID"));//一级代理商名称
-            profitDirect.setFristAgentPid(fristAgent == null ? "" : fristAgent.getAgentId());//一级代理商唯一码
+            profitDirect.setFristAgentPid(json.getString("FRISTAGENTID"));//一级代理商编号
+            profitDirect.setFristAgentName(json.getString("FRISTAGENTNAME"));//一级代理商名称
+            profitDirect.setFristAgentId(fristAgent == null ? "" : fristAgent.getAgentId());//一级代理商唯一码
             profitDirect.setPaycompanyNum(fristAgent == null ? "" : fristAgent.getCloPayCompany());//一级代理商打款公司
             profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
             profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
@@ -142,6 +141,7 @@ public class ProfitZhiFaDataJob {
             //ProfitDirect.setBuckleAmt(buckle == null ? BigDecimal.ZERO : buckle);//退单扣款
             profitDirect.setBuckleAmt(BigDecimal.ZERO);//退单扣款
             profitDirect.setDailyAmt(json.getBigDecimal("DAILYMONEY"));//日结分润总金额
+            profitDirect.setBossCode("6000");
             //退单补款、应发分润、应找上级扣款需计算赋值
             profitDirectService.insertSelective(profitDirect);
         }

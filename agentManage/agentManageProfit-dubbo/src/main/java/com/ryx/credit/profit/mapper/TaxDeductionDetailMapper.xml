@@ -31,6 +31,7 @@
     <result column="NOT_DEDUCTION_TAX_AMT" jdbcType="DECIMAL" property="notDeductionTaxAmt" />
     <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
     <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,7 +67,7 @@
     PARENT_AGENT_ID, PARENT_AGENT_NAME, PRE_LD_AMT, DAY_PROFIT_AMT, DAY_BACK_AMT, BASIC_PROFIT_AMT, 
     BL_AMT, MERCHAN_ORDER_AMT, AGENT_DF_AMT, ADJUST_AMT, ADJUST_ACCOUNT, ADJUST_RESON, 
     ADJUST_TIME, TAX_BASE, TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, SUPPOSED_TAX_AMT, 
-    REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, CREATE_TIME, UPDATE_TIME
+    REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, CREATE_TIME, UPDATE_TIME, BUS_PLATFORM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -84,7 +85,6 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-
   <select id="queryAndSubordinate" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
@@ -100,7 +100,6 @@
     CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{detail.profitMonth}
     <include refid="OracleDialectSuffix" />
   </select>
-
   <select id="queryCountAndSubordinate" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail" resultType="java.lang.Long">
     select  count(1) from (
       select
@@ -140,7 +139,8 @@
       ADJUST_RESON, ADJUST_TIME, TAX_BASE, 
       TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, 
       SUPPOSED_TAX_AMT, REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, 
-      CREATE_TIME, UPDATE_TIME)
+      CREATE_TIME, UPDATE_TIME, BUS_PLATFORM
+      )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{profitMonth,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{fristAgentId,jdbcType=VARCHAR}, 
       #{fristAgentName,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, 
@@ -150,7 +150,8 @@
       #{adjustReson,jdbcType=VARCHAR}, #{adjustTime,jdbcType=VARCHAR}, #{taxBase,jdbcType=DECIMAL}, 
       #{taxRate,jdbcType=DECIMAL}, #{addTaxAmt,jdbcType=DECIMAL}, #{preNotDeductionAmt1,jdbcType=DECIMAL}, 
       #{supposedTaxAmt,jdbcType=DECIMAL}, #{realTaxAmt,jdbcType=DECIMAL}, #{notDeductionTaxAmt,jdbcType=DECIMAL}, 
-      #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR})
+      #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail">
     insert into P_TAX_DEDUCTION_DETAIL
@@ -242,6 +243,9 @@
       <if test="updateTime != null">
         UPDATE_TIME,
       </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -330,6 +334,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -426,6 +433,9 @@
       <if test="updateTime != null">
         UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
       </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -458,7 +468,8 @@
       REAL_TAX_AMT = #{realTaxAmt,jdbcType=DECIMAL},
       NOT_DEDUCTION_TAX_AMT = #{notDeductionTaxAmt,jdbcType=DECIMAL},
       CREATE_TIME = #{createTime,jdbcType=VARCHAR},
-      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR}
+      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -472,7 +483,7 @@
     </if>
   </sql>
 
-  <!--扣税代理商查询-->
+  <!--直签扣税代理商查询-->
   <select id="queryTaxDeductionAgentList" parameterType="map" resultType="map">
     select a.AGENT_ID, a.PARENT_AGENT_ID,A.AGENT_NAME,
           NVL(b.BL_AMT,0) BL_AMT,
@@ -485,7 +496,8 @@
           nvl(f.NOT_DEDUCTION_TAX_AMT,0) PRE_NOT_DEDUCTION_TAX_AMT,
           nvl(h.PAY_AMOUNT,0) MACHIN_AMT,
           A.PARENT_AGENT_ID,g.AG_NAME PARENT_AGENT_NAME,
-          nvl(a.TAX,'0') TAX
+          nvl(a.TAX,'0') TAX,
+          a.BUS_PLATFORM BUS_PLATFORM
     from P_PROFIT_DETAIL_M a
 
     <!--保理-->
@@ -496,7 +508,7 @@
     <!--日结分润、返现-->
     left join (
       select AGENT_ID,PARENT_AGENT_ID,sum(SUCCESS_MONEY) DAYS_PROFIT_AMT,sum(RETURN_MONEY) RETURN_MONEY  from
-      P_PROFIT_D  where REMIT_DATE>='${profitMonth}01' and REMIT_DATE&gt;='${profitMonth}31'
+      P_PROFIT_D  where REMIT_DATE &gt;='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31'
       and PAY_COMPANY != 'Q000029564'
       group by AGENT_ID,PARENT_AGENT_ID
     ) c on a.AGENT_ID = c.AGENT_ID and a.PARENT_AGENT_ID = c.PARENT_AGENT_ID
@@ -521,6 +533,41 @@
     left join A_AGENT g on a.PARENT_AGENT_ID = g.ID
 
     where a.PROFIT_DATE = '${profitMonth}'
+  </select>
+
+  <!--直发扣税代理商查询-->
+  <select id="queryTaxDeductionZFAgentList" parameterType="map" resultType="map">
+    select a.AGENT_ID,A.AGENT_NAME,
+          a.PARENT_AGENT_ID,a.PARENT_AGENT_NAME,
+          a.FRIST_AGENT_ID,a.FRIST_AGENT_NAME,
+          NVL(C.DAYS_PROFIT_AMT,0) PAY_DAILY_AMT,<!--打款成功日分润-->
+          NVL(a.PARENT_BUCKLE,0) PARENT_BUCKLE,<!--代下级扣款-->
+          nvl(a.PROFIT_AMT,0) PROFIT_AMT,<!--月分润-->
+          nvl(a.DAILY_AMT,0) TRAN_DAILY_AMT,<!--交易日分润汇总-->
+          NVL(a.SUPPLY_AMT,0) SUPPLY_AMT,<!--退单补款-->
+          NVL(a.BUCKLE_AMT,0) BUCKLE_AMT,<!--退单扣款-->
+          NVL(e.ADJUST_AMT,0) ADJUST_AMT,
+          case when nvl(f.TAX_BASE,0) &lt; 0 then f.TAX_BASE else 0 end PRE_TAX_BASE,
+          nvl(f.NOT_DEDUCTION_TAX_AMT,0) PRE_NOT_DEDUCTION_TAX_AMT,
+          0.06 TAX,
+          a.BOSS_CODE BUS_PLATFORM
+    from P_PROFIT_DIRECT a
+
+    <!--日结分润、返现-->
+    left join (
+        select AGENT_ID,PARENT_AGENT_ID,sum(SUCCESS_MONEY) DAYS_PROFIT_AMT,sum(RETURN_MONEY) RETURN_MONEY  from
+          P_PROFIT_D  where REMIT_DATE &gt;='${profitMonth}01' and REMIT_DATE &lt;= '${profitMonth}31'
+        and PAY_COMPANY != 'Q000029564'
+        group by AGENT_ID,PARENT_AGENT_ID
+    ) c on a.AGENT_ID = c.AGENT_ID and a.PARENT_AGENT_ID = c.PARENT_AGENT_ID
+
+    <!--调整金额-->
+    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and a.PARENT_AGENT_ID=e.PARENT_AGENT_ID
+    left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and a.PARENT_AGENT_ID = f.PARENT_AGENT_ID
+
+    where a.TRANS_MONTH = '${profitMonth}'
+    and a.PAYCOMPANY_NUM != 'Q000029564'
+
   </select>
 
 
