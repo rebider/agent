@@ -77,7 +77,6 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
     public AgentBusInfo agentBusInfoInsert(AgentBusInfo agentBusInfo) throws Exception{
     		if(agentBusInfo == null ||
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
-        			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusType())
 				){
                 throw new ProcessException("业务数据不完整");
