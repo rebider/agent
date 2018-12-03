@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 直发分润数据同步、定时
+ * 直发分润数据同步、定时 cxinfo 直发分润数据同步 汪勇
  */
 @Service
 public class ProfitZhiFaDataJob {

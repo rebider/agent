@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * 首刷日结同步 cxinfo 三期分润汪勇
+ */
 @Service
 @Transactional(rollbackFor=RuntimeException.class)
 public class DailyProfitMposDataJob {

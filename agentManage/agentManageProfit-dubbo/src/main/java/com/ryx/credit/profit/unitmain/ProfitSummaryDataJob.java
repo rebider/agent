@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 汇总
+ * 汇总 cxinfo 月分润汇总 汪勇
  */
 @Service
 public class ProfitSummaryDataJob {

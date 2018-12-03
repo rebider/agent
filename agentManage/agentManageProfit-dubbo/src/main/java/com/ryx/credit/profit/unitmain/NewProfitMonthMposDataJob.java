@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 手刷月分润数据同步、定时
+ * 手刷月分润数据同步、定时 cxinfo 同步手刷月分润明细数据 汪勇
  */
 @Service
 @Transactional(rollbackFor=RuntimeException.class)

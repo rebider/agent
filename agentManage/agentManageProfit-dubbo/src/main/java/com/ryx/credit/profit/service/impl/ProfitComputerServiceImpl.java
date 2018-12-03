@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 分润计算(财务自编码)
+ * 分润计算(财务自编码) cxinfo 分润计算 汪勇
  * Created by IntelliJ IDEA.
  *
  * @Author Wang y
