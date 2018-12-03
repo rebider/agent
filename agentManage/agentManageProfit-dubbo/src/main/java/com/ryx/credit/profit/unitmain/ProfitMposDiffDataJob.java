@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 手刷补差数据同步
+ * 手刷补差数据同步 cxinfo 手刷补差数据同步 汪勇
  */
 @Service
 @Transactional(rollbackFor=RuntimeException.class)

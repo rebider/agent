@@ -62,8 +62,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Autowired
     private AgentAssProtocolService agentAssProtocolService;
     @Autowired
-    private AgentDataHistoryService agentDataHistoryService;
-    @Autowired
     private AimportService aimportService;
     @Autowired
     private AgentNotifyService agentNotifyService;
@@ -73,16 +71,6 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentMapper agentMapper;
-    @Autowired
-    private PlatFormMapper platFormMapper;
-    @Autowired
-    private RegionService regionService;
-    @Autowired
-    private ApaycompService apaycompService;
-    @Autowired
-    private COrganizationMapper organizationMapper;
-    @Autowired
-    private CUserMapper cUserMapper;
     @Autowired
     private AgentQueryService agentQueryService;
     @Autowired
@@ -784,6 +772,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
 
             return ResultVO.success(ag);
+        } catch (ProcessException e) {
+            logger.error("修改代理商错误", e.getMsg());
+            return ResultVO.fail(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("修改代理商错误", e);
