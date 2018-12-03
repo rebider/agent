@@ -429,6 +429,10 @@
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
     and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    nvl((select sum(o_payment_detail.pay_amount)
+    from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
@@ -501,6 +505,10 @@
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
     and o_payment_detail.payment_status in (1,3) ),0) as qk,
+    nvl((select sum(o_payment_detail.pay_amount)
+    from o_payment_detail
+    where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
+    and o_payment_detail.payment_status in (1,3,5) and to_char(plan_pay_time,'mm')=to_char(sysdate,'mm')),0) as byqk,
     (
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0)
     -
