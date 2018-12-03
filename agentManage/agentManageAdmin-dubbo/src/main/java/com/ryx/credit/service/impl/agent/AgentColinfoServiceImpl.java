@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
@@ -82,6 +83,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         boolean isHaveYHKSMJ = false;
         //开户许可证
         boolean isHaveKHXUZ = false;
+        //一般纳税人证明
+        boolean isHaveYBNSRZM = false;
 
         if(att!=null) {
             for (String s : att) {
@@ -94,6 +97,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     }
                     if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
                         isHaveKHXUZ = true;
+                    }
+                    if(AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType()+"")){
+                        isHaveYBNSRZM = true;
                     }
                 }
 
@@ -114,18 +120,27 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         }
 
         if(!ac.isImport())
-        if("2".equals(ac.getCloType())) {//对私
+        if(ac.getCloType().compareTo(new BigDecimal("2"))==0) {//对私
             if (!isHaveYHKSMJ) {
                 throw new ProcessException("请添加银行卡扫描件");
             }
         }
 
         if(!ac.isImport())
-        if("1".equals(ac.getCloType())) {//对公
+        if(ac.getCloType().compareTo(new BigDecimal("1"))==0) {//对公
             if (!isHaveKHXUZ) {
                 throw new ProcessException("请添加开户许可证");
             }
         }
+
+        //对公并且税点等于0.06一般纳税人证明必填
+        if(!ac.isImport())
+        if(ac.getCloType().compareTo(new BigDecimal("1"))==0 && ac.getCloTaxPoint().compareTo(new BigDecimal("0.06"))==0) {
+            if (!isHaveYBNSRZM) {
+                throw new ProcessException("请添加一般纳税人证明");
+            }
+        }
+
         if(1!=agentColinfoMapper.insertSelective(ac)){
             logger.info("收款账号添加:{}", "收款账号添加失败");
             throw new ProcessException("收款账号添加失败");
@@ -203,14 +218,14 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId) {
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId) throws Exception{
         try {
-            if(agent==null)throw new ProcessException("代理商信息不能为空");
+            if(agent==null)throw new MessageException("代理商信息不能为空");
             for (AgentColinfoVo agentColinfoVo : colinfoVoList) {
 
 
                 if(null!=agentColinfoVo.getCloTaxPoint() && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal(1))>=0){
-                    throw new ProcessException("税点不能大于1");
+                    throw new MessageException("税点不能大于1");
                 }
 
 
@@ -242,10 +257,10 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     db_AgentColinfo.setCloBankCode(agentColinfoVo.getCloBankCode());
                     db_AgentColinfo.setPayStatus(ColinfoPayStatus.A.getValue());
                     if(1!=agentColinfoMapper.updateByPrimaryKeySelective(db_AgentColinfo)){
-                        throw new ProcessException("更新收款信息失败");
+                        throw new MessageException("更新收款信息失败");
                     }else{
                         if(!agentDataHistoryService.saveDataHistory(db_AgentColinfo,db_AgentColinfo.getId(), DataHistoryType.GATHER.getValue(),userId,db_AgentColinfo.getVarsion()).isOK()){
-                            throw new ProcessException("更新收款信息失败");
+                            throw new MessageException("更新收款信息失败");
                         }
                     }
                     //删除老的附件
@@ -257,7 +272,7 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                         int i = attachmentRelMapper.updateByPrimaryKeySelective(attachmentRel);
                         if (1 != i) {
                             logger.info("修改收款信息附件关系失败{}",attachmentRel.getId());
-                            throw new ProcessException("更新收款信息信息失败");
+                            throw new MessageException("更新收款信息信息失败");
                         }
                     }
 
@@ -265,6 +280,8 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                     boolean isHaveYHKSMJ = false;
                     //开户许可证
                     boolean isHaveKHXUZ = false;
+                    //一般纳税人证明
+                    boolean isHaveYBNSRZM = false;
                     //添加新的附件
                     List<String> fileIdList = agentColinfoVo.getColinfoTableFile();
                     if(fileIdList!=null) {
@@ -277,6 +294,9 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                                 }
                                 if(AttDataTypeStatic.KHXUZ.code.equals(attachment.getAttDataType()+"")){
                                     isHaveKHXUZ = true;
+                                }
+                                if(AttDataTypeStatic.YBNSRZM.code.equals(attachment.getAttDataType()+"")){
+                                    isHaveYBNSRZM = true;
                                 }
                             }
 
@@ -295,21 +315,26 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
                             }
                         }
                     }
-                    if("2".equals(agentColinfoVo.getCloType())) {//对私
+                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0) {//对私
                         if (!isHaveYHKSMJ) {
-                            throw new ProcessException("请添加银行卡扫描件");
+                            throw new MessageException("请添加银行卡扫描件");
                         }
                     }
-                    if("1".equals(agentColinfoVo.getCloType())) {//对公
+                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0) {//对公
                         if (!isHaveKHXUZ) {
-                            throw new ProcessException("请添加开户许可证");
+                            throw new MessageException("请添加开户许可证");
                         }
                     }
 
+                    //对公并且税点等于0.06一般纳税人证明必填
+                    if(agentColinfoVo.getCloType().compareTo(new BigDecimal("1"))==0 && agentColinfoVo.getCloTaxPoint().compareTo(new BigDecimal("0.06"))==0) {
+                        if (!isHaveYBNSRZM) {
+                            throw new MessageException("请添加一般纳税人证明");
+                        }
+                    }
                 }
 
             }
-
             return ResultVO.success(null);
         } catch (Exception e) {
             e.printStackTrace();

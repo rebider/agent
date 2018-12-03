@@ -33,7 +33,7 @@ public interface AgentColinfoService {
 
     public int update(AgentColinfo a);
 
-    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId);
+    public ResultVO updateAgentColinfoVo(List<AgentColinfoVo> colinfoVoList, Agent agent,String userId)throws Exception;
 
     public AgentColinfo queryPoint(AgentColinfo agentColinfo);
 
