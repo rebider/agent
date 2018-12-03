@@ -25,6 +25,8 @@ public interface ProfitSettleErrLsService {
     PageInfo getProfitSettleErrList(ProfitSettleErrLs settleErr, Page page);
 
     List<ProfitSettleErrLs> getNotDeductionProfitSettleErrLsList(Map<String, Object> param);
+
+    List<ProfitSettleErrLs> getNotSupplyProfitSettleErrLsList(Map<String, Object> param);
     
     /*** 
     * @Description:插入退单信息
