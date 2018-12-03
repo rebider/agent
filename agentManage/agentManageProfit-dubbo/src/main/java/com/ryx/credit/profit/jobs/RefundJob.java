@@ -118,11 +118,16 @@ public class RefundJob {
 
     private void insertSupplyList(JSONArray array, String bussType) {
         // 获取现有补款数据
-        String supplyDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
         Map<String, String> supplyIdMap = new HashMap<>(10);
         LOG.info("对数据汇总并生成补款明细。");
-        insertSettleErrList(array, orgMap, supplyIdMap, null, "2");
+        // 获取现有未扣完数据
+        String supplyDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
+        Map<String, Object> query = new HashMap<>();
+        query.put("supplyDate", supplyDate);
+        query.put("bussType", "02".equals(bussType)?"POS":"MPOS");
+        List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotSupplyProfitSettleErrLsList(query);
+        insertSettleErrList(array, orgMap, supplyIdMap, settleErrLs, "2");
 
         if (orgMap.size() > 0) {
             Set<String> keys = orgMap.keySet();

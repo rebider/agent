@@ -23,4 +23,6 @@ public interface ProfitSettleErrLsMapper {
     int updateByPrimaryKey(ProfitSettleErrLs record);
 
     List<ProfitSettleErrLs> getNotDeductionProfitSettleErrLsList(Map<String, Object> param);
+
+    List<ProfitSettleErrLs> getNotSupplyProfitSettleErrLsList(Map<String, Object> param);
 }
