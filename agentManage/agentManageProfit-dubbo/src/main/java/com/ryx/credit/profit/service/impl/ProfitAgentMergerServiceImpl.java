@@ -254,7 +254,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 logger.info("1.更新代理商合并申请状态为通过，已生效");
                 pAgentMergeMapper.updateByPrimaryKeySelective(pAgentMerge);
                 logger.info("2.更新审批流与业务对象");
-                rel.setStatus(Status.STATUS_2.status);
+                rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {

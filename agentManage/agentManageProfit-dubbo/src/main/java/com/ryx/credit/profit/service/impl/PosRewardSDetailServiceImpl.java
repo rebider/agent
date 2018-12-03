@@ -1,8 +1,8 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PosRewardDetailMapper;
 import com.ryx.credit.profit.pojo.PosRewardDetail;
 import com.ryx.credit.profit.pojo.PosRewardDetailExample;
@@ -11,8 +11,8 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 @Service("posRewardSDetailService")
 public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
@@ -33,7 +33,7 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
 
     @Override
     public void insert(PosRewardDetail posrewardDetail) {
-        posrewardDetail.setId(idService.genId(TabId.p_pos_reward));
+        posrewardDetail.setId(UUID.randomUUID().toString());
         posRewardDetailMapper.insert(posrewardDetail);
     }
 
@@ -62,5 +62,32 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
         PosRewardDetailExample example = new PosRewardDetailExample();
         example.createCriteria().andProfitPosDateEqualTo(currentDate);
         posRewardDetailMapper.deleteByExample(example);
+    }
+
+    @Override
+    public List<String> queryChildLevelByAgentId(String agentId) {
+        return posRewardDetailMapper.queryChildLevelByAgentId(agentId);
+    }
+
+    @Override
+    public String getSuperAgentId(String agentId) {
+        return posRewardDetailMapper.querySuperAgentId(agentId);
+    }
+
+    @Override
+    public List<PosRewardDetail> getPosRewardDetailList(PosRewardDetail posRewardDetail, List<String> type, List<String> childAgentList) {
+        PosRewardDetailExample posRewardDetailExample = new PosRewardDetailExample();
+        PosRewardDetailExample.Criteria create = posRewardDetailExample.createCriteria();
+        if(StringUtils.isNotBlank(posRewardDetail.getProfitPosDate())){
+            create.andProfitPosDateEqualTo(posRewardDetail.getProfitPosDate());
+        }
+        if(type != null && !type.isEmpty()){
+            create.andPosMechanismTypeIn(Arrays.asList("2", "6"));
+        }
+        if(childAgentList != null && !childAgentList.isEmpty()){
+            create.andPosAgentIdIn(childAgentList);
+        }
+
+        return posRewardDetailMapper.selectByExample(posRewardDetailExample);
     }
 }

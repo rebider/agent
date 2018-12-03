@@ -95,8 +95,8 @@ public class PosRewardServiceImpl implements IPosRewardService {
         if(StringUtils.isNotBlank(reward.getAgentName())){
             criteria.andAgentNameEqualTo(reward.getAgentName());
         }
-        if(StringUtils.isNotBlank(reward.getAgentPid())){
-            criteria.andAgentPidEqualTo(reward.getAgentPid());
+        if(StringUtils.isNotBlank(reward.getAgentId())){
+            criteria.andAgentIdEqualTo(reward.getAgentId());
         }
         return posRewardExample;
     }
@@ -162,7 +162,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
             PosRewardExample posRewardExample = new PosRewardExample();
             posRewardExample.createCriteria().andIdEqualTo(posReward.getId());
             rewardMapper.deleteByExample(posRewardExample);
-            logger.error("POS奖励审批流启动失败，代理商ID：{}", posReward.getAgentPid());
+            logger.error("POS奖励审批流启动失败，代理商ID：{}", posReward.getAgentId());
             throw new ProcessException("POS奖励审批流启动失败!");
         }
         BusActRel record = new BusActRel();

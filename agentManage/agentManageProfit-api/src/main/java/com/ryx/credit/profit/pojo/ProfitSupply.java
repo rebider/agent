@@ -19,6 +19,16 @@ public class ProfitSupply implements Serializable {
     private String supplyDate;
     //新增 20180821
     private String parentAgentId;
+    //新增 业务类型
+    private String busType;
+
+    public String getBusType() {
+        return busType;
+    }
+
+    public void setBusType(String busType) {
+        this.busType = busType;
+    }
 
     public String getParentAgentName() {
         return parentAgentName;

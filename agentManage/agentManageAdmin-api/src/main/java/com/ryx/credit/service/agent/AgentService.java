@@ -59,4 +59,6 @@ public interface AgentService {
      */
     public AgentResult checkAgentIsIn(String agentId);
 
+    PageInfo queryAgentTierList(Page page, Agent agent, Long userId);
+
 }

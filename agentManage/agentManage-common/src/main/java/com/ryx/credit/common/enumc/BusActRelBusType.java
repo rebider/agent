@@ -14,7 +14,7 @@ public enum BusActRelBusType {
     DC_Colinfo("/BusActRelBusType/DC_Colinfo","代理商账户修改申请"),
     ORDER("/BusActRelBusType/ORDER","订单审批"),
     STAGING("/BusActRelBusType/STAGING","退单分期"),
-    OTHER_DEDUCTION("/BusActRelBusType/OTHER_DEDUCTION","其他扣款退单分期"),
+    OTHER_DEDUCTION("/BusActRelBusType/OTHER_DEDUCTION","其他扣款分期"),
     THAW("/BusActRelBusType/THAW","分润解冻申请"),
     PkType("/BusActRelBusType/PkType","订单补款"),
     refund("/BusActRelBusType/refund","退货审批"),

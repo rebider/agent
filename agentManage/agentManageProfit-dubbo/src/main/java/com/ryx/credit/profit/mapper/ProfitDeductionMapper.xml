@@ -37,7 +37,12 @@
                   and ${criterion.condition}
                 </when>
                 <when test="criterion.singleValue">
-                  and ${criterion.condition} #{criterion.value}
+                  <if test="criterion.condition.contains('like')">
+                    and ${criterion.condition} '%' || #{criterion.value} || '%'
+                  </if>
+                  <if test="!criterion.condition.contains('like')">
+                    and ${criterion.condition}  #{criterion.value}
+                  </if>
                 </when>
                 <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
@@ -56,9 +61,15 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME, 
+    ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME,
     DEDUCTION_DATE, DEDUCTION_TYPE, DEDUCTION_DESC, SUM_DEDUCTION_AMT, ADD_DEDUCTION_AMT, 
     MUST_DEDUCTION_AMT, ACTUAL_DEDUCTION_AMT, NOT_DEDUCTION_AMT, REMARK, SOURCE_ID, UPPER_NOT_DEDUCTION_AMT, 
+    STAGING_STATUS, USER_ID, CREATE_DATE_TIME,DEDUCTION_STATUS,NEXT_ID
+  </sql>
+  <sql id="Base_Column_List_query">
+    N.ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME,
+    DEDUCTION_DATE, DEDUCTION_TYPE, DEDUCTION_DESC, SUM_DEDUCTION_AMT, ADD_DEDUCTION_AMT,
+    MUST_DEDUCTION_AMT, ACTUAL_DEDUCTION_AMT, NOT_DEDUCTION_AMT, REMARK, SOURCE_ID, UPPER_NOT_DEDUCTION_AMT,
     STAGING_STATUS, USER_ID, CREATE_DATE_TIME,DEDUCTION_STATUS,NEXT_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultMap="BaseResultMap">
@@ -67,8 +78,8 @@
     <if test="distinct">
       distinct
     </if>
-    <include refid="Base_Column_List" />
-    from P_DEDUCTION
+    <include refid="Base_Column_List_query" />
+    from P_DEDUCTION N ${innerJoinDepartment}
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -260,7 +271,7 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultType="java.lang.Integer">
-    select count(*) from P_DEDUCTION
+    select count(*) from P_DEDUCTION ${innerJoinDepartment}
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -398,7 +409,7 @@
     SELECT SUM(MUST_DEDUCTION_AMT)
     FROM P_DEDUCTION
     WHERE DEDUCTION_DATE = #{deductionDate} AND  AGENT_ID = #{agentId} AND DEDUCTION_TYPE = '01' AND source_id = #{sourceId}
-    and DEDUCTION_STATUS IS NULL
+    and DEDUCTION_STATUS ='0'
   </select>
   <delete id="deleteById">
     delete  P_DEDUCTION where id = #{id}
@@ -425,6 +436,6 @@
 
   <delete id="resetDataDeduction">
     delete from P_DEDUCTION
-    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyymm')
+    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyy-MM')
   </delete>
 </mapper>

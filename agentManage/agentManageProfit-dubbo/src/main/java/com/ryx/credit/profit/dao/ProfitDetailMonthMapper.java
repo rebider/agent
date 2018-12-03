@@ -3,10 +3,10 @@ package com.ryx.credit.profit.dao;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
-import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ProfitDetailMonthMapper {
     int countByExample(ProfitDetailMonthExample example);
@@ -60,10 +60,6 @@ public interface ProfitDetailMonthMapper {
 
     void payMoney(String profitDate);
 
-    List<String> getDistrictAgent(String id);
-
-    List<String> getProAgent(String id);
-
     /**
      * 导出数据
      * @param profitDetailMonth
@@ -84,4 +80,6 @@ public interface ProfitDetailMonthMapper {
     * @Date: 2018/10/31
     */
     void clearComputData(String profitDate);
+
+    List<ProfitDetailMonth> getProfitDetailMonthListByParam(Map<String, Object> param);
 }

@@ -202,4 +202,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="getNextStagAmt" resultMap="BaseResultMap">
+     select sum(MUST_AMT) from  P_STAGING_DETAIL where STATUS='N' and DEDUCTION_DATE = #{deductionDate} and SOURCE_ID=#{sourceId}
+  </select>
 </mapper>

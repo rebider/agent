@@ -360,7 +360,6 @@
         detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,o.ORDER_PLATFORM
         from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
         on detail.AGENT_ID=agent.id
-
         left join O_ORDER o on detail.ORDER_ID=o.id where
         detail.status=1 and payment.status=1 and agent.status=1 and (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
         and detail.PAYMENT_TYPE='ORDER_FKD'
@@ -368,7 +367,7 @@
             and detail.AGENT_ID = #{map.agentId}
         </if>
         <if test="map.time != null and map.time != '' ">
-            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM') &lt;= #{map.time}
         </if>
         union
         select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,cash.agent_id,'' as ORDER_ID,
@@ -394,7 +393,7 @@
         and detail.AGENT_ID = #{map.agentId}
         </if>
         <if test="map.time != null and map.time != '' ">
-            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')&lt;= #{map.time}
         </if>
         union
         select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
@@ -408,7 +407,7 @@
             and detail.AGENT_ID = #{map.agentId}
         </if>
         <if test="map.time != null and map.time != '' ">
-            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')=#{map.time}
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')&lt;= #{map.time}
         </if>)a
         ORDER BY a.C_DATE DESC
     </select>
@@ -423,6 +422,11 @@
             and s.pay_method = #{map.payMethod}
             and pd.payment_id= #{map.paymentId}
         </where>
+    </select>
+
+    <select id="selectMoney" parameterType="string" resultType="com.ryx.credit.pojo.admin.order.OPaymentDetail">
+        select PAY_AMOUNT as payAmount,REAL_PAY_AMOUNT as realPayAmount from o_Payment_detail where id=#{id} and  PAYMENT_STATUS in(1,3,5)
+        and status=1
     </select>
 
 </mapper>

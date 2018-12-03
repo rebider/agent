@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhaodw
@@ -21,6 +22,7 @@ import java.util.List;
  */
 @Service("profitSettleErrLsServiceImpl")
 public class ProfitSettleErrLsServiceImpl implements ProfitSettleErrLsService {
+
 
     @Autowired
     private ProfitSettleErrLsMapper profitSettleErrLsMapper;
@@ -51,9 +53,20 @@ public class ProfitSettleErrLsServiceImpl implements ProfitSettleErrLsService {
     }
 
     @Override
+    public List<ProfitSettleErrLs> getNotDeductionProfitSettleErrLsList(Map<String, Object> param) {
+
+        return profitSettleErrLsMapper.getNotDeductionProfitSettleErrLsList(param);
+    }
+
+    @Override
     public void inset(ProfitSettleErrLs insert) {
          profitSettleErrLsMapper.insert(insert);
 
+    }
+
+    @Override
+    public void update(ProfitSettleErrLs profitSettleErrLs) {
+        profitSettleErrLsMapper.updateByPrimaryKey(profitSettleErrLs);
     }
 
 }

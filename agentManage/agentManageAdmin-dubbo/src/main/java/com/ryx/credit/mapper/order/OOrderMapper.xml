@@ -629,6 +629,8 @@
   <select id="queryAllOrderListView" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     select
+    d.PAY_METHOD,
+    o.O_INURETIME,
     o.id,
     o.o_num,
     o.order_platform,
@@ -649,6 +651,10 @@
     b.ag_name,
     b.ag_doc_pro ,
     b.ag_doc_district,
+    b.AG_UNIQ_NUM,
+    e.bus_num,
+    f.name as ag_doc_district_name ,
+    g.name as ag_doc_pro_name ,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -658,11 +664,15 @@
     -
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
+    nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
     c.platform_name
     from o_order o
     left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
+    left join c_organization f on f.id= b.ag_doc_district
+    left join c_organization g on g.id= b.ag_doc_pro
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -673,6 +683,19 @@
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
     </where>
     order by c_time desc
     <include refid="OracleDialectSuffix" />
@@ -685,8 +708,11 @@
     o.id
     from o_order o
     left join a_agent b on o.agent_id = b.id
+    left join a_agent_businfo e on o.bus_id = e.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
+    left join c_organization f on f.id= b.ag_doc_district
+    left join c_organization g on g.id= b.ag_doc_pro
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
@@ -697,6 +723,19 @@
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
       <if test="agName!=null and agName!=''"> and b.ag_name like  #{agName} </if>
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+      <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
+      <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
+        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="activityName!=null and activityName !=''">
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
+        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+      </if>
     </where>
     )
   </select>
@@ -805,12 +844,12 @@
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') ),0) as money,
+    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') <if test="id!=null and id!=''"> and  o.id = #{id} </if>),0) as money,
 
     nvl((select COUNT(o_payment_detail.plan_num)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
-    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') ),0) as planNum,
+    and o_payment_detail.status =1 and (o_payment_detail.pay_type='FRFQ'or o_payment_detail.pay_type='DKFQ') <if test="id!=null and id!=''"> and  o.id = #{id} </if>),0) as planNum,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -825,12 +864,14 @@
     d.nuclear_user,
     d.nuclear_time,
     NVL2(d.nuclear_time,to_char(d.nuclear_time,'YYYY-MM-DD'),'')as nuclear_user_string,
-    org.name as AGDOCPPRO
+    org.name as AGDOCPPRO,
+    cr.amount as xxAmount
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_platform c on c.platform_num = o.order_platform
     left join o_payment d on d.order_id = o.id
-    left join a_pay_comp comp on comp.id=d.COLLECT_COMPANY
+    left join o_cash_receivables cr on d.id = cr.src_id and cr.cashpay_type='PAYMENT' and cr.status=1
+    left join a_pay_comp comp on comp.id=cr.COLLECT_COMPANY
     left join c_organization org on org.id = b.ag_doc_pro
     <where>
       <if test="1==1"> and  o.status = 1 </if>
@@ -876,13 +917,14 @@
 
     <result column="DEDUCTION_TYPE" property="deductionType" jdbcType="VARCHAR"/>
     <result column="DEDUCTION_AMOUNT" property="deductionAmount" jdbcType="DECIMAL"/>
-    <result column="PAY_AMOUNT" property="money" jdbcType="DECIMAL"/>
+    <result column="money" property="money" jdbcType="DECIMAL"/>
     <result column="PLAN_NUM" property="planNum" jdbcType="DECIMAL"/>
 
     <result column="nuclear_user" property="nuclearUser" jdbcType="VARCHAR"/>
     <result column="nuclear_user_string" property="nuclearTimeString" jdbcType="VARCHAR"/>
     <result column="nuclear_time" property="nuclearTime" jdbcType="TIMESTAMP"/>
     <result column="AGDOCPPRO" property="agDocPpro" jdbcType="VARCHAR"/>
+    <result column="xxAmount" property="xxAmount" jdbcType="DECIMAL"/>
 
   </resultMap>
 </mapper>

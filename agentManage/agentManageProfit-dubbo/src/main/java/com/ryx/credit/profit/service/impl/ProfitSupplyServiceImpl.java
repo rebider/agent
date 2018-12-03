@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +55,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         List<Map<String, Object>> list = pProfitSupplyMapper.getProfitSupplyList(param);
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
-        System.out.println("查询============================================" + JSONObject.toJSON(list));
+//        System.out.println("查询============================================" + JSONObject.toJSON(list));
         return pageInfo;
     }
 
@@ -134,30 +136,34 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
     @Override
     public List<String> importSupplyList(List<List<Object>> data) throws Exception {
         List<String> list = new ArrayList<>();
+        if (null == data && data.size() == 0) {
+            logger.info("导入数据为空");
+            throw new MessageException("导入数据为空");
+        }
         for (List<Object> supply : data) {
             ProfitSupply profitSupply = new ProfitSupply();
-            profitSupply.setId(idService.genId(TabId.p_profit_supply));// ID序列号
-            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));// 录入日期
+            profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
+            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
             try {
                 profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
                 profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
                 profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
                 profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
-                profitSupply.setSupplyDate(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//月份
-                profitSupply.setSupplyType(null!=supply.get(5)?String.valueOf(supply.get(5)):"");//补款类型
-                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(6))));//补款金额
-                profitSupply.setSupplyCode(null!=supply.get(7)?String.valueOf(supply.get(7)):"");//补款码
+                profitSupply.setSupplyType(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//补款类型
+                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(5))));//补款金额
+                profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));//月份
+//                profitSupply.setSupplyDate(null!=supply.get(6)?String.valueOf(supply.get(6)):"");//月份
+//                profitSupply.setSupplyCode(supply.get(7)!=null?"":String.valueOf(supply.get(7)));//补款码
+                if (pProfitSupplyMapper.insertSelective(profitSupply)==0) {
+                    logger.info("导入失败！");
+                    throw new MessageException(supply.toString() + "导入失败！");
+                }
+                logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
+                list.add(profitSupply.getId());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;
             }
-
-            logger.info("补款数据信息-------------------------------------" , JSONObject.toJSON(supply));
-            if (1 != insertSelective(profitSupply)) {
-                logger.info("插入失败！");
-                throw new MessageException("代理商编号为:"+profitSupply.getAgentId()+"插入补款数据失败");
-            }
-            list.add(profitSupply.getId());
         }
         return list;
     }

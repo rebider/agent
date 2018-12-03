@@ -20,4 +20,6 @@ public interface ProfitStagingDetailMapper {
     int updateByPrimaryKeySelective(ProfitStagingDetail record);
 
     int updateByPrimaryKey(ProfitStagingDetail record);
+
+    ProfitStagingDetail getNextStagAmt(ProfitStagingDetail profitStagingDetail);
 }

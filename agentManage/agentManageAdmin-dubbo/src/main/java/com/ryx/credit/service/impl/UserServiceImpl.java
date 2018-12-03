@@ -107,7 +107,7 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         List<Map<String, Object>> list =  userMapper.selectUserPage(page, pageInfo.getCondition());
         pageInfo.setRows((ArrayList) list);
         //pageInfo.setTotal(page.getTotal());
-        pageInfo.setTotal(list.size());
+        pageInfo.setTotal(userMapper.selectUserCount(pageInfo.getCondition()));
         return JSON.toJSON(pageInfo).toString();
     }
 

@@ -13,6 +13,8 @@ import com.ryx.credit.pojo.admin.order.OSupplement;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 
+import java.math.BigDecimal;
+
 /**
  * 订单补款
  */
@@ -74,4 +76,6 @@ public interface OSupplementService {
      * 更新实际付款金额
      */
     public ResultVO updateAmount(AgentVo agentVo,Long userId) throws Exception;
+
+    BigDecimal selectPayAmout(String srcid, String pkType);
 }

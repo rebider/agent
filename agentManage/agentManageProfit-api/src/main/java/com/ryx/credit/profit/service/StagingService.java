@@ -96,4 +96,6 @@ public interface StagingService {
      */
      BigDecimal getNotDeductionAmt(Map<String, Object> param);
 
+    BigDecimal getNextStagAmt(ProfitStagingDetail profitStagingDetail);
+
 }

@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.OReceiptStatus;
-import com.ryx.credit.common.enumc.PlannerStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -90,6 +87,8 @@ public class PlannerServiceImpl implements PlannerService {
         if (null!=map.get("par_proName") && StringUtils.isNotBlank(map.get("par_proName")+"")){
             reqMap.put("proName", "%"+map.get("par_proName")+"%");
         }
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        reqMap.put("cIncomStatus", AgentInStatus.NO.status);
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){

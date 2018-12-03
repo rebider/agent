@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 退单管理业务接口
@@ -22,6 +23,8 @@ public interface ProfitSettleErrLsService {
      * @return 返回退单分页列表
      */
     PageInfo getProfitSettleErrList(ProfitSettleErrLs settleErr, Page page);
+
+    List<ProfitSettleErrLs> getNotDeductionProfitSettleErrLsList(Map<String, Object> param);
     
     /*** 
     * @Description:插入退单信息
@@ -30,4 +33,6 @@ public interface ProfitSettleErrLsService {
     * @Date: 2018/7/30 
     */ 
     void inset(ProfitSettleErrLs profitSettleErrLs);
+
+    void update(ProfitSettleErrLs profitSettleErrLs);
 }

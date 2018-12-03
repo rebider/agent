@@ -127,4 +127,6 @@ public interface ProfitDeductionService {
     BigDecimal getNotDeductionSum(String agentId);
 
     int resetDataDeduction();
+
+    void updateProfitDeductionByMap(Map<String, BigDecimal> deductionMap);
 }

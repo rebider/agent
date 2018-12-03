@@ -517,4 +517,12 @@ public class OSupplementServiceImpl implements OSupplementService {
         logger.info("更新实际付款金额成功");
         return ResultVO.success("");
     }
+
+    @Override
+    public BigDecimal selectPayAmout(String srcid, String pkType) {
+         BigDecimal payAmout= oSupplementMapper.selectPayAmout(srcid, pkType);
+         OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectMoney(srcid);
+         BigDecimal amount=(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()).subtract(payAmout));
+        return amount;
+    }
 }

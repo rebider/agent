@@ -79,4 +79,5 @@ public interface ToolsDeductService {
      * 查询上月未扣足订单且没有调整扣款金额，也没有后续分期计划的订单
      */
     public List<Map<String, Object>> getNotDeductDetail(String beforeDeductDate, String deductDate, String type);
+
 }

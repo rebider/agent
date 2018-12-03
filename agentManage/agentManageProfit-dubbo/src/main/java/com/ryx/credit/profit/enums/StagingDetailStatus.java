@@ -8,7 +8,7 @@ package com.ryx.credit.profit.enums;
  * @date 2018/7/2516:08
  */
 public enum StagingDetailStatus {
-    N("0"),Y("1");
+    N("0"),Y("1"),C("2");
 
     private String status;
     StagingDetailStatus(String status) {

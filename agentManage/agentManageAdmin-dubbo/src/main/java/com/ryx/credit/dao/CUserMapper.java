@@ -22,6 +22,8 @@ public interface CUserMapper extends BaseMapper<CUser> {
     
     List<Map<String, Object>> selectUserPage(Pagination page, Map<String, Object> params);
 
+    int selectUserCount(Map<String, Object> params);
+
     UserVo selectbyName(String name);
 
     List<Map<String, Object>> selectOrganizationCodeById(@Param("id") Long id);

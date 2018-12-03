@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class ProfitDeductionExample {
     protected String orderByClause;
@@ -19,7 +20,14 @@ public class ProfitDeductionExample {
     protected Integer limitStart;
 
     protected Integer limitEnd;
-
+    protected String innerJoinDepartment;
+    public void setInnerJoinDepartment(String innerJoinDepartment, String corId) {
+        if (Objects.equals("south", innerJoinDepartment )|| Objects.equals("north", innerJoinDepartment)) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID AND COR.ID ="+corId;
+        } else if (innerJoinDepartment.contains("south") || innerJoinDepartment.contains("north")) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID AND COR.ID ="+corId;
+        }
+    }
     public ProfitDeductionExample() {
         oredCriteria = new ArrayList<Criteria>();
     }
@@ -1540,6 +1548,10 @@ public class ProfitDeductionExample {
 
         public Criteria andDeductionStatusEqualTo(String value) {
             addCriterion("DEDUCTION_STATUS =", value, "userId");
+            return (Criteria) this;
+        }
+        public Criteria andDeductionStatusNotEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS <>", value, "userId");
             return (Criteria) this;
         }
 

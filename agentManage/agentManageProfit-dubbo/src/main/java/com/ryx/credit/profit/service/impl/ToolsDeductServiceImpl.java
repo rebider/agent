@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
@@ -23,7 +24,7 @@ import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.poi.util.SystemOutLogger;
+import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -54,6 +54,8 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     private ActivityService activityService;
     @Autowired
     private TaskApprovalService taskApprovalService;
+    @Autowired
+    private IPaymentDetailService iPaymentDetailService;
 
     /**
      * 扣款总额=本月新增+上月未口足，
@@ -111,6 +113,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
             throw new ProcessException("机具扣款调整申请审批流启动失败!:{}",e.getMessage());
         }
         profitDeduction.setStagingStatus(DeductionStatus.REVIEWING.getStatus());
+        profitDeduction.setMustDeductionAmt(profitDeduction.getSumDeductionAmt());
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
     }
 
@@ -129,6 +132,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         LOG.info("1.更新机具扣款申请状态为申请通过");
                         LOG.info("审批通过，未申请前本月实扣：{},申请扣款数：{}",profitDeduction.getActualDeductionAmt(),profitStagingDetail.getRealAmt());
                         profitDeduction.setStagingStatus(DeductionStatus.PASS.getStatus());
+                        profitDeduction.setMustDeductionAmt(profitDeduction.getSumDeductionAmt().subtract(profitStagingDetail.getMustAmt()));
                         profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
                     }
                     LOG.info("2更新审批流与业务对象");
@@ -194,17 +198,15 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         return null;
     }
 
-    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public void editToolDeduct(ProfitDeduction profitDeduction, String detailId) throws Exception{
         try {
-            profitDeductionMapper.updateByPrimaryKeySelective(profitDeduction);
             ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
             profitStagingDetail.setId(detailId);
             profitStagingDetail.setStagId(profitDeduction.getId());
             BigDecimal mustDeductionAmt = profitDeduction.getSumDeductionAmt().subtract(profitDeduction.getMustDeductionAmt());
             profitStagingDetail.setMustAmt(mustDeductionAmt);
-            profitStagingDetail.setRemark("机具扣款分期调整下月还款计划");
+            profitStagingDetail.setRemark("机具扣款分期调整下月扣款明细");
             profitStagingDetailMapper.updateByPrimaryKeySelective(profitStagingDetail);
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,9 +265,21 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                     } catch (Exception e) {
                         LOG.error("初始化机具分期失败，分期流水号:{}",map.get("ID").toString());
                         e.printStackTrace();
+                        throw new ProcessException("机具扣款数据初始化失败");
                     }
                 }
             });
+
+            LOG.info("通知订单系统，付款中订单信息：{} ", JSONObject.toJSON(successList));
+            try {
+                if(successList.size() > 0){
+                    //通知订单系统，订单付款中
+                    iPaymentDetailService.uploadStatus(successList, PaySign.FKING.code);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ProcessException("通知订单系统更新付款中状态异常");
+            }
             return successList;
         }
         return null;

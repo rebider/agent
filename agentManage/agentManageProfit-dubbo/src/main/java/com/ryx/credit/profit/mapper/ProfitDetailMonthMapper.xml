@@ -98,7 +98,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE, 
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE,
     PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, 
     TP_PROFIT_AMT, RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, 
     MPOS_ZQ_SUPPLY_PROFIT_AMT, PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT,
@@ -111,14 +111,28 @@
     BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
     BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT
   </sql>
+  <sql id="Base_Column_List_query" >
+    M.ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE,
+    PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT,
+    TP_PROFIT_AMT, RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT,
+    MPOS_ZQ_SUPPLY_PROFIT_AMT, PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT,
+    MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT, RHB_DG_MUST_DEDUCTION_AMT,
+    RHB_DG_REAL_DEDUCTION_AMT, POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT,
+    ZPOS_DG_MUST_DEDUCTION_AMT, ZPOS_TD_REAL_DEDUCTION_AMT, POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT,
+    BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT,
+    POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT,
+    REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL,
+    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
+    BASICS_PROFIT_AMT, PARENT_AGENT_ID, M.STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT
+  </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct" >
       distinct
     </if>
-    <include refid="Base_Column_List" />
-    from P_PROFIT_DETAIL_M
+    <include refid="Base_Column_List_query" />
+    from P_PROFIT_DETAIL_M M ${innerJoinDepartment}
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
@@ -134,13 +148,12 @@
     where ID = #{id,jdbcType=VARCHAR}
   </select>
   <update id="clearComputData">
-    UPDATE P_PROFIT_DETAIL_M SET POS_REWARD_AMT=0,POS_REWARD_DEDUCTION_AMT=0,
+    UPDATE P_PROFIT_DETAIL_M SET
     POS_TD_MUST_DEDUCTION_AMT=0, POS_TD_REAL_DEDUCTION_AMT=0,
     MPOS_TD_MUST_DEDUCTION_AMT=0, MPOS_TD_REAL_DEDUCTION_AMT=0, RHB_DG_MUST_DEDUCTION_AMT=0,
     RHB_DG_REAL_DEDUCTION_AMT=0, POS_DG_MUST_DEDUCTION_AMT=0, POS_DG_REAL_DEDUCTION_AMT=0,
     ZPOS_DG_MUST_DEDUCTION_AMT=0, ZPOS_TD_REAL_DEDUCTION_AMT=0, POS_KH_DEDUCTION_AMT=0, MPOS_KH_DEDUCTION_AMT=0,
-    BU_DEDUCTION_AMT=0, OTHER_DEDUCTION_AMT=0, POS_TD_SUPPLY_AMT=0, MPOS_TD_SUPPLY_AMT=0, OTHER_SUPPLY_AMT=0,
-    DEDUCTION_TAX_MONTH_AGO_AMT=0, DEDUCTION_TAX_MONTH_AMT=0, SUPPLY_TAX_AMT=0,REAL_PROFIT_AMT=0, PROFIT_MONTH_AMT=0,
+    BU_DEDUCTION_AMT=0, OTHER_DEDUCTION_AMT=0, DEDUCTION_TAX_MONTH_AGO_AMT=0, DEDUCTION_TAX_MONTH_AMT=0, SUPPLY_TAX_AMT=0,REAL_PROFIT_AMT=0, PROFIT_MONTH_AMT=0,
     BASICS_PROFIT_AMT=0
     where PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
@@ -648,7 +661,7 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer" >
-    select count(*) from P_PROFIT_DETAIL_M
+    select count(*) from P_PROFIT_DETAIL_M ${innerJoinDepartment}
     <if test="_parameter != null" >
       <include refid="Example_Where_Clause" />
     </if>
@@ -659,21 +672,7 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     update P_PROFIT_DETAIL_M
     <set >
-      <if test="agentPid != null" >
-        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null" >
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="agentName != null" >
-        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      </if>
-      <if test="profitId != null" >
-        PROFIT_ID = #{profitId,jdbcType=VARCHAR},
-      </if>
-      <if test="profitDate != null" >
-        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
-      </if>
+
       <if test="tranAmt != null" >
         TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
       </if>
@@ -925,16 +924,6 @@
     </if>
   </sql>
 
-  <!-- 获取大区代理商-->
-  <select id="getDistrictAgent" parameterType="String" resultType="java.lang.String">
-   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID WHERE COR.ID =#{id}
-  </select>
-
-  <!-- 获取省区代理商-->
-  <select id="getProAgent" parameterType="String" resultType="java.lang.String">
-   SELECT AGENT.ID  FROM A_AGENT AGENT LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID WHERE COR.ID =#{id}
-  </select>
-
   <!--导出数据-->
   <select id="exportByFinance" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
     select
@@ -955,4 +944,9 @@
     set OTHER_SUPPLY_AMT = #{otherSupplyAmt,jdbcType=DECIMAL}
     where AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </update>
+  <select id="getProfitDetailMonthListByParam" resultMap="BaseResultMap">
+      select * from ( select row_.*, rownum rownum_ from (
+        select * from   P_PROFIT_DETAIL_M where PROFIT_DATE = #{profitDate}
+      <![CDATA[ ) row_ ) where rownum_ > #{start} and rownum_ <= #{end} ]]>
+  </select>
 </mapper>

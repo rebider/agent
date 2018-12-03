@@ -83,9 +83,8 @@ public class ProfitZhiFaDataJob {
      * 交易月份（空则为上一月）
      * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
     */
-//    @Scheduled(cron = "0 35 16 22 * ?")
+//    @Scheduled(cron = "0 42 10 22 * ?")
     public void synchroProfitDirect(){
-//        String transDate = "201809";
         String transDate = null;
         HashMap<String,String> map = new HashMap<String,String>();
         month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6);
@@ -114,7 +113,6 @@ public class ProfitZhiFaDataJob {
         }else{
             computer();
         }
-
     }
 
     public void computer(){
@@ -137,7 +135,7 @@ public class ProfitZhiFaDataJob {
             ProfitDeduction where = new ProfitDeduction();
             where.setAgentId(json.getString("AGENTID"));
             where.setDeductionType("01");
-            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date(),-2)).substring(0,7));
+            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date(),-1)).substring(0,7));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
             AgentBusInfo fristAgent = businfoService.getByBusidAndCode("6000",json.getString("FRISTAGENTID"));
             ProfitDirect profitDirect = new ProfitDirect();
@@ -149,7 +147,8 @@ public class ProfitZhiFaDataJob {
             profitDirect.setFristAgentId(json.getString("FRISTAGENTNAME"));//一级代理商编号
             profitDirect.setFristAgentName(json.getString("FRISTAGENTID"));//一级代理商名称
             //profitDirect.setFristAgentPid(json.getString("FRISTAGENTPID"));//一级代理商唯一码
-            profitDirect.setFristAgentPid(fristAgent.getAgentId());//一级代理商唯一码
+            profitDirect.setFristAgentPid(fristAgent==null?"":fristAgent.getAgentId());//一级代理商唯一码
+            profitDirect.setPaycompanyNum(fristAgent==null?"":fristAgent.getCloPayCompany());//一级代理商打款公司
             profitDirect.setTransAmt(json.getBigDecimal("TRANSAMT"));//直发交易金额
             profitDirect.setTransMonth(json.getString("TRANSMONTH"));//月份
             profitDirect.setTransFee(json.getBigDecimal("TRANSFEE"));//直发交易手续费

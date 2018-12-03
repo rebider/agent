@@ -32,11 +32,10 @@ public class PosOrganDataServiceImpl implements PosOrganDataService {
     private static Logger logger = LoggerFactory.getLogger(PosOrganDataServiceImpl.class);
 
 
-    private String posRequest(String orgId)throws Exception{
+    private String posRequest(String orgId, String tranCode)throws Exception{
 
         String cooperator = Constants.cooperator;
         String charset = "UTF-8"; // 字符集
-        String tranCode = "ORG003"; // 交易码
         String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
         String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
@@ -101,6 +100,17 @@ public class PosOrganDataServiceImpl implements PosOrganDataService {
 
     @Override
     public AgentResult getAllChild(String orgId) throws ProcessException {
+        String tranCode = "ORG003"; // 交易码
+        return getAgentResult(orgId, tranCode);
+    }
+
+    @Override
+    public AgentResult getFirstAgent(String orgId) throws ProcessException {
+        String tranCode = "PFT002"; // 交易码
+        return getAgentResult(orgId, tranCode);
+    }
+
+    private AgentResult getAgentResult(String orgId, String tranCode) {
         AgentResult result = new AgentResult(500,"参数错误","");
         if (StringUtils.isBlank(orgId)) {
             logger.info("请求机构id为空。");
@@ -108,7 +118,7 @@ public class PosOrganDataServiceImpl implements PosOrganDataService {
         }
         try {
             result.setMsg("服务器异常");
-            String httpResult = posRequest(orgId);
+            String httpResult = posRequest(orgId, tranCode);
             if(StringUtils.isBlank(httpResult)){
                 return result;
             }
@@ -122,7 +132,7 @@ public class PosOrganDataServiceImpl implements PosOrganDataService {
                 return AgentResult.ok(dataMap);
             }
         } catch (Exception e) {
-            logger.info("机构子集获取异常:{}",e.getMessage());
+            logger.info("获取异常:{}",e.getMessage());
             e.printStackTrace();
         }
         return result;

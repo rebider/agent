@@ -777,9 +777,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             String returnId = agentVo.getReturnId();
             OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
             //独立事物更新
-            if(null!=agentVo.getoReturnOrder() && StringUtils.isNotEmpty(agentVo.getoReturnOrder().getRefundpeople())) {
+            if(null!=agentVo.getoReturnOrder()) {
                 if(null==agentVo.getoReturnOrder().getRefundtime()) {
                     throw new ProcessException("核款时间不能为空");
+                }
+                if(null==agentVo.getoReturnOrder().getRefundpeople()) {
+                    throw new ProcessException("核款人不能为空");
                 }
                 returnOrder.setAuditor(userId);
                 returnOrder.setRefundpeople(agentVo.getoReturnOrder().getRefundpeople());
@@ -1444,9 +1447,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
                     ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(id);
                     OReturnOrderDetail returnOrderDetail1Info = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
-                    if(!returnOrderDetail1Info.getAgentId().equals(subOrderItem.getAgentId())){
-                        throw new MessageException("发货代理商退货代理商不是同一个代理商！");
-                    }
 
                     if (receiptPlan != null) {
                         if(receiptPlan.getSendProNum()==null || receiptPlan.getSendProNum().compareTo(BigDecimal.ZERO)==0) {// 发货数量

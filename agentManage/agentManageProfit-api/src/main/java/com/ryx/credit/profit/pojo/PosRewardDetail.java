@@ -2,7 +2,12 @@ package com.ryx.credit.profit.pojo;
 
 import java.io.Serializable;
 
-public class PosRewardDetail implements Serializable{
+/**
+ * @author RYX
+ */
+public class PosRewardDetail implements Serializable {
+
+    private static final long serialVersionUID = -3169932965261141606L;
     private String id;
 
     private String profitPosDate;
@@ -34,6 +39,10 @@ public class PosRewardDetail implements Serializable{
     private String posReawrdProfit;
 
     private String posRemark;
+
+    private String posCheckDeductAmt;
+
+    private String childAgentIdList;
 
     public String getId() {
         return id;
@@ -161,5 +170,21 @@ public class PosRewardDetail implements Serializable{
 
     public void setPosRemark(String posRemark) {
         this.posRemark = posRemark == null ? null : posRemark.trim();
+    }
+
+    public String getPosCheckDeductAmt() {
+        return posCheckDeductAmt;
+    }
+
+    public void setPosCheckDeductAmt(String posCheckDeductAmt) {
+        this.posCheckDeductAmt = posCheckDeductAmt == null ? null : posCheckDeductAmt.trim();
+    }
+
+    public String getChildAgentIdList() {
+        return childAgentIdList;
+    }
+
+    public void setChildAgentIdList(String childAgentIdList) {
+        this.childAgentIdList = childAgentIdList == null ? null : childAgentIdList.trim();
     }
 }

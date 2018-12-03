@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.PProfitFactorMapper;
 import com.ryx.credit.profit.pojo.PProfitFactor;
+import com.ryx.credit.profit.pojo.PProfitFactorExample;
 import com.ryx.credit.profit.service.ProfitFactorService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -88,9 +89,13 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public List<String> addList(List<List<Object>> data, String userId) throws Exception {
+    public List<String> addList(List<List<String>> data, String userId) throws Exception {
         List<String> list = new ArrayList<>();
-        for (List<Object> factor : data) {
+        if (null == data && data.size() == 0) {
+            logger.info("导入数据为空");
+            throw new MessageException("导入数据为空");
+        }
+        for (List<String> factor : data) {
             PProfitFactor profitFactor = new PProfitFactor();
             profitFactor.setFactorDate(Calendar.getInstance().getTime());//导入时间
             profitFactor.setId(idService.genId(TabId.p_profit_factor));//ID序列号
@@ -107,28 +112,20 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
                 e.printStackTrace();
                 throw e;
             }
-
-//            logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
-//            if (1 != insertImportData(profitFactor)) {
-//                logger.info("插入失败！");
-//                throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
-//            }
-
             PProfitFactor profit = selectByData(profitFactor);//查询列表中是否有重复数据
             if (profit != null) {
-                logger.info(profitFactor.getAgentId()+"此条数据已存在！！");
-                throw new MessageException(profitFactor.getAgentId()+"此条数据已存在！！");
+                logger.info(profitFactor.getAgentId() + "此条数据已存在！");
+                throw new MessageException(profitFactor.getAgentId() + "此条数据已存在！");
             } else {
-                if (1 != insertImportData(profitFactor)) {
-                    logger.info("插入失败！");
-                    throw new MessageException("代理商编号为:"+profitFactor.getAgentId()+"插入保理数据失败！");
+                if (insertImportData(profitFactor)==0) {
+                    logger.info("导入失败！");
+                    throw new MessageException(factor.toString() + "导入失败！");
                 }
-                logger.info("保理数据信息-------------------------------------" + JSONObject.toJSON(profitFactor));
+                logger.info("保理数据信息：" + JSONObject.toJSON(profitFactor));
             }
             list.add(profitFactor.getId());
         }
         return list;
     }
-
 
 }

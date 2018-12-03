@@ -8,9 +8,11 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.profit.dao.ProfitSupplyMapper;
 import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitMonth;
+import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.service.OrganTranMonthDetailService;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.ProfitMonthService;
@@ -52,6 +54,9 @@ public class ProfitAmtSumJob {
     @Autowired
     public  RedisService redisService;
 
+    @Autowired
+    private ProfitSupplyMapper profitSupplyMapper;
+
     @Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
@@ -76,8 +81,11 @@ public class ProfitAmtSumJob {
                     BigDecimal posZqSupplyProfitAmt = profitDetailMonthTemp.getPosZqSupplyProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosZqSupplyProfitAmt();
                     BigDecimal mposZqSupplyProfitAmt = profitDetailMonthTemp.getMposZqSupplyProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getMposZqSupplyProfitAmt();
                     BigDecimal rhbProfitAmt = profitDetailMonthTemp.getRhbProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getRhbProfitAmt();
+
+                    getTdSupplyAmt(profitDetailMonthTemp);
                     profitDetailMonthTemp.setProfitSumAmt(payProfitAmt.add(tranProfitAmt).add(ryxProfitAmt).add(ryxHdProfitAmt).add(tpProfitAmt)
                             .add(rsProfitAmt).add(rsHdProfitAmt).add(zfProfitAmt).add(posZqSupplyProfitAmt).add(mposZqSupplyProfitAmt).add(rhbProfitAmt));
+
                     profitDetailMonthServiceImpl.update(profitDetailMonthTemp);
                     payProfitAmt = null;
                     tranProfitAmt = null;
@@ -99,5 +107,21 @@ public class ProfitAmtSumJob {
             throw new RuntimeException("分润数据处理失败");
         }
 
+    }
+
+    private BigDecimal getTdSupplyAmt(ProfitDetailMonth profitDetailMonthTemp) {
+        ProfitSupply profitSupply = new ProfitSupply();
+        profitSupply.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
+        profitSupply.setAgentId(profitDetailMonthTemp.getAgentId());
+        profitSupply.setSupplyDate(profitDetailMonthTemp.getProfitDate());
+        profitSupply.setBusType("02");
+        // pos退单补款
+        BigDecimal posSupply = profitSupplyMapper.getBuckleByMonthAndPid(profitSupply);
+        profitDetailMonthTemp.setPosTdSupplyAmt(posSupply==null?BigDecimal.ZERO:posSupply);
+        // mpos退单补款
+        profitSupply.setBusType("01");
+        BigDecimal mposSupply = profitSupplyMapper.getBuckleByMonthAndPid(profitSupply);
+        profitDetailMonthTemp.setMposTdSupplyAmt(mposSupply==null?BigDecimal.ZERO:mposSupply);
+        return profitDetailMonthTemp.getPosTdSupplyAmt().add(profitDetailMonthTemp.getMposTdSupplyAmt());
     }
 }

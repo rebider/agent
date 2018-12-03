@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitStaging;
+import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 import com.ryx.credit.profit.pojo.ProfitStagingExample;
 
 import java.math.BigDecimal;

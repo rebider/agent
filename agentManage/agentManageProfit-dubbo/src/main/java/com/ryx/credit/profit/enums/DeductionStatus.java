@@ -9,7 +9,7 @@ package com.ryx.credit.profit.enums;
  */
 public enum DeductionStatus {
     //未申请/未扣款，未审核，审核中，通过，不通过，已扣款
-    NOT_APPLIED("0"),UNREVIEWED("1"),REVIEWING("2"),PASS("3"),UN_PASS("4"),YES_WITHHOLD("5");
+    NOT_APPLIED("0"),UNREVIEWED("1"),REVIEWING("2"),PASS("3"),UN_PASS("4"),YES_WITHHOLD("5"),CANCEL("6");
 
     private String status;
     DeductionStatus(String status) {

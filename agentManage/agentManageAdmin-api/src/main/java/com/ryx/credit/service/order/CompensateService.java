@@ -25,7 +25,7 @@ public interface CompensateService {
 
     PageInfo compensateList(ORefundPriceDiffVo refundPriceDiff, Page page, String dataRole ,long userId);
 
-    List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId)throws ProcessException;
+    List<Map<String,Object>> getOrderMsgByExcel(List<Object> excelList,Long userId,String agentId)throws ProcessException;
 
     BigDecimal calculateTotalPrice(String activityId, BigDecimal count);
 

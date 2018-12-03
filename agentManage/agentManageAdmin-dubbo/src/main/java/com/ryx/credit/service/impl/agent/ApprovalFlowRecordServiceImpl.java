@@ -118,6 +118,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         }
 
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExampleWithBusActRel(par);
+        if(null!=approvalFlowRecords && approvalFlowRecords.size()!=0)
         approvalFlowRecords.forEach(row->{
             row.setBusTypeName(BusActRelBusType.getItemString(row.getBusType()));
             COrganization cOrganization = cOrganizationMapper.selectById(Integer.valueOf(row.getApprovalDep()));
@@ -129,7 +130,7 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
                 row.setApprovalPerson(cUser.getName());
             }
             BusActRel busActRel = busActRelService.findById(row.getExecutionId());
-            if(null!=busActRel.getcTime())
+            if(null!=busActRel && null!=busActRel.getcTime())
             row.setSubMitDate(DateUtil.format(busActRel.getcTime(),"yyyy-MM-dd"));
         });
         PageInfo pageInfo = new PageInfo();

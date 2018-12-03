@@ -8,6 +8,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
@@ -52,6 +53,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private AssProtoColMapper assProtoColMapper;
 	@Autowired
 	private PlatFormService platFormService;
+	@Autowired
+	private AgentMapper agentMapper;
+
 
     /**
      * 代理商查询插件数据获取
@@ -75,24 +79,19 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusPlatform()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusType())
-//					||
-//        			null == agentBusInfo.getBusSentDirectly() ||
-//        			null == agentBusInfo.getBusDirectCashback() ||
-//        			StringUtils.isEmpty(agentBusInfo.getBusContact()) ||
-//        			StringUtils.isEmpty(agentBusInfo.getBusContactMobile()) ||
-//        			StringUtils.isEmpty(agentBusInfo.getBusContactEmail()) ||
-//        			StringUtils.isEmpty(agentBusInfo.getBusContactPerson()) ||
-//        			StringUtils.isEmpty(agentBusInfo.getBusRiskEmail()) ||
-//        			null == agentBusInfo.getCloReceipt() ||
-//        			StringUtils.isEmpty(agentBusInfo.getcUser())
-        			){
+				){
                 throw new ProcessException("业务数据不完整");
         	}
         	agentBusInfo.setId(idService.genId(TabId.a_agent_businfo));
         	agentBusInfo.setcTime(new Date());
         	agentBusInfo.setcUtime(agentBusInfo.getcTime());
         	agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
-        	agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
+			Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+			if(agent.getAgStatus().equals(AgStatus.Create.name())){
+				agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
+			}else{
+				agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
+			}
         	agentBusInfo.setStatus(Status.STATUS_1.status);
 			agentBusInfo.setVersion(Status.STATUS_1.status);
 			//激活返现如果无值默人填写自己

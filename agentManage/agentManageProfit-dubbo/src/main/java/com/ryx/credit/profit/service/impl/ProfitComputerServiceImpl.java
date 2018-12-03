@@ -427,20 +427,8 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
     }
 
-
-    @Test
-    public void test(){
-        String transDate = "201809";
-        BigDecimal amt = synchroSSTotalTransAmt(transDate);
-        System.out.println(amt);
-    }
-
-    /**
-     * 同步手刷月分润交易汇总
-     * @param transDate 交易日期（空则为上一月）
-     */
-    @Override
-    public BigDecimal synchroSSTotalTransAmt(String transDate){
+//    @Override
+//    public BigDecimal synchroSSTotalTransAmtTwo(String transDate){
 //        //汇总手刷交易金额
 //        BigDecimal synchroAmt = synchroAmt(transDate);
 //        System.out.println("手刷：" + synchroAmt);
@@ -451,7 +439,22 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 //        BigDecimal total = synchroAmt.add(synchZFAmt);
 //        System.out.println("总金额：" + total);
 //        return total;
+//    }
 
+    @Scheduled(cron = "0 40 10 14 * ?")
+    @Test
+    public void test(){
+        String transDate = "201810";
+        BigDecimal amt = synchroSSTotalTransAmt(transDate);
+        System.out.println(amt);
+    }
+
+    /**
+     * 同步手刷月分润交易汇总
+     * @param transDate 交易日期（空则为上一月）
+     */
+    @Override
+    public BigDecimal synchroSSTotalTransAmt(String transDate){
         //默认日期为上个月
         transDate = transDate==null?DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1)).substring(0,6):transDate;
         //汇总手刷交易金额

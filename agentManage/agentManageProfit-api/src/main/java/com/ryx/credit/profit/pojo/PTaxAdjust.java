@@ -22,6 +22,16 @@ public class PTaxAdjust implements Serializable {
 
     private String userId;
 
+    private String profitMonth;
+
+    public String getProfitMonth() {
+        return profitMonth;
+    }
+
+    public void setProfitMonth(String profitMonth) {
+        this.profitMonth = profitMonth;
+    }
+
     public String getUserId() {
         return userId;
     }

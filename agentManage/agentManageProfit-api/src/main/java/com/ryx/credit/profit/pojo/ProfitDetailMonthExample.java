@@ -5,8 +5,11 @@ import com.ryx.credit.common.util.Page;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ProfitDetailMonthExample {
+    protected String innerJoinDepartment;
+
     protected String orderByClause;
 
     protected boolean distinct;
@@ -21,6 +24,14 @@ public class ProfitDetailMonthExample {
 
     public ProfitDetailMonthExample() {
         oredCriteria = new ArrayList<Criteria>();
+    }
+
+    public void setInnerJoinDepartment(String innerJoinDepartment, String corId) {
+        if (Objects.equals("south", innerJoinDepartment )|| Objects.equals("north", innerJoinDepartment)) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_DISTRICT= COR.ID AND COR.ID ="+corId;
+        } else if (innerJoinDepartment.contains("south") || innerJoinDepartment.contains("north")) {
+            this.innerJoinDepartment = " INNER JOIN A_AGENT AGENT ON AGENT_ID = AGENT.ID LEFT JOIN C_ORGANIZATION COR ON AGENT.AG_DOC_PRO= COR.ID AND COR.ID ="+corId;
+        }
     }
 
     public void setOrderByClause(String orderByClause) {

@@ -12,10 +12,12 @@ import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
@@ -95,6 +97,8 @@ public class OrderServiceImpl implements OrderService {
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private OCashReceivablesService oCashReceivablesService;
+    @Autowired
+    private IUserService iUserService;
 
     /**
      * 根据ID查询订单
@@ -1301,9 +1305,12 @@ public class OrderServiceImpl implements OrderService {
         try {
             //处理审批数据
             logger.info("订单提交审批，完成任务{}:{}：{}", agentVo.getTaskId(), userId, JSONObject.toJSONString(agentVo));
-            AgentResult busres = orderService.approvalTaskBussiData(agentVo,userId);
-            if(!busres.isOK()){
-                return busres;
+            //只有通过才处理业务
+            if(agentVo.getApprovalResult().equals("pass")){
+                AgentResult busres = orderService.approvalTaskBussiData(agentVo,userId);
+                if(!busres.isOK()){
+                    return busres;
+                }
             }
             //完成任务
             AgentResult result = new AgentResult(500, "系统异常", "");
@@ -2969,7 +2976,7 @@ public class OrderServiceImpl implements OrderService {
         List<Dict> dictList = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.SETTLEMENT_TYPE.name());
         List<Dict> capitalType = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
 
-        if (null!=orderoutList  && orderoutList.size()>1){
+        if (null!=orderoutList  && orderoutList.size()>0){
             for (OrderoutVo orderoutVo : orderoutList) {
                 if (StringUtils.isNotBlank(orderoutVo.getPayMethod()) && !orderoutVo.getPayMethod().equals("null")) {
                     for (Dict dict : dictList) {
@@ -2992,9 +2999,11 @@ public class OrderServiceImpl implements OrderService {
                         }
                     }
                 }
-
-
-
+                if(StringUtils.isNotBlank(orderoutVo.getNuclearUser())){
+                    CUser cUser = iUserService.selectById(orderoutVo.getNuclearUser());
+                    if(null!=cUser)
+                    orderoutVo.setNuclearUser(cUser.getName());
+                }
             }
         }
         return orderoutList;
