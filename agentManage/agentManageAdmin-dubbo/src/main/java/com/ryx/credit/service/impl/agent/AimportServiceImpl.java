@@ -82,6 +82,7 @@ public class AimportServiceImpl implements AimportService {
 
 
 
+
     @Override
     public int insertAgentImportData(ImportAgent importAgent) {
         importAgent.setStatus(Status.STATUS_1.status);
