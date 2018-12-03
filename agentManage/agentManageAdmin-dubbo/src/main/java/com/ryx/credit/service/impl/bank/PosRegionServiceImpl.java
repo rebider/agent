@@ -118,6 +118,7 @@ public class PosRegionServiceImpl implements PosRegionService {
             c.andCodeLevelEqualTo(level);
             c.andParentCodeEqualTo(code);
         }
+        example.setOrderByClause(" code asc ");
         List<DPosRegion> list = posRegionMapper.selectByExample(example);
         List<Tree> trees = new ArrayList<Tree>();
         for (DPosRegion dPosRegion : list) {
