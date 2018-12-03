@@ -1,10 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.RewardStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
@@ -229,7 +226,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
                 posReward.setApplyStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
                 rewardMapper.updateByPrimaryKeySelective(posReward);
                 logger.info("2更新审批流与业务对象");
-                rel.setStatus(Status.STATUS_2.status);
+                rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {

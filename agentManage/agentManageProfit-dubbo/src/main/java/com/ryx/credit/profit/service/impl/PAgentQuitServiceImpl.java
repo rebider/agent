@@ -138,7 +138,7 @@ public class PAgentQuitServiceImpl implements PAgentQuitService {
 //                }
 
                 logger.info("2.更新审批流与业务对象");
-                rel.setStatus(Status.STATUS_2.status);
+                rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {
