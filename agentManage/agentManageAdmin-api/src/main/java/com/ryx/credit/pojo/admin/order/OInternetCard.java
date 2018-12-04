@@ -1,5 +1,7 @@
 package com.ryx.credit.pojo.admin.order;
 
+import org.springframework.stereotype.Service;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -36,6 +38,10 @@ public class OInternetCard implements Serializable{
     private BigDecimal version;
 
     private BigDecimal status;
+
+    private String cUser;
+
+    private String uUser;
 
     public String getId() {
         return id;
@@ -163,5 +169,21 @@ public class OInternetCard implements Serializable{
 
     public void setStatus(BigDecimal status) {
         this.status = status;
+    }
+
+    public String getcUser() {
+        return cUser;
+    }
+
+    public void setcUser(String cUser) {
+        this.cUser = cUser == null ? null : cUser.trim();
+    }
+
+    public String getuUser() {
+        return uUser;
+    }
+
+    public void setuUser(String uUser) {
+        this.uUser = uUser == null ? null : uUser.trim();
     }
 }

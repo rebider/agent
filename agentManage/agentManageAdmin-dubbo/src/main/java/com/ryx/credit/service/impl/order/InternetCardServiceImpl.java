@@ -11,7 +11,9 @@ import com.ryx.credit.dao.order.OInternetCardMapper;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.OLogisticsMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.InternetCardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,8 @@ public class InternetCardServiceImpl implements InternetCardService {
     private IdService idService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
 
     @Override
@@ -57,7 +61,11 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardExample.setPage(page);
         oInternetCardExample.setOrderByClause(" c_time desc ");
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
-
+        for (OInternetCard oInternetCard : oInternetCards) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getProCom());
+            if(null!=dict)
+            oInternetCard.setProCom(dict.getdItemname());
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
         pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
@@ -71,6 +79,11 @@ public class InternetCardServiceImpl implements InternetCardService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
 
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+        for (OInternetCard oInternetCard : oInternetCards) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getProCom());
+            if(null!=dict)
+            oInternetCard.setProCom(dict.getdItemname());
+        }
         return oInternetCards;
     }
 
@@ -147,6 +160,7 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCard.setLogisticsId(oLogistics.getId());
         oInternetCard.setProCom(oLogistics.getProCom());
         oInternetCard.setuTime(new Date());
+        oInternetCard.setuUser(userId);
         if(oInternetCards.size()==0) {
             oInternetCard.setDebtAmt(new BigDecimal(0));
             oInternetCard.setcTime(new Date());
@@ -154,6 +168,9 @@ public class InternetCardServiceImpl implements InternetCardService {
             oInternetCard.setStatus(Status.STATUS_1.status);
             oInternetCard.setCardStatus(CardStatus.WZ.getValue());
             oInternetCard.setId(idService.genId(TabId.O_INTERNET_CARD));
+            oInternetCard.setcUser(userId);
+            oInternetCard.setExceedFlow("0");
+            oInternetCard.setExceedFlowUnit(ExceedFlowUnit.M.getValue());
             internetCardMapper.insert(oInternetCard);
         }else{
             OInternetCard internetCard = oInternetCards.get(0);
