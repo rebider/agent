@@ -77,7 +77,7 @@ public class InternetCardServiceImpl implements InternetCardService {
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public void importInternetCard(List<List<Object>> excelList, String importType)throws Exception{
+    public void importInternetCard(List<List<Object>> excelList, String importType, String userId)throws Exception{
 
         if(StringUtils.isBlank(CardImportType.getContentByValue(importType))){
              throw new MessageException("导入类型错误");
@@ -100,7 +100,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 if(StringUtils.isBlank(iccidNum)){
                     throw new MessageException("第"+index+"个iccid号为空");
                 }
-                importCard(index,snNum,iccidNum);
+                importCard(index,snNum,iccidNum,userId);
             }
         }catch (MessageException e) {
             e.printStackTrace();
@@ -112,7 +112,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
 
-    public void importCard(int index,String snNum,String iccidNum)throws Exception{
+    public void importCard(int index,String snNum,String iccidNum,String userId)throws Exception{
         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
         OLogisticsDetailExample.Criteria LogisticsDetailCriteria = oLogisticsDetailExample.createCriteria();
         LogisticsDetailCriteria.andSnNumEqualTo(snNum);
@@ -139,21 +139,20 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCard.setSnNum(snNum);
         oInternetCard.setIccidNum(iccidNum);
         oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
-        oInternetCard.setDebtAmt(new BigDecimal(0));
         oInternetCard.setLogisticsDetailId(oLogisticsDetail.getId());
-        oInternetCard.setcTime(new Date());
-        oInternetCard.setuTime(new Date());
-        oInternetCard.setVersion(Status.STATUS_0.status);
-        oInternetCard.setStatus(Status.STATUS_1.status);
-        oInternetCard.setCardStatus(CardStatus.WZ.getValue());
         Agent agent = agentMapper.selectByPrimaryKey(oLogisticsDetail.getAgentId());
         if(null!=agent)
         oInternetCard.setAgentName(agent.getAgName());
         OLogistics oLogistics = logisticsMapper.selectByPrimaryKey(oLogisticsDetail.getLogisticsId());
         oInternetCard.setLogisticsId(oLogistics.getId());
         oInternetCard.setProCom(oLogistics.getProCom());
-
+        oInternetCard.setuTime(new Date());
         if(oInternetCards.size()==0) {
+            oInternetCard.setDebtAmt(new BigDecimal(0));
+            oInternetCard.setcTime(new Date());
+            oInternetCard.setVersion(Status.STATUS_0.status);
+            oInternetCard.setStatus(Status.STATUS_1.status);
+            oInternetCard.setCardStatus(CardStatus.WZ.getValue());
             oInternetCard.setId(idService.genId(TabId.O_INTERNET_CARD));
             internetCardMapper.insert(oInternetCard);
         }else{

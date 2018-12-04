@@ -57,7 +57,7 @@ public enum CardImportType {
         return "";
     }
 
-    public Map<String, Object> getSelectMap(){
+    public static Map<String, Object> getSelectMap(){
         Map<String, Object> resultMap = new HashMap<>();
         CardImportType[] status = CardImportType.values();
         for(CardImportType cc : status){

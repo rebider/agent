@@ -57,7 +57,7 @@ public enum CardStatus {
         return "";
     }
 
-    public Map<BigDecimal, Object> getSelectMap(){
+    public static Map<BigDecimal, Object> getSelectMap(){
         Map<BigDecimal, Object> resultMap = new HashMap<>();
         CardStatus[] status = CardStatus.values();
         for(CardStatus cc : status){

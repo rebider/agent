@@ -15,5 +15,5 @@ public interface InternetCardService {
 
     List<OInternetCard> exportInternetCard(OInternetCard internetCard);
 
-    void importInternetCard(List<List<Object>> excelList, String importType)throws Exception;
+    void importInternetCard(List<List<Object>> excelList, String importType, String userId)throws Exception;
 }
