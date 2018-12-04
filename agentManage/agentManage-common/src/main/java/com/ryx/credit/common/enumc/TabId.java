@@ -76,7 +76,8 @@ public enum TabId {
     A_COLINFO_PAYMENT("ACP%s%015d"),
     P_AGENT_QUIT("PAQ%s%015d"),
     P_AGENT_MERGE("PAM%s%015d"),
-    PROFIT_ADJUST_M("PRAM%s%015d");
+    PROFIT_ADJUST_M("PRAM%s%015d"),
+    O_INTERNET_CARD("IC%s%015d");
 
 
     TabId(String thePatt){
