@@ -55,23 +55,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Autowired
     private PosRewardTemplateMapper templateMapper;
 
-
-    /**
-     * 处理分页用到的信息
-     *
-     * @return
-     */
-    protected Page pageProcessAll(int size) {
-        int numPerPage = size;
-        int currentPage = 1;
-        Page page = new Page();
-        page.setCurrent(currentPage);
-        page.setLength(numPerPage);
-        page.setBegin((currentPage - 1) * numPerPage);
-        page.setEnd(currentPage * numPerPage);
-        return page;
-    }
-
     @Override
     public PageInfo posRewardList(PosReward record, Page page) {
         PosRewardExample example = rewardEqualsTo(record);
@@ -96,48 +79,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
             criteria.andAgentIdEqualTo(reward.getAgentId());
         }
         return posRewardExample;
-    }
-
-    @Override
-    public long countByExample(PosRewardExample example) {
-        return rewardMapper.countByExample(example);
-    }
-
-
-
-    @Override
-    public int deleteByExample(PosRewardExample example) {
-        return rewardMapper.deleteByExample(example);
-    }
-
-    @Override
-    public int insert(PosReward record) {
-        return rewardMapper.insert(record);
-    }
-
-    @Override
-    public int insertSelective(PosReward record) {
-        return rewardMapper.insertSelective(record);
-    }
-
-    @Override
-    public List<PosReward> selectByExample(PosRewardExample example) {
-        return rewardMapper.selectByExample(example);
-    }
-
-    @Override
-    public PosReward selectByPrimaryKey(String id) {
-        return rewardMapper.selectByPrimaryKey(id);
-    }
-
-    @Override
-    public int updateByPrimaryKeySelective(PosReward record) {
-        return rewardMapper.updateByPrimaryKeySelective(record);
-    }
-
-    @Override
-    public int updateByPrimaryKey(PosReward record) {
-        return rewardMapper.updateByPrimaryKey(record);
     }
 
     /**
