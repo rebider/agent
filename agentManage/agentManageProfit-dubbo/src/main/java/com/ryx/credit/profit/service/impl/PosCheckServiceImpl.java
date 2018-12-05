@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -13,6 +14,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PosCheckMapper;
 import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
+import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.service.IPosCheckService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -50,89 +53,43 @@ public class PosCheckServiceImpl implements IPosCheckService {
     @Autowired
     private IdService idService;
 
-
-    /**
-     * 处理分页用到的信息
-     *
-     * @return
-     */
-    protected Page pageProcessAll(int size) {
-        int numPerPage = size;
-        int currentPage = 1;
-        Page page = new Page();
-        page.setCurrent(currentPage);
-        page.setLength(numPerPage);
-        page.setBegin((currentPage - 1) * numPerPage);
-        page.setEnd(currentPage * numPerPage);
-        return page;
-    }
-
     @Override
-    public PageInfo PosCheckList(PosCheck record, Page page) {
-        PosCheckExample example = checkEqualsTo(record);
-        example.setOrderByClause("APP_DATE "+Page.ORDER_DIRECTION_DESC);
+    public PageInfo posCheckList(Map<String, Object> param, PosCheck posCheck, Page page) {
+        PosCheckExample example = checkEqualsTo(posCheck);
+        example.setPage(page);
 
-
-        List<PosCheck> profitD = checkMapper.selectByExample(example);
+        example.setOrderByClause("APP_DATE DESC ");
+        List<PosCheck> posCheckList = checkMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(profitD);
-        pageInfo.setTotal((int)checkMapper.countByExample(example));
+        pageInfo.setRows(posCheckList);
+        pageInfo.setTotal((int) checkMapper.countByExample(example));
         return pageInfo;
     }
 
-    private PosCheckExample checkEqualsTo(PosCheck check) {
+    private PosCheckExample checkEqualsTo(PosCheck posCheck) {
         PosCheckExample posCheckExample = new PosCheckExample();
-        if(check == null ){
+        if(posCheck == null ){
             return posCheckExample;
         }
         PosCheckExample.Criteria criteria = posCheckExample.createCriteria();
-        if(StringUtils.isNotBlank(check.getAgentName())){
-            criteria.andAgentNameEqualTo(check.getAgentName());
+        if (StringUtils.isNotBlank(posCheck.getAgentId())) {
+            criteria.andAgentIdEqualTo(posCheck.getAgentId());
         }
-        if(StringUtils.isNotBlank(check.getAgentId())){
-            criteria.andAgentIdEqualTo(check.getAgentId());
+        if (StringUtils.isNotBlank(posCheck.getAgentName())) {
+            criteria.andAgentNameEqualTo(posCheck.getAgentName());
+        }
+        if (StringUtils.isNotBlank(posCheck.getCheckStatus())) {
+            criteria.andCheckStatusEqualTo(posCheck.getCheckStatus());
+        }
+        if (StringUtils.isNotBlank(posCheck.getCheckDateS()) && StringUtils.isNotBlank(posCheck.getCheckDateE())) {
+            criteria.andCheckDateSBetween(posCheck.getCheckDateS(), posCheck.getCheckDateE());
+            criteria.andCheckDateSBetween(posCheck.getCheckDateS(), posCheck.getCheckDateE());
+        } else if (StringUtils.isNotBlank(posCheck.getCheckDateS())){
+            criteria.andCheckDateSEqualTo(posCheck.getCheckDateS());
+        } else if (StringUtils.isNotBlank(posCheck.getCheckDateE())){
+            criteria.andCheckDateEEqualTo(posCheck.getCheckDateE());
         }
         return posCheckExample;
-    }
-
-    @Override
-    public long countByExample(PosCheckExample example) {
-        return checkMapper.countByExample(example);
-    }
-
-    @Override
-    public int deleteByExample(PosCheckExample example) {
-        return checkMapper.deleteByExample(example);
-    }
-
-    @Override
-    public int insert(PosCheck record) {
-        return checkMapper.insert(record);
-    }
-
-    @Override
-    public int insertSelective(PosCheck record) {
-        return checkMapper.insertSelective(record);
-    }
-
-    @Override
-    public List<PosCheck> selectByExample(PosCheckExample example) {
-        return checkMapper.selectByExample(example);
-    }
-
-    @Override
-    public PosCheck selectByPrimaryKey(String id) {
-        return checkMapper.selectByPrimaryKey(id);
-    }
-
-    @Override
-    public int updateByPrimaryKeySelective(PosCheck record) {
-        return checkMapper.updateByPrimaryKeySelective(record);
-    }
-
-    @Override
-    public int updateByPrimaryKey(PosCheck record) {
-        return checkMapper.updateByPrimaryKey(record);
     }
 
     /**
@@ -144,39 +101,51 @@ public class PosCheckServiceImpl implements IPosCheckService {
      */
     @Override
     public void applyPosCheck(PosCheck posCheck, String userId, String workId) throws ProcessException {
+
+        List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId());
+        for(PosCheck check : posCheckList){
+            long startMonth = DateUtil.format(check.getCheckDateS(), "yyyy-MM").getTime();
+            long endMonth = DateUtil.format(check.getCheckDateE(), "yyyy-MM").getTime();
+            long nowMonth = DateUtil.format(posCheck.getCheckDateS(), "yyyy-MM").getTime();
+            if (nowMonth >= startMonth && nowMonth <= endMonth) {
+                System.out.println("考核月份在区间内...更新已存在的数据状态值为无效");
+                check.setCheckStatus(RewardStatus.UN_PASS.getStatus());
+                checkMapper.updateByPrimaryKeySelective(check);
+            }
+        }
         LocalDate date = LocalDate.now();
         posCheck.setId((idService.genId(TabId.p_pos_check)));
         posCheck.setAppDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         System.out.println("序列ID---------------------"+idService.genId(TabId.p_pos_check));
         checkMapper.insertSelective(posCheck);
+//        //启动审批流
+//        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
+//        if (proceId == null) {
+//            PosCheckExample posCheckExample = new PosCheckExample();
+//            posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
+//            checkMapper.deleteByExample(posCheckExample);
+//            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentId());
+//            throw new ProcessException("分润比例考核审批流启动失败!");
+//        }
+//        BusActRel record = new BusActRel();
+//        record.setBusId(posCheck.getId());
+//        record.setActivId(proceId);
+//        record.setcTime(Calendar.getInstance().getTime());
+//        record.setcUser(userId);
+//        record.setBusType(BusActRelBusType.POSCHECK.name());
+//        record.setAgentId(posCheck.getAgentId());
+//        record.setAgentName(posCheck.getAgentName());
+//        try {
+//            taskApprovalService.addABusActRel(record);
+//            logger.info("分润比例考核审批流启动成功");
+//        } catch (Exception e) {
+//            e.getStackTrace();
+//            logger.error("分润比例考核审批流启动失败{}");
+//            throw new ProcessException("分润比例考核审批流启动失败!:{}",e.getMessage());
+//        }
+//        posCheck.setCheckStatus(RewardStatus.REVIEWING.getStatus());   // REVIEWING 0:审核中
+//        checkMapper.updateByPrimaryKeySelective(posCheck);
 
-        //启动审批流
-        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
-        if (proceId == null) {
-            PosCheckExample posCheckExample = new PosCheckExample();
-            posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
-            checkMapper.deleteByExample(posCheckExample);
-            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentId());
-            throw new ProcessException("分润比例考核审批流启动失败!");
-        }
-        BusActRel record = new BusActRel();
-        record.setBusId(posCheck.getId());
-        record.setActivId(proceId);
-        record.setcTime(Calendar.getInstance().getTime());
-        record.setcUser(userId);
-        record.setBusType(BusActRelBusType.POSCHECK.name());
-        record.setAgentId(posCheck.getAgentId());
-        record.setAgentName(posCheck.getAgentName());
-        try {
-            taskApprovalService.addABusActRel(record);
-            logger.info("分润比例考核审批流启动成功");
-        } catch (Exception e) {
-            e.getStackTrace();
-            logger.error("分润比例考核审批流启动失败{}");
-            throw new ProcessException("分润比例考核审批流启动失败!:{}",e.getMessage());
-        }
-        posCheck.setCheckStatus(RewardStatus.REVIEWING.getStatus());   // REVIEWING 0:审核中
-        checkMapper.updateByPrimaryKeySelective(posCheck);
     }
 
     @Override
@@ -262,5 +231,9 @@ public class PosCheckServiceImpl implements IPosCheckService {
         }
     }
 
+    @Override
+    public List<PosCheck> exportPosCheck(PosCheck posCheck) {
+        return checkMapper.exportPosCheck(posCheck);
+    }
 
 }

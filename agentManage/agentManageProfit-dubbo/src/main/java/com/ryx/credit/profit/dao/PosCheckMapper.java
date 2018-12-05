@@ -4,6 +4,7 @@ import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PosCheckMapper {
     long countByExample(PosCheckExample example);
@@ -21,4 +22,8 @@ public interface PosCheckMapper {
     int updateByPrimaryKeySelective(PosCheck record);
 
     int updateByPrimaryKey(PosCheck record);
+
+    List<PosCheck> exportPosCheck(PosCheck posCheck);
+
+    List<PosCheck> selectByAgentId(String agentId);
 }
