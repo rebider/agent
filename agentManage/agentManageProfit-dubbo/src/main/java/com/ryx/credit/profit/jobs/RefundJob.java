@@ -6,36 +6,33 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 import com.ryx.credit.profit.pojo.ProfitSupply;
-import com.ryx.credit.profit.service.*;
+import com.ryx.credit.profit.service.ProfitDeductionService;
+import com.ryx.credit.profit.service.ProfitSettleErrLsService;
+import com.ryx.credit.profit.service.ProfitSupplyService;
+import com.ryx.credit.profit.service.StagingService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.PosOrganDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author zhaodw
@@ -80,6 +77,9 @@ public class RefundJob {
 
     @Autowired
     private PosOrganDataService posOrganDataServiceImpl;
+
+    @Autowired
+    private AgentService agentService;
 
     @Scheduled(cron = "0 0 0 1 * ?")
     public void deal() {
@@ -442,6 +442,8 @@ public class RefundJob {
         List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), (String)posMap.get("BUS_PLATFORM"), (String)posMap.get("BUS_NUM"));
         if(agentBusInfo != null && !agentBusInfo.isEmpty()){
             posMap.put("parentAgentId", agentBusInfo.get(0).getAgentId());
+            Agent agent = agentService.getAgentById(agentBusInfo.get(0).getAgentId());
+            posMap.put("parentAgentName", agent!= null?agent.getAgName():null);
         }
     }
 }

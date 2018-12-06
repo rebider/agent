@@ -140,7 +140,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
         if(deductionist != null && deductionist.size() > 0 ) {
-            deductionist.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null).forEach(list->{
+            deductionist.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list->{
                 insertDeduction(list, userId);
             });
 
@@ -156,7 +156,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @Date: 2018/8/9
     */
     private void insertDeduction(List list, String userId) {
-        BigDecimal amt = list.get(4)==null?BigDecimal.ZERO:new BigDecimal(list.get(4).toString());
+        BigDecimal amt = list.get(5)==null?BigDecimal.ZERO:new BigDecimal(list.get(5).toString());
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.OTHER.getType());
         deduction.setAddDeductionAmt(amt);
@@ -165,9 +165,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
         deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) );
         deduction.setAgentId(list.get(0).toString());
-        deduction.setParentAgentId(list.get(1).toString());
-        deduction.setAgentName(list.get(2).toString());
-        deduction.setRemark(list.get(3).toString());
+        deduction.setParentAgentId(list.get(2).toString());
+        deduction.setAgentName(list.get(1).toString());
+        deduction.setParentAgentName(list.get(3).toString());
+        deduction.setRemark(list.get(4).toString());
         deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
         deduction.setCreateDateTime(new Date());
         deduction.setUserId(userId);
