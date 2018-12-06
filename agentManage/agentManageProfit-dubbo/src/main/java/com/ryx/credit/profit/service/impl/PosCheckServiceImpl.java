@@ -221,6 +221,17 @@ public class PosCheckServiceImpl implements IPosCheckService {
 
     @Override
     public void editCheckRegect(PosCheck posCheck) throws Exception {
+        List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId());
+        for(PosCheck check : posCheckList){
+            long startMonth = DateUtil.format(check.getCheckDateS(), "yyyy-MM").getTime();
+            long endMonth = DateUtil.format(check.getCheckDateE(), "yyyy-MM").getTime();
+            long nowMonth = DateUtil.format(posCheck.getCheckDateS(), "yyyy-MM").getTime();
+            if (nowMonth >= startMonth && nowMonth <= endMonth) {
+                logger.info("考核月份在区间内...更新已存在的数据状态值为无效");
+                check.setCheckStatus(RewardStatus.UN_PASS.getStatus());//UN_PASS 2:无效
+                checkMapper.updateByPrimaryKeySelective(check);
+            }
+        }
         try {
             checkMapper.updateByPrimaryKeySelective(posCheck);
         } catch (Exception e) {
