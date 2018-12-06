@@ -76,7 +76,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Override
     public ResultVO posTaxEnterIn(PTaxAdjust tax) throws ProcessException {
         tax.setId(idService.genId(TabId.p_profit_adjust));
-        System.out.println("序列ID---------------------"+idService.genId(TabId.p_profit_adjust));
+        logger.info("序列ID......"+idService.genId(TabId.p_profit_adjust));
         adjustMapper.insertSelective(tax);
 
         //启动审批流

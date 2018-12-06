@@ -101,51 +101,49 @@ public class PosCheckServiceImpl implements IPosCheckService {
      */
     @Override
     public void applyPosCheck(PosCheck posCheck, String userId, String workId) throws ProcessException {
-
         List<PosCheck> posCheckList = checkMapper.selectByAgentId(posCheck.getAgentId());
         for(PosCheck check : posCheckList){
             long startMonth = DateUtil.format(check.getCheckDateS(), "yyyy-MM").getTime();
             long endMonth = DateUtil.format(check.getCheckDateE(), "yyyy-MM").getTime();
             long nowMonth = DateUtil.format(posCheck.getCheckDateS(), "yyyy-MM").getTime();
             if (nowMonth >= startMonth && nowMonth <= endMonth) {
-                System.out.println("考核月份在区间内...更新已存在的数据状态值为无效");
-                check.setCheckStatus(RewardStatus.UN_PASS.getStatus());
+                logger.info("考核月份在区间内...更新已存在的数据状态值为无效");
+                check.setCheckStatus(RewardStatus.UN_PASS.getStatus());//UN_PASS 2:无效
                 checkMapper.updateByPrimaryKeySelective(check);
             }
         }
-        LocalDate date = LocalDate.now();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         posCheck.setId((idService.genId(TabId.p_pos_check)));
-        posCheck.setAppDate(date.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        System.out.println("序列ID---------------------"+idService.genId(TabId.p_pos_check));
+        posCheck.setAppDate(df.format(new Date()));
+        logger.info("序列ID......"+idService.genId(TabId.p_pos_check));
         checkMapper.insertSelective(posCheck);
-//        //启动审批流
-//        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
-//        if (proceId == null) {
-//            PosCheckExample posCheckExample = new PosCheckExample();
-//            posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
-//            checkMapper.deleteByExample(posCheckExample);
-//            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentId());
-//            throw new ProcessException("分润比例考核审批流启动失败!");
-//        }
-//        BusActRel record = new BusActRel();
-//        record.setBusId(posCheck.getId());
-//        record.setActivId(proceId);
-//        record.setcTime(Calendar.getInstance().getTime());
-//        record.setcUser(userId);
-//        record.setBusType(BusActRelBusType.POSCHECK.name());
-//        record.setAgentId(posCheck.getAgentId());
-//        record.setAgentName(posCheck.getAgentName());
-//        try {
-//            taskApprovalService.addABusActRel(record);
-//            logger.info("分润比例考核审批流启动成功");
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//            logger.error("分润比例考核审批流启动失败{}");
-//            throw new ProcessException("分润比例考核审批流启动失败!:{}",e.getMessage());
-//        }
-//        posCheck.setCheckStatus(RewardStatus.REVIEWING.getStatus());   // REVIEWING 0:审核中
-//        checkMapper.updateByPrimaryKeySelective(posCheck);
-
+        //启动审批流
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
+        if (proceId == null) {
+            PosCheckExample posCheckExample = new PosCheckExample();
+            posCheckExample.createCriteria().andIdEqualTo(posCheck.getId());
+            checkMapper.deleteByExample(posCheckExample);
+            logger.error("分润比例考核审批流启动失败，代理商ID：{}", posCheck.getAgentId());
+            throw new ProcessException("分润比例考核审批流启动失败!");
+        }
+        BusActRel record = new BusActRel();
+        record.setBusId(posCheck.getId());
+        record.setActivId(proceId);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(userId);
+        record.setBusType(BusActRelBusType.POSCHECK.name());
+        record.setAgentId(posCheck.getAgentId());
+        record.setAgentName(posCheck.getAgentName());
+        try {
+            taskApprovalService.addABusActRel(record);
+            logger.info("分润比例考核审批流启动成功");
+        } catch (Exception e) {
+            e.getStackTrace();
+            logger.error("分润比例考核审批流启动失败{}");
+            throw new ProcessException("分润比例考核审批流启动失败!:{}",e.getMessage());
+        }
+        posCheck.setCheckStatus(RewardStatus.REVIEWING.getStatus());//REVIEWING 0:审核中
+        checkMapper.updateByPrimaryKeySelective(posCheck);
     }
 
     @Override

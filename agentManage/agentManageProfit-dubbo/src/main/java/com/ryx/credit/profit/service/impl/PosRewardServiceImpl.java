@@ -91,7 +91,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public void applyPosReward(PosReward posReward, String userId, String workId) throws ProcessException {
         posReward.setId((idService.genId(TabId.p_pos_reward)));
-        System.out.println("序列ID---------------------"+idService.genId(TabId.p_pos_reward));
+        logger.info("序列ID......"+idService.genId(TabId.p_pos_reward));
         rewardMapper.insertSelective(posReward);
 
         //启动审批流
