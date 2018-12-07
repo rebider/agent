@@ -3,6 +3,7 @@ package com.ryx.credit.profit.service.impl;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
@@ -982,4 +983,19 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             throw new Exception("请先初始化基础分润数据");
         }
     }
+
+    @Override
+    public PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth) {
+        Long count = profitDetailMonthMapper.queryProfitDetailMonthCount(param);
+        List<Map<String, Object>> list = profitDetailMonthMapper.queryProfitDetailMonthList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
+    }
+
+    @Override
+    public ProfitDetailMonth getByAgentId(String agentId) {
+        return profitDetailMonthMapper.selectByAgentId(agentId);
+    }
+
 }

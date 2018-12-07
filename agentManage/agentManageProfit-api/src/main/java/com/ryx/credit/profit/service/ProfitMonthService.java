@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.*;
 
 import java.math.BigDecimal;
@@ -185,4 +186,8 @@ public interface ProfitMonthService {
      * 初始化Pos奖励明细数据
      */
     void initPosRowardDetail()throws Exception;
+
+    PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth);
+
+    ProfitDetailMonth getByAgentId(String agentId);
 }
