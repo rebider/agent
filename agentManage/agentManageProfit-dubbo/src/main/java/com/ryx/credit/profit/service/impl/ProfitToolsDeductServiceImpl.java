@@ -82,18 +82,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      */
     private Map<String, Object> fristRound(Map<String, Object> map, String agentPid, String computType, List<ProfitDeduction> list) {
         BigDecimal profitSumAmt = new BigDecimal(map.get("agentProfitAmt").toString());
-        Optional<BigDecimal> posOptional = list.parallelStream().filter(profitDeduction1 -> profitDeduction1 != null && Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add);
-        if(posOptional != null && posOptional.isPresent()) {
-            map.put("PosDgMustDeductionAmt", posOptional.get());
-        }
-        Optional<BigDecimal> rhbOptional = list.parallelStream().filter(profitDeduction1 -> profitDeduction1 != null && Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add);
-        if(rhbOptional != null && rhbOptional.isPresent()) {
-            map.put("RhbDgMustDeductionAmt", rhbOptional.get());
-        }
-        Optional<BigDecimal> ZposOptional = list.parallelStream().filter(profitDeduction1 -> profitDeduction1 != null && Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add);
-        if(ZposOptional != null && ZposOptional.isPresent()) {
-            map.put("ZposDgMustDeductionAmt", ZposOptional.get());
-        }
+        list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("PosDgMustDeductionAmt", bigDecimal));
+        list.stream().filter(profitDeduction1 -> Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("RhbDgMustDeductionAmt", bigDecimal));
+        list.stream().filter(profitDeduction1 -> Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("ZposDgMustDeductionAmt", bigDecimal));
         for (ProfitDeduction deduction : list) {
             if(deduction.getMustDeductionAmt().compareTo(deduction.getActualDeductionAmt()) == 0){
                 continue;
@@ -117,18 +108,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                         deduction.getMustDeductionAmt(), deduction.getActualDeductionAmt(), deduction.getNotDeductionAmt());
             }
         }
-        Optional<BigDecimal> posRealOptional = list.parallelStream().filter(profitDeduction1 -> profitDeduction1 != null && Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add);
-        if(posRealOptional != null && posRealOptional.isPresent()) {
-            map.put("PosDgRealDeductionAmt", posRealOptional.get());
-        }
-        Optional<BigDecimal> rhbRealOptional = list.parallelStream().filter(profitDeduction1 -> profitDeduction1 != null && Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add);
-        if(rhbRealOptional != null && rhbRealOptional.isPresent()) {
-            map.put("RhbDgRealDeductionAmt", rhbRealOptional.get());
-        }
-        Optional<BigDecimal> ZposRealOptional = list.parallelStream().filter(profitDeduction1 -> profitDeduction1 != null && Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add);
-        if(ZposRealOptional != null && ZposRealOptional.isPresent()) {
-            map.put("ZposTdRealDeductionAmt", ZposRealOptional.get());
-        }
+        list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("PosDgRealDeductionAmt", bigDecimal));
+        list.stream().filter(profitDeduction1 -> Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("RhbDgRealDeductionAmt", bigDecimal));
+        list.stream().filter(profitDeduction1 -> Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("ZposTdRealDeductionAmt", bigDecimal));
+
         map.put("agentProfitAmt", profitSumAmt);
         LOG.info("机具分润扣款响应参数：{}", map);
         return map;
