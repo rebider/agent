@@ -103,9 +103,13 @@ public class InternetCardServiceImpl implements InternetCardService {
             for (List<Object> object : excelList) {
                 String snNum = "";
                 String iccidNum = "";
-                if(importType.equals(CardImportType.COM.getValue())){
+                if(importType.equals(CardImportType.COM.getValue()) || importType.equals(CardImportType.TY.getValue())
+                   || importType.equals(CardImportType.XDL.getValue()) || importType.equals(CardImportType.XGG.getValue())){
                     snNum = String.valueOf(object.get(0));
                     iccidNum = String.valueOf(object.get(1));
+                }else if(importType.equals(CardImportType.LD.getValue())){
+                    snNum = String.valueOf(object.get(1));
+                    iccidNum = String.valueOf(object.get(2));
                 }
                 if(StringUtils.isBlank(snNum)){
                     throw new MessageException("第"+index+"个sn号为空");
@@ -154,7 +158,9 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
         oInternetCard.setLogisticsDetailId(oLogisticsDetail.getId());
         Agent agent = agentMapper.selectByPrimaryKey(oLogisticsDetail.getAgentId());
-        if(null!=agent)
+        if(agent==null){
+            throw new MessageException("第"+index+"个查询代理商信息失败..");
+        }
         oInternetCard.setAgentName(agent.getAgName());
         OLogistics oLogistics = logisticsMapper.selectByPrimaryKey(oLogisticsDetail.getLogisticsId());
         oInternetCard.setLogisticsId(oLogistics.getId());
