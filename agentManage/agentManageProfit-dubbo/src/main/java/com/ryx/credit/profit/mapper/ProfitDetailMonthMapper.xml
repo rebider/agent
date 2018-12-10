@@ -993,7 +993,7 @@
     +ppd.other_deduction_amt
     +sum(ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt)),0) as profitChargeSum,
     ppd.pos_td_real_deduction_amt, ppd.mpos_td_real_deduction_amt,
-    nvl(sum(ppd.pos_kh_deduction_amt+ppd.mpos_kh_deduction_amt),0) as khDeductionAmt,
+    nvl(sum(ppd.pos_kh_deduction_amt+ppd.mpos_kh_deduction_amt+ppd.pos_reward_deduction_amt),0) as khDeductionAmt,
     ppd.znpos_profit_amt,
     nvl(sum(ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt),0) as toolshargeAmt,
     ppd.other_deduction_amt,
