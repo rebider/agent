@@ -61,6 +61,16 @@ public class TransProfitDetail implements Serializable{
 
     private BigDecimal unlineAmt;
 
+    private String parentAgentName;
+
+    public String getParentAgentName() {
+        return parentAgentName;
+    }
+
+    public void setParentAgentName(String parentAgentName) {
+        this.parentAgentName = parentAgentName;
+    }
+
     public BigDecimal getUnlineAmt() {
         return unlineAmt;
     }

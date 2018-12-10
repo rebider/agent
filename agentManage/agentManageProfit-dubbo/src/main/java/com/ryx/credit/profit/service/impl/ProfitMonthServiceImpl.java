@@ -617,17 +617,18 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         // 其他补款
         profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
         sumAmt = sumAmt.add(profitDetailMonthTemp.getOtherSupplyAmt());
+        //机具返现
+//        profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
+        sumAmt = sumAmt.add(profitDetailMonthTemp.getToolsReturnAmt());
+
         // 考核奖励
         sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt() == null?BigDecimal.ZERO:profitDetailMonthTemp.getPosRewardAmt());
                 //.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt())
         //退单扣款-
         if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
-            long tdkstart = System.currentTimeMillis();
             sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt, computType);
-            long tdkend = System.currentTimeMillis();
-            System.out.println("退单扣款处理时间" + (tdkend - tdkstart));
         }
-        BigDecimal otherAmt = BigDecimal.ZERO;
+//        BigDecimal otherAmt = BigDecimal.ZERO;
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
         param.put("agentId", profitDetailMonthTemp.getAgentId());
@@ -635,57 +636,44 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
         param.put("sourceId", "4");// 罚款
         BigDecimal fk = profitDeductionServiceImpl.otherDeductionByType(param);
-        otherAmt = otherAmt.add(fk);
+//        otherAmt = otherAmt.add(fk);
         sumAmt = sumAmt.subtract(fk);
 
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "5"); // 预发分润
         BigDecimal yfk = profitDeductionServiceImpl.otherDeductionByType(param);
-        otherAmt = otherAmt.add(yfk);
+        profitDetailMonthTemp.setZnposProfitAmt(yfk);
         sumAmt = sumAmt.subtract(yfk);
 
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "1");
         //POS考核扣款（新国都、瑞易送）-
-        long poskstart = System.currentTimeMillis();
-//        profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+        profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
         BigDecimal posk = profitDeductionServiceImpl.otherDeductionByType(param);
-        long poskend = System.currentTimeMillis();
-        System.out.println("pos扣款处理时间" + (poskend - poskstart));
-//        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());
-        otherAmt = otherAmt.add(posk);
-        sumAmt = sumAmt.subtract(posk);
+        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());
+//        otherAmt = otherAmt.add(posk);
 
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "2");
         //手刷考核扣款（小蓝牙、MPOS）-
-        long mposkstart = System.currentTimeMillis();
         BigDecimal mposk = profitDeductionServiceImpl.otherDeductionByType(param);
-//        profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
-        long mposkend = System.currentTimeMillis();
-        System.out.println("mpos扣款处理时间" + (mposkend - mposkstart));
-//        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
-        otherAmt = otherAmt.add(mposk);
-        sumAmt = sumAmt.subtract(mposk);
+        profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
+//        otherAmt = otherAmt.add(mposk);
 
         //保理扣款-
-        long blkstart = System.currentTimeMillis();
         profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentId(), null));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
-        long blkend = System.currentTimeMillis();
-        System.out.println("保理扣款处理时间"+(blkend-blkstart));
 
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "3");
         //其他扣款-
         long qkstart = System.currentTimeMillis();
-//        profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
+        profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
         BigDecimal qt = profitDeductionServiceImpl.otherDeductionByType(param);
-        long qkend = System.currentTimeMillis();
-        System.out.println("其他扣款处理时间" + (qkend - qkstart));
+        profitDetailMonthTemp.setOtherDeductionAmt(qt);
         sumAmt = sumAmt.subtract(qt);
-        otherAmt = otherAmt.add(qt);
-        profitDetailMonthTemp.setOtherDeductionAmt(otherAmt);
+//        otherAmt = otherAmt.add(qt);
 
         // 机具扣款-
         long jkstart = System.currentTimeMillis();
