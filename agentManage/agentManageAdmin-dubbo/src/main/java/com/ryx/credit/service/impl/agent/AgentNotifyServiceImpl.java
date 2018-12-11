@@ -661,7 +661,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
         if(StringUtils.isNotBlank( agentBusInfo.getBusRegion())) {
             String[] split = null;
-            if(agentBusInfo.getBusRegion().equals("0")){
+            String[] busRegion = agentBusInfo.getBusRegion().split(",");
+            Boolean flag = false;
+            for(int i=0;i<busRegion.length;i++){
+                if(busRegion[i].equals("0")){
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag){
                 Set<String> dPosRegions = posRegionMapper.queryNationwide();
                 split = dPosRegions.toArray(new String[]{});
             }else{
