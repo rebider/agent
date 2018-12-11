@@ -394,7 +394,7 @@
     left join o_order oorder on oorder.id =odetail.order_id
     left join a_platform c on c.platform_num = oorder.order_platform
     left join o_payment d on d.order_id = odetail.order_id
-    left join a_agent ag on ag.id = ro.agent_id
+    left join a_agent ag on ag.id = ro.agent_id and ag.status = 1
 
     <include refid="BASE_WHERE_SQL"></include>
   </select>
@@ -418,7 +418,7 @@
     left join o_order oorder on oorder.id =odetail.order_id
     left join a_platform c on c.platform_num = oorder.order_platform
     left join o_payment d on d.order_id = odetail.order_id
-    left join a_agent ag on ag.id = ro.agent_id
+    left join a_agent ag on ag.id = ro.agent_id and ag.status = 1
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />

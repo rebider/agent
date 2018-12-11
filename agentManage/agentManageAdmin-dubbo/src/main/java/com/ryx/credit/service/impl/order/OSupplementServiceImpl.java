@@ -19,6 +19,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -63,9 +64,12 @@ public class OSupplementServiceImpl implements OSupplementService {
     private AgentService agentService;
     @Autowired
     private OCashReceivablesService oCashReceivablesService;
+    @Autowired
+    private IUserService iUserService;
+
 
     @Override
-    public PageInfo selectAll(Page page, OSupplement oSupplement, String time, String userId) {
+    public PageInfo selectAll(Page page, OSupplement oSupplement, String time, String userId,String supplementShrio) {
         Map<String, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(oSupplement.getPkType())) {
             map.put("pkType", oSupplement.getPkType());
@@ -85,8 +89,17 @@ public class OSupplementServiceImpl implements OSupplementService {
             //说明有代理商
             Agent data = (Agent) result.getData();
             map.put("agentId", data.getId());
+        }else{
+            if(StringUtils.isBlank(supplementShrio)){
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                    return null;
+                }
+                Map<String, Object> objectMap = orgCodeRes.get(0);
+                String orgId = String.valueOf(objectMap.get("ORGID"));
+                map.put("orgId",orgId);
+            }
         }
-
 
         List<Map<String, Object>> supplementList = oSupplementMapper.selectAll(map, page);
         for (Map<String, Object> maps : supplementList) {
@@ -94,21 +107,6 @@ public class OSupplementServiceImpl implements OSupplementService {
             maps.put("PAY_METHOD", PayMethod.getPayMethod(String.valueOf(maps.get("PAY_METHOD"))));//付款方式
             maps.put("REVIEW_STATUS", AgStatus.getMsg((BigDecimal) (maps.get("REVIEW_STATUS"))));//审核状态
             maps.put("SCHSTATUS", SchStatus.getMsg((BigDecimal) maps.get("SCHSTATUS")));//补款状态
-            AgentExample agentExample = new AgentExample();
-            AgentExample.Criteria agent = agentExample.createCriteria();
-            agent.andStatusEqualTo(Status.STATUS_1.status);
-
-            String agent_id = String.valueOf(maps.get("AGENT_ID"));
-            if (StringUtils.isNotBlank(agent_id) && !"null".equals(agent_id)) {
-                agent.andIdEqualTo(agent_id);
-                List<Agent> agentList = agentMapper.selectByExample(agentExample);
-                if (1 != agentList.size()) {
-                    return null;
-                }
-                Agent agen = agentList.get(0);
-                if (StringUtils.isNotBlank(agen.getAgName()))
-                    maps.put("AGENT_ID", agen.getAgName());//代理商名称
-            }
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(supplementList);

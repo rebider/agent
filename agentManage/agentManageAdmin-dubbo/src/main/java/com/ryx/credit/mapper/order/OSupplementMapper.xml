@@ -311,44 +311,57 @@
     <select id="selectAll" parameterType="map" resultType="map">
         <include refid="OracleDialectPrefix"/>
         select
-        <include refid="Base_Column_List"/>
-        from O_SUPPLEMENT where STATUS=1
+        o.ID, o.SRC_ID, o.PK_TYPE, o.PAY_METHOD, o.PAY_AMOUNT, o.REAL_PAY_AMOUNT, o.REMARK, o.AGENT_ID, o.C_USER,
+        o.C_TIME, o.REVIEW_STATUS, o.SCHSTATUS, o.STATUS, o.VERSION, o.REMIT_TIME, o.REMIT_PEOPLE, o.CHECK_TIME,
+        o.CHECK_PEOPLE,ag.AG_NAME
+        from O_SUPPLEMENT o left join  a_agent ag on agent_id = ag.id
+        where
+        o.STATUS=1 and ag.status=1
         <if test="map.pkType != null and map.pkType != '' ">
-            and PK_TYPE = #{map.pkType}
+            and o.PK_TYPE = #{map.pkType}
         </if>
         <if test="map.payMethod != null and map.payMethod != '' ">
-            and PAY_METHOD = #{map.payMethod}
+            and o.PAY_METHOD = #{map.payMethod}
         </if>
         <if test="map.reviewStatus != null and map.reviewStatus != '' ">
-            and REVIEW_STATUS = #{map.reviewStatus}
+            and o.REVIEW_STATUS = #{map.reviewStatus}
         </if>
         <if test="map.time != null and map.time != '' ">
-            and to_char(C_TIME,'YYYY-MM-dd')=#{map.time}
+            and to_char(o.C_TIME,'YYYY-MM-dd')=#{map.time}
         </if>
         <if test="map.agentId != null and map.agentId != '' ">
-            and AGENT_ID = #{map.agentId}
+            and o.AGENT_ID = #{map.agentId}
         </if>
-        order by C_TIME desc
+        <if test="map.orgId !=null and map.orgId !='' ">
+            and (ag.AG_DOC_PRO = #{map.orgId} or ag.AG_DOC_DISTRICT = #{map.orgId})
+        </if>
+        order by o.C_TIME desc
         <include refid="OracleDialectSuffix"/>
     </select>
 
     <select id="getCount" parameterType="map" resultType="int">
         select
         count(*)
-        from O_SUPPLEMENT where STATUS=1
+        from O_SUPPLEMENT o left join  a_agent ag on agent_id = ag.id
+        where o.STATUS=1 and ag.status=1
         <if test="map.pkType != null and map.pkType != '' ">
-            and PK_TYPE = #{map.pkType}
+            and o.PK_TYPE = #{map.pkType}
         </if>
         <if test="map.payMethod != null and map.payMethod != '' ">
-            and PAY_METHOD = #{map.payMethod}
+            and o.PAY_METHOD = #{map.payMethod}
         </if>
         <if test="map.reviewStatus != null and map.reviewStatus != '' ">
-            and REVIEW_STATUS = #{map.reviewStatus}
+            and o.REVIEW_STATUS = #{map.reviewStatus}
         </if>
         <if test="map.time != null and map.time != '' ">
-            and to_char(C_TIME,'YYYY-MM-dd')=#{map.time}
+            and to_char(o.C_TIME,'YYYY-MM-dd')=#{map.time}
         </if>
-        order by C_TIME desc
+        <if test="map.agentId != null and map.agentId != '' ">
+            and o.AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.orgId !=null and map.orgId !='' ">
+            and (ag.AG_DOC_PRO = #{map.orgId} or ag.AG_DOC_DISTRICT = #{map.orgId})
+        </if>
     </select>
 
     <select id="selectPayAmout" parameterType="string" resultType="BigDecimal">
