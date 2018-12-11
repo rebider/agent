@@ -394,7 +394,7 @@
     left join o_order oorder on oorder.id =odetail.order_id
     left join a_platform c on c.platform_num = oorder.order_platform
     left join o_payment d on d.order_id = odetail.order_id
-
+    left join a_agent ag on ag.id = ro.agent_id
 
     <include refid="BASE_WHERE_SQL"></include>
   </select>
@@ -418,6 +418,7 @@
     left join o_order oorder on oorder.id =odetail.order_id
     left join a_platform c on c.platform_num = oorder.order_platform
     left join o_payment d on d.order_id = odetail.order_id
+    left join a_agent ag on ag.id = ro.agent_id
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />
@@ -437,6 +438,7 @@
       <if test="beginTime!=null and endTime!=''"> and (to_char(odetail.return_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="agentId !=null and agentId !='' "> and ro.AGENT_ID=#{agentId}</if>
       <if test="agName !=null and agName !='' "> and agent.ag_name like concat(concat( '%', #{agName}),'%')</if>
+      <if test="orgId !=null and orgId !='' ">and (ag.AG_DOC_PRO = #{orgId} or ag.AG_DOC_DISTRICT = #{orgId})</if>
     </where>
   </sql>
 

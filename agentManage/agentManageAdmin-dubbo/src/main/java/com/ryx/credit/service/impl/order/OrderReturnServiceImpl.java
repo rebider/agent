@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.agent.PlatFormService;
@@ -133,10 +134,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private AgentMapper agentMapper;
     @Autowired
     private OActivityMapper oActivityMapper;
-
-
-
-
+    @Autowired
+    private IUserService iUserService;
 
 
     /**
@@ -1180,6 +1179,17 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     @Override
     public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
+        if(StringUtils.isNotBlank(String.valueOf(param.get("agentId"))) || !String.valueOf(param.get("agentId")).equals("null")){
+            if(!String.valueOf(param.get("orderReturn")).equals("all")){
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(param.get("userId").toString()));
+                if(orgCodeRes==null && orgCodeRes.size()!=1){
+                    return null;
+                }
+                Map<String, Object> objectMap = orgCodeRes.get(0);
+                String orgId = String.valueOf(objectMap.get("ORGID"));
+                param.put("orgId",orgId);
+            }
+        }
         Long count = returnOrderMapper.getOrderReturnCount(param);
         List<Map<String, Object>> list = returnOrderMapper.getOrderReturnList(param);
         for (Map<String, Object> stringObjectMap : list) {
@@ -1191,7 +1201,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             if (null!=modelType){
                 stringObjectMap.put("PRO_TYPE",modelType.getdItemname());
             }
-
         }
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
