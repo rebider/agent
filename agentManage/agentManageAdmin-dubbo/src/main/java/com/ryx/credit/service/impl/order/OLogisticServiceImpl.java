@@ -950,7 +950,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
         //排单信息
         ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
         //退货的话调用退货下发
-        if(org.apache.commons.lang.StringUtils.isEmpty(receiptPlan.getReturnOrderDetailId())){
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(receiptPlan.getReturnOrderDetailId())){
            return iOrderReturnService.sendReturnLgcInfoToBusSystem(lgcId,userId);
         }
         OLogisticsDetailExample example = new OLogisticsDetailExample();
