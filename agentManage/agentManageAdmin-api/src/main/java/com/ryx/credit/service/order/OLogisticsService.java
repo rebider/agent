@@ -34,7 +34,7 @@ public interface OLogisticsService {
 
     public int insertImportData(OLogistics oLogistics);
 
-    void updateSnStatus(String orderId, String startSn, String endSn, BigDecimal code, BigDecimal recordStatus,String returnId)throws Exception;
+    int updateSnStatus(String orderId, String startSn, String endSn, BigDecimal code, BigDecimal recordStatus,String returnId)throws Exception;
 
     Map<String, Object> getLogisticsBySn(String sn, String agentId) throws ProcessException;
 

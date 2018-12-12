@@ -515,7 +515,7 @@
    </select>
 
 
-    <update id="updateSnStatus">
+    <update id="updateSnStatus" >
     update o_logistics_detail
      set
         <if test="returnId != null  and returnId !=''">

@@ -35,5 +35,5 @@ public interface OLogisticsMapper {
 
     List<Map<String, Object>> queryLogisticsList(Map<String, Object> param);
 
-    void updateSnStatus(@Param("orderId") String orderId, @Param("startSn") String startSn, @Param("endSn") String endSn, @Param("status") BigDecimal status, @Param("recordStatus") BigDecimal recordStatus,@Param("returnId") String returnId);
+    int updateSnStatus(@Param("orderId") String orderId, @Param("startSn") String startSn, @Param("endSn") String endSn, @Param("status") BigDecimal status, @Param("recordStatus") BigDecimal recordStatus,@Param("returnId") String returnId);
 }
