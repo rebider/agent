@@ -747,6 +747,76 @@ public class BusActRelExample {
             addCriterion("AGENT_NAME not between", value1, value2, "agentName");
             return (Criteria) this;
         }
+
+        public Criteria andNetInBusTypeIsNull() {
+            addCriterion("NET_IN_BUS_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeIsNotNull() {
+            addCriterion("NET_IN_BUS_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeEqualTo(String value) {
+            addCriterion("NET_IN_BUS_TYPE =", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeNotEqualTo(String value) {
+            addCriterion("NET_IN_BUS_TYPE <>", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeGreaterThan(String value) {
+            addCriterion("NET_IN_BUS_TYPE >", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("NET_IN_BUS_TYPE >=", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeLessThan(String value) {
+            addCriterion("NET_IN_BUS_TYPE <", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeLessThanOrEqualTo(String value) {
+            addCriterion("NET_IN_BUS_TYPE <=", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeLike(String value) {
+            addCriterion("NET_IN_BUS_TYPE like", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeNotLike(String value) {
+            addCriterion("NET_IN_BUS_TYPE not like", value, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeIn(List<String> values) {
+            addCriterion("NET_IN_BUS_TYPE in", values, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeNotIn(List<String> values) {
+            addCriterion("NET_IN_BUS_TYPE not in", values, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeBetween(String value1, String value2) {
+            addCriterion("NET_IN_BUS_TYPE between", value1, value2, "netInBusType");
+            return (Criteria) this;
+        }
+
+        public Criteria andNetInBusTypeNotBetween(String value1, String value2) {
+            addCriterion("NET_IN_BUS_TYPE not between", value1, value2, "netInBusType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
