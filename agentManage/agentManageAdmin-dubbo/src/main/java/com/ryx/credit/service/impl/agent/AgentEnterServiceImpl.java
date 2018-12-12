@@ -224,7 +224,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     throw new ProcessException("启动审批异常，更新业务本信息失败");
                 }
             }
-            if(resultSet.size()!=1){
+            if(resultSet.size()>1){
                 throw new ProcessException("不能同时提交pos和手刷平台");
             }
             //代理商有效新建的合同

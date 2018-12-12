@@ -11,6 +11,7 @@ import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -25,23 +26,7 @@ import java.util.List;
 
 public interface IPosCheckService {
 
-    long countByExample(PosCheckExample example);
-
-    int deleteByExample(PosCheckExample example);
-
-    int insert(PosCheck record);
-
-    int insertSelective(PosCheck record);
-
-    List<PosCheck> selectByExample(PosCheckExample example);
-
-    PosCheck selectByPrimaryKey(String id);
-
-    int updateByPrimaryKeySelective(PosCheck record);
-
-    int updateByPrimaryKey(PosCheck record);
-
-    PageInfo PosCheckList(PosCheck record, Page page);
+    PageInfo posCheckList(Map<String, Object> param, PosCheck posCheck, Page page);
 
     /**
      * 分润比例考核申请，进行审批流
@@ -49,7 +34,7 @@ public interface IPosCheckService {
      * @param userId
      * @param workId
      */
-    public void applyPosCheck(PosCheck posCheck, String userId, String workId) throws ProcessException;
+    void applyPosCheck(PosCheck posCheck, String userId, String workId) throws ProcessException;
 
     /**
      * 处理审批任务
@@ -57,14 +42,14 @@ public interface IPosCheckService {
      * @param userId
      * @throws ProcessException
      */
-    public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException;
 
     /**
      * 审批流回调方法
      * @param insid
      * @param status
      */
-    public void completeTaskEnterActivity(String insid, String status);
+    void completeTaskEnterActivity(String insid, String status);
 
     /**
      * 获取分润比例考核信息
@@ -78,12 +63,14 @@ public interface IPosCheckService {
      * @param id
      * @return
      */
-    public List<PosCheck> getPosCheckByDataId(String id);
+    List<PosCheck> getPosCheckByDataId(String id);
 
     /**
      * 审批退回，修改申请信息
      * @param posCheck
      * @throws Exception
      */
-    public void editCheckRegect(PosCheck posCheck)throws Exception;
+    void editCheckRegect(PosCheck posCheck)throws Exception;
+
+    List<PosCheck> exportPosCheck(PosCheck posCheck);
 }

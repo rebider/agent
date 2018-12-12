@@ -233,8 +233,10 @@ public class StagingServiceImpl implements StagingService {
                         LOG.info("1.更新扣款分期状态为审核不通过");
                         deduction.setStagingStatus(DeductionStatus.UN_PASS.getStatus());
                         rel.setStatus(Status.STATUS_3.status);
-                        LOG.info("2.删除分期");
-                        deleteStaging(staging.getId());
+                        LOG.info("2.修改分期状态为失效");
+                        staging.setStatus("0");
+                        updateStagingStatus(staging);
+//                        deleteStaging(staging.getId());
                         LOG.info("3.删除分期明细");
                         deleteStagDetail(staging.getId());
                     }else{
@@ -244,6 +246,7 @@ public class StagingServiceImpl implements StagingService {
 //                    deduction.setRemark(remark);
                     profitDeductionServiceImpl.updateProfitDeduction(deduction);
                     LOG.info("更新审批流与业务对象");
+                    rel.setActivStatus(AgStatus.Approved.name());
                     taskApprovalService.updateABusActRel(rel);
                 }
             }
@@ -274,8 +277,16 @@ public class StagingServiceImpl implements StagingService {
             profitStagingMapper.updateByPrimaryKeySelective(profitStaging);
             // 删除原始分期明细信息
             deleteStagDetail(profitStaging.getId());
-            //新增分析明细
+            //新增分期明细
             splitStaging(profitStaging);
+        }else {
+            throw new StagingException("修改失败。");
+        }
+    }
+
+    private void updateStagingStatus(ProfitStaging profitStaging) {
+        if (StringUtils.isNotBlank(profitStaging.getId())) {
+            profitStagingMapper.updateByPrimaryKeySelective(profitStaging);
         }else {
             throw new StagingException("修改失败。");
         }

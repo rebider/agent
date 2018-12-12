@@ -139,6 +139,26 @@ public class ProfitDetailMonth implements Serializable{
     //已抵税金额
     private BigDecimal smalTaxAmt;
 
+    //新增字段：机具返现、智能POS预发分润扣款
+    private BigDecimal toolsReturnAmt;
+    private BigDecimal znposProfitAmt;
+
+    public BigDecimal getToolsReturnAmt() {
+        return toolsReturnAmt;
+    }
+
+    public void setToolsReturnAmt(BigDecimal toolsReturnAmt) {
+        this.toolsReturnAmt = toolsReturnAmt;
+    }
+
+    public BigDecimal getZnposProfitAmt() {
+        return znposProfitAmt;
+    }
+
+    public void setZnposProfitAmt(BigDecimal znposProfitAmt) {
+        this.znposProfitAmt = znposProfitAmt;
+    }
+
     public BigDecimal getSmalTaxAmt() {
         return smalTaxAmt;
     }

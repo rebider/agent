@@ -27,22 +27,6 @@ import java.util.List;
 
 public interface IPTaxAdjustService {
 
-    long countByExample(PTaxAdjustExample example);
-
-    int deleteByExample(PTaxAdjustExample example);
-
-    int insert(PTaxAdjust record);
-
-    int insertSelective(PTaxAdjust record);
-
-    List<PTaxAdjust> selectByExample(PTaxAdjustExample example);
-
-    PTaxAdjust selectByPrimaryKey(String id);
-
-    int updateByPrimaryKeySelective(PTaxAdjust record);
-
-    int updateByPrimaryKey(PTaxAdjust record);
-
     PageInfo PTaxAdjustList(PTaxAdjust record, Page page);
 
     PTaxAdjust selectByAgentId(String agentId);

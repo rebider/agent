@@ -1,10 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.RewardStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
@@ -58,23 +55,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Autowired
     private PosRewardTemplateMapper templateMapper;
 
-
-    /**
-     * 处理分页用到的信息
-     *
-     * @return
-     */
-    protected Page pageProcessAll(int size) {
-        int numPerPage = size;
-        int currentPage = 1;
-        Page page = new Page();
-        page.setCurrent(currentPage);
-        page.setLength(numPerPage);
-        page.setBegin((currentPage - 1) * numPerPage);
-        page.setEnd(currentPage * numPerPage);
-        return page;
-    }
-
     @Override
     public PageInfo posRewardList(PosReward record, Page page) {
         PosRewardExample example = rewardEqualsTo(record);
@@ -101,48 +81,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
         return posRewardExample;
     }
 
-    @Override
-    public long countByExample(PosRewardExample example) {
-        return rewardMapper.countByExample(example);
-    }
-
-
-
-    @Override
-    public int deleteByExample(PosRewardExample example) {
-        return rewardMapper.deleteByExample(example);
-    }
-
-    @Override
-    public int insert(PosReward record) {
-        return rewardMapper.insert(record);
-    }
-
-    @Override
-    public int insertSelective(PosReward record) {
-        return rewardMapper.insertSelective(record);
-    }
-
-    @Override
-    public List<PosReward> selectByExample(PosRewardExample example) {
-        return rewardMapper.selectByExample(example);
-    }
-
-    @Override
-    public PosReward selectByPrimaryKey(String id) {
-        return rewardMapper.selectByPrimaryKey(id);
-    }
-
-    @Override
-    public int updateByPrimaryKeySelective(PosReward record) {
-        return rewardMapper.updateByPrimaryKeySelective(record);
-    }
-
-    @Override
-    public int updateByPrimaryKey(PosReward record) {
-        return rewardMapper.updateByPrimaryKey(record);
-    }
-
     /**
      * @author: Lihl
      * @desc POS奖励申请调整，进行审批流
@@ -153,7 +91,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public void applyPosReward(PosReward posReward, String userId, String workId) throws ProcessException {
         posReward.setId((idService.genId(TabId.p_pos_reward)));
-        System.out.println("序列ID---------------------"+idService.genId(TabId.p_pos_reward));
+        logger.info("序列ID......"+idService.genId(TabId.p_pos_reward));
         rewardMapper.insertSelective(posReward);
 
         //启动审批流
@@ -229,7 +167,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
                 posReward.setApplyStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
                 rewardMapper.updateByPrimaryKeySelective(posReward);
                 logger.info("2更新审批流与业务对象");
-                rel.setStatus(Status.STATUS_2.status);
+                rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {

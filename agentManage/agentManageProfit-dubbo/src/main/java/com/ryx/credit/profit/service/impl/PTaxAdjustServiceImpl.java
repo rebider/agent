@@ -1,10 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.RewardStatus;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -65,22 +62,6 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     @Autowired
     private AgentService agentService;
 
-    /**
-     * 处理分页用到的信息
-     *
-     * @return
-     */
-    protected Page pageProcessAll(int size) {
-        int numPerPage = size;
-        int currentPage = 1;
-        Page page = new Page();
-        page.setCurrent(currentPage);
-        page.setLength(numPerPage);
-        page.setBegin((currentPage - 1) * numPerPage);
-        page.setEnd(currentPage * numPerPage);
-        return page;
-    }
-
     @Override
     public PageInfo PTaxAdjustList(PTaxAdjust record, Page page) {
         PTaxAdjustExample example = adjustEqualsTo(record);
@@ -93,14 +74,9 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     }
 
     @Override
-    public PTaxAdjust selectByAgentId(String agentId) {
-        return adjustMapper.selectByAgentId(agentId);
-    }
-
-    @Override
     public ResultVO posTaxEnterIn(PTaxAdjust tax) throws ProcessException {
         tax.setId(idService.genId(TabId.p_profit_adjust));
-        System.out.println("序列ID---------------------"+idService.genId(TabId.p_profit_adjust));
+        logger.info("序列ID......"+idService.genId(TabId.p_profit_adjust));
         adjustMapper.insertSelective(tax);
 
         //启动审批流
@@ -168,7 +144,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
                 }
 
                 logger.info("2.更新审批流与业务对象");
-                rel.setStatus(Status.STATUS_2.status);
+                rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
             }
         } catch (Exception e) {
@@ -215,6 +191,11 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
     }
 
     @Override
+    public PTaxAdjust selectByAgentId(String agentId) {
+        return adjustMapper.selectByAgentId(agentId);
+    }
+
+    @Override
     public List<PTaxAdjust> getPosTaxByDataId(String id) {
         if(StringUtils.isNotBlank(id)){
             PTaxAdjustExample taxAdjustExample = new PTaxAdjustExample();
@@ -249,46 +230,5 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         }
         return PTaxAdjustExample;
     }
-
-    @Override
-    public long countByExample(PTaxAdjustExample example) {
-        return adjustMapper.countByExample(example);
-    }
-
-    @Override
-    public int deleteByExample(PTaxAdjustExample example) {
-        return adjustMapper.deleteByExample(example);
-    }
-
-    @Override
-    public int insert(PTaxAdjust record) {
-        return adjustMapper.insert(record);
-    }
-
-    @Override
-    public int insertSelective(PTaxAdjust record) {
-        return adjustMapper.insertSelective(record);
-    }
-
-    @Override
-    public List<PTaxAdjust> selectByExample(PTaxAdjustExample example) {
-        return adjustMapper.selectByExample(example);
-    }
-
-    @Override
-    public PTaxAdjust selectByPrimaryKey(String id) {
-        return adjustMapper.selectByPrimaryKey(id);
-    }
-
-    @Override
-    public int updateByPrimaryKeySelective(PTaxAdjust record) {
-        return adjustMapper.updateByPrimaryKeySelective(record);
-    }
-
-    @Override
-    public int updateByPrimaryKey(PTaxAdjust record) {
-        return adjustMapper.updateByPrimaryKey(record);
-    }
-
 
 }

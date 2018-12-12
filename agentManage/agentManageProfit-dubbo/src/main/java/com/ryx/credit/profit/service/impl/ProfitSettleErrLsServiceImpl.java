@@ -59,6 +59,12 @@ public class ProfitSettleErrLsServiceImpl implements ProfitSettleErrLsService {
     }
 
     @Override
+    public List<ProfitSettleErrLs> getNotSupplyProfitSettleErrLsList(Map<String, Object> param) {
+
+        return profitSettleErrLsMapper.getNotSupplyProfitSettleErrLsList(param);
+    }
+
+    @Override
     public void inset(ProfitSettleErrLs insert) {
          profitSettleErrLsMapper.insert(insert);
 

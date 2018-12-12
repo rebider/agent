@@ -6,36 +6,33 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitSettleErrLs;
 import com.ryx.credit.profit.pojo.ProfitSupply;
-import com.ryx.credit.profit.service.*;
+import com.ryx.credit.profit.service.ProfitDeductionService;
+import com.ryx.credit.profit.service.ProfitSettleErrLsService;
+import com.ryx.credit.profit.service.ProfitSupplyService;
+import com.ryx.credit.profit.service.StagingService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.PosOrganDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author zhaodw
@@ -81,6 +78,9 @@ public class RefundJob {
     @Autowired
     private PosOrganDataService posOrganDataServiceImpl;
 
+    @Autowired
+    private AgentService agentService;
+
     @Scheduled(cron = "0 0 0 1 * ?")
     public void deal() {
         // 上月的开始及结束日期
@@ -118,11 +118,16 @@ public class RefundJob {
 
     private void insertSupplyList(JSONArray array, String bussType) {
         // 获取现有补款数据
-        String supplyDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
         Map<String, BigDecimal> orgMap = new HashMap<>(10);
         Map<String, String> supplyIdMap = new HashMap<>(10);
         LOG.info("对数据汇总并生成补款明细。");
-        insertSettleErrList(array, orgMap, supplyIdMap, null, "2");
+        // 获取现有未扣完数据
+        String supplyDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
+        Map<String, Object> query = new HashMap<>();
+        query.put("supplyDate", supplyDate);
+        query.put("bussType", "02".equals(bussType)?"POS":"MPOS");
+        List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotSupplyProfitSettleErrLsList(query);
+        insertSettleErrList(array, orgMap, supplyIdMap, settleErrLs, "2");
 
         if (orgMap.size() > 0) {
             Set<String> keys = orgMap.keySet();
@@ -437,6 +442,8 @@ public class RefundJob {
         List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), (String)posMap.get("BUS_PLATFORM"), (String)posMap.get("BUS_NUM"));
         if(agentBusInfo != null && !agentBusInfo.isEmpty()){
             posMap.put("parentAgentId", agentBusInfo.get(0).getAgentId());
+            Agent agent = agentService.getAgentById(agentBusInfo.get(0).getAgentId());
+            posMap.put("parentAgentName", agent!= null?agent.getAgName():null);
         }
     }
 }

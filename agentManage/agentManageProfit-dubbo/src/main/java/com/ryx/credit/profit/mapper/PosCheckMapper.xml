@@ -67,8 +67,15 @@
     select 
     <include refid="Base_Column_List" />
     from P_POS_CHECK
-    where ID = #{id,jdbcType=VARCHAR}
+    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
+  <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_POS_CHECK
+    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosCheckExample">
     delete from P_POS_CHECK
     <if test="_parameter != null">
@@ -223,5 +230,24 @@
     <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
+  </sql>
+
+  <select id="exportPosCheck" parameterType="com.ryx.credit.profit.pojo.PosCheck" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_POS_CHECK
+    <include refid="posCheckWhere" />
+    order by APP_DATE desc
+  </select>
+
+  <sql id="posCheckWhere">
+    <where>
+      1=1
+      <if test="agentId != null and agentId !=''"> and AGENT_ID =#{agentId}</if>
+      <if test='null!= agentName and agentName !="" '> AND AGENT_NAME = #{agentName}</if>
+      <if test='null!= checkStatus and checkStatus !="" '> AND CHECK_STATUS = #{checkStatus}</if>
+      <if test='null!= checkDateS and checkDateS !="" '> AND CHECK_DATE_S &gt;= #{checkDateS}</if>
+      <if test='null!= checkDateE and checkDateE !="" '> AND CHECK_DATE_E &lt;= #{checkDateE}</if>
+    </where>
   </sql>
 </mapper>

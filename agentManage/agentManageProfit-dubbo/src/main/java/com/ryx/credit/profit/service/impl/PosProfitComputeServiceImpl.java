@@ -15,6 +15,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author yangmx
@@ -69,7 +72,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
         long khstart = System.currentTimeMillis();
         String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         posRewardSDetailService.deleteCurrentDate(currentDate);
-        TransProfitDetail detail = new TransProfitDetail();
+        Supplier<TransProfitDetail> details = TransProfitDetail::new;
+        TransProfitDetail detail = details.get();
         detail.setProfitDate(currentDate);
         detail.setBusCode(PLATFORM_CODE);
         List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
@@ -140,32 +144,30 @@ public class PosProfitComputeServiceImpl implements DeductService {
         LOG.info("开始扣减机构POS奖励");
         PosRewardDetail posDetatil = new PosRewardDetail();
         posDetatil.setProfitPosDate(currentDate);
-        detailList.parallelStream().forEach(posRewardDetail -> {
-            if(Objects.equals(AGENT_TYPE_2,posRewardDetail.getPosMechanismType())) {
-                List childAgentList = JSONObject.parseObject(posRewardDetail.getChildAgentIdList(), List.class);
-                BigDecimal downReward = BigDecimal.ZERO;
-                if(childAgentList.size() > 0 ){
-                    List<PosRewardDetail> childDetail = posRewardSDetailService.getPosRewardDetailList(posDetatil, null, childAgentList);
-                    for (PosRewardDetail detail1 : childDetail){
-                        downReward = downReward.add(new BigDecimal(detail1.getPosReawrdProfit()));
-                    }
+        List<PosRewardDetail> jgList = detailList.parallelStream().filter(posRewardDetail -> Objects.equals(AGENT_TYPE_2, posRewardDetail.getPosMechanismType())).collect(Collectors.toList());
+        jgList.parallelStream().forEach(posRewardDetail -> {
+            List childAgentList = JSONObject.parseObject(posRewardDetail.getChildAgentIdList(), List.class);
+            BigDecimal downReward = BigDecimal.ZERO;
+            if(childAgentList.size() > 0 ){
+                List<PosRewardDetail> childDetail = posRewardSDetailService.getPosRewardDetailList(posDetatil, null, childAgentList);
+                BigDecimal childDownReward = childDetail.stream().map(s -> new BigDecimal(s.getPosReawrdProfit())).reduce(BigDecimal::add).get();
+                downReward = downReward.add(childDownReward);
+            }
+            LOG.info("代理商唯一码：{}，扣减机构一代POS奖励：{}",posRewardDetail.getPosAgentId(), downReward);
+            if(downReward.compareTo(BigDecimal.ZERO) > 0){
+                PosRewardDetail updateDetail = new PosRewardDetail();
+                updateDetail.setId(posRewardDetail.getId());
+                if(new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) == 0){
+                    return;
+                } else if(new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(downReward) >= 0){
+                    updateDetail.setPosDownReward(downReward.toString());
+                    BigDecimal posReawrdProfit = new BigDecimal(posRewardDetail.getPosReawrdProfit()).subtract(downReward);
+                    updateDetail.setPosReawrdProfit(posReawrdProfit.toString());
+                } else if(downReward.compareTo(new BigDecimal(posRewardDetail.getPosReawrdProfit())) > 0){
+                    updateDetail.setPosDownReward("0");
+                    updateDetail.setPosReawrdProfit("0");
                 }
-                LOG.info("代理商唯一码：{}，扣减机构一代POS奖励：{}",posRewardDetail.getPosAgentId(), downReward);
-                if(downReward.compareTo(BigDecimal.ZERO) > 0){
-                    PosRewardDetail updateDetail = new PosRewardDetail();
-                    updateDetail.setId(posRewardDetail.getId());
-                    if(new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) == 0){
-                        return;
-                    } else if(new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(downReward) >= 0){
-                        updateDetail.setPosDownReward(downReward.toString());
-                        BigDecimal posReawrdProfit = new BigDecimal(posRewardDetail.getPosReawrdProfit()).subtract(downReward);
-                        updateDetail.setPosReawrdProfit(posReawrdProfit.toString());
-                    } else if(downReward.compareTo(new BigDecimal(posRewardDetail.getPosReawrdProfit())) > 0){
-                        updateDetail.setPosDownReward("0");
-                        updateDetail.setPosReawrdProfit("0");
-                    }
-                    posRewardSDetailService.updatePosRewardDetail(updateDetail);
-                }
+                posRewardSDetailService.updatePosRewardDetail(updateDetail);
             }
         });
         LOG.info("扣减机构POS奖励结束");
@@ -216,20 +218,19 @@ public class PosProfitComputeServiceImpl implements DeductService {
         PosRewardDetail queryDetail =  new PosRewardDetail();
         queryDetail.setProfitPosDate(currentDate);
         List<PosRewardDetail> queryList = posRewardSDetailService.getPosRewardDetailList(queryDetail, null, null);
-        queryList.parallelStream().forEach(posRewardDetail -> {
-            if(new BigDecimal(posRewardDetail.getPosCheckDeductAmt()).compareTo(BigDecimal.ZERO) != 0  ||
-                    new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) != 0 ){
-                LOG.info("代理商唯一码：{}，更新基础分润POS奖励信息",posRewardDetail.getPosAgentId());
-                String superAgentId = posRewardSDetailService.getSuperAgentId(posRewardDetail.getPosAgentId());
-                List<ProfitDetailMonth> profitMonth = profitMonthService.getAgentProfit(posRewardDetail.getPosAgentId(),
-                        posRewardDetail.getProfitPosDate(), superAgentId);
-                if(profitMonth != null && !profitMonth.isEmpty()){
-                    ProfitDetailMonth detatil = new ProfitDetailMonth();
-                    detatil.setId(profitMonth.get(0).getId());
-                    detatil.setPosRewardDeductionAmt(new BigDecimal(posRewardDetail.getPosCheckDeductAmt()));
-                    detatil.setPosRewardAmt(new BigDecimal(posRewardDetail.getPosReawrdProfit()));
-                    profitDetailMonthServiceImpl.updateByPrimaryKeySelective(detatil);
-                }
+        List<PosRewardDetail> updateList = queryList.parallelStream().filter(posRewardDetail -> new BigDecimal(posRewardDetail.getPosCheckDeductAmt()).compareTo(BigDecimal.ZERO) != 0 ||
+                new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) != 0).collect(Collectors.toList());
+        updateList.parallelStream().forEach(posRewardDetail -> {
+            LOG.info("代理商唯一码：{}，更新基础分润POS奖励信息",posRewardDetail.getPosAgentId());
+            String superAgentId = posRewardSDetailService.getSuperAgentId(posRewardDetail.getPosAgentId());
+            List<ProfitDetailMonth> profitMonth = profitMonthService.getAgentProfit(posRewardDetail.getPosAgentId(),
+                    posRewardDetail.getProfitPosDate(), superAgentId);
+            if(profitMonth != null && !profitMonth.isEmpty()){
+                ProfitDetailMonth detatil = new ProfitDetailMonth();
+                detatil.setId(profitMonth.get(0).getId());
+                detatil.setPosRewardDeductionAmt(new BigDecimal(posRewardDetail.getPosCheckDeductAmt()));
+                detatil.setPosRewardAmt(new BigDecimal(posRewardDetail.getPosReawrdProfit()));
+                profitDetailMonthServiceImpl.updateByPrimaryKeySelective(detatil);
             }
         });
         LOG.info("更新基础分润中，POS奖励、考核扣款金额，结束");
@@ -333,23 +334,11 @@ public class PosProfitComputeServiceImpl implements DeductService {
         date.add(tranContrastMonth);
         String creditTranContrastMonth = posRewardTemplate.getCreditTranContrastMonth().replaceAll("-", "");
         date.add(creditTranContrastMonth);
-        BigDecimal tranContrastMonthAmt = BigDecimal.ZERO;
-        BigDecimal creditTranContrastMonthAmt = BigDecimal.ZERO;
-        BigDecimal childInTransAmt = BigDecimal.ZERO;
-        BigDecimal childCreditTransAmt = BigDecimal.ZERO;
         List<TransProfitDetail> list = profitDetailMonthServiceImpl.getChildTransProfitDetailList(childAgentList, date, null);
-        if (list != null && !list.isEmpty()) {
-            for (TransProfitDetail detail1 : list) {
-                if(Objects.equals(detail1.getProfitDate(), tranContrastMonth)){
-                    tranContrastMonthAmt = tranContrastMonthAmt.add(detail1.getPosRewardAmt() == null ? BigDecimal.ZERO : detail1.getPosRewardAmt());
-                } else if(Objects.equals(detail1.getProfitDate(), currentDate)) {
-                    childInTransAmt = childInTransAmt.add(detail1.getPosRewardAmt() == null ? BigDecimal.ZERO : detail1.getPosRewardAmt());
-                    childCreditTransAmt = childCreditTransAmt.add(detail1.getPosCreditAmt() == null ? BigDecimal.ZERO : detail1.getPosCreditAmt());
-                } else if(Objects.equals(detail1.getProfitDate(), creditTranContrastMonth)){
-                    creditTranContrastMonthAmt = creditTranContrastMonthAmt.add(detail1.getPosCreditAmt() == null ? BigDecimal.ZERO : detail1.getPosCreditAmt());
-                }
-            }
-        }
+        BigDecimal tranContrastMonthAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1->Objects.equals(detail1.getProfitDate(), tranContrastMonth)).map(TransProfitDetail::getPosRewardAmt).reduce(BigDecimal::add).get(): BigDecimal.ZERO;
+        BigDecimal childInTransAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1->Objects.equals(detail1.getProfitDate(), currentDate)).map(TransProfitDetail::getPosRewardAmt).reduce(BigDecimal::add).get(): BigDecimal.ZERO;
+        BigDecimal childCreditTransAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1->Objects.equals(detail1.getProfitDate(), currentDate)).map(TransProfitDetail::getPosCreditAmt).reduce(BigDecimal::add).get(): BigDecimal.ZERO;
+        BigDecimal creditTranContrastMonthAmt = list != null && !list.isEmpty() ? list.stream().filter(detail1->Objects.equals(detail1.getProfitDate(), creditTranContrastMonth)).map(TransProfitDetail::getPosCreditAmt).reduce(BigDecimal::add).get(): BigDecimal.ZERO;
         LOG.info("代理商唯一码：{}，当月交易总量：{}", posrewardDetail.getPosAgentId(), childInTransAmt);
         LOG.info("代理商唯一码：{}，当月贷记交易总量：{}", posrewardDetail.getPosAgentId(), childCreditTransAmt);
         LOG.info("代理商唯一码：{}，交易对比月：{}，交易对比月交易总量：{}", posrewardDetail.getPosAgentId(), tranContrastMonth, tranContrastMonthAmt);

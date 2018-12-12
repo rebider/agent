@@ -1,8 +1,10 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -82,4 +84,10 @@ public interface ProfitDetailMonthMapper {
     void clearComputData(String profitDate);
 
     List<ProfitDetailMonth> getProfitDetailMonthListByParam(Map<String, Object> param);
+
+    List<Map<String,Object>> queryProfitDetailMonthList(Map<String, Object> param);
+
+    Long queryProfitDetailMonthCount(Map<String, Object> param);
+
+    ProfitDetailMonth selectByAgentId(String agentId);
 }

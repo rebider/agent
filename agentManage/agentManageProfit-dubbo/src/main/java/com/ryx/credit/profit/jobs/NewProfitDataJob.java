@@ -17,6 +17,7 @@ import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.TransProfitDetailService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
+import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.agent.BusinessPlatformService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.profit.IPosProfitDataService;
@@ -71,6 +72,10 @@ public class NewProfitDataJob {
 
     @Autowired
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
+
+    @Autowired
+    private AgentService agentService;
+
     @Autowired
     @Qualifier("posProfitComputeServiceImpl")
     private DeductService posProfitComputeServiceImpl;
@@ -124,8 +129,9 @@ public class NewProfitDataJob {
         transProfitDetail.setAgentId((String)agentMap.get("AGENT_ID"));
         transProfitDetail.setBusNum(profitData.getString("ORG_ID"));
         transProfitDetail.setAgentName((String)agentMap.get("AG_NAME"));
-        transProfitDetail.setParentAgentId((String)agentMap.get("parentAgentPid"));
-        transProfitDetail.setParentBusNum((String)agentMap.get("parentAgentId"));
+        transProfitDetail.setParentAgentId((String)agentMap.get("parentAgentId"));
+        transProfitDetail.setParentBusNum((String)agentMap.get("parentBusNum"));
+        transProfitDetail.setParentAgentName((String)agentMap.get("parentAgentName"));
         transProfitDetail.setProfitDate(settleMonth);
         transProfitDetail.setInTransAmt(profitData.getBigDecimal("TRAN_01_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_01_AMT"));
         transProfitDetail.setOutTransAmt(profitData.getBigDecimal("TRAN_02_AMT")==null?BigDecimal.ZERO:profitData.getBigDecimal("TRAN_02_AMT"));
@@ -248,8 +254,10 @@ public class NewProfitDataJob {
     private void getParentAgentId(Map<String, Object> posMap) throws Exception{
         List<AgentBusInfo> agentBusInfo = agentBusinfoService.queryParenFourLevelBusNum(new ArrayList<AgentBusInfo>(), (String)posMap.get("BUS_PLATFORM"), (String)posMap.get("BUS_NUM"));
         if(agentBusInfo != null && !agentBusInfo.isEmpty()){
-            posMap.put("parentAgentId", agentBusInfo.get(0).getBusNum());
-            posMap.put("parentAgentPid", agentBusInfo.get(0).getAgentId());
+            posMap.put("parentBusNum", agentBusInfo.get(0).getBusNum());
+            posMap.put("parentAgentId", agentBusInfo.get(0).getAgentId());
+            Agent agent = agentService.getAgentById(agentBusInfo.get(0).getAgentId());
+            posMap.put("parentAgentName", agent!= null?agent.getAgName():null);
         }
     }
 }
