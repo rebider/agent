@@ -94,9 +94,10 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         map.put("companyname",agentName);
         map.put("batchIds",platId.toString());
         String params = JsonUtil.objectToJson(map);
+        log.info("======mPos_updateAgName:{}",params);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.upAgName"),params);
-        log.debug(res);
+        log.info("======mPos_updateAgName结果:{}",res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
             AppConfig.sendEmails("代理商更名失败","代理商更名失败");

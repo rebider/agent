@@ -961,7 +961,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
-                System.out.println("请求异常======" + httpResult);
+                 log.info("请求异常======" + httpResult);
                 throw new Exception("http请求异常");
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
@@ -977,13 +977,13 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 String resSignData = jsonObject.getString("signData");
                 byte[] signBytes = Base64.decodeBase64(resSignData);
                 if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
-                    System.out.println("签名验证失败");
+                     log.info("签名验证失败");
                 } else {
-                    System.out.println("签名验证成功");
+                     log.info("签名验证成功");
                     if (respXML.contains("data") && respXML.contains("orgId")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                        System.out.println(dataObj);
+                         log.info(dataObj.toJSONString());
                         return AgentResult.ok(dataObj);
                     }else{
                         log.info("http请求超时返回错误:{}",httpResult);
@@ -1032,7 +1032,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if (httpResult.contains("data") && httpResult.contains("orgId")){
                 JSONObject respXMLObj = JSONObject.parseObject(httpResult);
                 JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                System.out.println(dataObj);
+                 log.info(dataObj.toJSONString());
                 return AgentResult.ok(dataObj);
             }else{
                 log.info("http请求超时返回错误:{}",httpResult);
