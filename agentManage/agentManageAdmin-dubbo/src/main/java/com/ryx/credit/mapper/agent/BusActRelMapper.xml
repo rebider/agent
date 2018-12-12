@@ -11,6 +11,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="NET_IN_BUS_TYPE" jdbcType="VARCHAR" property="netInBusType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -42,7 +43,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ACTIV_ID, BUS_ID, BUS_TYPE, C_TIME, C_USER, ACTIV_STATUS, STATUS, AGENT_ID, AGENT_NAME
+    ACTIV_ID, BUS_ID, BUS_TYPE, C_TIME, C_USER, ACTIV_STATUS, STATUS, AGENT_ID, AGENT_NAME,
+    NET_IN_BUS_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.BusActRelExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -76,12 +78,12 @@
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
     insert into A_BUS_ACT_REL (ACTIV_ID, BUS_ID, BUS_TYPE,
     C_TIME, C_USER, ACTIV_STATUS,
-    STATUS, AGENT_ID, AGENT_NAME
-    )
+    STATUS, AGENT_ID, AGENT_NAME,
+    NET_IN_BUS_TYPE)
     values (#{activId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{activStatus,jdbcType=VARCHAR},
-    #{status,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}
-    )
+    #{status,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+    #{netInBusType,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.BusActRel">
     insert into A_BUS_ACT_REL
@@ -113,6 +115,9 @@
       <if test="agentName != null">
         AGENT_NAME,
       </if>
+      <if test="netInBusType != null">
+        NET_IN_BUS_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="activId != null">
@@ -141,6 +146,9 @@
       </if>
       <if test="agentName != null">
         #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="netInBusType != null">
+        #{netInBusType,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -174,6 +182,9 @@
       <if test="agentName != null">
         AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       </if>
+      <if test="netInBusType != null">
+        NET_IN_BUS_TYPE = #{netInBusType,jdbcType=VARCHAR},
+      </if>
     </set>
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
     and BUS_ID = #{busId,jdbcType=VARCHAR}
@@ -186,7 +197,8 @@
     ACTIV_STATUS = #{activStatus,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
     AGENT_ID = #{agentId,jdbcType=VARCHAR},
-    AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    NET_IN_BUS_TYPE = #{netInBusType,jdbcType=VARCHAR}
     where ACTIV_ID = #{activId,jdbcType=VARCHAR}
     and BUS_ID = #{busId,jdbcType=VARCHAR}
   </update>

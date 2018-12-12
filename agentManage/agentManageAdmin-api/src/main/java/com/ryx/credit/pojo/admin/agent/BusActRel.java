@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class BusActRel extends BusActRelKey implements Serializable {
+public class BusActRel extends BusActRelKey implements Serializable{
     private String busType;
 
     private Date cTime;
@@ -18,6 +18,8 @@ public class BusActRel extends BusActRelKey implements Serializable {
     private String agentId;
 
     private String agentName;
+
+    private String netInBusType;
 
     public String getBusType() {
         return busType;
@@ -64,7 +66,7 @@ public class BusActRel extends BusActRelKey implements Serializable {
     }
 
     public void setAgentId(String agentId) {
-        this.agentId = agentId;
+        this.agentId = agentId == null ? null : agentId.trim();
     }
 
     public String getAgentName() {
@@ -72,6 +74,14 @@ public class BusActRel extends BusActRelKey implements Serializable {
     }
 
     public void setAgentName(String agentName) {
-        this.agentName = agentName;
+        this.agentName = agentName == null ? null : agentName.trim();
+    }
+
+    public String getNetInBusType() {
+        return netInBusType;
+    }
+
+    public void setNetInBusType(String netInBusType) {
+        this.netInBusType = netInBusType == null ? null : netInBusType.trim();
     }
 }

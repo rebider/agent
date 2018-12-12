@@ -9,8 +9,6 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.COrganizationMapper;
-import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.AssProtoColMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
@@ -21,7 +19,6 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
-import com.ryx.credit.service.dict.RegionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +74,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private AssProtoColMapper assProtoColMapper;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
 
     /**
      * 商户入网
@@ -274,12 +273,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             record.setActivStatus(AgStatus.Approving.name());
             record.setAgentId(agent.getId());
             record.setAgentName(agent.getAgName());
+            AgentBusInfo agentBusInfo = aginfo.get(0);
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+            record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}", agentId, proce);
             }
-
             return ResultVO.success(null);
-
     }
 
 
@@ -373,6 +373,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agent.getId());
         record.setAgentName(agent.getAgName());
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
+        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商业务启动审批异常，添加审批关系失败{}:{}", record.getBusId(), proce);
         }
