@@ -369,7 +369,7 @@
 
     <select id="getOLogisticsList" parameterType="java.util.Map" resultType="java.util.Map">
         <include refid="PAGING_START" />
-        SELECT  L.SEND_NUM as sendnum,
+        SELECT  L.SEND_NUM as sendnum, L.ID AS O_LOGISTICS_ID,
         L.SEND_NUM * L.PRO_PRICE as proPrice,L.PRO_PRICE,
         R.PLAN_NUM,R.PLAN_ORDER_STATUS,R.ORDER_ID,R.PRO_COM,R.PLAN_PRO_NUM,R.SEND_PRO_NUM,L.SEND_NUM AS O_LOGISTICS_SEND_NUM,
         R.MODEL,R.SEND_DATE,R.REAL_SEND_DATE,R.RETURN_ORDER_DETAIL_ID,

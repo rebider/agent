@@ -11,7 +11,9 @@ import com.ryx.credit.dao.order.OInternetCardMapper;
 import com.ryx.credit.dao.order.OLogisticsDetailMapper;
 import com.ryx.credit.dao.order.OLogisticsMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.InternetCardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +48,8 @@ public class InternetCardServiceImpl implements InternetCardService {
     private IdService idService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
 
     @Override
@@ -57,7 +61,11 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCardExample.setPage(page);
         oInternetCardExample.setOrderByClause(" c_time desc ");
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
-
+        for (OInternetCard oInternetCard : oInternetCards) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getProCom());
+            if(null!=dict)
+            oInternetCard.setProCom(dict.getdItemname());
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(oInternetCards);
         pageInfo.setTotal((int)internetCardMapper.countByExample(oInternetCardExample));
@@ -71,13 +79,18 @@ public class InternetCardServiceImpl implements InternetCardService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
 
         List<OInternetCard> oInternetCards = internetCardMapper.selectByExample(oInternetCardExample);
+        for (OInternetCard oInternetCard : oInternetCards) {
+            Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(),oInternetCard.getProCom());
+            if(null!=dict)
+            oInternetCard.setProCom(dict.getdItemname());
+        }
         return oInternetCards;
     }
 
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
-    public void importInternetCard(List<List<Object>> excelList, String importType)throws Exception{
+    public void importInternetCard(List<List<Object>> excelList, String importType, String userId)throws Exception{
 
         if(StringUtils.isBlank(CardImportType.getContentByValue(importType))){
              throw new MessageException("导入类型错误");
@@ -90,9 +103,13 @@ public class InternetCardServiceImpl implements InternetCardService {
             for (List<Object> object : excelList) {
                 String snNum = "";
                 String iccidNum = "";
-                if(importType.equals(CardImportType.COM.getValue())){
+                if(importType.equals(CardImportType.COM.getValue()) || importType.equals(CardImportType.TY.getValue())
+                   || importType.equals(CardImportType.XDL.getValue()) || importType.equals(CardImportType.XGG.getValue())){
                     snNum = String.valueOf(object.get(0));
                     iccidNum = String.valueOf(object.get(1));
+                }else if(importType.equals(CardImportType.LD.getValue())){
+                    snNum = String.valueOf(object.get(1));
+                    iccidNum = String.valueOf(object.get(2));
                 }
                 if(StringUtils.isBlank(snNum)){
                     throw new MessageException("第"+index+"个sn号为空");
@@ -100,7 +117,7 @@ public class InternetCardServiceImpl implements InternetCardService {
                 if(StringUtils.isBlank(iccidNum)){
                     throw new MessageException("第"+index+"个iccid号为空");
                 }
-                importCard(index,snNum,iccidNum);
+                importCard(index,snNum,iccidNum,userId);
             }
         }catch (MessageException e) {
             e.printStackTrace();
@@ -112,7 +129,7 @@ public class InternetCardServiceImpl implements InternetCardService {
     }
 
 
-    public void importCard(int index,String snNum,String iccidNum)throws Exception{
+    public void importCard(int index,String snNum,String iccidNum,String userId)throws Exception{
         OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
         OLogisticsDetailExample.Criteria LogisticsDetailCriteria = oLogisticsDetailExample.createCriteria();
         LogisticsDetailCriteria.andSnNumEqualTo(snNum);
@@ -139,22 +156,27 @@ public class InternetCardServiceImpl implements InternetCardService {
         oInternetCard.setSnNum(snNum);
         oInternetCard.setIccidNum(iccidNum);
         oInternetCard.setAgentId(oLogisticsDetail.getAgentId());
-        oInternetCard.setDebtAmt(new BigDecimal(0));
         oInternetCard.setLogisticsDetailId(oLogisticsDetail.getId());
-        oInternetCard.setcTime(new Date());
-        oInternetCard.setuTime(new Date());
-        oInternetCard.setVersion(Status.STATUS_0.status);
-        oInternetCard.setStatus(Status.STATUS_1.status);
-        oInternetCard.setCardStatus(CardStatus.WZ.getValue());
         Agent agent = agentMapper.selectByPrimaryKey(oLogisticsDetail.getAgentId());
-        if(null!=agent)
+        if(agent==null){
+            throw new MessageException("第"+index+"个查询代理商信息失败..");
+        }
         oInternetCard.setAgentName(agent.getAgName());
         OLogistics oLogistics = logisticsMapper.selectByPrimaryKey(oLogisticsDetail.getLogisticsId());
         oInternetCard.setLogisticsId(oLogistics.getId());
         oInternetCard.setProCom(oLogistics.getProCom());
-
+        oInternetCard.setuTime(new Date());
+        oInternetCard.setuUser(userId);
         if(oInternetCards.size()==0) {
+            oInternetCard.setDebtAmt(new BigDecimal(0));
+            oInternetCard.setcTime(new Date());
+            oInternetCard.setVersion(Status.STATUS_0.status);
+            oInternetCard.setStatus(Status.STATUS_1.status);
+            oInternetCard.setCardStatus(CardStatus.WZ.getValue());
             oInternetCard.setId(idService.genId(TabId.O_INTERNET_CARD));
+            oInternetCard.setcUser(userId);
+            oInternetCard.setExceedFlow("0");
+            oInternetCard.setExceedFlowUnit(ExceedFlowUnit.M.getValue());
             internetCardMapper.insert(oInternetCard);
         }else{
             OInternetCard internetCard = oInternetCards.get(0);

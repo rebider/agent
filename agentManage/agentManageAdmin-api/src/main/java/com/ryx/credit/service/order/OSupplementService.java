@@ -26,7 +26,7 @@ public interface OSupplementService {
      * @param time
      * @return
      */
-    PageInfo selectAll(Page page, OSupplement oSupplement, String time,String userId);
+    PageInfo selectAll(Page page, OSupplement oSupplement, String time,String userId,String supplementShrio);
 
     /**
      * 查询补款详情

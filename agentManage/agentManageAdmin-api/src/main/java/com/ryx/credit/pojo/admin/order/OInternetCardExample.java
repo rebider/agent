@@ -1197,6 +1197,146 @@ public class OInternetCardExample {
             addCriterion("STATUS not between", value1, value2, "status");
             return (Criteria) this;
         }
+
+        public Criteria andCUserIsNull() {
+            addCriterion("C_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserIsNotNull() {
+            addCriterion("C_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserEqualTo(String value) {
+            addCriterion("C_USER =", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotEqualTo(String value) {
+            addCriterion("C_USER <>", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserGreaterThan(String value) {
+            addCriterion("C_USER >", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserGreaterThanOrEqualTo(String value) {
+            addCriterion("C_USER >=", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserLessThan(String value) {
+            addCriterion("C_USER <", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserLessThanOrEqualTo(String value) {
+            addCriterion("C_USER <=", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserLike(String value) {
+            addCriterion("C_USER like", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotLike(String value) {
+            addCriterion("C_USER not like", value, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserIn(List<String> values) {
+            addCriterion("C_USER in", values, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotIn(List<String> values) {
+            addCriterion("C_USER not in", values, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserBetween(String value1, String value2) {
+            addCriterion("C_USER between", value1, value2, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andCUserNotBetween(String value1, String value2) {
+            addCriterion("C_USER not between", value1, value2, "cUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserIsNull() {
+            addCriterion("U_USER is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserIsNotNull() {
+            addCriterion("U_USER is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserEqualTo(String value) {
+            addCriterion("U_USER =", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotEqualTo(String value) {
+            addCriterion("U_USER <>", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserGreaterThan(String value) {
+            addCriterion("U_USER >", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserGreaterThanOrEqualTo(String value) {
+            addCriterion("U_USER >=", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserLessThan(String value) {
+            addCriterion("U_USER <", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserLessThanOrEqualTo(String value) {
+            addCriterion("U_USER <=", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserLike(String value) {
+            addCriterion("U_USER like", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotLike(String value) {
+            addCriterion("U_USER not like", value, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserIn(List<String> values) {
+            addCriterion("U_USER in", values, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotIn(List<String> values) {
+            addCriterion("U_USER not in", values, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserBetween(String value1, String value2) {
+            addCriterion("U_USER between", value1, value2, "uUser");
+            return (Criteria) this;
+        }
+
+        public Criteria andUUserNotBetween(String value1, String value2) {
+            addCriterion("U_USER not between", value1, value2, "uUser");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

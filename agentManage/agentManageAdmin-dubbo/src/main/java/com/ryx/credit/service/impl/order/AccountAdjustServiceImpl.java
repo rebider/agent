@@ -136,7 +136,10 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     //计算此付款单可抵扣金额
                     BigDecimal thisPaymentOutstandingAmt = BigDecimal.ZERO;
                     for (OPaymentDetail oneDetail : oPaymentDetails) {
-                        thisPaymentOutstandingAmt = thisPaymentOutstandingAmt.add(oneDetail.getPayAmount());
+                        //已付款
+                        BigDecimal realpay = oneDetail.getRealPayAmount();
+                        //欠款减去已付款
+                        thisPaymentOutstandingAmt = thisPaymentOutstandingAmt.add(oneDetail.getPayAmount().subtract(realpay==null?new BigDecimal(0):realpay));
                     }
                     //=================剩余退款金额可大于当前循环订单欠款======================
                     if (thisPaymentOutstandingAmt.compareTo(leftAmt) <= 0) {

@@ -61,4 +61,13 @@ public interface IOrderReturnService {
     AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail);
 
     Map selectByReturnDeId(String returnDetailsId);
+
+    /**
+     * 退货发货
+     * @param lgcId
+     * @param userId
+     * @return
+     * @throws Exception
+     */
+    public AgentResult sendReturnLgcInfoToBusSystem(String lgcId,String userId)throws Exception ;
 }

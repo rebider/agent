@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.IOrderReturnService;
 import com.ryx.credit.service.order.OLogisticsService;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.zookeeper.data.Stat;
@@ -76,6 +77,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private OLogisticsService oLogisticsService;
     @Autowired
     private OActivityMapper oActivityMapper;
+    @Autowired
+    private IOrderReturnService iOrderReturnService;
 
     /**
      * 物流信息:
@@ -925,5 +928,155 @@ public class OLogisticServiceImpl implements OLogisticsService {
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
         return pageInfo;
+    }
+
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult sendLgcInfoToBusSystem(String lgcId,String userId)throws Exception {
+        OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(lgcId);
+        if(logistics.getSendStatus()!=null){
+            if(logistics.getSendStatus().compareTo(Status.STATUS_2.status)!=0){
+                return AgentResult.fail("只发送联动失败的物流");
+            }
+        }
+        //排单信息
+        ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
+        //退货的话调用退货下发
+        if(org.apache.commons.lang.StringUtils.isEmpty(receiptPlan.getReturnOrderDetailId())){
+           return iOrderReturnService.sendReturnLgcInfoToBusSystem(lgcId,userId);
+        }
+        OLogisticsDetailExample example = new OLogisticsDetailExample();
+        example.or().andLogisticsIdEqualTo(logistics.getId()).andRecordStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
+        List<OLogisticsDetail>  listDetails = oLogisticsDetailMapper.selectByExample(example);
+        if(listDetails.size()<=0){
+            return AgentResult.fail("物流明细为空");
+        }
+        if(listDetails.size()!=logistics.getSendNum().intValue()){
+            logger.info("物流下发发货数量不匹配");
+            return AgentResult.fail("物流下发发货数量不匹配");
+        }
+        if (!logistics.getProType().equals(PlatformType.MPOS.msg) && !logistics.getProType().equals(PlatformType.MPOS.code)){
+            List<String> ids = new ArrayList<>();
+            for (OLogisticsDetail listDetail : listDetails) {
+                ids.add(listDetail.getSnNum());
+            }
+            OLogisticsDetail detail = listDetails.get(0);
+            ImsTermWarehouseDetail imsTermWarehouseDetail = new ImsTermWarehouseDetail();
+            OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
+            if (null==oOrder) {
+                throw new MessageException("查询订单数据失败！");
+            }
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+            if (null==agentBusInfo) {
+                throw new MessageException("查询业务数据失败！");
+            }
+            imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
+            imsTermWarehouseDetail.setMachineId(detail.getBusProCode());
+            try {
+                //机具下发接口
+                AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(ids,imsTermWarehouseDetail);
+                if(posSendRes.isOK()){
+                    logistics.setSendMsg(posSendRes.getMsg());
+                    logistics.setSendStatus(Status.STATUS_1.status);
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                        logger.info("pos下发物流更新失败STATUS_1成功{}",JSONObject.toJSONString(logistics));
+                    }
+                    return AgentResult.ok();
+                }else{
+                    logistics.setSendMsg(posSendRes.getMsg());
+                    logistics.setSendStatus(Status.STATUS_2.status);
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                        logger.info("pos下发物流更新失败STATUS_2失败{}",JSONObject.toJSONString(logistics));
+                    }
+                    return AgentResult.fail(posSendRes.getMsg());
+                }
+            } catch (MessageException e) {
+                e.printStackTrace();
+                logistics.setSendMsg(e.getMsg());
+                logistics.setSendStatus(Status.STATUS_2.status);
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                    logger.info("pos下发物流更新失败MessageException{}",JSONObject.toJSONString(logistics));
+                }
+                return AgentResult.fail(e.getMsg());
+            }catch (Exception e){
+                e.printStackTrace();
+                logistics.setSendMsg("下发异常");
+                logistics.setSendStatus(Status.STATUS_2.status);
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                    logger.info("pos下发物流更新失败Exception{}",JSONObject.toJSONString(logistics));
+                }
+                return AgentResult.fail(e.getLocalizedMessage());
+            }
+            //首刷下发业务系统
+        }else{
+            OOrder oOrder = oOrderMapper.selectByPrimaryKey(logistics.getOrderId());
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+            //起始sn
+            OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
+            exampleOLogisticsDetailExamplestart.or().andSnNumEqualTo(logistics.getSnBeginNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+            List<OLogisticsDetail> logisticsDetailsstart = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
+            OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+            //结束sn
+            OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
+            exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(logistics.getSnEndNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+            List<OLogisticsDetail> logisticsDetailsend = oLogisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
+            OLogisticsDetail detailend = logisticsDetailsend.get(0);
+
+            //sn号码段
+            LowerHairMachineVo lowerHairMachineVo = new LowerHairMachineVo();
+            lowerHairMachineVo.setBusNum(agentBusInfo.getBusNum());
+            lowerHairMachineVo.setOptUser(userId);
+            lowerHairMachineVo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
+            lowerHairMachineVo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
+            lowerHairMachineVo.setoLogisticsId(logistics.getId());
+            //sn明细
+            List<MposSnVo> listSn = new ArrayList<MposSnVo>();
+            for (OLogisticsDetail forsendSn : listDetails) {
+                listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
+                        ,forsendSn.getSnNum()+forsendSn.getTerminalidCheck()
+                        ,forsendSn.getTerminalidKey()
+                        ,forsendSn.getBusProCode()
+                        ,forsendSn.getTermtype()));
+            }
+            lowerHairMachineVo.setListSn(listSn);
+            //机具下发接口
+            OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
+            try {
+                AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
+                logger.info("导入物流：下发到首刷平台结果:{}",lowerHairMachineRes.getMsg());
+                if(lowerHairMachineRes.isOK()) {
+                    logistics_send.setSendStatus(Status.STATUS_1.status);
+                    logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                        logger.info("pos下发物流更新记录STATUS_1失败{}",JSONObject.toJSONString(logistics));
+                    }
+                    return AgentResult.ok();
+                }else{
+                    logistics_send.setSendStatus(Status.STATUS_2.status);
+                    logistics_send.setSendMsg(lowerHairMachineRes.getMsg());
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                        logger.info("pos下发物流更新记录STATUS_2失败{}",JSONObject.toJSONString(logistics));
+                    }
+                    return AgentResult.fail(lowerHairMachineRes.getMsg());
+                }
+            }catch (MessageException e) {
+                e.printStackTrace();
+                logistics_send.setSendStatus(Status.STATUS_2.status);
+                logistics_send.setSendMsg(e.getMsg());
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                    logger.info("pos下发物流更新记录MessageException失败{}",JSONObject.toJSONString(logistics));
+                }
+                return AgentResult.fail(e.getMsg());
+            } catch (Exception e) {
+                e.printStackTrace();
+                logistics_send.setSendStatus(Status.STATUS_2.status);
+                logistics_send.setSendMsg("下发异常");
+                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics_send)){
+                    logger.info("pos下发物流更新记录Exception失败{}",JSONObject.toJSONString(logistics));
+                }
+                return AgentResult.fail(e.getLocalizedMessage());
+            }
+        }
     }
 }

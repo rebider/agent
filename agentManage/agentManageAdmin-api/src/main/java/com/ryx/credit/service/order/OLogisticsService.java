@@ -42,4 +42,12 @@ public interface OLogisticsService {
     public List<String> addSn(List<List<String>>  data, String user)throws Exception;
 
     PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo);
+
+
+    /**
+     * 发送物流到业务系统
+     * @param lgcId
+     * @return
+     */
+    public AgentResult sendLgcInfoToBusSystem(String lgcId,String userId)throws Exception;
 }

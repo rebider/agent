@@ -1,28 +1,26 @@
 package com.ryx.credit.common.enumc;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 导入类型
+ * 物联网卡流量单位
  * @version V1.0
  * @Description:
  * @author: Liudh
  * @date: 2018/12/4 18:11
  */
-public enum CardImportType {
+public enum ExceedFlowUnit {
 
-    XGG("1","新国都"),
-    TY("2","天瑜"),
-    LD("3","联迪"),
-    XDL("4","新大陆"),
-    COM("5","通用");
+    M("1","M"),
+    G("2","G");
 
     public String code;
 
     public String msg;
 
-    CardImportType(String c, String m){
+    ExceedFlowUnit(String c, String m){
         this.code=c;
         this.msg =m;
     }
@@ -48,8 +46,8 @@ public enum CardImportType {
      * @return
      */
     public static String getContentByValue(String value){
-        CardImportType[] status = CardImportType.values();
-        for(CardImportType cc : status){
+        ExceedFlowUnit[] status = ExceedFlowUnit.values();
+        for(ExceedFlowUnit cc : status){
             if(cc.code.equals(value)){
                 return cc.msg;
             }
@@ -59,8 +57,8 @@ public enum CardImportType {
 
     public static Map<String, Object> getSelectMap(){
         Map<String, Object> resultMap = new HashMap<>();
-        CardImportType[] status = CardImportType.values();
-        for(CardImportType cc : status){
+        ExceedFlowUnit[] status = ExceedFlowUnit.values();
+        for(ExceedFlowUnit cc : status){
             resultMap.put(cc.code,cc.msg);
         }
         return resultMap;
