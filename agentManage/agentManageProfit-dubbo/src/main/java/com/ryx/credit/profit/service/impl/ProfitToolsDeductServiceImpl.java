@@ -45,9 +45,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     private static final String POS = "100003";
     private static final String ZPOS = "100002";
 
-    /**
-     * 代理商分润不足，扣减了担保代理商的分润
-     */
     @Override
     public Map<String, Object> execut(Map<String, Object> map) throws Exception {
         LOG.info("机具分润扣款请求参数：{}", map);
@@ -75,11 +72,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         return map;
     }
 
-    /**
-     * 1、代理商基础分润充足，优先扣除自己的分润，能扣多少算多少
-     * 2、分润不足，不存在担保代理商，则记录未扣足部分机具款
-     * 3、有担保代理商，不足部分从担保代理商list的基础分润一条条的扣
-     */
     private Map<String, Object> fristRound(Map<String, Object> map, String agentPid, String computType, List<ProfitDeduction> list) {
         BigDecimal profitSumAmt = new BigDecimal(map.get("agentProfitAmt").toString());
         list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal-> map.put("PosDgMustDeductionAmt", bigDecimal));
@@ -165,11 +157,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         }
     }
 
-    /**
-     * 先扣掉代理商还剩的分润，然后在从担保代理商扣
-     */
     private void deduceParentAgent(ProfitDeduction profitDeduction, BigDecimal mustAmt, String computType){
-        LOG.info("机具扣款流水号：{}，代理商唯一码：{}，汇总分润不足，担保代理商需代扣金额：{}",
+        LOG.info("机具扣款流水号：{}，代理商唯一码：{}，汇总分润不足：{}",
                 profitDeduction.getSourceId(), profitDeduction.getAgentId(), mustAmt);
         List<ProfitDetailMonth> profitMonth = profitMonthService.getAgentProfit(profitDeduction.getParentAgentId(),
                 profitDeduction.getDeductionDate().replaceAll("-", ""), null);
@@ -196,20 +185,14 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 }
             } catch (Exception e){e.printStackTrace();}
         } else {
-            LOG.info("机具扣款流水号：{}，代理商唯一码：{}，未查询到担保代理商月分润信息，扣除基础分润金额：{}，未扣足金额：{}",
-                    profitDeduction.getSourceId(), profitDeduction.getAgentId(), profitDeduction.getActualDeductionAmt(), mustAmt);
-            try {
+           try {
                 profitDeduction.setNotDeductionAmt(mustAmt);
                 this.updateDeductionInfo(profitDeduction, computType);
             } catch (Exception e){e.printStackTrace();}
         }
     }
 
-    /**
-     * 担保代理商扣减基础分润，增加担保代理商的应扣与实扣
-     * @param profitDeductionList
-     * @param profitMonth
-     */
+
     private BigDecimal deductParentAgentProfit(ProfitDeduction profitDeductionList, ProfitDetailMonth profitMonth, String computType, BigDecimal mustNotDeductionAmt) {
         BigDecimal parentBasicsProfitAmt = profitMonth.getBasicsProfitAmt();
         BigDecimal deductionAmt = BigDecimal.ZERO;
@@ -234,12 +217,6 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         return deductionAmt;
     }
 
-    /**
-     * 核算担保代理的各款项扣款累计
-     * @param profitDetailMonth
-     * @param dudecutAmt
-     * @param paltformNo
-     */
     private ProfitDetailMonth updateProfitMonth(ProfitDetailMonth profitDetailMonth, BigDecimal dudecutAmt, String paltformNo){
         if(Objects.equals(POS, paltformNo)){
             BigDecimal posMuust = profitDetailMonth.getPosDgMustDeductionAmt() == null ? BigDecimal.ZERO : profitDetailMonth.getPosDgMustDeductionAmt();
