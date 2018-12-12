@@ -79,6 +79,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
     private OActivityMapper oActivityMapper;
     @Autowired
     private IOrderReturnService iOrderReturnService;
+    @Autowired
+    private OReturnOrderMapper returnOrderMapper;
+    @Autowired
+    private OReturnOrderDetailMapper oReturnOrderDetailMapper;
 
     /**
      * 物流信息:
@@ -700,8 +704,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * @Date: 20:18 2018/8/3
      */
     @Override
-    public void updateSnStatus(String orderId, String startSn, String endSn, BigDecimal status, BigDecimal recordStatus,String returnId) throws Exception {
-        oLogisticsMapper.updateSnStatus(orderId, startSn, endSn, status, recordStatus,returnId);
+    public int updateSnStatus(String orderId, String startSn, String endSn, BigDecimal status, BigDecimal recordStatus,String returnId) throws Exception {
+        int res = oLogisticsMapper.updateSnStatus(orderId, startSn, endSn, status, recordStatus,returnId);
+        return res;
     }
 
 
@@ -777,10 +782,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                    OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                    detail.setReturnOrderId(detail1.getReturnId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 }else{
-                    detail.setReturnOrderId(planVo.getReturnOrderDetailId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
@@ -858,10 +864,11 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                    OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                    detail.setReturnOrderId(detail1.getReturnId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 }else{
-                    detail.setReturnOrderId(planVo.getReturnOrderDetailId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
