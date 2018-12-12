@@ -89,12 +89,15 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             }
             LOG.info("机具扣款流水号：{}，代理商唯一码：{}，应扣金额：{}，分润汇总剩余：{}", deduction.getSourceId(), agentPid, mustAmt, profitSumAmt);
 
-            if(profitSumAmt.compareTo(BigDecimal.ZERO) > 0){
-                this.basicsProfitDeductAmt(deduction, mustAmt, profitSumAmt, map);
-                profitSumAmt = (BigDecimal)map.get("profitSumAmt");
-                LOG.info("机具扣款流水号：{}，此条机具扣款完毕。应扣：{}，实扣：{}，未扣足：{}，分润汇总剩余：{}", deduction.getSourceId(),
-                        deduction.getMustDeductionAmt(), deduction.getActualDeductionAmt(), deduction.getNotDeductionAmt(), profitSumAmt);
-            } else {
+            if(Objects.equals("1", map.get("rotation"))){
+                if(profitSumAmt.compareTo(BigDecimal.ZERO) > 0){
+                    this.basicsProfitDeductAmt(deduction, mustAmt, profitSumAmt, map);
+                    profitSumAmt = (BigDecimal)map.get("profitSumAmt");
+                    LOG.info("机具扣款流水号：{}，此条机具扣款完毕。应扣：{}，实扣：{}，未扣足：{}，分润汇总剩余：{}", deduction.getSourceId(),
+                            deduction.getMustDeductionAmt(), deduction.getActualDeductionAmt(), deduction.getNotDeductionAmt(), profitSumAmt);
+                }
+            }
+            if(Objects.equals("3", map.get("rotation"))){
                 this.deduceParentAgent(deduction, mustAmt, computType);
                 LOG.info("机具扣款流水号：{}，此条机具扣款完毕。应扣：{}，实扣：{}，未扣足：{}", deduction.getSourceId(),
                         deduction.getMustDeductionAmt(), deduction.getActualDeductionAmt(), deduction.getNotDeductionAmt());
