@@ -213,13 +213,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
             //获取代理商有效的业务
             List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId());
+            Set<String> resultSet = new HashSet<>();
             for (AgentBusInfo agentBusInfo : aginfo) {
                 agentBusInfo.setcUtime(Calendar.getInstance().getTime());
                 agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+                resultSet.add(platForm.getPlatformType());
                 if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                     logger.info("代理商审批，更新业务本信息失败{}:{}", agentId, cuser);
                     throw new ProcessException("启动审批异常，更新业务本信息失败");
                 }
+            }
+            if(resultSet.size()!=1){
+                throw new ProcessException("不能同时提交pos和手刷平台");
             }
             //代理商有效新建的合同
             List<AgentContract> ag = agentContractService.queryAgentContract(agentId, null, AgStatus.Create.status);
