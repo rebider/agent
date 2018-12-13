@@ -362,7 +362,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", busid, cuser);
             throw new ProcessException("启动部门参数为空!");
         }
-        startPar.put("rs","pass");
+        //startPar.put("rs","pass");
         //启动审批
         String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
         if (proce == null) {
