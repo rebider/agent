@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.order.*;
@@ -136,6 +137,7 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
     public  AgentResult addOCashReceivables(List<OCashReceivablesVo> oCashReceivablesList, String user,String agentId, CashPayType cpt, String srcId)throws Exception {
         logger.info("操作人[{}]操作付款信息[{}]",user, JSONObject.toJSONString(oCashReceivablesList));
         Date date = new Date();
+        boolean isYHHK = false;
         BigDecimal total = BigDecimal.ZERO;
 
         //先更新成删除状态
@@ -177,6 +179,10 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
                     logger.info("操作人[{}]修改付款信息[{}]",user, JSONObject.toJSONString(oCashReceivables));
                     throw new MessageException("内容不能为空");
                 }
+
+                if(oCashReceivables.getPayType().equals(PayType.YHHK.code) && !isYHHK){
+                    isYHHK = true;
+                }
             }
 
             //cxinfo 更具库里的数据 检查具体的数据是否是审批状态
@@ -212,7 +218,9 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
 
         }
         total = total.setScale(2,BigDecimal.ROUND_HALF_UP);
-        return AgentResult.ok(total);
+        AgentResult res = AgentResult.ok(total);
+        res.setMapData(FastMap.fastMap("isYHHK",isYHHK));
+        return res;
     }
 
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)

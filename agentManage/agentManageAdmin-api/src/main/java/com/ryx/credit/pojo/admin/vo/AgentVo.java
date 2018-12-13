@@ -1,5 +1,11 @@
 package com.ryx.credit.pojo.admin.vo;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.ryx.credit.common.util.DateJsonDeserializer;
+import com.ryx.credit.common.util.DateJsonSerializer;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 import com.ryx.credit.pojo.admin.order.*;
@@ -35,6 +41,10 @@ public class AgentVo implements Serializable {
     private BigDecimal realPayAmount;
     private String supplementId;
     private Date remitTime;
+    @JSONField(format="yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JsonDeserialize(using = DateJsonDeserializer.class)
+    @JsonSerialize(using = DateJsonSerializer.class)
     private Date checkTime;
     //订单审批下个审批部门参数
     private String orderAprDept;

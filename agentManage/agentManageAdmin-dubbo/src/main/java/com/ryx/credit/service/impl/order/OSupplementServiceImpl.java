@@ -26,6 +26,7 @@ import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OSupplementService;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -151,6 +152,11 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款添加:{}", "源数据不能为空");
             return ResultVO.fail("源数据不能为空");
         }
+        List<String> file = osupplementVo.getAgentTableFile();
+        if(file==null || file.size()==0){
+            logger.info("补款添加:{}", "请上传打款截图");
+            throw new MessageException("请上传打款截图");
+        }
         //去查询是否已经在审批
         String srcId = oSupplement.getSrcId();
         String pkType = oSupplement.getPkType();
@@ -176,10 +182,18 @@ public class OSupplementServiceImpl implements OSupplementService {
         oSupplement.setStatus(Status.STATUS_1.status);
         oSupplement.setVersion(Status.STATUS_1.status);
         AgentResult result = oCashReceivablesService.addOCashReceivables(osupplementVo.getoCashReceivablesVos(), String.valueOf(oSupplement.getcUser()), osupplementVo.getSupplement().getAgentId(), CashPayType.getContentEnum(CashPayType.SUPPLEMENT.code), osupplementVo.getSupplement().getId());
+        if(result.getMapData()!=null){
+            Map<String,Object> resMapCash = result.getMapData();
+            if(resMapCash.get("isYHHK")!=null && (Boolean)resMapCash.get("isYHHK")){
+                if(file==null || file.size()==0){
+                    logger.info("补款添加:{}", "请上传打款截图");
+                    throw new MessageException("请上传打款截图");
+                }
+            }
+        }
         oSupplement.setRealPayAmount((BigDecimal) result.getData());
         if (1 == oSupplementMapper.insertSelective(oSupplement)) {
             osupplementVo.setSupplement(oSupplement);
-            List<String> file = osupplementVo.getAgentTableFile();
             if (null != file) {
                 for (String s : file) {
                     if (org.apache.commons.lang.StringUtils.isEmpty(s)) continue;

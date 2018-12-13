@@ -54,6 +54,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
     OAccountAdjustDetailMapper accountAdjustDetailMapper;
     @Resource
     IOrderReturnService orderReturnService;
+    @Autowired
+    private ORefundPriceDiffMapper refundPriceDiffMapper;
 
 
     public Map<String, Object> createTkeRecord(OPayment payment, BigDecimal thisPaymentOutstandingAmt) {
@@ -99,7 +101,15 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
         Map<String, Object> result = new HashMap<>();
 
         try {
-
+            if(isRealAdjust && PamentSrcType.TUICHAJIA_DIKOU.code.equals(srcType+"")){
+                ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(srcId);
+                if(diff!=null){
+                   if(diff.getMachOweAmt()!=null && diff.getMachOweAmt().compareTo(BigDecimal.ZERO)>0){
+                            log.info("======错误抵扣=已抵扣{}",JSONObject.toJSONString(diff));
+                            throw new MessageException("已抵扣");
+                   }
+                }
+            }
             //退款金额
             BigDecimal leftAmt = adjustAmt;
 
@@ -338,7 +348,21 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {
                 orderReturnService.doPlan(srcId, takeAmt, userid);
             }
-
+            if(isRealAdjust && PamentSrcType.TUICHAJIA_DIKOU.code.equals(srcType+"")){
+                ORefundPriceDiff diff = refundPriceDiffMapper.selectByPrimaryKey(srcId);
+                if(diff!=null){
+                    if(diff.getMachOweAmt()!=null && diff.getMachOweAmt().compareTo(BigDecimal.ZERO)==0){
+                        log.info("======抵扣{}",JSONObject.toJSONString(diff));
+                                diff.setMachOweAmt(takeAmt);
+                                if(1!=refundPriceDiffMapper.updateByPrimaryKeySelective(diff)){
+                                    log.info("======抵扣，更新补差记录失败{}",JSONObject.toJSONString(diff));
+                                      throw new MessageException("更新补差记录失败");
+                                }
+                    }
+                }else{
+                    log.info("======抵扣补差记录为空{}",JSONObject.toJSONString(diff));
+                }
+            }
 
         } catch (ProcessException e) {
             log.error("调账计算出现错误,{}", e.getMessage(), e);
