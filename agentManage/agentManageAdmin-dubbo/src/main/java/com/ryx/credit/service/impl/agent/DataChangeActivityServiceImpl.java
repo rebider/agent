@@ -66,6 +66,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
 
 
@@ -317,6 +319,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 e.printStackTrace();
                throw e;
             }
+
+            try {
+                agentQueryService.loadCach();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             return ResultVO.success(dr);
         } catch (Exception e) {
             e.printStackTrace();
