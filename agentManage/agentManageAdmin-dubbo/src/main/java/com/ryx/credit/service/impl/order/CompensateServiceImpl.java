@@ -302,6 +302,11 @@ public class CompensateServiceImpl implements CompensateService {
                                          List<String> refundPriceDiffFile, String cUser,List<OCashReceivablesVo> oCashReceivablesVoList){
 
         try {
+            if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
+                if(refundPriceDiffFile.size()==0){
+                    return AgentResult.fail("代理商打款必须上传打款凭证");
+                }
+            }
             String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
             oRefundPriceDiff.setId(priceDiffId);
             Date nowDate = new Date();
