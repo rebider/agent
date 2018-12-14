@@ -4,6 +4,7 @@ package com.ryx.credit.profit.service.impl;/**
  * @Description:
  */
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.result.AgentResult;
@@ -89,7 +90,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
 
 
     @Override
-    public void mPos_updateAgName(String agentName, List<String> platId) {
+    public AgentResult mPos_updateAgName(String agentName, List<String> platId) {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("companyname",agentName);
         map.put("batchIds",platId.toString());
@@ -98,20 +99,21 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.upAgName"),params);
         log.info("======mPos_updateAgName结果:{}",res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
+        JSONObject resObj = JSONObject.parseObject(res);
+        if(!resObj.get("respCode").equals("000000")){
             log.error("请求失败！");
             AppConfig.sendEmails("代理商更名失败","代理商更名失败");
-            return;
+            return AgentResult.fail("代理商更名失败");
         }
-        String data = JSONObject.parseObject(res).get("data").toString();
-        log.debug(data);
-        log.debug("代理商更名成功！");
+        log.info("代理商更名成功！{}",resObj.get("respMsg"));
+        return AgentResult.ok();
     }
 
     @Override
-    public void pos_updateAgName(AgentNotifyVo agentNotifyVo) throws Exception {
+    public AgentResult pos_updateAgName(AgentNotifyVo agentNotifyVo) throws Exception {
         agentNotifyVo.setUseOrgan("886");//使用范围 886-代理商
-        agentNotifyService.httpRequestForPos(agentNotifyVo);
+        return agentNotifyService.httpRequestForPos(agentNotifyVo);
+
     }
 
     @Override

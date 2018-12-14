@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public interface BusiPlatService {
      * @param agentName 变更后代理商名称
      * @param platId 业务平台编号
      */
-    void mPos_updateAgName(String agentName,List<String> platId);
+    AgentResult mPos_updateAgName(String agentName, List<String> platId);
 
     /**
      * 代理商更名(POS)
@@ -42,7 +43,7 @@ public interface BusiPlatService {
      *                      orgName 变更后名称
      *                      orgType 机构类型
      */
-    void pos_updateAgName(AgentNotifyVo agentNotifyVo) throws Exception;
+    AgentResult pos_updateAgName(AgentNotifyVo agentNotifyVo) throws Exception;
 
     /**
      * 代理商退出（手刷）

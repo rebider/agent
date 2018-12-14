@@ -34,9 +34,12 @@
 		</javaClientGenerator>
 		 <!--要生成那些表(更改tableName和domainObjectName就可以)-->
 
-		<table tableName="o_activity" domainObjectName="OActivity" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
-		<table tableName="o_sub_order_activity" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"
+		<!--<table tableName="o_activity" domainObjectName="OActivity" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="o_sub_order_activity" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+
+		<table tableName="P_AGENT_MERGE" domainObjectName="PAgentMerge" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 
 	</context>
