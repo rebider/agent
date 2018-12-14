@@ -32,6 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -72,9 +75,9 @@ public class ActivityServiceImpl implements ActivityService {
         }
     }
 
-    
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map) {
+    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map)throws Exception {
 
         try {
             List<ProcessDefinition> processDefinitions = findProcessDefinition();
@@ -91,8 +94,8 @@ public class ActivityServiceImpl implements ActivityService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("createDeloyFlow error", e);
+            throw e;
         }
-        return null;
     }
     
     @Override
@@ -122,7 +125,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public Map completeTask(String taskId, Map<String,Object>  map) throws ProcessException {
         Map<String,Object> rs = new HashMap<>(5);
@@ -171,8 +174,11 @@ public class ActivityServiceImpl implements ActivityService {
             upFlowRecord.setStatus(Status.STATUS_0.status);
             upFlowRecord.setActivityStatus(Status.STATUS_0.status);
             upFlowRecord.setErrorMsg(e.getMessage());
+            throw new ProcessException(e.getLocalizedMessage());
+        }finally {
+            approvalFlowRecordService.update(upFlowRecord);
         }
-        approvalFlowRecordService.update(upFlowRecord);
+
         return rs;
     }
 
