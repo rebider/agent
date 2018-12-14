@@ -13,6 +13,8 @@
     <result column="MAIN_HEAD_MOBILE" jdbcType="VARCHAR" property="mainHeadMobile" />
     <result column="SUBN_HEAD" jdbcType="VARCHAR" property="subnHead" />
     <result column="SUB_HEAD_MOBILE" jdbcType="VARCHAR" property="subHeadMobile" />
+    <result column="SYN_STATUS" jdbcType="DECIMAL" property="synStatus" />
+    <result column="SYN_MSG" jdbcType="VARCHAR" property="synMsg" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -44,8 +46,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, MAIN_AGENT_ID, SUB_AGENT_ID, MERGE_DATE, MERGE_STATUS, MAIN_AGENT_NAME, SUB_AGENT_NAME, 
-    MAIN_HEAD, MAIN_HEAD_MOBILE, SUBN_HEAD, SUB_HEAD_MOBILE
+    ID, MAIN_AGENT_ID, SUB_AGENT_ID, MERGE_DATE, MERGE_STATUS, MAIN_AGENT_NAME, SUB_AGENT_NAME,
+    MAIN_HEAD, MAIN_HEAD_MOBILE, SUBN_HEAD, SUB_HEAD_MOBILE, SYN_STATUS, SYN_MSG
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PAgentMergeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -63,28 +65,6 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select
-    <include refid="Base_Column_List" />
-    from P_AGENT_MERGE
-    where ID = #{id,jdbcType=VARCHAR}
-  </select>
-
-  <select id="selectBySubAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from P_AGENT_MERGE
-    WHERE SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} AND
-    (MERGE_STATUS = 'Approved' OR MERGE_STATUS = 'Create' OR MERGE_STATUS = 'Approving')
-  </select>
-
-  <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from P_AGENT_MERGE
-    WHERE MERGE_STATUS = 'Approved' AND (SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR} OR MAIN_AGENT_ID = #{subAgentId,jdbcType=VARCHAR})
-  </select>
-
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PAgentMergeExample">
     delete from P_AGENT_MERGE
     <if test="_parameter != null">
@@ -92,14 +72,16 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PAgentMerge">
-    insert into P_AGENT_MERGE (ID, MAIN_AGENT_ID, SUB_AGENT_ID, 
-      MERGE_DATE, MERGE_STATUS, MAIN_AGENT_NAME, 
-      SUB_AGENT_NAME, MAIN_HEAD, MAIN_HEAD_MOBILE, 
-      SUBN_HEAD, SUB_HEAD_MOBILE)
-    values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR}, 
-      #{mergeDate,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR}, 
-      #{subAgentName,jdbcType=VARCHAR}, #{mainHead,jdbcType=VARCHAR}, #{mainHeadMobile,jdbcType=VARCHAR}, 
-      #{subnHead,jdbcType=VARCHAR}, #{subHeadMobile,jdbcType=VARCHAR})
+    insert into P_AGENT_MERGE (ID, MAIN_AGENT_ID, SUB_AGENT_ID,
+    MERGE_DATE, MERGE_STATUS, MAIN_AGENT_NAME,
+    SUB_AGENT_NAME, MAIN_HEAD, MAIN_HEAD_MOBILE,
+    SUBN_HEAD, SUB_HEAD_MOBILE, SYN_STATUS,
+    SYN_MSG)
+    values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR},
+    #{mergeDate,jdbcType=VARCHAR}, #{mergeStatus,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR},
+    #{subAgentName,jdbcType=VARCHAR}, #{mainHead,jdbcType=VARCHAR}, #{mainHeadMobile,jdbcType=VARCHAR},
+    #{subnHead,jdbcType=VARCHAR}, #{subHeadMobile,jdbcType=VARCHAR}, #{synStatus,jdbcType=DECIMAL},
+    #{synMsg,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PAgentMerge">
     insert into P_AGENT_MERGE
@@ -137,6 +119,12 @@
       <if test="subHeadMobile != null">
         SUB_HEAD_MOBILE,
       </if>
+      <if test="synStatus != null">
+        SYN_STATUS,
+      </if>
+      <if test="synMsg != null">
+        SYN_MSG,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -172,6 +160,12 @@
       <if test="subHeadMobile != null">
         #{subHeadMobile,jdbcType=VARCHAR},
       </if>
+      <if test="synStatus != null">
+        #{synStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="synMsg != null">
+        #{synMsg,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PAgentMergeExample" resultType="java.lang.Long">
@@ -182,7 +176,7 @@
   </select>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -277,7 +271,7 @@
   <!--根据agentId查询平台编号-->
   <select id="getByBusPlatform" parameterType="map" resultMap="BusInfoMap">
     SELECT * FROM A_AGENT_BUSINFO
-    WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    WHERE AGENT_ID = #{agentId,jdbcType=VARCHAR} and STATUS = 1
     AND (BUS_PLATFORM = '100002' OR BUS_PLATFORM = '100003')
   </select>
 
