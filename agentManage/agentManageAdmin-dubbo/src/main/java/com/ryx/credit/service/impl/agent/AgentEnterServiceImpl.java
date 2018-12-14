@@ -224,7 +224,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     throw new ProcessException("启动审批异常，更新业务本信息失败");
                 }
             }
-            if(resultSet.size()!=1){
+            if(resultSet.size()>1){
                 throw new ProcessException("不能同时提交pos和手刷平台");
             }
             //代理商有效新建的合同
@@ -362,6 +362,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", busid, cuser);
             throw new ProcessException("启动部门参数为空!");
         }
+        startPar.put("rs","pass");
         //启动审批
         String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
         if (proce == null) {

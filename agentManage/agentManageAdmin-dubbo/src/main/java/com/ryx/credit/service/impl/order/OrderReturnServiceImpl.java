@@ -732,7 +732,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             example.or().andReturnIdEqualTo(returnId);
             List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
             for (OReturnOrderDetail detail : list) {
-                oLogisticsService.updateSnStatus(detail.getOrderId(), detail.getBeginSn(), detail.getEndSn(), snStatus, recordStatus, returnId);
+                log.info("======更新退货单中原始订单SN状态{},{},{},{},{},{}",detail.getOrderId(), detail.getBeginSn(), detail.getEndSn(), snStatus, recordStatus, returnId);
+                int res = oLogisticsService.updateSnStatus(detail.getOrderId(), detail.getBeginSn().trim(), detail.getEndSn().trim(), snStatus, recordStatus, returnId);
+                log.info("======更新退货单中原始订单SN状态数量{}:{},{},{},{},{},{}",res,detail.getOrderId(), detail.getBeginSn(), detail.getEndSn(), snStatus, recordStatus, returnId);
+                if(res==0)throw new MessageException("更新退货单中原始订单SN状态数量为0");
             }
         } catch (Exception e) {
             log.error("更新退货单中原始订单SN状态失败{},{}", returnId, snStatus, e);
@@ -745,11 +748,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 更新退货单状态
      * @Date: 16:50 2018/8/8
      */
-    public void updateOrderReturn(String returnId, BigDecimal status) {
+    public int updateOrderReturn(String returnId, BigDecimal status) {
         OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
         returnOrder.setRetSchedule(status);
         returnOrder.setuTime(new Date());
-        returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
+        return returnOrderMapper.updateByPrimaryKeySelective(returnOrder);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
@@ -912,8 +915,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 审批拒绝
      * @Date: 16:38 2018/8/8
      */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
-    @Transactional
     public void approvalReject(String processInstanceId, String activityName) throws Exception{
         try {
             log.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
@@ -938,6 +941,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 审批完成
      * @Date: 16:38 2018/8/8
      */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public void approvalFinish(String processInstanceId, String activityName) throws Exception{
         try {
@@ -947,13 +951,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             //退货编号
             String returnId = rel.getBusId();
             //更新退货单
-            updateOrderReturn(returnId, new BigDecimal(RetSchedule.WC.code));
+            if(updateOrderReturn(returnId, new BigDecimal(RetSchedule.WC.code))!=1){
+                log.info("退货审批完成回调:{},{},更新退货单失败", processInstanceId, activityName);
+                throw new MessageException("更新退货单失败");
+            }
             //更新原始订单SN
             updateReturnOrderSnStatus(returnId, OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
             //更新新订单SN状态
             updateNewOrderSnStatus(returnId);
         } catch (Exception e) {
-            log.error("退货审批完成回调", e);
+            log.error("退货审批完成回调异常", e);
             throw e;
         }
     }
@@ -965,7 +972,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     public void updateNewOrderSnStatus(String returnId)throws Exception {
         try {
-
+            log.info("======更新新订单物流明细SN状态:{}",returnId);
             //根据退货单查询明细
             OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
             oReturnOrderDetailExample.or().andStatusEqualTo(Status.STATUS_1.status).andReturnIdEqualTo(returnId);
@@ -975,6 +982,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 list_return_order_detail_id.add(detail.getId());
             }
             if(list_return_order_detail_id.size()==0){
+                log.info("======更新新订单物流明细SN状态:未找到对应的退货单明细");
                 throw new MessageException("未找到对应的退货单明细");
             }
             //根据退货单查询明细查询排单信息 更具排单信息 查询订单和sn
@@ -992,7 +1000,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     String orderId = logi.getOrderId();
                     String startSn = logi.getSnBeginNum();
                     String endSn = logi.getSnEndNum();
-                    oLogisticsService.updateSnStatus(orderId, startSn, endSn, OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code, null);
+                    log.info("======更新新订单物流明细SN状态:{}",JSONObject.toJSONString(logi));
+                    int res = oLogisticsService.updateSnStatus(orderId, startSn.trim(), endSn.trim(), OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code, null);
+                    log.info("======更新新订单物流明细SN状态:{},{}",JSONObject.toJSONString(logi),res);
+                    if(res==0){
+                        throw new MessageException("更新新订单物流明细SN状态：修改记录为空");
+                    }
                 }
             }
         } catch (Exception e) {
@@ -1765,10 +1778,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
+                    OReturnOrderDetail detail1 = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+                    detail.setReturnOrderId(detail1.getReturnId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 }else{
-                    detail.setReturnOrderId(planVo.getReturnOrderDetailId());
                     detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }

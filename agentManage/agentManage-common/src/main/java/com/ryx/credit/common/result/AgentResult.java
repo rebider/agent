@@ -2,6 +2,7 @@ package com.ryx.credit.common.result;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +23,11 @@ public class AgentResult implements Serializable{
 
     // 响应中的数据
     private Object data;
+
+    /**
+     * 数据
+     */
+    private Map<String,Object> mapData;
 
     public static AgentResult build(Integer status, String msg, Object data) {
         return new AgentResult(status, msg, data);
@@ -155,4 +161,11 @@ public class AgentResult implements Serializable{
         }
     }
 
+    public Map<String, Object> getMapData() {
+        return mapData;
+    }
+
+    public void setMapData(Map<String, Object> mapData) {
+        this.mapData = mapData;
+    }
 }

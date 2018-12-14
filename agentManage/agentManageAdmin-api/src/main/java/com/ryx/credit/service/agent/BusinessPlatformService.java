@@ -32,6 +32,8 @@ public interface BusinessPlatformService {
 
     int updateByPrimaryKeySelective(AgentBusInfo agentBusInfo);
 
+    void updateBusInfoList(List<AgentBusInfoVo> busInfoVoList)throws Exception;
+
     List<PlatForm> queryAblePlatForm();
 
     AgentResult saveBusinessPlatform(AgentVo agentVo) throws Exception;

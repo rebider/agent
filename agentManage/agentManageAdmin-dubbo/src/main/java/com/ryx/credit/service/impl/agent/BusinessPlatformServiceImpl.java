@@ -199,6 +199,27 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+    public void updateBusInfoList(List<AgentBusInfoVo> busInfoVoList)throws Exception{
+        if (busInfoVoList==null) {
+            throw new MessageException("信息错误");
+        }
+        if (busInfoVoList.size()==0) {
+            throw new MessageException("信息错误");
+        }
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+            agentBusInfoVo.setVersion(agbus.getVersion());
+            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+            if (i!=1) {
+                throw new MessageException("更新失败");
+            }
+        }
+
+    }
+
+
+    @Override
     public List<PlatForm> queryAblePlatForm() {
         PlatFormExample example = new PlatFormExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status).andPlatformStatusEqualTo(Status.STATUS_1.status);
@@ -255,6 +276,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
+                item.setCloReviewStatus(AgStatus.Create.status);
                 AgentBusInfo agentBusInfo = agentBusinfoService.agentBusInfoInsert(item);
                 agentBusInfoList.add(agentBusInfo);
             }

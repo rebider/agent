@@ -20,7 +20,7 @@ import java.util.Map;
 public interface ActivityService {
     void createTable();
 
-    String createDeloyFlow(String deployName, String workId, String activity_path, String activity_image_path,Map<String,Object> map);
+    String createDeloyFlow(String deployName, String workId, String activity_path, String activity_image_path,Map<String,Object> map)throws ProcessException;
 
     List<Task> findMyPersonTask(String assignee,String group);
 

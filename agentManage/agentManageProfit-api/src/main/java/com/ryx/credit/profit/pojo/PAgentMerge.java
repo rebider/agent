@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.pojo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class PAgentMerge implements Serializable{
     private String id;
@@ -24,6 +25,10 @@ public class PAgentMerge implements Serializable{
     private String subnHead;
 
     private String subHeadMobile;
+
+    private BigDecimal synStatus;
+
+    private String synMsg;
 
     public String getId() {
         return id;
@@ -111,5 +116,21 @@ public class PAgentMerge implements Serializable{
 
     public void setSubHeadMobile(String subHeadMobile) {
         this.subHeadMobile = subHeadMobile == null ? null : subHeadMobile.trim();
+    }
+
+    public BigDecimal getSynStatus() {
+        return synStatus;
+    }
+
+    public void setSynStatus(BigDecimal synStatus) {
+        this.synStatus = synStatus;
+    }
+
+    public String getSynMsg() {
+        return synMsg;
+    }
+
+    public void setSynMsg(String synMsg) {
+        this.synMsg = synMsg == null ? null : synMsg.trim();
     }
 }

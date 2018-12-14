@@ -2,6 +2,7 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -903,6 +904,136 @@ public class PAgentMergeExample {
 
         public Criteria andSubHeadMobileNotBetween(String value1, String value2) {
             addCriterion("SUB_HEAD_MOBILE not between", value1, value2, "subHeadMobile");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusIsNull() {
+            addCriterion("SYN_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusIsNotNull() {
+            addCriterion("SYN_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusEqualTo(BigDecimal value) {
+            addCriterion("SYN_STATUS =", value, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusNotEqualTo(BigDecimal value) {
+            addCriterion("SYN_STATUS <>", value, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusGreaterThan(BigDecimal value) {
+            addCriterion("SYN_STATUS >", value, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SYN_STATUS >=", value, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusLessThan(BigDecimal value) {
+            addCriterion("SYN_STATUS <", value, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SYN_STATUS <=", value, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusIn(List<BigDecimal> values) {
+            addCriterion("SYN_STATUS in", values, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusNotIn(List<BigDecimal> values) {
+            addCriterion("SYN_STATUS not in", values, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SYN_STATUS between", value1, value2, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SYN_STATUS not between", value1, value2, "synStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgIsNull() {
+            addCriterion("SYN_MSG is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgIsNotNull() {
+            addCriterion("SYN_MSG is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgEqualTo(String value) {
+            addCriterion("SYN_MSG =", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgNotEqualTo(String value) {
+            addCriterion("SYN_MSG <>", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgGreaterThan(String value) {
+            addCriterion("SYN_MSG >", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgGreaterThanOrEqualTo(String value) {
+            addCriterion("SYN_MSG >=", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgLessThan(String value) {
+            addCriterion("SYN_MSG <", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgLessThanOrEqualTo(String value) {
+            addCriterion("SYN_MSG <=", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgLike(String value) {
+            addCriterion("SYN_MSG like", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgNotLike(String value) {
+            addCriterion("SYN_MSG not like", value, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgIn(List<String> values) {
+            addCriterion("SYN_MSG in", values, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgNotIn(List<String> values) {
+            addCriterion("SYN_MSG not in", values, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgBetween(String value1, String value2) {
+            addCriterion("SYN_MSG between", value1, value2, "synMsg");
+            return (Criteria) this;
+        }
+
+        public Criteria andSynMsgNotBetween(String value1, String value2) {
+            addCriterion("SYN_MSG not between", value1, value2, "synMsg");
             return (Criteria) this;
         }
     }

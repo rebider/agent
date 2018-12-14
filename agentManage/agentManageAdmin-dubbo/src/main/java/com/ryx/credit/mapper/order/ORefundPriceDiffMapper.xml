@@ -295,7 +295,7 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
       <if test="agentId != null">
         AGENT_ID = #{agentId,jdbcType=VARCHAR},
@@ -307,7 +307,7 @@
         SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL},
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} <if test="version != null"> and  VERSION = #{version,jdbcType=DECIMAL} </if>
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.ORefundPriceDiff">
     update O_REFUND_PRICE_DIFF
@@ -327,11 +327,11 @@
     C_USER = #{cUser,jdbcType=VARCHAR},
     U_USER = #{uUser,jdbcType=VARCHAR},
     STATUS = #{status,jdbcType=DECIMAL},
-    VERSION = #{version,jdbcType=DECIMAL},
+    VERSION = VERSION +1 ,
     AGENT_ID = #{agentId,jdbcType=VARCHAR},
     BELOW_PAY_AMT = #{belowPayAmt,jdbcType=DECIMAL},
     SHARE_DEDUCT_AMT = #{shareDeductAmt,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} <if test="version != null"> and  VERSION = #{version,jdbcType=DECIMAL} </if>
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
