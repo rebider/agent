@@ -7,9 +7,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
-import com.ryx.credit.dao.agent.AgentColinfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AssProtoColMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.service.agent.AgentAssProtocolService;
@@ -26,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 
@@ -55,7 +52,8 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	private PlatFormService platFormService;
 	@Autowired
 	private AgentMapper agentMapper;
-
+	@Autowired
+	private PlatFormMapper platFormMapper;
 
     /**
      * 代理商查询插件数据获取
@@ -86,10 +84,12 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         	agentBusInfo.setcUtime(agentBusInfo.getcTime());
         	agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
 			Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
-			if(agent.getAgStatus().equals(AgStatus.Create.name())){
-				agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
-			}else{
-				agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
+			if(null==agentBusInfo.getCloReviewStatus()){
+				if(agent.getAgStatus().equals(AgStatus.Create.name())){
+					agentBusInfo.setCloReviewStatus(AgStatus.Create.status);
+				}else{
+					agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
+				}
 			}
         	agentBusInfo.setStatus(Status.STATUS_1.status);
 			agentBusInfo.setVersion(Status.STATUS_1.status);
@@ -167,8 +167,10 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	public ResultVO updateAgentBusInfoVo(List<AgentBusInfoVo> busInfoVoList, Agent agent,String userId)throws Exception {
 		try {
 			if(agent==null)throw new ProcessException("代理商信息不能为空");
-
+			Set<String> resultSet = new HashSet<>();
 			for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+				PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfoVo.getBusPlatform());
+				resultSet.add(platForm.getPlatformType());
 				if (null!=agentBusInfoVo.getBusPlatform()){
 					PlatformType platformType = platFormService.byPlatformCode(agentBusInfoVo.getBusPlatform());
 					if (null!=platformType){
@@ -300,6 +302,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 					}
 				}
 
+			}
+			if(resultSet.size()>1){
+				throw new MessageException("不能同时提交pos和手刷平台");
 			}
 			return ResultVO.success(null);
 		} catch (Exception e) {
