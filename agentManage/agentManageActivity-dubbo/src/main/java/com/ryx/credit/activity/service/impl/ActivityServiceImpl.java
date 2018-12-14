@@ -77,7 +77,7 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map)throws Exception {
+    public String createDeloyFlow(String deployName, String workId, String activityPath, String activityImagePath,Map<String,Object> map)throws ProcessException {
 
         try {
             List<ProcessDefinition> processDefinitions = findProcessDefinition();
@@ -94,7 +94,7 @@ public class ActivityServiceImpl implements ActivityService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("createDeloyFlow error", e);
-            throw e;
+            throw new ProcessException(e.getLocalizedMessage());
         }
     }
     
