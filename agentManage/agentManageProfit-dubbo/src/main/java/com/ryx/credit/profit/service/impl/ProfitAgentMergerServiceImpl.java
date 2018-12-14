@@ -96,6 +96,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      * @param pAgentMerge
      * @param userId
      */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public ResultVO agentMergeTaxEnterIn(PAgentMerge pAgentMerge, Long userId) throws ProcessException, MessageException {
         pAgentMerge.setId(idService.genId(TabId.P_AGENT_MERGE));
