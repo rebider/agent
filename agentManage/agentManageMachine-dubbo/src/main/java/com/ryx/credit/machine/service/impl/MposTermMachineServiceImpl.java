@@ -176,11 +176,13 @@ public class MposTermMachineServiceImpl implements TermMachineService {
                 JSONObject respXMLObj = JSONObject.parseObject(httpResult);
                 return respXMLObj;
             }else{
+                AppConfig.sendEmails("错误信息："+httpResult, "机具划拨通知手刷失败报警");
                 throw new Exception("请求出错");
             }
         } catch (Exception e) {
             logger.error("首刷发送请求失败：",e);
             e.printStackTrace();
+            AppConfig.sendEmails("首刷发送请求失败："+e.getStackTrace(), "机具划拨通知手刷失败报警");
             throw e;
         }
 

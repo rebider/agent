@@ -133,12 +133,14 @@ public class PlatformSynServiceMpos implements PlatformSynService {
                 JSONObject repdata =  respXMLObj.getJSONObject("data");
                 return AgentResult.ok(respXMLObj);
             }else{
+                AppConfig.sendEmails(respXMLObj.toJSONString(), "升级通知手刷失败报警");
                 AgentResult ag = AgentResult.fail(respMsg);
                 ag.setData(respXMLObj);
                 return ag;
             }
         } catch (Exception e) {
             log.info("http请求超时:{}",e.getMessage());
+            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "升级通知手刷失败报警");
             throw e;
         }
     }
