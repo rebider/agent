@@ -962,6 +962,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             JSONObject jsonObject = JSONObject.parseObject(httpResult);
             if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
                  log.info("请求异常======" + httpResult);
+                AppConfig.sendEmails("http请求异常", "入网通知POS失败报警");
                 throw new Exception("http请求异常");
             } else {
                 String resEncryptData = jsonObject.getString("encryptData");
@@ -986,13 +987,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                          log.info(dataObj.toJSONString());
                         return AgentResult.ok(dataObj);
                     }else{
-                        log.info("http请求超时返回错误:{}",httpResult);
+                        AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                        log.info("http请求超时返回错误:{}",respXML);
                         throw new Exception("http返回有误");
                     }
                 }
                 return new AgentResult(500,"http请求异常","");
             }
         } catch (Exception e) {
+            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw e;
         }
@@ -1035,10 +1038,12 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                  log.info(dataObj.toJSONString());
                 return AgentResult.ok(dataObj);
             }else{
+                AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
                 log.info("http请求超时返回错误:{}",httpResult);
                 throw new Exception("http返回有误");
             }
         } catch (Exception e) {
+            AppConfig.sendEmails("通知手刷请求超时："+e.getStackTrace(), "入网通知手刷失败报警");
             log.info("http请求超时:{}",e.getMessage());
             throw new Exception("http请求超时");
         }
