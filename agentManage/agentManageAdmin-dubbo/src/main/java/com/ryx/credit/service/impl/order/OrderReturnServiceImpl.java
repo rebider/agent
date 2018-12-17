@@ -1610,6 +1610,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                                         log.info("机具退货调整首刷接口调用STATUS_1更新数据库失败:{}:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd(),mposXF.getMsg());
                                     }
                                 }
+                            }catch (MessageException e) {
+                                e.printStackTrace();
+                                logistics.setSendStatus(Status.STATUS_2.status);
+                                logistics.setSendMsg(e.getMsg());
+                                if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                                    log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logistics.setSendStatus(Status.STATUS_2.status);
