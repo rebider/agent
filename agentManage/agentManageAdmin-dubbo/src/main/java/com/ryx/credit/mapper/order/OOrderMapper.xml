@@ -472,6 +472,7 @@
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
     </where>
     UNION
     select
@@ -549,6 +550,7 @@
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
     </where>
     )
     order by c_time desc
@@ -708,6 +710,7 @@
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
     </where>
     order by c_time desc
     <include refid="OracleDialectSuffix" />
