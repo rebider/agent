@@ -404,11 +404,12 @@
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
-    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus} and c_incom_status!=#{par.cIncomStatus} and ag.status='1'
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus} and c_incom_status!=#{par.cIncomStatus}
     left join o_order o on o.id = ro.order_id
-    left join a_agent_businfo ab on ab.id = o.bus_id and ab.status = '1' and ab.clo_review_status=#{par.cloReviewStatus} and ab.bus_num is not null
+    left join a_agent_businfo ab on ab.id = o.bus_id
     <where>
       and ro.status=1 and ag.status=1
+      and ab.status = '1' and ab.clo_review_status=#{par.cloReviewStatus} and ab.bus_num is not null
       <if test="par.proType != null and par.proType!=''" >
         and suborder.pro_type=#{par.proType}
       </if>
@@ -471,11 +472,12 @@
     left join o_sub_order suborder on    rp.pro_id=suborder.pro_id   and rp.orderId=suborder.order_id and suborder.status=1
     left join o_sub_order_activity ac on ac.sub_order_id=suborder.id and ac.status=1
     left join o_activity oa on ac.activity_id = oa.id
-    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus} and c_incom_status!=#{par.cIncomStatus} and ag.status='1'
+    left join a_agent ag on ag.id = ro.agent_id and ag.ag_status=#{par.agStatus} and c_incom_status!=#{par.cIncomStatus}
     left join o_order o on o.id = ro.order_id
-    left join a_agent_businfo ab on ab.id = o.bus_id and ab.status = '1' and ab.clo_review_status=#{par.cloReviewStatus} and ab.bus_num is not null
+    left join a_agent_businfo ab on ab.id = o.bus_id
     <where>
       and ro.status=1 and ag.status=1
+      and ab.status = '1' and ab.clo_review_status=#{par.cloReviewStatus} and ab.bus_num is not null
     <if test="par.proType != null and par.proType!=''" >
         and suborder.pro_type=#{par.proType}
     </if>
