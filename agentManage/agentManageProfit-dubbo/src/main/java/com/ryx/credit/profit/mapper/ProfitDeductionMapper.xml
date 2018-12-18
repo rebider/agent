@@ -434,8 +434,10 @@
     AND N.DEDUCTION_TYPE = '02')
   </select>
 
-  <delete id="resetDataDeduction">
+  <!-- 清楚上月数据-->
+  <delete id="resetDataDeduction" parameterType="java.lang.String">
     delete from P_DEDUCTION
-    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyy-MM')
+    where DEDUCTION_DATE = to_char(sysdate-30 ,'yyyy-MM') and  DEDUCTION_TYPE = #{type}
   </delete>
+
 </mapper>

@@ -126,7 +126,12 @@ public interface ProfitDeductionService {
     */
     BigDecimal getNotDeductionSum(String agentId);
 
-    int resetDataDeduction();
+    /**
+     * 清楚对应考核上月数据
+     * @param type
+     * @return
+     */
+    int resetDataDeduction(String type);
 
     void updateProfitDeductionByMap(Map<String, BigDecimal> deductionMap);
 

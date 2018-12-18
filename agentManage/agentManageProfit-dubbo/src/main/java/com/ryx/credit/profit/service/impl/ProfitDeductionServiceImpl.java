@@ -664,11 +664,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     /**
-     * 清除本月导入
+     * 清除上月数据
      * @return
      */
     @Override
-    public int resetDataDeduction() {
+    public int resetDataDeduction(String deductionType) {
         // 终审后不能清除
         String finalStatus = redisService.getValue("commitFinal");
         if (StringUtils.isBlank(finalStatus)) {
@@ -677,7 +677,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return profitDeductionMapper.resetDataDeduction();
+        return profitDeductionMapper.resetDataDeduction(deductionType);
     }
 
     @Override
