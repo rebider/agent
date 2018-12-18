@@ -129,4 +129,17 @@ public interface ProfitDeductionService {
     int resetDataDeduction();
 
     void updateProfitDeductionByMap(Map<String, BigDecimal> deductionMap);
+
+
+
+    /**
+     * 批量插入考核扣款数据
+     * @Create 2018/12/17
+     * @Author CQT
+     * @param datas
+     * @param userId
+     */
+    public void batchInsertCheckDeduction(List<List<Object>> datas , String userId);
+
+
 }
