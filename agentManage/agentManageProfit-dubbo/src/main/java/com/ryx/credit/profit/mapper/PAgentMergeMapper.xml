@@ -318,4 +318,11 @@
     from P_AGENT_MERGE
     WHERE SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR}
   </select>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from P_AGENT_MERGE
+    WHERE ID = #{id,jdbcType=VARCHAR}
+  </select>
 </mapper>
