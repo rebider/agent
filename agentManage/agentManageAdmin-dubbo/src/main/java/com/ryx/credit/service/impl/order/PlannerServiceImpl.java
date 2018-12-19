@@ -182,6 +182,9 @@ public class PlannerServiceImpl implements PlannerService {
             OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
             OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
             OSubOrderActivityItem.setPrice(real_activity.getPrice());
+            OSubOrderActivityItem.setPosType(real_activity.getPosType());
+            OSubOrderActivityItem.setPosSpePrice(real_activity.getPosSpePrice());
+            OSubOrderActivityItem.setStandTime(real_activity.getStandTime());
             if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
                 throw new MessageException("更新活动失败!");
             }

@@ -772,6 +772,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
                     detail.setSettlementPrice(oSubOrderActivity.getPrice());
+                    detail.setPosType(oSubOrderActivity.getPosType());
+                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
+                    detail.setStandTime(oSubOrderActivity.getStandTime());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
@@ -855,6 +858,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
                     detail.setSettlementPrice(oSubOrderActivity.getPrice());
+                    detail.setPosType(oSubOrderActivity.getPosType());
+                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
+                    detail.setStandTime(oSubOrderActivity.getStandTime());
                 }
                 detail.setAgentId(order.getAgentId());
                 detail.setcUser(cUser);
