@@ -75,4 +75,13 @@ public interface IPosRewardService {
      */
     List<PosReward> selectRewardByMonth(PosReward posReward);
 
+    /**
+     * 按照考核月查询pos奖励申请
+     * @param posReward
+     * @return
+     */
+    List<PosReward> selectByEndMonth(PosReward posReward);
+
+
+
 }

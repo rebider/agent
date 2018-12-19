@@ -597,6 +597,11 @@ public class PosRewardExample implements Serializable {
             return (Criteria) this;
         }
 
+        public Criteria andTotalEndMonthLike(String value){
+            addCriterion("TOTAL_END_MONTH like", value, "totalEndMonth");
+            return (Criteria) this;
+        }
+
         public Criteria andCreditConsMonthNotLike(String value) {
             addCriterion("CREDIT_CONS_MONTH not like", value, "creditConsMonth");
             return (Criteria) this;

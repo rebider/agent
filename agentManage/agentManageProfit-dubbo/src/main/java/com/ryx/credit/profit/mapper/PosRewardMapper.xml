@@ -12,6 +12,8 @@
     <result column="REWARD_SCALE" jdbcType="DECIMAL" property="rewardScale" />
     <result column="APPLY_STATUS" jdbcType="CHAR" property="applyStatus" />
     <result column="TOTAL_END_MONTH" jdbcType="VARCHAR" property="totalEndMonth" />
+    <result column="MACHINERY_NUM" jdbcType="NUMERIC" property="machineryNum" />
+    <result column="CREATE_TM" jdbcType="CHAR" property="createTm" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -44,7 +46,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, CREDIT_CONS_MONTH, 
-    REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH
+    REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH ,MACHINERY_NUM ,CREATE_TM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -62,6 +64,26 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+
+  <!--selectByEndMonth 更新按照考核月查询pos奖励申请-->
+  <select id="selectByEndMonth" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_POS_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -77,12 +99,12 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosReward">
     insert into P_POS_REWARD (ID, AGENT_PID, AGENT_ID, 
       AGENT_NAME, TOTAL_CONS_MONTH, GROW_AMT, 
-      CREDIT_CONS_MONTH, REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH
+      CREDIT_CONS_MONTH, REWARD_SCALE, APPLY_STATUS, TOTAL_END_MONTH,MACHINERY_NUM,CREATE_TM
       )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{totalConsMonth,jdbcType=VARCHAR}, #{growAmt,jdbcType=DECIMAL}, 
       #{creditConsMonth,jdbcType=VARCHAR}, #{rewardScale,jdbcType=DECIMAL}, #{applyStatus,jdbcType=CHAR},
-      #{totalEndMonth,jdbcType=VARCHAR}
+      #{totalEndMonth,jdbcType=VARCHAR}, #{machineryNum,jdbcType=NUMERIC}, #{createTm,jdbcType=CHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosReward">
@@ -118,6 +140,12 @@
       <if test="totalEndMonth != null">
         TOTAL_END_MONTH,
       </if>
+      <if test="machineryNum != null">
+        MACHINERY_NUM,
+      </if>
+      <if test="createTm != null">
+        CREATE_TM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -150,6 +178,13 @@
       <if test="totalEndMonth != null">
         #{totalEndMonth,jdbcType=VARCHAR},
       </if>
+      <if test="machineryNum != null">
+        #{machineryNum,jdbcType=NUMERIC},
+      </if>
+      <if test="createTm != null">
+        #{createTm,jdbcType=CHAR}
+      </if>
+
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosRewardExample" resultType="java.lang.Long">
@@ -188,6 +223,12 @@
       <if test="totalEndMonth != null">
         TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
       </if>
+      <if test="machineryNum != null">
+        MACHINERY_NUM = #{machineryNum,jdbcType=NUMERIC},
+      </if>
+      <if test="createTm != null">
+        CREATE_TM= #{createTm,jdbcType=CHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -202,6 +243,8 @@
       REWARD_SCALE = #{rewardScale,jdbcType=DECIMAL},
       APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
     TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
+    MACHINERY_NUM = #{machineryNum,jdbcType=NUMERIC},
+    CREATE_TM = #{createTm,jdbcType=CHAR},
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
