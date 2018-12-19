@@ -1,10 +1,11 @@
 package com.ryx.credit.profit.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import com.ryx.credit.profit.pojo.PosRewardDetail;
 import com.ryx.credit.profit.pojo.PosRewardDetailExample;
 import org.apache.ibatis.annotations.Param;
-import java.util.List;
-import java.util.Map;
 
 public interface PosRewardDetailMapper {
     long countByExample(PosRewardDetailExample example);
