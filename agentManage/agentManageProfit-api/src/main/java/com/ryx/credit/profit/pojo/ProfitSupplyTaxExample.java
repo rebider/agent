@@ -1,7 +1,7 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
-
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -553,6 +553,346 @@ public class ProfitSupplyTaxExample {
 
         public Criteria andSupplyTaxSubNameNotBetween(String value1, String value2) {
             addCriterion("SUPPLY_TAX_SUB_NAME not between", value1, value2, "supplyTaxSubName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtIsNull() {
+            addCriterion("SUPPLY_TAX_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtIsNotNull() {
+            addCriterion("SUPPLY_TAX_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtEqualTo(BigDecimal value) {
+            addCriterion("SUPPLY_TAX_AMT =", value, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtNotEqualTo(BigDecimal value) {
+            addCriterion("SUPPLY_TAX_AMT <>", value, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtGreaterThan(BigDecimal value) {
+            addCriterion("SUPPLY_TAX_AMT >", value, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUPPLY_TAX_AMT >=", value, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtLessThan(BigDecimal value) {
+            addCriterion("SUPPLY_TAX_AMT <", value, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUPPLY_TAX_AMT <=", value, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtIn(List<BigDecimal> values) {
+            addCriterion("SUPPLY_TAX_AMT in", values, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtNotIn(List<BigDecimal> values) {
+            addCriterion("SUPPLY_TAX_AMT not in", values, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUPPLY_TAX_AMT between", value1, value2, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUPPLY_TAX_AMT not between", value1, value2, "supplyTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeIsNull() {
+            addCriterion("SUPPLY_TAX_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeIsNotNull() {
+            addCriterion("SUPPLY_TAX_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_TYPE =", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeNotEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_TYPE <>", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeGreaterThan(String value) {
+            addCriterion("SUPPLY_TAX_TYPE >", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_TYPE >=", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeLessThan(String value) {
+            addCriterion("SUPPLY_TAX_TYPE <", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeLessThanOrEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_TYPE <=", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeLike(String value) {
+            addCriterion("SUPPLY_TAX_TYPE like", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeNotLike(String value) {
+            addCriterion("SUPPLY_TAX_TYPE not like", value, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeIn(List<String> values) {
+            addCriterion("SUPPLY_TAX_TYPE in", values, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeNotIn(List<String> values) {
+            addCriterion("SUPPLY_TAX_TYPE not in", values, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeBetween(String value1, String value2) {
+            addCriterion("SUPPLY_TAX_TYPE between", value1, value2, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxTypeNotBetween(String value1, String value2) {
+            addCriterion("SUPPLY_TAX_TYPE not between", value1, value2, "supplyTaxType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformIsNull() {
+            addCriterion("SUPPLY_TAX_PLATFORM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformIsNotNull() {
+            addCriterion("SUPPLY_TAX_PLATFORM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM =", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformNotEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM <>", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformGreaterThan(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM >", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformGreaterThanOrEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM >=", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformLessThan(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM <", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformLessThanOrEqualTo(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM <=", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformLike(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM like", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformNotLike(String value) {
+            addCriterion("SUPPLY_TAX_PLATFORM not like", value, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformIn(List<String> values) {
+            addCriterion("SUPPLY_TAX_PLATFORM in", values, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformNotIn(List<String> values) {
+            addCriterion("SUPPLY_TAX_PLATFORM not in", values, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformBetween(String value1, String value2) {
+            addCriterion("SUPPLY_TAX_PLATFORM between", value1, value2, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupplyTaxPlatformNotBetween(String value1, String value2) {
+            addCriterion("SUPPLY_TAX_PLATFORM not between", value1, value2, "supplyTaxPlatform");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeIsNull() {
+            addCriterion("CREATE_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeIsNotNull() {
+            addCriterion("CREATE_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeEqualTo(String value) {
+            addCriterion("CREATE_TIME =", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotEqualTo(String value) {
+            addCriterion("CREATE_TIME <>", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeGreaterThan(String value) {
+            addCriterion("CREATE_TIME >", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("CREATE_TIME >=", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeLessThan(String value) {
+            addCriterion("CREATE_TIME <", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeLessThanOrEqualTo(String value) {
+            addCriterion("CREATE_TIME <=", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeLike(String value) {
+            addCriterion("CREATE_TIME like", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotLike(String value) {
+            addCriterion("CREATE_TIME not like", value, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeIn(List<String> values) {
+            addCriterion("CREATE_TIME in", values, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotIn(List<String> values) {
+            addCriterion("CREATE_TIME not in", values, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeBetween(String value1, String value2) {
+            addCriterion("CREATE_TIME between", value1, value2, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andCreateTimeNotBetween(String value1, String value2) {
+            addCriterion("CREATE_TIME not between", value1, value2, "createTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeIsNull() {
+            addCriterion("UPDATE_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeIsNotNull() {
+            addCriterion("UPDATE_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeEqualTo(String value) {
+            addCriterion("UPDATE_TIME =", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotEqualTo(String value) {
+            addCriterion("UPDATE_TIME <>", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeGreaterThan(String value) {
+            addCriterion("UPDATE_TIME >", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeGreaterThanOrEqualTo(String value) {
+            addCriterion("UPDATE_TIME >=", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeLessThan(String value) {
+            addCriterion("UPDATE_TIME <", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeLessThanOrEqualTo(String value) {
+            addCriterion("UPDATE_TIME <=", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeLike(String value) {
+            addCriterion("UPDATE_TIME like", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotLike(String value) {
+            addCriterion("UPDATE_TIME not like", value, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeIn(List<String> values) {
+            addCriterion("UPDATE_TIME in", values, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotIn(List<String> values) {
+            addCriterion("UPDATE_TIME not in", values, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeBetween(String value1, String value2) {
+            addCriterion("UPDATE_TIME between", value1, value2, "updateTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateTimeNotBetween(String value1, String value2) {
+            addCriterion("UPDATE_TIME not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
     }

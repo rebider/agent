@@ -1,10 +1,10 @@
 package com.ryx.credit.profit.dao;
 
-import com.ryx.credit.profit.pojo.ProfitSupplyTax;
-import com.ryx.credit.profit.pojo.ProfitSupplyTaxExample;
 import java.util.List;
 import java.util.Map;
 
+import com.ryx.credit.profit.pojo.ProfitSupplyTax;
+import com.ryx.credit.profit.pojo.ProfitSupplyTaxExample;
 import org.apache.ibatis.annotations.Param;
 
 public interface ProfitSupplyTaxMapper {
