@@ -322,7 +322,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OActivityExample" resultType="java.lang.Integer">
     select count(*) from O_ACTIVITY
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
