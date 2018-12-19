@@ -448,6 +448,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         }
                         imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
                         imsTermWarehouseDetail.setMachineId(oSubOrderActivity.getBusProCode());
+                        imsTermWarehouseDetail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
+                        imsTermWarehouseDetail.setPosType(oSubOrderActivity.getPosType());
+                        imsTermWarehouseDetail.setStandTime(oSubOrderActivity.getStandTime());
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                         try {
                             //机具下发接口
@@ -986,6 +989,9 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
             imsTermWarehouseDetail.setOrgId(agentBusInfo.getBusNum());
             imsTermWarehouseDetail.setMachineId(detail.getBusProCode());
+            imsTermWarehouseDetail.setPosSpePrice(detail.getPosSpePrice());
+            imsTermWarehouseDetail.setPosType(detail.getPosType());
+            imsTermWarehouseDetail.setStandTime(detail.getStandTime());
             try {
                 //机具下发接口
                 AgentResult posSendRes = imsTermWarehouseDetailService.insertWarehouseAndTransfer(ids,imsTermWarehouseDetail);
