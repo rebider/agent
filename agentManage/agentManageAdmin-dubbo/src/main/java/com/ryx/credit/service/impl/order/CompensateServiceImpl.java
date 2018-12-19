@@ -730,6 +730,9 @@ public class CompensateServiceImpl implements CompensateService {
                     oLogisticsDetail.setTermtype(activity.getTermtype());
                     oLogisticsDetail.setTermtypename(activity.getTermtypename());
                     oLogisticsDetail.setVersion(Status.STATUS_0.status);
+                    oLogisticsDetail.setPosType(activity.getPosType());
+                    oLogisticsDetail.setPosSpePrice(activity.getPosSpePrice());
+                    oLogisticsDetail.setStandTime(activity.getStandTime());
                     int insert = logisticsDetailMapper.insert(oLogisticsDetail);
                     if(1!=insert){
                         throw new ProcessException("退补差价数据新增完成失败");
@@ -782,6 +785,9 @@ public class CompensateServiceImpl implements CompensateService {
                 oSubOrderActivity.setTermtypename(oActivity.getTermtypename());
                 oSubOrderActivity.setOriginalPrice(oActivity.getOriginalPrice());
                 oSubOrderActivity.setPrice(oActivity.getPrice());
+                oSubOrderActivity.setPosType(oActivity.getPosType());
+                oSubOrderActivity.setPosSpePrice(oActivity.getPosSpePrice());
+                oSubOrderActivity.setStandTime(oActivity.getStandTime());
                 int j = subOrderActivityMapper.updateByPrimaryKeySelective(oSubOrderActivity);
                 if(1!=j){
                     throw new ProcessException("退补差价数据更新活动失败");
