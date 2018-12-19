@@ -9,6 +9,10 @@
     <result column="SUPPLY_TAX_SUB_ID" jdbcType="VARCHAR" property="supplyTaxSubId" />
     <result column="SUPPLY_TAX_SUB_NAME" jdbcType="VARCHAR" property="supplyTaxSubName" />
     <result column="SUPPLY_TAX_AMT" jdbcType="DECIMAL" property="supplyTaxAmt" />
+    <result column="SUPPLY_TAX_TYPE" jdbcType="VARCHAR" property="supplyTaxType" />
+    <result column="SUPPLY_TAX_PLATFORM" jdbcType="VARCHAR" property="supplyTaxPlatform" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +74,8 @@
   </sql>
   <sql id="Base_Column_List">
     ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, 
-    SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
+    SUPPLY_TAX_SUB_NAME, SUPPLY_TAX_AMT, SUPPLY_TAX_TYPE, SUPPLY_TAX_PLATFORM, CREATE_TIME, 
+    UPDATE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -96,12 +101,13 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     insert into PROFIT_SUPPLY_TAX (ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, 
-      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
-      )
+      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME, 
+      SUPPLY_TAX_AMT, SUPPLY_TAX_TYPE, SUPPLY_TAX_PLATFORM, 
+      CREATE_TIME, UPDATE_TIME)
     values (#{id,jdbcType=VARCHAR}, #{supplyTaxDate,jdbcType=VARCHAR}, #{supplyTaxAgentId,jdbcType=VARCHAR}, 
-      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}, #{supplyTaxAmt,jdbcType=DECIMAL}
-
-      )
+      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}, 
+      #{supplyTaxAmt,jdbcType=DECIMAL}, #{supplyTaxType,jdbcType=VARCHAR}, #{supplyTaxPlatform,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     insert into PROFIT_SUPPLY_TAX
@@ -127,6 +133,18 @@
       <if test="supplyTaxAmt != null">
         SUPPLY_TAX_AMT,
       </if>
+      <if test="supplyTaxType != null">
+        SUPPLY_TAX_TYPE,
+      </if>
+      <if test="supplyTaxPlatform != null">
+        SUPPLY_TAX_PLATFORM,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -149,6 +167,18 @@
       </if>
       <if test="supplyTaxAmt != null">
         #{supplyTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyTaxType != null">
+        #{supplyTaxType,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxPlatform != null">
+        #{supplyTaxPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -182,6 +212,18 @@
       <if test="record.supplyTaxAmt != null">
         SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
       </if>
+      <if test="record.supplyTaxType != null">
+        SUPPLY_TAX_TYPE = #{record.supplyTaxType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxPlatform != null">
+        SUPPLY_TAX_PLATFORM = #{record.supplyTaxPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateTime != null">
+        UPDATE_TIME = #{record.updateTime,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -195,7 +237,11 @@
       SUPPLY_TAX_AGENT_NAME = #{record.supplyTaxAgentName,jdbcType=VARCHAR},
       SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
       SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
-      SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL}
+      SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
+      SUPPLY_TAX_TYPE = #{record.supplyTaxType,jdbcType=VARCHAR},
+      SUPPLY_TAX_PLATFORM = #{record.supplyTaxPlatform,jdbcType=VARCHAR},
+      CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      UPDATE_TIME = #{record.updateTime,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -251,4 +297,5 @@
   <sql id='SORT'>
     ORDER BY SUPPLY_TAX_DATE DESC
   </sql>
+
 </mapper>
