@@ -29,6 +29,9 @@
     <result column="TERMTYPE" jdbcType="VARCHAR" property="termtype" />
     <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
     <result column="ORIGINAL_PRICE" jdbcType="DECIMAL" property="originalPrice" />
+    <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
+    <result column="POS_TYPE" jdbcType="VARCHAR" property="posType" />
+    <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,7 +66,7 @@
     ID, ACTIVITY_ID, SUB_ORDER_ID, ACTIVITY_NAME, RULE_ID, ACTIVITY_RULE, ACTIVITY_WAY,
     PRICE, PRO_MODEL, VENDER, PLATFORM, G_TIME, C_TIME, U_TIME, C_USER, U_USER, VERSION,
     PRO_ID, PRO_NAME, STATUS, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
-    TERMTYPE, TERMTYPENAME, ORIGINAL_PRICE
+    TERMTYPE, TERMTYPENAME, ORIGINAL_PRICE, POS_SPE_PRICE, POS_TYPE, STAND_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivityExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,7 +105,8 @@
     U_USER, VERSION, PRO_ID,
     PRO_NAME, STATUS, BUS_PRO_CODE,
     BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
-    TERMTYPE, TERMTYPENAME, ORIGINAL_PRICE
+    TERMTYPE, TERMTYPENAME, ORIGINAL_PRICE,
+    POS_SPE_PRICE, POS_TYPE, STAND_TIME
     )
     values (#{id,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{subOrderId,jdbcType=VARCHAR},
     #{activityName,jdbcType=VARCHAR}, #{ruleId,jdbcType=VARCHAR}, #{activityRule,jdbcType=VARCHAR},
@@ -112,7 +116,8 @@
     #{uUser,jdbcType=VARCHAR}, #{version,jdbcType=DECIMAL}, #{proId,jdbcType=VARCHAR},
     #{proName,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{busProCode,jdbcType=VARCHAR},
     #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, #{termBatchname,jdbcType=VARCHAR},
-    #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, #{originalPrice,jdbcType=DECIMAL}
+    #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, #{originalPrice,jdbcType=DECIMAL},
+    #{posSpePrice,jdbcType=DECIMAL}, #{posType,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL}
     )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OSubOrderActivity">
@@ -199,6 +204,15 @@
       <if test="originalPrice != null">
         ORIGINAL_PRICE,
       </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE,
+      </if>
+      <if test="posType != null">
+        POS_TYPE,
+      </if>
+      <if test="standTime != null">
+        STAND_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -281,6 +295,15 @@
       </if>
       <if test="originalPrice != null">
         #{originalPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="posSpePrice != null">
+        #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="posType != null">
+        #{posType,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        #{standTime,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -371,6 +394,15 @@
       <if test="originalPrice != null">
         ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL},
       </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="posType != null">
+        POS_TYPE = #{posType,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -401,7 +433,10 @@
     TERM_BATCHNAME = #{termBatchname,jdbcType=VARCHAR},
     TERMTYPE = #{termtype,jdbcType=VARCHAR},
     TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
-    ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL}
+    ORIGINAL_PRICE = #{originalPrice,jdbcType=DECIMAL},
+    POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+    POS_TYPE = #{posType,jdbcType=VARCHAR},
+    STAND_TIME = #{standTime,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

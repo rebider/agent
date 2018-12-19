@@ -2,7 +2,6 @@ package com.ryx.credit.dao.order;
 
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetailExample;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
