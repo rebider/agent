@@ -1183,7 +1183,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     @Override
     public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
-        if(StringUtils.isNotBlank(String.valueOf(param.get("agentId"))) || !String.valueOf(param.get("agentId")).equals("null")){
+        if(StringUtils.isBlank(String.valueOf(param.get("agentId")))){
             if(!String.valueOf(param.get("orderReturn")).equals("all")){
                 List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(param.get("userId").toString()));
                 if(orgCodeRes==null && orgCodeRes.size()!=1){
