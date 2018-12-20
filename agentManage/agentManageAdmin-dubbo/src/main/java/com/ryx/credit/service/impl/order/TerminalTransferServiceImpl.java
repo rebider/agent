@@ -17,6 +17,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.TerminalTransferService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private AgentMapper agentMapper;
     @Autowired
     private AgentEnterService agentEnterService;
-
+    @Autowired
+    private IdService idService;
 
 
     @Override
@@ -80,39 +82,49 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         return pageInfo;
     }
 
+    /**
+     *
+     * saveFlag 1暂存2提交审批
+     * @param terminalTransfer
+     * @param terminalTransferDetailList
+     * @param cuser
+     * @param saveFlag
+     * @return
+     * @throws Exception
+     */
+    public AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String saveFlag)throws Exception{
+
+        if (StringUtils.isBlank(cuser)) {
+            log.info("终端划拨提交审批,操作用户为空:{}", cuser);
+            return AgentResult.fail("终端划拨审批中，操作用户为空");
+        }
+        terminalTransfer.setId(idService.genId(TabId.O_TERMINAL_TRANSFER));
+        if(saveFlag.equals(SaveFlag.TJSP.getValue())){
+            terminalTransfer.setReviewStatus(AgStatus.Approving.status);
+        }else{
+            terminalTransfer.setReviewStatus(AgStatus.Create.status);
+        }
+        Date date = new Date();
+        terminalTransfer.setcTime(date);
+        terminalTransfer.setuTime(date);
+        terminalTransfer.setcUser(cuser);
+        terminalTransfer.setcUser(cuser);
+        terminalTransfer.setStatus(Status.STATUS_1.status);
+        terminalTransfer.setVersion(Status.STATUS_1.status);
+        int i = terminalTransferMapper.insert(terminalTransfer);
+        if (1 != i) {
+            log.info("终端划拨提交审批，更新订单基本信息失败:{}", cuser);
+            throw new MessageException("终端划拨提交审批，更新终端划拨基本信息失败");
+        }
+
+
+        return AgentResult.ok();
+    }
+
+
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId) throws Exception {
-
-        if (StringUtils.isBlank(id)) {
-            log.info("终端划拨提交审批,订单ID为空{}:{}", id, cuser);
-            return AgentResult.fail("终端划拨提交审批，订单ID为空");
-        }
-        if (StringUtils.isBlank(cuser)) {
-            log.info("终端划拨提交审批,操作用户为空{}:{}", id, cuser);
-            return AgentResult.fail("终端划拨审批中，操作用户为空");
-        }
-        //更新审批中
-        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
-        if (terminalTransfer.getReviewStatus().equals(AgStatus.Approving.name())) {
-            log.info("终端划拨提交审批,禁止重复提交审批{}:{}", id, cuser);
-            return AgentResult.fail("终端划拨提交审批，禁止重复提交审批");
-        }
-
-        if (!terminalTransfer.getStatus().equals(Status.STATUS_1.status)) {
-            log.info("终端划拨提交审批,代理商信息已失效{}:{}", id, cuser);
-            return AgentResult.fail("终端划拨信息已失效");
-        }
-
-        TerminalTransfer upTerminalTransfer = new TerminalTransfer();
-        upTerminalTransfer.setVersion(terminalTransfer.getVersion());
-        upTerminalTransfer.setId(id);
-        upTerminalTransfer.setReviewStatus(AgStatus.Approving.status);
-        int i = terminalTransferMapper.updateByPrimaryKeySelective(upTerminalTransfer);
-        if (1 != i) {
-            log.info("终端划拨提交审批，更新订单基本信息失败{}:{}", id, cuser);
-            throw new MessageException("终端划拨提交审批，更新终端划拨基本信息失败");
-        }
 
         //启动审批
         String proce = activityService.createDeloyFlow(null, "agentTerminal", null, null, null);
