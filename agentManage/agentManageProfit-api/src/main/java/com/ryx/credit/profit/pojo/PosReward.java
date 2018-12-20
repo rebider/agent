@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 /**
- *
+ *特殊奖励申请明细
  */
 public class PosReward implements Serializable {
     private static final long serialVersionUID = -1379167402707558577L;
@@ -29,6 +29,10 @@ public class PosReward implements Serializable {
     private String userId;
 
     private String totalEndMonth;
+
+    private Integer machineryNum;
+
+    private String createTm;
 
     public String getTotalEndMonth() {
         return totalEndMonth;
@@ -116,5 +120,21 @@ public class PosReward implements Serializable {
 
     public void setApplyStatus(String applyStatus) {
         this.applyStatus = applyStatus == null ? null : applyStatus.trim();
+    }
+
+    public Integer getMachineryNum() {
+        return machineryNum;
+    }
+
+    public void setMachineryNum(Integer machineryNum) {
+        this.machineryNum = machineryNum;
+    }
+
+    public String getCreateTm() {
+        return createTm;
+    }
+
+    public void setCreateTm(String createTm) {
+        this.createTm = createTm;
     }
 }

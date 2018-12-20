@@ -42,6 +42,10 @@ public class PosRewardDetail implements Serializable {
 
     private String posCheckDeductAmt;
 
+    private String parentAgentId;
+
+    private String parentAgentName;
+
     private String childAgentIdList;
 
     public String getId() {
@@ -178,6 +182,22 @@ public class PosRewardDetail implements Serializable {
 
     public void setPosCheckDeductAmt(String posCheckDeductAmt) {
         this.posCheckDeductAmt = posCheckDeductAmt == null ? null : posCheckDeductAmt.trim();
+    }
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId == null ? null : parentAgentId.trim();
+    }
+
+    public String getParentAgentName() {
+        return parentAgentName;
+    }
+
+    public void setParentAgentName(String parentAgentName) {
+        this.parentAgentName = parentAgentName == null ? null : parentAgentName.trim();
     }
 
     public String getChildAgentIdList() {

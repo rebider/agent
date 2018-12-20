@@ -50,11 +50,13 @@ public class TaxDeductionDetail implements Serializable {
 
     private BigDecimal addTaxAmt;
 
+    private BigDecimal preNotDeductionAmt1;
+
+    private BigDecimal supposedTaxAmt;
+
     private BigDecimal realTaxAmt;
 
     private BigDecimal notDeductionTaxAmt;
-
-    private BigDecimal preNotDeductionAmt;
 
     private String createTime;
 
@@ -244,6 +246,22 @@ public class TaxDeductionDetail implements Serializable {
         this.addTaxAmt = addTaxAmt;
     }
 
+    public BigDecimal getPreNotDeductionAmt1() {
+        return preNotDeductionAmt1;
+    }
+
+    public void setPreNotDeductionAmt1(BigDecimal preNotDeductionAmt1) {
+        this.preNotDeductionAmt1 = preNotDeductionAmt1;
+    }
+
+    public BigDecimal getSupposedTaxAmt() {
+        return supposedTaxAmt;
+    }
+
+    public void setSupposedTaxAmt(BigDecimal supposedTaxAmt) {
+        this.supposedTaxAmt = supposedTaxAmt;
+    }
+
     public BigDecimal getRealTaxAmt() {
         return realTaxAmt;
     }
@@ -258,14 +276,6 @@ public class TaxDeductionDetail implements Serializable {
 
     public void setNotDeductionTaxAmt(BigDecimal notDeductionTaxAmt) {
         this.notDeductionTaxAmt = notDeductionTaxAmt;
-    }
-
-    public BigDecimal getPreNotDeductionAmt() {
-        return preNotDeductionAmt;
-    }
-
-    public void setPreNotDeductionAmt(BigDecimal preNotDeductionAmt) {
-        this.preNotDeductionAmt = preNotDeductionAmt;
     }
 
     public String getCreateTime() {

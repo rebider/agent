@@ -60,8 +60,9 @@
 		<!--<table tableName="O_SUB_ORDER_ACTIVITY" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<table tableName="P_TAX_DEDUCTION_DETAIL" domainObjectName="TaxDeductionDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
-		<table tableName="P_INVOICE" domainObjectName="Invoice" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
-		<table tableName="P_INVOICE_DETAIL" domainObjectName="InvoiceDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
-
+		<!--<table tableName="P_INVOICE" domainObjectName="Invoice" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<table tableName="P_INVOICE_DETAIL" domainObjectName="InvoiceDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
+        <!--<table tableName="PROFIT_SUPPLY_TAX" domainObjectName="ProfitSupplyTax" enableUpdateByExample="true"
+               enableDeleteByPrimaryKey="true"/>-->
 </context>
 </generatorConfiguration>
