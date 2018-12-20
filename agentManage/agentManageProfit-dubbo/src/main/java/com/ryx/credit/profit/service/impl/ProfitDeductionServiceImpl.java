@@ -758,7 +758,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setAgentName(list.get(1).toString());
         deduction.setParentAgentName(list.get(3).toString());
         deduction.setRemark(list.get(5).toString());
-        deduction.setDeductionDate((list.get(4).toString().substring(0,4)+"-"+list.get(4).toString().substring(4,6)));
+        deduction.setDeductionDate(list.get(4).toString().substring(0,6));
         deduction.setCreateDateTime(new Date());
         deduction.setUserId(userId);
         if ("POS奖励考核扣款".equals(deduction.getRemark())) {
