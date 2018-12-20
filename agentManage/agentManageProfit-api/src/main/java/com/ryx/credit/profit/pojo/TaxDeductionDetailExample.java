@@ -1636,6 +1636,126 @@ public class TaxDeductionDetailExample {
             return (Criteria) this;
         }
 
+        public Criteria andPreNotDeductionAmt1IsNull() {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1IsNotNull() {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1EqualTo(BigDecimal value) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 =", value, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1NotEqualTo(BigDecimal value) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 <>", value, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1GreaterThan(BigDecimal value) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 >", value, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1GreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 >=", value, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1LessThan(BigDecimal value) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 <", value, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1LessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 <=", value, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1In(List<BigDecimal> values) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 in", values, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1NotIn(List<BigDecimal> values) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 not in", values, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1Between(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 between", value1, value2, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPreNotDeductionAmt1NotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PRE_NOT_DEDUCTION_AMT1 not between", value1, value2, "preNotDeductionAmt1");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtIsNull() {
+            addCriterion("SUPPOSED_TAX_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtIsNotNull() {
+            addCriterion("SUPPOSED_TAX_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtEqualTo(BigDecimal value) {
+            addCriterion("SUPPOSED_TAX_AMT =", value, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtNotEqualTo(BigDecimal value) {
+            addCriterion("SUPPOSED_TAX_AMT <>", value, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtGreaterThan(BigDecimal value) {
+            addCriterion("SUPPOSED_TAX_AMT >", value, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUPPOSED_TAX_AMT >=", value, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtLessThan(BigDecimal value) {
+            addCriterion("SUPPOSED_TAX_AMT <", value, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUPPOSED_TAX_AMT <=", value, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtIn(List<BigDecimal> values) {
+            addCriterion("SUPPOSED_TAX_AMT in", values, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtNotIn(List<BigDecimal> values) {
+            addCriterion("SUPPOSED_TAX_AMT not in", values, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUPPOSED_TAX_AMT between", value1, value2, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSupposedTaxAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUPPOSED_TAX_AMT not between", value1, value2, "supposedTaxAmt");
+            return (Criteria) this;
+        }
+
         public Criteria andRealTaxAmtIsNull() {
             addCriterion("REAL_TAX_AMT is null");
             return (Criteria) this;
@@ -1753,66 +1873,6 @@ public class TaxDeductionDetailExample {
 
         public Criteria andNotDeductionTaxAmtNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("NOT_DEDUCTION_TAX_AMT not between", value1, value2, "notDeductionTaxAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtIsNull() {
-            addCriterion("PRE_NOT_DEDUCTION_AMT is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtIsNotNull() {
-            addCriterion("PRE_NOT_DEDUCTION_AMT is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtEqualTo(BigDecimal value) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT =", value, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtNotEqualTo(BigDecimal value) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT <>", value, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtGreaterThan(BigDecimal value) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT >", value, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT >=", value, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtLessThan(BigDecimal value) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT <", value, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtLessThanOrEqualTo(BigDecimal value) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT <=", value, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtIn(List<BigDecimal> values) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT in", values, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtNotIn(List<BigDecimal> values) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT not in", values, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT between", value1, value2, "preNotDeductionAmt");
-            return (Criteria) this;
-        }
-
-        public Criteria andPreNotDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
-            addCriterion("PRE_NOT_DEDUCTION_AMT not between", value1, value2, "preNotDeductionAmt");
             return (Criteria) this;
         }
 

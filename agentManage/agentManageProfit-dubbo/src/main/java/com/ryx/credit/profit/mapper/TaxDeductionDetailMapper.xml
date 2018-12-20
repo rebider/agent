@@ -25,9 +25,10 @@
     <result column="TAX_BASE" jdbcType="DECIMAL" property="taxBase" />
     <result column="TAX_RATE" jdbcType="DECIMAL" property="taxRate" />
     <result column="ADD_TAX_AMT" jdbcType="DECIMAL" property="addTaxAmt" />
+    <result column="PRE_NOT_DEDUCTION_AMT1" jdbcType="DECIMAL" property="preNotDeductionAmt1" />
+    <result column="SUPPOSED_TAX_AMT" jdbcType="DECIMAL" property="supposedTaxAmt" />
     <result column="REAL_TAX_AMT" jdbcType="DECIMAL" property="realTaxAmt" />
     <result column="NOT_DEDUCTION_TAX_AMT" jdbcType="DECIMAL" property="notDeductionTaxAmt" />
-    <result column="PRE_NOT_DEDUCTION_AMT" jdbcType="DECIMAL" property="preNotDeductionAmt" />
     <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
     <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
   </resultMap>
@@ -64,8 +65,8 @@
     ID, AGENT_PID, PROFIT_MONTH, AGENT_ID, AGENT_NAME, FRIST_AGENT_ID, FRIST_AGENT_NAME, 
     PARENT_AGENT_ID, PARENT_AGENT_NAME, PRE_LD_AMT, DAY_PROFIT_AMT, DAY_BACK_AMT, BASIC_PROFIT_AMT, 
     BL_AMT, MERCHAN_ORDER_AMT, AGENT_DF_AMT, ADJUST_AMT, ADJUST_ACCOUNT, ADJUST_RESON, 
-    ADJUST_TIME, TAX_BASE, TAX_RATE, ADD_TAX_AMT, REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, 
-    PRE_NOT_DEDUCTION_AMT, CREATE_TIME, UPDATE_TIME
+    ADJUST_TIME, TAX_BASE, TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, SUPPOSED_TAX_AMT, 
+    REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, CREATE_TIME, UPDATE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -103,8 +104,8 @@
       BASIC_PROFIT_AMT, BL_AMT, MERCHAN_ORDER_AMT, 
       AGENT_DF_AMT, ADJUST_AMT, ADJUST_ACCOUNT, 
       ADJUST_RESON, ADJUST_TIME, TAX_BASE, 
-      TAX_RATE, ADD_TAX_AMT, REAL_TAX_AMT, 
-      NOT_DEDUCTION_TAX_AMT, PRE_NOT_DEDUCTION_AMT, 
+      TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, 
+      SUPPOSED_TAX_AMT, REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, 
       CREATE_TIME, UPDATE_TIME)
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{profitMonth,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{fristAgentId,jdbcType=VARCHAR}, 
@@ -113,8 +114,8 @@
       #{basicProfitAmt,jdbcType=DECIMAL}, #{blAmt,jdbcType=DECIMAL}, #{merchanOrderAmt,jdbcType=DECIMAL}, 
       #{agentDfAmt,jdbcType=DECIMAL}, #{adjustAmt,jdbcType=DECIMAL}, #{adjustAccount,jdbcType=VARCHAR}, 
       #{adjustReson,jdbcType=VARCHAR}, #{adjustTime,jdbcType=VARCHAR}, #{taxBase,jdbcType=DECIMAL}, 
-      #{taxRate,jdbcType=DECIMAL}, #{addTaxAmt,jdbcType=DECIMAL}, #{realTaxAmt,jdbcType=DECIMAL}, 
-      #{notDeductionTaxAmt,jdbcType=DECIMAL}, #{preNotDeductionAmt,jdbcType=DECIMAL}, 
+      #{taxRate,jdbcType=DECIMAL}, #{addTaxAmt,jdbcType=DECIMAL}, #{preNotDeductionAmt1,jdbcType=DECIMAL}, 
+      #{supposedTaxAmt,jdbcType=DECIMAL}, #{realTaxAmt,jdbcType=DECIMAL}, #{notDeductionTaxAmt,jdbcType=DECIMAL}, 
       #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail">
@@ -189,14 +190,17 @@
       <if test="addTaxAmt != null">
         ADD_TAX_AMT,
       </if>
+      <if test="preNotDeductionAmt1 != null">
+        PRE_NOT_DEDUCTION_AMT1,
+      </if>
+      <if test="supposedTaxAmt != null">
+        SUPPOSED_TAX_AMT,
+      </if>
       <if test="realTaxAmt != null">
         REAL_TAX_AMT,
       </if>
       <if test="notDeductionTaxAmt != null">
         NOT_DEDUCTION_TAX_AMT,
-      </if>
-      <if test="preNotDeductionAmt != null">
-        PRE_NOT_DEDUCTION_AMT,
       </if>
       <if test="createTime != null">
         CREATE_TIME,
@@ -275,14 +279,17 @@
       <if test="addTaxAmt != null">
         #{addTaxAmt,jdbcType=DECIMAL},
       </if>
+      <if test="preNotDeductionAmt1 != null">
+        #{preNotDeductionAmt1,jdbcType=DECIMAL},
+      </if>
+      <if test="supposedTaxAmt != null">
+        #{supposedTaxAmt,jdbcType=DECIMAL},
+      </if>
       <if test="realTaxAmt != null">
         #{realTaxAmt,jdbcType=DECIMAL},
       </if>
       <if test="notDeductionTaxAmt != null">
         #{notDeductionTaxAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="preNotDeductionAmt != null">
-        #{preNotDeductionAmt,jdbcType=DECIMAL},
       </if>
       <if test="createTime != null">
         #{createTime,jdbcType=VARCHAR},
@@ -367,14 +374,17 @@
       <if test="addTaxAmt != null">
         ADD_TAX_AMT = #{addTaxAmt,jdbcType=DECIMAL},
       </if>
+      <if test="preNotDeductionAmt1 != null">
+        PRE_NOT_DEDUCTION_AMT1 = #{preNotDeductionAmt1,jdbcType=DECIMAL},
+      </if>
+      <if test="supposedTaxAmt != null">
+        SUPPOSED_TAX_AMT = #{supposedTaxAmt,jdbcType=DECIMAL},
+      </if>
       <if test="realTaxAmt != null">
         REAL_TAX_AMT = #{realTaxAmt,jdbcType=DECIMAL},
       </if>
       <if test="notDeductionTaxAmt != null">
         NOT_DEDUCTION_TAX_AMT = #{notDeductionTaxAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="preNotDeductionAmt != null">
-        PRE_NOT_DEDUCTION_AMT = #{preNotDeductionAmt,jdbcType=DECIMAL},
       </if>
       <if test="createTime != null">
         CREATE_TIME = #{createTime,jdbcType=VARCHAR},
@@ -409,9 +419,10 @@
       TAX_BASE = #{taxBase,jdbcType=DECIMAL},
       TAX_RATE = #{taxRate,jdbcType=DECIMAL},
       ADD_TAX_AMT = #{addTaxAmt,jdbcType=DECIMAL},
+      PRE_NOT_DEDUCTION_AMT1 = #{preNotDeductionAmt1,jdbcType=DECIMAL},
+      SUPPOSED_TAX_AMT = #{supposedTaxAmt,jdbcType=DECIMAL},
       REAL_TAX_AMT = #{realTaxAmt,jdbcType=DECIMAL},
       NOT_DEDUCTION_TAX_AMT = #{notDeductionTaxAmt,jdbcType=DECIMAL},
-      PRE_NOT_DEDUCTION_AMT = #{preNotDeductionAmt,jdbcType=DECIMAL},
       CREATE_TIME = #{createTime,jdbcType=VARCHAR},
       UPDATE_TIME = #{updateTime,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
