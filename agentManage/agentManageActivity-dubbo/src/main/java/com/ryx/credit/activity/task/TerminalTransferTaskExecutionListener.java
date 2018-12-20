@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.order.CompensateService;
+import com.ryx.credit.service.order.TerminalTransferService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * CompensationTaskExecutionListener
+ * TerminalTransferTaskExecutionListener
  * Created by IntelliJ IDEA.
  * 代理商终端划拨
  * @author Wang Qi
@@ -39,16 +40,16 @@ public class TerminalTransferTaskExecutionListener implements TaskListener, Exec
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            CompensateService dataChange = (CompensateService) MySpringContextHandler.applicationContext.getBean("compensateService");
+            TerminalTransferService terminalTransferService = (TerminalTransferService) MySpringContextHandler.applicationContext.getBean("terminalTransferService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                AgentResult res = dataChange.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
-                logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                AgentResult res = terminalTransferService.compressTerminalTransferActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                AgentResult res = dataChange.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
-                logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
+                AgentResult res = terminalTransferService.compressTerminalTransferActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                logger.info("=========TerminalTransferTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
