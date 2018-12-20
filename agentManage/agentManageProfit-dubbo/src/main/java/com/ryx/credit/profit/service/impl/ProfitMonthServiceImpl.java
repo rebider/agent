@@ -435,6 +435,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 doHbToolDeduction(profitDetailMonthTemp, computType, null, "3");
             });
+            //扣税
+
+            //补税点
+
             // 计算税点及实发分润
             try {
                 long sstart = System.currentTimeMillis();
@@ -473,7 +477,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 param.put("computeType", computType);
                 param.put("parentAgentId", profitDetailMonth.getParentAgentId());
                 param.put("sourceId", "1");
-                param.put("hbList", hbList);     //代理商分润
+                param.put("hbList", hbList);     //合并代理商
                 param.put("deductionStatus", "1");
                 //POS考核扣款（新国都、瑞易送）-
                 param = profitDeductionServiceImpl.otherDeductionHbByType(param);
@@ -545,7 +549,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("agentId", profitDetailMonthTemp.getAgentId());
         param.put("computeType", computeType);
         param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
-        param.put("hbList", hbList);     //代理商分润
+        param.put("hbList", hbList);     //合并代理商
         param.put("deductionStatus", "1");
         //退单扣款-pos 未扣足
         if (!profitDetailMonthTemp.getPosTdMustDeductionAmt().equals(profitDetailMonthTemp.getPosTdRealDeductionAmt())) {
@@ -923,7 +927,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                             Map<String, Object> idMap = null;
                             if (temp.containsKey(profitDetailMonthTemp.getId())) {
                                 idMap = temp.get(profitDetailMonthTemp.getId());
-                                basicAmt = (BigDecimal) idMap.get("basicAmt");
+                                basicAmt = (BigDecimal) idMap.get("basicAmt");  //应发分润
                             } else {
                                 basicAmt = getComputAmt(profitDetailMonthTemp, computType);
                             }

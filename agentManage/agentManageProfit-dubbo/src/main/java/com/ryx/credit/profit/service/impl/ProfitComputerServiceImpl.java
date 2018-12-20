@@ -887,12 +887,15 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     }
 
     /**
-     *
-     * @param subAmt 下级分润金额
-     * @param transDate
-     * @param dayTotal
-     * @param isRYX
-     * @return
+     * 本月税额、补下级税点、本月之前税额、本月分润、实发分润计算
+     * 分润不足并存在扣税时，记录本月未扣足税额
+     * PS：补下级税点计算必须先计算所有代理商的税前应发分润
+     * @param detailMonth 月分润明细
+     * @param subAmt 所有下级的应发分润汇总
+     * @param transDate 月份
+     * @param isSupply 是否补税
+     * @param isRYX 是否瑞银信打款
+     * @return ProfitDetailMonth（本月税额、补下级税点、扣本月之前税额（含日）、本月分润、实发分润）
      */
     public ProfitDetailMonth getNewTaxAndProfit(ProfitDetailMonth detailMonth,BigDecimal subAmt,String transDate,BigDecimal dayTotal,boolean isRYX,boolean isSupply){
         BigDecimal profitAmt = detailMonth.getBasicsProfitAmt()==null?BigDecimal.ZERO:detailMonth.getBasicsProfitAmt();//基础分润（扣补款之后、税前）
@@ -921,7 +924,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             return detail;
         }
         //-------------------本月税额计算-------------------
-        BigDecimal tax = adjustMapper.getTax(detailMonth.getAgentId());
+        BigDecimal tax = adjustMapper.getTax(detailMonth.getAgentId());//查询税点
         if (null == tax){
             AgentColinfo condition = new AgentColinfo();
             condition.setAgentId(detailMonth.getAgentId());
@@ -943,6 +946,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
 
         logger.info("税点："+tax);
+
         //-------------------查询该代理商下级代理应补税额-------------------
         BigDecimal subTax1 = BigDecimal.ZERO;//直发补税
         BigDecimal subTax2 = BigDecimal.ZERO;//非直发下级补税
@@ -956,6 +960,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             logger.info("开票补所有");
             subTax1 = subTax1.multiply(new BigDecimal("0.06"));
             logger.info("直发所有下级分润补税："+subTax1);
+
             subTax2 = subAmt.multiply(new BigDecimal("0.06"));
             subTax2 = subTax2==null?BigDecimal.ZERO:subTax2;
             logger.info("下级分润补税点差额："+subTax2);
