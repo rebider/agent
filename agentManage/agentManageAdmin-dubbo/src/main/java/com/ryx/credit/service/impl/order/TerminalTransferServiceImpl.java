@@ -10,9 +10,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.order.TerminalTransferDetailMapper;
-import com.ryx.credit.dao.order.TerminalTransferMapper;
-import com.ryx.credit.machine.vo.ChangeActMachineVo;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -58,6 +56,12 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private IdService idService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private OLogisticsDetailMapper logisticsDetailMapper;
+    @Autowired
+    private OSubOrderMapper subOrderMapper;
+    @Autowired
+    private OSubOrderActivityMapper subOrderActivityMapper;
 
 
 
@@ -96,6 +100,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
     public AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId,String saveFlag)throws Exception{
 
         if (StringUtils.isBlank(cuser)) {
@@ -126,6 +132,59 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if(StringUtils.isBlank(terminalTransferDetail.getGoalOrgId()) || StringUtils.isBlank(terminalTransferDetail.getOriginalOrgId())){
                     throw new MessageException("缺少参数");
                 }
+                Map<String, Object> reqParam = new HashMap<>();
+                reqParam.put("snBegin",terminalTransferDetail.getSnBeginNum());
+                reqParam.put("snEnd",terminalTransferDetail.getSnEndNum());
+                reqParam.put("status",OLogisticsDetailStatus.STATUS_FH.code);
+                ArrayList<Object> recordStatusList = new ArrayList<>();
+                recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                reqParam.put("recordStatusList",recordStatusList);
+                List<Map<String,Object>> logisticsDetailList = logisticsDetailMapper.queryCompensateLList(reqParam);
+                if(logisticsDetailList.size()==0){
+                    throw new ProcessException("sn号在审批中或已退货");
+                }
+                BigDecimal proNumSum = new BigDecimal(0);
+                for (Map<String, Object> stringObjectMap : logisticsDetailList) {
+                    proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
+                }
+                if(!String.valueOf(proNumSum).equals(terminalTransferDetail.getSnCount())){
+                    throw new ProcessException("sn号数量不匹配");
+                }
+                Set<String> proComSet = new HashSet<>();
+                Set<String> proModelSet = new HashSet<>();
+                for (Map<String, Object> logisticsDetail : logisticsDetailList) {
+                    String orderId = String.valueOf(logisticsDetail.get("ORDER_ID"));
+                    String proId = String.valueOf(logisticsDetail.get("PRO_ID"));
+                    String activityId = String.valueOf(logisticsDetail.get("ACTIVITY_ID"));
+                    OSubOrderExample oSubOrderExample = new OSubOrderExample();
+                    OSubOrderExample.Criteria criteria = oSubOrderExample.createCriteria();
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria.andOrderIdEqualTo(orderId);
+                    criteria.andProIdEqualTo(proId);
+                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
+                    if(oSubOrders.size()!=1){
+                        throw new ProcessException("查询采购单数据有误");
+                    }
+                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+                    OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
+                    criteria1.andSubOrderIdEqualTo(oSubOrders.get(0).getId());
+                    criteria1.andActivityIdEqualTo(activityId);
+                    criteria1.andStatusEqualTo(Status.STATUS_1.status);
+                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+                    if(oSubOrderActivities.size()!=1){
+                        throw new ProcessException("查询活动快照数据有误");
+                    }
+                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+                    proComSet.add(oSubOrderActivity.getVender());
+                    proModelSet.add(oSubOrderActivity.getProModel());
+                }
+                if(proComSet.size()!=1){
+                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
+                }
+                if(proModelSet.size()!=1){
+                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
+                }
+
                 AgentBusInfoExample originalExample = new AgentBusInfoExample();
                 AgentBusInfoExample.Criteria originalCriteria = originalExample.createCriteria();
                 originalCriteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -157,6 +216,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
                 terminalTransferDetail.setOriginalBusId(originalAgentBusInfo.getId());
                 terminalTransferDetail.setGoalBusId(goalAgentBusInfo.getId());
+                terminalTransferDetail.setProCom(proComSet.iterator().next());
+                terminalTransferDetail.setProModel(proModelSet.iterator().next());
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }
             return AgentResult.ok();
