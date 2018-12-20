@@ -83,6 +83,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     public PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page) {
 
         Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put("status",Status.STATUS_1.status);
         List<Map<String,Object>> terminalTransferList = terminalTransferDetailMapper.selectTerminalTransferDetailList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(terminalTransferList);
@@ -219,6 +220,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setProCom(proComSet.iterator().next());
                 terminalTransferDetail.setProModel(proModelSet.iterator().next());
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
+            }
+            if(saveFlag.equals(SaveFlag.TJSP.getValue())){
+                startTerminalTransferActivity(terminalTransferId,cuser,agentId);
             }
             return AgentResult.ok();
         } catch (Exception e) {

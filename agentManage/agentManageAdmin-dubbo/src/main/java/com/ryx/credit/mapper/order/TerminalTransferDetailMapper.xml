@@ -409,7 +409,7 @@
   </select>
   <sql id="TerminalTransferListWhere">
       <where>
-          1=1
+          t.status = #{status} and a.status = #{status}
       </where>
   </sql>
 
