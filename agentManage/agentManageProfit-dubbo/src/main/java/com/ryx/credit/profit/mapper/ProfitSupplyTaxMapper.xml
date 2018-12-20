@@ -235,6 +235,7 @@
       <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
       <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
       <if test="SUPPLY_TAX_TYPE != null and SUPPLY_TAX_TYPE !='' "> and SUPPLY_TAX_TYPE = #{SUPPLY_TAX_TYPE} </if>
+
     </where>
   </sql>
 
