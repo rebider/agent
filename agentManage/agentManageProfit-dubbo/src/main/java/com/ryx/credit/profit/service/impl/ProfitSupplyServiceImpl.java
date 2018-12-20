@@ -5,7 +5,6 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
-import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -18,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +53,14 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
     public PageInfo getProfitSupplyList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = pProfitSupplyMapper.getProfitSupplyCount(param);
         List<Map<String, Object>> list = pProfitSupplyMapper.getProfitSupplyList(param);
+        for (int i = 0; i <list.size() ; i++) {
+            if(list.get(i).get("BUS_BIG_TYPE").equals("01" )&& list.get(i).get("BUS_TYPE").equals("01" )){
+                list.get(i).put("SUPPLY_TYPE","手刷退款补款");
+            } else if (list.get(i).get("BUS_BIG_TYPE").equals("01" ) && list.get(i).get("BUS_TYPE").equals("02" )) {
+                list.get(i).put("SUPPLY_TYPE","POS退单补款");
+            }
+            }
+
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
 //        System.out.println("查询============================================" + JSONObject.toJSON(list));
@@ -134,7 +142,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public List<String> importSupplyList(List<List<Object>> data) throws Exception {
+    public List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception {
         List<String> list = new ArrayList<>();
         if (null == data && data.size() == 0) {
             logger.info("导入数据为空");
@@ -145,6 +153,12 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
             profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
             try {
+                //01 退单补款 02:机具返现 99：其它
+                if ("02".equals(sign)) {
+                    profitSupply.setBusBigType("02");
+                } else{
+                    profitSupply.setBusBigType("99");
+                }
                 profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
                 profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
                 profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
