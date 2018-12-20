@@ -783,11 +783,11 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             return ResultVO.success(ag);
         } catch (ProcessException e) {
             logger.error("修改代理商错误", e.getMsg());
-            return ResultVO.fail(e.getMsg());
+            throw new Exception(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("修改代理商错误", e);
-            throw e;
+            throw new Exception("修改代理商错误");
         }
     }
 
