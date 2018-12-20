@@ -56,7 +56,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         log.debug(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
-            AppConfig.sendEmails("代理商冻结失败","代理商冻结失败");
+            AppConfig.sendEmails("代理商冻结失败"+res,"代理商冻结失败");
             return true;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
@@ -79,7 +79,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         log.debug(res);
         if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
             log.error("请求失败！");
-            AppConfig.sendEmails("代理商解冻失败","代理商解冻失败");
+            AppConfig.sendEmails("代理商解冻失败："+res,"代理商解冻失败");
             return true;
         }
         String data = JSONObject.parseObject(res).get("data").toString();
@@ -102,7 +102,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         JSONObject resObj = JSONObject.parseObject(res);
         if(!resObj.get("respCode").equals("000000")){
             log.error("请求失败！");
-            AppConfig.sendEmails("代理商更名失败","代理商更名失败");
+            AppConfig.sendEmails("代理商更名失败:"+res,"代理商更名失败");
             return AgentResult.fail("代理商更名失败");
         }
         log.info("代理商更名成功！{}",resObj.get("respMsg"));

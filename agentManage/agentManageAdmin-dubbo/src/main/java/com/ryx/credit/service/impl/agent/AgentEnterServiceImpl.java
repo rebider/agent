@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
@@ -784,6 +785,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         } catch (ProcessException e) {
             logger.error("修改代理商错误", e.getMsg());
             throw new Exception(e.getMsg());
+        } catch (MessageException e) {
+            e.printStackTrace();
+            logger.error("修改代理商错误", e);
+            throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("修改代理商错误", e);
