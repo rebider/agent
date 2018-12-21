@@ -84,7 +84,27 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put("status",Status.STATUS_1.status);
-        List<Map<String,Object>> terminalTransferList = terminalTransferDetailMapper.selectTerminalTransferDetailList(reqMap,page);
+        if(StringUtils.isNotBlank(terminalTransferDetail.getTerminalTransferId())){
+            reqMap.put("terminalTransferId",terminalTransferDetail.getTerminalTransferId());
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getAgentId())){
+            reqMap.put("agentId",terminalTransferDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getSnBeginNum())){
+            reqMap.put("snBeginNum",terminalTransferDetail.getSnBeginNum());
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getSnEndNum())){
+            reqMap.put("snEndNum",terminalTransferDetail.getSnEndNum());
+        }
+        if(null!=terminalTransferDetail.getAdjustStatus()){
+            reqMap.put("adjustStatus",terminalTransferDetail.getAdjustStatus());
+        }
+        List<Map<String,Object>> terminalTransferList = null;
+        if(page==null){
+            terminalTransferList = terminalTransferDetailMapper.selectTerminalTransferDetailList(reqMap,page);
+        }else{
+            terminalTransferList = terminalTransferDetailMapper.exprotTerminalTransferDetails(reqMap);
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(terminalTransferList);
         pageInfo.setTotal(terminalTransferDetailMapper.selectTerminalTransferDetailCount(reqMap));

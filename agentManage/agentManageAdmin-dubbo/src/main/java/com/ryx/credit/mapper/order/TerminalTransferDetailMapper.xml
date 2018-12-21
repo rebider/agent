@@ -391,6 +391,13 @@
     </if>
   </sql>
 
+  <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
+      select
+      t.*,a.ag_name
+      from o_terminal_transfer_detail t
+      left join a_agent a on t.agent_id = a.id
+      <include refid="TerminalTransferListWhere" />
+  </select>
   <select id="selectTerminalTransferDetailList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
       select
@@ -409,7 +416,22 @@
   </select>
   <sql id="TerminalTransferListWhere">
       <where>
-          t.status = #{status} and a.status = #{status}
+          t.status = #{map.status} and a.status = #{map.status}
+          <if test="map.terminalTransferId != null">
+            and t.terminal_Transfer_Id = #{map.terminalTransferId}
+          </if>
+          <if test="map.agentId != null">
+            and t.agent_Id = #{map.agentId}
+          </if>
+          <if test="map.snBeginNum != null">
+            and t.sn_Begin_Num = #{map.snBeginNum}
+          </if>
+          <if test="map.snEndNum != null">
+            and t.sn_End_Num = #{map.snEndNum}
+          </if>
+          <if test="map.adjustStatus != null">
+            and t.adjust_Status = #{map.adjustStatus}
+          </if>
       </where>
   </sql>
 
