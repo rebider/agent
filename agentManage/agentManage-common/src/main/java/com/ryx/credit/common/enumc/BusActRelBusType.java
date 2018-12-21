@@ -24,7 +24,8 @@ public enum BusActRelBusType {
     POSCHECK("/BusActRelBusType/POSCHECK","分润比例考核"),
     POSREWARD("/BusActRelBusType/POSREWARD","POS特殊奖励"),
     QUIT("/BusActRelBusType/QUIT","代理商退出申请"),
-    MERGE("/BusActRelBusType/MERGE","代理商合并申请");
+    MERGE("/BusActRelBusType/MERGE","代理商合并申请"),
+    agentTerminal("/BusActRelBusType/agentTerminal","终端划拨申请");
 
 
     public String key;

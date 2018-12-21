@@ -105,7 +105,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId,String saveFlag)throws Exception{
 
-        if (StringUtils.isBlank(cuser)) {
+        if (StringUtils.isBlank(cuser) || StringUtils.isBlank(agentId)) {
             log.info("终端划拨提交审批,操作用户为空:{}", cuser);
             return AgentResult.fail("终端划拨审批中，操作用户为空");
         }
@@ -141,69 +141,69 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 recordStatusList.add(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 reqParam.put("recordStatusList",recordStatusList);
                 List<Map<String,Object>> logisticsDetailList = logisticsDetailMapper.queryCompensateLList(reqParam);
-                if(logisticsDetailList.size()==0){
-                    throw new ProcessException("sn号在审批中或已退货");
-                }
-                BigDecimal proNumSum = new BigDecimal(0);
-                for (Map<String, Object> stringObjectMap : logisticsDetailList) {
-                    proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
-                }
-                if(!String.valueOf(proNumSum).equals(terminalTransferDetail.getSnCount())){
-                    throw new ProcessException("sn号数量不匹配");
-                }
-                Set<String> proComSet = new HashSet<>();
-                Set<String> proModelSet = new HashSet<>();
-                for (Map<String, Object> logisticsDetail : logisticsDetailList) {
-                    String orderId = String.valueOf(logisticsDetail.get("ORDER_ID"));
-                    String proId = String.valueOf(logisticsDetail.get("PRO_ID"));
-                    String activityId = String.valueOf(logisticsDetail.get("ACTIVITY_ID"));
-                    OSubOrderExample oSubOrderExample = new OSubOrderExample();
-                    OSubOrderExample.Criteria criteria = oSubOrderExample.createCriteria();
-                    criteria.andStatusEqualTo(Status.STATUS_1.status);
-                    criteria.andOrderIdEqualTo(orderId);
-                    criteria.andProIdEqualTo(proId);
-                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
-                    if(oSubOrders.size()!=1){
-                        throw new ProcessException("查询采购单数据有误");
-                    }
-                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
-                    OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
-                    criteria1.andSubOrderIdEqualTo(oSubOrders.get(0).getId());
-                    criteria1.andActivityIdEqualTo(activityId);
-                    criteria1.andStatusEqualTo(Status.STATUS_1.status);
-                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
-                    if(oSubOrderActivities.size()!=1){
-                        throw new ProcessException("查询活动快照数据有误");
-                    }
-                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
-                    proComSet.add(oSubOrderActivity.getVender());
-                    proModelSet.add(oSubOrderActivity.getProModel());
-                }
-                if(proComSet.size()!=1){
-                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
-                }
-                if(proModelSet.size()!=1){
-                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
-                }
-
-                AgentBusInfoExample originalExample = new AgentBusInfoExample();
-                AgentBusInfoExample.Criteria originalCriteria = originalExample.createCriteria();
-                originalCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                originalCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
-                List<AgentBusInfo> originalAgentBusInfos = agentBusInfoMapper.selectByExample(originalExample);
-                if(originalAgentBusInfos.size()!=1){
-                    throw new MessageException("原机构数据有误");
-                }
-                AgentBusInfoExample goalExample = new AgentBusInfoExample();
-                AgentBusInfoExample.Criteria goalCriteria = goalExample.createCriteria();
-                goalCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                goalCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
-                List<AgentBusInfo> goalBusInfos = agentBusInfoMapper.selectByExample(goalExample);
-                if(goalBusInfos.size()!=1){
-                    throw new MessageException("原机构数据有误");
-                }
-                AgentBusInfo originalAgentBusInfo = originalAgentBusInfos.get(0);
-                AgentBusInfo goalAgentBusInfo = goalBusInfos.get(0);
+//                if(logisticsDetailList.size()==0){
+//                    throw new ProcessException("sn号在审批中或已退货");
+//                }
+//                BigDecimal proNumSum = new BigDecimal(0);
+//                for (Map<String, Object> stringObjectMap : logisticsDetailList) {
+//                    proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
+//                }
+//                if(!String.valueOf(proNumSum).equals(terminalTransferDetail.getSnCount())){
+//                    throw new ProcessException("sn号数量不匹配");
+//                }
+//                Set<String> proComSet = new HashSet<>();
+//                Set<String> proModelSet = new HashSet<>();
+//                for (Map<String, Object> logisticsDetail : logisticsDetailList) {
+//                    String orderId = String.valueOf(logisticsDetail.get("ORDER_ID"));
+//                    String proId = String.valueOf(logisticsDetail.get("PRO_ID"));
+//                    String activityId = String.valueOf(logisticsDetail.get("ACTIVITY_ID"));
+//                    OSubOrderExample oSubOrderExample = new OSubOrderExample();
+//                    OSubOrderExample.Criteria criteria = oSubOrderExample.createCriteria();
+//                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+//                    criteria.andOrderIdEqualTo(orderId);
+//                    criteria.andProIdEqualTo(proId);
+//                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
+//                    if(oSubOrders.size()!=1){
+//                        throw new ProcessException("查询采购单数据有误");
+//                    }
+//                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
+//                    OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
+//                    criteria1.andSubOrderIdEqualTo(oSubOrders.get(0).getId());
+//                    criteria1.andActivityIdEqualTo(activityId);
+//                    criteria1.andStatusEqualTo(Status.STATUS_1.status);
+//                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+//                    if(oSubOrderActivities.size()!=1){
+//                        throw new ProcessException("查询活动快照数据有误");
+//                    }
+//                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
+//                    proComSet.add(oSubOrderActivity.getVender());
+//                    proModelSet.add(oSubOrderActivity.getProModel());
+//                }
+//                if(proComSet.size()!=1){
+//                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
+//                }
+//                if(proModelSet.size()!=1){
+//                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
+//                }
+//
+//                AgentBusInfoExample originalExample = new AgentBusInfoExample();
+//                AgentBusInfoExample.Criteria originalCriteria = originalExample.createCriteria();
+//                originalCriteria.andStatusEqualTo(Status.STATUS_1.status);
+//                originalCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
+//                List<AgentBusInfo> originalAgentBusInfos = agentBusInfoMapper.selectByExample(originalExample);
+//                if(originalAgentBusInfos.size()!=1){
+//                    throw new MessageException("原机构数据有误");
+//                }
+//                AgentBusInfoExample goalExample = new AgentBusInfoExample();
+//                AgentBusInfoExample.Criteria goalCriteria = goalExample.createCriteria();
+//                goalCriteria.andStatusEqualTo(Status.STATUS_1.status);
+//                goalCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
+//                List<AgentBusInfo> goalBusInfos = agentBusInfoMapper.selectByExample(goalExample);
+//                if(goalBusInfos.size()!=1){
+//                    throw new MessageException("原机构数据有误");
+//                }
+//                AgentBusInfo originalAgentBusInfo = originalAgentBusInfos.get(0);
+//                AgentBusInfo goalAgentBusInfo = goalBusInfos.get(0);
 
                 terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DETAIL));
                 terminalTransferDetail.setTerminalTransferId(terminalTransferId);
@@ -215,10 +215,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setVersion(Status.STATUS_1.status);
                 terminalTransferDetail.setAgentId(agentId);
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
-                terminalTransferDetail.setOriginalBusId(originalAgentBusInfo.getId());
-                terminalTransferDetail.setGoalBusId(goalAgentBusInfo.getId());
-                terminalTransferDetail.setProCom(proComSet.iterator().next());
-                terminalTransferDetail.setProModel(proModelSet.iterator().next());
+//                terminalTransferDetail.setOriginalBusId(originalAgentBusInfo.getId());
+//                terminalTransferDetail.setGoalBusId(goalAgentBusInfo.getId());
+//                terminalTransferDetail.setProCom(proComSet.iterator().next());
+//                terminalTransferDetail.setProModel(proModelSet.iterator().next());
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }
             if(saveFlag.equals(SaveFlag.TJSP.getValue())){
@@ -237,7 +237,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId) throws Exception {
 
         //启动审批
-        String proce = activityService.createDeloyFlow(null, "agentTerminal", null, null, null);
+        String proce = activityService.createDeloyFlow(null, BusActRelBusType.agentTerminal.name(), null, null, null);
         if (proce == null) {
             log.info("终端划拨提交审批，审批流启动失败{}:{}", id, cuser);
             throw new MessageException("审批流启动失败!");
@@ -249,7 +249,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(cuser);
         record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.COMPENSATE.name());
+        record.setBusType(BusActRelBusType.agentTerminal.name());
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
