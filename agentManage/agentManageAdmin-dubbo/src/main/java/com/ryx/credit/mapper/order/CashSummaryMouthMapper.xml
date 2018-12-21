@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.CashSummaryMouthMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.CashSummaryMouth">
+    <id column="BUSID" jdbcType="VARCHAR" property="busid" />
+    <id column="DAY_STR" jdbcType="VARCHAR" property="dayStr" />
+    <id column="PAY_TYPE" jdbcType="VARCHAR" property="payType" />
+    <id column="IS_CLO_INVOICE" jdbcType="VARCHAR" property="isCloInvoice" />
+    <result column="PAY_AMOUNT" jdbcType="DECIMAL" property="payAmount" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AG_UNIQ_NUM" jdbcType="VARCHAR" property="agUniqNum" />
+    <result column="BUS_PARENT_ID" jdbcType="VARCHAR" property="busParentId" />
+    <result column="BUS_PARENT_BUS_NUM" jdbcType="VARCHAR" property="busParentBusNum" />
+    <result column="BUS_PARENT_AGENT_ID" jdbcType="VARCHAR" property="busParentAgentId" />
+    <result column="C_DATE" jdbcType="TIMESTAMP" property="cDate" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    BUSID, DAY_STR, PAY_TYPE, IS_CLO_INVOICE, PAY_AMOUNT, BUS_PLATFORM, BUS_NUM, AGENT_ID,
+    AG_UNIQ_NUM, BUS_PARENT_ID, BUS_PARENT_BUS_NUM, BUS_PARENT_AGENT_ID, C_DATE, STATUS
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouthExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_CASH_SUMMARY_MOUTH
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouthKey" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from O_CASH_SUMMARY_MOUTH
+    where BUSID = #{busid,jdbcType=VARCHAR}
+    and DAY_STR = #{dayStr,jdbcType=VARCHAR}
+    and PAY_TYPE = #{payType,jdbcType=VARCHAR}
+    and IS_CLO_INVOICE = #{isCloInvoice,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouthExample">
+    delete from O_CASH_SUMMARY_MOUTH
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouth">
+    insert into O_CASH_SUMMARY_MOUTH (BUSID, DAY_STR, PAY_TYPE,
+    IS_CLO_INVOICE, PAY_AMOUNT, BUS_PLATFORM,
+    BUS_NUM, AGENT_ID, AG_UNIQ_NUM,
+    BUS_PARENT_ID, BUS_PARENT_BUS_NUM, BUS_PARENT_AGENT_ID,
+    C_DATE, STATUS)
+    values (#{busid,jdbcType=VARCHAR}, #{dayStr,jdbcType=VARCHAR}, #{payType,jdbcType=VARCHAR},
+    #{isCloInvoice,jdbcType=VARCHAR}, #{payAmount,jdbcType=DECIMAL}, #{busPlatform,jdbcType=VARCHAR},
+    #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agUniqNum,jdbcType=VARCHAR},
+    #{busParentId,jdbcType=VARCHAR}, #{busParentBusNum,jdbcType=VARCHAR}, #{busParentAgentId,jdbcType=VARCHAR},
+    #{cDate,jdbcType=TIMESTAMP}, #{status,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouth">
+    insert into O_CASH_SUMMARY_MOUTH
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="busid != null">
+        BUSID,
+      </if>
+      <if test="dayStr != null">
+        DAY_STR,
+      </if>
+      <if test="payType != null">
+        PAY_TYPE,
+      </if>
+      <if test="isCloInvoice != null">
+        IS_CLO_INVOICE,
+      </if>
+      <if test="payAmount != null">
+        PAY_AMOUNT,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agUniqNum != null">
+        AG_UNIQ_NUM,
+      </if>
+      <if test="busParentId != null">
+        BUS_PARENT_ID,
+      </if>
+      <if test="busParentBusNum != null">
+        BUS_PARENT_BUS_NUM,
+      </if>
+      <if test="busParentAgentId != null">
+        BUS_PARENT_AGENT_ID,
+      </if>
+      <if test="cDate != null">
+        C_DATE,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="busid != null">
+        #{busid,jdbcType=VARCHAR},
+      </if>
+      <if test="dayStr != null">
+        #{dayStr,jdbcType=VARCHAR},
+      </if>
+      <if test="payType != null">
+        #{payType,jdbcType=VARCHAR},
+      </if>
+      <if test="isCloInvoice != null">
+        #{isCloInvoice,jdbcType=VARCHAR},
+      </if>
+      <if test="payAmount != null">
+        #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agUniqNum != null">
+        #{agUniqNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busParentId != null">
+        #{busParentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busParentBusNum != null">
+        #{busParentBusNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busParentAgentId != null">
+        #{busParentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="cDate != null">
+        #{cDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouthExample" resultType="java.lang.Long">
+    select count(*) from O_CASH_SUMMARY_MOUTH
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouth">
+    update O_CASH_SUMMARY_MOUTH
+    <set>
+      <if test="payAmount != null">
+        PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agUniqNum != null">
+        AG_UNIQ_NUM = #{agUniqNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busParentId != null">
+        BUS_PARENT_ID = #{busParentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busParentBusNum != null">
+        BUS_PARENT_BUS_NUM = #{busParentBusNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busParentAgentId != null">
+        BUS_PARENT_AGENT_ID = #{busParentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="cDate != null">
+        C_DATE = #{cDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where BUSID = #{busid,jdbcType=VARCHAR}
+    and DAY_STR = #{dayStr,jdbcType=VARCHAR}
+    and PAY_TYPE = #{payType,jdbcType=VARCHAR}
+    and IS_CLO_INVOICE = #{isCloInvoice,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.CashSummaryMouth">
+    update O_CASH_SUMMARY_MOUTH
+    set PAY_AMOUNT = #{payAmount,jdbcType=DECIMAL},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AG_UNIQ_NUM = #{agUniqNum,jdbcType=VARCHAR},
+      BUS_PARENT_ID = #{busParentId,jdbcType=VARCHAR},
+      BUS_PARENT_BUS_NUM = #{busParentBusNum,jdbcType=VARCHAR},
+      BUS_PARENT_AGENT_ID = #{busParentAgentId,jdbcType=VARCHAR},
+      C_DATE = #{cDate,jdbcType=TIMESTAMP},
+      STATUS = #{status,jdbcType=DECIMAL}
+    where BUSID = #{busid,jdbcType=VARCHAR}
+          and DAY_STR = #{dayStr,jdbcType=VARCHAR}
+          and PAY_TYPE = #{payType,jdbcType=VARCHAR}
+          and IS_CLO_INVOICE = #{isCloInvoice,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="selectCashSummaryMouthData" parameterType="string" resultMap="BaseResultMap">
+    select sum(pay_amount) as PAY_AMOUNT,
+      BUSID, DAY_STR, PAY_TYPE, BUS_PLATFORM, BUS_NUM, IS_CLO_INVOICE, AGENT_ID,
+      AG_UNIQ_NUM, BUS_PARENT_ID, BUS_PARENT_BUS_NUM, BUS_PARENT_AGENT_ID, sysdate, 1
+    from (
+           --付款单现付金额  不开发票
+           select sum(a.real_amount) as pay_amount,'YHHK' as pay_type,to_char(max(a.real_rec_time),'yyyy-MM') as day_str,
+             e.agent_id,d.ag_uniq_num,e.bus_num,e.bus_platform,e.id as  busid,${is_clo_invoice} as is_clo_invoice,
+             h.id as bus_parent_id,h.bus_num as bus_parent_bus_num,h.agent_id as bus_parent_agent_id
+           from o_Cash_Receivables a
+             left join o_payment b on b.id = a.src_id and a.cashpay_type = 'PAYMENT'
+             left join o_order c on c.id=b.order_id
+             left join a_agent d on d.id=c.agent_id
+             left join a_agent_businfo e on e.id = c.bus_id
+             left join a_agent_businfo h on h.bus_parent  = e.id
+           where a.pay_status = '4' --结清状态
+                 and a.review_status='3'  --审核通过状态
+                 and b.is_clo_invoice=#{is_clo_invoice}   --是否开发票
+                 and c.review_status = '3'
+                 and a.pay_type='YHHK' --线下打款
+                 and a.cashpay_type = 'PAYMENT'  --付款单现付金额
+                 and a.real_rec_time is not null --实际到账时间不为空
+                 and e.bus_num is not null       --业务编号不为空
+                 and to_char(a.real_rec_time,'yyyy-MM') = #{date_str}
+                 and a.status=1 and b.status=1 and c.status=1 and d.status=1
+           group by e.agent_id,d.ag_uniq_num,e.bus_num,e.bus_platform,e.id,h.id ,h.bus_num ,h.agent_id
+           union
+           select
+                                                               sum(a.real_amount) as pay_amount,'YHHK'as pay_type,to_char(max(a.real_rec_time),'yyyy-MM') as day_str,
+             f.agent_id,e.ag_uniq_num,f.bus_num,f.bus_platform,f.id as  busid,${is_clo_invoice} as is_clo_invoice,
+                                                               h.id as bus_parent_id,h.bus_num as bus_parent_bus_num,h.agent_id as bus_parent_agent_id
+           from o_Cash_Receivables a
+             left join o_Supplement b on a.src_id = b.id and b.pay_method=1 and b.pk_type=1 and b.status=1 --pay_method=1线下打款 pk_type=1分期补款
+             left join o_payment_detail c on c.src_id = b.id  and c.status=1
+             left join o_payment d on d.id = c.payment_id and d.status=1
+             left join  o_order g on g.id = d.order_id
+             left join a_agent e on e.id = d.agent_id
+             left join a_agent_businfo f on f.id= g.bus_id
+             left join a_agent_businfo h on h.bus_parent  = f.id
+           where a.pay_status = '4' --结清状态
+                 and a.review_status='3'  --审核通过状态
+                 and a.pay_type='YHHK' --线下打款
+                 and a.cashpay_type = 'SUPPLEMENT'  --付款单现付金额
+                 and c.src_type = 'XXBK' -- 线下补款
+                 and d.is_clo_invoice=#{is_clo_invoice}
+                 and g.review_status = '3' -- 订单审批通过
+                 and to_char(a.real_rec_time,'yyyy-MM') = #{date_str}
+                 and g.status=1 and d.status=1  and c.status=1  and b.status=1 and a.status=1
+           group by f.agent_id,e.ag_uniq_num,f.bus_num,f.bus_platform,f.id,h.id ,h.bus_num ,h.agent_id
+         ) i group by pay_type,
+      day_str,
+      agent_id,
+      ag_uniq_num,
+      bus_num,
+      bus_platform,
+      busid,
+      is_clo_invoice,
+      bus_parent_id,
+      bus_parent_bus_num,
+      bus_parent_agent_id
+  </select>
+</mapper>
