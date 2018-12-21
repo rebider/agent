@@ -37,6 +37,115 @@ public class OrderoutVo implements Serializable{
     private String nuclearTimeString;
     private String agDocPpro;
 
+    private String proType;//机具类型
+    private String activityName;//活动名称
+    private BigDecimal ddAmt;//订单金额
+    private BigDecimal ykfrAmt;//应扣分润金额
+    private BigDecimal downPaymentCount;//分期扣分润期数
+    private BigDecimal downPayment;//首付金额
+    private BigDecimal mqykAmt;//每期应扣分润金额
+    private BigDecimal skfrAmt;//实扣分润金额
+    private BigDecimal fqdkAmt;//分期打款金额
+    private BigDecimal frdkCount;//分期打款期数
+    private BigDecimal sjdkAmt;//实际打款金额
+    private BigDecimal syqkAmt;//剩余欠款
+
+    public String getProType() {
+        return proType;
+    }
+
+    public void setProType(String proType) {
+        this.proType = proType;
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
+    }
+
+    public BigDecimal getDdAmt() {
+        return ddAmt;
+    }
+
+    public void setDdAmt(BigDecimal ddAmt) {
+        this.ddAmt = ddAmt;
+    }
+
+    public BigDecimal getYkfrAmt() {
+        return ykfrAmt;
+    }
+
+    public void setYkfrAmt(BigDecimal ykfrAmt) {
+        this.ykfrAmt = ykfrAmt;
+    }
+
+    public BigDecimal getDownPaymentCount() {
+        return downPaymentCount;
+    }
+
+    public void setDownPaymentCount(BigDecimal downPaymentCount) {
+        this.downPaymentCount = downPaymentCount;
+    }
+
+    public BigDecimal getDownPayment() {
+        return downPayment;
+    }
+
+    public void setDownPayment(BigDecimal downPayment) {
+        this.downPayment = downPayment;
+    }
+
+    public BigDecimal getMqykAmt() {
+        return mqykAmt;
+    }
+
+    public void setMqykAmt(BigDecimal mqykAmt) {
+        this.mqykAmt = mqykAmt;
+    }
+
+    public BigDecimal getSkfrAmt() {
+        return skfrAmt;
+    }
+
+    public void setSkfrAmt(BigDecimal skfrAmt) {
+        this.skfrAmt = skfrAmt;
+    }
+
+    public BigDecimal getFqdkAmt() {
+        return fqdkAmt;
+    }
+
+    public void setFqdkAmt(BigDecimal fqdkAmt) {
+        this.fqdkAmt = fqdkAmt;
+    }
+
+    public BigDecimal getFrdkCount() {
+        return frdkCount;
+    }
+
+    public void setFrdkCount(BigDecimal frdkCount) {
+        this.frdkCount = frdkCount;
+    }
+
+    public BigDecimal getSjdkAmt() {
+        return sjdkAmt;
+    }
+
+    public void setSjdkAmt(BigDecimal sjdkAmt) {
+        this.sjdkAmt = sjdkAmt;
+    }
+
+    public BigDecimal getSyqkAmt() {
+        return syqkAmt;
+    }
+
+    public void setSyqkAmt(BigDecimal syqkAmt) {
+        this.syqkAmt = syqkAmt;
+    }
+
     public BigDecimal getMoney() {
         return money;
     }

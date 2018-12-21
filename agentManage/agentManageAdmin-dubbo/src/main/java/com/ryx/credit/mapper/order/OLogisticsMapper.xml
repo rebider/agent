@@ -427,6 +427,7 @@
                 <if test="proType!=null and proType!=''"> and os.PRO_TYPE=#{proType}</if>
                 <if test="agName!=null and agName!=''"> and AGENT.ag_name like concat(concat( '%', #{agName} ),'%')</if>
                 <if test="proName!=null and proName!=''"> and os.pro_name like concat(concat( '%', #{proName}),'%')</if>
+                <if test="sendStatus!=null and sendStatus!=''"> and L.SEND_STATUS=#{sendStatus}</if>
         </where>
     </sql>
 
