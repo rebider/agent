@@ -121,7 +121,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             terminalTransfer.setcTime(date);
             terminalTransfer.setuTime(date);
             terminalTransfer.setcUser(cuser);
-            terminalTransfer.setcUser(cuser);
+            terminalTransfer.setuUser(cuser);
             terminalTransfer.setStatus(Status.STATUS_1.status);
             terminalTransfer.setVersion(Status.STATUS_1.status);
             int i = terminalTransferMapper.insert(terminalTransfer);
@@ -299,7 +299,13 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         terminalTransfer.setuTime(new Date());
         int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
         if(i!=1) {
-            log.info("审批任务结束{}{}，终端划拨更新失败", proIns, agStatus);
+            log.info("审批任务结束{}{}，终端划拨更新失败1", proIns, agStatus);
+            throw new MessageException("终端划拨更新失败");
+        }
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        int j = busActRelMapper.updateByPrimaryKey(busActRel);
+        if(j!=1) {
+            log.info("审批任务结束{}{}，终端划拨更新失败2", proIns, agStatus);
             throw new MessageException("终端划拨更新失败");
         }
         return AgentResult.ok();
