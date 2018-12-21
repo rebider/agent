@@ -27,4 +27,5 @@ public interface TerminalTransferService {
 
     AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag)throws Exception;
 
+    TerminalTransfer queryTerminalTransfer(String terminalTransferId);
 }

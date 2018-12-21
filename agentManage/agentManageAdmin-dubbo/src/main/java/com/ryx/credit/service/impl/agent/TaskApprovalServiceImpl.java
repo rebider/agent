@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.ApprovalType;
 import com.ryx.credit.common.enumc.Platform;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.MessageException;
@@ -97,7 +98,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     @Override
     public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
 
-        if(agentVo.getApprovalResult().equals("pass")){
+        if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);

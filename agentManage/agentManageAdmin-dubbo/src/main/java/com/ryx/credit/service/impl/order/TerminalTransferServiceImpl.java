@@ -266,7 +266,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     @Override
     public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId) throws Exception{
         try {
-            if(agentVo.getApprovalResult().equals("pass")){
+            if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
 
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
@@ -304,4 +304,28 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok();
     }
+
+    /**
+     * 根据id查询带明细
+     * @param terminalTransferId
+     * @return
+     */
+    @Override
+    public TerminalTransfer queryTerminalTransfer(String terminalTransferId){
+        if(StringUtils.isBlank(terminalTransferId)){
+            return null;
+        }
+        TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(terminalTransferId);
+        if(null==terminalTransfer){
+            return null;
+        }
+        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+        terminalTransfer.setTerminalTransferDetailList(terminalTransferDetails);
+        return terminalTransfer;
+    }
+
 }
