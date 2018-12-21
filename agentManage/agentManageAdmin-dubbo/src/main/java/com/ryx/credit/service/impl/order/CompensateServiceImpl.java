@@ -536,7 +536,7 @@ public class CompensateServiceImpl implements CompensateService {
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
         try {
-            if(agentVo.getApprovalResult().equals("pass")){
+            if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
                 BigDecimal deductAmt = new BigDecimal(0);
                 if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0){
                     if(agentVo.getDeductCapitalList()!=null)

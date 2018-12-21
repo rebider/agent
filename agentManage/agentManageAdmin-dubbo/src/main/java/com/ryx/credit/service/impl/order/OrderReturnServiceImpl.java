@@ -794,7 +794,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             String approveResult = agentVo.getApprovalResult();
 
             //如果是代理商修改订单时，修改SN状态
-            if (approveResult.equals("pass") && sid.equals(refund_agent_modify_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_modify_id)) {
                 try {
                     updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 } catch (ProcessException e) {
@@ -803,7 +803,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //业务审批时添加排单
-            if (approveResult.equals("pass") && sid.equals(refund_business1_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
                 AgentResult agentResult = savePlans(agentVo, userId);
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
@@ -811,12 +811,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //财务第一次审批时更新发货状态
-            if (approveResult.equals("pass") && sid.equals(refund_finc1_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_finc1_id)) {
                 updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.DFH.code));
             }
 
             //财务最后审批时上传打款凭证,并且是已经执行退款方案
-            if (approveResult.equals("pass") && sid.equals(refund_finc2_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_finc2_id)) {
                 OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
                 oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
                 List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
@@ -836,7 +836,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
             //代理商上传物流信息时判断是否上传物流信息
-            if (approveResult.equals("pass") && sid.equals(refund_agent_upload_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_upload_id)) {
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
@@ -853,7 +853,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //如果是退回修改订单信息时，修改SN状态
-            if (agentVo.getApprovalResult().equals("back")) {
+            if (agentVo.getApprovalResult().equals(ApprovalType.BACK.getValue())) {
                 try {
                     updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                     updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.TH.code));

@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by RYX on 2018/12/20.
@@ -23,4 +24,8 @@ public interface TerminalTransferService {
     AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId) throws Exception;
 
     AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
+
+    AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag)throws Exception;
+
+    TerminalTransfer queryTerminalTransfer(String terminalTransferId);
 }

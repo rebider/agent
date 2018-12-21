@@ -3,6 +3,7 @@ package com.ryx.credit.pojo.admin.order;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class TerminalTransfer implements Serializable{
     private String id;
@@ -22,6 +23,8 @@ public class TerminalTransfer implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private List<TerminalTransferDetail> terminalTransferDetailList;
 
     public String getId() {
         return id;
@@ -93,5 +96,13 @@ public class TerminalTransfer implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public List<TerminalTransferDetail> getTerminalTransferDetailList() {
+        return terminalTransferDetailList;
+    }
+
+    public void setTerminalTransferDetailList(List<TerminalTransferDetail> terminalTransferDetailList) {
+        this.terminalTransferDetailList = terminalTransferDetailList;
     }
 }
