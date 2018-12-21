@@ -97,8 +97,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private BusActRelService busActRelService;
     @Autowired
     private OLogisticsDetailMapper logisticsDetailMapper;
-    @Resource
-    private OLogisticsService oLogisticService;
     @Autowired
     private OAccountAdjustMapper accountAdjustMapper;
     @Autowired
@@ -110,15 +108,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     @Autowired
     private OLogisticsMapper oLogisticsMapper;
     @Autowired
-    private OLogisticsDetailMapper oLogisticsDetailMapper;
-    @Autowired
     private TermMachineService termMachineService;
     @Autowired
-    private PlatFormService platFormService;
-    @Autowired
     private OOrderMapper oOrderMapper;
-    @Autowired
-    private OLogisticsDetailService oLogisticsDetailService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
     @Autowired
@@ -127,8 +119,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OSubOrderActivityMapper subOrderActivityMapper;
     @Autowired
     private OReceiptProMapper oReceiptProMapper;
-    @Autowired
-    private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private IOrderReturnService iOrderReturnService;
     @Autowired
@@ -527,7 +517,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 List<String> sns = logisticsDetailService.querySnLList(startSn, endSn);
                 for (String sn : sns) {
                     //根据sn查询物流信息
-                    Map<String, Object> snmap = oLogisticService.getLogisticsBySn(sn, agentId);
+                    Map<String, Object> snmap = oLogisticsService.getLogisticsBySn(sn, agentId);
                 }
             }
         }
@@ -804,7 +794,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             String approveResult = agentVo.getApprovalResult();
 
             //如果是代理商修改订单时，修改SN状态
-            if (approveResult.equals("pass") && sid.equals(refund_agent_modify_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_modify_id)) {
                 try {
                     updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code);
                 } catch (ProcessException e) {
@@ -813,7 +803,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //业务审批时添加排单
-            if (approveResult.equals("pass") && sid.equals(refund_business1_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
                 AgentResult agentResult = savePlans(agentVo, userId);
                 if (!agentResult.isOK()) {
                     return AgentResult.fail(agentResult.getMsg());
@@ -821,12 +811,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //财务第一次审批时更新发货状态
-            if (approveResult.equals("pass") && sid.equals(refund_finc1_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_finc1_id)) {
                 updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.DFH.code));
             }
 
             //财务最后审批时上传打款凭证,并且是已经执行退款方案
-            if (approveResult.equals("pass") && sid.equals(refund_finc2_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_finc2_id)) {
                 OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
                 oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
                 List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
@@ -846,7 +836,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
 
             //代理商上传物流信息时判断是否上传物流信息
-            if (approveResult.equals("pass") && sid.equals(refund_agent_upload_id)) {
+            if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_agent_upload_id)) {
                 ReceiptPlanExample example = new ReceiptPlanExample();
                 example.or().andReturnOrderDetailIdEqualTo(agentVo.getReturnId());
                 List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(example);
@@ -863,7 +853,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //如果是退回修改订单信息时，修改SN状态
-            if (agentVo.getApprovalResult().equals("back")) {
+            if (agentVo.getApprovalResult().equals(ApprovalType.BACK.getValue())) {
                 try {
                     updateReturnOrderSnStatus(agentVo.getReturnId(), OLogisticsDetailStatus.STATUS_FH.code, OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                     updateOrderReturn(agentVo.getReturnId(), new BigDecimal(RetSchedule.TH.code));
@@ -1193,7 +1183,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
     @Override
     public PageInfo orderReturnList(Map<String, Object> param, PageInfo pageInfo) {
-        if(StringUtils.isNotBlank(String.valueOf(param.get("agentId"))) || !String.valueOf(param.get("agentId")).equals("null")){
+        if(StringUtils.isBlank(String.valueOf(param.get("agentId")))){
             if(!String.valueOf(param.get("orderReturn")).equals("all")){
                 List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(param.get("userId").toString()));
                 if(orgCodeRes==null && orgCodeRes.size()!=1){
@@ -1450,7 +1440,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
                     criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                     criteria.andSnNumEqualTo(snNum);
-                    List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                    List<OLogisticsDetail> oLogisticsDetails = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                     if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
                         //说明已经存在数据
                         log.info(snNum+"此物流已经存在,正在发货中!!!");
@@ -1580,7 +1570,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         OSubOrder old_suborder  = list_osub_old.get(0);
                         OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
                         example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
-                        List<OSubOrderActivity>  list_old_act = oSubOrderActivityMapper.selectByExample(example_old_activity);
+                        List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
                         if(list_old_act.size()==0){
                             throw new MessageException("退货机具活动信息未找到");
                         }
@@ -1707,7 +1697,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         OSubOrder oSubOrder = oSubOrders.get(0);
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         oSubOrderActivityExample.or().andSubOrderIdEqualTo(oSubOrder.getId()).andProIdEqualTo(oSubOrder.getProId()).andStatusEqualTo(Status.STATUS_1.status);
-        List<OSubOrderActivity>  OSubOrderActivitylist = oSubOrderActivityMapper.selectByExample(oSubOrderActivityExample);
+        List<OSubOrderActivity>  OSubOrderActivitylist = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
         OOrder order = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
         //1.起始SN序列号  2.结束SN序列号  3.开始截取的位数   4.结束截取的位数
         if (StringUtils.isBlank(startSn)) {
@@ -1738,7 +1728,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         .andRecordStatusEqualTo(Status.STATUS_2.status);
                 oLogisticsDetailExample.setOrderByClause(" c_time desc ");
 
-                List<OLogisticsDetail>  OLogisticsDetaillist_fahuo =  oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                List<OLogisticsDetail>  OLogisticsDetaillist_fahuo =  logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                 if(OLogisticsDetaillist_fahuo.size()>0) {
                    throw new MessageException(OLogisticsDetaillist_fahuo.get(0).getSnNum()+"已处于发货锁定状态");
                 }
@@ -1749,7 +1739,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         .andStatusEqualTo(Status.STATUS_2.status)
                         .andRecordStatusEqualTo(Status.STATUS_2.status);
                 oLogisticsDetailExample.setOrderByClause(" c_time desc ");
-                List<OLogisticsDetail>  OLogisticsDetaillist_tuihuo =  oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                List<OLogisticsDetail>  OLogisticsDetaillist_tuihuo =  logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                 OLogisticsDetail detail = new OLogisticsDetail();
                 if(OLogisticsDetaillist_tuihuo.size()>0) {
                      detail = OLogisticsDetaillist_tuihuo.get(0);
@@ -1775,6 +1765,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     detail.setTermtype(oSubOrderActivity.getTermtype());
                     detail.setTermtypename(oSubOrderActivity.getTermtypename());
                     detail.setSettlementPrice(oSubOrderActivity.getPrice());
+                    detail.setPosType(oSubOrderActivity.getPosType());
+                    detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
+                    detail.setStandTime(oSubOrderActivity.getStandTime());
                 }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
@@ -1794,7 +1787,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 }
                 detail.setVersion(Status.STATUS_1.status);
-                if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
+                if (1 != logisticsDetailMapper.insertSelective(detail)) {
                     log.info("添加失败");
                     throw new ProcessException("添加失败");
                 }
@@ -1815,7 +1808,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
         OLogisticsDetailExample example = new OLogisticsDetailExample();
         example.or().andLogisticsIdEqualTo(logistics.getId()).andRecordStatusEqualTo(Status.STATUS_1.status).andStatusEqualTo(Status.STATUS_1.status);
-        List<OLogisticsDetail>  listDetails = oLogisticsDetailMapper.selectByExample(example);
+        List<OLogisticsDetail>  listDetails = logisticsDetailMapper.selectByExample(example);
         if(listDetails.size()<=0){
             return AgentResult.fail("物流明细为空");
         }
@@ -1925,7 +1918,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             OSubOrder old_suborder  = list_osub_old.get(0);
             OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
             example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
-            List<OSubOrderActivity>  list_old_act = oSubOrderActivityMapper.selectByExample(example_old_activity);
+            List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
             if(list_old_act.size()==0){
                 throw new MessageException("退货机具活动信息未找到");
             }

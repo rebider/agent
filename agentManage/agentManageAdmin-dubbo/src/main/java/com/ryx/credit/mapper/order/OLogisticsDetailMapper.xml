@@ -36,6 +36,9 @@
     <result column="TERMTYPENAME" jdbcType="VARCHAR" property="termtypename" />
     <result column="SEND_STATUS" jdbcType="DECIMAL" property="sendStatus" />
     <result column="TERMINALID_CHECK" jdbcType="VARCHAR" property="terminalidCheck" />
+    <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
+    <result column="POS_TYPE" jdbcType="VARCHAR" property="posType" />
+    <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -71,7 +74,7 @@
     G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER,
     U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM, TERMINALID, TERMINALID_KEY, TERMINALID_SEQ,
     TERMINALID_TYPE, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME, TERMTYPE,
-    TERMTYPENAME, SEND_STATUS, TERMINALID_CHECK
+    TERMTYPENAME, SEND_STATUS, TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE, STAND_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -113,7 +116,8 @@
     TERMINALID_SEQ, TERMINALID_TYPE, BUS_PRO_CODE,
     BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
     TERMTYPE, TERMTYPENAME, SEND_STATUS,
-    TERMINALID_CHECK)
+    TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE,
+    STAND_TIME)
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
     #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
@@ -125,7 +129,8 @@
     #{terminalidSeq,jdbcType=VARCHAR}, #{terminalidType,jdbcType=VARCHAR}, #{busProCode,jdbcType=VARCHAR},
     #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, #{termBatchname,jdbcType=VARCHAR},
     #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
-    #{terminalidCheck,jdbcType=VARCHAR})
+    #{terminalidCheck,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, #{posType,jdbcType=VARCHAR},
+    #{standTime,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     insert into O_LOGISTICS_DETAIL
@@ -232,6 +237,15 @@
       <if test="terminalidCheck != null">
         TERMINALID_CHECK,
       </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE,
+      </if>
+      <if test="posType != null">
+        POS_TYPE,
+      </if>
+      <if test="standTime != null">
+        STAND_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -335,6 +349,15 @@
       </if>
       <if test="terminalidCheck != null">
         #{terminalidCheck,jdbcType=VARCHAR},
+      </if>
+      <if test="posSpePrice != null">
+        #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="posType != null">
+        #{posType,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        #{standTime,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -446,6 +469,15 @@
       <if test="terminalidCheck != null">
         TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
       </if>
+      <if test="posSpePrice != null">
+        POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="posType != null">
+        POS_TYPE = #{posType,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -483,7 +515,10 @@
     TERMTYPE = #{termtype,jdbcType=VARCHAR},
     TERMTYPENAME = #{termtypename,jdbcType=VARCHAR},
     SEND_STATUS = #{sendStatus,jdbcType=DECIMAL},
-    TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR}
+    TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
+    POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
+    POS_TYPE = #{posType,jdbcType=VARCHAR},
+    STAND_TIME = #{standTime,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -496,7 +531,6 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
   <select id="queryCompensateLList" parameterType="java.util.Map" resultType="java.util.Map">
     select
       ORDER_ID, LOGISTICS_ID, PRO_ID, PRO_NAME, SETTLEMENT_PRICE, ACTIVITY_ID, ACTIVITY_NAME, AGENT_ID,G_TIME,

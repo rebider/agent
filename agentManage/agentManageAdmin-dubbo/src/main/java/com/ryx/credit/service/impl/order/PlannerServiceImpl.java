@@ -89,6 +89,7 @@ public class PlannerServiceImpl implements PlannerService {
         }
         reqMap.put("agStatus", AgStatus.Approved.name());
         reqMap.put("cIncomStatus", AgentInStatus.NO.status);
+        reqMap.put("cloReviewStatus", AgStatus.Approved.status);
         List<Map<String, Object>> plannerList = receiptOrderMapper.queryPlannerAll(reqMap, page);
         //退货子订单编号
         if(plannerList.size()>0 && null!=map.get("O_RETURN_ORDER_DETAIL_ID")){
@@ -181,6 +182,9 @@ public class PlannerServiceImpl implements PlannerService {
             OSubOrderActivityItem.setTermtypename(real_activity.getTermtypename());
             OSubOrderActivityItem.setOriginalPrice(real_activity.getOriginalPrice());
             OSubOrderActivityItem.setPrice(real_activity.getPrice());
+            OSubOrderActivityItem.setPosType(real_activity.getPosType());
+            OSubOrderActivityItem.setPosSpePrice(real_activity.getPosSpePrice());
+            OSubOrderActivityItem.setStandTime(real_activity.getStandTime());
             if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
                 throw new MessageException("更新活动失败!");
             }
