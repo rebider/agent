@@ -3,7 +3,10 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.IDUtils;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -62,6 +65,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private OSubOrderMapper subOrderMapper;
     @Autowired
     private OSubOrderActivityMapper subOrderActivityMapper;
+    @Autowired
+    private RedisService redisService;
 
 
 
@@ -354,4 +359,57 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         return terminalTransfer;
     }
 
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult importTerminal(List<List<Object>> excelList,String cUser)throws Exception{
+
+        int i = 1;
+        String batchNo = IDUtils.getBatchNo();
+        List<Map<String,String>> resultList = new ArrayList<>();
+        for (List<Object> objects : excelList) {
+            String id = String.valueOf(objects.get(0));
+            String adjustStatusCon = String.valueOf(objects.get(12));
+            String remark = String.valueOf(objects.get(13));
+            BigDecimal adjustStatus = AdjustStatus.getValueByContent(adjustStatusCon);
+            if(adjustStatus==null){
+                throw new MessageException("第"+i+"个调整结果类型错误");
+            }
+            if(StringUtils.isBlank(id)){
+                throw new MessageException("第"+i+"个编号为空");
+            }
+            TerminalTransferDetail terminalTransferDetail = terminalTransferDetailMapper.selectByPrimaryKey(id);
+            if(null==terminalTransferDetail){
+                throw new MessageException("第"+i+"个编号不存在");
+            }
+            try {
+                terminalTransferDetail.setRemark(remark);
+                Date date = new Date();
+                terminalTransferDetail.setAdjustTime(date);
+                terminalTransferDetail.setAdjustStatus(adjustStatus);
+                terminalTransferDetail.setuUser(cUser);
+                terminalTransferDetail.setuTime(date);
+                terminalTransferDetail.setBatchNum(batchNo);
+                TerminalTransferDetail upTransferDetail = new TerminalTransferDetail();
+                upTransferDetail.setId(id);
+                upTransferDetail.setuUser(cUser);
+                upTransferDetail.setuTime(date);
+                upTransferDetail.setAdjustStatus(AdjustStatus.TZZ.getValue());
+                int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(upTransferDetail);
+                if(j!=1){
+                    throw new MessageException("第"+i+"个数据更新失败");
+                }
+                redisService.hSet(RedisCachKey.TERMINAL_TRANSFER.code,id, JsonUtil.objectToJson(terminalTransferDetail));
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MessageException("第"+i+"个数据处理失败");
+            }
+            Map<String,String> resultMap = new HashMap<>();
+            resultMap.put("id",id);
+            resultMap.put("adjustStatusCon",adjustStatusCon);
+            resultMap.put("remark",remark);
+            resultList.add(resultMap);
+        }
+        return AgentResult.ok(resultList);
+    }
 }

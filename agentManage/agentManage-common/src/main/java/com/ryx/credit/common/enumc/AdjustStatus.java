@@ -48,4 +48,14 @@ public enum AdjustStatus {
         return "";
     }
 
+    public static BigDecimal getValueByContent(String value){
+        AdjustStatus[] busType = AdjustStatus.values();
+        for(AdjustStatus bt : busType){
+            if(bt.msg.equals(value)){
+                return bt.key;
+            }
+        }
+        return null;
+    }
+
 }
