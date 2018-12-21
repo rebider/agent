@@ -41,6 +41,7 @@ public class OrderoutVo implements Serializable{
     private String activityName;//活动名称
     private BigDecimal ddAmt;//订单金额
     private BigDecimal ykfrAmt;//应扣分润金额
+    private String downPaymentDate;//分润扣款开始月份
     private BigDecimal downPaymentCount;//分期扣分润期数
     private BigDecimal downPayment;//首付金额
     private BigDecimal mqykAmt;//每期应扣分润金额
@@ -80,6 +81,14 @@ public class OrderoutVo implements Serializable{
 
     public void setYkfrAmt(BigDecimal ykfrAmt) {
         this.ykfrAmt = ykfrAmt;
+    }
+
+    public String getDownPaymentDate() {
+        return downPaymentDate;
+    }
+
+    public void setDownPaymentDate(String downPaymentDate) {
+        this.downPaymentDate = downPaymentDate;
     }
 
     public BigDecimal getDownPaymentCount() {
