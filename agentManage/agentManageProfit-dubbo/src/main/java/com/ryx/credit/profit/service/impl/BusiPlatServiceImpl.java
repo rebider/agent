@@ -94,6 +94,8 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("companyname",agentName);
         map.put("batchIds",platId.toString());
+        map.put("colinfoMessage","AgentColinfo");
+
         String params = JsonUtil.objectToJson(map);
         log.info("======mPos_updateAgName:{}",params);
         String res = HttpClientUtil.doPostJson
