@@ -73,27 +73,26 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
 
     @Override
-    public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page) {
+    public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName) {
 
-        TerminalTransferExample example = new TerminalTransferExample();
-        TerminalTransferExample.Criteria criteria = example.createCriteria();
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-        example.setPage(page);
-        example.setOrderByClause(" c_time desc ");
-        List<TerminalTransfer> terminalTransferList = terminalTransferMapper.selectByExample(example);
-        for (TerminalTransfer transfer : terminalTransferList) {
-            CUser cUser = userService.selectById(Integer.valueOf(transfer.getcUser()));
-            if(cUser!=null){
-                transfer.setcUser(cUser.getName());
-            }
-            CUser uUser = userService.selectById(Integer.valueOf(transfer.getuUser()));
-            if(uUser!=null){
-                transfer.setuUser(uUser.getName());
-            }
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("status",Status.STATUS_1.status);
+        if(StringUtils.isNotBlank(terminalTransfer.getAgentId())){
+            reqMap.put("agentId",terminalTransfer.getAgentId());
         }
+        if(StringUtils.isNotBlank(agName)){
+            reqMap.put("agName",agName);
+        }
+        if(StringUtils.isNotBlank(terminalTransfer.getId())){
+            reqMap.put("id",terminalTransfer.getId());
+        }
+        if(null!=terminalTransfer.getReviewStatus()){
+            reqMap.put("reviewStatus",terminalTransfer.getReviewStatus());
+        }
+        List<Map<String,Object>> terminalTransferList = terminalTransferMapper.selectTerminalTransferList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(terminalTransferList);
-        pageInfo.setTotal((int)terminalTransferMapper.countByExample(example));
+        pageInfo.setTotal(terminalTransferMapper.selectTerminalTransferCount(reqMap));
         return pageInfo;
     }
 
@@ -174,6 +173,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             String terminalTransferId = idService.genId(TabId.O_TERMINAL_TRANSFER);
             terminalTransfer.setId(terminalTransferId);
+            terminalTransfer.setAgentId(agentId);
             Date date = new Date();
             terminalTransfer.setcTime(date);
             terminalTransfer.setuTime(date);

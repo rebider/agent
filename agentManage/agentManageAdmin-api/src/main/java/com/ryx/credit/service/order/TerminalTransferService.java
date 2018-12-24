@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface TerminalTransferService {
 
-    PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page);
+    PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName);
 
     PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName);
 
