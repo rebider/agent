@@ -21,7 +21,7 @@ public interface TerminalTransferService {
 
     AgentResult startTerminalTransferActivity(String id, String cuser, String agentId) throws Exception;
 
-    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId) throws Exception;
+    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception;
 
     AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
 
@@ -29,5 +29,9 @@ public interface TerminalTransferService {
 
     TerminalTransfer queryTerminalTransfer(String terminalTransferId);
 
+    List<TerminalTransferDetail> queryDetailByTerminalId(String terminalTransferId);
+
     AgentResult importTerminal(List<List<Object>> excelList,String cUser)throws Exception;
+
+    List<TerminalTransferDetail> queryImprotMsgList(String terminalTransferId);
 }

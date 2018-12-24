@@ -289,10 +289,26 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId) throws Exception{
+    public AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception{
         try {
             if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
-
+                //财务审批
+                List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(busId);
+                if(agentVo.getSid().equals("cw")){
+                    List<TerminalTransferDetail> terminalTransferDetailsRedis = queryImprotMsgList(busId);
+                    if(terminalTransferDetails.size()!=terminalTransferDetailsRedis.size()){
+                        throw new ProcessException("请导入信息后在提交审批");
+                    }
+                }else{
+                    //目前就省区一个节点直接else
+                    for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+                        terminalTransferDetail.setButtJointPerson(userId);
+                        int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
+                        if(i!=1){
+                            throw new ProcessException("更新审批失败");
+                        }
+                    }
+                }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
@@ -327,6 +343,27 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             log.info("审批任务结束{}{}，终端划拨更新失败1", proIns, agStatus);
             throw new MessageException("终端划拨更新失败");
         }
+        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+        if(terminalTransferDetails.size()==0){
+            throw new MessageException("终端划拨更新失败");
+        }
+        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+            //从redis取出导入的数据更新到DB
+            String terminalTransferJson = redisService.hGet(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
+            TerminalTransferDetail terminal = JsonUtil.jsonToPojo(terminalTransferJson, TerminalTransferDetail.class);
+            TerminalTransferDetail upTerminal = new TerminalTransferDetail();
+            upTerminal.setId(terminalTransferDetail.getId());
+            upTerminal.setAdjustStatus(terminal.getAdjustStatus());
+            upTerminal.setRemark(terminal.getRemark());
+            int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(upTerminal);
+            if(j!=1){
+                throw new MessageException("终端划拨明细更新到DB失败");
+            }
+        }
         busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
         int j = busActRelMapper.updateByPrimaryKey(busActRel);
         if(j!=1) {
@@ -359,6 +396,47 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         return terminalTransfer;
     }
 
+    /**
+     * 根据申请id查询明细
+     * @param terminalTransferId
+     * @return
+     */
+    @Override
+    public List<TerminalTransferDetail> queryDetailByTerminalId(String terminalTransferId){
+        if(StringUtils.isBlank(terminalTransferId)){
+            return null;
+        }
+        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andTerminalTransferIdEqualTo(terminalTransferId);
+        List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+        return terminalTransferDetails;
+    }
+
+    /**
+     * 查询redis已导入信息
+     * @param terminalTransferId
+     * @return
+     */
+    @Override
+    public List<TerminalTransferDetail> queryImprotMsgList(String terminalTransferId){
+        List<TerminalTransferDetail> terminalTransferDetails = queryDetailByTerminalId(terminalTransferId);
+        if(terminalTransferDetails==null){
+            return null;
+        }
+        List<TerminalTransferDetail> resultList = new ArrayList<>();
+        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+            String terminalTransferJson = redisService.hGet(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
+            TerminalTransferDetail terminal = JsonUtil.jsonToPojo(terminalTransferJson, TerminalTransferDetail.class);
+            if(terminal!=null){
+                terminal.setAdjustMsg(AdjustStatus.getContentByValue(terminalTransferDetail.getAdjustStatus()));
+                resultList.add(terminal);
+            }
+        }
+        return resultList;
+    }
+
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
@@ -372,7 +450,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             String adjustStatusCon = String.valueOf(objects.get(12));
             String remark = String.valueOf(objects.get(13));
             BigDecimal adjustStatus = AdjustStatus.getValueByContent(adjustStatusCon);
-            if(adjustStatus==null){
+            if(adjustStatus==null || adjustStatusCon.equals(AdjustStatus.TZZ.msg) || adjustStatusCon.equals(AdjustStatus.WTZ.msg) ){
                 throw new MessageException("第"+i+"个调整结果类型错误");
             }
             if(StringUtils.isBlank(id)){
@@ -412,4 +490,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         return AgentResult.ok(resultList);
     }
+
+
 }
