@@ -25,4 +25,12 @@ public interface ProfitSupplyTaxMapper {
     long getProfitSupplyTaxCount(Map<String, Object> param);
 
     List<Map<String, Object>> getProfitSupplyTaxList(Map<String, Object> param);
+
+
+    List<Map<String, Object>> getClassificationList(Map<String, Object> param);
+
+
+
+
+
 }

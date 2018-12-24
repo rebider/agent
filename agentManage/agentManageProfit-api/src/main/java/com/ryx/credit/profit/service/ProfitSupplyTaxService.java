@@ -6,5 +6,4 @@ import java.util.Map;
 
 public interface ProfitSupplyTaxService {
     PageInfo getProfitSupplyTaxList(Map<String, Object> param, PageInfo pageInfo);
-
 }
