@@ -13,7 +13,7 @@
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
     <result column="FACTOR_DATE" jdbcType="TIMESTAMP" property="factorDate" />
     <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
-
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -44,9 +44,38 @@
       </foreach>
     </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
   <sql id="Base_Column_List">
     ID, AGENT_ID, AGENT_PID, AGENT_NAME, FACTOR_MONTH, TATOL_AMT, BUCKLE_AMT, SURPLUS_AMT, 
-    REMARK, FACTOR_DATE, PARENT_AGENT_ID
+    REMARK, FACTOR_DATE, PARENT_AGENT_ID, PARENT_AGENT_NAME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PProfitFactorExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -80,11 +109,13 @@
     insert into P_PROFIT_FACTOR (ID, AGENT_ID, AGENT_PID, 
       AGENT_NAME, FACTOR_MONTH, TATOL_AMT, 
       BUCKLE_AMT, SURPLUS_AMT, REMARK, 
-      FACTOR_DATE, PARENT_AGENT_ID)
+      FACTOR_DATE, PARENT_AGENT_ID, PARENT_AGENT_NAME
+      )
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{factorMonth,jdbcType=VARCHAR}, #{tatolAmt,jdbcType=DECIMAL}, 
       #{buckleAmt,jdbcType=DECIMAL}, #{surplusAmt,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
-      #{factorDate,jdbcType=TIMESTAMP}, #{parentAgentId,jdbcType=VARCHAR})
+      #{factorDate,jdbcType=TIMESTAMP}, #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
     insert into P_PROFIT_FACTOR
@@ -122,6 +153,9 @@
       <if test="parentAgentId != null">
         PARENT_AGENT_ID,
       </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -157,6 +191,9 @@
       <if test="parentAgentId != null">
         #{parentAgentId,jdbcType=VARCHAR},
       </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PProfitFactorExample" resultType="java.lang.Long">
@@ -165,15 +202,74 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-
   <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.math.BigDecimal">
     select SUM(BUCKLE_AMT) from P_PROFIT_FACTOR
      where
     FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
   </select>
-
-
+  <update id="updateByExampleSelective" parameterType="map">
+    update P_PROFIT_FACTOR
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentPid != null">
+        AGENT_PID = #{record.agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentName != null">
+        AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.factorMonth != null">
+        FACTOR_MONTH = #{record.factorMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tatolAmt != null">
+        TATOL_AMT = #{record.tatolAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.buckleAmt != null">
+        BUCKLE_AMT = #{record.buckleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.surplusAmt != null">
+        SURPLUS_AMT = #{record.surplusAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.factorDate != null">
+        FACTOR_DATE = #{record.factorDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.parentAgentId != null">
+        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentName != null">
+        PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_PROFIT_FACTOR
+    set ID = #{record.id,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      AGENT_PID = #{record.agentPid,jdbcType=VARCHAR},
+      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      FACTOR_MONTH = #{record.factorMonth,jdbcType=VARCHAR},
+      TATOL_AMT = #{record.tatolAmt,jdbcType=DECIMAL},
+      BUCKLE_AMT = #{record.buckleAmt,jdbcType=DECIMAL},
+      SURPLUS_AMT = #{record.surplusAmt,jdbcType=DECIMAL},
+      REMARK = #{record.remark,jdbcType=VARCHAR},
+      FACTOR_DATE = #{record.factorDate,jdbcType=TIMESTAMP},
+      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PProfitFactor">
     update P_PROFIT_FACTOR
     <set>
@@ -207,6 +303,9 @@
       <if test="parentAgentId != null">
         PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
       </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -221,7 +320,8 @@
       SURPLUS_AMT = #{surplusAmt,jdbcType=DECIMAL},
       REMARK = #{remark,jdbcType=VARCHAR},
       FACTOR_DATE = #{factorDate,jdbcType=TIMESTAMP},
-      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR}
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -252,7 +352,7 @@
   <select id="getProfitFactorList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT ID,AGENT_ID,AGENT_PID,AGENT_NAME,FACTOR_MONTH,
-    TATOL_AMT,BUCKLE_AMT,SURPLUS_AMT,REMARK,FACTOR_DATE,PARENT_AGENT_ID
+    TATOL_AMT,BUCKLE_AMT,SURPLUS_AMT,REMARK,FACTOR_DATE,PARENT_AGENT_ID,PARENT_AGENT_NAME
     FROM P_PROFIT_FACTOR
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>

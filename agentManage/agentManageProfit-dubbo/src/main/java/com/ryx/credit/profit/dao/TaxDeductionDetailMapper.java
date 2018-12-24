@@ -1,7 +1,10 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.TaxDeductionDetail;
 import com.ryx.credit.profit.pojo.TaxDeductionDetailExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface TaxDeductionDetailMapper {
@@ -20,4 +23,8 @@ public interface TaxDeductionDetailMapper {
     int updateByPrimaryKeySelective(TaxDeductionDetail record);
 
     int updateByPrimaryKey(TaxDeductionDetail record);
+
+    List<TaxDeductionDetail> queryAndSubordinate(@Param("detail") TaxDeductionDetail taxDeductionDetail, @Param("page") Page page);
+
+    long queryCountAndSubordinate(TaxDeductionDetail taxDeductionDetail);
 }
