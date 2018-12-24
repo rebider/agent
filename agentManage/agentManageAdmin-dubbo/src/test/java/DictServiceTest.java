@@ -116,7 +116,7 @@ public class DictServiceTest extends BaseSpringTest {
     @Test
     public void testSelectCashSummaryMouthData(){
 
-      List<CashSummaryMouth> res =  cashSummaryMouthMapper.selectCashSummaryMouthData("2018-11","0");
+      List<CashSummaryMouth> res =  cashSummaryMouthMapper.selectCashSummaryMouthData("201811","0");
         for (CashSummaryMouth re : res) {
             if(null==cashSummaryMouthMapper.selectByPrimaryKey(re)){
                 cashSummaryMouthMapper.insertSelective(re);

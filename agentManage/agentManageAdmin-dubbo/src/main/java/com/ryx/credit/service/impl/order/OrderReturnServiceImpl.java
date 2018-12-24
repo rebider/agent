@@ -1514,7 +1514,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             e.printStackTrace();
                             log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
                             logistics.setSendStatus(Status.STATUS_2.status);
-                            logistics.setSendMsg("机具退货调整POS接口调用异常");
+                            logistics.setSendMsg(e.getMsg());
+                            oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
+                            logistics.setSendStatus(Status.STATUS_2.status);
+                            logistics.setSendMsg(e.getLocalizedMessage());
                             oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                         }
                         //===============================================================================
@@ -1610,7 +1616,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logistics.setSendStatus(Status.STATUS_2.status);
-                                logistics.setSendMsg("退货物流业务系统联动调整异常");
+                                logistics.setSendMsg(e.getLocalizedMessage());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
                                     log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                                 }

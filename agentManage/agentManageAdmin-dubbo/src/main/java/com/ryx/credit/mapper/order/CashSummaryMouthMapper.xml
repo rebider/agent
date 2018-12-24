@@ -263,7 +263,7 @@
       AG_UNIQ_NUM, BUS_PARENT_ID, BUS_PARENT_BUS_NUM, BUS_PARENT_AGENT_ID, sysdate, 1
     from (
            --付款单现付金额  不开发票
-           select sum(a.real_amount) as pay_amount,'YHHK' as pay_type,to_char(max(a.real_rec_time),'yyyy-MM') as day_str,
+           select sum(a.real_amount) as pay_amount,'YHHK' as pay_type,to_char(max(a.real_rec_time),'yyyyMM') as day_str,
              e.agent_id,d.ag_uniq_num,e.bus_num,e.bus_platform,e.id as  busid,${is_clo_invoice} as is_clo_invoice,
              h.id as bus_parent_id,h.bus_num as bus_parent_bus_num,h.agent_id as bus_parent_agent_id
            from o_Cash_Receivables a
@@ -280,12 +280,12 @@
                  and a.cashpay_type = 'PAYMENT'  --付款单现付金额
                  and a.real_rec_time is not null --实际到账时间不为空
                  and e.bus_num is not null       --业务编号不为空
-                 and to_char(a.real_rec_time,'yyyy-MM') = #{date_str}
+                 and to_char(a.real_rec_time,'yyyyMM') = #{date_str}
                  and a.status=1 and b.status=1 and c.status=1 and d.status=1
            group by e.agent_id,d.ag_uniq_num,e.bus_num,e.bus_platform,e.id,h.id ,h.bus_num ,h.agent_id
            union
            select
-                                                               sum(a.real_amount) as pay_amount,'YHHK'as pay_type,to_char(max(a.real_rec_time),'yyyy-MM') as day_str,
+                                                               sum(a.real_amount) as pay_amount,'YHHK'as pay_type,to_char(max(a.real_rec_time),'yyyyMM') as day_str,
              f.agent_id,e.ag_uniq_num,f.bus_num,f.bus_platform,f.id as  busid,${is_clo_invoice} as is_clo_invoice,
                                                                h.id as bus_parent_id,h.bus_num as bus_parent_bus_num,h.agent_id as bus_parent_agent_id
            from o_Cash_Receivables a
@@ -303,7 +303,7 @@
                  and c.src_type = 'XXBK' -- 线下补款
                  and d.is_clo_invoice=#{is_clo_invoice}
                  and g.review_status = '3' -- 订单审批通过
-                 and to_char(a.real_rec_time,'yyyy-MM') = #{date_str}
+                 and to_char(a.real_rec_time,'yyyyMM') = #{date_str}
                  and g.status=1 and d.status=1  and c.status=1  and b.status=1 and a.status=1
            group by f.agent_id,e.ag_uniq_num,f.bus_num,f.bus_platform,f.id,h.id ,h.bus_num ,h.agent_id
          ) i group by pay_type,
