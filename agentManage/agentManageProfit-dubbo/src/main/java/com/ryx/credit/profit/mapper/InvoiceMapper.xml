@@ -237,4 +237,13 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <select id="getInvoiceByInvoice" parameterType="com.ryx.credit.profit.pojo.Invoice" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+     from P_INVOICE where FACTOR_MONTH=#{factorMonth} and AGENT_ID=#{agentId} and AGENT_NAME=#{agentName} and STATUS='1'
+  </select>
+  <update id="setStatusToInvoice" parameterType="com.ryx.credit.profit.pojo.Invoice">
+    update  P_INVOICE set STATUS='0' where FACTOR_MONTH=#{factorMonth} and AGENT_ID=#{agentId} and AGENT_NAME=#{agentName}
+  </update>
+
 </mapper>
