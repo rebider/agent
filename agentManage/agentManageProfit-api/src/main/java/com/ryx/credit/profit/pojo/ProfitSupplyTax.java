@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProfitSupplyTax {
+public class ProfitSupplyTax implements Serializable {
     private String id;
 
     private String supplyTaxDate;
