@@ -100,7 +100,7 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
             profitFactor.setFactorDate(Calendar.getInstance().getTime());//导入时间
             profitFactor.setId(idService.genId(TabId.p_profit_factor));//ID序列号
             try {
-                profitFactor.setFactorMonth(null!=factor.get(0)?String.valueOf(factor.get(0)):"");//月份
+                profitFactor.setFactorMonth(null!=factor.get(0)?String.valueOf(factor.get(0)).substring(0,6):"");//月份
                 profitFactor.setAgentPid(null!=factor.get(1)?String.valueOf(factor.get(1)):"");//代理商唯一码
                 profitFactor.setAgentName(null!=factor.get(2)?String.valueOf(factor.get(2)):"");//代理商名称
                 profitFactor.setAgentId(null!=factor.get(3)?String.valueOf(factor.get(3)):"");//代理商编号

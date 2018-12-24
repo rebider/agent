@@ -165,7 +165,8 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
                 profitSupply.setSupplyType(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//补款类型
                 profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(5))));//补款金额
-                profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));//月份
+                profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7).replace("-",""));//月份
+
 //                profitSupply.setSupplyDate(null!=supply.get(6)?String.valueOf(supply.get(6)):"");//月份
 //                profitSupply.setSupplyCode(supply.get(7)!=null?"":String.valueOf(supply.get(7)));//补款码
                 if (pProfitSupplyMapper.insertSelective(profitSupply)==0) {

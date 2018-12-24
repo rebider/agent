@@ -26,13 +26,7 @@ public class PProfitFactor {
     //新增  20180821
     private String parentAgentId;
 
-    public String getParentAgentId() {
-        return parentAgentId;
-    }
-
-    public void setParentAgentId(String parentAgentId) {
-        this.parentAgentId = parentAgentId;
-    }
+    private String parentAgentName;
 
     public String getId() {
         return id;
@@ -112,5 +106,21 @@ public class PProfitFactor {
 
     public void setFactorDate(Date factorDate) {
         this.factorDate = factorDate;
+    }
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId == null ? null : parentAgentId.trim();
+    }
+
+    public String getParentAgentName() {
+        return parentAgentName;
+    }
+
+    public void setParentAgentName(String parentAgentName) {
+        this.parentAgentName = parentAgentName == null ? null : parentAgentName.trim();
     }
 }
