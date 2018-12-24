@@ -38,10 +38,10 @@ public enum AdjustStatus {
     }
 
 
-    public static String getContentByValue(String value){
+    public static String getContentByValue(BigDecimal value){
         AdjustStatus[] busType = AdjustStatus.values();
         for(AdjustStatus bt : busType){
-            if(bt.key.toString().equals(value)){
+            if(bt.key.compareTo(value)==0){
                 return bt.msg;
             }
         }

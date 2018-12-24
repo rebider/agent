@@ -1498,7 +1498,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
                         imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
                         OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
-                        log.info("退货上传物流下发到首刷系统:{}:{}:{}",user,logistics.getId(),snList.toString());
+                        log.info("退货上传物流下发到POS系统:{}:{}:{}",user,logistics.getId(),snList.toString());
                         try {
                             AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
                             if(ar.isOK()){
