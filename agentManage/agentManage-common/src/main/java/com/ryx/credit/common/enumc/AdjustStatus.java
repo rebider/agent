@@ -1,6 +1,8 @@
 package com.ryx.credit.common.enumc;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 业务平台类型
@@ -56,6 +58,15 @@ public enum AdjustStatus {
             }
         }
         return null;
+    }
+
+    public static Map<BigDecimal, String>  getValueMap(){
+        Map<BigDecimal, String> hashMap = new LinkedHashMap<>();
+        AdjustStatus[] busType = AdjustStatus.values();
+        for(AdjustStatus bt : busType){
+            hashMap.put(bt.key,bt.msg);
+        }
+        return hashMap;
     }
 
 }

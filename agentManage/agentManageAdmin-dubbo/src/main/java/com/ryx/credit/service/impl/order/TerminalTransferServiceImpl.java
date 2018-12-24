@@ -2,7 +2,6 @@ package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.IDUtils;
@@ -14,10 +13,12 @@ import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.TerminalTransferService;
@@ -67,7 +68,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private OSubOrderActivityMapper subOrderActivityMapper;
     @Autowired
     private RedisService redisService;
-
+    @Autowired
+    private IUserService userService;
 
 
     @Override
@@ -77,7 +79,18 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         TerminalTransferExample.Criteria criteria = example.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         example.setPage(page);
+        example.setOrderByClause(" c_time desc ");
         List<TerminalTransfer> terminalTransferList = terminalTransferMapper.selectByExample(example);
+        for (TerminalTransfer transfer : terminalTransferList) {
+            CUser cUser = userService.selectById(Integer.valueOf(transfer.getcUser()));
+            if(cUser!=null){
+                transfer.setcUser(cUser.getName());
+            }
+            CUser uUser = userService.selectById(Integer.valueOf(transfer.getuUser()));
+            if(uUser!=null){
+                transfer.setuUser(uUser.getName());
+            }
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(terminalTransferList);
         pageInfo.setTotal((int)terminalTransferMapper.countByExample(example));
@@ -85,7 +98,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     }
 
     @Override
-    public PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page) {
+    public PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName) {
 
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put("status",Status.STATUS_1.status);
@@ -104,11 +117,30 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(null!=terminalTransferDetail.getAdjustStatus()){
             reqMap.put("adjustStatus",terminalTransferDetail.getAdjustStatus());
         }
+        if(StringUtils.isNotBlank(agName)){
+            reqMap.put("agName",agName);
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getGoalOrgId())){
+            reqMap.put("goalOrgId",terminalTransferDetail.getGoalOrgId());
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getGoalOrgName())){
+            reqMap.put("goalOrgName",terminalTransferDetail.getGoalOrgName());
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getOriginalOrgId())){
+            reqMap.put("originalOrgId",terminalTransferDetail.getOriginalOrgId());
+        }
+        if(StringUtils.isNotBlank(terminalTransferDetail.getOriginalOrgName())){
+            reqMap.put("originalOrgName",terminalTransferDetail.getOriginalOrgName());
+        }
         List<Map<String,Object>> terminalTransferList = null;
         if(page==null){
             terminalTransferList = terminalTransferDetailMapper.selectTerminalTransferDetailList(reqMap,page);
         }else{
             terminalTransferList = terminalTransferDetailMapper.exprotTerminalTransferDetails(reqMap);
+        }
+        for (Map<String, Object> queryMap : terminalTransferList) {
+            BigDecimal adjustStatus = new BigDecimal(queryMap.get("ADJUST_STATUS").toString());
+            queryMap.put("ADJUST_STATUS_MSG",AdjustStatus.getContentByValue(adjustStatus));
         }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(terminalTransferList);
@@ -167,14 +199,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 reqParam.put("recordStatusList",recordStatusList);
                 List<Map<String,Object>> logisticsDetailList = logisticsDetailMapper.queryCompensateLList(reqParam);
 //                if(logisticsDetailList.size()==0){
-//                    throw new ProcessException("sn号在审批中或已退货");
+//                    throw new MessageException("sn号在审批中或已退货");
 //                }
 //                BigDecimal proNumSum = new BigDecimal(0);
 //                for (Map<String, Object> stringObjectMap : logisticsDetailList) {
 //                    proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
 //                }
 //                if(!String.valueOf(proNumSum).equals(terminalTransferDetail.getSnCount())){
-//                    throw new ProcessException("sn号数量不匹配");
+//                    throw new MessageException("sn号数量不匹配");
 //                }
 //                Set<String> proComSet = new HashSet<>();
 //                Set<String> proModelSet = new HashSet<>();
@@ -189,7 +221,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 //                    criteria.andProIdEqualTo(proId);
 //                    List<OSubOrder> oSubOrders = subOrderMapper.selectByExample(oSubOrderExample);
 //                    if(oSubOrders.size()!=1){
-//                        throw new ProcessException("查询采购单数据有误");
+//                        throw new MessageException("查询采购单数据有误");
 //                    }
 //                    OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
 //                    OSubOrderActivityExample.Criteria criteria1 = oSubOrderActivityExample.createCriteria();
@@ -198,17 +230,17 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 //                    criteria1.andStatusEqualTo(Status.STATUS_1.status);
 //                    List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
 //                    if(oSubOrderActivities.size()!=1){
-//                        throw new ProcessException("查询活动快照数据有误");
+//                        throw new MessageException("查询活动快照数据有误");
 //                    }
 //                    OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
 //                    proComSet.add(oSubOrderActivity.getVender());
 //                    proModelSet.add(oSubOrderActivity.getProModel());
 //                }
 //                if(proComSet.size()!=1){
-//                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
+//                    throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一厂商");
 //                }
 //                if(proModelSet.size()!=1){
-//                    throw new ProcessException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
+//                    throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
 //                }
 //
 //                AgentBusInfoExample originalExample = new AgentBusInfoExample();
@@ -297,7 +329,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if(agentVo.getSid().equals("cw")){
                     List<TerminalTransferDetail> terminalTransferDetailsRedis = queryImprotMsgList(busId);
                     if(terminalTransferDetails.size()!=terminalTransferDetailsRedis.size()){
-                        throw new ProcessException("请导入信息后在提交审批");
+                        throw new MessageException("请导入信息后在提交审批");
                     }
                 }else{
                     //目前就省区一个节点直接else
@@ -305,7 +337,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                         terminalTransferDetail.setButtJointPerson(userId);
                         int i = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);
                         if(i!=1){
-                            throw new ProcessException("更新审批失败");
+                            throw new MessageException("更新审批失败");
                         }
                     }
                 }
@@ -313,11 +345,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
             if(!result.isOK()){
                 log.error(result.getMsg());
-                throw new ProcessException("工作流处理任务异常");
+                throw new MessageException("工作流处理任务异常");
             }
-        } catch (ProcessException e) {
+        }catch (MessageException e) {
             e.printStackTrace();
-            throw new ProcessException("catch工作流处理任务异常!");
+            throw new MessageException(e.getMsg());
+        }catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("catch工作流处理任务异常!" );
         }
         return AgentResult.ok();
     }
@@ -352,15 +387,23 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             throw new MessageException("终端划拨更新失败");
         }
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
-            //从redis取出导入的数据更新到DB
-            String terminalTransferJson = redisService.hGet(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
-            TerminalTransferDetail terminal = JsonUtil.jsonToPojo(terminalTransferJson, TerminalTransferDetail.class);
-            TerminalTransferDetail upTerminal = new TerminalTransferDetail();
-            upTerminal.setId(terminalTransferDetail.getId());
-            upTerminal.setAdjustStatus(terminal.getAdjustStatus());
-            upTerminal.setRemark(terminal.getRemark());
-            int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(upTerminal);
-            if(j!=1){
+            try {
+                //从redis取出导入的数据更新到DB
+                String terminalTransferJson = redisService.hGet(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
+                TerminalTransferDetail terminal = JsonUtil.jsonToPojo(terminalTransferJson, TerminalTransferDetail.class);
+                TerminalTransferDetail upTerminal = new TerminalTransferDetail();
+                upTerminal.setId(terminalTransferDetail.getId());
+                upTerminal.setAdjustStatus(terminal.getAdjustStatus());
+                upTerminal.setRemark(terminal.getRemark());
+                upTerminal.setAdjustTime(terminal.getAdjustTime());
+                upTerminal.setBatchNum(terminal.getBatchNum());
+                int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(upTerminal);
+                if(j!=1){
+                    throw new MessageException("终端划拨明细更新到DB失败");
+                }
+                redisService.hDel(RedisCachKey.TERMINAL_TRANSFER.code,terminalTransferDetail.getId());
+            }catch (Exception e){
+                e.getStackTrace();
                 throw new MessageException("终端划拨明细更新到DB失败");
             }
         }
@@ -392,6 +435,12 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
         List<TerminalTransferDetail> terminalTransferDetails = terminalTransferDetailMapper.selectByExample(terminalTransferDetailExample);
+        for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetails) {
+            CUser cUser = userService.selectById(Integer.valueOf(terminalTransferDetail.getButtJointPerson()));
+            if(cUser!=null){
+                terminalTransferDetail.setButtJointPerson(cUser.getName());
+            }
+        }
         terminalTransfer.setTerminalTransferDetailList(terminalTransferDetails);
         return terminalTransfer;
     }
@@ -430,7 +479,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             String terminalTransferJson = redisService.hGet(RedisCachKey.TERMINAL_TRANSFER.code, terminalTransferDetail.getId());
             TerminalTransferDetail terminal = JsonUtil.jsonToPojo(terminalTransferJson, TerminalTransferDetail.class);
             if(terminal!=null){
-                terminal.setAdjustMsg(AdjustStatus.getContentByValue(terminalTransferDetail.getAdjustStatus()));
+                terminal.setAdjustMsg(AdjustStatus.getContentByValue(terminal.getAdjustStatus()));
                 resultList.add(terminal);
             }
         }
@@ -440,7 +489,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult importTerminal(List<List<Object>> excelList,String cUser)throws Exception{
+    public AgentResult importTerminal(List<List<Object>> excelList,String cUser,String busId)throws Exception{
 
         int i = 1;
         String batchNo = IDUtils.getBatchNo();
@@ -457,6 +506,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 throw new MessageException("第"+i+"个编号为空");
             }
             TerminalTransferDetail terminalTransferDetail = terminalTransferDetailMapper.selectByPrimaryKey(id);
+            if(!busId.equals(terminalTransferDetail.getTerminalTransferId())){
+                throw new MessageException("第"+i+"个数据错误,不在该订单下！");
+            }
             if(null==terminalTransferDetail){
                 throw new MessageException("第"+i+"个编号不存在");
             }
