@@ -1,11 +1,12 @@
 package com.ryx.credit.profit.dao;
 
-import com.ryx.credit.profit.pojo.PProfitFactor;
-import com.ryx.credit.profit.pojo.PProfitFactorExample;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+
+import com.ryx.credit.profit.pojo.PProfitFactor;
+import com.ryx.credit.profit.pojo.PProfitFactorExample;
+import org.apache.ibatis.annotations.Param;
 
 public interface PProfitFactorMapper {
     long countByExample(PProfitFactorExample example);
@@ -21,6 +22,10 @@ public interface PProfitFactorMapper {
     List<PProfitFactor> selectByExample(PProfitFactorExample example);
 
     PProfitFactor selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") PProfitFactor record, @Param("example") PProfitFactorExample example);
+
+    int updateByExample(@Param("record") PProfitFactor record, @Param("example") PProfitFactorExample example);
 
     int updateByPrimaryKeySelective(PProfitFactor record);
 
