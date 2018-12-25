@@ -403,25 +403,25 @@
   <select id="getOrderReturnList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     select
-    to_char(ro.c_time,'YYYY-MM-DD') as rotime,
+    to_char(coalesce((select max(o_logistics.send_date) from O_Receipt_plan left join o_logistics on o_logistics.receipt_plan_id = O_Receipt_plan.Id where odetail.id = O_Receipt_plan.Return_Order_Detail_Id),to_date('1990-01-01','yyyy-MM-dd')),'yyyy-MM-dd') as rotime,
     to_char(odetail.return_time,'YYYY-MM-DD') as returntime,
     to_char(ro.refundtime,'YYYY-MM-DD') as refundtime,
     ro.refundpeople, ro.auditor,
     c.PLATFORM_NAME, ro.ret_schedule,
-    ro.id, odetail.return_count, odetail.return_count * odetail.return_price as return_price,
+    ro.id, odetail.return_count, odetail.return_count * odetail.return_price as return_price,odetail.order_price as order_price,
     odetail.begin_sn, odetail.end_sn, odetail.order_id,
     agent.AG_UNIQ_NUM, agent.AG_NAME, os.pro_type,
     oso.activity_name, oso.pro_model, oso.vender,
     ro.take_out_amo, ro.rel_return_amo, refund.clo_bank_account, refund.clo_realname
-    from o_return_order ro left join a_agent agent on agent.id = agent_id
-    left join o_return_order_detail odetail on odetail.return_id = ro.id
+    from o_return_order ro
+    right join o_return_order_detail odetail on odetail.return_id = ro.id
     left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status=1
     left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
     left join o_order oorder on oorder.id = odetail.order_id
     left join a_platform c on c.platform_num = oorder.order_platform
-    left join o_payment d on d.order_id = odetail.order_id
-    left join a_agent ag on ag.id = ro.agent_id and ag.status=1
-    left join o_refund_agent refund on ro.id = refund.src_id
+    left join o_payment d on d.order_id = odetail.order_id and d.status=1
+    left join a_agent agent on agent.id = ro.agent_id and agent.status=1
+    left join o_refund_agent refund on ro.id = refund.src_id and refund.refund_type = 'TKTH'
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />
@@ -429,7 +429,7 @@
 
   <sql id="BASE_WHERE_SQL">
     <where>
-      1=1
+      ro.status=1 and odetail.status=1
       <if test="id!=null and id!=''"> and ro.ID=#{id} </if>
       <if test="agUniqNum!=null and agUniqNum!=''"> and agent.AG_UNIQ_NUM=#{agUniqNum} </if>
       <if test="activityName!=null and activityName !=''"> and oso.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%')</if>
@@ -442,6 +442,8 @@
       <if test="agentId !=null and agentId !='' "> and ro.AGENT_ID=#{agentId}</if>
       <if test="agName !=null and agName !='' "> and agent.ag_name like concat(concat( '%', #{agName}),'%')</if>
       <if test="orgId !=null and orgId !='' ">and (ag.AG_DOC_PRO = #{orgId} or ag.AG_DOC_DISTRICT = #{orgId})</if>
+      <if test="retSchedule !=null and retSchedule !='' ">and ro.ret_schedule = #{retSchedule} </if>
+
     </where>
   </sql>
 

@@ -355,4 +355,17 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         }).start();
 
     }
+
+
+    @Override
+    public AgentColinfo queryUserColinfo(String agentId) {
+        AgentColinfoExample example = new AgentColinfoExample();
+        example.or()
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andPayStatusEqualTo(ColinfoPayStatus.C.code)
+                .andAgentIdEqualTo(agentId);
+        example.setOrderByClause(" c_utime DES ");
+        agentColinfoMapper.selectByExample(example);
+        return null;
+    }
 }
