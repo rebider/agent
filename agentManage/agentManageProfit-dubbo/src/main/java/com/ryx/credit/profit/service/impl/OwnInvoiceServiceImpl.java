@@ -53,6 +53,9 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     @Autowired
     ProfitDetailMonthMapper profitDetailMonthMapper;
 
+    @Autowired
+    protected InvoiceMapper invoiceMapper;
+
     /**
      * @Author: Zhang Lei
      * @Description: 欠票导入或重导后重算
@@ -194,17 +197,9 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         invoiceDetailMapper.insertSelective(invoiceDetail);
     }
 
-    @Autowired
-    private InvoiceDetailMapper invoiceDetailMapper;
-
-    @Autowired
-    protected InvoiceMapper invoiceMapper;
-
-    private static Logger logger = LoggerFactory.getLogger(OwnInvoiceServiceImpl.class);
-
-
     /**
-     * 获取发票信息列表
+     * @Author CQT
+     * @Description获取发票信息列表
      * @param page
      * @return
      */
@@ -236,7 +231,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             }
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
-        int count = invoiceDetailMapper.countByExample(example);
+        int count = (int)invoiceDetailMapper.countByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(lists);
         pageInfo.setTotal(count);
@@ -244,10 +239,12 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     *向欠票导入表中导入数据
+     * @Author CQT
+     * 向欠票导入表中导入数据
+     * @param datas
+     * @param loginName
      */
     @Override
-    @Transactional
     public void exportData(List<List<Object>> datas,String loginName) {
         if(datas != null && datas.size() > 0 ) {
             datas.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list->{
@@ -257,6 +254,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
+     * @Author CQT
      * 根据id获取对应代理商数据信息
      * @param id
      * @return
@@ -267,6 +265,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
+     * @Author CQT
      * 设置调整金额
      * @param invoiceDetail
      * @return
@@ -279,7 +278,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * 导出数据：
+     * @Author CQT
+     * @Description导出数据
      * @param agentId
      * @param agentName
      * @param concludeChild
@@ -318,7 +318,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * 插入数据
+     * @Author CQT
+     *@Description 插入数据
      * @param list
      * @param loginName
      */
@@ -350,8 +351,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * 判断导入欠票表中是否存在有效且已有数据
-     * 有效：指月份，id，name，相同，且staus=1
+     * @Author CQT
+     * @Description判断导入欠票表中是否存在有效且已有数据
      * @param invoice
      * @return  不存在，返回true
      */
