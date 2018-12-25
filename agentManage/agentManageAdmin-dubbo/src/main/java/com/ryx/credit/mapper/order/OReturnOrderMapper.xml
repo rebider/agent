@@ -408,11 +408,17 @@
     to_char(ro.refundtime,'YYYY-MM-DD') as refundtime,
     ro.refundpeople, ro.auditor,
     c.PLATFORM_NAME, ro.ret_schedule,
-    ro.id, odetail.return_count, odetail.return_count * odetail.return_price as return_price,odetail.order_price as order_price,
+    ro.id, odetail.return_count,
+    odetail.return_count * odetail.return_price as return_price,
+    odetail.order_price as order_price,
     odetail.begin_sn, odetail.end_sn, odetail.order_id,
     agent.AG_UNIQ_NUM, agent.AG_NAME, os.pro_type,
     oso.activity_name, oso.pro_model, oso.vender,
-    ro.take_out_amo, ro.rel_return_amo, refund.clo_bank_account, refund.clo_realname
+    ro.take_out_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo) as take_out_amo,
+    ro.rel_return_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo) as rel_return_amo,
+    ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo) as cut_amo,
+    refund.clo_bank_account,
+    refund.clo_realname
     from o_return_order ro
     right join o_return_order_detail odetail on odetail.return_id = ro.id
     left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status=1
