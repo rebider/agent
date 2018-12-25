@@ -146,6 +146,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
             agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
             List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentBusInfo.getId());
+            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+            agentBusInfo.setParentInfo(parentInfo);
             if(null==maps){
                 continue;
             }else if(maps.size()==0){
@@ -153,6 +155,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }else{
                 agentBusInfo.setAssProtocolMap(maps.get(0));
             }
+
         }
         return agentBusInfos;
     }
@@ -176,6 +179,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }
             agentBusInfo.setAgentColinfoList(agentColinfoMapper.queryBusConinfoList(agentBusInfo.getId()));
             List<Map<String, Object>> maps = assProtoColMapper.selectByBusInfoId(agentBusInfo.getId());
+            Map<String,Object> parentInfo = agentBusInfoMapper.queryBusInfoParent(FastMap.fastMap("id",agentBusInfo.getId()));
+            agentBusInfo.setParentInfo(parentInfo);
             if(null==maps){
                 continue;
             }else if(maps.size()==0){
@@ -183,6 +188,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             }else{
                 agentBusInfo.setAssProtocolMap(maps.get(0));
             }
+
         }
         return agentBusInfos;
     }
