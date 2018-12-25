@@ -19,6 +19,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.TerminalTransferService;
@@ -70,6 +71,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private RedisService redisService;
     @Autowired
     private IUserService userService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
 
     @Override
@@ -163,7 +166,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
 
         if (StringUtils.isBlank(cuser) || StringUtils.isBlank(agentId)) {
             log.info("终端划拨提交审批,操作用户为空:{}", cuser);
-            return AgentResult.fail("终端划拨审批中，操作用户为空");
+            return AgentResult.fail("终端划拨，操作用户为空");
         }
         try {
             if(saveFlag.equals(SaveFlag.TJSP.getValue())){
@@ -190,6 +193,44 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if(StringUtils.isBlank(terminalTransferDetail.getGoalOrgId()) || StringUtils.isBlank(terminalTransferDetail.getOriginalOrgId())){
                     throw new MessageException("缺少参数");
                 }
+                //验证目标代理商是否存在
+                AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+                AgentBusInfoExample.Criteria agentBusInfoCriteria = agentBusInfoExample.createCriteria();
+                agentBusInfoCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                agentBusInfoCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+                agentBusInfoCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                agentBusInfoCriteria.andBusNumEqualTo(terminalTransferDetail.getGoalOrgId());
+                List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+                if(agentBusInfos.size()!=1){
+                    throw new MessageException("目标机构ID(不存在或存在多个或审批未通过)");
+                }
+                AgentBusInfo goalAgentBusInfo = agentBusInfos.get(0);
+                Agent agent = agentMapper.selectByPrimaryKey(goalAgentBusInfo.getAgentId());
+                if(!agent.getAgName().equals(terminalTransferDetail.getGoalOrgName())){
+                    throw new MessageException("目标机构ID和名称不匹配");
+                }
+                //查询目标机构是否是当前代理商下的
+                AgentBusInfoExample agentExample = new AgentBusInfoExample();
+                AgentBusInfoExample.Criteria agentCriteria = agentExample.createCriteria();
+                agentCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                agentCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+                agentCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+                agentCriteria.andAgentIdEqualTo(agentId);
+                List<AgentBusInfo> agentBusInfoList = agentBusInfoMapper.selectByExample(agentExample);
+                Boolean isSub = false; //是否是下级
+                here:
+                for (AgentBusInfo busInfo : agentBusInfoList) {
+                    List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, busInfo.getBusPlatform(), busInfo.getBusNum());
+                    for (AgentBusInfo childLevelBusInfo : childLevelBusInfos) {
+                        if(childLevelBusInfo.getBusNum().equals(terminalTransferDetail.getGoalOrgId())){
+                            isSub = true;
+                        }
+                        break here;
+                    }
+                }
+                if(!isSub){
+                    throw new MessageException("目标机构不是当前代理商下级");
+                }
                 Map<String, Object> reqParam = new HashMap<>();
                 reqParam.put("snBegin",terminalTransferDetail.getSnBeginNum());
                 reqParam.put("snEnd",terminalTransferDetail.getSnEndNum());
@@ -205,7 +246,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 for (Map<String, Object> stringObjectMap : logisticsDetailList) {
                     proNumSum = proNumSum.add(new BigDecimal(stringObjectMap.get("PRO_NUM").toString()));
                 }
-                if(!String.valueOf(proNumSum).equals(terminalTransferDetail.getSnCount())){
+                if(proNumSum.compareTo(terminalTransferDetail.getSnCount())!=0){
                     throw new MessageException("sn号数量不匹配");
                 }
                 Set<String> proComSet = new HashSet<>();
@@ -242,26 +283,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if(proModelSet.size()!=1){
                     throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
                 }
-
-                AgentBusInfoExample originalExample = new AgentBusInfoExample();
-                AgentBusInfoExample.Criteria originalCriteria = originalExample.createCriteria();
-                originalCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                originalCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
-                List<AgentBusInfo> originalAgentBusInfos = agentBusInfoMapper.selectByExample(originalExample);
-                if(originalAgentBusInfos.size()!=1){
-                    throw new MessageException("原机构数据有误");
-                }
-                AgentBusInfoExample goalExample = new AgentBusInfoExample();
-                AgentBusInfoExample.Criteria goalCriteria = goalExample.createCriteria();
-                goalCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                goalCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
-                List<AgentBusInfo> goalBusInfos = agentBusInfoMapper.selectByExample(goalExample);
-                if(goalBusInfos.size()!=1){
-                    throw new MessageException("原机构数据有误");
-                }
-                AgentBusInfo originalAgentBusInfo = originalAgentBusInfos.get(0);
-                AgentBusInfo goalAgentBusInfo = goalBusInfos.get(0);
-
                 terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DETAIL));
                 terminalTransferDetail.setTerminalTransferId(terminalTransferId);
                 terminalTransferDetail.setcUser(cuser);
@@ -272,7 +293,6 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setVersion(Status.STATUS_1.status);
                 terminalTransferDetail.setAgentId(agentId);
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
-                terminalTransferDetail.setOriginalBusId(originalAgentBusInfo.getId());
                 terminalTransferDetail.setGoalBusId(goalAgentBusInfo.getId());
                 terminalTransferDetail.setProCom(proComSet.iterator().next());
                 terminalTransferDetail.setProModel(proModelSet.iterator().next());
@@ -282,6 +302,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 startTerminalTransferActivity(terminalTransferId,cuser,agentId);
             }
             return AgentResult.ok();
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("新增失败");
