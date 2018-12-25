@@ -34,4 +34,9 @@ public interface TerminalTransferService {
     AgentResult importTerminal(List<List<Object>> excelList,String cUser,String busId)throws Exception;
 
     List<TerminalTransferDetail> queryImprotMsgList(String terminalTransferId);
+
+    AgentResult delTerminalTransfer(String terminalTransferId,String cUser)throws Exception;
+
+    AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId)throws Exception;
+
 }
