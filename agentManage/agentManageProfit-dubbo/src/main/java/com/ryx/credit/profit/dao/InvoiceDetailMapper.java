@@ -22,10 +22,10 @@ public interface InvoiceDetailMapper {
 
     int updateByPrimaryKey(InvoiceDetail record);
 
-    /**根据agentId 获得下级agentId*/
-    List<String> getAgentId(String agentId);
     /**根据agentId获取agentPid*/
     String getAgentPidByAgentId(String agentId);
 
+    /**根据上级获取全部下级的agentId*/
+    List<String> getAgentIdByBusParent(String agentId);
 
 }
