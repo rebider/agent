@@ -77,7 +77,10 @@ public enum TabId {
     P_AGENT_QUIT("PAQ%s%015d"),
     P_AGENT_MERGE("PAM%s%015d"),
     PROFIT_ADJUST_M("PRAM%s%015d"),
-    O_INTERNET_CARD("IC%s%015d");
+    O_INTERNET_CARD("IC%s%015d"),
+    P_TAX_DEDUCTION_DETAIL("TAXDD%s%015d"),
+    P_INVOICE_DETAIL("INVOICE_DETAIL_%s%015d"),
+    PROFIT_SUPPLU_TAX("PST%s%015d");
 
 
     TabId(String thePatt){

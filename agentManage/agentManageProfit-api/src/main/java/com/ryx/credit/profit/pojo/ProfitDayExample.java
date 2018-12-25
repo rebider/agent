@@ -977,6 +977,556 @@ public class ProfitDayExample implements Serializable {
             addCriterion("RETURN_MONEY not between", value1, value2, "returnMoney");
             return (Criteria) this;
         }
+
+        public Criteria andTotalProfit1IsNull() {
+            addCriterion("TOTAL_PROFIT1 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1IsNotNull() {
+            addCriterion("TOTAL_PROFIT1 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1EqualTo(BigDecimal value) {
+            addCriterion("TOTAL_PROFIT1 =", value, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1NotEqualTo(BigDecimal value) {
+            addCriterion("TOTAL_PROFIT1 <>", value, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1GreaterThan(BigDecimal value) {
+            addCriterion("TOTAL_PROFIT1 >", value, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1GreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("TOTAL_PROFIT1 >=", value, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1LessThan(BigDecimal value) {
+            addCriterion("TOTAL_PROFIT1 <", value, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1LessThanOrEqualTo(BigDecimal value) {
+            addCriterion("TOTAL_PROFIT1 <=", value, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1In(List<BigDecimal> values) {
+            addCriterion("TOTAL_PROFIT1 in", values, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1NotIn(List<BigDecimal> values) {
+            addCriterion("TOTAL_PROFIT1 not in", values, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1Between(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TOTAL_PROFIT1 between", value1, value2, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andTotalProfit1NotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TOTAL_PROFIT1 not between", value1, value2, "totalProfit1");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumIsNull() {
+            addCriterion("PLATFORMNUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumIsNotNull() {
+            addCriterion("PLATFORMNUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumEqualTo(String value) {
+            addCriterion("PLATFORMNUM =", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumNotEqualTo(String value) {
+            addCriterion("PLATFORMNUM <>", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumGreaterThan(String value) {
+            addCriterion("PLATFORMNUM >", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumGreaterThanOrEqualTo(String value) {
+            addCriterion("PLATFORMNUM >=", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumLessThan(String value) {
+            addCriterion("PLATFORMNUM <", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumLessThanOrEqualTo(String value) {
+            addCriterion("PLATFORMNUM <=", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumLike(String value) {
+            addCriterion("PLATFORMNUM like", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumNotLike(String value) {
+            addCriterion("PLATFORMNUM not like", value, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumIn(List<String> values) {
+            addCriterion("PLATFORMNUM in", values, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumNotIn(List<String> values) {
+            addCriterion("PLATFORMNUM not in", values, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumBetween(String value1, String value2) {
+            addCriterion("PLATFORMNUM between", value1, value2, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformnumNotBetween(String value1, String value2) {
+            addCriterion("PLATFORMNUM not between", value1, value2, "platformnum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNull() {
+            addCriterion("BUS_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIsNotNull() {
+            addCriterion("BUS_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumEqualTo(String value) {
+            addCriterion("BUS_NUM =", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotEqualTo(String value) {
+            addCriterion("BUS_NUM <>", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThan(String value) {
+            addCriterion("BUS_NUM >", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM >=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThan(String value) {
+            addCriterion("BUS_NUM <", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLessThanOrEqualTo(String value) {
+            addCriterion("BUS_NUM <=", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumLike(String value) {
+            addCriterion("BUS_NUM like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotLike(String value) {
+            addCriterion("BUS_NUM not like", value, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumIn(List<String> values) {
+            addCriterion("BUS_NUM in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotIn(List<String> values) {
+            addCriterion("BUS_NUM not in", values, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumBetween(String value1, String value2) {
+            addCriterion("BUS_NUM between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusNumNotBetween(String value1, String value2) {
+            addCriterion("BUS_NUM not between", value1, value2, "busNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumIsNull() {
+            addCriterion("PARENT_BUS_NUM is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumIsNotNull() {
+            addCriterion("PARENT_BUS_NUM is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumEqualTo(String value) {
+            addCriterion("PARENT_BUS_NUM =", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumNotEqualTo(String value) {
+            addCriterion("PARENT_BUS_NUM <>", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumGreaterThan(String value) {
+            addCriterion("PARENT_BUS_NUM >", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_BUS_NUM >=", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumLessThan(String value) {
+            addCriterion("PARENT_BUS_NUM <", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_BUS_NUM <=", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumLike(String value) {
+            addCriterion("PARENT_BUS_NUM like", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumNotLike(String value) {
+            addCriterion("PARENT_BUS_NUM not like", value, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumIn(List<String> values) {
+            addCriterion("PARENT_BUS_NUM in", values, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumNotIn(List<String> values) {
+            addCriterion("PARENT_BUS_NUM not in", values, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumBetween(String value1, String value2) {
+            addCriterion("PARENT_BUS_NUM between", value1, value2, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentBusNumNotBetween(String value1, String value2) {
+            addCriterion("PARENT_BUS_NUM not between", value1, value2, "parentBusNum");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdIsNull() {
+            addCriterion("PARENT_AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdIsNotNull() {
+            addCriterion("PARENT_AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID =", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID <>", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdGreaterThan(String value) {
+            addCriterion("PARENT_AGENT_ID >", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID >=", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdLessThan(String value) {
+            addCriterion("PARENT_AGENT_ID <", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID <=", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdLike(String value) {
+            addCriterion("PARENT_AGENT_ID like", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotLike(String value) {
+            addCriterion("PARENT_AGENT_ID not like", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdIn(List<String> values) {
+            addCriterion("PARENT_AGENT_ID in", values, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotIn(List<String> values) {
+            addCriterion("PARENT_AGENT_ID not in", values, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_ID between", value1, value2, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_ID not between", value1, value2, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIsNull() {
+            addCriterion("AGENT_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIsNotNull() {
+            addCriterion("AGENT_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeEqualTo(String value) {
+            addCriterion("AGENT_TYPE =", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotEqualTo(String value) {
+            addCriterion("AGENT_TYPE <>", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeGreaterThan(String value) {
+            addCriterion("AGENT_TYPE >", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_TYPE >=", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLessThan(String value) {
+            addCriterion("AGENT_TYPE <", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_TYPE <=", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLike(String value) {
+            addCriterion("AGENT_TYPE like", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotLike(String value) {
+            addCriterion("AGENT_TYPE not like", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIn(List<String> values) {
+            addCriterion("AGENT_TYPE in", values, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotIn(List<String> values) {
+            addCriterion("AGENT_TYPE not in", values, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeBetween(String value1, String value2) {
+            addCriterion("AGENT_TYPE between", value1, value2, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotBetween(String value1, String value2) {
+            addCriterion("AGENT_TYPE not between", value1, value2, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNull() {
+            addCriterion("PARENT_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNotNull() {
+            addCriterion("PARENT_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME =", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <>", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThan(String value) {
+            addCriterion("PARENT_AGENT_NAME >", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME >=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThan(String value) {
+            addCriterion("PARENT_AGENT_NAME <", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLike(String value) {
+            addCriterion("PARENT_AGENT_NAME like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotLike(String value) {
+            addCriterion("PARENT_AGENT_NAME not like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME not in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME not between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyIsNull() {
+            addCriterion("PAY_COMPANY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyIsNotNull() {
+            addCriterion("PAY_COMPANY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyEqualTo(String value) {
+            addCriterion("PAY_COMPANY =", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyNotEqualTo(String value) {
+            addCriterion("PAY_COMPANY <>", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyGreaterThan(String value) {
+            addCriterion("PAY_COMPANY >", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyGreaterThanOrEqualTo(String value) {
+            addCriterion("PAY_COMPANY >=", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyLessThan(String value) {
+            addCriterion("PAY_COMPANY <", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyLessThanOrEqualTo(String value) {
+            addCriterion("PAY_COMPANY <=", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyLike(String value) {
+            addCriterion("PAY_COMPANY like", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyNotLike(String value) {
+            addCriterion("PAY_COMPANY not like", value, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyIn(List<String> values) {
+            addCriterion("PAY_COMPANY in", values, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyNotIn(List<String> values) {
+            addCriterion("PAY_COMPANY not in", values, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyBetween(String value1, String value2) {
+            addCriterion("PAY_COMPANY between", value1, value2, "payCompany");
+            return (Criteria) this;
+        }
+
+        public Criteria andPayCompanyNotBetween(String value1, String value2) {
+            addCriterion("PAY_COMPANY not between", value1, value2, "payCompany");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

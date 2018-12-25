@@ -6,14 +6,9 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
-import com.ryx.credit.profit.dao.ProfitDayMapper;
-import com.ryx.credit.profit.dao.ProfitDirectMapper;
-import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.service.*;
-import com.ryx.credit.profit.unitmain.ProfitDayMposDataJob;
 import com.ryx.credit.service.dict.IdService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -125,7 +120,7 @@ public class ZhiFaDateTest {
             profitDirect.setAccountName(json.getString("ACCOUNTNAME"));//户名
             profitDirect.setBankOpen(json.getString("BANKOPEN"));//开户行
             profitDirect.setBankCode(json.getString("BANKCODE"));//银行号
-            //profitDirect.setBossCode(json.getString("BOSSCODE"));//总行行号
+            //ProfitDirect.setBossCode(json.getString("BOSSCODE"));//总行行号
             profitDirect.setSupplyAmt(BigDecimal.ZERO);//补款
             profitDirect.setBuckleAmt(buckle==null?BigDecimal.ZERO:buckle);//退单扣款
             profitDirect.setParentBuckle(BigDecimal.ZERO);//代下级扣款

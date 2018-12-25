@@ -119,8 +119,8 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     }
 
     /*@Override
-    public void updateByAgentId(ProfitDirect profitDirect) {
-        directMapper.updateByAgentId(profitDirect);
+    public void updateByAgentId(ProfitDirect ProfitDirect) {
+        directMapper.updateByAgentId(ProfitDirect);
     }*/
 
 

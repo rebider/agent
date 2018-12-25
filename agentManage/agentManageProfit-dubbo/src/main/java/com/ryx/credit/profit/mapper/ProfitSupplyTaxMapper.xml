@@ -290,4 +290,29 @@
     ORDER BY SUPPLY_TAX_DATE DESC
   </sql>
 
+  <!--查询直签扣税一代。   直签、机构或标准一代、扣税（打款公司非瑞银信账户）-->
+  <select id="getZqTaxAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select distinct A.AGENT_ID from A_AGENT_BUSINFO A
+    WHERE A.BUS_PLATFORM &lt;&gt; '6000'
+    AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
+    AND A.CLO_PAY_COMPANY &lt;&gt; 'Q000029564';
+  </select>
+
+  <!--查询直发开票一代 -->
+  <select id="getZfInvoiceAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select distinct A.AGENT_ID from A_AGENT_BUSINFO A
+    WHERE A.BUS_PLATFORM = '6000'
+    AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
+    AND A.CLO_PAY_COMPANY = 'Q000029564';
+  </select>
+
+  <!--查询直发扣税一代 -->
+  <select id="getZfTaxAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select distinct A.AGENT_ID from A_AGENT_BUSINFO A
+    WHERE A.BUS_PLATFORM = '6000'
+    AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
+    AND A.CLO_PAY_COMPANY != 'Q000029564';
+  </select>
+
+
 </mapper>

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -52,4 +53,6 @@ public interface ProfitDirectMapper {
     void  updateByStatus(ProfitDirect profitDirectSingleList);
 
     BigDecimal selectAmtByDeal(String transMonth);
+
+    void deleteByMonth(@Param("transMonth") String transMonth);
 }

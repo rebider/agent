@@ -14,7 +14,6 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PosCheckMapper;
 import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
-import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.service.IPosCheckService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -28,8 +27,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**

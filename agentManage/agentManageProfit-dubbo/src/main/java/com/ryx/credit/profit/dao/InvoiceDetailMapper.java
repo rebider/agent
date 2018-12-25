@@ -3,6 +3,7 @@ package com.ryx.credit.profit.dao;
 import com.ryx.credit.profit.pojo.InvoiceDetail;
 import com.ryx.credit.profit.pojo.InvoiceDetailExample;
 import java.util.List;
+import java.util.Map;
 
 public interface InvoiceDetailMapper {
     long countByExample(InvoiceDetailExample example);
@@ -20,4 +21,6 @@ public interface InvoiceDetailMapper {
     int updateByPrimaryKeySelective(InvoiceDetail record);
 
     int updateByPrimaryKey(InvoiceDetail record);
+
+    List<Map<String,Object>> queryInvoiceAgents(Map<String,Object> params);
 }

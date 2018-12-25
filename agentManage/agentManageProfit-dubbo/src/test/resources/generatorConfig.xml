@@ -59,10 +59,14 @@
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="O_SUB_ORDER_ACTIVITY" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
-		<table tableName="P_TAX_DEDUCTION_DETAIL" domainObjectName="TaxDeductionDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="P_TAX_DEDUCTION_DETAIL" domainObjectName="TaxDeductionDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="P_INVOICE" domainObjectName="Invoice" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
 		<table tableName="P_INVOICE_DETAIL" domainObjectName="InvoiceDetail" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
         <!--<table tableName="PROFIT_SUPPLY_TAX" domainObjectName="ProfitSupplyTax" enableUpdateByExample="true"
                enableDeleteByPrimaryKey="true"/>-->
+
+		<!--<table tableName="P_PROFIT_D" domainObjectName="ProfitDay" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="P_PROFIT_DIRECT" domainObjectName="profitDirect" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>
+
 </context>
 </generatorConfiguration>

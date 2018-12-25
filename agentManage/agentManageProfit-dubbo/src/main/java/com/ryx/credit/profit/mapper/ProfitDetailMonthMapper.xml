@@ -1092,4 +1092,46 @@
       <if test="profitDateEnd != null and profitDateEnd != ''">and profit_date_end &lt;= TO_DATE(#{profitDateEnd},'yyyy-MM')</if>
     </where>
   </sql>
+
+  <select id="selectListByParams" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where 1=1
+    <if test="agentId != null and agentId !=''">
+      and agent_id = #{agentId}
+    </if>
+    <if test="parentAgentId != null and parentAgentId !=''">
+      and parent_agent_id = #{parentAgentId}
+    </if>
+    <if test="profitDate != null and profitDate !=''">
+      and PROFIT_DATE = #{profitDate}
+    </if>
+    <if test="taxnoteql != null and taxnoteql !=''">
+      and TAX != #{taxnoteql}
+    </if>
+  </select>
+
+  <select id="getSubAgentTaxBaseTotal" resultType="java.math.BigDecimal" parameterType="map" >
+   SELECT SUM(SUB_ADD_TAX) SUB_TAX_BASE_TOTAL FROM (
+      SELECT a.*,b.CLO_TAX_POINT PARENT_TAX,TAX_BASE*(b.CLO_TAX_POINT-TAX) SUB_ADD_TAX FROM(
+        select
+          ID,
+          AGENT_ID,
+          AGENT_NAME,
+          PARENT_AGENT_ID,
+          TAX,
+          DEDUCTION_TAX_MONTH_AMT,
+          DEDUCTION_TAX_MONTH_AMT/TAX TAX_BASE
+        from P_PROFIT_DETAIL_M
+        where PROFIT_DATE = '${profitDate}'
+        start with PARENT_AGENT_ID = '${parentAgentId}' and AGENT_ID = '${subAgentId}'
+              <if test="profitDate != null and profitDate !=''">AND TAX != '${parentTax}' </if>
+        connect by prior AGENT_ID = PARENT_AGENT_ID AND PAY_COMPANY != 'Q000029564'
+      ) a
+      left join A_agent_colinfo b on a.PARENT_AGENT_ID= b.AGENT_ID
+    )
+
+  </select>
+
 </mapper>

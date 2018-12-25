@@ -1,9 +1,6 @@
 package com.ryx.credit.profit.service;
 
-import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.profit.pojo.PosCheck;
-import com.ryx.credit.profit.pojo.PosCheckExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
 
@@ -48,7 +45,7 @@ public interface IProfitDirectService {
 
     BigDecimal getSubBuckleByMonth(ProfitDirect record);
 
-    //void updateByAgentId(ProfitDirect profitDirect);
+    //void updateByAgentId(ProfitDirect ProfitDirect);
 
     //直发分润页面导出
     public List<ProfitDirect> exportProfitDirect(ProfitDirect record);
@@ -57,4 +54,5 @@ public interface IProfitDirectService {
     List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect);
     //直发分润修改状态
     void updateByStatus(ProfitDirect profitDirectSingleList);
+
 }
