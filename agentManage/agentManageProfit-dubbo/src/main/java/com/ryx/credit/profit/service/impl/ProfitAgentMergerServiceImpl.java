@@ -88,7 +88,6 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         List<Map<String, Object>> list = pAgentMergeMapper.getProfitAgentMergeList(param);
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
-        System.out.println("查询============================================" + JSONObject.toJSON(list));
         return pageInfo;
     }
 
@@ -222,48 +221,48 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
         try {
-            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            BusActRel rel = taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
 
                 //一、更改代理商信息的名称
                 Agent agent = agentService.getAgentById(pAgentMerge.getSubAgentId());
-                agent.setAgName(pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")");
-                if(1!=agentService.updateByPrimaryKeySelective(agent)){
+                agent.setAgName(pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")");
+                if (1 != agentService.updateByPrimaryKeySelective(agent)) {
                     throw new ProcessException("更新数据库异常");
                 }
 
                 String sendMsg = "";
                 BigDecimal isSuccess = Status.STATUS_1.status;
                 //二、手刷改名接口(agentName、agentId)
-                String agentName = pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")";
+                String agentName = pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")";
                 List<String> platId = new ArrayList<>();
                 platId.add(pAgentMerge.getSubAgentId());
                 try {
                     AgentResult mpos = busiPlatService.mPos_updateAgName(agentName, platId);
                     sendMsg = mpos.getMsg();
-                    if(!mpos.isOK()){
-                        isSuccess= Status.STATUS_0.status;
+                    if (!mpos.isOK()) {
+                        isSuccess = Status.STATUS_0.status;
                     }
                 } catch (Exception e) {
-                    logger.error("======mPos_updateAgName",e);
+                    logger.error("======mPos_updateAgName", e);
                     e.printStackTrace();
-                    sendMsg="首刷通知业务系统失败";
+                    sendMsg = "首刷通知业务系统失败";
                 }
-                //二、POS改名接口(uniqueId、orgName、orgType)
+                //三、POS改名接口(uniqueId、orgName、orgType)
                 List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
                 for (AgentBusInfo agentBusInfo : list) {
                     AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
                     agentNotifyVo.setUniqueId(agentBusInfo.getId());//代理商AB码
-                    agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName()+"("+pAgentMerge.getSubAgentName()+")");//变更后名称=主名称+(自己名称)
-                    if (agentBusInfo.getBusType().equals("2") || agentBusInfo.getBusType().equals("6")){
+                    agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")");//变更后名称=主名称+(自己名称)
+                    if (agentBusInfo.getBusType().equals("2") || agentBusInfo.getBusType().equals("6")) {
                         agentNotifyVo.setOrgType("01");//机构类型：01-普通机构
                     } else {
                         agentNotifyVo.setOrgType("02");//机构类型：02-直签机构
                     }
-                    AgentResult pos_Item =   busiPlatService.pos_updateAgName(agentNotifyVo);
-                    sendMsg=sendMsg+"_"+pos_Item.getMsg();
-                    if(!pos_Item.isOK()){
+                    AgentResult pos_Item = busiPlatService.pos_updateAgName(agentNotifyVo);
+                    sendMsg = sendMsg + "_" + pos_Item.getMsg();
+                    if (!pos_Item.isOK()) {
                             isSuccess = Status.STATUS_0.status;
                     }
                 }
@@ -280,6 +279,67 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("代理商合并申请审批流回调异常，activId：{}" + insid);
+        }
+        return AgentResult.ok();
+    }
+
+    /**
+     * 手动更改手刷、POS代理商名称
+     * @param insid
+     */
+    @Override
+    public AgentResult updateAgentName(String insid) throws Exception{
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        BusActRel busActRel = new BusActRel();
+        busActRel.setActivId(insid);
+        try {
+            BusActRel rel = taskApprovalService.queryBusActRel(busActRel);
+            if (rel != null) {
+                PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
+
+                String sendMsg = "";
+                BigDecimal isSuccess = Status.STATUS_1.status;
+                //一、手刷改名接口(agentName、agentId)
+                String agentName = pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")";
+                List<String> platId = new ArrayList<>();
+                platId.add(pAgentMerge.getSubAgentId());
+                try {
+                    AgentResult mpos = busiPlatService.mPos_updateAgName(agentName, platId);
+                    sendMsg = mpos.getMsg();
+                    if (!mpos.isOK()) {
+                        isSuccess = Status.STATUS_0.status;
+                    }
+                } catch (Exception e) {
+                    logger.error("======mPos_updateAgName" ,e);
+                    e.printStackTrace();
+                    sendMsg = "首刷通知业务系统失败！";
+                }
+                //二、POS改名接口(uniqueId、orgName、orgType)
+                List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
+                for (AgentBusInfo agentBusInfo : list) {
+                    AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+                    agentNotifyVo.setUniqueId(agentBusInfo.getId());//代理商AB码
+                    agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")");//变更后名称=主名称+(自己名称)
+                    if (agentBusInfo.getBusType().equals("2") || agentBusInfo.getBusType().equals("6")) {
+                        agentNotifyVo.setOrgType("01");//机构类型：01-普通机构
+                    } else {
+                        agentNotifyVo.setOrgType("02");//机构类型：02-直签机构
+                    }
+                    AgentResult pos_Item = busiPlatService.pos_updateAgName(agentNotifyVo);
+                    sendMsg = sendMsg + "_" + pos_Item.getMsg();
+                    if (!pos_Item.isOK()) {
+                        isSuccess = Status.STATUS_0.status;
+                    }
+                }
+                pAgentMerge.setSynStatus(isSuccess);
+                pAgentMerge.setSynMsg(sendMsg);
+                pAgentMerge.setMergeDate(df.format(new Date()));//合并日期（生效日期）
+                pAgentMergeMapper.updateByPrimaryKeySelective(pAgentMerge);
+                taskApprovalService.updateABusActRel(rel);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("代理商合并申请-更改代理商名称异常，activId：{}" + insid);
         }
         return AgentResult.ok();
     }

@@ -1246,6 +1246,66 @@ public class ImsTermWarehouseDetailExample {
             addCriterion("DELIVERY_TIME not between", value1, value2, "deliveryTime");
             return (Criteria) this;
         }
+
+        public Criteria andStandTimeIsNull() {
+            addCriterion("STAND_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeIsNotNull() {
+            addCriterion("STAND_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME =", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeNotEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME <>", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeGreaterThan(BigDecimal value) {
+            addCriterion("STAND_TIME >", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME >=", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeLessThan(BigDecimal value) {
+            addCriterion("STAND_TIME <", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME <=", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeIn(List<BigDecimal> values) {
+            addCriterion("STAND_TIME in", values, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeNotIn(List<BigDecimal> values) {
+            addCriterion("STAND_TIME not in", values, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAND_TIME between", value1, value2, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAND_TIME not between", value1, value2, "standTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

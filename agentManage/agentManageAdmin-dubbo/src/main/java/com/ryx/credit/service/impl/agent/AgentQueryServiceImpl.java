@@ -6,17 +6,11 @@ import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
-import com.ryx.credit.dao.order.OOrderMapper;
-import com.ryx.credit.dao.order.ORefundPriceDiffMapper;
-import com.ryx.credit.dao.order.OReturnOrderMapper;
-import com.ryx.credit.dao.order.OSupplementMapper;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.bank.DPosRegionExample;
-import com.ryx.credit.pojo.admin.order.OOrder;
-import com.ryx.credit.pojo.admin.order.ORefundPriceDiff;
-import com.ryx.credit.pojo.admin.order.OReturnOrder;
-import com.ryx.credit.pojo.admin.order.OSupplement;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.PlatFormService;
 import org.slf4j.Logger;
@@ -68,6 +62,8 @@ public class AgentQueryServiceImpl implements AgentQueryService {
     private RedisService redisService;
     @Autowired
     private AssProtoColMapper assProtoColMapper;
+    @Autowired
+    private TerminalTransferMapper terminalTransferMapper;
 
 
     @Override
@@ -250,6 +246,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 return FastMap.fastSuccessMap().putKeyV("oReturnOrder",oReturnOrder).putKeyV("rel",rel)
                         .putKeyV("agentId",oReturnOrder.getAgentId()).putKeyV("agName",agName);
             }
+            return FastMap.fastSuccessMap().putKeyV("rel",rel);
         }
         return null;
     }

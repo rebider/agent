@@ -39,7 +39,10 @@
 		<!--<table tableName="o_sub_order_activity" domainObjectName="OSubOrderActivity" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 
-		<table tableName="P_AGENT_MERGE" domainObjectName="PAgentMerge" enableUpdateByExample="false"
+		<!--<table tableName="P_AGENT_MERGE" domainObjectName="PAgentMerge" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+
+		<table tableName="O_CASH_SUMMARY_MOUTH" domainObjectName="CashSummaryMouth" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 
 	</context>

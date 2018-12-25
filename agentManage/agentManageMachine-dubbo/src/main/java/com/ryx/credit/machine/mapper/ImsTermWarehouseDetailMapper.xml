@@ -18,6 +18,7 @@
     <result column="PAY_TIME" jdbcType="VARCHAR" property="payTime" />
     <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
     <result column="DELIVERY_TIME" jdbcType="VARCHAR" property="deliveryTime" />
+    <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -50,7 +51,8 @@
   </sql>
   <sql id="Base_Column_List">
     POS_SN, WD_ID, MACHINE_ID, ORG_ID, MER_ID, TERM_ID, USE_STATUS, STATUS, CREATE_TIME, 
-    CREATE_PERSON, UPDATE_TIME, POS_TYPE, PAY_STATUS, PAY_TIME, POS_SPE_PRICE, DELIVERY_TIME
+    CREATE_PERSON, UPDATE_TIME, POS_TYPE, PAY_STATUS, PAY_TIME, POS_SPE_PRICE, DELIVERY_TIME, 
+    STAND_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -86,13 +88,13 @@
       USE_STATUS, STATUS, CREATE_TIME, 
       CREATE_PERSON, UPDATE_TIME, POS_TYPE, 
       PAY_STATUS, PAY_TIME, POS_SPE_PRICE, 
-      DELIVERY_TIME)
+      DELIVERY_TIME, STAND_TIME)
     values (#{posSn,jdbcType=VARCHAR}, #{wdId,jdbcType=VARCHAR}, #{machineId,jdbcType=VARCHAR}, 
       #{orgId,jdbcType=VARCHAR}, #{merId,jdbcType=VARCHAR}, #{termId,jdbcType=VARCHAR}, 
       #{useStatus,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, 
       #{createPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, #{posType,jdbcType=VARCHAR}, 
       #{payStatus,jdbcType=VARCHAR}, #{payTime,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, 
-      #{deliveryTime,jdbcType=VARCHAR})
+      #{deliveryTime,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermWarehouseDetail">
     insert into IMS_TERM_WAREHOUSE_DETAIL
@@ -145,6 +147,9 @@
       <if test="deliveryTime != null">
         DELIVERY_TIME,
       </if>
+      <if test="standTime != null">
+        STAND_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="posSn != null">
@@ -194,6 +199,9 @@
       </if>
       <if test="deliveryTime != null">
         #{deliveryTime,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        #{standTime,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -251,6 +259,9 @@
       <if test="deliveryTime != null">
         DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
       </if>
+      <if test="standTime != null">
+        STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      </if>
     </set>
     where POS_SN = #{posSn,jdbcType=VARCHAR}
   </update>
@@ -270,7 +281,8 @@
       PAY_STATUS = #{payStatus,jdbcType=VARCHAR},
       PAY_TIME = #{payTime,jdbcType=VARCHAR},
       POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
-      DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR}
+      DELIVERY_TIME = #{deliveryTime,jdbcType=VARCHAR},
+      STAND_TIME = #{standTime,jdbcType=DECIMAL}
     where POS_SN = #{posSn,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

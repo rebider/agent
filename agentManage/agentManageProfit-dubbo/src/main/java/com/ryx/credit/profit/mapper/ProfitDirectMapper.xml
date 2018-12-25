@@ -509,6 +509,16 @@
     FROM P_PROFIT_DIRECT
     WHERE FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR}
   </select>
+
+  <!--根据唯一码查询业务平台编码-->
+  <select id="selectByAgUniqNum" parameterType="string" resultType="string">
+    select
+    b.BUS_NUM
+    from a_agent a
+    left join a_agent_businfo b on a.id = b.agent_id and b.bus_platform in('5000','6000')
+    where a.ag_uniq_num = #{agUniqNum,jdbcType=VARCHAR}
+  </select>
+
   <!--直发分润修改状态 -->
   <update id="updateByStatus" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
     update P_PROFIT_DIRECT

@@ -2077,6 +2077,196 @@ public class OActivityExample {
             addCriterion("ORIGINAL_PRICE not between", value1, value2, "originalPrice");
             return (Criteria) this;
         }
+
+        public Criteria andPosSpePriceIsNull() {
+            addCriterion("POS_SPE_PRICE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceIsNotNull() {
+            addCriterion("POS_SPE_PRICE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceEqualTo(BigDecimal value) {
+            addCriterion("POS_SPE_PRICE =", value, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceNotEqualTo(BigDecimal value) {
+            addCriterion("POS_SPE_PRICE <>", value, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceGreaterThan(BigDecimal value) {
+            addCriterion("POS_SPE_PRICE >", value, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_SPE_PRICE >=", value, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceLessThan(BigDecimal value) {
+            addCriterion("POS_SPE_PRICE <", value, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_SPE_PRICE <=", value, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceIn(List<BigDecimal> values) {
+            addCriterion("POS_SPE_PRICE in", values, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceNotIn(List<BigDecimal> values) {
+            addCriterion("POS_SPE_PRICE not in", values, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_SPE_PRICE between", value1, value2, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosSpePriceNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_SPE_PRICE not between", value1, value2, "posSpePrice");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeIsNull() {
+            addCriterion("POS_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeIsNotNull() {
+            addCriterion("POS_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeEqualTo(String value) {
+            addCriterion("POS_TYPE =", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeNotEqualTo(String value) {
+            addCriterion("POS_TYPE <>", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeGreaterThan(String value) {
+            addCriterion("POS_TYPE >", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("POS_TYPE >=", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeLessThan(String value) {
+            addCriterion("POS_TYPE <", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeLessThanOrEqualTo(String value) {
+            addCriterion("POS_TYPE <=", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeLike(String value) {
+            addCriterion("POS_TYPE like", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeNotLike(String value) {
+            addCriterion("POS_TYPE not like", value, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeIn(List<String> values) {
+            addCriterion("POS_TYPE in", values, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeNotIn(List<String> values) {
+            addCriterion("POS_TYPE not in", values, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeBetween(String value1, String value2) {
+            addCriterion("POS_TYPE between", value1, value2, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTypeNotBetween(String value1, String value2) {
+            addCriterion("POS_TYPE not between", value1, value2, "posType");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeIsNull() {
+            addCriterion("STAND_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeIsNotNull() {
+            addCriterion("STAND_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME =", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeNotEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME <>", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeGreaterThan(BigDecimal value) {
+            addCriterion("STAND_TIME >", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME >=", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeLessThan(BigDecimal value) {
+            addCriterion("STAND_TIME <", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAND_TIME <=", value, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeIn(List<BigDecimal> values) {
+            addCriterion("STAND_TIME in", values, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeNotIn(List<BigDecimal> values) {
+            addCriterion("STAND_TIME not in", values, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAND_TIME between", value1, value2, "standTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandTimeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAND_TIME not between", value1, value2, "standTime");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.profit.dao.ProfitDirectMapper;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
@@ -105,6 +106,11 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     @Override
     public List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect) {
         return directMapper.selectByFristAgentPid(profitDirect);
+    }
+
+    @Override
+    public List<String> selectByAgUniqNum(String agUniqNum) {
+        return directMapper.selectByAgUniqNum(agUniqNum);
     }
 
     @Override

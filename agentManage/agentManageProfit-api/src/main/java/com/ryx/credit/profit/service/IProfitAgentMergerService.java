@@ -32,23 +32,30 @@ public interface IProfitAgentMergerService {
      * @param userId
      * @throws Exception
      */
-    public AgentResult approvalTask(AgentVo agentVo, String userId)throws Exception;
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
     /**
      * 审批流回调方法
      * @param insid
      * @param status
      */
-    public AgentResult approveFinish(String insid, String status)throws Exception;
+    AgentResult approveFinish(String insid, String status) throws Exception;
 
     /**
      * 审批退回，修改申请信息
      * @param pAgentMerge
      * @throws Exception
      */
-    public void editMergeRegect(PAgentMerge pAgentMerge)throws Exception;
+    void editMergeRegect(PAgentMerge pAgentMerge) throws Exception;
+
     /**
      * 附代理商是否已经存在
      * */
-    public List<PAgentMerge> selectBySubAgenId(String subAgentId);
+    List<PAgentMerge> selectBySubAgenId(String subAgentId);
+
+    /**
+     * 手动更改手刷、POS代理商名称
+     * @param insid
+     */
+    AgentResult updateAgentName(String insid) throws Exception;
 }

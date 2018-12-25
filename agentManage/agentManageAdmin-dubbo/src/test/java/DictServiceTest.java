@@ -3,9 +3,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.dao.order.CashSummaryMouthMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.pojo.admin.order.CashSummaryMouth;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.AimportService;
@@ -44,6 +46,8 @@ public class DictServiceTest extends BaseSpringTest {
     private AimportService aimportService;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private CashSummaryMouthMapper cashSummaryMouthMapper;
     
     @Test
     public void testId(){
@@ -108,6 +112,18 @@ public class DictServiceTest extends BaseSpringTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+    @Test
+    public void testSelectCashSummaryMouthData(){
+
+      List<CashSummaryMouth> res =  cashSummaryMouthMapper.selectCashSummaryMouthData("2018-11","0");
+        for (CashSummaryMouth re : res) {
+            if(null==cashSummaryMouthMapper.selectByPrimaryKey(re)){
+                cashSummaryMouthMapper.insertSelective(re);
+            }
+        }
+      logger.info("======="+JSONObject.toJSONString(res));
+
     }
 
 }
