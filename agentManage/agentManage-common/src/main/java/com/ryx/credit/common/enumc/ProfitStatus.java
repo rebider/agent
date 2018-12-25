@@ -23,4 +23,9 @@ public enum ProfitStatus {
     ProfitStatus(int s) {
         status = new BigDecimal(s);
     }
+
+    public String value(){
+        return String.valueOf(status);
+    }
+
 }

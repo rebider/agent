@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -75,11 +76,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Autowired
     private ProfitBalanceSerialService profitBalanceSerialServiceImpl;
+    @Resource
+    ITaxDeductionService taxDeductionService;
+    @Resource
+    ProfitSupplyTaxService profitSupplyTaxService;
 
     @Autowired
     private PAgentMergeMapper agentMergeMapper;
     @Autowired
     private ProfitSupplyMapper profitSupplyMapper;
+    @Resource
+    IOwnInvoiceService ownInvoiceService;
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -417,13 +424,21 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     private void comput(String computType) {
+
         // 获取所有代理商月度分润明细
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
         ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
         profitDetailMonth.setProfitDate(profitDate);
+
+        Map<String,Object> params = new HashMap<>();
+        params.put("profitMonth",profitDate);
+
         int count = this.getProfitDetailMonthCount(null, profitDetailMonth);
         if (count > 0) {
+
+            //其他扣款
             FORK_JOIN_POOL.invoke(new ProfitMonthServiceImpl.ComputStep(0, count, profitDetailMonth, computType));
+
             //合并代理商扣分润计算
             notDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 List<Map<String, Object>>  hbList = getAgentIdProfitAmt(profitDetailMonthTemp.getAgentId(), profitAmtMap);
@@ -431,15 +446,22 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                     doHbDeduction(profitDetailMonthTemp, computType, hbList);
                 }
             });
+
             // 机具扣款未扣足，扣担保代理商
             toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 doHbToolDeduction(profitDetailMonthTemp, computType, null, "3");
             });
+
             //扣税
+            taxDeductionService.taxDeductionComputer(params);
 
             //补税点
+            profitSupplyTaxService.taxSupplyComputer(params);
 
-            // 计算税点及实发分润
+            //欠票计算
+            ownInvoiceService.invoiceOwnComputer(params);
+
+            /*// 计算税点及实发分润
             try {
                 long sstart = System.currentTimeMillis();
                 profitComputerService.new_computerTax(computType);
@@ -447,7 +469,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 System.out.println("实发处理时间"+(send-sstart));
             } catch (Exception e) {
                 e.printStackTrace();
-            }
+            }*/
             LOG.error("执行完毕");
             temp.clear();
             profitAmtMap.clear();

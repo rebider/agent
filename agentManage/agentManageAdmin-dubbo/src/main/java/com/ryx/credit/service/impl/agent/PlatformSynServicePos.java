@@ -220,6 +220,7 @@ public class PlatformSynServicePos implements PlatformSynService {
                 JSONObject rep_data =  res.getJSONObject("data");
                 return AgentResult.ok(res);
             }else{
+                AppConfig.sendEmails(res.toJSONString(), "升级通知POS失败报警");
                 AgentResult ag = AgentResult.fail(respMsg);
                 ag.setData(res);
                 return ag;
@@ -228,6 +229,7 @@ public class PlatformSynServicePos implements PlatformSynService {
             e.printStackTrace();
             log.error(e.getMessage(),e);
             log.info("http请求超时:{}",e.getMessage());
+            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "升级通知POS失败报警");
             throw new Exception("http请求超时");
         }
     }

@@ -3,7 +3,7 @@ package com.ryx.credit.machine.entity;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ImsTermWarehouseDetail  implements Serializable {
+public class ImsTermWarehouseDetail implements Serializable{
     private String posSn;
 
     private String wdId;
@@ -35,6 +35,8 @@ public class ImsTermWarehouseDetail  implements Serializable {
     private BigDecimal posSpePrice;
 
     private String deliveryTime;
+
+    private BigDecimal standTime;
 
     public String getPosSn() {
         return posSn;
@@ -162,5 +164,13 @@ public class ImsTermWarehouseDetail  implements Serializable {
 
     public void setDeliveryTime(String deliveryTime) {
         this.deliveryTime = deliveryTime == null ? null : deliveryTime.trim();
+    }
+
+    public BigDecimal getStandTime() {
+        return standTime;
+    }
+
+    public void setStandTime(BigDecimal standTime) {
+        this.standTime = standTime;
     }
 }

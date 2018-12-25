@@ -1,20 +1,13 @@
 package com.ryx.credit.profit.unitmain;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.TabId;
-import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.HttpClientUtil;
-import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
-import com.ryx.credit.profit.dao.PAgentPidLinkMapper;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
-import com.ryx.credit.profit.pojo.PAgentPidLink;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
@@ -26,12 +19,10 @@ import com.ryx.credit.service.order.OrderService;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**

@@ -30,25 +30,21 @@ public class ProfitDay implements Serializable {
 
     private BigDecimal returnMoney;
 
-    private BigDecimal totalProfit1;//新增
+    private BigDecimal totalProfit1;
 
-    private String platformNum;
+    private String platformnum;
 
-    public String getPlatformNum() {
-        return platformNum;
-    }
+    private String busNum;
 
-    public void setPlatformNum(String platformNum) {
-        this.platformNum = platformNum;
-    }
+    private String parentBusNum;
 
-    public BigDecimal getTotalProfit1() {
-        return totalProfit1;
-    }
+    private String parentAgentId;
 
-    public void setTotalProfit1(BigDecimal totalProfit1) {
-        this.totalProfit1 = totalProfit1;
-    }
+    private String agentType;
+
+    private String parentAgentName;
+
+    private String payCompany;
 
     public String getId() {
         return id;
@@ -152,5 +148,69 @@ public class ProfitDay implements Serializable {
 
     public void setReturnMoney(BigDecimal returnMoney) {
         this.returnMoney = returnMoney;
+    }
+
+    public BigDecimal getTotalProfit1() {
+        return totalProfit1;
+    }
+
+    public void setTotalProfit1(BigDecimal totalProfit1) {
+        this.totalProfit1 = totalProfit1;
+    }
+
+    public String getPlatformnum() {
+        return platformnum;
+    }
+
+    public void setPlatformnum(String platformnum) {
+        this.platformnum = platformnum == null ? null : platformnum.trim();
+    }
+
+    public String getBusNum() {
+        return busNum;
+    }
+
+    public void setBusNum(String busNum) {
+        this.busNum = busNum == null ? null : busNum.trim();
+    }
+
+    public String getParentBusNum() {
+        return parentBusNum;
+    }
+
+    public void setParentBusNum(String parentBusNum) {
+        this.parentBusNum = parentBusNum == null ? null : parentBusNum.trim();
+    }
+
+    public String getParentAgentId() {
+        return parentAgentId;
+    }
+
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId == null ? null : parentAgentId.trim();
+    }
+
+    public String getAgentType() {
+        return agentType;
+    }
+
+    public void setAgentType(String agentType) {
+        this.agentType = agentType == null ? null : agentType.trim();
+    }
+
+    public String getParentAgentName() {
+        return parentAgentName;
+    }
+
+    public void setParentAgentName(String parentAgentName) {
+        this.parentAgentName = parentAgentName == null ? null : parentAgentName.trim();
+    }
+
+    public String getPayCompany() {
+        return payCompany;
+    }
+
+    public void setPayCompany(String payCompany) {
+        this.payCompany = payCompany == null ? null : payCompany.trim();
     }
 }

@@ -14,7 +14,6 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PosCheckMapper;
 import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
-import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.service.IPosCheckService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -28,8 +27,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -57,7 +54,6 @@ public class PosCheckServiceImpl implements IPosCheckService {
     public PageInfo posCheckList(Map<String, Object> param, PosCheck posCheck, Page page) {
         PosCheckExample example = checkEqualsTo(posCheck);
         example.setPage(page);
-
         example.setOrderByClause("APP_DATE DESC ");
         List<PosCheck> posCheckList = checkMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
@@ -82,11 +78,11 @@ public class PosCheckServiceImpl implements IPosCheckService {
             criteria.andCheckStatusEqualTo(posCheck.getCheckStatus());
         }
         if (StringUtils.isNotBlank(posCheck.getCheckDateS()) && StringUtils.isNotBlank(posCheck.getCheckDateE())) {
-            criteria.andCheckDateSBetween(posCheck.getCheckDateS(), posCheck.getCheckDateE());
-            criteria.andCheckDateSBetween(posCheck.getCheckDateS(), posCheck.getCheckDateE());
-        } else if (StringUtils.isNotBlank(posCheck.getCheckDateS())){
+            criteria.andCheckDateSGreaterThanOrEqualTo(posCheck.getCheckDateS());
+            criteria.andCheckDateELessThanOrEqualTo(posCheck.getCheckDateE());
+        } else if (StringUtils.isNotBlank(posCheck.getCheckDateS())) {
             criteria.andCheckDateSEqualTo(posCheck.getCheckDateS());
-        } else if (StringUtils.isNotBlank(posCheck.getCheckDateE())){
+        } else if (StringUtils.isNotBlank(posCheck.getCheckDateE())) {
             criteria.andCheckDateEEqualTo(posCheck.getCheckDateE());
         }
         return posCheckExample;

@@ -2,11 +2,11 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.InvoiceDetail;
 import com.ryx.credit.profit.pojo.InvoiceDetailExample;
-
 import java.util.List;
+import java.util.Map;
 
 public interface InvoiceDetailMapper {
-    int countByExample(InvoiceDetailExample example);
+    long countByExample(InvoiceDetailExample example);
 
     int deleteByExample(InvoiceDetailExample example);
 
@@ -21,6 +21,8 @@ public interface InvoiceDetailMapper {
     int updateByPrimaryKeySelective(InvoiceDetail record);
 
     int updateByPrimaryKey(InvoiceDetail record);
+
+    List<Map<String,Object>> queryInvoiceAgents(Map<String,Object> params);
 
     /**根据agentId获取agentPid*/
     String getAgentPidByAgentId(String agentId);

@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class ProfitSupplyTax {
+public class ProfitSupplyTax implements Serializable {
     private String id;
 
     private String supplyTaxDate;
@@ -15,17 +16,15 @@ public class ProfitSupplyTax {
 
     private String supplyTaxSubName;
 
-    public String getSupplyTaxType() {
-        return supplyTaxType;
-    }
-
-    public void setSupplyTaxType(String supplyTaxType) {
-        this.supplyTaxType = supplyTaxType;
-    }
-
     private BigDecimal supplyTaxAmt;
 
     private String supplyTaxType;
+
+    private String supplyTaxPlatform;
+
+    private String createTime;
+
+    private String updateTime;
 
     public String getId() {
         return id;
@@ -81,5 +80,37 @@ public class ProfitSupplyTax {
 
     public void setSupplyTaxAmt(BigDecimal supplyTaxAmt) {
         this.supplyTaxAmt = supplyTaxAmt;
+    }
+
+    public String getSupplyTaxType() {
+        return supplyTaxType;
+    }
+
+    public void setSupplyTaxType(String supplyTaxType) {
+        this.supplyTaxType = supplyTaxType == null ? null : supplyTaxType.trim();
+    }
+
+    public String getSupplyTaxPlatform() {
+        return supplyTaxPlatform;
+    }
+
+    public void setSupplyTaxPlatform(String supplyTaxPlatform) {
+        this.supplyTaxPlatform = supplyTaxPlatform == null ? null : supplyTaxPlatform.trim();
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime == null ? null : createTime.trim();
+    }
+
+    public String getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(String updateTime) {
+        this.updateTime = updateTime == null ? null : updateTime.trim();
     }
 }

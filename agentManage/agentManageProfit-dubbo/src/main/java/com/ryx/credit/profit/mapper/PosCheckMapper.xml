@@ -67,7 +67,7 @@
     select 
     <include refid="Base_Column_List" />
     from P_POS_CHECK
-    where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
   </select>
   <select id="selectByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
@@ -243,11 +243,11 @@
   <sql id="posCheckWhere">
     <where>
       1=1
-      <if test="agentId != null and agentId !=''"> and AGENT_ID =#{agentId}</if>
-      <if test='null!= agentName and agentName !="" '> AND AGENT_NAME = #{agentName}</if>
-      <if test='null!= checkStatus and checkStatus !="" '> AND CHECK_STATUS = #{checkStatus}</if>
-      <if test='null!= checkDateS and checkDateS !="" '> AND CHECK_DATE_S &gt;= #{checkDateS}</if>
-      <if test='null!= checkDateE and checkDateE !="" '> AND CHECK_DATE_E &lt;= #{checkDateE}</if>
+      <if test="agentId != null and agentId !=''"> and AGENT_ID = #{agentId}</if>
+      <if test="agentName != null and agentName !=''"> and AGENT_NAME = #{agentName}</if>
+      <if test="checkStatus != null and checkStatus !=''"> and CHECK_STATUS = #{checkStatus}</if>
+      <if test="checkDateS != null and checkDateS !=''"> and CHECK_DATE_S &gt;= #{checkDateS}</if>
+      <if test="checkDateE != null and checkDateE !=''"> and CHECK_DATE_E &lt;= #{checkDateE}</if>
     </where>
   </sql>
 </mapper>

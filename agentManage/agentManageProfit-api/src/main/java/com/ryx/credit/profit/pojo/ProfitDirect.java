@@ -12,17 +12,6 @@ public class ProfitDirect implements Serializable {
 
     private String fristAgentPid;
 
-    //新增
-    private String fristAgentId;
-
-    public String getFristAgentId() {
-        return fristAgentId;
-    }
-
-    public void setFristAgentId(String fristAgentId) {
-        this.fristAgentId = fristAgentId;
-    }
-
     private String fristAgentName;
 
     private String parentAgentId;
@@ -59,36 +48,15 @@ public class ProfitDirect implements Serializable {
 
     private BigDecimal parentBuckle;
 
+    private String fristAgentId;
+
     private String status;
 
-    //新增字段
     private String paycompanyName;
 
     private String paycompanyNum;
 
-    public String getPaycompanyName() {
-        return paycompanyName;
-    }
-
-    public void setPaycompanyName(String paycompanyName) {
-        this.paycompanyName = paycompanyName;
-    }
-
-    public String getPaycompanyNum() {
-        return paycompanyNum;
-    }
-
-    public void setPaycompanyNum(String paycompanyNum) {
-        this.paycompanyNum = paycompanyNum;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    private BigDecimal dailyAmt;
 
     public String getId() {
         return id;
@@ -264,5 +232,45 @@ public class ProfitDirect implements Serializable {
 
     public void setParentBuckle(BigDecimal parentBuckle) {
         this.parentBuckle = parentBuckle;
+    }
+
+    public String getFristAgentId() {
+        return fristAgentId;
+    }
+
+    public void setFristAgentId(String fristAgentId) {
+        this.fristAgentId = fristAgentId == null ? null : fristAgentId.trim();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status == null ? null : status.trim();
+    }
+
+    public String getPaycompanyName() {
+        return paycompanyName;
+    }
+
+    public void setPaycompanyName(String paycompanyName) {
+        this.paycompanyName = paycompanyName == null ? null : paycompanyName.trim();
+    }
+
+    public String getPaycompanyNum() {
+        return paycompanyNum;
+    }
+
+    public void setPaycompanyNum(String paycompanyNum) {
+        this.paycompanyNum = paycompanyNum == null ? null : paycompanyNum.trim();
+    }
+
+    public BigDecimal getDailyAmt() {
+        return dailyAmt;
+    }
+
+    public void setDailyAmt(BigDecimal dailyAmt) {
+        this.dailyAmt = dailyAmt;
     }
 }

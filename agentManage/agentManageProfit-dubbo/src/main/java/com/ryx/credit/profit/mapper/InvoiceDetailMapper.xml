@@ -416,6 +416,40 @@
     </if>
   </sql>
 
+  <select id="getZfTaxAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select AGENT_ID,AGENT_NAME,
+      nvl(REAL_PROFIT_AMT,0) PRE_PROFIT_AMT,
+      nvl(DAYS_PROFIT_AMT,0) DAYS_PROFIT_AMT,
+      nvl(RETURN_MONEY,0) RETURN_MONEY,
+      nvl(OWN_INVOICE,0) PRE_LEFT_AMT,
+      nvl(BL_AMT,0) BL_AMT,
+      nvl(ADD_INVOICE_AMT,0) ADD_INVOICE_AMT,
+      nvl(ADJUST_AMT,0) ADJUST_AMT
+    from (
+      select distinct a.AGENT_ID,a.AGENT_NAME,b.REAL_PROFIT_AMT,c.DAYS_PROFIT_AMT,c.RETURN_MONEY,
+        d.OWN_INVOICE,e.BL_AMT,f.ADD_INVOICE_AMT,f.ADJUST_AMT from P_PROFIT_DETAIL_M  a
+      left join
+        (select AGENT_ID,sum(REAL_PROFIT_AMT) REAL_PROFIT_AMT  <!--前月月分润-->
+        from P_PROFIT_DETAIL_M a where PROFIT_DATE='${preMonth}' group by AGENT_ID) b on a.AGENT_ID = b.AGENT_ID
+
+      left join
+        (select AGENT_ID,sum(SUCCESS_MONEY) DAYS_PROFIT_AMT,sum(RETURN_MONEY) RETURN_MONEY  from    <!--日结分润、返现-->
+        P_PROFIT_D  where REMIT_DATE &gt;='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31' group by AGENT_ID) c on a.AGENT_ID = c.AGENT_ID
+
+      left join
+        (select AGENT_ID,OWN_INVOICE from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}') d on a.AGENT_ID = d.AGENT_ID <!--上月欠票-->
+
+      left join
+        (select AGENT_ID,sum(BUCKLE_AMT) BL_AMT from <!--保理-->
+        P_PROFIT_FACTOR  where FACTOR_MONTH='${profitMonth}' group by AGENT_ID ) e on a.AGENT_ID = e.AGENT_ID
+
+      left join
+        (select AGENT_ID,ADD_INVOICE_AMT,ADJUST_AMT from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}') f on a.AGENT_ID = f.AGENT_ID
+      where a.PROFIT_DATE = '${profitMonth}' AND a.PAY_COMPANY = 'Q000029564'
+    )
+  </select>
+
+
 
   <!--  String getAgentPidByAgentId(String agentId);-->
   <select id="getAgentPidByAgentId" resultType="java.lang.String">

@@ -1,7 +1,9 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -48,8 +50,14 @@ public interface ProfitDirectMapper {
 
     //直发分润查询
     List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect);
+
+    //根据唯一码查询业务平台编码
+    List<String> selectByAgUniqNum(String agUniqNum);
+
     //直发分润修改状态
     void  updateByStatus(ProfitDirect profitDirectSingleList);
 
     BigDecimal selectAmtByDeal(String transMonth);
+
+    void deleteByMonth(@Param("transMonth") String transMonth);
 }

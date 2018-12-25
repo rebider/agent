@@ -2,6 +2,7 @@ package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
@@ -260,7 +261,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 logger.info("========用户{}{}启动部门参数为空", agentId, cuser);
                 throw new ProcessException("启动部门参数为空!");
             }
-            startPar.put("rs","pass");
+            startPar.put("rs",ApprovalType.PASS.getValue());
             //启动审批
             String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
             if (proce == null) {
@@ -362,7 +363,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             logger.info("========用户{}{}启动部门参数为空", busid, cuser);
             throw new ProcessException("启动部门参数为空!");
         }
-        startPar.put("rs","pass");
+        startPar.put("rs",ApprovalType.PASS.getValue());
         //启动审批
         String proce = activityService.createDeloyFlow(null, AppConfig.getProperty("agent_net_in_activity"), null, null, startPar);
         if (proce == null) {
@@ -783,11 +784,15 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             return ResultVO.success(ag);
         } catch (ProcessException e) {
             logger.error("修改代理商错误", e.getMsg());
-            return ResultVO.fail(e.getMsg());
+            throw new Exception(e.getMsg());
+        } catch (MessageException e) {
+            e.printStackTrace();
+            logger.error("修改代理商错误", e);
+            throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("修改代理商错误", e);
-            throw e;
+            throw new Exception("修改代理商错误");
         }
     }
 

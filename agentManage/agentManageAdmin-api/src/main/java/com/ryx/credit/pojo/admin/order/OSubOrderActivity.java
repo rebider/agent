@@ -59,6 +59,13 @@ public class OSubOrderActivity implements Serializable{
 
     private BigDecimal originalPrice;
 
+    private BigDecimal posSpePrice;
+
+    private String posType;
+
+    private BigDecimal standTime;
+
+
     public String getId() {
         return id;
     }
@@ -273,5 +280,29 @@ public class OSubOrderActivity implements Serializable{
 
     public void setOriginalPrice(BigDecimal originalPrice) {
         this.originalPrice = originalPrice;
+    }
+
+    public BigDecimal getPosSpePrice() {
+        return posSpePrice;
+    }
+
+    public void setPosSpePrice(BigDecimal posSpePrice) {
+        this.posSpePrice = posSpePrice;
+    }
+
+    public String getPosType() {
+        return posType;
+    }
+
+    public void setPosType(String posType) {
+        this.posType = posType;
+    }
+
+    public BigDecimal getStandTime() {
+        return standTime;
+    }
+
+    public void setStandTime(BigDecimal standTime) {
+        this.standTime = standTime;
     }
 }

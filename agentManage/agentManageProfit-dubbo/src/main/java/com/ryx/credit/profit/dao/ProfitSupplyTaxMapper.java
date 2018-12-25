@@ -25,4 +25,18 @@ public interface ProfitSupplyTaxMapper {
     long getProfitSupplyTaxCount(Map<String, Object> param);
 
     List<Map<String, Object>> getProfitSupplyTaxList(Map<String, Object> param);
+
+    List<Map<String,Object>> getZqTaxAgents(Map<String,Object> params);
+
+    List<Map<String,Object>> getZfInvoiceAgents(Map<String,Object> params);
+
+    List<Map<String,Object>> getZfTaxAgents(Map<String,Object> params);
+
+
+    List<Map<String, Object>> getClassificationList(Map<String, Object> param);
+
+
+
+
+
 }

@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.*;
+import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IProfitDirectService;
 import com.ryx.credit.profit.service.ProfitComputerService;
@@ -249,7 +250,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             BigDecimal creditAmt = buckleRunMapper.getSumRunAmt(profitDirect.getAgentId());//一共被代扣总额
             //找不着扣款关系------------------
             if(null==creditAmt||creditAmt.compareTo(BigDecimal.ZERO)==0){
-                /*ProfitDetailMonth detailMonth = detailMonthMapper.selectByAgentPid(profitDirect.getFristAgentPid());
+                /*ProfitDetailMonth detailMonth = detailMonthMapper.selectByAgentPid(ProfitDirect.getFristAgentPid());
                 if(null==detailMonth.getZhifaSupply()){
                     detailMonth.setZhifaSupply(supply);
                 }else{
@@ -422,7 +423,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 //parent = should.multiply(new BigDecimal("-1"));//此时该代理商上级如果是一代？
             }
             profitDirect.setShouldProfit(should);
-            //profitDirect.setParentBuckle(parent);
+            //ProfitDirect.setParentBuckle(parent);
             directMapper.updateByPrimaryKeySelective(profitDirect);
         }
     }

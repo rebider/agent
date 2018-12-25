@@ -5,6 +5,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.IDUtils;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.dao.ImsTermTransferDetailMapper;
 import com.ryx.credit.machine.dao.ImsTermTransferMapper;
 import com.ryx.credit.machine.dao.ImsTermWarehouseDetailMapper;
@@ -72,6 +73,9 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             if(null!=imsTermActive){
                 throw new MessageException("Sn机具已激活");
             }
+            if(imsTermWarehouseDetail.getStandTime()==null || StringUtils.isBlank(imsTermWarehouseDetail.getPosType()) || imsTermWarehouseDetail.getPosSpePrice()==null ){
+                throw new MessageException("缺少参数");
+            }
             String createTime = DateUtil.format(new Date());
             imsTermWarehouseDetail.setWdId(IDUtils.genImsTermId());
             imsTermWarehouseDetail.setPosSn(sn);
@@ -80,7 +84,6 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             imsTermWarehouseDetail.setCreateTime(createTime);
             imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
             imsTermWarehouseDetail.setUpdateTime(createTime);
-            imsTermWarehouseDetail.setPosType("0");  //pos类型 0普通级，1：特价机
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
 
             int i = imsTermWarehouseDetailMapper.insert(imsTermWarehouseDetail);
