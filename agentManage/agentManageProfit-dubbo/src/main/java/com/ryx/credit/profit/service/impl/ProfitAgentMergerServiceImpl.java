@@ -182,6 +182,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      * @param userId
      * @throws Exception
      */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception {
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
@@ -215,6 +216,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      * @param insid
      * @param status
      */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentResult approveFinish(String insid, String status) throws Exception{
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
