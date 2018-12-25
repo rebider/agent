@@ -48,9 +48,6 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         InvoiceDetailExample example = new InvoiceDetailExample();
         example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(agentId)){
-            criteria.andAgentIdEqualTo(agentId);
-        }
         if(StringUtils.isNotBlank(agentName)){
             criteria.andAgentNameEqualTo(agentName);
         }
@@ -64,10 +61,14 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             }
         }
         //如果查询条件：包含下级
-        if("1".equals(concludeChild)){
-            List<String> lists = invoiceDetailMapper.getAgentId(agentId);//获取下级的agentId
-            lists.add(agentId);//添加本级agentId
+        if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
+            lists.add(agentId);
             criteria.andAgentIdIn(lists);
+        }else{
+            if(StringUtils.isNotBlank(agentId)){
+                criteria.andAgentIdEqualTo(agentId);
+            }
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         int count = invoiceDetailMapper.countByExample(example);
@@ -126,9 +127,6 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         InvoiceDetailExample example = new InvoiceDetailExample();
        //example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(agentId)){
-            criteria.andAgentIdEqualTo(agentId);
-        }
         if(StringUtils.isNotBlank(agentName)){
             criteria.andAgentNameEqualTo(agentName);
         }
@@ -141,10 +139,14 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 criteria.andProfitMonthEqualTo(dateEnd);
             }
         }
-        if("1".equals(concludeChild)){
-            List<String> lists = invoiceDetailMapper.getAgentId(agentId);
+        if("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)){
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
+        }else{
+            if(StringUtils.isNotBlank(agentId)){
+                criteria.andAgentIdEqualTo(agentId);
+            }
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         return lists;
