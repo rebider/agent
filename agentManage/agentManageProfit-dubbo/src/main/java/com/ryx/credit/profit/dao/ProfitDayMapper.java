@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,4 +40,6 @@ public interface ProfitDayMapper {
     BigDecimal totalProfitAndReturn(ProfitDay record);
 
     BigDecimal totalProfitAndReturnById(ProfitDay record);
+
+    void deleteByDay(@Param("frDate") String frDate);
 }

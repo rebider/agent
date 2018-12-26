@@ -80,7 +80,7 @@ public class NewProfitMonthMposDataJob {
         transDate = transDate == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : transDate;
         map.put("frMonth", transDate);
         map.put("pageNumber", index++ + "");
-        map.put("pageSize", "50");
+        map.put("pageSize", "1000");
         String params = JsonUtil.objectToJson(map);
         logger.info("========手刷{}月分润明细请求报文：{}", transDate, JSONObject.toJSONString(map));
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newmonth"), params);
@@ -89,8 +89,8 @@ public class NewProfitMonthMposDataJob {
         JSONObject json = JSONObject.parseObject(res);
         if (!json.get("respCode").equals("000000")) {
             logger.error("请求同步失败！");
-            AppConfig.sendEmails("月分润同步失败", "月分润同步失败");
-            return;
+            AppConfig.sendEmails("月分润同步失败! respCode="+json.get("respCode")+",respMsg="+json.get("respMsg"), "月分润同步失败");
+            throw new RuntimeException("月分润同步失败！");
         }
 
 
@@ -175,6 +175,7 @@ public class NewProfitMonthMposDataJob {
             detail.setAgentType(null == Busime ? "3" : Busime.getBusType());
 
             //detail.setNotaxAmt(totalDay==null?BigDecimal.ZERO:totalDay);//未计税日结金额
+            detail.setNotaxAmt(json.getBigDecimal("DAILYMONEY") == null ? BigDecimal.ZERO : json.getBigDecimal("DAILYMONEY"));//日结金额
             detail.setSourceInfo("MPOS");
 
             ProfitSupplyDiff where = new ProfitSupplyDiff();
