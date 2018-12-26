@@ -204,14 +204,12 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         if(StringUtils.isNotBlank(agentName)){
             criteria.andAgentNameEqualTo(agentName);
         }
-        if(StringUtils.isNotBlank(dateStart) || StringUtils.isNotBlank(dateEnd)){
-            if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
-                criteria.andProfitMonthBetween(dateStart,dateEnd);
-            }else if(StringUtils.isNotBlank(dateStart)){
-                criteria.andProfitMonthEqualTo(dateStart);
-            }else{
-                criteria.andProfitMonthEqualTo(dateEnd);
-            }
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthEqualTo(dateEnd);
         }
         if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
@@ -222,10 +220,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
             lists.add(agentIde);
             criteria.andAgentIdIn(lists);
-        }else{
-            if(StringUtils.isNotBlank(agentId)){
-                criteria.andAgentIdEqualTo(agentId);
-            }
+        }else if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         Long count =invoiceDetailMapper.countByExample(example);
@@ -271,6 +267,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     public int setAdjustAMT(InvoiceDetail invoiceDetail) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         invoiceDetail.setUpdateTime(sdf.format(new Date()));
+        invoiceDetail.setAdjustTime(sdf.format(new Date()));//设置调整时间
         return invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
     }
 
@@ -291,14 +288,12 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         if(StringUtils.isNotBlank(agentName)){
             criteria.andAgentNameEqualTo(agentName);
         }
-        if(StringUtils.isNotBlank(dateStart) || StringUtils.isNotBlank(dateEnd)){
-            if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
-                criteria.andProfitMonthBetween(dateStart,dateEnd);
-            }else if(StringUtils.isNotBlank(dateStart)){
-                criteria.andProfitMonthEqualTo(dateStart);
-            }else{
-                criteria.andProfitMonthEqualTo(dateEnd);
-            }
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthEqualTo(dateEnd);
         }
         if("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)){
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
@@ -309,10 +304,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agent);
             lists.add(agent);
             criteria.andAgentIdIn(lists);
-        }else{
-            if(StringUtils.isNotBlank(agentId)){
-                criteria.andAgentIdEqualTo(agentId);
-            }
+        }else if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         return lists;
@@ -345,7 +338,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         invoice.setOptUser(loginName);
         boolean isHave = getInvoiceByInvoice(invoice);
         if(isHave == false){
-            //表示存在有效记录，更改数据状态
+            //表示存在有效记录，将其设置为无效
             invoiceMapper.setStatusToInvoice(invoice);
         }
         invoiceMapper.insertSelective(invoice);
