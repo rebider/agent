@@ -1,6 +1,8 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
 
@@ -26,6 +28,6 @@ public interface DataChangeActivityService {
     ResultVO compressColInfoDataChangeActivity(String proIns, String agStatus)throws Exception;
 
 
-
+    AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception;
 
 }

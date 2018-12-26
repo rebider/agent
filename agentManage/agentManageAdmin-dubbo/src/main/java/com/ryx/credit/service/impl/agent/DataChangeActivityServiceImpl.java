@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
@@ -12,6 +13,7 @@ import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.slf4j.Logger;
@@ -33,19 +35,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private static Logger logger = LoggerFactory.getLogger(AgentEnterServiceImpl.class);
 
     @Autowired
-    private AgentService agentService;
-    @Autowired
-    private AgentContractService agentContractService;
-    @Autowired
-    private AccountPaidItemService accountPaidItemService;
-    @Autowired
-    private AgentBusinfoService agentBusinfoService;
-    @Autowired
     private AgentColinfoService agentColinfoService;
     @Autowired
     private ActivityService activityService;
-    @Autowired
-    private AgentAssProtocolService agentAssProtocolService;
     @Autowired
     private DateChangeRequestMapper dateChangeRequestMapper;
     @Autowired
@@ -68,6 +60,8 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentMapper agentMapper;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private IUserService iUserService;
 
 
 
@@ -332,4 +326,54 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             throw e;
         }
     }
+
+    /**
+     * 处理任务
+     * @return
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalTask(AgentVo agentVo, String userId) throws Exception{
+
+        try {
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new ProcessException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            //财务审批
+            if(orgId.equals("222")){
+                DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(agentVo.getAgentBusId());
+                if(null==dateChangeRequest){
+                    throw new ProcessException("数据错误");
+                }
+                //数据修改
+                if(dateChangeRequest.getDataType().equals(DataChangeApyType.DC_Agent.name())){
+                    AgentVo vo = JSONObject.parseObject(dateChangeRequest.getDataContent(), AgentVo.class);
+                    if(StringUtils.isBlank(agentVo.getDebt()) || StringUtils.isBlank(agentVo.getOweTicket())){
+                        throw new ProcessException("请填写欠票欠款信息,没有请填0");
+                    }
+                    vo.setDebt(agentVo.getDebt());
+                    vo.setOweTicket(agentVo.getOweTicket());
+                    String voJson = JSONObject.toJSONString(vo);
+                    dateChangeRequest.setDataContent(voJson);
+                    int i = dateChangeRequestMapper.updateByPrimaryKeySelective(dateChangeRequest);
+                    if(i!=1){
+                        throw new ProcessException("处理任务：更新失败");
+                    }
+                }
+            }
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
+            if(!result.isOK()){
+                logger.error(result.getMsg());
+                throw new ProcessException("工作流处理任务异常");
+            }
+        } catch (ProcessException e) {
+            e.printStackTrace();
+            throw new MessageException("catch工作流处理任务异常:",e.getMsg());
+        }
+        return AgentResult.ok();
+    }
+
 }
