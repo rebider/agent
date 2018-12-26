@@ -75,6 +75,8 @@ public class AgentVo implements Serializable {
     private List<OCashReceivablesVo> oCashReceivablesVoList;
     private List<TerminalTransferDetail > terminalTransferDetailList;
     private TerminalTransfer terminalTransfer;
+    private String debt;  //欠款
+    private String oweTicket;  //欠票
 
     public OReturnOrder getoReturnOrder() {
         return oReturnOrder;
@@ -402,5 +404,21 @@ public class AgentVo implements Serializable {
 
     public void setTerminalTransfer(TerminalTransfer terminalTransfer) {
         this.terminalTransfer = terminalTransfer;
+    }
+
+    public String getDebt() {
+        return debt;
+    }
+
+    public void setDebt(String debt) {
+        this.debt = debt;
+    }
+
+    public String getOweTicket() {
+        return oweTicket;
+    }
+
+    public void setOweTicket(String oweTicket) {
+        this.oweTicket = oweTicket;
     }
 }

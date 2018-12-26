@@ -10,7 +10,12 @@ import java.math.BigDecimal;
  */
 public enum AgCapitalType {
     //    资金类型(押金，押金退款，扣款，扣款分期，补款，奖励，服务费等)
-    YAJIN("押金"),REIHEBAOBZJ("瑞和宝保证金"),REIHEBAOFWF("瑞和宝服务费"),S0BAOZHENGJIN("S0保证金"),BAOZHENGJIN("保证金"),FUWUFEI("服务费");
+    YAJIN("押金"),
+    REIHEBAOBZJ("瑞和宝保证金"),
+    REIHEBAOFWF("瑞和宝服务费"),
+    S0BAOZHENGJIN("S0保证金"),
+    BAOZHENGJIN("保证金"),
+    FUWUFEI("服务费");
 
     public String  msg;
 
