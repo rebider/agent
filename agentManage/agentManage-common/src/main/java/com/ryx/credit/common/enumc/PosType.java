@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public enum PosType {
 
-    ZERO(new BigDecimal("0"),"普通级"),
+    ZERO(new BigDecimal("0"),"普通机"),
     ONE(new BigDecimal("1"),"特价机"),
     TWO(new BigDecimal("2"),"特价机（无押金）");
 

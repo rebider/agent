@@ -19,7 +19,7 @@ public interface TerminalTransferService {
 
     PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName);
 
-    AgentResult startTerminalTransferActivity(String id, String cuser, String agentId) throws Exception;
+    AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception;
 
     AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception;
 

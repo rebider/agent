@@ -204,13 +204,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setVersion(Status.STATUS_1.status);
                 terminalTransferDetail.setAgentId(agentId);
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
-                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusInfoId"));
+                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
+                terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
                 terminalTransferDetail.setProCom(resultMap.get("proCom"));
                 terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }
             if(saveFlag.equals(SaveFlag.TJSP.getValue())){
-                startTerminalTransferActivity(terminalTransferId,cuser,agentId);
+                startTerminalTransferActivity(terminalTransferId,cuser,agentId,true);
             }
             return AgentResult.ok();
         } catch (MessageException e) {
@@ -325,24 +326,56 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(proModelSet.size()!=1){
             throw new MessageException(terminalTransferDetail.getSnBeginNum()+"到"+terminalTransferDetail.getSnEndNum()+"不是同一型号");
         }
+        AgentBusInfoExample originalOrgExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria originalOrgCriteria = originalOrgExample.createCriteria();
+        originalOrgCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        originalOrgCriteria.andBusStatusEqualTo(Status.STATUS_1.status);
+        originalOrgCriteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
+        originalOrgCriteria.andBusNumEqualTo(terminalTransferDetail.getOriginalOrgId());
+        List<AgentBusInfo> originalOrgBusInfoList = agentBusInfoMapper.selectByExample(agentExample);
+        if(originalOrgBusInfoList.size()==1){
+            resultMap.put("originalBusId",originalOrgBusInfoList.get(0).getId());
+        }
         resultMap.put("proCom",proComSet.iterator().next());
         resultMap.put("proModel",proModelSet.iterator().next());
-        resultMap.put("goalBusInfoId",goalAgentBusInfo.getId());
+        resultMap.put("goalBusId",goalAgentBusInfo.getId());
         return resultMap;
     }
 
 
+    /**
+     * 提交审批
+     * @param id
+     * @param cuser
+     * @param agentId
+     * @param isSave 是否已保存
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId) throws Exception {
+    public AgentResult startTerminalTransferActivity(String id, String cuser, String agentId,Boolean isSave) throws Exception {
 
+        if(!isSave){
+            TerminalTransfer terminalTransfer = terminalTransferMapper.selectByPrimaryKey(id);
+            if(terminalTransfer==null){
+                throw new MessageException("提交审批信息有误");
+            }
+            terminalTransfer.setuUser(cuser);
+            terminalTransfer.setuTime(new Date());
+            terminalTransfer.setReviewStatus(AgStatus.Approving.status);
+            int i = terminalTransferMapper.updateByPrimaryKeySelective(terminalTransfer);
+            if(i!=1){
+                throw new MessageException("提交审批处理失败");
+            }
+        }
         //启动审批
         String proce = activityService.createDeloyFlow(null, BusActRelBusType.agentTerminal.name(), null, null, null);
         if (proce == null) {
             log.info("终端划拨提交审批，审批流启动失败{}:{}", id, cuser);
             throw new MessageException("审批流启动失败!");
         }
-        //代理商业务视频关系
+        //代理商业务和工作流关系
         BusActRel record = new BusActRel();
         record.setBusId(id);
         record.setActivId(proce);
@@ -653,14 +686,16 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 terminalTransferDetail.setVersion(Status.STATUS_1.status);
                 terminalTransferDetail.setAgentId(agentId);
                 terminalTransferDetail.setAdjustStatus(AdjustStatus.WTZ.getValue());
-                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusInfoId"));
+                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
+                terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
                 terminalTransferDetail.setProCom(resultMap.get("proCom"));
                 terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 terminalTransferDetailMapper.insert(terminalTransferDetail);
             }else{
                 terminalTransferDetail.setuUser(cuser);
                 terminalTransferDetail.setuTime(date);
-                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusInfoId"));
+                terminalTransferDetail.setGoalBusId(resultMap.get("goalBusId"));
+                terminalTransferDetail.setOriginalBusId(resultMap.get("originalBusId"));
                 terminalTransferDetail.setProCom(resultMap.get("proCom"));
                 terminalTransferDetail.setProModel(resultMap.get("proModel"));
                 int j = terminalTransferDetailMapper.updateByPrimaryKeySelective(terminalTransferDetail);

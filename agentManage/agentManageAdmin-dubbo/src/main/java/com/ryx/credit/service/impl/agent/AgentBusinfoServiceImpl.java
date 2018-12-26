@@ -619,6 +619,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		criteria.andBusNumEqualTo(busNum);
 		criteria.andCloReviewStatusEqualTo(AgStatus.Approved.getValue());
 		criteria.andBusStatusEqualTo(AgentInStatus.IN.status);
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
 		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 		if(null==agentBusInfos){
 			return null;
