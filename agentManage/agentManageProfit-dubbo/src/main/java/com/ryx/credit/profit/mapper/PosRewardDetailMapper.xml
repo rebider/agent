@@ -19,8 +19,6 @@
     <result column="POS_REAWRD_PROFIT" jdbcType="VARCHAR" property="posReawrdProfit" />
     <result column="POS_REMARK" jdbcType="VARCHAR" property="posRemark" />
     <result column="POS_CHECK_DEDUCT_AMT" jdbcType="VARCHAR" property="posCheckDeductAmt" />
-    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
-    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.ryx.credit.profit.pojo.PosRewardDetail">
     <result column="CHILD_AGENT_ID_LIST" jdbcType="CLOB" property="childAgentIdList" />
@@ -87,7 +85,7 @@
     ID, PROFIT_POS_DATE, POS_AGENT_ID, POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID, 
     POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, POS_CURRENT_LOAN_COUNT, 
     POS_AMT, POS_STANDARD, POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, POS_REMARK, 
-    POS_CHECK_DEDUCT_AMT, PARENT_AGENT_ID, PARENT_AGENT_NAME
+    POS_CHECK_DEDUCT_AMT
   </sql>
   <sql id="Blob_Column_List">
     CHILD_AGENT_ID_LIST
@@ -144,8 +142,7 @@
       POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, 
       POS_CURRENT_LOAN_COUNT, POS_AMT, POS_STANDARD, 
       POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, 
-      POS_REMARK, POS_CHECK_DEDUCT_AMT, PARENT_AGENT_ID, 
-      PARENT_AGENT_NAME, CHILD_AGENT_ID_LIST)
+      POS_REMARK, POS_CHECK_DEDUCT_AMT, CHILD_AGENT_ID_LIST)
     values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR}, 
       #{posAgentName,jdbcType=VARCHAR}, #{posMechanismType,jdbcType=VARCHAR}, #{posMechanismId,jdbcType=VARCHAR}, 
       #{posCompareCount,jdbcType=VARCHAR}, #{posCurrentCount,jdbcType=VARCHAR}, #{posCompareLoanCount,jdbcType=VARCHAR}, 
@@ -207,12 +204,6 @@
       </if>
       <if test="posCheckDeductAmt != null">
         POS_CHECK_DEDUCT_AMT,
-      </if>
-      <if test="parentAgentId != null">
-        PARENT_AGENT_ID,
-      </if>
-      <if test="parentAgentName != null">
-        PARENT_AGENT_NAME,
       </if>
       <if test="childAgentIdList != null">
         CHILD_AGENT_ID_LIST,
@@ -341,12 +332,6 @@
       <if test="record.posCheckDeductAmt != null">
         POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
       </if>
-      <if test="record.parentAgentId != null">
-        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
-      </if>
-      <if test="record.parentAgentName != null">
-        PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
-      </if>
       <if test="record.childAgentIdList != null">
         CHILD_AGENT_ID_LIST = #{record.childAgentIdList,jdbcType=CLOB},
       </if>
@@ -374,8 +359,6 @@
       POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
       POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
       POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
-      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
-      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
       CHILD_AGENT_ID_LIST = #{record.childAgentIdList,jdbcType=CLOB}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -400,8 +383,6 @@
       POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
       POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
       POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
-      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
-      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -457,12 +438,6 @@
       <if test="posCheckDeductAmt != null">
         POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR},
       </if>
-      <if test="parentAgentId != null">
-        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
-      </if>
-      <if test="parentAgentName != null">
-        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
-      </if>
       <if test="childAgentIdList != null">
         CHILD_AGENT_ID_LIST = #{childAgentIdList,jdbcType=CLOB},
       </if>
@@ -487,8 +462,6 @@
       POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
       POS_REMARK = #{posRemark,jdbcType=VARCHAR},
       POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR},
-      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
-      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
       CHILD_AGENT_ID_LIST = #{childAgentIdList,jdbcType=CLOB}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -509,9 +482,7 @@
       POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
       POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
       POS_REMARK = #{posRemark,jdbcType=VARCHAR},
-      POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR},
-      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
-      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR}
+      POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -524,8 +495,6 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
-
   <select id="getRewardDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM POS_REWARD_DETAIL
@@ -551,7 +520,6 @@
       <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
     </where>
   </sql>
-
   <select id="getRewardDetailList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT
@@ -559,6 +527,25 @@
     FROM POS_REWARD_DETAIL
     <include refid="BASE_WHERE_SQL" />
     order by POS_REMARK,POS_MECHANISM_TYPE
+    <include refid="PAGING_END" />
+  </select>
+  <select id="getRewardDetailListByParam" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+   select <include refid="Base_Column_List" />
+          ,(select info2.AGENT_ID from A_AGENT_BUSINFO info2 where ID=
+          (select BUS_PARENT from A_AGENT_BUSINFO info1 where info1.AGENT_ID=detail.POS_AGENT_ID and
+                  ( BUS_NUM like 'SS%' or BUS_NUM like 'O%'))) as PARENT_AGENT_ID ,(select agent.AG_NAME from A_AGENT agent where agent.ID=(select info2.AGENT_ID from A_AGENT_BUSINFO info2 where ID=
+          (select BUS_PARENT from A_AGENT_BUSINFO info1 where info1.AGENT_ID=detail.POS_AGENT_ID and
+                  ( BUS_NUM like 'SS%' or BUS_NUM like 'O%'))))as PARENT_AGENT_NAME from POS_REWARD_DETAIL detail
+    where 1=1
+    <!--select
+    <include refid="Base_Column_List" />,
+
+     from POS_REWARD_DETAIL-->
+    <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' "> and POS_AGENT_ID = #{POS_AGENT_ID} </if>
+    <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+    <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
+    <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
     <include refid="PAGING_END" />
   </select>
   <sql id="PAGING_START">
@@ -571,13 +558,11 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
     </if>
   </sql>
-
   <update id="updateRewradData">
     UPDATE POS_REWARD_DETAIL  SET
     POS_OWN_REWARD = 0, POS_DOWN_REWARD = 0, POS_REAWRD_PROFIT = 0
     where PROFIT_POS_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
-
   <select id="queryChildLevelByAgentId" resultType="java.lang.String">
     SELECT AGENT_ID
     FROM A_AGENT_BUSINFO
