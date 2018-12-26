@@ -11,6 +11,7 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -42,7 +43,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, REMARK, REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION
+    ID, REMARK, REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, AGENT_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -61,7 +62,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_TERMINAL_TRANSFER
     where ID = #{id,jdbcType=VARCHAR}
@@ -73,14 +74,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
-    insert into O_TERMINAL_TRANSFER (ID, REMARK, REVIEW_STATUS, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, STATUS, VERSION
-      )
-    values (#{id,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+    insert into O_TERMINAL_TRANSFER (ID, REMARK, REVIEW_STATUS,
+    C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION,
+    AGENT_ID)
+    values (#{id,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{agentId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransfer">
     insert into O_TERMINAL_TRANSFER
@@ -112,6 +113,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -140,6 +144,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -176,6 +183,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -188,12 +198,13 @@
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -201,4 +212,42 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectTerminalTransferList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+      select
+      t.*,a.ag_name,cu.name as C_USER_NAME,uu.name as U_USER_NAME
+      from o_terminal_transfer t
+      left join a_agent a on t.agent_id = a.id
+      left join c_user cu on t.c_user = cu.id
+      left join c_user uu on t.u_user = uu.id
+    <include refid="TerminalTransferListWhere" />
+    order by t.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectTerminalTransferCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from o_terminal_transfer t
+    left join a_agent a on t.agent_id = a.id
+    <include refid="TerminalTransferListWhere" />
+  </select>
+  <sql id="TerminalTransferListWhere">
+    <where>
+      t.status = #{map.status} and a.status = #{map.status}
+      <if test="map.agentId != null">
+        and t.agent_Id = #{map.agentId}
+      </if>
+      <if test="map.agName != null">
+        and a.ag_Name = #{map.agName}
+      </if>
+      <if test="map.id != null">
+        and t.id = #{map.id}
+      </if>
+      <if test="map.reviewStatus != null">
+        and t.review_status = #{map.reviewStatus}
+      </if>
+    </where>
+  </sql>
+
 </mapper>

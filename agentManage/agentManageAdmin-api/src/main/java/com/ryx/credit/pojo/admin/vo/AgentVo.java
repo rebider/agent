@@ -74,6 +74,7 @@ public class AgentVo implements Serializable {
     private OReturnOrder oReturnOrder;
     private List<OCashReceivablesVo> oCashReceivablesVoList;
     private List<TerminalTransferDetail > terminalTransferDetailList;
+    private TerminalTransfer terminalTransfer;
 
     public OReturnOrder getoReturnOrder() {
         return oReturnOrder;
@@ -393,5 +394,13 @@ public class AgentVo implements Serializable {
 
     public void setTerminalTransferDetailList(List<TerminalTransferDetail> terminalTransferDetailList) {
         this.terminalTransferDetailList = terminalTransferDetailList;
+    }
+
+    public TerminalTransfer getTerminalTransfer() {
+        return terminalTransfer;
+    }
+
+    public void setTerminalTransfer(TerminalTransfer terminalTransfer) {
+        this.terminalTransfer = terminalTransfer;
     }
 }

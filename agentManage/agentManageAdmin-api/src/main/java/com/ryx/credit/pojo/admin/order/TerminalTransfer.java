@@ -24,6 +24,8 @@ public class TerminalTransfer implements Serializable{
 
     private BigDecimal version;
 
+    private String agentId;
+
     private List<TerminalTransferDetail> terminalTransferDetailList;
 
     public String getId() {
@@ -104,5 +106,13 @@ public class TerminalTransfer implements Serializable{
 
     public void setTerminalTransferDetailList(List<TerminalTransferDetail> terminalTransferDetailList) {
         this.terminalTransferDetailList = terminalTransferDetailList;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public void setAgentId(String agentId) {
+        this.agentId = agentId;
     }
 }
