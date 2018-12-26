@@ -189,6 +189,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 log.info("终端划拨提交审批，更新订单基本信息失败:{}", cuser);
                 throw new MessageException("终端划拨提交审批，更新终端划拨基本信息失败");
             }
+            if(terminalTransferDetailList.size()==0){
+                throw new MessageException("请填写明细最少一条");
+            }
             for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
                 Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
                 terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DETAIL));
@@ -632,6 +635,10 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(i!=1){
             throw new MessageException("更新数据明细失败");
         }
+        if(terminalTransferDetailList.size()==0){
+            throw new MessageException("请填写明细最少一条");
+        }
+        int updateCount = 0;
         for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             //新增
@@ -660,9 +667,18 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
                 if(j!=1){
                     throw new MessageException("更新数据明细失败");
                 }
+                updateCount++;
             }
         }
 
+        TerminalTransferDetailExample terminalTransferDetailExample = new TerminalTransferDetailExample();
+        TerminalTransferDetailExample.Criteria criteria = terminalTransferDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andTerminalTransferIdEqualTo(terminalTransfer.getId());
+        int selectCount = (int)terminalTransferDetailMapper.countByExample(terminalTransferDetailExample);
+        if(updateCount!=selectCount){
+            throw new MessageException("数据存在异常,请联系管理员！");
+        }
         return AgentResult.ok();
     }
 }
