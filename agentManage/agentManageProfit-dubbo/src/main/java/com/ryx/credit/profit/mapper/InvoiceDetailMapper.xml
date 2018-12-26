@@ -285,7 +285,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceDetailExample" resultType="int">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceDetailExample" resultType="java.lang.Long">
     select count(*) from P_INVOICE_DETAIL
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -448,21 +448,21 @@
       where a.PROFIT_DATE = '${profitMonth}' AND a.PAY_COMPANY = 'Q000029564'
     )
   </select>
-
-
-
-  <!--  String getAgentPidByAgentId(String agentId);-->
   <select id="getAgentPidByAgentId" resultType="java.lang.String">
     select ag_uniq_num from A_agent where id=#{agentId}
   </select>
-
-
-  <!-- /**根据上级获取全部下级的agentId*/
-    List<String> getAgentIdByBusParent(String agentId);-->
   <select id="getAgentIdByBusParent" resultType="java.lang.String">
-    select AGENT_ID from A_AGENT_BUSINFO
-    start with BUS_PARENT=#{agentId}
-    connect by prior  AGENT_ID = BUS_PARENT
+    select distinct ab.AGENT_ID from (select ID from A_AGENT_BUSINFO where AGENT_ID=#{agentId})aa
+      join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT
+    union
+    select distinct ad.AGENT_ID from (select ab.ID from (select ID from A_AGENT_BUSINFO where AGENT_ID=#{agentId})aa
+      join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT
+    union
+    select distinct  af.AGENT_ID from (select ad.ID from (select ab.ID from (select ID from A_AGENT_BUSINFO where AGENT_ID=#{agentId})aa
+      join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac  join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT) ae join A_AGENT_BUSINFO af on ae.ID = af.BUS_PARENT
+  </select>
+  <select id="getAgentIdbyAgentName" resultType="java.lang.String">
+    select AGENT_ID from  P_INVOICE_DETAIL where AGENT_NAME = #{agentId}
   </select>
 
 </mapper>

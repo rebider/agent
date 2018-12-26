@@ -30,4 +30,6 @@ public interface InvoiceDetailMapper {
     /**根据上级获取全部下级的agentId*/
     List<String> getAgentIdByBusParent(String agentId);
 
+    String getAgentIdbyAgentName(String agentId);
+
 }

@@ -10,7 +10,6 @@ import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.profit.dao.InvoiceDetailMapper;
 import com.ryx.credit.profit.dao.InvoiceMapper;
 import com.ryx.credit.profit.pojo.Invoice;
 import com.ryx.credit.profit.pojo.InvoiceDetail;
@@ -20,11 +19,7 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -32,8 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -220,10 +213,14 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 criteria.andProfitMonthEqualTo(dateEnd);
             }
         }
-        //如果查询条件：包含下级
         if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
+            criteria.andAgentIdIn(lists);
+        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
+            String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
+            lists.add(agentIde);
             criteria.andAgentIdIn(lists);
         }else{
             if(StringUtils.isNotBlank(agentId)){
@@ -231,10 +228,10 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             }
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
-        int count = (int)invoiceDetailMapper.countByExample(example);
+        Long count =invoiceDetailMapper.countByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(lists);
-        pageInfo.setTotal(count);
+        pageInfo.setTotal(count.intValue());
         return pageInfo;
     }
 
@@ -290,7 +287,6 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     @Override
     public List<InvoiceDetail> exportInvoiceData(String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
         InvoiceDetailExample example = new InvoiceDetailExample();
-       //example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
         if(StringUtils.isNotBlank(agentName)){
             criteria.andAgentNameEqualTo(agentName);
@@ -307,6 +303,11 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         if("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)){
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
+            criteria.andAgentIdIn(lists);
+        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
+            String agent = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agent);
+            lists.add(agent);
             criteria.andAgentIdIn(lists);
         }else{
             if(StringUtils.isNotBlank(agentId)){
