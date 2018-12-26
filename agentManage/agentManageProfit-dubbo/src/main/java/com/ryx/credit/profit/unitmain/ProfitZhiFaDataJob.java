@@ -79,10 +79,11 @@ public class ProfitZhiFaDataJob {
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.zhifa"), params);
         logger.info("直发数据同步返回报文：{}", JSONObject.toJSONString(res));
 
+        JSONObject json = JSONObject.parseObject(res);
         if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
             logger.error("请求同步失败！");
-            AppConfig.sendEmails("日分润同步失败", "日分润同步失败");
-            return;
+            AppConfig.sendEmails("直发分润数据同步失败！respCode="+json.get("respCode")+",respMsg="+json.get("respMsg"), "直发分润数据同步失败");
+            throw new RuntimeException("直发分润数据同步失败！");
         }
 
         String data = JSONObject.parseObject(res).get("data").toString();

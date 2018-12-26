@@ -400,4 +400,10 @@
     to_date(substr(TRANS_DATE,0,6),'yyyymm') = to_date(#{transDate},'yyyymm')
     AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
+
+  <delete id="deleteByDay" parameterType="java.lang.String">
+    delete from P_PROFIT_D
+    where REMIT_DATE = '${frDate}'
+  </delete>
+
 </mapper>

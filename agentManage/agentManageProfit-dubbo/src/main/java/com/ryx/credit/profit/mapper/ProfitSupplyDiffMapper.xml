@@ -226,4 +226,10 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <delete id="deleteByMonth" parameterType="java.lang.String">
+    delete from P_PROFIT_SUPPLY_DIFF
+    where DIFF_DATE = '${month}'
+  </delete>
+
 </mapper>
