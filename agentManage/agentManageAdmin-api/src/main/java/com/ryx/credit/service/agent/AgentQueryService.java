@@ -93,4 +93,11 @@ public interface AgentQueryService {
 
 
     List<AgentBusInfo> businessQuery(String agentId,String isZpos);
+
+    /**
+     * 查询用户收款账户
+     * @param agentId
+     * @return
+     */
+    AgentColinfo queryUserColinfo(String agentId);
 }

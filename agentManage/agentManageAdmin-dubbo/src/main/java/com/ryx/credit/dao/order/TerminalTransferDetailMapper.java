@@ -27,6 +27,8 @@ public interface TerminalTransferDetailMapper {
 
     List<Map<String,Object>> selectTerminalTransferDetailList(@Param("map") Map<String, Object> map, @Param("page") Page page);
 
+    List<Map<String,Object>> exprotTerminalTransferDetails(@Param("map") Map<String, Object> map);
+
     int selectTerminalTransferDetailCount(@Param("map") Map<String, Object> map);
 
 }

@@ -391,13 +391,28 @@
     </if>
   </sql>
 
+  <select id="exprotTerminalTransferDetails" parameterType="map" resultType="map">
+      select
+      t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
+      from o_terminal_transfer_detail t
+      left join a_agent a on t.agent_id = a.id
+      left join c_user u on t.butt_joint_person = u.id
+      left join c_user cu on t.c_user = cu.id
+      left join c_user uu on t.u_user = uu.id
+      <include refid="TerminalTransferListWhere" />
+      order by t.c_time desc
+  </select>
   <select id="selectTerminalTransferDetailList" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
       select
-      t.*,a.ag_name
+      t.*,a.ag_name,u.name as BUTT_JOINT_PERSON_NAME,cu.name as C_USER_NAME,uu.name as U_USER_NAME
       from o_terminal_transfer_detail t
       left join a_agent a on t.agent_id = a.id
+      left join c_user u on t.butt_joint_person = u.id
+      left join c_user cu on t.c_user = cu.id
+      left join c_user uu on t.u_user = uu.id
       <include refid="TerminalTransferListWhere" />
+      order by t.c_time desc
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectTerminalTransferDetailCount" parameterType="map" resultType="java.lang.Integer">
@@ -409,7 +424,37 @@
   </select>
   <sql id="TerminalTransferListWhere">
       <where>
-          t.status = #{status} and a.status = #{status}
+          t.status = #{map.status} and a.status = #{map.status}
+          <if test="map.terminalTransferId != null">
+            and t.terminal_Transfer_Id = #{map.terminalTransferId}
+          </if>
+          <if test="map.agentId != null">
+            and t.agent_Id = #{map.agentId}
+          </if>
+          <if test="map.snBeginNum != null">
+            and t.sn_Begin_Num = #{map.snBeginNum}
+          </if>
+          <if test="map.snEndNum != null">
+            and t.sn_End_Num = #{map.snEndNum}
+          </if>
+          <if test="map.adjustStatus != null">
+            and t.adjust_Status = #{map.adjustStatus}
+          </if>
+          <if test="map.agName != null">
+            and a.ag_Name = #{map.agName}
+          </if>
+          <if test="map.goalOrgId != null">
+            and t.goal_Org_Id = #{map.goalOrgId}
+          </if>
+          <if test="map.goalOrgName != null">
+            and t.goal_Org_Name = #{map.goalOrgName}
+          </if>
+          <if test="map.originalOrgId != null">
+            and t.original_Org_Id = #{map.originalOrgId}
+          </if>
+          <if test="map.originalOrgName != null">
+            and t.original_Org_Name = #{map.originalOrgName}
+          </if>
       </where>
   </sql>
 

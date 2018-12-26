@@ -15,17 +15,28 @@ import java.util.List;
  */
 public interface TerminalTransferService {
 
-    PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page);
+    PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName);
 
-    PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page);
+    PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName);
 
     AgentResult startTerminalTransferActivity(String id, String cuser, String agentId) throws Exception;
 
-    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId) throws Exception;
+    AgentResult approvalTerminalTransferTask(AgentVo agentVo, String userId, String busId) throws Exception;
 
     AgentResult compressTerminalTransferActivity(String proIns, BigDecimal agStatus)throws Exception;
 
     AgentResult saveTerminalTransfer(TerminalTransfer terminalTransfer, List<TerminalTransferDetail> terminalTransferDetailList, String cuser, String agentId, String saveFlag)throws Exception;
 
     TerminalTransfer queryTerminalTransfer(String terminalTransferId);
+
+    List<TerminalTransferDetail> queryDetailByTerminalId(String terminalTransferId);
+
+    AgentResult importTerminal(List<List<Object>> excelList,String cUser,String busId)throws Exception;
+
+    List<TerminalTransferDetail> queryImprotMsgList(String terminalTransferId);
+
+    AgentResult delTerminalTransfer(String terminalTransferId,String cUser)throws Exception;
+
+    AgentResult editTerminalTransfer(TerminalTransfer terminalTransfer,List<TerminalTransferDetail> terminalTransferDetailList, String cuser,String agentId)throws Exception;
+
 }

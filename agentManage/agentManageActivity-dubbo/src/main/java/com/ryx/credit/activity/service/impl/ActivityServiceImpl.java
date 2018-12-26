@@ -4,6 +4,7 @@ import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.ApprovalFlowRecord;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
@@ -182,7 +183,14 @@ public class ActivityServiceImpl implements ActivityService {
         return rs;
     }
 
-    
+    @Override
+    public Map completeTaskInNer(String taskId, Map<String, Object> map) throws ProcessException {
+        TaskService taskService = processEngine.getTaskService();
+        taskService.setVariable(taskId,taskId+"_ryx_wq", JSONObject.fromMap(map).toString());
+        taskService.complete(taskId, map);
+        return FastMap.fastSuccessMap();
+    }
+
     @Override
     public List<ProcessDefinition> findProcessDefinition() {
         List<ProcessDefinition> list = null;

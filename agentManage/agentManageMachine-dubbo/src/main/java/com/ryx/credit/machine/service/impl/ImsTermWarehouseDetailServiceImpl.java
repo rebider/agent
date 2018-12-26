@@ -85,6 +85,7 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             imsTermWarehouseDetail.setCreatePerson(ZHYY_CREATE_PERSON);
             imsTermWarehouseDetail.setUpdateTime(createTime);
             imsTermWarehouseDetail.setPayStatus("1");  //支付状态 0 已付 1 未付
+            imsTermWarehouseDetail.setDeliveryTime(DateUtil.formatDay(new Date()));
 
             int i = imsTermWarehouseDetailMapper.insert(imsTermWarehouseDetail);
             log.info("同步POS入库返回结果:{}",i);
