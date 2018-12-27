@@ -239,15 +239,15 @@ public class PosRewardServiceImpl implements IPosRewardService {
         PosRewardExample.Criteria criteria = example.createCriteria();
         /*if(StringUtils.isNotBlank(posReward.getTotalConsMonth())){
             criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
-        }
+        }*/
         if(StringUtils.isNotBlank(posReward.getCreditConsMonth())){
             criteria.andCreditConsMonthLike("%"+posReward.getCreditConsMonth()+"%");
-        }*/
-        if(StringUtils.isNotBlank(posReward.getTotalEndMonth())){
-            criteria.andTotalEndMonthLike("%"+posReward.getCreditConsMonth());
         }
        /* if(StringUtils.isNotBlank(posReward.getAgentPid())){
             criteria.andAgentPidEqualTo(posReward.getAgentPid());
+        }
+        if(StringUtils.isNotBlank(posReward.getTotalEndMonth())){
+            criteria.andTotalEndMonthLike("%"+posReward.getTotalEndMonth());
         }
         if(StringUtils.isNotBlank(posReward.getAgentId())){
             criteria.andAgentIdEqualTo(posReward.getAgentId());
