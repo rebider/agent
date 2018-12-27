@@ -473,7 +473,11 @@
     </if>
   </sql>
   <select id="productActivityOrderBuild" resultType="hashmap" parameterType="hashmap">
-    select ACT_CODE,max(o_activity.id)as ID,max(o_activity.activity_name)as ACTIVITYNAME,max(o_activity.price) as PRICE from o_activity
+    select ACT_CODE,max(o_activity.id)as ID,
+    max(o_activity.activity_name)as ACTIVITYNAME,
+    max(o_activity.price) as PRICE ,
+    max(o_activity.original_price) as ORIGINALPRICE
+    from o_activity
     <where>
       o_activity.status=1
       <if test="notEqActcode!=null and notEqActcode!=''" > and o_activity.act_code!=#{notEqActcode} </if>
