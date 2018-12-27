@@ -260,6 +260,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             oActivity.setActivityName(stringObjectMap.get("ACTIVITYNAME")+"");
             oActivity.setPrice(new BigDecimal(stringObjectMap.get("PRICE")+""));
             oActivity.setActCode(stringObjectMap.get("ACT_CODE")+"");
+            oActivity.setOriginalPrice(new BigDecimal(stringObjectMap.get("ORIGINALPRICE")+""));
             activitys.add(oActivity);
         }
 
