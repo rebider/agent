@@ -455,6 +455,9 @@
           <if test="map.originalOrgName != null">
             and t.original_Org_Name = #{map.originalOrgName}
           </if>
+          <if test="map.orgId!=null and map.orgId!=''">
+            and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
+          </if>
       </where>
   </sql>
 
