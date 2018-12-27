@@ -247,6 +247,9 @@
       <if test="map.reviewStatus != null">
         and t.review_status = #{map.reviewStatus}
       </if>
+      <if test="map.orgId!=null and map.orgId!=''">
+        and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId})
+      </if>
     </where>
   </sql>
 

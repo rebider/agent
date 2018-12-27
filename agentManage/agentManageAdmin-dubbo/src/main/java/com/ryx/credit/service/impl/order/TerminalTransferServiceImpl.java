@@ -73,10 +73,11 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     private IUserService userService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
-
+    @Autowired
+    private IUserService iUserService;
 
     @Override
-    public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName) {
+    public PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName,String dataRole,Long userId) {
 
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("status",Status.STATUS_1.status);
@@ -92,6 +93,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(null!=terminalTransfer.getReviewStatus()){
             reqMap.put("reviewStatus",terminalTransfer.getReviewStatus());
         }
+        if(StringUtils.isBlank(dataRole) && StringUtils.isBlank(terminalTransfer.getAgentId())){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String,Object>> terminalTransferList = terminalTransferMapper.selectTerminalTransferList(reqMap,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(terminalTransferList);
@@ -100,7 +109,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
     }
 
     @Override
-    public PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName) {
+    public PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName,String dataRole,Long userId) {
 
         Map<String,Object> reqMap = new HashMap<>();
         reqMap.put("status",Status.STATUS_1.status);
@@ -133,6 +142,14 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         }
         if(StringUtils.isNotBlank(terminalTransferDetail.getOriginalOrgName())){
             reqMap.put("originalOrgName",terminalTransferDetail.getOriginalOrgName());
+        }
+        if(StringUtils.isBlank(dataRole)  && StringUtils.isBlank(terminalTransferDetail.getAgentId())){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
         }
         List<Map<String,Object>> terminalTransferList = null;
         if(page==null){

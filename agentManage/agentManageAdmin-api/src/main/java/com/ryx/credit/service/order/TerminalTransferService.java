@@ -15,9 +15,9 @@ import java.util.List;
  */
 public interface TerminalTransferService {
 
-    PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName);
+    PageInfo terminalTransferList(TerminalTransfer terminalTransfer, Page page, String agName,String dataRole,Long userId);
 
-    PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName);
+    PageInfo terminalTransferDetailList(TerminalTransferDetail terminalTransferDetail, Page page, String agName,String dataRole,Long userId);
 
     AgentResult startTerminalTransferActivity(String id, String cuser, String agentId, Boolean isSave) throws Exception;
 
