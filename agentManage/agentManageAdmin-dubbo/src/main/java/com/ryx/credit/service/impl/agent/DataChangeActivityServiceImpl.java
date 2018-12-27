@@ -155,10 +155,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
         Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
         if(agent!=null)
         record.setAgentName(agent.getAgName());
-        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
-        AgentBusInfo agentBusInfo = agentBusInfos.get(0);
-        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
+//        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
+//        AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+//        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+//        record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if(1!=busActRelMapper.insertSelective(record)){
             logger.info("代理商审批，启动审批异常，添加审批关系失败{}:{}",dateChangeRequest.getId(),proce);
             throw  new MessageException("添加审批关系失败");
