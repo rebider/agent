@@ -111,21 +111,21 @@ public class ProfitDetailMonth implements Serializable{
     private String payStatus;
 
     private String remark;
-    //新增
-    private BigDecimal zhifaBuckle;//直发扣款
 
-    private BigDecimal zhifaSupply;//直发补款
+    private BigDecimal zhifaBuckle;
 
-    private BigDecimal tax;
+    private BigDecimal zhifaSupply;
 
-    private String busPlatForm;
+    private String tax;
+
+    private String busPlatform;
 
     private BigDecimal posRewardDeductionAmt;
 
-    //新增 20180821
     private BigDecimal basicsProfitAmt;
+
     private String parentAgentId;
-    //新增 20180822
+
     private String status;
     //新增 20180822
     private String profitDateStart;
@@ -133,46 +133,18 @@ public class ProfitDetailMonth implements Serializable{
 
     private BigDecimal unlineAmt;
 
-    //打款公司
     private String payCompany;
 
-    //已抵税金额
     private BigDecimal smalTaxAmt;
 
-    //新增字段：机具返现、智能POS预发分润扣款
     private BigDecimal toolsReturnAmt;
+
     private BigDecimal znposProfitAmt;
 
-    public BigDecimal getToolsReturnAmt() {
-        return toolsReturnAmt;
-    }
+    private BigDecimal mposTranAmt;
 
-    public void setToolsReturnAmt(BigDecimal toolsReturnAmt) {
-        this.toolsReturnAmt = toolsReturnAmt;
-    }
-
-    public BigDecimal getZnposProfitAmt() {
-        return znposProfitAmt;
-    }
-
-    public void setZnposProfitAmt(BigDecimal znposProfitAmt) {
-        this.znposProfitAmt = znposProfitAmt;
-    }
-
-    public BigDecimal getSmalTaxAmt() {
-        return smalTaxAmt;
-    }
-
-    public void setSmalTaxAmt(BigDecimal smalTaxAmt) {
-        this.smalTaxAmt = smalTaxAmt;
-    }
-
-    public BigDecimal getUnlineAmt() {
-        return unlineAmt;
-    }
-
-    public void setUnlineAmt(BigDecimal unlineAmt) {
-        this.unlineAmt = unlineAmt;
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
     }
 
     public String getStatus() {
@@ -181,66 +153,6 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getParentAgentId() {
-        return parentAgentId;
-    }
-
-    public void setParentAgentId(String parentAgentId) {
-        this.parentAgentId = parentAgentId;
-    }
-
-    public BigDecimal getBasicsProfitAmt() {
-        return basicsProfitAmt;
-    }
-
-    public void setBasicsProfitAmt(BigDecimal basicsProfitAmt) {
-        this.basicsProfitAmt = basicsProfitAmt;
-    }
-
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
-    public BigDecimal getPosRewardDeductionAmt() {
-        return posRewardDeductionAmt;
-    }
-
-    public void setPosRewardDeductionAmt(BigDecimal posRewardDeductionAmt) {
-        this.posRewardDeductionAmt = posRewardDeductionAmt;
-    }
-
-    public String getBusPlatForm() {
-        return busPlatForm;
-    }
-
-    public void setBusPlatForm(String busPlatForm) {
-        this.busPlatForm = busPlatForm;
-    }
-
-    public BigDecimal getTax() {
-        return tax;
-    }
-
-    public void setTax(BigDecimal tax) {
-        this.tax = tax;
-    }
-
-    public BigDecimal getZhifaBuckle() {
-        return zhifaBuckle;
-    }
-
-    public void setZhifaBuckle(BigDecimal zhifaBuckle) {
-        this.zhifaBuckle = zhifaBuckle;
-    }
-
-    public BigDecimal getZhifaSupply() {
-        return zhifaSupply;
-    }
-
-    public void setZhifaSupply(BigDecimal zhifaSupply) {
-        this.zhifaSupply = zhifaSupply;
     }
 
 
@@ -282,6 +194,14 @@ public class ProfitDetailMonth implements Serializable{
 
     public void setProfitId(String profitId) {
         this.profitId = profitId == null ? null : profitId.trim();
+    }
+
+    public String getProfitDate() {
+        return profitDate;
+    }
+
+    public void setProfitDate(String profitDate) {
+        this.profitDate = profitDate == null ? null : profitDate.trim();
     }
 
     public BigDecimal getTranAmt() {
@@ -652,12 +572,13 @@ public class ProfitDetailMonth implements Serializable{
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public String getProfitDate() {
-        return profitDate;
+
+    public String getParentAgentId() {
+        return parentAgentId;
     }
 
-    public void setProfitDate(String profitDate) {
-        this.profitDate = profitDate;
+    public void setParentAgentId(String parentAgentId) {
+        this.parentAgentId = parentAgentId == null ? null : parentAgentId.trim();
     }
 
     public String getProfitDateStart() {
@@ -681,6 +602,94 @@ public class ProfitDetailMonth implements Serializable{
     }
 
     public void setPayCompany(String payCompany) {
-        this.payCompany = payCompany;
+        this.payCompany = payCompany == null ? null : payCompany.trim();
+    }
+
+    public BigDecimal getSmalTaxAmt() {
+        return smalTaxAmt;
+    }
+
+    public void setSmalTaxAmt(BigDecimal smalTaxAmt) {
+        this.smalTaxAmt = smalTaxAmt;
+    }
+
+    public BigDecimal getToolsReturnAmt() {
+        return toolsReturnAmt;
+    }
+
+    public void setToolsReturnAmt(BigDecimal toolsReturnAmt) {
+        this.toolsReturnAmt = toolsReturnAmt;
+    }
+
+    public BigDecimal getZnposProfitAmt() {
+        return znposProfitAmt;
+    }
+
+    public void setZnposProfitAmt(BigDecimal znposProfitAmt) {
+        this.znposProfitAmt = znposProfitAmt;
+    }
+
+    public BigDecimal getMposTranAmt() {
+        return mposTranAmt;
+    }
+
+    public void setMposTranAmt(BigDecimal mposTranAmt) {
+        this.mposTranAmt = mposTranAmt;
+    }
+
+    public BigDecimal getZhifaBuckle() {
+        return zhifaBuckle;
+    }
+
+    public void setZhifaBuckle(BigDecimal zhifaBuckle) {
+        this.zhifaBuckle = zhifaBuckle;
+    }
+
+    public BigDecimal getZhifaSupply() {
+        return zhifaSupply;
+    }
+
+    public void setZhifaSupply(BigDecimal zhifaSupply) {
+        this.zhifaSupply = zhifaSupply;
+    }
+
+    public String getTax() {
+        return tax;
+    }
+
+    public void setTax(String tax) {
+        this.tax = tax;
+    }
+
+    public String getBusPlatform() {
+        return busPlatform;
+    }
+
+    public void setBusPlatform(String busPlatform) {
+        this.busPlatform = busPlatform;
+    }
+
+    public BigDecimal getPosRewardDeductionAmt() {
+        return posRewardDeductionAmt;
+    }
+
+    public void setPosRewardDeductionAmt(BigDecimal posRewardDeductionAmt) {
+        this.posRewardDeductionAmt = posRewardDeductionAmt;
+    }
+
+    public BigDecimal getBasicsProfitAmt() {
+        return basicsProfitAmt;
+    }
+
+    public void setBasicsProfitAmt(BigDecimal basicsProfitAmt) {
+        this.basicsProfitAmt = basicsProfitAmt;
+    }
+
+    public BigDecimal getUnlineAmt() {
+        return unlineAmt;
+    }
+
+    public void setUnlineAmt(BigDecimal unlineAmt) {
+        this.unlineAmt = unlineAmt;
     }
 }

@@ -9,6 +9,10 @@
     <result column="SUPPLY_TAX_SUB_ID" jdbcType="VARCHAR" property="supplyTaxSubId" />
     <result column="SUPPLY_TAX_SUB_NAME" jdbcType="VARCHAR" property="supplyTaxSubName" />
     <result column="SUPPLY_TAX_AMT" jdbcType="DECIMAL" property="supplyTaxAmt" />
+    <result column="SUPPLY_TAX_TYPE" jdbcType="VARCHAR" property="supplyTaxType" />
+    <result column="SUPPLY_TAX_PLATFORM" jdbcType="VARCHAR" property="supplyTaxPlatform" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -70,7 +74,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, 
-    SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
+    SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT,SUPPLY_TAX_TYPE,SUPPLY_TAX_PLATFORM,CREATE_TIME,UPDATE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -97,6 +101,7 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     insert into PROFIT_SUPPLY_TAX (ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, 
       SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
+      ,SUPPLY_TAX_TYPE,SUPPLY_TAX_PLATFORM,CREATE_TIME,UPDATE_TIME
       )
     values (#{id,jdbcType=VARCHAR}, #{supplyTaxDate,jdbcType=VARCHAR}, #{supplyTaxAgentId,jdbcType=VARCHAR}, 
       #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}, #{supplyTaxAmt,jdbcType=DECIMAL}
@@ -150,6 +155,9 @@
       <if test="supplyTaxAmt != null">
         #{supplyTaxAmt,jdbcType=DECIMAL},
       </if>
+        <if test="supplyTaxType != null">
+            #{supplyTaxType,jdbcType=VARCHAR},
+        </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultType="java.lang.Long">
@@ -182,6 +190,9 @@
       <if test="record.supplyTaxAmt != null">
         SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
       </if>
+        <if test="record.supplyTaxType != null">
+            SUPPLY_TAX_AMT = #{record.supplyTaxType,jdbcType=VARCHAR},
+        </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -196,6 +207,7 @@
       SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
       SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
       SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL}
+      SUPPLY_TAX_TYPE= #{record.supplyTaxType,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -226,6 +238,12 @@
       <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
       <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
       <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
+      <if test="SUPPLY_TAX_TYPE != null and SUPPLY_TAX_TYPE !='' "> and SUPPLY_TAX_TYPE = #{SUPPLY_TAX_TYPE} </if>
+      <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
+
+      <if test="CREATE_TIME != null and CREATE_TIME !='' "> and CREATE_TIME = #{CREATE_TIME} </if>
+      <if test="UPDATE_TIME != null and UPDATE_TIME !='' "> and UPDATE_TIME = #{UPDATE_TIME} </if>
+
     </where>
   </sql>
 
@@ -238,6 +256,26 @@
     <include refid="SORT" />
     <include refid="PAGING_END" />
   </select>
+
+  <select id="getClassificationList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM PROFIT_SUPPLY_TAX
+    START WITH
+    SUPPLY_TAX_PLATFORM = '01'
+    <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
+    <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
+    CONNECT BY PRIOR SUPPLY_TAX_SUB_ID=SUPPLY_TAX_AGENT_ID
+    <include refid="PAGING_END" />
+  </select>
+
+
+
+
+
+
+
   <sql id="PAGING_START">
     <if test="begin != null  and end != null and end &gt;0">
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
@@ -251,4 +289,34 @@
   <sql id='SORT'>
     ORDER BY SUPPLY_TAX_DATE DESC
   </sql>
+
+  <!--查询直签扣税一代。   直签、机构或标准一代、扣税（打款公司非瑞银信账户）-->
+  <select id="getZqTaxAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select distinct A.AGENT_ID from A_AGENT_BUSINFO A
+    WHERE A.BUS_PLATFORM &lt;&gt; '6000'
+    AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
+    AND A.CLO_PAY_COMPANY &lt;&gt; 'Q000029564'
+  </select>
+
+  <!--查询直发开票一代 -->
+  <select id="getZfInvoiceAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select distinct A.AGENT_ID from A_AGENT_BUSINFO A
+    WHERE A.BUS_PLATFORM = '6000'
+    AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
+    AND A.CLO_PAY_COMPANY = 'Q000029564'
+  </select>
+
+  <!--查询直发扣税一代 -->
+  <select id="getZfTaxAgents" parameterType="java.util.Map" resultType="java.util.Map">
+    select distinct A.AGENT_ID from A_AGENT_BUSINFO A
+    WHERE A.BUS_PLATFORM = '6000'
+    AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
+    AND A.CLO_PAY_COMPANY != 'Q000029564'
+  </select>
+
+  <delete id="deleteByMonth" parameterType="java.lang.String">
+    delete from PROFIT_SUPPLY_TAX
+    where SUPPLY_TAX_DATE = '${profitMonth}'
+  </delete>
+
 </mapper>

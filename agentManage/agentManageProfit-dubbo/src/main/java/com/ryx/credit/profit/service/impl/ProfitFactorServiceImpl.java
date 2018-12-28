@@ -100,14 +100,16 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
             profitFactor.setFactorDate(Calendar.getInstance().getTime());//导入时间
             profitFactor.setId(idService.genId(TabId.p_profit_factor));//ID序列号
             try {
-                profitFactor.setFactorMonth(null!=factor.get(0)?String.valueOf(factor.get(0)):"");//月份
-                profitFactor.setAgentPid(null!=factor.get(1)?String.valueOf(factor.get(1)):"");//代理商唯一码
+                profitFactor.setFactorMonth(null!=factor.get(0)?String.valueOf(factor.get(0)).substring(0,6):"");//月份
+                profitFactor.setAgentPid(null!=factor.get(1)?String.valueOf(factor.get(1)):"");//代理商唯一码(因业务中无pid，现将pid取值更改为AG码)
                 profitFactor.setAgentName(null!=factor.get(2)?String.valueOf(factor.get(2)):"");//代理商名称
-                profitFactor.setAgentId(null!=factor.get(3)?String.valueOf(factor.get(3)):"");//代理商编号
-                profitFactor.setTatolAmt(new BigDecimal(String.valueOf(factor.get(4))));//应还款
-                profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(factor.get(5))));//已扣款
-                profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(factor.get(6))));//未扣足
-                profitFactor.setRemark(null!=factor.get(7)?String.valueOf(factor.get(7)):"");//备注
+                profitFactor.setAgentId(null!=factor.get(1)?String.valueOf(factor.get(1)):"");//代理商编号
+                profitFactor.setParentAgentId(null!=factor.get(3)?String.valueOf(factor.get(3)):"");//上级代理商编号
+                profitFactor.setParentAgentName(null!=factor.get(4)?String.valueOf(factor.get(4)):"");//上级代理商名称
+                profitFactor.setTatolAmt(new BigDecimal(String.valueOf(factor.get(5))));//应还款
+                profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(factor.get(6))));//已扣款
+                profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(factor.get(7))));//未扣足
+                profitFactor.setRemark(null!=factor.get(8)?String.valueOf(factor.get(8)):"");//备注
             } catch (Exception e) {
                 e.printStackTrace();
                 throw e;

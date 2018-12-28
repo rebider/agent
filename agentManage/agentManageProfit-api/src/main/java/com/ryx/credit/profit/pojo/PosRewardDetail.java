@@ -187,4 +187,6 @@ public class PosRewardDetail implements Serializable {
     public void setChildAgentIdList(String childAgentIdList) {
         this.childAgentIdList = childAgentIdList == null ? null : childAgentIdList.trim();
     }
+
+
 }

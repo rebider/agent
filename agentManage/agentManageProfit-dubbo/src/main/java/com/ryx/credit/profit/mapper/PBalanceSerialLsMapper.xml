@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PBalanceSerialLsMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PBalanceSerialLs">
+    <id column="BALANCE_ID" jdbcType="VARCHAR" property="balanceId" />
+    <result column="PAY_DATE" jdbcType="VARCHAR" property="payDate" />
+    <result column="PROFIT_AMT" jdbcType="DECIMAL" property="profitAmt" />
+    <result column="CARD_NO" jdbcType="VARCHAR" property="cardNo" />
+    <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
+    <result column="BANK_NAME" jdbcType="VARCHAR" property="bankName" />
+    <result column="BANK_CODE" jdbcType="VARCHAR" property="bankCode" />
+    <result column="CHILD_BANK_CODE" jdbcType="VARCHAR" property="childBankCode" />
+    <result column="CHILD_BANK_NAME" jdbcType="VARCHAR" property="childBankName" />
+    <result column="BALANCE_RCV_TYPE" jdbcType="VARCHAR" property="balanceRcvType" />
+    <result column="INPUT_TIME" jdbcType="VARCHAR" property="inputTime" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="ERR_DESC" jdbcType="VARCHAR" property="errDesc" />
+    <result column="PAY_COMPANY" jdbcType="VARCHAR" property="payCompany" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PROFIT_ID" jdbcType="VARCHAR" property="profitId" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    BALANCE_ID, PAY_DATE, PROFIT_AMT, CARD_NO, ACCOUNT_NAME, BANK_NAME, BANK_CODE, CHILD_BANK_CODE, 
+    CHILD_BANK_NAME, BALANCE_RCV_TYPE, INPUT_TIME, REMARK, STATUS, ERR_DESC, PAY_COMPANY, 
+    AGENT_ID, PARENT_AGENT_ID, PROFIT_ID
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLsExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_BALANCE_SERIAL_LS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_BALANCE_SERIAL_LS
+    where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from P_BALANCE_SERIAL_LS
+    where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLsExample">
+    delete from P_BALANCE_SERIAL_LS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLs">
+    insert into P_BALANCE_SERIAL_LS (BALANCE_ID, PAY_DATE, PROFIT_AMT, 
+      CARD_NO, ACCOUNT_NAME, BANK_NAME, 
+      BANK_CODE, CHILD_BANK_CODE, CHILD_BANK_NAME, 
+      BALANCE_RCV_TYPE, INPUT_TIME, REMARK, 
+      STATUS, ERR_DESC, PAY_COMPANY, 
+      AGENT_ID, PARENT_AGENT_ID, PROFIT_ID
+      )
+    values (#{balanceId,jdbcType=VARCHAR}, #{payDate,jdbcType=VARCHAR}, #{profitAmt,jdbcType=DECIMAL}, 
+      #{cardNo,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{bankName,jdbcType=VARCHAR}, 
+      #{bankCode,jdbcType=VARCHAR}, #{childBankCode,jdbcType=VARCHAR}, #{childBankName,jdbcType=VARCHAR}, 
+      #{balanceRcvType,jdbcType=VARCHAR}, #{inputTime,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{errDesc,jdbcType=VARCHAR}, #{payCompany,jdbcType=VARCHAR}, 
+      #{agentId,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLs">
+    insert into P_BALANCE_SERIAL_LS
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="balanceId != null">
+        BALANCE_ID,
+      </if>
+      <if test="payDate != null">
+        PAY_DATE,
+      </if>
+      <if test="profitAmt != null">
+        PROFIT_AMT,
+      </if>
+      <if test="cardNo != null">
+        CARD_NO,
+      </if>
+      <if test="accountName != null">
+        ACCOUNT_NAME,
+      </if>
+      <if test="bankName != null">
+        BANK_NAME,
+      </if>
+      <if test="bankCode != null">
+        BANK_CODE,
+      </if>
+      <if test="childBankCode != null">
+        CHILD_BANK_CODE,
+      </if>
+      <if test="childBankName != null">
+        CHILD_BANK_NAME,
+      </if>
+      <if test="balanceRcvType != null">
+        BALANCE_RCV_TYPE,
+      </if>
+      <if test="inputTime != null">
+        INPUT_TIME,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="errDesc != null">
+        ERR_DESC,
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="balanceId != null">
+        #{balanceId,jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null">
+        #{payDate,jdbcType=VARCHAR},
+      </if>
+      <if test="profitAmt != null">
+        #{profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="cardNo != null">
+        #{cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null">
+        #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCode != null">
+        #{bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="childBankCode != null">
+        #{childBankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="childBankName != null">
+        #{childBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvType != null">
+        #{balanceRcvType,jdbcType=VARCHAR},
+      </if>
+      <if test="inputTime != null">
+        #{inputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="errDesc != null">
+        #{errDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="payCompany != null">
+        #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="profitId != null">
+        #{profitId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLsExample" resultType="java.lang.Long">
+    select count(*) from P_BALANCE_SERIAL_LS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update P_BALANCE_SERIAL_LS
+    <set>
+      <if test="record.balanceId != null">
+        BALANCE_ID = #{record.balanceId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payDate != null">
+        PAY_DATE = #{record.payDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitAmt != null">
+        PROFIT_AMT = #{record.profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.cardNo != null">
+        CARD_NO = #{record.cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.accountName != null">
+        ACCOUNT_NAME = #{record.accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bankName != null">
+        BANK_NAME = #{record.bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bankCode != null">
+        BANK_CODE = #{record.bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.childBankCode != null">
+        CHILD_BANK_CODE = #{record.childBankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.childBankName != null">
+        CHILD_BANK_NAME = #{record.childBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.balanceRcvType != null">
+        BALANCE_RCV_TYPE = #{record.balanceRcvType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.inputTime != null">
+        INPUT_TIME = #{record.inputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        STATUS = #{record.status,jdbcType=VARCHAR},
+      </if>
+      <if test="record.errDesc != null">
+        ERR_DESC = #{record.errDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.payCompany != null">
+        PAY_COMPANY = #{record.payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentId != null">
+        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitId != null">
+        PROFIT_ID = #{record.profitId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_BALANCE_SERIAL_LS
+    set BALANCE_ID = #{record.balanceId,jdbcType=VARCHAR},
+      PAY_DATE = #{record.payDate,jdbcType=VARCHAR},
+      PROFIT_AMT = #{record.profitAmt,jdbcType=DECIMAL},
+      CARD_NO = #{record.cardNo,jdbcType=VARCHAR},
+      ACCOUNT_NAME = #{record.accountName,jdbcType=VARCHAR},
+      BANK_NAME = #{record.bankName,jdbcType=VARCHAR},
+      BANK_CODE = #{record.bankCode,jdbcType=VARCHAR},
+      CHILD_BANK_CODE = #{record.childBankCode,jdbcType=VARCHAR},
+      CHILD_BANK_NAME = #{record.childBankName,jdbcType=VARCHAR},
+      BALANCE_RCV_TYPE = #{record.balanceRcvType,jdbcType=VARCHAR},
+      INPUT_TIME = #{record.inputTime,jdbcType=VARCHAR},
+      REMARK = #{record.remark,jdbcType=VARCHAR},
+      STATUS = #{record.status,jdbcType=VARCHAR},
+      ERR_DESC = #{record.errDesc,jdbcType=VARCHAR},
+      PAY_COMPANY = #{record.payCompany,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      PROFIT_ID = #{record.profitId,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLs">
+    update P_BALANCE_SERIAL_LS
+    <set>
+      <if test="payDate != null">
+        PAY_DATE = #{payDate,jdbcType=VARCHAR},
+      </if>
+      <if test="profitAmt != null">
+        PROFIT_AMT = #{profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="cardNo != null">
+        CARD_NO = #{cardNo,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null">
+        BANK_NAME = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCode != null">
+        BANK_CODE = #{bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="childBankCode != null">
+        CHILD_BANK_CODE = #{childBankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="childBankName != null">
+        CHILD_BANK_NAME = #{childBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="balanceRcvType != null">
+        BALANCE_RCV_TYPE = #{balanceRcvType,jdbcType=VARCHAR},
+      </if>
+      <if test="inputTime != null">
+        INPUT_TIME = #{inputTime,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="errDesc != null">
+        ERR_DESC = #{errDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PBalanceSerialLs">
+    update P_BALANCE_SERIAL_LS
+    set PAY_DATE = #{payDate,jdbcType=VARCHAR},
+      PROFIT_AMT = #{profitAmt,jdbcType=DECIMAL},
+      CARD_NO = #{cardNo,jdbcType=VARCHAR},
+      ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+      BANK_NAME = #{bankName,jdbcType=VARCHAR},
+      BANK_CODE = #{bankCode,jdbcType=VARCHAR},
+      CHILD_BANK_CODE = #{childBankCode,jdbcType=VARCHAR},
+      CHILD_BANK_NAME = #{childBankName,jdbcType=VARCHAR},
+      BALANCE_RCV_TYPE = #{balanceRcvType,jdbcType=VARCHAR},
+      INPUT_TIME = #{inputTime,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      ERR_DESC = #{errDesc,jdbcType=VARCHAR},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      PROFIT_ID = #{profitId,jdbcType=VARCHAR}
+    where BALANCE_ID = #{balanceId,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      1=1
+      <if test="BALANCE_ID != null and BALANCE_ID !='' "> and BALANCE_ID = #{BALANCE_ID} </if>
+      <if test="PAY_DATE_BEGIN != null and PAY_DATE_BEGIN !='' "> and PAY_DATE &gt;= #{PAY_DATE_BEGIN} </if>
+      <if test="PAY_DATE_END != null and PAY_DATE_END !='' "> and PAY_DATE &lt;= #{PAY_DATE_END} </if>
+
+      <if test="PROFIT_AMT != null and PROFIT_AMT !='' "> and PROFIT_AMT = #{PROFIT_AMT} </if>
+      <if test="CARD_NO != null and CARD_NO !='' "> and CARD_NO = #{CARD_NO} </if>
+      <if test="ACCOUNT_NAME != null and ACCOUNT_NAME !='' "> and ACCOUNT_NAME = #{ACCOUNT_NAME} </if>
+      <if test="BANK_CODE != null and BANK_CODE !='' "> and BANK_CODE = #{BANK_CODE} </if>
+      <if test="BANK_NAME != null and BANK_NAME !='' "> and BANK_NAME = #{BANK_NAME} </if>
+      <if test="CHILD_BANK_CODE != null and CHILD_BANK_CODE !='' "> and CHILD_BANK_CODE = #{CHILD_BANK_CODE} </if>
+      <if test="CHILD_BANK_NAME != null and CHILD_BANK_NAME !='' "> and CHILD_BANK_NAME = #{CHILD_BANK_NAME} </if>
+      <if test="BALANCE_RCV_TYPE != null and BALANCE_RCV_TYPE !='' "> and BALANCE_RCV_TYPE = #{BALANCE_RCV_TYPE} </if>
+
+      <if test="INPUT_TIME != null and INPUT_TIME !='' "> and INPUT_TIME = #{INPUT_TIME} </if>
+      <if test="REMARK != null and REMARK !='' "> and REMARK = #{REMARK} </if>
+      <if test="STATUS != null and STATUS !='' "> and STATUS = #{STATUS} </if>
+      <if test="ERR_DESC != null and ERR_DESC !='' "> and ERR_DESC = #{ERR_DESC} </if>
+      <if test="PAY_COMPANY != null and PAY_COMPANY !='' "> and PAY_COMPANY = #{PAY_COMPANY} </if>
+      <if test="AGENT_ID != null and AGENT_ID !='' "> and AGENT_ID = #{AGENT_ID} </if>
+      <if test="PARENT_AGENT_ID != null and PARENT_AGENT_ID !='' "> and PARENT_AGENT_ID = #{PARENT_AGENT_ID} </if>
+      <if test="PROFIT_ID != null and PROFIT_ID !='' "> and PROFIT_ID = #{PROFIT_ID} </if>
+    </where>
+
+  </sql>
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
+
+<select id="getPBalanceSerialLsList" resultType="java.util.Map" parameterType="java.util.Map">
+  <include refid="PAGING_START" />
+  select cc.*,dd.AG_NAME as FIRFT_AGENT_NAME   from(select pbsl.* ,aa.AG_NAME,bb.AG_NAME as PARENT_NAME,(select distinct AGENT_ID from A_AGENT_BUSINFO
+  where BUS_PARENT is null
+  start with
+<choose>
+  <when test="is_subordinate != null and is_subordinate != ''">
+    AGENT_ID in(
+    select  distinct AGENT_ID from A_AGENT_BUSINFO where <if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>
+    union all
+    select  distinct ab.AGENT_ID from (select id from A_AGENT_BUSINFO where<if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>)aa join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT
+    union  all
+    select distinct ad.AGENT_ID from (select  ab.id from (select id from A_AGENT_BUSINFO where <if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>)aa  join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac
+    join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT
+    union all
+    select distinct af.AGENT_ID  from (select ad.id from (select  ab.id from (select id from A_AGENT_BUSINFO where <if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>)aa  join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac
+    join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT) ae  join A_AGENT_BUSINFO af on ae.ID = af.BUS_PARENT
+    )
+  </when>
+  <when test="AGENT_ID != null and AGENT_ID !=''and is_subordinate == null ">AGENT_ID = #{AGENT_ID}</when>
+  <when test="AGENT_ID == null or AGENT_ID =='' ">AGENT_ID = pbsl.AGENT_ID</when>
+</choose>
+ connect by PRIOR BUS_PARENT = ID) as FIRFT_AGENT_ID from  p_balance_serial_ls pbsl  left join A_agent aa  on  aa.ID=pbsl.AGENT_ID
+  left join A_AGENT bb on pbsl.PARENT_AGENT_ID = bb.ID
+    where 1=1 <if test="AG_NAME != null and AG_NAME !='' "> and aa.AG_NAME = #{AG_NAME} </if>
+       <if test="PAY_DATE_BEGIN != null and PAY_DATE_BEGIN !='' "> and pbsl.PAY_DATE &gt;= #{PAY_DATE_BEGIN} </if>
+       <if test="PAY_DATE_END != null and PAY_DATE_END !='' "> and pbsl.PAY_DATE &lt;= #{PAY_DATE_END} </if>
+       <if test="STATUS != null and STATUS !='' "> and pbsl.STATUS &lt;= #{STATUS} </if>
+       <if test="ACCOUNT_NAME != null and ACCOUNT_NAME !='' "> and pbsl.ACCOUNT_NAME &lt;= #{ACCOUNT_NAME} </if>
+    ) cc left join A_AGENT dd on cc.FIRFT_AGENT_ID = dd.ID
+  <include refid="PAGING_END" />
+</select>
+
+ <select id="getPBalanceSerialLsCount" parameterType="java.util.Map" resultType="java.lang.Long">
+     SELECT COUNT(1)
+     FROM p_balance_serial_ls
+     <include refid="BASE_WHERE_SQL"></include>
+   </select>
+
+<select id="getAGList"  resultType="string" parameterType="java.util.Map">
+  select  distinct AGENT_ID from A_AGENT_BUSINFO where <if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>
+       union all
+  select  distinct ab.AGENT_ID from (select id from A_AGENT_BUSINFO where<if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>)aa join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT
+       union  all
+  select distinct ad.AGENT_ID from (select  ab.id from (select id from A_AGENT_BUSINFO where <if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>)aa  join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac
+  join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT
+       union all
+  select distinct af.AGENT_ID  from (select ad.id from (select  ab.id from (select id from A_AGENT_BUSINFO where <if test="AGENT_ID != null and AGENT_ID !='' ">AGENT_ID = #{AGENT_ID}</if>)aa  join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac
+  join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT) ae  join A_AGENT_BUSINFO af on ae.ID = af.BUS_PARENT
+</select>
+
+</mapper>

@@ -169,7 +169,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         deduction.setAgentName(list.get(1).toString());
         deduction.setParentAgentName(list.get(3).toString());
         deduction.setRemark(list.get(4).toString());
-        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7));
+        deduction.setDeductionDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7).replace("-",""));
         deduction.setCreateDateTime(new Date());
         deduction.setUserId(userId);
         if ("POS考核扣款（新国都、瑞易送）".equals(deduction.getRemark())) {
@@ -260,7 +260,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Override
     public BigDecimal otherDeductionByType(Map<String, Object> param) throws DeductionException {
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
         try {
             param.put("deductionDate", deductionDate);
             return otherDeduction(param);
@@ -273,7 +273,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public Map<String, Object> otherDeductionHbByType(Map<String, Object> param) throws DeductionException {
 
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
         param.put("deductionDate", deductionDate);
         param.put("type", DeductionType.OTHER.getType());
         List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
@@ -283,7 +283,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public BigDecimal settleErrDeduction(Map<String, Object> param) throws DeductionException {
         // 获取退单扣款
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
         param.put("deductionDate", deductionDate);
         param.put("type", DeductionType.SETTLE_ERR.getType());
         param.put("deductionStatus", "N6");
@@ -297,7 +297,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Override
     public Map<String, Object> settleErrHbDeduction(Map<String, Object> param) throws DeductionException {
         // 获取退单扣款
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
         param.put("deductionDate", deductionDate);
         param.put("type", DeductionType.SETTLE_ERR.getType());
         param.put("deductionStatus", "N6");
@@ -436,7 +436,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     * @return:
     * @Author: zhaodw
     * @Date: 2018/8/9
-    *///
+    */
+
     private BigDecimal deduction(BigDecimal result, ProfitDeduction profitDeductionTemp, Map<String, Object> param) {
         BigDecimal profitAmt = (BigDecimal) param.get("profitAmt");
         String computeType = (String) param.get("computeType");
@@ -533,7 +534,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 stagAmt = BigDecimal.ZERO;
             }
             // 更新当期未下期扣款
-            profitDeductionTemp.setDeductionDate(LocalDate.now().toString().substring(0,7));
+            profitDeductionTemp.setDeductionDate(LocalDate.now().toString().substring(0,7).replace("-",""));
             profitDeductionTemp.setSumDeductionAmt(stagAmt.add(profitDeductionTemp.getUpperNotDeductionAmt()));
             profitDeductionTemp.setMustDeductionAmt(profitDeductionTemp.getSumDeductionAmt());
             profitDeductionTemp.setNotDeductionAmt(BigDecimal.ZERO); // 未扣足请0
@@ -555,7 +556,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     */
     private BigDecimal getNextStagAmt(ProfitDeduction profitDeductionTemp) {
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
-        profitStagingDetail.setDeductionDate(LocalDate.now().toString().substring(0,7));
+        profitStagingDetail.setDeductionDate(LocalDate.now().toString().substring(0,7).replace("-",""));
         profitStagingDetail.setSourceId(profitDeductionTemp.getId());
         return stagingServiceImpl.getNextStagAmt(profitStagingDetail);
     }
@@ -570,7 +571,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private void updateStagingDetail(BigDecimal profitAmt, ProfitDeduction profitDeductionTemp) {
         // 获取代理商本月分期
         ProfitStagingDetail profitStagingDetail = new ProfitStagingDetail();
-        profitStagingDetail.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7));
+        profitStagingDetail.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-",""));
         profitStagingDetail.setSourceId(profitDeductionTemp.getId());
         PageInfo pageInfo = stagingServiceImpl.getStagingDetailList(profitStagingDetail,null);
         if (pageInfo != null && pageInfo.getTotal()>0) {
@@ -654,7 +655,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         BigDecimal stagNotDeductionSumAmt = stagingServiceImpl.getNotDeductionAmt(param);
 
         // 获取本月新增
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId(agentId);
         profitDeduction.setDeductionDate(deductionDate);
@@ -663,11 +664,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     /**
-     * 清除本月导入
+     * 清除上月数据
      * @return
      */
     @Override
-    public int resetDataDeduction() {
+    public int resetDataDeduction(String deductionType) {
         // 终审后不能清除
         String finalStatus = redisService.getValue("commitFinal");
         if (StringUtils.isBlank(finalStatus)) {
@@ -676,7 +677,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return profitDeductionMapper.resetDataDeduction();
+        return profitDeductionMapper.resetDataDeduction(deductionType);
     }
 
     @Override
@@ -726,6 +727,48 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                profitDeductionMapper.updateByPrimaryKey(deduction);
            }
         }
+    }
+
+    /**
+     * 批量插入考核扣款数据
+     * @param datas
+     * @param userId
+     */
+    @Override
+    public void batchInsertCheckDeduction(List<List<Object>> datas, String userId) {
+        if(datas != null && datas.size() > 0 ) {
+            datas.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list->{
+                insertCheckDeduction(list, userId);
+            });
+        }
+    }
+
+    /**插入考核扣款数据*/
+    private void insertCheckDeduction(List list, String userId){
+        BigDecimal amt = list.get(6)==null?BigDecimal.ZERO:new BigDecimal(list.get(6).toString());
+        ProfitDeduction deduction = new ProfitDeduction();
+        deduction.setDeductionType(DeductionType.POS_REWARD_DEDUCT.getType()); // 04
+        deduction.setAddDeductionAmt(amt);
+        deduction.setSumDeductionAmt(amt);
+        deduction.setMustDeductionAmt(amt);
+        deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus()); //分期状态
+        deduction.setId(idService.genIdInTran(TabId.P_DEDUCTION) ); //id
+        deduction.setAgentId(list.get(0).toString());
+        deduction.setParentAgentId(list.get(2).toString());
+        deduction.setAgentName(list.get(1).toString());
+        deduction.setParentAgentName(list.get(3).toString());
+        deduction.setRemark(list.get(5).toString());
+        deduction.setDeductionDate(list.get(4).toString().substring(0,6));
+        deduction.setCreateDateTime(new Date());
+        deduction.setUserId(userId);
+        if ("POS奖励考核扣款".equals(deduction.getRemark())) {
+            deduction.setSourceId("01");
+        }else  if ("POS分润比例考核扣款".equals(deduction.getRemark())) {
+            deduction.setSourceId("02");
+        }else{
+            deduction.setSourceId("99");
+        }
+        this.insert(deduction);
     }
 
 }

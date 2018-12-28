@@ -58,6 +58,16 @@ public class ProfitSupply implements Serializable {
 
     private String remerk;
 
+    public String getBusBigType() {
+        return busBigType;
+    }
+
+    public void setBusBigType(String busBigType) {
+        this.busBigType = busBigType;
+    }
+
+    private String busBigType;
+
     private String sourceId;
     //补款码
     private String supplyCode;

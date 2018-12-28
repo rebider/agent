@@ -30,6 +30,6 @@ public class ProfitDataJobTest {
 
     @Test
     public void testDeal() {
-        profitDataJob.deal();
+        profitDataJob.deal("201811");
     }
 }
