@@ -27,6 +27,6 @@ public class ProfitSummaryDataJobTest {
 
     @Test
     public void testDeal() {
-        profitSummaryDataJob.excute("201810");
+        profitSummaryDataJob.excute("201811");
     }
 }

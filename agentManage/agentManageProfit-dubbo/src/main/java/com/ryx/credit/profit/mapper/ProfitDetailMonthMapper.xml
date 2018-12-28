@@ -1,94 +1,93 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ryx.credit.profit.dao.ProfitDetailMonthMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-    <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="AGENT_PID" property="agentPid" jdbcType="VARCHAR" />
-    <result column="AGENT_ID" property="agentId" jdbcType="VARCHAR" />
-    <result column="AGENT_NAME" property="agentName" jdbcType="VARCHAR" />
-    <result column="PROFIT_ID" property="profitId" jdbcType="VARCHAR" />
-    <result column="PROFIT_DATE" property="profitDate" jdbcType="VARCHAR" />
-    <result column="TRAN_AMT" property="tranAmt" jdbcType="DECIMAL" />
-    <result column="PAY_AMT" property="payAmt" jdbcType="DECIMAL" />
-    <result column="TRAN_PROFIT_SCALE" property="tranProfitScale" jdbcType="VARCHAR" />
-    <result column="PAY_PROFIT_SCALE" property="payProfitScale" jdbcType="VARCHAR" />
-    <result column="TRAN_PROFIT_AMT" property="tranProfitAmt" jdbcType="DECIMAL" />
-    <result column="PAY_PROFIT_AMT" property="payProfitAmt" jdbcType="DECIMAL" />
-    <result column="RYX_PROFIT_AMT" property="ryxProfitAmt" jdbcType="DECIMAL" />
-    <result column="RYX_HD_PROFIT_AMT" property="ryxHdProfitAmt" jdbcType="DECIMAL" />
-    <result column="TP_PROFIT_AMT" property="tpProfitAmt" jdbcType="DECIMAL" />
-    <result column="RS_PROFIT_AMT" property="rsProfitAmt" jdbcType="DECIMAL" />
-    <result column="RS_HD_PROFIT_AMT" property="rsHdProfitAmt" jdbcType="DECIMAL" />
-    <result column="RHB_PROFIT_AMT" property="rhbProfitAmt" jdbcType="DECIMAL" />
-    <result column="ZF_PROFIT_AMT" property="zfProfitAmt" jdbcType="DECIMAL" />
-    <result column="POS_ZQ_SUPPLY_PROFIT_AMT" property="posZqSupplyProfitAmt" jdbcType="DECIMAL" />
-    <result column="MPOS_ZQ_SUPPLY_PROFIT_AMT" property="mposZqSupplyProfitAmt" jdbcType="DECIMAL" />
-    <result column="PROFIT_SUM_AMT" property="profitSumAmt" jdbcType="DECIMAL" />
-    <result column="POS_TD_MUST_DEDUCTION_AMT" property="posTdMustDeductionAmt" jdbcType="DECIMAL" />
-    <result column="POS_TD_REAL_DEDUCTION_AMT" property="posTdRealDeductionAmt" jdbcType="DECIMAL" />
-    <result column="MPOS_TD_MUST_DEDUCTION_AMT" property="mposTdMustDeductionAmt" jdbcType="DECIMAL" />
-    <result column="MPOS_TD_REAL_DEDUCTION_AMT" property="mposTdRealDeductionAmt" jdbcType="DECIMAL" />
-    <result column="RHB_DG_MUST_DEDUCTION_AMT" property="rhbDgMustDeductionAmt" jdbcType="DECIMAL" />
-    <result column="RHB_DG_REAL_DEDUCTION_AMT" property="rhbDgRealDeductionAmt" jdbcType="DECIMAL" />
-    <result column="POS_DG_MUST_DEDUCTION_AMT" property="posDgMustDeductionAmt" jdbcType="DECIMAL" />
-    <result column="POS_DG_REAL_DEDUCTION_AMT" property="posDgRealDeductionAmt" jdbcType="DECIMAL" />
-    <result column="ZPOS_DG_MUST_DEDUCTION_AMT" property="zposDgMustDeductionAmt" jdbcType="DECIMAL" />
-    <result column="ZPOS_TD_REAL_DEDUCTION_AMT" property="zposTdRealDeductionAmt" jdbcType="DECIMAL" />
-    <result column="POS_KH_DEDUCTION_AMT" property="posKhDeductionAmt" jdbcType="DECIMAL" />
-    <result column="MPOS_KH_DEDUCTION_AMT" property="mposKhDeductionAmt" jdbcType="DECIMAL" />
-    <result column="BU_DEDUCTION_AMT" property="buDeductionAmt" jdbcType="DECIMAL" />
-    <result column="OTHER_DEDUCTION_AMT" property="otherDeductionAmt" jdbcType="DECIMAL" />
-    <result column="POS_TD_SUPPLY_AMT" property="posTdSupplyAmt" jdbcType="DECIMAL" />
-    <result column="MPOS_TD_SUPPLY_AMT" property="mposTdSupplyAmt" jdbcType="DECIMAL" />
-    <result column="OTHER_SUPPLY_AMT" property="otherSupplyAmt" jdbcType="DECIMAL" />
-    <result column="POS_REWARD_AMT" property="posRewardAmt" jdbcType="DECIMAL" />
-    <result column="DEDUCTION_TAX_MONTH_AGO_AMT" property="deductionTaxMonthAgoAmt" jdbcType="DECIMAL" />
-    <result column="DEDUCTION_TAX_MONTH_AMT" property="deductionTaxMonthAmt" jdbcType="DECIMAL" />
-    <result column="SUPPLY_TAX_AMT" property="supplyTaxAmt" jdbcType="DECIMAL" />
-    <result column="REAL_PROFIT_AMT" property="realProfitAmt" jdbcType="DECIMAL" />
-    <result column="PROFIT_MONTH_AMT" property="profitMonthAmt" jdbcType="DECIMAL" />
-    <result column="ACCOUNT_ID" property="accountId" jdbcType="VARCHAR" />
-    <result column="ACCOUNT_NAME" property="accountName" jdbcType="VARCHAR" />
-    <result column="OPEN_BANK_NAME" property="openBankName" jdbcType="VARCHAR" />
-    <result column="EMAIL" property="email" jdbcType="VARCHAR" />
-    <result column="BANK_CODE" property="bankCode" jdbcType="VARCHAR" />
-    <result column="PAY_STATUS" property="payStatus" jdbcType="CHAR" />
-    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
-
-    <result column="ZHIFA_BUCKLE" property="zhifaBuckle" jdbcType="DECIMAL" />
-    <result column="ZHIFA_SUPPLY" property="zhifaSupply" jdbcType="DECIMAL" />
-    <result column="ZHIFA_SUPPLY" property="zhifaSupply" jdbcType="DECIMAL" />
-    <result column="TAX" property="tax" jdbcType="DECIMAL" />
-    <result column="POS_REWARD_DEDUCTION_AMT" property="posRewardDeductionAmt" jdbcType="DECIMAL" />
-    <result column="BUS_PLATFORM" property="busPlatForm" jdbcType="VARCHAR" />
-    <result column="BASICS_PROFIT_AMT" property="basicsProfitAmt" jdbcType="DECIMAL" />
-    <result column="PARENT_AGENT_ID" property="parentAgentId" jdbcType="VARCHAR" />
-    <result column="STATUS" property="status" jdbcType="VARCHAR" />
-    <result column="UNLINE_AMT" property="unlineAmt" jdbcType="DECIMAL" />
-    <result column="PAY_COMPANY" property="payCompany" jdbcType="VARCHAR" />
-    <result column="SMAL_TAX_AMT" property="smalTaxAmt" jdbcType="DECIMAL" />
-    <result column="TOOLS_RETURN_AMT" property="toolsReturnAmt" jdbcType="DECIMAL" />
-    <result column="ZNPOS_PROFIT_AMT" property="znposProfitAmt" jdbcType="DECIMAL" />
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitDetailMonth">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_PID" jdbcType="VARCHAR" property="agentPid" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PROFIT_ID" jdbcType="VARCHAR" property="profitId" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
+    <result column="TRAN_AMT" jdbcType="DECIMAL" property="tranAmt" />
+    <result column="PAY_AMT" jdbcType="DECIMAL" property="payAmt" />
+    <result column="TRAN_PROFIT_SCALE" jdbcType="VARCHAR" property="tranProfitScale" />
+    <result column="PAY_PROFIT_SCALE" jdbcType="VARCHAR" property="payProfitScale" />
+    <result column="TRAN_PROFIT_AMT" jdbcType="DECIMAL" property="tranProfitAmt" />
+    <result column="PAY_PROFIT_AMT" jdbcType="DECIMAL" property="payProfitAmt" />
+    <result column="RYX_PROFIT_AMT" jdbcType="DECIMAL" property="ryxProfitAmt" />
+    <result column="RYX_HD_PROFIT_AMT" jdbcType="DECIMAL" property="ryxHdProfitAmt" />
+    <result column="TP_PROFIT_AMT" jdbcType="DECIMAL" property="tpProfitAmt" />
+    <result column="RS_PROFIT_AMT" jdbcType="DECIMAL" property="rsProfitAmt" />
+    <result column="RS_HD_PROFIT_AMT" jdbcType="DECIMAL" property="rsHdProfitAmt" />
+    <result column="RHB_PROFIT_AMT" jdbcType="DECIMAL" property="rhbProfitAmt" />
+    <result column="ZF_PROFIT_AMT" jdbcType="DECIMAL" property="zfProfitAmt" />
+    <result column="POS_ZQ_SUPPLY_PROFIT_AMT" jdbcType="DECIMAL" property="posZqSupplyProfitAmt" />
+    <result column="MPOS_ZQ_SUPPLY_PROFIT_AMT" jdbcType="DECIMAL" property="mposZqSupplyProfitAmt" />
+    <result column="PROFIT_SUM_AMT" jdbcType="DECIMAL" property="profitSumAmt" />
+    <result column="POS_TD_MUST_DEDUCTION_AMT" jdbcType="DECIMAL" property="posTdMustDeductionAmt" />
+    <result column="POS_TD_REAL_DEDUCTION_AMT" jdbcType="DECIMAL" property="posTdRealDeductionAmt" />
+    <result column="MPOS_TD_MUST_DEDUCTION_AMT" jdbcType="DECIMAL" property="mposTdMustDeductionAmt" />
+    <result column="MPOS_TD_REAL_DEDUCTION_AMT" jdbcType="DECIMAL" property="mposTdRealDeductionAmt" />
+    <result column="RHB_DG_MUST_DEDUCTION_AMT" jdbcType="DECIMAL" property="rhbDgMustDeductionAmt" />
+    <result column="RHB_DG_REAL_DEDUCTION_AMT" jdbcType="DECIMAL" property="rhbDgRealDeductionAmt" />
+    <result column="POS_DG_MUST_DEDUCTION_AMT" jdbcType="DECIMAL" property="posDgMustDeductionAmt" />
+    <result column="POS_DG_REAL_DEDUCTION_AMT" jdbcType="DECIMAL" property="posDgRealDeductionAmt" />
+    <result column="ZPOS_DG_MUST_DEDUCTION_AMT" jdbcType="DECIMAL" property="zposDgMustDeductionAmt" />
+    <result column="ZPOS_TD_REAL_DEDUCTION_AMT" jdbcType="DECIMAL" property="zposTdRealDeductionAmt" />
+    <result column="POS_KH_DEDUCTION_AMT" jdbcType="DECIMAL" property="posKhDeductionAmt" />
+    <result column="MPOS_KH_DEDUCTION_AMT" jdbcType="DECIMAL" property="mposKhDeductionAmt" />
+    <result column="BU_DEDUCTION_AMT" jdbcType="DECIMAL" property="buDeductionAmt" />
+    <result column="OTHER_DEDUCTION_AMT" jdbcType="DECIMAL" property="otherDeductionAmt" />
+    <result column="POS_TD_SUPPLY_AMT" jdbcType="DECIMAL" property="posTdSupplyAmt" />
+    <result column="MPOS_TD_SUPPLY_AMT" jdbcType="DECIMAL" property="mposTdSupplyAmt" />
+    <result column="OTHER_SUPPLY_AMT" jdbcType="DECIMAL" property="otherSupplyAmt" />
+    <result column="POS_REWARD_AMT" jdbcType="DECIMAL" property="posRewardAmt" />
+    <result column="DEDUCTION_TAX_MONTH_AGO_AMT" jdbcType="DECIMAL" property="deductionTaxMonthAgoAmt" />
+    <result column="DEDUCTION_TAX_MONTH_AMT" jdbcType="DECIMAL" property="deductionTaxMonthAmt" />
+    <result column="SUPPLY_TAX_AMT" jdbcType="DECIMAL" property="supplyTaxAmt" />
+    <result column="REAL_PROFIT_AMT" jdbcType="DECIMAL" property="realProfitAmt" />
+    <result column="PROFIT_MONTH_AMT" jdbcType="DECIMAL" property="profitMonthAmt" />
+    <result column="ACCOUNT_ID" jdbcType="VARCHAR" property="accountId" />
+    <result column="ACCOUNT_NAME" jdbcType="VARCHAR" property="accountName" />
+    <result column="OPEN_BANK_NAME" jdbcType="VARCHAR" property="openBankName" />
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="BANK_CODE" jdbcType="VARCHAR" property="bankCode" />
+    <result column="PAY_STATUS" jdbcType="CHAR" property="payStatus" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="ZHIFA_BUCKLE" jdbcType="DECIMAL" property="zhifaBuckle" />
+    <result column="ZHIFA_SUPPLY" jdbcType="DECIMAL" property="zhifaSupply" />
+    <result column="TAX" jdbcType="VARCHAR" property="tax" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="POS_REWARD_DEDUCTION_AMT" jdbcType="DECIMAL" property="posRewardDeductionAmt" />
+    <result column="BASICS_PROFIT_AMT" jdbcType="DECIMAL" property="basicsProfitAmt" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="STATUS" jdbcType="VARCHAR" property="status" />
+    <result column="UNLINE_AMT" jdbcType="DECIMAL" property="unlineAmt" />
+    <result column="PAY_COMPANY" jdbcType="VARCHAR" property="payCompany" />
+    <result column="SMAL_TAX_AMT" jdbcType="DECIMAL" property="smalTaxAmt" />
+    <result column="TOOLS_RETURN_AMT" jdbcType="DECIMAL" property="toolsReturnAmt" />
+    <result column="ZNPOS_PROFIT_AMT" jdbcType="DECIMAL" property="znposProfitAmt" />
+    <result column="MPOS_TRAN_AMT" jdbcType="DECIMAL" property="mposTranAmt" />
   </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
                   and ${criterion.condition}
                 </when>
-                <when test="criterion.singleValue" >
+                <when test="criterion.singleValue">
                   and ${criterion.condition} #{criterion.value}
                 </when>
-                <when test="criterion.betweenValue" >
+                <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                 </when>
-                <when test="criterion.listValue" >
+                <when test="criterion.listValue">
                   and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                     #{listItem}
                   </foreach>
                 </when>
@@ -99,22 +98,8 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE,
-    PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, 
-    TP_PROFIT_AMT, RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, 
-    MPOS_ZQ_SUPPLY_PROFIT_AMT, PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT,
-    MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT, RHB_DG_MUST_DEDUCTION_AMT,
-    RHB_DG_REAL_DEDUCTION_AMT, POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT,
-    ZPOS_DG_MUST_DEDUCTION_AMT, ZPOS_TD_REAL_DEDUCTION_AMT, POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT,
-    BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT,
-    POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT, 
-    REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL, 
-    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
-    BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT, TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT
-  </sql>
-  <sql id="Base_Column_List_query" >
-    M.ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE,
     PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT,
     TP_PROFIT_AMT, RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT,
     MPOS_ZQ_SUPPLY_PROFIT_AMT, PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT,
@@ -124,31 +109,783 @@
     BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT,
     POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT,
     REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL,
-    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
-    BASICS_PROFIT_AMT, PARENT_AGENT_ID, M.STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT
+    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX, BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
+    BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT,
+    TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT, MPOS_TRAN_AMT
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
-    <include refid="Base_Column_List_query" />
-    from P_PROFIT_DETAIL_M M ${innerJoinDepartment}
-    <if test="_parameter != null" >
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
-    select 
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
     <include refid="Base_Column_List" />
     from P_PROFIT_DETAIL_M
     where ID = #{id,jdbcType=VARCHAR}
   </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample">
+    delete from P_PROFIT_DETAIL_M
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth">
+    insert into P_PROFIT_DETAIL_M (ID, AGENT_PID, AGENT_ID,
+      AGENT_NAME, PROFIT_ID, PROFIT_DATE,
+      TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE,
+      PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT,
+      RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, TP_PROFIT_AMT,
+      RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT,
+      ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, MPOS_ZQ_SUPPLY_PROFIT_AMT,
+      PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT,
+      MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT,
+      RHB_DG_MUST_DEDUCTION_AMT, RHB_DG_REAL_DEDUCTION_AMT,
+      POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT,
+      ZPOS_DG_MUST_DEDUCTION_AMT, ZPOS_TD_REAL_DEDUCTION_AMT,
+      POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT,
+      BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT,
+      MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT, POS_REWARD_AMT,
+      DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT,
+      SUPPLY_TAX_AMT, REAL_PROFIT_AMT, PROFIT_MONTH_AMT,
+      ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME,
+      EMAIL, BANK_CODE, PAY_STATUS,
+      REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY,
+      TAX, BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
+      BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS,
+      UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT,
+      TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT, MPOS_TRAN_AMT
+      )
+    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
+      #{agentName,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR},
+      #{tranAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR},
+      #{payProfitScale,jdbcType=VARCHAR}, #{tranProfitAmt,jdbcType=DECIMAL}, #{payProfitAmt,jdbcType=DECIMAL},
+      #{ryxProfitAmt,jdbcType=DECIMAL}, #{ryxHdProfitAmt,jdbcType=DECIMAL}, #{tpProfitAmt,jdbcType=DECIMAL},
+      #{rsProfitAmt,jdbcType=DECIMAL}, #{rsHdProfitAmt,jdbcType=DECIMAL}, #{rhbProfitAmt,jdbcType=DECIMAL},
+      #{zfProfitAmt,jdbcType=DECIMAL}, #{posZqSupplyProfitAmt,jdbcType=DECIMAL}, #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
+      #{profitSumAmt,jdbcType=DECIMAL}, #{posTdMustDeductionAmt,jdbcType=DECIMAL}, #{posTdRealDeductionAmt,jdbcType=DECIMAL},
+      #{mposTdMustDeductionAmt,jdbcType=DECIMAL}, #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
+      #{rhbDgMustDeductionAmt,jdbcType=DECIMAL}, #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
+      #{posDgMustDeductionAmt,jdbcType=DECIMAL}, #{posDgRealDeductionAmt,jdbcType=DECIMAL},
+      #{zposDgMustDeductionAmt,jdbcType=DECIMAL}, #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
+      #{posKhDeductionAmt,jdbcType=DECIMAL}, #{mposKhDeductionAmt,jdbcType=DECIMAL},
+      #{buDeductionAmt,jdbcType=DECIMAL}, #{otherDeductionAmt,jdbcType=DECIMAL}, #{posTdSupplyAmt,jdbcType=DECIMAL},
+      #{mposTdSupplyAmt,jdbcType=DECIMAL}, #{otherSupplyAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL},
+      #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL}, #{deductionTaxMonthAmt,jdbcType=DECIMAL},
+      #{supplyTaxAmt,jdbcType=DECIMAL}, #{realProfitAmt,jdbcType=DECIMAL}, #{profitMonthAmt,jdbcType=DECIMAL},
+      #{accountId,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{openBankName,jdbcType=VARCHAR},
+      #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR},
+      #{remark,jdbcType=VARCHAR}, #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL},
+      #{tax,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL},
+      #{basicsProfitAmt,jdbcType=DECIMAL}, #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+      #{unlineAmt,jdbcType=DECIMAL}, #{payCompany,jdbcType=VARCHAR}, #{smalTaxAmt,jdbcType=DECIMAL},
+      #{toolsReturnAmt,jdbcType=DECIMAL}, #{znposProfitAmt,jdbcType=DECIMAL}, #{mposTranAmt,jdbcType=DECIMAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth">
+    insert into P_PROFIT_DETAIL_M
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentPid != null">
+        AGENT_PID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID,
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE,
+      </if>
+      <if test="tranAmt != null">
+        TRAN_AMT,
+      </if>
+      <if test="payAmt != null">
+        PAY_AMT,
+      </if>
+      <if test="tranProfitScale != null">
+        TRAN_PROFIT_SCALE,
+      </if>
+      <if test="payProfitScale != null">
+        PAY_PROFIT_SCALE,
+      </if>
+      <if test="tranProfitAmt != null">
+        TRAN_PROFIT_AMT,
+      </if>
+      <if test="payProfitAmt != null">
+        PAY_PROFIT_AMT,
+      </if>
+      <if test="ryxProfitAmt != null">
+        RYX_PROFIT_AMT,
+      </if>
+      <if test="ryxHdProfitAmt != null">
+        RYX_HD_PROFIT_AMT,
+      </if>
+      <if test="tpProfitAmt != null">
+        TP_PROFIT_AMT,
+      </if>
+      <if test="rsProfitAmt != null">
+        RS_PROFIT_AMT,
+      </if>
+      <if test="rsHdProfitAmt != null">
+        RS_HD_PROFIT_AMT,
+      </if>
+      <if test="rhbProfitAmt != null">
+        RHB_PROFIT_AMT,
+      </if>
+      <if test="zfProfitAmt != null">
+        ZF_PROFIT_AMT,
+      </if>
+      <if test="posZqSupplyProfitAmt != null">
+        POS_ZQ_SUPPLY_PROFIT_AMT,
+      </if>
+      <if test="mposZqSupplyProfitAmt != null">
+        MPOS_ZQ_SUPPLY_PROFIT_AMT,
+      </if>
+      <if test="profitSumAmt != null">
+        PROFIT_SUM_AMT,
+      </if>
+      <if test="posTdMustDeductionAmt != null">
+        POS_TD_MUST_DEDUCTION_AMT,
+      </if>
+      <if test="posTdRealDeductionAmt != null">
+        POS_TD_REAL_DEDUCTION_AMT,
+      </if>
+      <if test="mposTdMustDeductionAmt != null">
+        MPOS_TD_MUST_DEDUCTION_AMT,
+      </if>
+      <if test="mposTdRealDeductionAmt != null">
+        MPOS_TD_REAL_DEDUCTION_AMT,
+      </if>
+      <if test="rhbDgMustDeductionAmt != null">
+        RHB_DG_MUST_DEDUCTION_AMT,
+      </if>
+      <if test="rhbDgRealDeductionAmt != null">
+        RHB_DG_REAL_DEDUCTION_AMT,
+      </if>
+      <if test="posDgMustDeductionAmt != null">
+        POS_DG_MUST_DEDUCTION_AMT,
+      </if>
+      <if test="posDgRealDeductionAmt != null">
+        POS_DG_REAL_DEDUCTION_AMT,
+      </if>
+      <if test="zposDgMustDeductionAmt != null">
+        ZPOS_DG_MUST_DEDUCTION_AMT,
+      </if>
+      <if test="zposTdRealDeductionAmt != null">
+        ZPOS_TD_REAL_DEDUCTION_AMT,
+      </if>
+      <if test="posKhDeductionAmt != null">
+        POS_KH_DEDUCTION_AMT,
+      </if>
+      <if test="mposKhDeductionAmt != null">
+        MPOS_KH_DEDUCTION_AMT,
+      </if>
+      <if test="buDeductionAmt != null">
+        BU_DEDUCTION_AMT,
+      </if>
+      <if test="otherDeductionAmt != null">
+        OTHER_DEDUCTION_AMT,
+      </if>
+      <if test="posTdSupplyAmt != null">
+        POS_TD_SUPPLY_AMT,
+      </if>
+      <if test="mposTdSupplyAmt != null">
+        MPOS_TD_SUPPLY_AMT,
+      </if>
+      <if test="otherSupplyAmt != null">
+        OTHER_SUPPLY_AMT,
+      </if>
+      <if test="posRewardAmt != null">
+        POS_REWARD_AMT,
+      </if>
+      <if test="deductionTaxMonthAgoAmt != null">
+        DEDUCTION_TAX_MONTH_AGO_AMT,
+      </if>
+      <if test="deductionTaxMonthAmt != null">
+        DEDUCTION_TAX_MONTH_AMT,
+      </if>
+      <if test="supplyTaxAmt != null">
+        SUPPLY_TAX_AMT,
+      </if>
+      <if test="realProfitAmt != null">
+        REAL_PROFIT_AMT,
+      </if>
+      <if test="profitMonthAmt != null">
+        PROFIT_MONTH_AMT,
+      </if>
+      <if test="accountId != null">
+        ACCOUNT_ID,
+      </if>
+      <if test="accountName != null">
+        ACCOUNT_NAME,
+      </if>
+      <if test="openBankName != null">
+        OPEN_BANK_NAME,
+      </if>
+      <if test="email != null">
+        EMAIL,
+      </if>
+      <if test="bankCode != null">
+        BANK_CODE,
+      </if>
+      <if test="payStatus != null">
+        PAY_STATUS,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="zhifaBuckle != null">
+        ZHIFA_BUCKLE,
+      </if>
+      <if test="zhifaSupply != null">
+        ZHIFA_SUPPLY,
+      </if>
+      <if test="tax != null">
+        TAX,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="posRewardDeductionAmt != null">
+        POS_REWARD_DEDUCTION_AMT,
+      </if>
+      <if test="basicsProfitAmt != null">
+        BASICS_PROFIT_AMT,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="unlineAmt != null">
+        UNLINE_AMT,
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY,
+      </if>
+      <if test="smalTaxAmt != null">
+        SMAL_TAX_AMT,
+      </if>
+      <if test="toolsReturnAmt != null">
+        TOOLS_RETURN_AMT,
+      </if>
+      <if test="znposProfitAmt != null">
+        ZNPOS_PROFIT_AMT,
+      </if>
+      <if test="mposTranAmt != null">
+        MPOS_TRAN_AMT,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentPid != null">
+        #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitId != null">
+        #{profitId,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null">
+        #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="tranAmt != null">
+        #{tranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmt != null">
+        #{payAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tranProfitScale != null">
+        #{tranProfitScale,jdbcType=VARCHAR},
+      </if>
+      <if test="payProfitScale != null">
+        #{payProfitScale,jdbcType=VARCHAR},
+      </if>
+      <if test="tranProfitAmt != null">
+        #{tranProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payProfitAmt != null">
+        #{payProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ryxProfitAmt != null">
+        #{ryxProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ryxHdProfitAmt != null">
+        #{ryxHdProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tpProfitAmt != null">
+        #{tpProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rsProfitAmt != null">
+        #{rsProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rsHdProfitAmt != null">
+        #{rsHdProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rhbProfitAmt != null">
+        #{rhbProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="zfProfitAmt != null">
+        #{zfProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posZqSupplyProfitAmt != null">
+        #{posZqSupplyProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposZqSupplyProfitAmt != null">
+        #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitSumAmt != null">
+        #{profitSumAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTdMustDeductionAmt != null">
+        #{posTdMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTdRealDeductionAmt != null">
+        #{posTdRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTdMustDeductionAmt != null">
+        #{mposTdMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTdRealDeductionAmt != null">
+        #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rhbDgMustDeductionAmt != null">
+        #{rhbDgMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rhbDgRealDeductionAmt != null">
+        #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posDgMustDeductionAmt != null">
+        #{posDgMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posDgRealDeductionAmt != null">
+        #{posDgRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="zposDgMustDeductionAmt != null">
+        #{zposDgMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="zposTdRealDeductionAmt != null">
+        #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posKhDeductionAmt != null">
+        #{posKhDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposKhDeductionAmt != null">
+        #{mposKhDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="buDeductionAmt != null">
+        #{buDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="otherDeductionAmt != null">
+        #{otherDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTdSupplyAmt != null">
+        #{posTdSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTdSupplyAmt != null">
+        #{mposTdSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="otherSupplyAmt != null">
+        #{otherSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posRewardAmt != null">
+        #{posRewardAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionTaxMonthAgoAmt != null">
+        #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionTaxMonthAmt != null">
+        #{deductionTaxMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyTaxAmt != null">
+        #{supplyTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="realProfitAmt != null">
+        #{realProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitMonthAmt != null">
+        #{profitMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="accountId != null">
+        #{accountId,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="openBankName != null">
+        #{openBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCode != null">
+        #{bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        #{payStatus,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="zhifaBuckle != null">
+        #{zhifaBuckle,jdbcType=DECIMAL},
+      </if>
+      <if test="zhifaSupply != null">
+        #{zhifaSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="tax != null">
+        #{tax,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="posRewardDeductionAmt != null">
+        #{posRewardDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="basicsProfitAmt != null">
+        #{basicsProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="unlineAmt != null">
+        #{unlineAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payCompany != null">
+        #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="smalTaxAmt != null">
+        #{smalTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="toolsReturnAmt != null">
+        #{toolsReturnAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="znposProfitAmt != null">
+        #{znposProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTranAmt != null">
+        #{mposTranAmt,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer">
+    select count(*) from P_PROFIT_DETAIL_M
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth">
+    update P_PROFIT_DETAIL_M
+    <set>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitId != null">
+        PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      </if>
+      <if test="profitDate != null">
+        PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="tranAmt != null">
+        TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmt != null">
+        PAY_AMT = #{payAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tranProfitScale != null">
+        TRAN_PROFIT_SCALE = #{tranProfitScale,jdbcType=VARCHAR},
+      </if>
+      <if test="payProfitScale != null">
+        PAY_PROFIT_SCALE = #{payProfitScale,jdbcType=VARCHAR},
+      </if>
+      <if test="tranProfitAmt != null">
+        TRAN_PROFIT_AMT = #{tranProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payProfitAmt != null">
+        PAY_PROFIT_AMT = #{payProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ryxProfitAmt != null">
+        RYX_PROFIT_AMT = #{ryxProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="ryxHdProfitAmt != null">
+        RYX_HD_PROFIT_AMT = #{ryxHdProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="tpProfitAmt != null">
+        TP_PROFIT_AMT = #{tpProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rsProfitAmt != null">
+        RS_PROFIT_AMT = #{rsProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rsHdProfitAmt != null">
+        RS_HD_PROFIT_AMT = #{rsHdProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rhbProfitAmt != null">
+        RHB_PROFIT_AMT = #{rhbProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="zfProfitAmt != null">
+        ZF_PROFIT_AMT = #{zfProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posZqSupplyProfitAmt != null">
+        POS_ZQ_SUPPLY_PROFIT_AMT = #{posZqSupplyProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposZqSupplyProfitAmt != null">
+        MPOS_ZQ_SUPPLY_PROFIT_AMT = #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitSumAmt != null">
+        PROFIT_SUM_AMT = #{profitSumAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTdMustDeductionAmt != null">
+        POS_TD_MUST_DEDUCTION_AMT = #{posTdMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTdRealDeductionAmt != null">
+        POS_TD_REAL_DEDUCTION_AMT = #{posTdRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTdMustDeductionAmt != null">
+        MPOS_TD_MUST_DEDUCTION_AMT = #{mposTdMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTdRealDeductionAmt != null">
+        MPOS_TD_REAL_DEDUCTION_AMT = #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rhbDgMustDeductionAmt != null">
+        RHB_DG_MUST_DEDUCTION_AMT = #{rhbDgMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="rhbDgRealDeductionAmt != null">
+        RHB_DG_REAL_DEDUCTION_AMT = #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posDgMustDeductionAmt != null">
+        POS_DG_MUST_DEDUCTION_AMT = #{posDgMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posDgRealDeductionAmt != null">
+        POS_DG_REAL_DEDUCTION_AMT = #{posDgRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="zposDgMustDeductionAmt != null">
+        ZPOS_DG_MUST_DEDUCTION_AMT = #{zposDgMustDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="zposTdRealDeductionAmt != null">
+        ZPOS_TD_REAL_DEDUCTION_AMT = #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posKhDeductionAmt != null">
+        POS_KH_DEDUCTION_AMT = #{posKhDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposKhDeductionAmt != null">
+        MPOS_KH_DEDUCTION_AMT = #{mposKhDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="buDeductionAmt != null">
+        BU_DEDUCTION_AMT = #{buDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="otherDeductionAmt != null">
+        OTHER_DEDUCTION_AMT = #{otherDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTdSupplyAmt != null">
+        POS_TD_SUPPLY_AMT = #{posTdSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTdSupplyAmt != null">
+        MPOS_TD_SUPPLY_AMT = #{mposTdSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="otherSupplyAmt != null">
+        OTHER_SUPPLY_AMT = #{otherSupplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posRewardAmt != null">
+        POS_REWARD_AMT = #{posRewardAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionTaxMonthAgoAmt != null">
+        DEDUCTION_TAX_MONTH_AGO_AMT = #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionTaxMonthAmt != null">
+        DEDUCTION_TAX_MONTH_AMT = #{deductionTaxMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="supplyTaxAmt != null">
+        SUPPLY_TAX_AMT = #{supplyTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="realProfitAmt != null">
+        REAL_PROFIT_AMT = #{realProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="profitMonthAmt != null">
+        PROFIT_MONTH_AMT = #{profitMonthAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="accountId != null">
+        ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+      </if>
+      <if test="accountName != null">
+        ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="openBankName != null">
+        OPEN_BANK_NAME = #{openBankName,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        EMAIL = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="bankCode != null">
+        BANK_CODE = #{bankCode,jdbcType=VARCHAR},
+      </if>
+      <if test="payStatus != null">
+        PAY_STATUS = #{payStatus,jdbcType=CHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="zhifaBuckle != null">
+        ZHIFA_BUCKLE = #{zhifaBuckle,jdbcType=DECIMAL},
+      </if>
+      <if test="zhifaSupply != null">
+        ZHIFA_SUPPLY = #{zhifaSupply,jdbcType=DECIMAL},
+      </if>
+      <if test="tax != null">
+        TAX = #{tax,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="posRewardDeductionAmt != null">
+        POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="basicsProfitAmt != null">
+        BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="unlineAmt != null">
+        UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="smalTaxAmt != null">
+        SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="toolsReturnAmt != null">
+        TOOLS_RETURN_AMT = #{toolsReturnAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="znposProfitAmt != null">
+        ZNPOS_PROFIT_AMT = #{znposProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="mposTranAmt != null">
+        MPOS_TRAN_AMT = #{mposTranAmt,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth">
+    update P_PROFIT_DETAIL_M
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PROFIT_ID = #{profitId,jdbcType=VARCHAR},
+      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
+      TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
+      PAY_AMT = #{payAmt,jdbcType=DECIMAL},
+      TRAN_PROFIT_SCALE = #{tranProfitScale,jdbcType=VARCHAR},
+      PAY_PROFIT_SCALE = #{payProfitScale,jdbcType=VARCHAR},
+      TRAN_PROFIT_AMT = #{tranProfitAmt,jdbcType=DECIMAL},
+      PAY_PROFIT_AMT = #{payProfitAmt,jdbcType=DECIMAL},
+      RYX_PROFIT_AMT = #{ryxProfitAmt,jdbcType=DECIMAL},
+      RYX_HD_PROFIT_AMT = #{ryxHdProfitAmt,jdbcType=DECIMAL},
+      TP_PROFIT_AMT = #{tpProfitAmt,jdbcType=DECIMAL},
+      RS_PROFIT_AMT = #{rsProfitAmt,jdbcType=DECIMAL},
+      RS_HD_PROFIT_AMT = #{rsHdProfitAmt,jdbcType=DECIMAL},
+      RHB_PROFIT_AMT = #{rhbProfitAmt,jdbcType=DECIMAL},
+      ZF_PROFIT_AMT = #{zfProfitAmt,jdbcType=DECIMAL},
+      POS_ZQ_SUPPLY_PROFIT_AMT = #{posZqSupplyProfitAmt,jdbcType=DECIMAL},
+      MPOS_ZQ_SUPPLY_PROFIT_AMT = #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
+      PROFIT_SUM_AMT = #{profitSumAmt,jdbcType=DECIMAL},
+      POS_TD_MUST_DEDUCTION_AMT = #{posTdMustDeductionAmt,jdbcType=DECIMAL},
+      POS_TD_REAL_DEDUCTION_AMT = #{posTdRealDeductionAmt,jdbcType=DECIMAL},
+      MPOS_TD_MUST_DEDUCTION_AMT = #{mposTdMustDeductionAmt,jdbcType=DECIMAL},
+      MPOS_TD_REAL_DEDUCTION_AMT = #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
+      RHB_DG_MUST_DEDUCTION_AMT = #{rhbDgMustDeductionAmt,jdbcType=DECIMAL},
+      RHB_DG_REAL_DEDUCTION_AMT = #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
+      POS_DG_MUST_DEDUCTION_AMT = #{posDgMustDeductionAmt,jdbcType=DECIMAL},
+      POS_DG_REAL_DEDUCTION_AMT = #{posDgRealDeductionAmt,jdbcType=DECIMAL},
+      ZPOS_DG_MUST_DEDUCTION_AMT = #{zposDgMustDeductionAmt,jdbcType=DECIMAL},
+      ZPOS_TD_REAL_DEDUCTION_AMT = #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
+      POS_KH_DEDUCTION_AMT = #{posKhDeductionAmt,jdbcType=DECIMAL},
+      MPOS_KH_DEDUCTION_AMT = #{mposKhDeductionAmt,jdbcType=DECIMAL},
+      BU_DEDUCTION_AMT = #{buDeductionAmt,jdbcType=DECIMAL},
+      OTHER_DEDUCTION_AMT = #{otherDeductionAmt,jdbcType=DECIMAL},
+      POS_TD_SUPPLY_AMT = #{posTdSupplyAmt,jdbcType=DECIMAL},
+      MPOS_TD_SUPPLY_AMT = #{mposTdSupplyAmt,jdbcType=DECIMAL},
+      OTHER_SUPPLY_AMT = #{otherSupplyAmt,jdbcType=DECIMAL},
+      POS_REWARD_AMT = #{posRewardAmt,jdbcType=DECIMAL},
+      DEDUCTION_TAX_MONTH_AGO_AMT = #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL},
+      DEDUCTION_TAX_MONTH_AMT = #{deductionTaxMonthAmt,jdbcType=DECIMAL},
+      SUPPLY_TAX_AMT = #{supplyTaxAmt,jdbcType=DECIMAL},
+      REAL_PROFIT_AMT = #{realProfitAmt,jdbcType=DECIMAL},
+      PROFIT_MONTH_AMT = #{profitMonthAmt,jdbcType=DECIMAL},
+      ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
+      ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
+      OPEN_BANK_NAME = #{openBankName,jdbcType=VARCHAR},
+      EMAIL = #{email,jdbcType=VARCHAR},
+      BANK_CODE = #{bankCode,jdbcType=VARCHAR},
+      PAY_STATUS = #{payStatus,jdbcType=CHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      ZHIFA_BUCKLE = #{zhifaBuckle,jdbcType=DECIMAL},
+      ZHIFA_SUPPLY = #{zhifaSupply,jdbcType=DECIMAL},
+      TAX = #{tax,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL},
+      BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=VARCHAR},
+      UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL},
+      TOOLS_RETURN_AMT = #{toolsReturnAmt,jdbcType=DECIMAL},
+      ZNPOS_PROFIT_AMT = #{znposProfitAmt,jdbcType=DECIMAL},
+      MPOS_TRAN_AMT = #{mposTranAmt,jdbcType=DECIMAL}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+
   <update id="clearComputData">
     UPDATE P_PROFIT_DETAIL_M SET
     POS_TD_MUST_DEDUCTION_AMT=0, POS_TD_REAL_DEDUCTION_AMT=0,
@@ -208,12 +945,12 @@
   </select>
 
   <select id="selectByIdAndParent" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-      select
-      <include refid="Base_Column_List" />
-      from P_PROFIT_DETAIL_M
-      where
-      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
-      AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where
+    PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
     <if test="parentAgentId != null">
       AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
     </if>
@@ -223,725 +960,25 @@
   </select>
 
 
-  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" >
-    delete from P_PROFIT_DETAIL_M
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </delete>
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-    insert into P_PROFIT_DETAIL_M (ID, AGENT_PID, AGENT_ID, 
-      AGENT_NAME, PROFIT_ID, PROFIT_DATE, 
-      TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE, 
-      PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, 
-      RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT, TP_PROFIT_AMT, 
-      RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, 
-      ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT, MPOS_ZQ_SUPPLY_PROFIT_AMT, 
-      PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT, 
-      MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT, 
-      RHB_DG_MUST_DEDUCTION_AMT, RHB_DG_REAL_DEDUCTION_AMT, 
-      POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT, 
-      ZPOS_DG_MUST_DEDUCTION_AMT, ZPOS_TD_REAL_DEDUCTION_AMT, 
-      POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT, 
-      BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, 
-      MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT, POS_REWARD_AMT, 
-      DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, 
-      SUPPLY_TAX_AMT, REAL_PROFIT_AMT, PROFIT_MONTH_AMT, 
-      ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, 
-      EMAIL, BANK_CODE, PAY_STATUS, 
-      REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
-      BASICS_PROFIT_AMT, PARENT_AGENT_ID, STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT, TOOLS_RETURN_AMT, ZNPOS_PROFIT_AMT)
-    values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
-      #{agentName,jdbcType=VARCHAR}, #{profitId,jdbcType=VARCHAR}, #{profitDate,jdbcType=VARCHAR}, 
-      #{tranAmt,jdbcType=DECIMAL}, #{payAmt,jdbcType=DECIMAL}, #{tranProfitScale,jdbcType=VARCHAR}, 
-      #{payProfitScale,jdbcType=VARCHAR}, #{tranProfitAmt,jdbcType=DECIMAL}, #{payProfitAmt,jdbcType=DECIMAL}, 
-      #{ryxProfitAmt,jdbcType=DECIMAL}, #{ryxHdProfitAmt,jdbcType=DECIMAL}, #{tpProfitAmt,jdbcType=DECIMAL}, 
-      #{rsProfitAmt,jdbcType=DECIMAL}, #{rsHdProfitAmt,jdbcType=DECIMAL}, #{rhbProfitAmt,jdbcType=DECIMAL}, 
-      #{zfProfitAmt,jdbcType=DECIMAL}, #{posZqSupplyProfitAmt,jdbcType=DECIMAL}, #{mposZqSupplyProfitAmt,jdbcType=DECIMAL}, 
-      #{profitSumAmt,jdbcType=DECIMAL}, #{posTdMustDeductionAmt,jdbcType=DECIMAL}, #{posTdRealDeductionAmt,jdbcType=DECIMAL}, 
-      #{mposTdMustDeductionAmt,jdbcType=DECIMAL}, #{mposTdRealDeductionAmt,jdbcType=DECIMAL}, 
-      #{rhbDgMustDeductionAmt,jdbcType=DECIMAL}, #{rhbDgRealDeductionAmt,jdbcType=DECIMAL}, 
-      #{posDgMustDeductionAmt,jdbcType=DECIMAL}, #{posDgRealDeductionAmt,jdbcType=DECIMAL}, 
-      #{zposDgMustDeductionAmt,jdbcType=DECIMAL}, #{zposTdRealDeductionAmt,jdbcType=DECIMAL}, 
-      #{posKhDeductionAmt,jdbcType=DECIMAL}, #{mposKhDeductionAmt,jdbcType=DECIMAL}, 
-      #{buDeductionAmt,jdbcType=DECIMAL}, #{otherDeductionAmt,jdbcType=DECIMAL}, #{posTdSupplyAmt,jdbcType=DECIMAL}, 
-      #{mposTdSupplyAmt,jdbcType=DECIMAL}, #{otherSupplyAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL}, 
-      #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL}, #{deductionTaxMonthAmt,jdbcType=DECIMAL}, 
-      #{supplyTaxAmt,jdbcType=DECIMAL}, #{realProfitAmt,jdbcType=DECIMAL}, #{profitMonthAmt,jdbcType=DECIMAL}, 
-      #{accountId,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR}, #{openBankName,jdbcType=VARCHAR}, 
-      #{email,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{payStatus,jdbcType=CHAR}, 
-      #{remark,jdbcType=VARCHAR}, #{zhifaBuckle,jdbcType=DECIMAL}, #{zhifaSupply,jdbcType=DECIMAL}, #{tax,jdbcType=DECIMAL},
-      #{busPlatForm,jdbcType=VARCHAR}, #{posRewardDeductionAmt,jdbcType=DECIMAL}, #{basicsProfitAmt,jdbcType=DECIMAL},
-      #{parentAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL},
-      #{payCompany,jdbcType=VARCHAR}, #{smalTaxAmt,jdbcType=DECIMAL}, #{toolsReturnAmt,jdbcType=DECIMAL}, #{znposProfitAmt,jdbcType=DECIMAL})
-  </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-    insert into P_PROFIT_DETAIL_M
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        ID,
-      </if>
-      <if test="agentPid != null" >
-        AGENT_PID,
-      </if>
-      <if test="agentId != null" >
-        AGENT_ID,
-      </if>
-      <if test="agentName != null" >
-        AGENT_NAME,
-      </if>
-      <if test="profitId != null" >
-        PROFIT_ID,
-      </if>
-      <if test="profitDate != null" >
-        PROFIT_DATE,
-      </if>
-      <if test="tranAmt != null" >
-        TRAN_AMT,
-      </if>
-      <if test="payAmt != null" >
-        PAY_AMT,
-      </if>
-      <if test="tranProfitScale != null" >
-        TRAN_PROFIT_SCALE,
-      </if>
-      <if test="payProfitScale != null" >
-        PAY_PROFIT_SCALE,
-      </if>
-      <if test="tranProfitAmt != null" >
-        TRAN_PROFIT_AMT,
-      </if>
-      <if test="payProfitAmt != null" >
-        PAY_PROFIT_AMT,
-      </if>
-      <if test="ryxProfitAmt != null" >
-        RYX_PROFIT_AMT,
-      </if>
-      <if test="ryxHdProfitAmt != null" >
-        RYX_HD_PROFIT_AMT,
-      </if>
-      <if test="tpProfitAmt != null" >
-        TP_PROFIT_AMT,
-      </if>
-      <if test="rsProfitAmt != null" >
-        RS_PROFIT_AMT,
-      </if>
-      <if test="rsHdProfitAmt != null" >
-        RS_HD_PROFIT_AMT,
-      </if>
-      <if test="rhbProfitAmt != null" >
-        RHB_PROFIT_AMT,
-      </if>
-      <if test="zfProfitAmt != null" >
-        ZF_PROFIT_AMT,
-      </if>
-      <if test="posZqSupplyProfitAmt != null" >
-        POS_ZQ_SUPPLY_PROFIT_AMT,
-      </if>
-      <if test="mposZqSupplyProfitAmt != null" >
-        MPOS_ZQ_SUPPLY_PROFIT_AMT,
-      </if>
-      <if test="profitSumAmt != null" >
-        PROFIT_SUM_AMT,
-      </if>
-      <if test="posTdMustDeductionAmt != null" >
-        POS_TD_MUST_DEDUCTION_AMT,
-      </if>
-      <if test="posTdRealDeductionAmt != null" >
-        POS_TD_REAL_DEDUCTION_AMT,
-      </if>
-      <if test="mposTdMustDeductionAmt != null" >
-        MPOS_TD_MUST_DEDUCTION_AMT,
-      </if>
-      <if test="mposTdRealDeductionAmt != null" >
-        MPOS_TD_REAL_DEDUCTION_AMT,
-      </if>
-      <if test="rhbDgMustDeductionAmt != null" >
-        RHB_DG_MUST_DEDUCTION_AMT,
-      </if>
-      <if test="rhbDgRealDeductionAmt != null" >
-        RHB_DG_REAL_DEDUCTION_AMT,
-      </if>
-      <if test="posDgMustDeductionAmt != null" >
-        POS_DG_MUST_DEDUCTION_AMT,
-      </if>
-      <if test="posDgRealDeductionAmt != null" >
-        POS_DG_REAL_DEDUCTION_AMT,
-      </if>
-      <if test="zposDgMustDeductionAmt != null" >
-        ZPOS_DG_MUST_DEDUCTION_AMT,
-      </if>
-      <if test="zposTdRealDeductionAmt != null" >
-        ZPOS_TD_REAL_DEDUCTION_AMT,
-      </if>
-      <if test="posKhDeductionAmt != null" >
-        POS_KH_DEDUCTION_AMT,
-      </if>
-      <if test="mposKhDeductionAmt != null" >
-        MPOS_KH_DEDUCTION_AMT,
-      </if>
-      <if test="buDeductionAmt != null" >
-        BU_DEDUCTION_AMT,
-      </if>
-      <if test="otherDeductionAmt != null" >
-        OTHER_DEDUCTION_AMT,
-      </if>
-      <if test="posTdSupplyAmt != null" >
-        POS_TD_SUPPLY_AMT,
-      </if>
-      <if test="mposTdSupplyAmt != null" >
-        MPOS_TD_SUPPLY_AMT,
-      </if>
-      <if test="otherSupplyAmt != null" >
-        OTHER_SUPPLY_AMT,
-      </if>
-      <if test="posRewardAmt != null" >
-        POS_REWARD_AMT,
-      </if>
-      <if test="deductionTaxMonthAgoAmt != null" >
-        DEDUCTION_TAX_MONTH_AGO_AMT,
-      </if>
-      <if test="deductionTaxMonthAmt != null" >
-        DEDUCTION_TAX_MONTH_AMT,
-      </if>
-      <if test="supplyTaxAmt != null" >
-        SUPPLY_TAX_AMT,
-      </if>
-      <if test="realProfitAmt != null" >
-        REAL_PROFIT_AMT,
-      </if>
-      <if test="profitMonthAmt != null" >
-        PROFIT_MONTH_AMT,
-      </if>
-      <if test="accountId != null" >
-        ACCOUNT_ID,
-      </if>
-      <if test="accountName != null" >
-        ACCOUNT_NAME,
-      </if>
-      <if test="openBankName != null" >
-        OPEN_BANK_NAME,
-      </if>
-      <if test="email != null" >
-        EMAIL,
-      </if>
-      <if test="bankCode != null" >
-        BANK_CODE,
-      </if>
-      <if test="payStatus != null" >
-        PAY_STATUS,
-      </if>
-      <if test="remark != null" >
-        REMARK,
-      </if>
-      <if test="zhifaBuckle != null" >
-        ZHIFA_BUCKLE,
-      </if>
-      <if test="zhifaSupply != null" >
-        ZHIFA_SUPPLY,
-      </if>
-      <if test="tax != null" >
-        TAX,
-      </if>
-      <if test="busPlatForm != null" >
-        BUS_PLATFORM,
-      </if>
-      <if test="posRewardDeductionAmt != null" >
-        POS_REWARD_DEDUCTION_AMT,
-      </if>
-      <if test="basicsProfitAmt != null" >
-        BASICS_PROFIT_AMT,
-      </if>
-      <if test="parentAgentId != null" >
-        PARENT_AGENT_ID,
-      </if>
-      <if test="status != null" >
-        STATUS,
-      </if>
-      <if test="unlineAmt != null" >
-        UNLINE_AMT,
-      </if>
-      <if test="payCompany != null" >
-        PAY_COMPANY,
-      </if>
-      <if test="smalTaxAmt != null" >
-        SMAL_TAX_AMT,
-      </if>
-      <if test="toolsReturnAmt != null" >
-        TOOLS_RETURN_AMT,
-      </if>
-      <if test="znposProfitAmt != null" >
-        ZNPOS_PROFIT_AMT,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="agentPid != null" >
-        #{agentPid,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null" >
-        #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="agentName != null" >
-        #{agentName,jdbcType=VARCHAR},
-      </if>
-      <if test="profitId != null" >
-        #{profitId,jdbcType=VARCHAR},
-      </if>
-      <if test="profitDate != null" >
-        #{profitDate,jdbcType=VARCHAR},
-      </if>
-      <if test="tranAmt != null" >
-        #{tranAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="payAmt != null" >
-        #{payAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="tranProfitScale != null" >
-        #{tranProfitScale,jdbcType=VARCHAR},
-      </if>
-      <if test="payProfitScale != null" >
-        #{payProfitScale,jdbcType=VARCHAR},
-      </if>
-      <if test="tranProfitAmt != null" >
-        #{tranProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="payProfitAmt != null" >
-        #{payProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="ryxProfitAmt != null" >
-        #{ryxProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="ryxHdProfitAmt != null" >
-        #{ryxHdProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="tpProfitAmt != null" >
-        #{tpProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rsProfitAmt != null" >
-        #{rsProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rsHdProfitAmt != null" >
-        #{rsHdProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rhbProfitAmt != null" >
-        #{rhbProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="zfProfitAmt != null" >
-        #{zfProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posZqSupplyProfitAmt != null" >
-        #{posZqSupplyProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposZqSupplyProfitAmt != null" >
-        #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="profitSumAmt != null" >
-        #{profitSumAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posTdMustDeductionAmt != null" >
-        #{posTdMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posTdRealDeductionAmt != null" >
-        #{posTdRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposTdMustDeductionAmt != null" >
-        #{mposTdMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposTdRealDeductionAmt != null" >
-        #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rhbDgMustDeductionAmt != null" >
-        #{rhbDgMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rhbDgRealDeductionAmt != null" >
-        #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posDgMustDeductionAmt != null" >
-        #{posDgMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posDgRealDeductionAmt != null" >
-        #{posDgRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="zposDgMustDeductionAmt != null" >
-        #{zposDgMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="zposTdRealDeductionAmt != null" >
-        #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posKhDeductionAmt != null" >
-        #{posKhDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposKhDeductionAmt != null" >
-        #{mposKhDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="buDeductionAmt != null" >
-        #{buDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="otherDeductionAmt != null" >
-        #{otherDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posTdSupplyAmt != null" >
-        #{posTdSupplyAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposTdSupplyAmt != null" >
-        #{mposTdSupplyAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="otherSupplyAmt != null" >
-        #{otherSupplyAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posRewardAmt != null" >
-        #{posRewardAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="deductionTaxMonthAgoAmt != null" >
-        #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="deductionTaxMonthAmt != null" >
-        #{deductionTaxMonthAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="supplyTaxAmt != null" >
-        #{supplyTaxAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="realProfitAmt != null" >
-        #{realProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="profitMonthAmt != null" >
-        #{profitMonthAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="accountId != null" >
-        #{accountId,jdbcType=VARCHAR},
-      </if>
-      <if test="accountName != null" >
-        #{accountName,jdbcType=VARCHAR},
-      </if>
-      <if test="openBankName != null" >
-        #{openBankName,jdbcType=VARCHAR},
-      </if>
-      <if test="email != null" >
-        #{email,jdbcType=VARCHAR},
-      </if>
-      <if test="bankCode != null" >
-        #{bankCode,jdbcType=VARCHAR},
-      </if>
-      <if test="payStatus != null" >
-        #{payStatus,jdbcType=CHAR},
-      </if>
-      <if test="remark != null" >
-        #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="zhifaBuckle != null" >
-        #{zhifaBuckle,jdbcType=VARCHAR},
-      </if>
-      <if test="zhifaSupply != null" >
-        #{zhifaSupply,jdbcType=VARCHAR},
-      </if>
-      <if test="tax != null" >
-        #{tax,jdbcType=VARCHAR},
-      </if>
-      <if test="busPlatForm != null" >
-        #{busPlatForm,jdbcType=VARCHAR},
-      </if>
-      <if test="posRewardDeductionAmt != null" >
-        #{posRewardDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="basicsProfitAmt != null" >
-        #{basicsProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="parentAgentId != null" >
-        #{parentAgentId,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        #{status,jdbcType=VARCHAR},
-      </if>
-      <if test="unlineAmt != null" >
-        #{unlineAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="payCompany != null" >
-        #{payCompany,jdbcType=VARCHAR},
-      </if>
-      <if test="smalTaxAmt != null" >
-        #{smalTaxAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="toolsReturnAmt != null" >
-        #{toolsReturnAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="znposProfitAmt != null" >
-        #{znposProfitAmt,jdbcType=DECIMAL},
-      </if>
-    </trim>
-  </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonthExample" resultType="java.lang.Integer" >
-    select count(*) from P_PROFIT_DETAIL_M ${innerJoinDepartment}
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
+  <sql id="Base_Column_List_query" >
+    M.ID, AGENT_PID, AGENT_ID, AGENT_NAME, PROFIT_ID, PROFIT_DATE, TRAN_AMT, PAY_AMT, TRAN_PROFIT_SCALE,
+    PAY_PROFIT_SCALE, TRAN_PROFIT_AMT, PAY_PROFIT_AMT, RYX_PROFIT_AMT, RYX_HD_PROFIT_AMT,
+    TP_PROFIT_AMT, RS_PROFIT_AMT, RS_HD_PROFIT_AMT, RHB_PROFIT_AMT, ZF_PROFIT_AMT, POS_ZQ_SUPPLY_PROFIT_AMT,
+    MPOS_ZQ_SUPPLY_PROFIT_AMT, PROFIT_SUM_AMT, POS_TD_MUST_DEDUCTION_AMT, POS_TD_REAL_DEDUCTION_AMT,
+    MPOS_TD_MUST_DEDUCTION_AMT, MPOS_TD_REAL_DEDUCTION_AMT, RHB_DG_MUST_DEDUCTION_AMT,
+    RHB_DG_REAL_DEDUCTION_AMT, POS_DG_MUST_DEDUCTION_AMT, POS_DG_REAL_DEDUCTION_AMT,
+    ZPOS_DG_MUST_DEDUCTION_AMT, ZPOS_TD_REAL_DEDUCTION_AMT, POS_KH_DEDUCTION_AMT, MPOS_KH_DEDUCTION_AMT,
+    BU_DEDUCTION_AMT, OTHER_DEDUCTION_AMT, POS_TD_SUPPLY_AMT, MPOS_TD_SUPPLY_AMT, OTHER_SUPPLY_AMT,
+    POS_REWARD_AMT, DEDUCTION_TAX_MONTH_AGO_AMT, DEDUCTION_TAX_MONTH_AMT, SUPPLY_TAX_AMT,
+    REAL_PROFIT_AMT, PROFIT_MONTH_AMT, ACCOUNT_ID, ACCOUNT_NAME, OPEN_BANK_NAME, EMAIL,
+    BANK_CODE, PAY_STATUS, REMARK, ZHIFA_BUCKLE, ZHIFA_SUPPLY, TAX,BUS_PLATFORM, POS_REWARD_DEDUCTION_AMT,
+    BASICS_PROFIT_AMT, PARENT_AGENT_ID, M.STATUS, UNLINE_AMT, PAY_COMPANY, SMAL_TAX_AMT
+  </sql>
+
   <update id="payMoney">
       update P_PROFIT_DETAIL_M set status='5' where status in('4','5') and   PROFIT_DATE = #{profitDate}
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-    update P_PROFIT_DETAIL_M
-    <set >
-      <if test="tranAmt != null" >
-        TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="payAmt != null" >
-        PAY_AMT = #{payAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="tranProfitScale != null" >
-        TRAN_PROFIT_SCALE = #{tranProfitScale,jdbcType=VARCHAR},
-      </if>
-      <if test="payProfitScale != null" >
-        PAY_PROFIT_SCALE = #{payProfitScale,jdbcType=VARCHAR},
-      </if>
-      <if test="tranProfitAmt != null" >
-        TRAN_PROFIT_AMT = #{tranProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="payProfitAmt != null" >
-        PAY_PROFIT_AMT = #{payProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="ryxProfitAmt != null" >
-        RYX_PROFIT_AMT = #{ryxProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="ryxHdProfitAmt != null" >
-        RYX_HD_PROFIT_AMT = #{ryxHdProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="tpProfitAmt != null" >
-        TP_PROFIT_AMT = #{tpProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rsProfitAmt != null" >
-        RS_PROFIT_AMT = #{rsProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rsHdProfitAmt != null" >
-        RS_HD_PROFIT_AMT = #{rsHdProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rhbProfitAmt != null" >
-        RHB_PROFIT_AMT = #{rhbProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="zfProfitAmt != null" >
-        ZF_PROFIT_AMT = #{zfProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posZqSupplyProfitAmt != null" >
-        POS_ZQ_SUPPLY_PROFIT_AMT = #{posZqSupplyProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposZqSupplyProfitAmt != null" >
-        MPOS_ZQ_SUPPLY_PROFIT_AMT = #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="profitSumAmt != null" >
-        PROFIT_SUM_AMT = #{profitSumAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posTdMustDeductionAmt != null" >
-        POS_TD_MUST_DEDUCTION_AMT = #{posTdMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posTdRealDeductionAmt != null" >
-        POS_TD_REAL_DEDUCTION_AMT = #{posTdRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposTdMustDeductionAmt != null" >
-        MPOS_TD_MUST_DEDUCTION_AMT = #{mposTdMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposTdRealDeductionAmt != null" >
-        MPOS_TD_REAL_DEDUCTION_AMT = #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rhbDgMustDeductionAmt != null" >
-        RHB_DG_MUST_DEDUCTION_AMT = #{rhbDgMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="rhbDgRealDeductionAmt != null" >
-        RHB_DG_REAL_DEDUCTION_AMT = #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posDgMustDeductionAmt != null" >
-        POS_DG_MUST_DEDUCTION_AMT = #{posDgMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posDgRealDeductionAmt != null" >
-        POS_DG_REAL_DEDUCTION_AMT = #{posDgRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="zposDgMustDeductionAmt != null" >
-        ZPOS_DG_MUST_DEDUCTION_AMT = #{zposDgMustDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="zposTdRealDeductionAmt != null" >
-        ZPOS_TD_REAL_DEDUCTION_AMT = #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posKhDeductionAmt != null" >
-        POS_KH_DEDUCTION_AMT = #{posKhDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposKhDeductionAmt != null" >
-        MPOS_KH_DEDUCTION_AMT = #{mposKhDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="buDeductionAmt != null" >
-        BU_DEDUCTION_AMT = #{buDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="otherDeductionAmt != null" >
-        OTHER_DEDUCTION_AMT = #{otherDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posTdSupplyAmt != null" >
-        POS_TD_SUPPLY_AMT = #{posTdSupplyAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="mposTdSupplyAmt != null" >
-        MPOS_TD_SUPPLY_AMT = #{mposTdSupplyAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="otherSupplyAmt != null" >
-        OTHER_SUPPLY_AMT = #{otherSupplyAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="posRewardAmt != null" >
-        POS_REWARD_AMT = #{posRewardAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="deductionTaxMonthAgoAmt != null" >
-        DEDUCTION_TAX_MONTH_AGO_AMT = #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="deductionTaxMonthAmt != null" >
-        DEDUCTION_TAX_MONTH_AMT = #{deductionTaxMonthAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="supplyTaxAmt != null" >
-        SUPPLY_TAX_AMT = #{supplyTaxAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="realProfitAmt != null" >
-        REAL_PROFIT_AMT = #{realProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="profitMonthAmt != null" >
-        PROFIT_MONTH_AMT = #{profitMonthAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="accountId != null" >
-        ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
-      </if>
-      <if test="accountName != null" >
-        ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
-      </if>
-      <if test="openBankName != null" >
-        OPEN_BANK_NAME = #{openBankName,jdbcType=VARCHAR},
-      </if>
-      <if test="email != null" >
-        EMAIL = #{email,jdbcType=VARCHAR},
-      </if>
-      <if test="bankCode != null" >
-        BANK_CODE = #{bankCode,jdbcType=VARCHAR},
-      </if>
-      <if test="payStatus != null" >
-        PAY_STATUS = #{payStatus,jdbcType=CHAR},
-      </if>
-      <if test="remark != null" >
-        REMARK = #{remark,jdbcType=VARCHAR},
-      </if>
-      <if test="zhifaBuckle != null" >
-        ZHIFA_BUCKLE = #{zhifaBuckle,jdbcType=VARCHAR},
-      </if>
-      <if test="zhifaSupply != null" >
-        ZHIFA_SUPPLY = #{zhifaSupply,jdbcType=VARCHAR},
-      </if>
-      <if test="tax != null" >
-        TAX = #{tax,jdbcType=DECIMAL},
-      </if>
-      <if test="busPlatForm != null" >
-        BUS_PLATFORM = #{busPlatForm,jdbcType=VARCHAR},
-      </if>
-      <if test="posRewardDeductionAmt != null" >
-        POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="basicsProfitAmt != null" >
-        BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="parentAgentId != null" >
-        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null" >
-        STATUS = #{status,jdbcType=VARCHAR},
-      </if>
-      <if test="unlineAmt != null" >
-        UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="payCompany != null" >
-        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
-      </if>
-      <if test="smalTaxAmt != null" >
-        SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="toolsReturnAmt != null" >
-        TOOLS_RETURN_AMT = #{toolsReturnAmt,jdbcType=DECIMAL},
-      </if>
-      <if test="znposProfitAmt != null" >
-        ZNPOS_PROFIT_AMT = #{znposProfitAmt,jdbcType=DECIMAL},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
-    update P_PROFIT_DETAIL_M
-    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      PROFIT_ID = #{profitId,jdbcType=VARCHAR},
-      PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
-      TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
-      PAY_AMT = #{payAmt,jdbcType=DECIMAL},
-      TRAN_PROFIT_SCALE = #{tranProfitScale,jdbcType=VARCHAR},
-      PAY_PROFIT_SCALE = #{payProfitScale,jdbcType=VARCHAR},
-      TRAN_PROFIT_AMT = #{tranProfitAmt,jdbcType=DECIMAL},
-      PAY_PROFIT_AMT = #{payProfitAmt,jdbcType=DECIMAL},
-      RYX_PROFIT_AMT = #{ryxProfitAmt,jdbcType=DECIMAL},
-      RYX_HD_PROFIT_AMT = #{ryxHdProfitAmt,jdbcType=DECIMAL},
-      TP_PROFIT_AMT = #{tpProfitAmt,jdbcType=DECIMAL},
-      RS_PROFIT_AMT = #{rsProfitAmt,jdbcType=DECIMAL},
-      RS_HD_PROFIT_AMT = #{rsHdProfitAmt,jdbcType=DECIMAL},
-      RHB_PROFIT_AMT = #{rhbProfitAmt,jdbcType=DECIMAL},
-      ZF_PROFIT_AMT = #{zfProfitAmt,jdbcType=DECIMAL},
-      POS_ZQ_SUPPLY_PROFIT_AMT = #{posZqSupplyProfitAmt,jdbcType=DECIMAL},
-      MPOS_ZQ_SUPPLY_PROFIT_AMT = #{mposZqSupplyProfitAmt,jdbcType=DECIMAL},
-      PROFIT_SUM_AMT = #{profitSumAmt,jdbcType=DECIMAL},
-      POS_TD_MUST_DEDUCTION_AMT = #{posTdMustDeductionAmt,jdbcType=DECIMAL},
-      POS_TD_REAL_DEDUCTION_AMT = #{posTdRealDeductionAmt,jdbcType=DECIMAL},
-      MPOS_TD_MUST_DEDUCTION_AMT = #{mposTdMustDeductionAmt,jdbcType=DECIMAL},
-      MPOS_TD_REAL_DEDUCTION_AMT = #{mposTdRealDeductionAmt,jdbcType=DECIMAL},
-      RHB_DG_MUST_DEDUCTION_AMT = #{rhbDgMustDeductionAmt,jdbcType=DECIMAL},
-      RHB_DG_REAL_DEDUCTION_AMT = #{rhbDgRealDeductionAmt,jdbcType=DECIMAL},
-      POS_DG_MUST_DEDUCTION_AMT = #{posDgMustDeductionAmt,jdbcType=DECIMAL},
-      POS_DG_REAL_DEDUCTION_AMT = #{posDgRealDeductionAmt,jdbcType=DECIMAL},
-      ZPOS_DG_MUST_DEDUCTION_AMT = #{zposDgMustDeductionAmt,jdbcType=DECIMAL},
-      ZPOS_TD_REAL_DEDUCTION_AMT = #{zposTdRealDeductionAmt,jdbcType=DECIMAL},
-      POS_KH_DEDUCTION_AMT = #{posKhDeductionAmt,jdbcType=DECIMAL},
-      MPOS_KH_DEDUCTION_AMT = #{mposKhDeductionAmt,jdbcType=DECIMAL},
-      BU_DEDUCTION_AMT = #{buDeductionAmt,jdbcType=DECIMAL},
-      OTHER_DEDUCTION_AMT = #{otherDeductionAmt,jdbcType=DECIMAL},
-      POS_TD_SUPPLY_AMT = #{posTdSupplyAmt,jdbcType=DECIMAL},
-      MPOS_TD_SUPPLY_AMT = #{mposTdSupplyAmt,jdbcType=DECIMAL},
-      OTHER_SUPPLY_AMT = #{otherSupplyAmt,jdbcType=DECIMAL},
-      POS_REWARD_AMT = #{posRewardAmt,jdbcType=DECIMAL},
-      DEDUCTION_TAX_MONTH_AGO_AMT = #{deductionTaxMonthAgoAmt,jdbcType=DECIMAL},
-      DEDUCTION_TAX_MONTH_AMT = #{deductionTaxMonthAmt,jdbcType=DECIMAL},
-      SUPPLY_TAX_AMT = #{supplyTaxAmt,jdbcType=DECIMAL},
-      REAL_PROFIT_AMT = #{realProfitAmt,jdbcType=DECIMAL},
-      PROFIT_MONTH_AMT = #{profitMonthAmt,jdbcType=DECIMAL},
-      ACCOUNT_ID = #{accountId,jdbcType=VARCHAR},
-      ACCOUNT_NAME = #{accountName,jdbcType=VARCHAR},
-      OPEN_BANK_NAME = #{openBankName,jdbcType=VARCHAR},
-      EMAIL = #{email,jdbcType=VARCHAR},
-      BANK_CODE = #{bankCode,jdbcType=VARCHAR},
-      PAY_STATUS = #{payStatus,jdbcType=CHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      ZHIFA_BUCKLE = #{zhifaBuckle,jdbcType=DECIMAL},
-      ZHIFA_SUPPLY = #{zhifaBuckle,jdbcType=DECIMAL},
-      TAX = #{tax,jdbcType=DECIMAL},
-      BUS_PLATFORM = #{busPlatForm,jdbcType=VARCHAR},
-      POS_REWARD_DEDUCTION_AMT = #{posRewardDeductionAmt,jdbcType=DECIMAL},
-      BASICS_PROFIT_AMT = #{basicsProfitAmt,jdbcType=DECIMAL},
-      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=VARCHAR},
-      UNLINE_AMT = #{unlineAmt,jdbcType=DECIMAL},
-      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
-      SMAL_TAX_AMT = #{smalTaxAmt,jdbcType=DECIMAL},
-      TOOLS_RETURN_AMT = #{toolsReturnAmt,jdbcType=DECIMAL},
-      ZNPOS_PROFIT_AMT = #{znposProfitAmt,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <sql id="OracleDialectPrefix" >
-    <if test="page != null" >
-      select * from ( select row_.*, rownum rownum_ from ( 
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix" >
-    <if test="page != null" >
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
+
 
   <!--导出数据-->
   <select id="exportByFinance" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
@@ -1088,8 +1125,8 @@
       1=1
       <if test="agentId != null and agentId !=''">and ppd.agent_id = #{agentId}</if>
       <if test="agentName != null and agentName !=''">and ppd.agent_name = #{agentName}</if>
-      <if test="profitDateStart != null and profitDateStart != ''">and profit_date_start >= TO_DATE(#{profitDateStart},'yyyy-MM')</if>
-      <if test="profitDateEnd != null and profitDateEnd != ''">and profit_date_end &lt;= TO_DATE(#{profitDateEnd},'yyyy-MM')</if>
+      <if test="profitDateStart != null and profitDateStart != ''">and profit_date >= TO_DATE(#{profitDateStart},'yyyy-MM')</if>
+      <if test="profitDateEnd != null and profitDateEnd != ''">and profit_date &lt;= TO_DATE(#{profitDateEnd},'yyyy-MM')</if>
     </where>
   </sql>
 

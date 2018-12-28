@@ -54,9 +54,10 @@ public class NewProfitMonthMposDataJob {
     private int index = 1;
     private static BigDecimal allAmount = BigDecimal.ZERO;
 
-    @Transactional
     public void excute(String transDate) {
         logger.info("=============手刷{}月分润明细数据同步执行开始===========", transDate);
+        transDate = transDate == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : transDate;
+        index = 1;
         long t1 = System.currentTimeMillis();
 
         //清除旧数据
@@ -74,10 +75,10 @@ public class NewProfitMonthMposDataJob {
      * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
      */
 //    @Scheduled(cron = "0 55 10 22 * ?")
+
     public void synchroProfitMonth(String transDate) {
 
         HashMap<String, String> map = new HashMap<String, String>();
-        transDate = transDate == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : transDate;
         map.put("frMonth", transDate);
         map.put("pageNumber", index++ + "");
         map.put("pageSize", "1000");

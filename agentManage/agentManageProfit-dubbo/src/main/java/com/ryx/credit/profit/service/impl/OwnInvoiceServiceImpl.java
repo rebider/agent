@@ -131,6 +131,9 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         params.put("preMonth", new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -2)));
         logger.info("=======欠票计算开始=======");
         try {
+            //清除数据
+            invoiceDetailMapper.deleteByMonth(profitMonth);
+
             List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceAgents(params);
             for (Map<String, Object> map : agentList) {
 
@@ -162,6 +165,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
 
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("代理商欠票计算出现异常错误",e);
         }
         logger.info("=======欠票计算結束=======");

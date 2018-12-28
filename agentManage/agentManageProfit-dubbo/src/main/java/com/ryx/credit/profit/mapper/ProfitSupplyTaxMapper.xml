@@ -314,5 +314,9 @@
     AND A.CLO_PAY_COMPANY != 'Q000029564';
   </select>
 
+  <delete id="deleteByMonth" parameterType="java.lang.String">
+    delete from PROFIT_SUPPLY_TAX
+    where PROFIT_MONTH = '${profitMonth}'
+  </delete>
 
 </mapper>

@@ -120,6 +120,8 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         computedAgentIds.clear();
 
         logger.info("======={}补税点计算开始======", profitMonth);
+        profitSupplyTaxMapper.deleteByMonth(profitMonth);
+
         logger.info("直签开票代理商无需补税点计算");
 
         logger.info("开始直签扣税代理商补税点计算 (只需计算税点小于6%且不开票的代理商)");
@@ -266,7 +268,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         profitSupplyTax.setSupplyTaxSubId(sub.getAgentId());
         profitSupplyTax.setSupplyTaxSubName(sub.getAgentName());
         profitSupplyTax.setSupplyTaxAmt(addTaxAmt);
-        profitSupplyTax.setSupplyTaxPlatform(parentProfitDetailMonth.getBusPlatForm());
+        profitSupplyTax.setSupplyTaxPlatform(parentProfitDetailMonth.getBusPlatform());
         profitSupplyTax.setCreateTime(DateUtils.dateToStringss(new Date()));
         profitSupplyTaxMapper.insertSelective(profitSupplyTax);
     }

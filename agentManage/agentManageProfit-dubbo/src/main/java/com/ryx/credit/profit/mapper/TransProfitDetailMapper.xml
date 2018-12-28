@@ -359,7 +359,7 @@
 
   <delete id="deleteBySourceIdAndMonth" parameterType="java.lang.String">
     delete from TRANS_PROFIT_DETAIL
-    where SOURCE_INFO = 'MPOS' and PROFIT_DATE = '${transDate}'
+    where SOURCE_INFO = '${sourceInfo}' and PROFIT_DATE = '${transDate}'
   </delete>
 
 </mapper>

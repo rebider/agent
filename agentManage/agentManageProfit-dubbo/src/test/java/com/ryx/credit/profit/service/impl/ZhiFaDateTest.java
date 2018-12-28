@@ -99,7 +99,7 @@ public class ZhiFaDateTest {
             ProfitDeduction where = new ProfitDeduction();
             where.setAgentId(json.getString("AGENTID"));
             where.setDeductionType("01");
-            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -2)).substring(0,7));
+            where.setDeductionDate(DateUtil.sdf_Days.format(DateUtil.addMonth(new Date() , -2)).substring(0,7).replace("-",""));
             BigDecimal buckle = profitDeductionService.totalBuckleByMonth(where);//退单扣款
             ProfitDirect profitDirect = new ProfitDirect();
             profitDirect.setId(idService.genId(TabId.P_PROFIT_DIRECT));

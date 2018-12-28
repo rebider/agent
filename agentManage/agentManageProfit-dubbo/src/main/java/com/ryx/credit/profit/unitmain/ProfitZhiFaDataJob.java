@@ -52,7 +52,10 @@ public class ProfitZhiFaDataJob {
     @Transactional
     public void excute(String transDate) {
         logger.info("==========={}月手刷直发分润数据同步开始===========", transDate);
+        index = 1;
         long t1 = System.currentTimeMillis();
+        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+        transDate = transDate == null ? month : transDate;
 
         profitDirectMapper.deleteByMonth(transDate);
         synchroProfitDirect(transDate);
@@ -70,8 +73,7 @@ public class ProfitZhiFaDataJob {
     public void synchroProfitDirect(String transDate) {
 
         HashMap<String, String> map = new HashMap<String, String>();
-        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        map.put("frmonth", transDate == null ? month : transDate);
+        map.put("frmonth", transDate);
         map.put("pageNumber", index++ + "");
         map.put("pageSize", "200");
         String params = JsonUtil.objectToJson(map);

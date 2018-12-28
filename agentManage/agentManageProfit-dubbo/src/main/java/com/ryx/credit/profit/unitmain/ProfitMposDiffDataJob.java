@@ -58,6 +58,7 @@ public class ProfitMposDiffDataJob {
     public void excute(String month) {
         month = month == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : month;
         long t1 = System.currentTimeMillis();
+        index = 1;
         logger.info("========={}月手刷补差数据同步开始==========", month);
 
         //删除现有数据

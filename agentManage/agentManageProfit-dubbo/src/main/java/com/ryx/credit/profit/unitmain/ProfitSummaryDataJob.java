@@ -8,7 +8,6 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
-import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.service.ProfitComputerService;
@@ -16,8 +15,6 @@ import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,8 +84,8 @@ public class ProfitSummaryDataJob {
                 isAdd = true;
             }
             detailMonth.setProfitDate(transDate);
-            BigDecimal transAmt = detailMonth.getTranAmt() == null ? BigDecimal.ZERO : detailMonth.getTranAmt();
-            detailMonth.setTranAmt(detail.getInTransAmt().add(transAmt));
+            //BigDecimal transAmt = detailMonth.getTranAmt() == null ? BigDecimal.ZERO : detailMonth.getTranAmt();
+            detailMonth.setMposTranAmt(detail.getInTransAmt());
             if (detail.getBusCode().equals("0001")) {//瑞银信
                 detailMonth.setRyxProfitAmt(detail.getProfitAmt());
             } else if (detail.getBusCode().equals("3000")) {//瑞刷活动
@@ -114,7 +111,8 @@ public class ProfitSummaryDataJob {
             }
 
             if (detail.getSupplyAmt() != null && detail.getSupplyAmt().compareTo(BigDecimal.ZERO) > 0) {
-                detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt() == null ? detail.getSupplyAmt() : detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
+                //detailMonth.setMposZqSupplyProfitAmt(detailMonth.getMposZqSupplyProfitAmt() == null ? detail.getSupplyAmt() : detailMonth.getMposZqSupplyProfitAmt().add(detail.getSupplyAmt()));//手刷补差
+                detailMonth.setMposZqSupplyProfitAmt(detail.getSupplyAmt());//手刷补差
             }
             //获取账户信息
             List<AgentColinfo> agentColinfos = agentColinfoService.queryAgentColinfoService(detail.getAgentId(), null, AgStatus.Approved.status);
@@ -124,7 +122,7 @@ public class ProfitSummaryDataJob {
                 detailMonth.setAccountName(agentColinfo.getCloRealname());
                 detailMonth.setOpenBankName(agentColinfo.getCloBank());
                 detailMonth.setBankCode(agentColinfo.getBranchLineNum());
-                detailMonth.setTax(agentColinfo.getCloTaxPoint());
+                detailMonth.setTax(String.valueOf(agentColinfo.getCloTaxPoint()));
                 detailMonth.setPayStatus(agentColinfo.getCloType().toString());
             }
 

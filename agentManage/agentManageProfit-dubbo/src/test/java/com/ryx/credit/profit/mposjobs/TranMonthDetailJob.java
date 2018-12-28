@@ -32,6 +32,6 @@ public class TranMonthDetailJob {
      */
     @Test
     public void testDeal() {
-        newProfitMonthMposDataJob.excute("201810");
+        newProfitMonthMposDataJob.excute("201811");
     }
 }

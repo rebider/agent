@@ -67,7 +67,7 @@ public class ProfitMonthTest {
      * @throws Exception
      */
     @Test
-    @Scheduled(cron = "0 0 * * * ?")
+    //@Scheduled(cron = "0 0 * * * ?")
     public void synchroProfitMonth(){
         String transDate = "201807";
 //        String transDate = null;

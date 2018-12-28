@@ -30,4 +30,6 @@ public interface TaxDeductionDetailMapper {
     List<TaxDeductionDetail> queryAndSubordinate(@Param("detail") TaxDeductionDetail taxDeductionDetail, @Param("page") Page page);
 
     long queryCountAndSubordinate(TaxDeductionDetail taxDeductionDetail);
+
+    void deleteByMonth(@Param("profitMonth") String profitMonth);
 }
