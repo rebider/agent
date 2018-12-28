@@ -678,9 +678,7 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name,
-    dict.d_itemname as pro_type,
-    oso.activity_name
+    c.platform_name
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_agent_businfo e on o.bus_id = e.id
@@ -688,9 +686,6 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id = b.ag_doc_district
     left join c_organization g on g.id = b.ag_doc_pro
-    left join o_sub_order os on os.order_id = o.id and os.status=1
-    left join o_sub_order_activity oso on oso.sub_order_id = os.id and oso.status=1
-    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname=os.pro_type
     <where>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
