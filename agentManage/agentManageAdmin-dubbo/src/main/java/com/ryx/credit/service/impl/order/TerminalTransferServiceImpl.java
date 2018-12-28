@@ -678,6 +678,9 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         if(StringUtils.isBlank(terminalTransfer.getId())){
             throw new MessageException("数据ID为空");
         }
+        if(StringUtils.isBlank(agentId)){
+            throw new MessageException("缺少代理商编号");
+        }
         Date date = new Date();
         terminalTransfer.setuTime(date);
         terminalTransfer.setuUser(cuser);
