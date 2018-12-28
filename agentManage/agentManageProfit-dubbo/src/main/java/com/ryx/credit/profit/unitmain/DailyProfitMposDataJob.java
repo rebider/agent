@@ -78,9 +78,9 @@ public class DailyProfitMposDataJob {
             map.put("pageSize", "50");
             String params = JsonUtil.objectToJson(map);
 
-            logger.info("日结数据同步请求参数：{}", params);
+            logger.debug("日结数据同步请求参数：{}", params);
             String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newday"), params);
-            logger.info("日结数据同步返回数据：{}", res);
+            logger.debug("日结数据同步返回数据：{}", res);
 
             JSONObject object = JSONObject.parseObject(res);
             if (!object.get("respCode").equals("000000")) {

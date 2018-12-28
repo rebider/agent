@@ -77,9 +77,9 @@ public class ProfitZhiFaDataJob {
         map.put("pageNumber", index++ + "");
         map.put("pageSize", "200");
         String params = JsonUtil.objectToJson(map);
-        logger.info("直发数据同步请求报文：{}", JSONObject.toJSONString(map));
+        logger.debug("直发数据同步请求报文：{}", JSONObject.toJSONString(map));
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.zhifa"), params);
-        logger.info("直发数据同步返回报文：{}", JSONObject.toJSONString(res));
+        logger.debug("直发数据同步返回报文：{}", JSONObject.toJSONString(res));
 
         JSONObject json = JSONObject.parseObject(res);
         if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
