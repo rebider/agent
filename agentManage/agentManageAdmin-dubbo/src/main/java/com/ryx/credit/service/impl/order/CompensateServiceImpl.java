@@ -836,7 +836,7 @@ public class CompensateServiceImpl implements CompensateService {
                 cav.setSnStart(detailstart.getSnNum()+(detailstart.getTerminalidCheck()==null?"":detailstart.getTerminalidCheck()));
                 cav.setSnEnd(detailend.getSnNum()+(detailend.getTerminalidCheck()==null?"":detailend.getTerminalidCheck()));
 
-                cav.setPlatformType(agentBusInfo.getBusPlatform());
+                cav.setPlatformType(platformType.code);
                 cav.setoRefundPriceDiffDetailId(row.getId());
                 cav.setLogisticsDetailList(oLogisticsDetails);
                 cav.setSnNum(oLogisticsDetails.size()+"");
