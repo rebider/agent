@@ -268,11 +268,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
      * @return
      */
     @Override
-    public int setAdjustAMT(InvoiceDetail invoiceDetail) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        invoiceDetail.setUpdateTime(sdf.format(new Date()));
-        invoiceDetail.setAdjustTime(sdf.format(new Date()));//设置调整时间
-        return invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
+    public void setAdjustAMT(InvoiceDetail invoiceDetail) {
+        ownInvoiceAdjust(invoiceDetail.getId(),new BigDecimal(invoiceDetail.getAdjustAmt().toString()),invoiceDetail.getAdjustAccount(),invoiceDetail.getAdjustReson());
     }
 
     /**
@@ -346,6 +343,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             invoiceMapper.setStatusToInvoice(invoice);
         }
         invoiceMapper.insertSelective(invoice);
+        //欠票导入后进行计算
+        ownInvoiceReComputer(invoice);
     }
 
     /**
