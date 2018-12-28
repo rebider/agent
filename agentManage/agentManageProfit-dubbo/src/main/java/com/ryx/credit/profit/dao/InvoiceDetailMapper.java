@@ -34,4 +34,5 @@ public interface InvoiceDetailMapper {
 
     String getAgentIdbyAgentName(String agentId);
 
+    void deleteByMonth(String profitMonth);
 }
