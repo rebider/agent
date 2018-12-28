@@ -98,7 +98,6 @@ public class HttpClientUtil {
 		}
 		return resultString;
 	}
-
 	public static String doPost(String url) {
 		return doPost(url, null);
 	}
@@ -126,7 +125,6 @@ public class HttpClientUtil {
 				e.printStackTrace();
 			}
 		}
-
 		return resultString;
 	}
 
@@ -154,7 +152,6 @@ public class HttpClientUtil {
 				e.printStackTrace();
 			}
 		}
-
 		return resultString;
 	}
 }
