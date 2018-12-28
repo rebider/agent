@@ -485,7 +485,7 @@
           nvl(f.NOT_DEDUCTION_TAX_AMT,0) PRE_NOT_DEDUCTION_TAX_AMT,
           nvl(h.PAY_AMOUNT,0) MACHIN_AMT,
           A.PARENT_AGENT_ID,g.AG_NAME PARENT_AGENT_NAME,
-          a.TAX
+          nvl(a.TAX,'0') TAX
     from P_PROFIT_DETAIL_M a
 
     <!--保理-->
@@ -519,6 +519,14 @@
                 group by AGENT_ID,BUS_PARENT_AGENT_ID) h on a.AGENT_ID=h.AGENT_ID and a.PARENT_AGENT_ID=h.PARENT_AGENT_ID
 
     left join A_AGENT g on a.PARENT_AGENT_ID = g.ID
+
+    where a.PROFIT_DATE = '${profitMonth}'
   </select>
+
+
+  <delete id="deleteByMonth" parameterType="java.lang.String">
+    delete from P_TAX_DEDUCTION_DETAIL
+    where PROFIT_MONTH = '${profitMonth}'
+  </delete>
 
 </mapper>

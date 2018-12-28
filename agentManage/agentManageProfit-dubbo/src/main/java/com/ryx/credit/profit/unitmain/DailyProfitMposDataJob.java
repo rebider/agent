@@ -48,6 +48,7 @@ public class DailyProfitMposDataJob {
     public void excute(String frDate) {
         frDate = frDate == null ? DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2)) : frDate;
         logger.info("======={}日结分润数据同步开始=======", frDate);
+        index = 1;
         long t1 = System.currentTimeMillis();
 
         //删除现有数据
@@ -84,7 +85,7 @@ public class DailyProfitMposDataJob {
             JSONObject object = JSONObject.parseObject(res);
             if (!object.get("respCode").equals("000000")) {
                 logger.error("请求同步失败！");
-                AppConfig.sendEmails("日分润同步失败！respCode="+object.get("respCode")+",respMsg="+object.get("respMsg"), "日分润同步失败！");
+                AppConfig.sendEmails("日分润同步失败！respCode=" + object.get("respCode") + ",respMsg=" + object.get("respMsg"), "日分润同步失败！");
                 throw new RuntimeException("日结数据同步失败！");
             }
 
@@ -130,11 +131,14 @@ public class DailyProfitMposDataJob {
                 profitD.setAgentPid(busime.getAgZbh());
                 profitD.setBusNum(busime.getBusNum());
 
-                AgentBusInfo parent = businfoService.getById(busime.getBusParent());
-                if (parent != null) {
-                    profitD.setParentAgentId(parent.getAgentId());
-                    profitD.setParentBusNum(parent.getBusNum());
+                if (busime.getBusParent() != null) {
+                    AgentBusInfo parent = businfoService.getById(busime.getBusParent());
+                    if (parent != null) {
+                        profitD.setParentAgentId(parent.getAgentId());
+                        profitD.setParentBusNum(parent.getBusNum());
+                    }
                 }
+
             }
 
             profitDService.insertSelective(profitD);

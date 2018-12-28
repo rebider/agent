@@ -556,10 +556,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             boolean isJieYin = false;//是否所属捷步、银点
             boolean isRYX = false;//是否瑞银信打款
             List<PAgentPidLink> links = pidLinkMapper.selectListByPid(detailMonth.getAgentPid());//获取代理商所有业务平台编码
-            if(null!=detailMonth.getAgentId() && null!=detailMonth.getBusPlatForm()){
+            if(null!=detailMonth.getAgentId() && null!=detailMonth.getBusPlatform()){
                 PAgentPidLink pos = new PAgentPidLink();
                 pos.setAgentId(detailMonth.getAgentId());
-                pos.setDeptCode(detailMonth.getBusPlatForm());
+                pos.setDeptCode(detailMonth.getBusPlatform());
                 links.add(pos);
             }
             AgentBusInfo me = new AgentBusInfo();//本代理商业务信息
@@ -600,7 +600,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 }
             }
             ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt()==null?BigDecimal.ZERO:detailMonth.getRealProfitAmt()
-                    ,detailMonth.getAgentPid(),isDecimalNull(subAmt),detailMonth.getTax(),profitDate,isJieYin,isRYX);
+                    ,detailMonth.getAgentPid(),isDecimalNull(subAmt),new BigDecimal(detailMonth.getTax()),profitDate,isJieYin,isRYX);
             updateDetail.setId(detailMonth.getId());
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
@@ -850,7 +850,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
             BigDecimal deductionTax = profitDetail.getDeductionTaxMonthAmt();//本月税额
             BigDecimal realAmt = profitDetail.getRealProfitAmt()==null?BigDecimal.ZERO:profitDetail.getRealProfitAmt();//实际分润
-            BigDecimal tax = profitDetail.getTax()==null?new BigDecimal("0.06"):profitDetail.getTax();//税点(0.06)
+            BigDecimal tax = profitDetail.getTax()==null?new BigDecimal("0.06"):new BigDecimal(profitDetail.getTax());//税点(0.06)
             BigDecimal smalTax = profitDetail.getSmalTaxAmt()==null?BigDecimal.ZERO:profitDetail.getSmalTaxAmt();;//已抵税金额
 
             List<OPayment> paymentList = new ArrayList<>();

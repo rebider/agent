@@ -1,35 +1,27 @@
-package com.ryx.credit.profit.jobs;/**
- * @Auther: zhaodw
- * @Date: 2018/7/30 14:59
- * @Description:
- */
+package com.ryx.credit.profit.jobs;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 分润数据同步任务测试
+ *
  * @author zhaodw
- * @create 2018/7/30
+ * @create 2018/8/8
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class ProfitDataJobTest {
-
-    private Logger logger = LoggerFactory.getLogger(ProfitDataJobTest.class);
+public class PosSumJobTest {
 
     @Autowired
-    private NewProfitDataJob profitDataJob;
+    private NewProfitDataJob newProfitDataJob;
 
     @Test
-    public void testDeal() {
-        profitDataJob.deal("201811");
+    public void testSum() {
+        newProfitDataJob.doSum("201811");
     }
 }

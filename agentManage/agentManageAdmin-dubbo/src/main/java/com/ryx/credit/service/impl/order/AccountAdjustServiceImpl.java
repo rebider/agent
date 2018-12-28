@@ -8,8 +8,10 @@ import com.ryx.credit.common.util.MapUtil;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.dao.agent.DataHistoryMapper;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.DataHistory;
 import com.ryx.credit.pojo.admin.order.*;
+import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IAccountAdjustService;
 import com.ryx.credit.service.order.IOrderReturnService;
@@ -56,6 +58,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
     IOrderReturnService orderReturnService;
     @Autowired
     private ORefundPriceDiffMapper refundPriceDiffMapper;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
 
     public Map<String, Object> createTkeRecord(OPayment payment, BigDecimal thisPaymentOutstandingAmt) {
@@ -290,14 +294,15 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             result.put("takeoutList", takeoutList);
             // 如果最终金额还有剩余，走线下退款
             ORefundAgent refundAgent = new ORefundAgent();
-//            if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
-                refundAgent.setRefundType(adjustType);
-                refundAgent.setSrcId(srcId);
-                refundAgent.setRefundAmount(leftAmt);
-                refundAgent.setAgentId(agentId);
-                refundAgent.setcUser(userid);
-                result.put("refund", refundAgent);
-//            }
+
+            //if (leftAmt.compareTo(BigDecimal.ZERO) > 0) {
+            refundAgent.setRefundType(adjustType);
+            refundAgent.setSrcId(srcId);
+            refundAgent.setRefundAmount(leftAmt);
+            refundAgent.setAgentId(agentId);
+            refundAgent.setcUser(userid);
+            result.put("refund", refundAgent);
+            //}
             if (isRealAdjust) {
                 //生成调账记录
                 OAccountAdjust oAccountAdjust = new OAccountAdjust();
@@ -334,6 +339,25 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     }
                 }
 
+                //收款账户信息填充
+                AgentColinfo agentColinfo = agentQueryService.queryUserColinfo(agentId);
+                if(agentColinfo!=null){
+                    refundAgent.setAllLineNum(agentColinfo.getAllLineNum());
+                    refundAgent.setBranchLineNum(agentColinfo.getBranchLineNum());
+                    refundAgent.setCloBank(agentColinfo.getCloBank());
+                    refundAgent.setCloBankAccount(agentColinfo.getCloBankAccount());
+                    refundAgent.setCloRealname(agentColinfo.getCloRealname());
+                    refundAgent.setCloType(agentColinfo.getCloType());
+                    refundAgent.setCloBankBranch(agentColinfo.getCloBankBranch());
+                    refundAgent.setBankRegion(agentColinfo.getBankRegion());
+                    refundAgent.setCloTaxPoint(agentColinfo.getCloTaxPoint());
+                    refundAgent.setCloInvoice(agentColinfo.getCloInvoice());
+                }else{
+                    if(leftAmt.compareTo(BigDecimal.ZERO)>0) {
+                        throw new MessageException("用户收款账户信息不完整,代理商编号{}", agentId);
+                    }
+                }
+
                 refundAgent.setId(idService.genId(TabId.o_refund_agent));
                 refundAgent.setAdjustId(oAccountAdjust.getId());
                 if(1!=refundAgentMapper.insertSelective(refundAgent)){
@@ -364,9 +388,12 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                 }
             }
 
-        } catch (ProcessException e) {
+        }  catch (MessageException e) {
             log.error("调账计算出现错误,{}", e.getMessage(), e);
-            throw new ProcessException("调账计算出现错误," + e.getMessage());
+            throw new ProcessException("调账计算出现错误," + e.getMsg());
+        } catch (ProcessException e) {
+            log.error("调账计算出现错误,{}", e.getLocalizedMessage(), e);
+            throw new ProcessException("调账计算出现错误," + e.getLocalizedMessage());
         } catch (Exception e) {
             log.error("调账计算出现错误", e);
             throw new ProcessException("调账计算出现错误");

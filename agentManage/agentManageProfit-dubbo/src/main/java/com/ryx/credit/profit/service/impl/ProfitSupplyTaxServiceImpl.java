@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service("profitSupplyTaxService")
@@ -45,11 +47,11 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
     @Override
     public PageInfo getProfitSupplyTaxList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = 0L;
-       List<Map<String, Object>> listAll;
+        List<Map<String, Object>> listAll;
 
-        if ("1".equals(param.get("chekbox"))){
-                count = profitSupplyTaxMapper.getProfitSupplyTaxCount(param);
-                listAll = profitSupplyTaxMapper.getClassificationList(param);
+        if ("1".equals(param.get("chekbox"))) {
+            count = profitSupplyTaxMapper.getProfitSupplyTaxCount(param);
+            listAll = profitSupplyTaxMapper.getClassificationList(param);
             /*if ("".equals(param.get("SUPPLY_TAX_AGENT_NAME"))&&("".equals(param.get("SUPPLY_TAX_AGENT_ID")))){
                 param.put("SUPPLY_TAX_TYPE", BusType.JG.key);
                 List<Map<String, Object>> list1 = profitSupplyTaxMapper.getProfitSupplyTaxList(param);
@@ -95,7 +97,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
              }else{
                  throw new ProcessException("没有此代理商！");
              }*/
-        }else{
+        } else {
             count = profitSupplyTaxMapper.getProfitSupplyTaxCount(param);
             listAll = profitSupplyTaxMapper.getProfitSupplyTaxList(param);
         }
@@ -104,7 +106,6 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         System.out.println("查询============================================" + JSONObject.toJSON(listAll));
         return pageInfo;
     }
-
 
 
     /**
@@ -116,10 +117,12 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
     @Transactional
     public void taxSupplyComputer(Map<String, Object> params) {
 
-        String profitMonth = (String) params.get("profitMonth");
+        String profitMonth = params.get("profitMonth") == null ? new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -1)) : (String) params.get("profitMonth");
         computedAgentIds.clear();
 
         logger.info("======={}补税点计算开始======", profitMonth);
+        profitSupplyTaxMapper.deleteByMonth(profitMonth);
+
         logger.info("直签开票代理商无需补税点计算");
 
         logger.info("开始直签扣税代理商补税点计算 (只需计算税点小于6%且不开票的代理商)");
@@ -156,7 +159,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         dirct.setFristAgentPid(parentAgentId);
         dirct.setTransMonth(profitMonth);
         BigDecimal shouldProfitAmt = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总
-        if (shouldProfitAmt.compareTo(BigDecimal.ZERO) <= 0) {
+        if (shouldProfitAmt==null || shouldProfitAmt.compareTo(BigDecimal.ZERO) <= 0) {
             return;
         }
 
@@ -187,7 +190,6 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
             //记录补税点明细
             insertProfitSupplyTax(pdm, addTaxAmt, pdm);
         }
-
 
 
     }
@@ -231,7 +233,8 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
                 params.put("profitDate", profitMonth);
                 params.put("parentTax", parentProfitDetailMonth.getTax());
                 BigDecimal addTaxAmt = profitDetailMonthMapper.getSubAgentTaxBaseTotal(params);
-                sub.setSupplyTaxAmt(sub.getSupplyTaxAmt().add(addTaxAmt));
+                BigDecimal tmp = sub.getSupplyTaxAmt() == null ? BigDecimal.ZERO : sub.getSupplyTaxAmt();
+                sub.setSupplyTaxAmt(tmp.add(addTaxAmt));
                 profitDetailMonthMapper.updateByPrimaryKeySelective(sub);
                 logger.info("{}给上级{}补税点金额：{}", subAgentId, parentAgentId, addTaxAmt);
 
@@ -266,7 +269,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         profitSupplyTax.setSupplyTaxSubId(sub.getAgentId());
         profitSupplyTax.setSupplyTaxSubName(sub.getAgentName());
         profitSupplyTax.setSupplyTaxAmt(addTaxAmt);
-        profitSupplyTax.setSupplyTaxPlatform(parentProfitDetailMonth.getBusPlatForm());
+        profitSupplyTax.setSupplyTaxPlatform(parentProfitDetailMonth.getBusPlatform());
         profitSupplyTax.setCreateTime(DateUtils.dateToStringss(new Date()));
         profitSupplyTaxMapper.insertSelective(profitSupplyTax);
     }

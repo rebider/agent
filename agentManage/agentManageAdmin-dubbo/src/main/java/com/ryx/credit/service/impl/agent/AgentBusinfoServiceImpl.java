@@ -556,7 +556,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 
 
 	/**
-	 * 业务编码不为空
+	 * 查询所有下级
 	 * @param list
 	 * @param platformCode
 	 * @param busNum

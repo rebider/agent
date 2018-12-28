@@ -295,7 +295,7 @@
     select distinct A.AGENT_ID from A_AGENT_BUSINFO A
     WHERE A.BUS_PLATFORM &lt;&gt; '6000'
     AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
-    AND A.CLO_PAY_COMPANY &lt;&gt; 'Q000029564';
+    AND A.CLO_PAY_COMPANY &lt;&gt; 'Q000029564'
   </select>
 
   <!--查询直发开票一代 -->
@@ -303,7 +303,7 @@
     select distinct A.AGENT_ID from A_AGENT_BUSINFO A
     WHERE A.BUS_PLATFORM = '6000'
     AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
-    AND A.CLO_PAY_COMPANY = 'Q000029564';
+    AND A.CLO_PAY_COMPANY = 'Q000029564'
   </select>
 
   <!--查询直发扣税一代 -->
@@ -311,8 +311,12 @@
     select distinct A.AGENT_ID from A_AGENT_BUSINFO A
     WHERE A.BUS_PLATFORM = '6000'
     AND (A.BUS_TYPE='2' OR A.BUS_TYPE = '6')
-    AND A.CLO_PAY_COMPANY != 'Q000029564';
+    AND A.CLO_PAY_COMPANY != 'Q000029564'
   </select>
 
+  <delete id="deleteByMonth" parameterType="java.lang.String">
+    delete from PROFIT_SUPPLY_TAX
+    where SUPPLY_TAX_DATE = '${profitMonth}'
+  </delete>
 
 </mapper>

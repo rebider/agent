@@ -29,7 +29,6 @@ public class ProfitDServiceImpl implements IProfitDService {
     private ProfitDayMapper profitDMapper;
 
 
-
     /**
      * 处理分页用到的信息
      *
@@ -91,19 +90,19 @@ public class ProfitDServiceImpl implements IProfitDService {
         ProfitDayExample example = new ProfitDayExample();
         example.setPage(page);
         ProfitDayExample.Criteria criteria = example.createCriteria();
-        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentName())){
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentName())) {
             criteria.andAgentNameEqualTo(record.getAgentName());
         }
-        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentId())){
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentId())) {
             criteria.andAgentIdEqualTo(record.getAgentId());
         }
-        if(com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getTransDate())){
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getTransDate())) {
             criteria.andTransDateEqualTo(record.getTransDate());
         }
         List<ProfitDay> profitD = profitDMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);
-        pageInfo.setTotal(profitDMapper.countByExample(example));
+        pageInfo.setTotal(Integer.parseInt(profitDMapper.countByExample(example) + ""));
         return pageInfo;
     }
 

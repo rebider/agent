@@ -8,6 +8,8 @@ import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.TaxDeductionDetail;
 import com.ryx.credit.profit.service.ITaxDeductionService;
 import com.ryx.credit.service.dict.IdService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ import java.util.Map;
  */
 @Service("taxDeductionService")
 public class TaxDeductionServiceImpl implements ITaxDeductionService {
+
+    Logger logger = LoggerFactory.getLogger(TaxDeductionServiceImpl.class);
 
     @Autowired
     TaxDeductionDetailMapper taxDeductionDetailMapper;
@@ -45,12 +49,17 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         params.put("profitMonth", profitMonth);
         params.put("preMonth", new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -2)));
 
+        logger.info("=========={}月扣税计算开始=========",profitMonth);
+        logger.info("清除数据");
+        taxDeductionDetailMapper.deleteByMonth(profitMonth);
+
         List<Map<String, Object>> agentList = taxDeductionDetailMapper.queryTaxDeductionAgentList(params);
         if (agentList == null) {
-            throw new RuntimeException("查询扣税基数数据失败");
+            throw new RuntimeException("查询扣税代理商失败");
         }
 
         agentList.parallelStream().forEach(map -> {
+            logger.info("计算扣税,{}",(String) map.get("AGENT_ID"));
             String agentId = (String) map.get("AGENT_ID");
             String agentName = (String) map.get("AGENT_NAME");
             String parentAgentId = (String) map.get("PARENT_AGENT_ID");
@@ -62,8 +71,8 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
             BigDecimal dzAmt = (BigDecimal) map.get("DZ_AMT");  //代代理商垫付款项
             BigDecimal adjustAmt = (BigDecimal) map.get("ADJUST_AMT");//调整金额
             BigDecimal preTaxBase = (BigDecimal) map.get("PRE_TAX_BASE");   //上月留底基数
-            BigDecimal preNotDeductionTaxAmt = (BigDecimal) map.get("PRE_NOT_DEDUCTION_TAX_AMT");   //上月未扣
-            BigDecimal tax = (BigDecimal) map.get("TAX");   //税率
+            BigDecimal preNotDeductionTaxAmt = (BigDecimal)map.get("PRE_NOT_DEDUCTION_TAX_AMT");   //上月未扣
+            BigDecimal tax = new BigDecimal((String) map.get("TAX"));   //税率
             BigDecimal machinAmt = (BigDecimal) map.get("MACHIN_AMT");  //机具实收货款
 
             //扣税明细
@@ -125,7 +134,7 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         param.setProfitDate(tdd.getProfitMonth());
         param.setAgentId(tdd.getAgentId());
         param.setParentAgentId(tdd.getParentAgentId());
-        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByPIdAndMonth(param);
+        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByIdAndParent(param);
 
         //涉税前月分润
         BigDecimal basickProfitAmt = profitDetailMonth.getBasicsProfitAmt();

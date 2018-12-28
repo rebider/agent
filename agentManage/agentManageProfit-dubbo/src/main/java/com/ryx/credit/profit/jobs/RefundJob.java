@@ -181,7 +181,7 @@ public class RefundJob {
         if (result.containsKey("info") ) {
             JSONArray array = result.getJSONArray("info");
             // 获取现有未扣完数据
-            String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+            String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
             Map<String, Object> query = new HashMap<>();
             query.put("deductionDate", deductionDate);
             query.put("bussType", ((String)param.get("bussType")).equals("02")?"POS":"MPOS");
@@ -222,7 +222,7 @@ public class RefundJob {
     * @Date: 2018/7/30
     */
     private void insertProfitDeduction(String instId, BigDecimal addAmt, Map<String, String> deductionIdMap, String bussType) {
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7);
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0,7).replace("-","");
         Map<String,Object> agentMap = getAgentId(instId);
         ProfitDeduction deduction = new ProfitDeduction();
         deduction.setDeductionType(DeductionType.SETTLE_ERR.getType());

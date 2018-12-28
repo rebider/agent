@@ -50,16 +50,17 @@ public class TranDataJob {
     @Autowired
     private IdService idService;
 
-    @Scheduled(cron = "0 0 12 10 * ?")
+    //@Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+settleMonth);
-        LOG.info("获取分润数据");
+        LOG.info("===获取交易量数据开始====");
         try {
             AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
             if (agentResult != null && agentResult.getData() != null) {
                 JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
                 if (json != null) {
+                    LOG.info(JSONObject.toJSONString(json));
                     BigDecimal tranAmt = BigDecimal.ZERO;
                     BigDecimal zyssAmt = BigDecimal.ZERO;
                     BigDecimal posAmt = BigDecimal.ZERO;
@@ -87,6 +88,7 @@ public class TranDataJob {
             LOG.error("分润数据处理失败");
             throw new RuntimeException("分润数据处理失败");
         }
+        LOG.info("===获取交易量数据结束====");
     }
 
 
@@ -121,7 +123,7 @@ public class TranDataJob {
         profitOrganTranMonth.setId(idService.genId(TabId.P_ORGAN_TRAN_MONTH));
         profitOrganTranMonth.setProductType("02");
         profitOrganTranMonth.setProductName("MPOS");
-        profitOrganTranMonth.setTranAmt(tranAmt.add(json.getBigDecimal("QR_SS_TOTAL_AMT")));
+        profitOrganTranMonth.setTranAmt(tranAmt.add(new BigDecimal(json.getString("QR_SS_TOTAL_AMT"))));
         try {
             BigDecimal settleAmt = profitComputerService.synchroSSTotalTransAmt(null);
             profitOrganTranMonth.setSettleAmt(settleAmt);
@@ -187,11 +189,12 @@ public class TranDataJob {
      * @Date: 2018/8/2
      */
     private JSONObject getTranData(String settleMonth) {
-        LOG.info("获取POS交易数据");
+        LOG.info("从清算获取POS交易数据:");
         JSONObject json = new JSONObject();
         json.put("tranType","22");
         json.put("tranMon",   settleMonth);
         String result = HttpClientUtil.doPostJson(URL, json.toJSONString());
+        LOG.info(result);
         if (StringUtils.isNotBlank(result)) {
             return  JSONObject.parseObject(result);
         }

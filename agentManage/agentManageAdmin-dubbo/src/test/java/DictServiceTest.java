@@ -1,13 +1,16 @@
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotations.TableId;
+import com.ryx.credit.common.enumc.OrgType;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.order.CashSummaryMouthMapper;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.DateChangeRequest;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.CashSummaryMouth;
+import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentQueryService;
 import com.ryx.credit.service.agent.AimportService;
@@ -21,7 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -116,7 +121,7 @@ public class DictServiceTest extends BaseSpringTest {
     @Test
     public void testSelectCashSummaryMouthData(){
 
-      List<CashSummaryMouth> res =  cashSummaryMouthMapper.selectCashSummaryMouthData("2018-11","0");
+      List<CashSummaryMouth> res =  cashSummaryMouthMapper.selectCashSummaryMouthData("201811","0");
         for (CashSummaryMouth re : res) {
             if(null==cashSummaryMouthMapper.selectByPrimaryKey(re)){
                 cashSummaryMouthMapper.insertSelective(re);
@@ -124,6 +129,10 @@ public class DictServiceTest extends BaseSpringTest {
         }
       logger.info("======="+JSONObject.toJSONString(res));
 
+    }
+
+    @Test
+    public void notifyBean() {
     }
 
 }

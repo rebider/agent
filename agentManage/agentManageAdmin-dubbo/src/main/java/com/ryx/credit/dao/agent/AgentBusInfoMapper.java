@@ -68,4 +68,7 @@ public interface AgentBusInfoMapper {
 
     /**根据代理商信息查询业务类型*/
     List<AgentBusInfo> selectByAgenId(String agentId);
+
+    /*业务信息上级查询*/
+    Map<String,Object> queryBusInfoParent(Map<String,Object> reqMap);
 }

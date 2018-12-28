@@ -26,6 +26,8 @@ public interface ActivityService {
 
     Map completeTask(String taskId, Map<String, Object> map)throws ProcessException;
 
+    Map completeTaskInNer(String taskId, Map<String, Object> map)throws ProcessException;
+
     List<ProcessDefinition> findProcessDefinition();
 
     void delProcessDefinition(String deploymentId);

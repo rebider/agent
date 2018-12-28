@@ -41,5 +41,5 @@ public interface TransProfitDetailMapper {
 
     BigDecimal selectAmtBySummary(String profitDate);
 
-    void deleteBySourceIdAndMonth(@Param("sourceId") String sourceId, @Param("transDate") String transDate);
+    void deleteBySourceIdAndMonth(@Param("sourceInfo") String sourceInfo, @Param("transDate") String transDate);
 }

@@ -601,6 +601,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setBeginSn((String) map.get("startSn"));
                 returnOrderDetail.setEndSn((String) map.get("endSn"));
                 returnOrderDetail.setOrderPrice(MapUtil.getBigDecimal(map, "proPrice"));
+                returnOrderDetail.setReturnPrice(MapUtil.getBigDecimal(map, "proPrice"));
                 returnOrderDetail.setReturnCount(MapUtil.getBigDecimal(map, "count"));
                 returnOrderDetail.setReturnAmt(MapUtil.getBigDecimal(map, "totalPrice"));
                 returnOrderDetail.setReturnTime(new Date());
@@ -1498,7 +1499,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
                         imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
                         OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
-                        log.info("退货上传物流下发到首刷系统:{}:{}:{}",user,logistics.getId(),snList.toString());
+                        log.info("退货上传物流下发到POS系统:{}:{}:{}",user,logistics.getId(),snList.toString());
                         try {
                             AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
                             if(ar.isOK()){
@@ -1514,7 +1515,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             e.printStackTrace();
                             log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
                             logistics.setSendStatus(Status.STATUS_2.status);
-                            logistics.setSendMsg("机具退货调整POS接口调用异常");
+                            logistics.setSendMsg(e.getMsg());
+                            oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                            log.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
+                            logistics.setSendStatus(Status.STATUS_2.status);
+                            logistics.setSendMsg(e.getLocalizedMessage());
                             oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                         }
                         //===============================================================================
@@ -1610,7 +1617,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 logistics.setSendStatus(Status.STATUS_2.status);
-                                logistics.setSendMsg("退货物流业务系统联动调整异常");
+                                logistics.setSendMsg(e.getLocalizedMessage());
                                 if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
                                     log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
                                 }

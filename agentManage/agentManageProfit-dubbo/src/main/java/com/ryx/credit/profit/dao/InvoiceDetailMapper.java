@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.InvoiceDetail;
 import com.ryx.credit.profit.pojo.InvoiceDetailExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 import java.util.Map;
 
@@ -32,4 +34,5 @@ public interface InvoiceDetailMapper {
 
     String getAgentIdbyAgentName(String agentId);
 
+    void deleteByMonth(String profitMonth);
 }

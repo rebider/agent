@@ -27,6 +27,6 @@ public class DailyProfitDataJobTest {
 
     @Test
     public void testDeal() {
-        dailyProfitMposDataJob.excute("20181013");
+        dailyProfitMposDataJob.excute("20181101");
     }
 }

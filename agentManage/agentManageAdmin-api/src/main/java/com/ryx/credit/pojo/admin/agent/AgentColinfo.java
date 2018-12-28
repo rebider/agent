@@ -12,13 +12,13 @@ public class AgentColinfo implements Serializable {
 
     private BigDecimal cloType;
 
-    private String cloRealname;
+    private String cloRealname;//收款账户名
 
-    private String cloBank;
+    private String cloBank;//收款银行
 
-    private String cloBankBranch;
+    private String cloBankBranch;//收款银行支行
 
-    private String cloBankAccount;
+    private String cloBankAccount;//账户号
 
     private Date cTime;
 
@@ -34,9 +34,9 @@ public class AgentColinfo implements Serializable {
 
     private BigDecimal varsion;
 
-    private String branchLineNum;
+    private String branchLineNum;//收款银行支行联号
 
-    private String allLineNum;
+    private String allLineNum;//收款银行联号
 
     private String bankRegion;
 
@@ -44,15 +44,15 @@ public class AgentColinfo implements Serializable {
 
     private BigDecimal cloInvoice;
 
-    private String cloBankCode;
+    private String cloBankCode;//开户行行号
 
     private BigDecimal payStatus;
 
     private List<Attachment> attachmentList;
 
-    private String accountId;
+    private String accountId;//打款公司代码
 
-    private String accountName;
+    private String accountName; //打款公司名称
 
     private boolean isImport = false;
 

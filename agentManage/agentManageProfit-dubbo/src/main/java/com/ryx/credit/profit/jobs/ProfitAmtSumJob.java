@@ -1,24 +1,11 @@
 package com.ryx.credit.profit.jobs;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.redis.RedisService;
-import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.pojo.admin.agent.Agent;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.profit.dao.ProfitSupplyMapper;
-import com.ryx.credit.profit.pojo.OrganTranMonthDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitMonth;
 import com.ryx.credit.profit.pojo.ProfitSupply;
-import com.ryx.credit.profit.service.OrganTranMonthDetailService;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
 import com.ryx.credit.profit.service.ProfitMonthService;
-import com.ryx.credit.service.agent.BusinessPlatformService;
-import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.profit.IPosProfitDataService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,7 +16,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhaodw
@@ -57,7 +43,7 @@ public class ProfitAmtSumJob {
     @Autowired
     private ProfitSupplyMapper profitSupplyMapper;
 
-    @Scheduled(cron = "0 0 12 10 * ?")
+    //@Scheduled(cron = "0 0 12 10 * ?")
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0,6);
         LOG.info("分润月份"+settleMonth);
