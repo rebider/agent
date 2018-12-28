@@ -134,7 +134,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     }
                 }
             }
+            Set<String> resultSet = new HashSet<>();
             for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                PlatForm platForm = platFormMapper.selectByPlatFormNum(item.getBusPlatform());
+                resultSet.add(platForm.getPlatformType());
                 item.setcUser(agent.getcUser());
                 item.setAgentId(agent.getId());
                 item.setCloReviewStatus(AgStatus.Create.status);
@@ -155,9 +158,10 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                         throw new ProcessException("业务分管协议添加失败");
                     }
                 }
-
             }
-
+            if(resultSet.size()>1){
+                throw new ProcessException("不能同时提交pos和手刷平台");
+            }
             return ResultVO.success(agentVo);
         } catch (Exception e) {
             e.printStackTrace();
@@ -214,19 +218,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
 
             //获取代理商有效的业务
             List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId());
-            Set<String> resultSet = new HashSet<>();
             for (AgentBusInfo agentBusInfo : aginfo) {
                 agentBusInfo.setcUtime(Calendar.getInstance().getTime());
                 agentBusInfo.setCloReviewStatus(AgStatus.Approving.status);
-                PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-                resultSet.add(platForm.getPlatformType());
                 if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                     logger.info("代理商审批，更新业务本信息失败{}:{}", agentId, cuser);
                     throw new ProcessException("启动审批异常，更新业务本信息失败");
                 }
-            }
-            if(resultSet.size()>1){
-                throw new ProcessException("不能同时提交pos和手刷平台");
             }
             //代理商有效新建的合同
             List<AgentContract> ag = agentContractService.queryAgentContract(agentId, null, AgStatus.Create.status);
