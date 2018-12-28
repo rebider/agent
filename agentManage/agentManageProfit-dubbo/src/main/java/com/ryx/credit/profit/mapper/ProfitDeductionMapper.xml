@@ -412,7 +412,7 @@
     and DEDUCTION_STATUS ='0'
   </select>
   <delete id="deleteById">
-    delete  P_DEDUCTION where id = #{id}
+    delete from P_DEDUCTION where id = #{id}
   </delete>
 
   <select id="getNotDeductDetail" resultType="java.util.Map">
@@ -436,6 +436,6 @@
 
   <delete id="resetDataDeduction">
     delete from P_DEDUCTION
-    where DEDUCTION_TYPE = '03' and DEDUCTION_DATE = to_char(sysdate-30 ,'yyyy-MM')
+    where DEDUCTION_TYPE = #{type} and DEDUCTION_DATE = to_char(sysdate-30 ,'yyyyMM')
   </delete>
 </mapper>
