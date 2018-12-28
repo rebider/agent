@@ -7,6 +7,13 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.profit.dao.InvoiceDetailMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.profit.dao.InvoiceMapper;
+import com.ryx.credit.profit.pojo.Invoice;
+import com.ryx.credit.profit.pojo.InvoiceDetail;
+import com.ryx.credit.profit.pojo.InvoiceDetailExample;
 import com.ryx.credit.profit.service.IOwnInvoiceService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -16,6 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import java.util.*;
 
 /**
@@ -34,6 +45,9 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     private IdService idService;
     @Autowired
     ProfitDetailMonthMapper profitDetailMonthMapper;
+
+    @Autowired
+    protected InvoiceMapper invoiceMapper;
 
     /**
      * @Author: Zhang Lei
@@ -175,5 +189,174 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         invoiceDetail.setCreateTime(DateUtils.dateToStringss(new Date()));
         invoiceDetailMapper.insertSelective(invoiceDetail);
     }
+
+    /**
+     * @Author CQT
+     * @Description获取发票信息列表
+     * @param page
+     * @return
+     */
+    @Override
+    public PageInfo getInvoiceDetailList(Page page, String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
+        InvoiceDetailExample example = new InvoiceDetailExample();
+        example.setPage(page);
+        InvoiceDetailExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
+        }
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthEqualTo(dateEnd);
+        }
+        if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
+            lists.add(agentId);
+            criteria.andAgentIdIn(lists);
+        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
+            String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
+            lists.add(agentIde);
+            criteria.andAgentIdIn(lists);
+        }else if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }
+        List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
+        Long count =invoiceDetailMapper.countByExample(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(lists);
+        pageInfo.setTotal(count.intValue());
+        return pageInfo;
+    }
+
+    /**
+     * @Author CQT
+     * 向欠票导入表中导入数据
+     * @param datas
+     * @param loginName
+     */
+    @Override
+    public void exportData(List<List<Object>> datas,String loginName) {
+        if(datas != null && datas.size() > 0 ) {
+            datas.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list->{
+                insertInvoice(list,loginName);
+            });
+        }
+    }
+
+    /**
+     * @Author CQT
+     * 根据id获取对应代理商数据信息
+     * @param id
+     * @return
+     */
+    @Override
+    public InvoiceDetail getInvoiceById(String id) {
+        return invoiceDetailMapper.selectByPrimaryKey(id);
+    }
+
+    /**
+     * @Author CQT
+     * 设置调整金额
+     * @param invoiceDetail
+     * @return
+     */
+    @Override
+    public int setAdjustAMT(InvoiceDetail invoiceDetail) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        invoiceDetail.setUpdateTime(sdf.format(new Date()));
+        invoiceDetail.setAdjustTime(sdf.format(new Date()));//设置调整时间
+        return invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
+    }
+
+    /**
+     * @Author CQT
+     * @Description导出数据
+     * @param agentId
+     * @param agentName
+     * @param concludeChild
+     * @param dateStart
+     * @param dateEnd
+     * @return
+     */
+    @Override
+    public List<InvoiceDetail> exportInvoiceData(String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
+        InvoiceDetailExample example = new InvoiceDetailExample();
+        InvoiceDetailExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
+        }
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthEqualTo(dateEnd);
+        }
+        if("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)){
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
+            lists.add(agentId);
+            criteria.andAgentIdIn(lists);
+        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
+            String agent = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agent);
+            lists.add(agent);
+            criteria.andAgentIdIn(lists);
+        }else if(StringUtils.isNotBlank(agentId)){
+            criteria.andAgentIdEqualTo(agentId);
+        }
+        List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
+        return lists;
+    }
+
+    /**
+     * @Author CQT
+     *@Description 插入数据
+     * @param list
+     * @param loginName
+     */
+    private void insertInvoice(List list,String loginName){
+        Invoice invoice = new Invoice();
+        String agentId = list.get(1).toString();
+        String agentName = list.get(0).toString();
+        BigDecimal amt = new BigDecimal(list.get(2).toString());
+        UUID uuid = UUID.randomUUID();
+        String str = uuid.toString().replace("-","");
+        invoice.setId(str); //设置id
+        invoice.setAgentId(agentId);
+        invoice.setAgentName(agentName);
+        String agentPid = invoiceDetailMapper.getAgentPidByAgentId(agentId);//获取代理商唯一码
+        invoice.setAgentPid(agentPid);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");//将每次导入的欠票月份当设为当月
+        invoice.setFactorMonth(sdf.format(new Date()));
+        invoice.setInvoiceAmt(amt);
+        invoice.setStatus("1");
+        SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        invoice.setOptDate(ss.format(new Date()));
+        invoice.setOptUser(loginName);
+        boolean isHave = getInvoiceByInvoice(invoice);
+        if(isHave == false){
+            //表示存在有效记录，将其设置为无效
+            invoiceMapper.setStatusToInvoice(invoice);
+        }
+        invoiceMapper.insertSelective(invoice);
+    }
+
+    /**
+     * @Author CQT
+     * @Description判断导入欠票表中是否存在有效且已有数据
+     * @param invoice
+     * @return  不存在，返回true
+     */
+    private boolean getInvoiceByInvoice(Invoice invoice){
+        Invoice invoce = invoiceMapper.getInvoiceByInvoice(invoice);
+        if(invoce == null){
+            return true;
+        }
+        return false;
+    }
+
 
 }

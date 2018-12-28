@@ -20,4 +20,11 @@ public interface InvoiceMapper {
     int updateByPrimaryKeySelective(Invoice record);
 
     int updateByPrimaryKey(Invoice record);
+
+    /**根据id和月份，以及状态判断用户数据是否存在*/
+    Invoice getInvoiceByInvoice(Invoice record);
+    /**设置数据有效性*/
+    int setStatusToInvoice(Invoice record);
+
+
 }

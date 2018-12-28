@@ -39,5 +39,5 @@ public interface ProfitDeductionMapper {
 
     BigDecimal getCurrentDeductionAmtSum(ProfitDeduction profitDeduction);
 
-    int resetDataDeduction();
+    int resetDataDeduction(String type);
 }
