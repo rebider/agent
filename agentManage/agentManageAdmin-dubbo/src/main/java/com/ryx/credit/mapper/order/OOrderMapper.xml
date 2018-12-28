@@ -502,6 +502,7 @@
     e.bus_num,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
+    o.user_id as user_id,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -663,6 +664,7 @@
     b.ag_doc_district,
     b.AG_UNIQ_NUM,
     e.bus_num,
+    o.user_id as user_id,
     f.name as ag_doc_district_name,
     g.name as ag_doc_pro_name,
     nvl((select sum(o_payment_detail.pay_amount)
@@ -678,7 +680,16 @@
     nvl((select sum(o_receipt_pro.pro_num) from o_receipt_pro where o_receipt_pro.orderid=o.id and o_receipt_pro.status=1 and o_receipt_pro.receipt_pro_status in (1,2)),0)
     )as dpd,
     nvl((select sum(o_sub_order.pro_num) from o_sub_order where o_sub_order.order_id = o.id and o_sub_order.status=1),0) pro_num,
-    c.platform_name
+    c.platform_name,
+    (
+    select LISTAGG(dict.d_itemname,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)  from o_sub_order
+    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname=o_sub_order.pro_type
+    where o_sub_order.order_id = o.id and o_sub_order.status=1
+    ) as pro_type,
+    (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP( ORDER BY o_sub_order.order_id) from o_sub_order_activity
+    left join o_sub_order on o_sub_order_activity.sub_order_id = o_sub_order.id and o_sub_order.status=1 and o_sub_order_activity.status=1
+    where o_sub_order.status=1 and o_sub_order_activity.status=1 and o_sub_order.order_id = o.id
+    ) as activity_name
     from o_order o
     left join a_agent b on o.agent_id = b.id
     left join a_agent_businfo e on o.bus_id = e.id
@@ -686,8 +697,8 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id = b.ag_doc_district
     left join c_organization g on g.id = b.ag_doc_pro
-    <where>
-      <if test="1==1"> and  o.status = 1 </if>
+ <where>
+      <if test="1==1"> and  o.status = 1 and  b.STATUS=1 and e.STATUS=1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
@@ -698,16 +709,12 @@
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
-        and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
-      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1
-        and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and model=#{model} and o.id=ORDER_ID) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
-      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.VENDER=#{vender})</if>
+      <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})</if>
       <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
     </where>
@@ -728,7 +735,7 @@
     left join c_organization f on f.id= b.ag_doc_district
     left join c_organization g on g.id= b.ag_doc_pro
     <where>
-      <if test="1==1"> and  o.status = 1 </if>
+      <if test="1==1"> and  o.status = 1 and  b.STATUS=1 and e.STATUS=1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
       <if test="agentId!=null and agentId!=''"> and  o.agent_id = #{agentId} </if>
