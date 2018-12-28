@@ -85,6 +85,8 @@ public class AgentBusInfo implements Serializable {
 
     private String busRegionName;
 
+    private Map<String,Object> parentInfo;
+
     public List<Attachment> getAttachmentList() {
         return attachmentList;
     }
@@ -395,5 +397,13 @@ public class AgentBusInfo implements Serializable {
 
     public void setBusRegionName(String busRegionName) {
         this.busRegionName = busRegionName;
+    }
+
+    public Map<String, Object> getParentInfo() {
+        return parentInfo;
+    }
+
+    public void setParentInfo(Map<String, Object> parentInfo) {
+        this.parentInfo = parentInfo;
     }
 }

@@ -601,6 +601,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setBeginSn((String) map.get("startSn"));
                 returnOrderDetail.setEndSn((String) map.get("endSn"));
                 returnOrderDetail.setOrderPrice(MapUtil.getBigDecimal(map, "proPrice"));
+                returnOrderDetail.setReturnPrice(MapUtil.getBigDecimal(map, "proPrice"));
                 returnOrderDetail.setReturnCount(MapUtil.getBigDecimal(map, "count"));
                 returnOrderDetail.setReturnAmt(MapUtil.getBigDecimal(map, "totalPrice"));
                 returnOrderDetail.setReturnTime(new Date());
