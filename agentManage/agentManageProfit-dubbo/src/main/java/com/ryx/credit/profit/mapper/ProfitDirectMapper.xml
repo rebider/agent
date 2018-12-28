@@ -431,7 +431,7 @@
 
   <select id="selectSumTaxAmt" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
     SELECT
-    SUM(SHOULD_PROFIT)
+    nvl(SUM(SHOULD_PROFIT),0.00)
     FROM P_PROFIT_DIRECT
     WHERE TRANS_MONTH = #{transMonth,jdbcType=VARCHAR} AND FRIST_AGENT_PID =  #{fristAgentPid,jdbcType=VARCHAR}
   </select>
