@@ -260,10 +260,6 @@
       <if test="posCheckDeductAmt != null">
         #{posCheckDeductAmt,jdbcType=VARCHAR},
       </if>
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
       <if test="childAgentIdList != null">
         #{childAgentIdList,jdbcType=CLOB},
       </if>
