@@ -88,6 +88,7 @@ public class MeTest extends BaseSpringTest {
             changeActMachineVo.setPlatformType("MPOS");
             changeActMachineVo.setOldAct("1005");
             changeActMachineVo.setNewAct("1004");
+            changeActMachineVo.setSnNum("20");
             logger.debug(JSONArray.toJSONString(termMachineService.changeActMachine(changeActMachineVo)));
         } catch (Exception e) {
             e.printStackTrace();
