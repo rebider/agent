@@ -683,7 +683,7 @@
     c.platform_name,
     (
     select LISTAGG(dict.d_itemname,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)  from o_sub_order
-    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname=o_sub_order.pro_type
+    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.D_ITEMVALUE=o_sub_order.pro_type
     where o_sub_order.order_id = o.id and o_sub_order.status=1
     ) as pro_type,
     (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP( ORDER BY o_sub_order.order_id) from o_sub_order_activity
