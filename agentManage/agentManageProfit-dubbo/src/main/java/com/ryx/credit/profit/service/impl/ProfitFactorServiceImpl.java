@@ -104,8 +104,8 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
                 profitFactor.setAgentPid(null!=factor.get(1)?String.valueOf(factor.get(1)):"");//代理商唯一码
                 profitFactor.setAgentName(null!=factor.get(2)?String.valueOf(factor.get(2)):"");//代理商名称
                 profitFactor.setAgentId(null!=factor.get(3)?String.valueOf(factor.get(3)):"");//代理商编号
-                profitFactor.setParentAgentId(null!=factor.get(4)?String.valueOf(factor.get(3)):"");
-                profitFactor.setParentAgentName(null!=factor.get(5)?String.valueOf(factor.get(3)):"");
+                profitFactor.setParentAgentId(null!=factor.get(4)?String.valueOf(factor.get(4)):"");//上级代理商编号
+                profitFactor.setParentAgentName(null!=factor.get(5)?String.valueOf(factor.get(5)):"");//上级代理商名称
                 profitFactor.setTatolAmt(new BigDecimal(String.valueOf(factor.get(6))));//应还款
                 profitFactor.setBuckleAmt(new BigDecimal(String.valueOf(factor.get(7))));//已扣款
                 profitFactor.setSurplusAmt(new BigDecimal(String.valueOf(factor.get(8))));//未扣足
