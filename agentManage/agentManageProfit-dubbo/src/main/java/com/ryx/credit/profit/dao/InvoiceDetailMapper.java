@@ -23,4 +23,13 @@ public interface InvoiceDetailMapper {
     int updateByPrimaryKey(InvoiceDetail record);
 
     List<Map<String,Object>> queryInvoiceAgents(Map<String,Object> params);
+
+    /**根据agentId获取agentPid*/
+    String getAgentPidByAgentId(String agentId);
+
+    /**根据上级获取全部下级的agentId*/
+    List<String> getAgentIdByBusParent(String agentId);
+
+    String getAgentIdbyAgentName(String agentId);
+
 }

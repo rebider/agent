@@ -148,8 +148,7 @@
       #{posCompareCount,jdbcType=VARCHAR}, #{posCurrentCount,jdbcType=VARCHAR}, #{posCompareLoanCount,jdbcType=VARCHAR}, 
       #{posCurrentLoanCount,jdbcType=VARCHAR}, #{posAmt,jdbcType=VARCHAR}, #{posStandard,jdbcType=VARCHAR}, 
       #{posOwnReward,jdbcType=VARCHAR}, #{posDownReward,jdbcType=VARCHAR}, #{posReawrdProfit,jdbcType=VARCHAR}, 
-      #{posRemark,jdbcType=VARCHAR}, #{posCheckDeductAmt,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
-      #{parentAgentName,jdbcType=VARCHAR}, #{childAgentIdList,jdbcType=CLOB})
+      #{posRemark,jdbcType=VARCHAR}, #{posCheckDeductAmt,jdbcType=VARCHAR}, #{childAgentIdList,jdbcType=CLOB})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
     insert into POS_REWARD_DETAIL
@@ -260,12 +259,6 @@
       </if>
       <if test="posCheckDeductAmt != null">
         #{posCheckDeductAmt,jdbcType=VARCHAR},
-      </if>
-      <if test="parentAgentId != null">
-        #{parentAgentId,jdbcType=VARCHAR},
-      </if>
-      <if test="parentAgentName != null">
-        #{parentAgentName,jdbcType=VARCHAR},
       </if>
       <if test="childAgentIdList != null">
         #{childAgentIdList,jdbcType=CLOB},
