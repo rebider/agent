@@ -82,9 +82,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, PROFIT_POS_DATE, POS_AGENT_ID, POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID,
-    POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, POS_CURRENT_LOAN_COUNT,
-    POS_AMT, POS_STANDARD, POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, POS_REMARK,
+    ID, PROFIT_POS_DATE, POS_AGENT_ID, POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID, 
+    POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, POS_CURRENT_LOAN_COUNT, 
+    POS_AMT, POS_STANDARD, POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, POS_REMARK, 
     POS_CHECK_DEDUCT_AMT
   </sql>
   <sql id="Blob_Column_List">
@@ -123,7 +123,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
-    select
+    select 
     <include refid="Base_Column_List" />
     ,
     <include refid="Blob_Column_List" />
@@ -137,20 +137,18 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
-    insert into POS_REWARD_DETAIL (ID, PROFIT_POS_DATE, POS_AGENT_ID,
-    POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID,
-    POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT,
-    POS_CURRENT_LOAN_COUNT, POS_AMT, POS_STANDARD,
-    POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT,
-    POS_REMARK, POS_CHECK_DEDUCT_AMT, CHILD_AGENT_ID_LIST
-    )
-    values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR},
-    #{posAgentName,jdbcType=VARCHAR}, #{posMechanismType,jdbcType=VARCHAR}, #{posMechanismId,jdbcType=VARCHAR},
-    #{posCompareCount,jdbcType=VARCHAR}, #{posCurrentCount,jdbcType=VARCHAR}, #{posCompareLoanCount,jdbcType=VARCHAR},
-    #{posCurrentLoanCount,jdbcType=VARCHAR}, #{posAmt,jdbcType=VARCHAR}, #{posStandard,jdbcType=VARCHAR},
-    #{posOwnReward,jdbcType=VARCHAR}, #{posDownReward,jdbcType=VARCHAR}, #{posReawrdProfit,jdbcType=VARCHAR},
-    #{posRemark,jdbcType=VARCHAR}, #{posCheckDeductAmt,jdbcType=VARCHAR}, #{childAgentIdList,jdbcType=CLOB}
-    )
+    insert into POS_REWARD_DETAIL (ID, PROFIT_POS_DATE, POS_AGENT_ID, 
+      POS_AGENT_NAME, POS_MECHANISM_TYPE, POS_MECHANISM_ID, 
+      POS_COMPARE_COUNT, POS_CURRENT_COUNT, POS_COMPARE_LOAN_COUNT, 
+      POS_CURRENT_LOAN_COUNT, POS_AMT, POS_STANDARD, 
+      POS_OWN_REWARD, POS_DOWN_REWARD, POS_REAWRD_PROFIT, 
+      POS_REMARK, POS_CHECK_DEDUCT_AMT, CHILD_AGENT_ID_LIST)
+    values (#{id,jdbcType=VARCHAR}, #{profitPosDate,jdbcType=VARCHAR}, #{posAgentId,jdbcType=VARCHAR}, 
+      #{posAgentName,jdbcType=VARCHAR}, #{posMechanismType,jdbcType=VARCHAR}, #{posMechanismId,jdbcType=VARCHAR}, 
+      #{posCompareCount,jdbcType=VARCHAR}, #{posCurrentCount,jdbcType=VARCHAR}, #{posCompareLoanCount,jdbcType=VARCHAR}, 
+      #{posCurrentLoanCount,jdbcType=VARCHAR}, #{posAmt,jdbcType=VARCHAR}, #{posStandard,jdbcType=VARCHAR}, 
+      #{posOwnReward,jdbcType=VARCHAR}, #{posDownReward,jdbcType=VARCHAR}, #{posReawrdProfit,jdbcType=VARCHAR}, 
+      #{posRemark,jdbcType=VARCHAR}, #{posCheckDeductAmt,jdbcType=VARCHAR}, #{childAgentIdList,jdbcType=CLOB})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
     insert into POS_REWARD_DETAIL
@@ -338,23 +336,23 @@
   <update id="updateByExampleWithBLOBs" parameterType="map">
     update POS_REWARD_DETAIL
     set ID = #{record.id,jdbcType=VARCHAR},
-    PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
-    POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
-    POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
-    POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
-    POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
-    POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
-    POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
-    POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
-    POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
-    POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
-    POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
-    POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
-    POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
-    POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
-    POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
-    POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
-    CHILD_AGENT_ID_LIST = #{record.childAgentIdList,jdbcType=CLOB}
+      PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+      POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+      POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+      POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+      POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+      POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+      POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+      POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+      POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+      POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+      POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+      POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+      POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
+      POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
+      CHILD_AGENT_ID_LIST = #{record.childAgentIdList,jdbcType=CLOB}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -362,22 +360,22 @@
   <update id="updateByExample" parameterType="map">
     update POS_REWARD_DETAIL
     set ID = #{record.id,jdbcType=VARCHAR},
-    PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
-    POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
-    POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
-    POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
-    POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
-    POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
-    POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
-    POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
-    POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
-    POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
-    POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
-    POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
-    POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
-    POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
-    POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
-    POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR}
+      PROFIT_POS_DATE = #{record.profitPosDate,jdbcType=VARCHAR},
+      POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      POS_MECHANISM_TYPE = #{record.posMechanismType,jdbcType=VARCHAR},
+      POS_MECHANISM_ID = #{record.posMechanismId,jdbcType=VARCHAR},
+      POS_COMPARE_COUNT = #{record.posCompareCount,jdbcType=VARCHAR},
+      POS_CURRENT_COUNT = #{record.posCurrentCount,jdbcType=VARCHAR},
+      POS_COMPARE_LOAN_COUNT = #{record.posCompareLoanCount,jdbcType=VARCHAR},
+      POS_CURRENT_LOAN_COUNT = #{record.posCurrentLoanCount,jdbcType=VARCHAR},
+      POS_AMT = #{record.posAmt,jdbcType=VARCHAR},
+      POS_STANDARD = #{record.posStandard,jdbcType=VARCHAR},
+      POS_OWN_REWARD = #{record.posOwnReward,jdbcType=VARCHAR},
+      POS_DOWN_REWARD = #{record.posDownReward,jdbcType=VARCHAR},
+      POS_REAWRD_PROFIT = #{record.posReawrdProfit,jdbcType=VARCHAR},
+      POS_REMARK = #{record.posRemark,jdbcType=VARCHAR},
+      POS_CHECK_DEDUCT_AMT = #{record.posCheckDeductAmt,jdbcType=VARCHAR},
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -442,47 +440,47 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
     update POS_REWARD_DETAIL
     set PROFIT_POS_DATE = #{profitPosDate,jdbcType=VARCHAR},
-    POS_AGENT_ID = #{posAgentId,jdbcType=VARCHAR},
-    POS_AGENT_NAME = #{posAgentName,jdbcType=VARCHAR},
-    POS_MECHANISM_TYPE = #{posMechanismType,jdbcType=VARCHAR},
-    POS_MECHANISM_ID = #{posMechanismId,jdbcType=VARCHAR},
-    POS_COMPARE_COUNT = #{posCompareCount,jdbcType=VARCHAR},
-    POS_CURRENT_COUNT = #{posCurrentCount,jdbcType=VARCHAR},
-    POS_COMPARE_LOAN_COUNT = #{posCompareLoanCount,jdbcType=VARCHAR},
-    POS_CURRENT_LOAN_COUNT = #{posCurrentLoanCount,jdbcType=VARCHAR},
-    POS_AMT = #{posAmt,jdbcType=VARCHAR},
-    POS_STANDARD = #{posStandard,jdbcType=VARCHAR},
-    POS_OWN_REWARD = #{posOwnReward,jdbcType=VARCHAR},
-    POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
-    POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
-    POS_REMARK = #{posRemark,jdbcType=VARCHAR},
-    POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR},
-    CHILD_AGENT_ID_LIST = #{childAgentIdList,jdbcType=CLOB}
+      POS_AGENT_ID = #{posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{posAgentName,jdbcType=VARCHAR},
+      POS_MECHANISM_TYPE = #{posMechanismType,jdbcType=VARCHAR},
+      POS_MECHANISM_ID = #{posMechanismId,jdbcType=VARCHAR},
+      POS_COMPARE_COUNT = #{posCompareCount,jdbcType=VARCHAR},
+      POS_CURRENT_COUNT = #{posCurrentCount,jdbcType=VARCHAR},
+      POS_COMPARE_LOAN_COUNT = #{posCompareLoanCount,jdbcType=VARCHAR},
+      POS_CURRENT_LOAN_COUNT = #{posCurrentLoanCount,jdbcType=VARCHAR},
+      POS_AMT = #{posAmt,jdbcType=VARCHAR},
+      POS_STANDARD = #{posStandard,jdbcType=VARCHAR},
+      POS_OWN_REWARD = #{posOwnReward,jdbcType=VARCHAR},
+      POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
+      POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
+      POS_REMARK = #{posRemark,jdbcType=VARCHAR},
+      POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR},
+      CHILD_AGENT_ID_LIST = #{childAgentIdList,jdbcType=CLOB}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PosRewardDetail">
     update POS_REWARD_DETAIL
     set PROFIT_POS_DATE = #{profitPosDate,jdbcType=VARCHAR},
-    POS_AGENT_ID = #{posAgentId,jdbcType=VARCHAR},
-    POS_AGENT_NAME = #{posAgentName,jdbcType=VARCHAR},
-    POS_MECHANISM_TYPE = #{posMechanismType,jdbcType=VARCHAR},
-    POS_MECHANISM_ID = #{posMechanismId,jdbcType=VARCHAR},
-    POS_COMPARE_COUNT = #{posCompareCount,jdbcType=VARCHAR},
-    POS_CURRENT_COUNT = #{posCurrentCount,jdbcType=VARCHAR},
-    POS_COMPARE_LOAN_COUNT = #{posCompareLoanCount,jdbcType=VARCHAR},
-    POS_CURRENT_LOAN_COUNT = #{posCurrentLoanCount,jdbcType=VARCHAR},
-    POS_AMT = #{posAmt,jdbcType=VARCHAR},
-    POS_STANDARD = #{posStandard,jdbcType=VARCHAR},
-    POS_OWN_REWARD = #{posOwnReward,jdbcType=VARCHAR},
-    POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
-    POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
-    POS_REMARK = #{posRemark,jdbcType=VARCHAR},
-    POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR}
+      POS_AGENT_ID = #{posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{posAgentName,jdbcType=VARCHAR},
+      POS_MECHANISM_TYPE = #{posMechanismType,jdbcType=VARCHAR},
+      POS_MECHANISM_ID = #{posMechanismId,jdbcType=VARCHAR},
+      POS_COMPARE_COUNT = #{posCompareCount,jdbcType=VARCHAR},
+      POS_CURRENT_COUNT = #{posCurrentCount,jdbcType=VARCHAR},
+      POS_COMPARE_LOAN_COUNT = #{posCompareLoanCount,jdbcType=VARCHAR},
+      POS_CURRENT_LOAN_COUNT = #{posCurrentLoanCount,jdbcType=VARCHAR},
+      POS_AMT = #{posAmt,jdbcType=VARCHAR},
+      POS_STANDARD = #{posStandard,jdbcType=VARCHAR},
+      POS_OWN_REWARD = #{posOwnReward,jdbcType=VARCHAR},
+      POS_DOWN_REWARD = #{posDownReward,jdbcType=VARCHAR},
+      POS_REAWRD_PROFIT = #{posReawrdProfit,jdbcType=VARCHAR},
+      POS_REMARK = #{posRemark,jdbcType=VARCHAR},
+      POS_CHECK_DEDUCT_AMT = #{posCheckDeductAmt,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
+      select * from ( select row_.*, rownum rownum_ from ( 
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -490,7 +488,6 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
   <select id="getRewardDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM POS_REWARD_DETAIL
@@ -516,7 +513,6 @@
       <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
     </where>
   </sql>
-
   <select id="getRewardDetailList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
     SELECT
@@ -524,6 +520,25 @@
     FROM POS_REWARD_DETAIL
     <include refid="BASE_WHERE_SQL" />
     order by POS_REMARK,POS_MECHANISM_TYPE
+    <include refid="PAGING_END" />
+  </select>
+  <select id="getRewardDetailListByParam" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+   select <include refid="Base_Column_List" />
+          ,(select info2.AGENT_ID from A_AGENT_BUSINFO info2 where ID=
+          (select BUS_PARENT from A_AGENT_BUSINFO info1 where info1.AGENT_ID=detail.POS_AGENT_ID and
+                  ( BUS_NUM like 'SS%' or BUS_NUM like 'O%'))) as PARENT_AGENT_ID ,(select agent.AG_NAME from A_AGENT agent where agent.ID=(select info2.AGENT_ID from A_AGENT_BUSINFO info2 where ID=
+          (select BUS_PARENT from A_AGENT_BUSINFO info1 where info1.AGENT_ID=detail.POS_AGENT_ID and
+                  ( BUS_NUM like 'SS%' or BUS_NUM like 'O%'))))as PARENT_AGENT_NAME from POS_REWARD_DETAIL detail
+    where 1=1
+    <!--select
+    <include refid="Base_Column_List" />,
+
+     from POS_REWARD_DETAIL-->
+    <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' "> and POS_AGENT_ID = #{POS_AGENT_ID} </if>
+    <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+    <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
+    <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
     <include refid="PAGING_END" />
   </select>
   <sql id="PAGING_START">
@@ -536,13 +551,11 @@
       ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
     </if>
   </sql>
-
   <update id="updateRewradData">
     UPDATE POS_REWARD_DETAIL  SET
     POS_OWN_REWARD = 0, POS_DOWN_REWARD = 0, POS_REAWRD_PROFIT = 0
     where PROFIT_POS_DATE = #{profitDate,jdbcType=VARCHAR}
   </update>
-
   <select id="queryChildLevelByAgentId" resultType="java.lang.String">
     SELECT AGENT_ID
     FROM A_AGENT_BUSINFO

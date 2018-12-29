@@ -1,10 +1,11 @@
 package com.ryx.credit.profit.dao;
 
+import java.util.List;
+import java.util.Map;
+
 import com.ryx.credit.profit.pojo.PosRewardDetail;
 import com.ryx.credit.profit.pojo.PosRewardDetailExample;
 import org.apache.ibatis.annotations.Param;
-import java.util.List;
-import java.util.Map;
 
 public interface PosRewardDetailMapper {
     long countByExample(PosRewardDetailExample example);
@@ -36,6 +37,8 @@ public interface PosRewardDetailMapper {
     long getRewardDetailCount(Map<String, Object> param);
 
     List<Map<String, Object>> getRewardDetailList(Map<String, Object> param);
+
+    List<Map<String, Object>> getRewardDetailListByParam(Map<String,Object> param);
 
     void updateRewradData(String profitDate);
 

@@ -425,7 +425,6 @@
     e.bus_num,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
-    o.user_id as user_id,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
@@ -686,7 +685,7 @@
     c.platform_name,
     (
     select LISTAGG(dict.d_itemname,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)  from o_sub_order
-    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.d_itemname=o_sub_order.pro_type
+    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.D_ITEMVALUE=o_sub_order.pro_type
     where o_sub_order.order_id = o.id and o_sub_order.status=1
     ) as pro_type,
     (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP( ORDER BY o_sub_order.order_id) from o_sub_order_activity
@@ -700,7 +699,7 @@
     left join o_payment d on d.order_id = o.id
     left join c_organization f on f.id = b.ag_doc_district
     left join c_organization g on g.id = b.ag_doc_pro
-    <where>
+ <where>
       <if test="1==1"> and  o.status = 1 and  b.STATUS=1 and e.STATUS=1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>

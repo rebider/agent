@@ -24,7 +24,8 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
     @Override
     public PageInfo getRewardDetailList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = posRewardDetailMapper.getRewardDetailCount(param);
-        List<Map<String, Object>> list = posRewardDetailMapper.getRewardDetailList(param);
+        List<Map<String, Object>> list = posRewardDetailMapper.getRewardDetailListByParam(param);
+     //   List<Map<String, Object>> list = posRewardDetailMapper.getRewardDetailList(param);
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
         System.out.println("查询============================================" + JSONObject.toJSON(list));

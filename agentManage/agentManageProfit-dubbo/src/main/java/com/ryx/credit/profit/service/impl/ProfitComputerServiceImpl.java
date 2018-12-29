@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.*;
+import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IProfitDirectService;
 import com.ryx.credit.profit.service.ProfitComputerService;
@@ -249,7 +250,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             BigDecimal creditAmt = buckleRunMapper.getSumRunAmt(profitDirect.getAgentId());//一共被代扣总额
             //找不着扣款关系------------------
             if(null==creditAmt||creditAmt.compareTo(BigDecimal.ZERO)==0){
-                /*ProfitDetailMonth detailMonth = detailMonthMapper.selectByAgentPid(profitDirect.getFristAgentPid());
+                /*ProfitDetailMonth detailMonth = detailMonthMapper.selectByAgentPid(ProfitDirect.getFristAgentPid());
                 if(null==detailMonth.getZhifaSupply()){
                     detailMonth.setZhifaSupply(supply);
                 }else{
@@ -422,7 +423,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 //parent = should.multiply(new BigDecimal("-1"));//此时该代理商上级如果是一代？
             }
             profitDirect.setShouldProfit(should);
-            //profitDirect.setParentBuckle(parent);
+            //ProfitDirect.setParentBuckle(parent);
             directMapper.updateByPrimaryKeySelective(profitDirect);
         }
     }
@@ -555,10 +556,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             boolean isJieYin = false;//是否所属捷步、银点
             boolean isRYX = false;//是否瑞银信打款
             List<PAgentPidLink> links = pidLinkMapper.selectListByPid(detailMonth.getAgentPid());//获取代理商所有业务平台编码
-            if(null!=detailMonth.getAgentId() && null!=detailMonth.getBusPlatForm()){
+            if(null!=detailMonth.getAgentId() && null!=detailMonth.getBusPlatform()){
                 PAgentPidLink pos = new PAgentPidLink();
                 pos.setAgentId(detailMonth.getAgentId());
-                pos.setDeptCode(detailMonth.getBusPlatForm());
+                pos.setDeptCode(detailMonth.getBusPlatform());
                 links.add(pos);
             }
             AgentBusInfo me = new AgentBusInfo();//本代理商业务信息
@@ -599,7 +600,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 }
             }
             ProfitDetailMonth updateDetail = getTaxAndProfit(detailMonth.getRealProfitAmt()==null?BigDecimal.ZERO:detailMonth.getRealProfitAmt()
-                    ,detailMonth.getAgentPid(),isDecimalNull(subAmt),detailMonth.getTax(),profitDate,isJieYin,isRYX);
+                    ,detailMonth.getAgentPid(),isDecimalNull(subAmt),new BigDecimal(detailMonth.getTax()),profitDate,isJieYin,isRYX);
             updateDetail.setId(detailMonth.getId());
             detailMonthMapper.updateByPrimaryKeySelective(updateDetail);
         }
@@ -849,7 +850,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 
             BigDecimal deductionTax = profitDetail.getDeductionTaxMonthAmt();//本月税额
             BigDecimal realAmt = profitDetail.getRealProfitAmt()==null?BigDecimal.ZERO:profitDetail.getRealProfitAmt();//实际分润
-            BigDecimal tax = profitDetail.getTax()==null?new BigDecimal("0.06"):profitDetail.getTax();//税点(0.06)
+            BigDecimal tax = profitDetail.getTax()==null?new BigDecimal("0.06"):new BigDecimal(profitDetail.getTax());//税点(0.06)
             BigDecimal smalTax = profitDetail.getSmalTaxAmt()==null?BigDecimal.ZERO:profitDetail.getSmalTaxAmt();;//已抵税金额
 
             List<OPayment> paymentList = new ArrayList<>();
@@ -887,12 +888,15 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     }
 
     /**
-     *
-     * @param subAmt 下级分润金额
-     * @param transDate
-     * @param dayTotal
-     * @param isRYX
-     * @return
+     * 本月税额、补下级税点、本月之前税额、本月分润、实发分润计算
+     * 分润不足并存在扣税时，记录本月未扣足税额
+     * PS：补下级税点计算必须先计算所有代理商的税前应发分润
+     * @param detailMonth 月分润明细
+     * @param subAmt 所有下级的应发分润汇总
+     * @param transDate 月份
+     * @param isSupply 是否补税
+     * @param isRYX 是否瑞银信打款
+     * @return ProfitDetailMonth（本月税额、补下级税点、扣本月之前税额（含日）、本月分润、实发分润）
      */
     public ProfitDetailMonth getNewTaxAndProfit(ProfitDetailMonth detailMonth,BigDecimal subAmt,String transDate,BigDecimal dayTotal,boolean isRYX,boolean isSupply){
         BigDecimal profitAmt = detailMonth.getBasicsProfitAmt()==null?BigDecimal.ZERO:detailMonth.getBasicsProfitAmt();//基础分润（扣补款之后、税前）
@@ -921,7 +925,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             return detail;
         }
         //-------------------本月税额计算-------------------
-        BigDecimal tax = adjustMapper.getTax(detailMonth.getAgentId());
+        BigDecimal tax = adjustMapper.getTax(detailMonth.getAgentId());//查询税点
         if (null == tax){
             AgentColinfo condition = new AgentColinfo();
             condition.setAgentId(detailMonth.getAgentId());
@@ -943,6 +947,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
 
         logger.info("税点："+tax);
+
         //-------------------查询该代理商下级代理应补税额-------------------
         BigDecimal subTax1 = BigDecimal.ZERO;//直发补税
         BigDecimal subTax2 = BigDecimal.ZERO;//非直发下级补税
@@ -956,6 +961,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             logger.info("开票补所有");
             subTax1 = subTax1.multiply(new BigDecimal("0.06"));
             logger.info("直发所有下级分润补税："+subTax1);
+
             subTax2 = subAmt.multiply(new BigDecimal("0.06"));
             subTax2 = subTax2==null?BigDecimal.ZERO:subTax2;
             logger.info("下级分润补税点差额："+subTax2);

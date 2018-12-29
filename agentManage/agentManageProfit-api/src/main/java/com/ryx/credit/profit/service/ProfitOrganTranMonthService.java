@@ -55,5 +55,5 @@ public interface ProfitOrganTranMonthService {
     * @Author: zhaodw
     * @Date: 2018/8/10 
     */ 
-    void importData();
+    void importData(String type);
 }

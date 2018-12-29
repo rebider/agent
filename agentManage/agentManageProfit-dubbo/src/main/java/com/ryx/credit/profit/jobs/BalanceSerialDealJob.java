@@ -2,8 +2,6 @@ package com.ryx.credit.profit.jobs;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
-import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -11,18 +9,13 @@ import com.ryx.credit.profit.pojo.ProfitBalanceSerial;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.service.ProfitBalanceSerialService;
 import com.ryx.credit.profit.service.ProfitDetailMonthService;
-import com.ryx.credit.profit.service.ProfitMonthService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author zhaodw

@@ -9,14 +9,20 @@
     <result column="TRANS_DATE" jdbcType="VARCHAR" property="transDate" />
     <result column="REMIT_DATE" jdbcType="VARCHAR" property="remitDate" />
     <result column="TOTAL_PROFIT" jdbcType="DECIMAL" property="totalProfit" />
-    <result column="TOTAL_PROFIT1" jdbcType="DECIMAL" property="totalProfit1" />
     <result column="FROZEN_MONEY" jdbcType="DECIMAL" property="frozenMoney" />
     <result column="SUCCESS_MONEY" jdbcType="DECIMAL" property="successMoney" />
     <result column="FAIL_MONEY" jdbcType="DECIMAL" property="failMoney" />
     <result column="REAL_MONEY" jdbcType="DECIMAL" property="realMoney" />
     <result column="REDO_MONEY" jdbcType="DECIMAL" property="redoMoney" />
     <result column="RETURN_MONEY" jdbcType="DECIMAL" property="returnMoney" />
-    <result column="PLATFORMNUM" jdbcType="VARCHAR" property="platformNum" />
+    <result column="TOTAL_PROFIT1" jdbcType="DECIMAL" property="totalProfit1" />
+    <result column="PLATFORMNUM" jdbcType="VARCHAR" property="platformnum" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="PARENT_BUS_NUM" jdbcType="VARCHAR" property="parentBusNum" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="AGENT_TYPE" jdbcType="VARCHAR" property="agentType" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="PAY_COMPANY" jdbcType="VARCHAR" property="payCompany" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -48,8 +54,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TRANS_DATE, REMIT_DATE, TOTAL_PROFIT,TOTAL_PROFIT1, FROZEN_MONEY,
-    SUCCESS_MONEY, FAIL_MONEY, REAL_MONEY, REDO_MONEY, RETURN_MONEY, PLATFORMNUM
+    ID, AGENT_PID, AGENT_ID, AGENT_NAME, TRANS_DATE, REMIT_DATE, TOTAL_PROFIT, FROZEN_MONEY,
+    SUCCESS_MONEY, FAIL_MONEY, REAL_MONEY, REDO_MONEY, RETURN_MONEY, TOTAL_PROFIT1, PLATFORMNUM,
+    BUS_NUM, PARENT_BUS_NUM, PARENT_AGENT_ID, AGENT_TYPE, PARENT_AGENT_NAME, PAY_COMPANY
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -67,29 +74,6 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-
-  <select id="selectByWhere" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDay" >
-    select
-    <include refid="Base_Column_List" />
-    from P_PROFIT_D
-    <where>
-      1=1
-      <if test='null!= agentName and agentName !="" '>
-        AND AGENT_NAME = #{agentName}
-      </if>
-      <if test='null!= agentPid and agentPid !="" '>
-        AND AGENT_PID = #{agentPid}
-      </if>
-      <if test='null!= transDate and transDate !="" '>
-        AND TRANS_DATE = #{transDate}
-      </if>
-      <if test='null!= remitDate and remitDate !="" '>
-        AND REMIT_DATE = #{remitDate}
-      </if>
-    </where>
-    order by TRANS_DATE
-  </select>
-
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
@@ -104,15 +88,21 @@
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
     insert into P_PROFIT_D (ID, AGENT_PID, AGENT_ID,
-    AGENT_NAME, TRANS_DATE, REMIT_DATE,
-    TOTAL_PROFIT,TOTAL_PROFIT1, FROZEN_MONEY, SUCCESS_MONEY,
-    FAIL_MONEY, REAL_MONEY, REDO_MONEY,
-    RETURN_MONEY, PLATFORMNUM)
+      AGENT_NAME, TRANS_DATE, REMIT_DATE,
+      TOTAL_PROFIT, FROZEN_MONEY, SUCCESS_MONEY,
+      FAIL_MONEY, REAL_MONEY, REDO_MONEY,
+      RETURN_MONEY, TOTAL_PROFIT1, PLATFORMNUM,
+      BUS_NUM, PARENT_BUS_NUM, PARENT_AGENT_ID,
+      AGENT_TYPE, PARENT_AGENT_NAME, PAY_COMPANY
+      )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
-    #{agentName,jdbcType=VARCHAR}, #{transDate,jdbcType=VARCHAR}, #{remitDate,jdbcType=VARCHAR},
-    #{totalProfit,jdbcType=DECIMAL}, #{frozenMoney,jdbcType=DECIMAL}, #{successMoney,jdbcType=DECIMAL},
-    #{failMoney,jdbcType=DECIMAL}, #{realMoney,jdbcType=DECIMAL}, #{redoMoney,jdbcType=DECIMAL},
-    #{returnMoney,jdbcType=DECIMAL}, #{platformNum,jdbcType=VARCHAR})
+      #{agentName,jdbcType=VARCHAR}, #{transDate,jdbcType=VARCHAR}, #{remitDate,jdbcType=VARCHAR},
+      #{totalProfit,jdbcType=DECIMAL}, #{frozenMoney,jdbcType=DECIMAL}, #{successMoney,jdbcType=DECIMAL},
+      #{failMoney,jdbcType=DECIMAL}, #{realMoney,jdbcType=DECIMAL}, #{redoMoney,jdbcType=DECIMAL},
+      #{returnMoney,jdbcType=DECIMAL}, #{totalProfit1,jdbcType=DECIMAL}, #{platformnum,jdbcType=VARCHAR},
+      #{busNum,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR},
+      #{agentType,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, #{payCompany,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
     insert into P_PROFIT_D
@@ -138,9 +128,6 @@
       <if test="totalProfit != null">
         TOTAL_PROFIT,
       </if>
-      <if test="totalProfit1 != null">
-        TOTAL_PROFIT1,
-      </if>
       <if test="frozenMoney != null">
         FROZEN_MONEY,
       </if>
@@ -159,8 +146,29 @@
       <if test="returnMoney != null">
         RETURN_MONEY,
       </if>
-      <if test="platformNum != null">
+      <if test="totalProfit1 != null">
+        TOTAL_PROFIT1,
+      </if>
+      <if test="platformnum != null">
         PLATFORMNUM,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="parentBusNum != null">
+        PARENT_BUS_NUM,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="agentType != null">
+        AGENT_TYPE,
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -203,17 +211,139 @@
       <if test="returnMoney != null">
         #{returnMoney,jdbcType=DECIMAL},
       </if>
-      <if test="platformNum != null">
-        #{platformNum,jdbcType=VARCHAR},
+      <if test="totalProfit1 != null">
+        #{totalProfit1,jdbcType=DECIMAL},
+      </if>
+      <if test="platformnum != null">
+        #{platformnum,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="parentBusNum != null">
+        #{parentBusNum,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentType != null">
+        #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="payCompany != null">
+        #{payCompany,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultType="java.lang.Integer">
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultType="java.lang.Long">
     select count(*) from P_PROFIT_D
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
+    update P_PROFIT_D
+    <set>
+      <if test="agentPid != null">
+        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="transDate != null">
+        TRANS_DATE = #{transDate,jdbcType=VARCHAR},
+      </if>
+      <if test="remitDate != null">
+        REMIT_DATE = #{remitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="totalProfit != null">
+        TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
+      </if>
+      <if test="frozenMoney != null">
+        FROZEN_MONEY = #{frozenMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="successMoney != null">
+        SUCCESS_MONEY = #{successMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="failMoney != null">
+        FAIL_MONEY = #{failMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="realMoney != null">
+        REAL_MONEY = #{realMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="redoMoney != null">
+        REDO_MONEY = #{redoMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="returnMoney != null">
+        RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="totalProfit1 != null">
+        TOTAL_PROFIT1 = #{totalProfit1,jdbcType=DECIMAL},
+      </if>
+      <if test="platformnum != null">
+        PLATFORMNUM = #{platformnum,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="parentBusNum != null">
+        PARENT_BUS_NUM = #{parentBusNum,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentType != null">
+        AGENT_TYPE = #{agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="payCompany != null">
+        PAY_COMPANY = #{payCompany,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
+    update P_PROFIT_D
+    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      TRANS_DATE = #{transDate,jdbcType=VARCHAR},
+      REMIT_DATE = #{remitDate,jdbcType=VARCHAR},
+      TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
+      FROZEN_MONEY = #{frozenMoney,jdbcType=DECIMAL},
+      SUCCESS_MONEY = #{successMoney,jdbcType=DECIMAL},
+      FAIL_MONEY = #{failMoney,jdbcType=DECIMAL},
+      REAL_MONEY = #{realMoney,jdbcType=DECIMAL},
+      REDO_MONEY = #{redoMoney,jdbcType=DECIMAL},
+      RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL},
+      TOTAL_PROFIT1 = #{totalProfit1,jdbcType=DECIMAL},
+      PLATFORMNUM = #{platformnum,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      PARENT_BUS_NUM = #{parentBusNum,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      AGENT_TYPE = #{agentType,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      PAY_COMPANY = #{payCompany,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
 
   <select id="totalMonthByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
     SELECT SUM(TOTAL_PROFIT)
@@ -223,7 +353,7 @@
     AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
   </select>
 
-    <select id="totalRPByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
+  <select id="totalRPByAgentPid" parameterType="com.ryx.credit.profit.pojo.ProfitDay" resultType="java.math.BigDecimal">
         SELECT SUM(TOTAL_PROFIT)
         FROM P_PROFIT_D
         where
@@ -271,80 +401,9 @@
     AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
   </select>
 
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
-    update P_PROFIT_D
-    <set>
-      <if test="agentPid != null">
-        AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-      </if>
-      <if test="agentId != null">
-        AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      </if>
-      <if test="agentName != null">
-        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      </if>
-      <if test="transDate != null">
-        TRANS_DATE = #{transDate,jdbcType=VARCHAR},
-      </if>
-      <if test="remitDate != null">
-        REMIT_DATE = #{remitDate,jdbcType=VARCHAR},
-      </if>
-      <if test="totalProfit != null">
-        TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
-      </if>
-      <if test="totalProfit1 != null">
-        TOTAL_PROFIT1 = #{totalProfit1,jdbcType=DECIMAL},
-      </if>
-      <if test="frozenMoney != null">
-        FROZEN_MONEY = #{frozenMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="successMoney != null">
-        SUCCESS_MONEY = #{successMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="failMoney != null">
-        FAIL_MONEY = #{failMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="realMoney != null">
-        REAL_MONEY = #{realMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="redoMoney != null">
-        REDO_MONEY = #{redoMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="returnMoney != null">
-        RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL},
-      </if>
-      <if test="platformNum != null">
-        PLATFORMNUM = #{platformNum,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitDay">
-    update P_PROFIT_D
-    set AGENT_PID = #{agentPid,jdbcType=VARCHAR},
-    AGENT_ID = #{agentId,jdbcType=VARCHAR},
-    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-    TRANS_DATE = #{transDate,jdbcType=VARCHAR},
-    REMIT_DATE = #{remitDate,jdbcType=VARCHAR},
-    TOTAL_PROFIT = #{totalProfit,jdbcType=DECIMAL},
-    TOTAL_PROFIT1 = #{totalProfit1,jdbcType=DECIMAL},
-    FROZEN_MONEY = #{frozenMoney,jdbcType=DECIMAL},
-    SUCCESS_MONEY = #{successMoney,jdbcType=DECIMAL},
-    FAIL_MONEY = #{failMoney,jdbcType=DECIMAL},
-    REAL_MONEY = #{realMoney,jdbcType=DECIMAL},
-    REDO_MONEY = #{redoMoney,jdbcType=DECIMAL},
-    RETURN_MONEY = #{returnMoney,jdbcType=DECIMAL},
-    PLATFORMNUM = #{platformNum,jdbcType=VARCHAR}
-    where ID = #{id,jdbcType=VARCHAR}
-  </update>
-  <sql id="OracleDialectPrefix">
-    <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from (
-    </if>
-  </sql>
-  <sql id="OracleDialectSuffix">
-    <if test="page != null">
-      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
-    </if>
-  </sql>
+  <delete id="deleteByDay" parameterType="java.lang.String">
+    delete from P_PROFIT_D
+    where REMIT_DATE = '${frDate}'
+  </delete>
+
 </mapper>

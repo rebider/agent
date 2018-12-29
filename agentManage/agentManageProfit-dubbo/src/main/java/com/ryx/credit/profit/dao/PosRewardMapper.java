@@ -16,6 +16,10 @@ public interface PosRewardMapper {
 
     List<PosReward> selectByExample(PosRewardExample example);
 
+    //更新按照考核月查询pos奖励申请
+    List<PosReward> selectByEndMonth(PosRewardExample example);
+
+
     PosReward selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(PosReward record);

@@ -124,4 +124,10 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
         return directMapper.selectByWhere(record);
     }
 
+    /*@Override
+    public void updateByAgentId(ProfitDirect ProfitDirect) {
+        directMapper.updateByAgentId(ProfitDirect);
+    }*/
+
+
 }

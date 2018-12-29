@@ -74,7 +74,7 @@ public class LinkDateTest {
             ProfitDetailMonth profitDetail = detailMonthMapper.selectByIdAndParent(where);
             BigDecimal deductionTax = profitDetail.getDeductionTaxMonthAmt();//本月税额
             BigDecimal realAmt = profitDetail.getRealProfitAmt()==null?BigDecimal.ZERO:profitDetail.getRealProfitAmt();//实际分润
-            BigDecimal tax = profitDetail.getTax();//税点(0.06)
+            BigDecimal tax = new BigDecimal(profitDetail.getTax());//税点(0.06)
             BigDecimal smalTax = profitDetail.getSmalTaxAmt()==null?BigDecimal.ZERO:profitDetail.getSmalTaxAmt();;//已抵税金额
 
             List<OPayment> paymentList = new ArrayList<>();

@@ -40,5 +40,5 @@ public interface ProfitSupplyService {
 
     int resetData();
 
-    List<String> importSupplyList(List<List<Object>> data) throws Exception;
+    List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception;
 }

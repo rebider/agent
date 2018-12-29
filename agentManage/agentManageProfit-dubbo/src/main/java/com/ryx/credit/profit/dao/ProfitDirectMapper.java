@@ -58,4 +58,6 @@ public interface ProfitDirectMapper {
     void  updateByStatus(ProfitDirect profitDirectSingleList);
 
     BigDecimal selectAmtByDeal(String transMonth);
+
+    void deleteByMonth(@Param("transMonth") String transMonth);
 }

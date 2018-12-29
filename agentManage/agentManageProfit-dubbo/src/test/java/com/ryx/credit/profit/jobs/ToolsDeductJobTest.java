@@ -348,7 +348,11 @@ public class ToolsDeductJobTest {
     @Test
     public void tes1111t() throws InterruptedException {
 //        profitToolsDeductService.otherOperate();
-        posProfitComputeServiceImpl.otherOperate();
+        try {
+            posProfitComputeServiceImpl.otherOperate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 //        profitToolsDeductService.otherOperate();
 //        posProfitComputeServiceImpl.clearDetail();
 

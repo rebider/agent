@@ -8,20 +8,24 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
+import com.ryx.credit.profit.jobs.NewProfitDataJob;
 import com.ryx.credit.profit.jobs.TranDataJob;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample;
 import com.ryx.credit.profit.service.ProfitOrganTranMonthService;
+import com.ryx.credit.profit.unitmain.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
  * 月交易实现
+ *
  * @author zhaodw
  * @create 2018/8/1
  * @since 1.0.0
@@ -36,6 +40,18 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Autowired
     private TranDataJob tranDataJob;
+    @Resource
+    NewProfitDataJob newProfitDataJob;
+    @Autowired
+    NewProfitMonthMposDataJob newProfitMonthMposDataJob;
+    @Autowired
+    DailyProfitMposDataJob dailyProfitMposDataJob;
+    @Autowired
+    ProfitZhiFaDataJob profitZhiFaDataJob;
+    @Autowired
+    ProfitMposDiffDataJob profitMposDiffDataJob;
+    @Autowired
+    ProfitSummaryDataJob profitSummaryDataJob;
 
     @Override
     public void insert(ProfitOrganTranMonth profitOrganTranMonth) {
@@ -54,21 +70,18 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         ProfitOrganTranMonthExample.Criteria criteria = example.createCriteria();
         // 月份按开始到结束查询
 
-        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateEnd()))
-        {
-            criteria.andProfitDateBetween(profitOrganTranMonth.getProfitDateStart(),profitOrganTranMonth.getProfitDateEnd());
-        }else if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateStart())){
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateStart()) && StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateEnd())) {
+            criteria.andProfitDateBetween(profitOrganTranMonth.getProfitDateStart(), profitOrganTranMonth.getProfitDateEnd());
+        } else if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateStart())) {
             criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDateStart());
-        }else if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateEnd())){
+        } else if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDateEnd())) {
             criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDateEnd());
         }
 
-        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate()))
-        {
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate())) {
             criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDate());
         }
-        if (StringUtils.isNotBlank(profitOrganTranMonth.getProductType()))
-        {
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProductType())) {
             criteria.andProductTypeEqualTo(profitOrganTranMonth.getProductType());
         }
         example.setOrderByClause(" PROFIT_DATE DESC ");
@@ -84,11 +97,9 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         ProfitOrganTranMonthExample example = new ProfitOrganTranMonthExample();
         ProfitOrganTranMonthExample.Criteria criteria = example.createCriteria();
         // 月份按开始到结束查询
-        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate()))
-        {
+        if (StringUtils.isNotBlank(profitOrganTranMonth.getProfitDate())) {
             criteria.andProfitDateEqualTo(profitOrganTranMonth.getProfitDate());
-            if (StringUtils.isNotBlank(profitOrganTranMonth.getProductType()))
-            {
+            if (StringUtils.isNotBlank(profitOrganTranMonth.getProductType())) {
                 criteria.andProductTypeEqualTo(profitOrganTranMonth.getProductType());
             }
         } else {
@@ -99,7 +110,44 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
     }
 
     @Override
-    public void importData() {
-        tranDataJob.deal();
+    public void importData(String type) {
+        try {
+            if (type.equals("1")) {//交易量重新导入
+                tranDataJob.deal();
+            } else if ("2".equals(type)) {//pos分润重新同步
+                newProfitDataJob.deal(null);
+            } else if ("3".equals(type)) {//手刷月结分润重新同步
+                newProfitMonthMposDataJob.excute(null);
+            } else if ("4".equals(type)) {//手刷日结分润重新同步
+                for (int i = 1; i <= 31; i++) {
+                    String month = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+                    String settleDay = month + (i < 10 ? "0" + i : i);
+                    Thread thread = new Thread(new SyncMposDayProfit(settleDay));
+                    thread.start();
+                }
+            } else if ("5".equals(type)) {//手刷直发平台重新同步
+                profitZhiFaDataJob.excute(null);
+            } else if ("6".equals(type)) {//手刷补差数据重新同步
+                profitMposDiffDataJob.excute(null);
+            } else if ("7".equals(type)) {//手刷月汇总重算
+                profitSummaryDataJob.excute(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    class SyncMposDayProfit implements Runnable {
+
+        private String settleDay;
+
+        public SyncMposDayProfit(String settleDay) {
+            this.settleDay = settleDay;
+        }
+
+        @Override
+        public void run() {
+            dailyProfitMposDataJob.excute(settleDay);
+        }
     }
 }
