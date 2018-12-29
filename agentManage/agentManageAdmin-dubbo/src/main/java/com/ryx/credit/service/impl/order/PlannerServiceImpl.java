@@ -87,6 +87,9 @@ public class PlannerServiceImpl implements PlannerService {
         if (null!=map.get("par_proName") && StringUtils.isNotBlank(map.get("par_proName")+"")){
             reqMap.put("proName", "%"+map.get("par_proName")+"%");
         }
+        if (null!=map.get("oInuretime") && StringUtils.isNotBlank(map.get("oInuretime")+"")){
+            reqMap.put("oInuretime", map.get("oInuretime"));
+        }
         reqMap.put("agStatus", AgStatus.Approved.name());
         reqMap.put("cIncomStatus", AgentInStatus.NO.status);
         reqMap.put("cloReviewStatus", AgStatus.Approved.status);
