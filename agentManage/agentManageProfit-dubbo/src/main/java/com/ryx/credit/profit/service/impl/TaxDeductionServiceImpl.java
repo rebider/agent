@@ -62,12 +62,12 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         }
 
         //agentList.parallelStream().forEach(map -> {
-        for(Map<String, Object> map:agentList) {
+        for (Map<String, Object> map : agentList) {
             try {
                 logger.info("=====================================1");
                 String agentId = (String) map.get("AGENT_ID");
                 String agentName = map.get("AGENT_NAME") == null ? "" : (String) map.get("AGENT_NAME");
-                String parentAgentId = (String) map.get("PARENT_AGENT_ID");
+                String parentAgentId = (String) map.get("PARENT_AGENT_ID") == null ? "" : (String) map.get("PARENT_AGENT_ID");
                 String parentAgentName = map.get("PARENT_AGENT_NAME") == null ? "" : (String) map.get("PARENT_AGENT_NAME");
                 logger.info("计算扣税,{}，{}", agentId, parentAgentId);
                 BigDecimal blAmt = (BigDecimal) map.get("BL_AMT");  //保理
@@ -83,13 +83,16 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 logger.info("=====================================2");
                 //扣税明细
                 TaxDeductionDetail taxDeductionDetail = new TaxDeductionDetail();
+                logger.info("=====================================2.1");
                 taxDeductionDetail.setId(idService.genId(TabId.P_TAX_DEDUCTION_DETAIL));
+                logger.info("=====================================2.2");
                 taxDeductionDetail.setAgentId(agentId);
                 taxDeductionDetail.setAgentName(agentName);
                 taxDeductionDetail.setProfitMonth(profitMonth);
                 taxDeductionDetail.setAgentPid("");
                 taxDeductionDetail.setParentAgentId(parentAgentId);
                 taxDeductionDetail.setParentAgentName(parentAgentName);
+                logger.info("=====================================2.3");
                 taxDeductionDetail.setPreLdAmt(preTaxBase);
                 taxDeductionDetail.setDayProfitAmt(daysProfitAmt);
                 taxDeductionDetail.setDayBackAmt(returnMoney);
@@ -147,8 +150,8 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         param.setAgentId(tdd.getAgentId());
         param.setParentAgentId(tdd.getParentAgentId());
         ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByIdAndParent(param);
-        if(profitDetailMonth==null){
-            throw new RuntimeException("查询月汇总数据为空"+JSONObject.toJSONString(param));
+        if (profitDetailMonth == null) {
+            throw new RuntimeException("查询月汇总数据为空" + JSONObject.toJSONString(param));
         }
         logger.debug(JSONObject.toJSONString(profitDetailMonth));
 
