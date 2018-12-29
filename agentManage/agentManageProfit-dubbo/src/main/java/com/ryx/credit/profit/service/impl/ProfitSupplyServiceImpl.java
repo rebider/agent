@@ -124,7 +124,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      * @return
      */
     @Override
-    public int resetData() {
+    public int resetData(String busBigType) {
         // 终审后不能清除
         String finalStatus = redisService.getValue("commitFinal");
         if (StringUtils.isBlank(finalStatus)) {
@@ -133,7 +133,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return pProfitSupplyMapper.resetData();
+        return pProfitSupplyMapper.resetData(busBigType);
     }
 
     /**
@@ -142,7 +142,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception {
+    public  List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception {
         List<String> list = new ArrayList<>();
         if (null == data && data.size() == 0) {
             logger.info("导入数据为空");
