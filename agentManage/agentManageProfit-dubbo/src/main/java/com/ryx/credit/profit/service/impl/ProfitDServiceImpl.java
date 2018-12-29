@@ -102,7 +102,7 @@ public class ProfitDServiceImpl implements IProfitDService {
         List<ProfitDay> profitD = profitDMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);
-        pageInfo.setTotal(Integer.parseInt(profitDMapper.countByExample(example) + ""));
+        pageInfo.setTotal(profitDMapper.countByExample(example));
         return pageInfo;
     }
 

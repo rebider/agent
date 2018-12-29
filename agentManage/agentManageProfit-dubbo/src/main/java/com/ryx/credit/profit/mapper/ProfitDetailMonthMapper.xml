@@ -951,12 +951,14 @@
     where
     PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
-    <if test="parentAgentId != null">
-      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
-    </if>
-    <if test="parentAgentId == null">
-      AND PARENT_AGENT_ID is null
-    </if>
+    <choose>
+      <when test="parentAgentId != null and parentAgentId != ''">
+        AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+      </when>
+      <otherwise>
+        AND PARENT_AGENT_ID is null
+      </otherwise>
+    </choose>
   </select>
 
 
@@ -1019,7 +1021,7 @@
     select
     ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,
     ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,
-    ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,
+    ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
     ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
     ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
     nvl(sum(ppd.pos_td_supply_amt+ppd.mpos_td_supply_amt+ppd.tools_return_amt+ppd.other_supply_amt),0) as profitSupplySum,
@@ -1046,7 +1048,7 @@
     <include refid="queryWhere"/>
     group by
     ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,
-    ppd.profit_sum_amt, ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,
+    ppd.profit_sum_amt, ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
     ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
     ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
     ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,
@@ -1062,7 +1064,7 @@
   <select id="queryProfitDetailMonthCount" parameterType="java.util.Map" resultType="java.lang.Long">
     select count(1) from(
     select
-    ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,
+    ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.BU_DEDUCTION_AMT,
     (ppd.profit_sum_amt
     +ppd.supply_tax_amt
     +sum(ppd.pos_td_supply_amt+ppd.mpos_td_supply_amt+ppd.tools_return_amt+ppd.other_supply_amt)
@@ -1095,7 +1097,7 @@
     from P_PROFIT_DETAIL_M ppd
     <include refid="queryWhere"/>
     group by
-    ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,
+    ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.BU_DEDUCTION_AMT,
     ppd.profit_sum_amt, ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,
     ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
     ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
@@ -1125,8 +1127,8 @@
       1=1
       <if test="agentId != null and agentId !=''">and ppd.agent_id = #{agentId}</if>
       <if test="agentName != null and agentName !=''">and ppd.agent_name = #{agentName}</if>
-      <if test="profitDateStart != null and profitDateStart != ''">and profit_date >= TO_DATE(#{profitDateStart},'yyyy-MM')</if>
-      <if test="profitDateEnd != null and profitDateEnd != ''">and profit_date &lt;= TO_DATE(#{profitDateEnd},'yyyy-MM')</if>
+      <if test="profitDateStart != null and profitDateStart != ''">and PROFIT_DATE &gt;= #{profitDateStart}</if>
+      <if test="profitDateEnd != null and profitDateEnd != ''">and PROFIT_DATE &lt;= #{profitDateEnd}</if>
     </where>
   </sql>
 
