@@ -83,9 +83,9 @@ public class NewProfitMonthMposDataJob {
         map.put("pageNumber", index++ + "");
         map.put("pageSize", "1000");
         String params = JsonUtil.objectToJson(map);
-        logger.info("========手刷{}月分润明细请求报文：{}", transDate, JSONObject.toJSONString(map));
+        logger.debug("========手刷{}月分润明细请求报文：{}", transDate, JSONObject.toJSONString(map));
         String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newmonth"), params);
-        logger.info("========手刷{}月分润明细返回报文：{}", transDate, res);
+        logger.debug("========手刷{}月分润明细返回报文：{}", transDate, res);
 
         JSONObject json = JSONObject.parseObject(res);
         if (!json.get("respCode").equals("000000")) {
