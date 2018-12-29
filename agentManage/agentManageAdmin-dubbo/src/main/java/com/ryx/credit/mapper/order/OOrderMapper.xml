@@ -528,7 +528,7 @@
     left join c_organization g on g.id= b.ag_doc_pro
     <where>
       <if test="doc==null"> and 1=2 </if>
-      <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
+      <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) and o.review_status != 1</if>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
@@ -595,6 +595,7 @@
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
     </where>
     UNION
     select
@@ -608,7 +609,7 @@
     left join c_organization g on g.id= b.ag_doc_pro
     <where>
       <if test="doc==null"> and 1=2 </if>
-      <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) </if>
+      <if test="doc!=null"> and (b.ag_doc_pro = #{doc,jdbcType=VARCHAR} or b.ag_doc_district=#{doc,jdbcType=VARCHAR}) and o.review_status != 1</if>
       <if test="1==1"> and  o.status = 1 </if>
       <if test="oNum!=null and oNum!=''"> and  o.o_num = #{oNum} </if>
       <if test="id!=null and id!=''"> and  o.id = #{id} </if>
@@ -632,6 +633,7 @@
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on soa.SUB_ORDER_ID=os.id
         and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
       </if>
+      <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
     </where>
     )
   </select>
