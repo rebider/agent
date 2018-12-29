@@ -951,12 +951,14 @@
     where
     PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
-    <if test="parentAgentId != null">
-      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
-    </if>
-    <if test="parentAgentId == null">
-      AND PARENT_AGENT_ID is null
-    </if>
+    <choose>
+      <when test="parentAgentId != null and parentAgentId != ''">
+        AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+      </when>
+      <otherwise>
+        AND PARENT_AGENT_ID is null
+      </otherwise>
+    </choose>
   </select>
 
 
