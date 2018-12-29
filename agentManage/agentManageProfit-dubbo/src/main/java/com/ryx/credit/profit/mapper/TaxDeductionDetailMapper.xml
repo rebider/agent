@@ -85,24 +85,6 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-
-  <select id="selectDirectlyByExample" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    from P_TAX_DEDUCTION_DETAIL
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-    <include refid="OracleDialectSuffix" />
-  </select>
-
   <select id="queryAndSubordinate" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
@@ -118,7 +100,6 @@
     CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{detail.profitMonth}
     <include refid="OracleDialectSuffix" />
   </select>
-
   <select id="queryCountAndSubordinate" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail" resultType="java.lang.Long">
     select  count(1) from (
       select
