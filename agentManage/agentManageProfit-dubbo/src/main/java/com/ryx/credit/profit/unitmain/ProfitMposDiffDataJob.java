@@ -88,9 +88,9 @@ public class ProfitMposDiffDataJob {
             map.put("pageSize", "50");
             String params = JsonUtil.objectToJson(map);
 
-            logger.info("{}月手刷补差数据同步请求参数:{}", month, params);
+            logger.debug("{}月手刷补差数据同步请求参数:{}", month, params);
             String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.bucha"), params);
-            logger.info("{}月手刷补差数据同步返回数据:{}", month, res);
+            logger.debug("{}月手刷补差数据同步返回数据:{}", month, res);
 
 
             JSONObject json = JSONObject.parseObject(res);

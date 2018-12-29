@@ -453,7 +453,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             });
 
             //扣税
-            taxDeductionService.taxDeductionComputer(params);
+            taxDeductionService.taxDeductionComputer();
 
             //补税点
             profitSupplyTaxService.taxSupplyComputer(params);
