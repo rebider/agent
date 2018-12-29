@@ -236,6 +236,14 @@ public class OrderServiceImpl implements OrderService {
         orderFormVo.setUserId(userId);
         //保存订单数据
         orderFormVo = setOrderFormValue(orderFormVo, userId);
+        //是否启动流程
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(orderFormVo.getIsApproveWhenSubmit()) && "1".equals(orderFormVo.getIsApproveWhenSubmit())){
+            //启动流程审批
+            AgentResult agentResult = startOrderActiviy(orderFormVo.getId(),userId);
+            if(!agentResult.isOK()){
+                throw new Exception(agentResult.getMsg());
+            }
+        }
         //添加到数据历史表
         agentDataHistoryService.saveDataHistory(orderFormVo, DataHistoryType.ORDER.getValue());
         return AgentResult.ok(orderFormVo.getId());
