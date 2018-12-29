@@ -24,6 +24,8 @@ public class ChangeActMachineVo implements Serializable{
     //平台类型
     private String platformType;
 
+    private String snNum;
+
     /**
      * 活动调整明细ID
      */
@@ -101,5 +103,13 @@ public class ChangeActMachineVo implements Serializable{
 
     public void setLogisticsDetailList(List<OLogisticsDetail> logisticsDetailList) {
         this.logisticsDetailList = logisticsDetailList;
+    }
+
+    public String getSnNum() {
+        return snNum;
+    }
+
+    public void setSnNum(String snNum) {
+        this.snNum = snNum;
     }
 }

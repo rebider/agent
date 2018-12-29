@@ -292,7 +292,7 @@
         Pro_Code as "proCode",Pro_Name  as "proName",Pro_Type  as "proType",Pro_Price  as "proPrice"
         from O_product
         <where>
-          O_product.Pro_Status=1
+          O_product.Pro_Status=1 and status = 1
          <if test="proType!=null and proType!=''"> and O_product.Pro_Type=#{proType}</if>
          <if test="proCode!=null and proCode!=''"> and O_product.Pro_Code=#{proCode}</if>
          <if test="proName!=null and proName!=''"> and O_product.Pro_Name like '${proName}'</if>
