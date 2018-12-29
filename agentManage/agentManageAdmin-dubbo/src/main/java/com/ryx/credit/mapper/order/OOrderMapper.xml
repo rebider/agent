@@ -425,6 +425,7 @@
     e.bus_num,
     f.name as ag_doc_district_name ,
     g.name as ag_doc_pro_name ,
+    o.user_id as user_id,
     nvl((select sum(o_payment_detail.pay_amount)
     from o_payment_detail
     where o_payment_detail.payment_id = d.id and o_payment_detail.order_id= o.id
