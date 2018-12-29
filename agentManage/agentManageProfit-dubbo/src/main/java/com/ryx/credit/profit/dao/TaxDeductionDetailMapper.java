@@ -11,6 +11,8 @@ import java.util.Map;
 public interface TaxDeductionDetailMapper {
     long countByExample(TaxDeductionDetailExample example);
 
+    long countDirectlyByExample(TaxDeductionDetailExample example);
+
     int deleteByExample(TaxDeductionDetailExample example);
 
     int insert(TaxDeductionDetail record);
@@ -18,6 +20,8 @@ public interface TaxDeductionDetailMapper {
     int insertSelective(TaxDeductionDetail record);
 
     List<TaxDeductionDetail> selectByExample(TaxDeductionDetailExample example);
+
+    List<TaxDeductionDetail> selectDirectlyByExample(TaxDeductionDetailExample example);
 
     TaxDeductionDetail selectByPrimaryKey(String id);
 

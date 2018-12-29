@@ -31,6 +31,7 @@
     <result column="NOT_DEDUCTION_TAX_AMT" jdbcType="DECIMAL" property="notDeductionTaxAmt" />
     <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
     <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,9 +67,26 @@
     PARENT_AGENT_ID, PARENT_AGENT_NAME, PRE_LD_AMT, DAY_PROFIT_AMT, DAY_BACK_AMT, BASIC_PROFIT_AMT, 
     BL_AMT, MERCHAN_ORDER_AMT, AGENT_DF_AMT, ADJUST_AMT, ADJUST_ACCOUNT, ADJUST_RESON, 
     ADJUST_TIME, TAX_BASE, TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, SUPPOSED_TAX_AMT, 
-    REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, CREATE_TIME, UPDATE_TIME
+    REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, CREATE_TIME, UPDATE_TIME, BUS_PLATFORM
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="selectDirectlyByExample" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -140,7 +158,8 @@
       ADJUST_RESON, ADJUST_TIME, TAX_BASE, 
       TAX_RATE, ADD_TAX_AMT, PRE_NOT_DEDUCTION_AMT1, 
       SUPPOSED_TAX_AMT, REAL_TAX_AMT, NOT_DEDUCTION_TAX_AMT, 
-      CREATE_TIME, UPDATE_TIME)
+      CREATE_TIME, UPDATE_TIME, BUS_PLATFORM
+      )
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{profitMonth,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{fristAgentId,jdbcType=VARCHAR}, 
       #{fristAgentName,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, 
@@ -150,7 +169,8 @@
       #{adjustReson,jdbcType=VARCHAR}, #{adjustTime,jdbcType=VARCHAR}, #{taxBase,jdbcType=DECIMAL}, 
       #{taxRate,jdbcType=DECIMAL}, #{addTaxAmt,jdbcType=DECIMAL}, #{preNotDeductionAmt1,jdbcType=DECIMAL}, 
       #{supposedTaxAmt,jdbcType=DECIMAL}, #{realTaxAmt,jdbcType=DECIMAL}, #{notDeductionTaxAmt,jdbcType=DECIMAL}, 
-      #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR})
+      #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail">
     insert into P_TAX_DEDUCTION_DETAIL
@@ -242,6 +262,9 @@
       <if test="updateTime != null">
         UPDATE_TIME,
       </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -330,6 +353,9 @@
       </if>
       <if test="updateTime != null">
         #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -426,6 +452,9 @@
       <if test="updateTime != null">
         UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
       </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -458,7 +487,8 @@
       REAL_TAX_AMT = #{realTaxAmt,jdbcType=DECIMAL},
       NOT_DEDUCTION_TAX_AMT = #{notDeductionTaxAmt,jdbcType=DECIMAL},
       CREATE_TIME = #{createTime,jdbcType=VARCHAR},
-      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR}
+      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
