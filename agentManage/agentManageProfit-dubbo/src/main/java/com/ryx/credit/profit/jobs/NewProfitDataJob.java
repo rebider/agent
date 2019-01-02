@@ -222,6 +222,7 @@ public class NewProfitDataJob {
         profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
         profitDetailMonthTemp.setParentAgentId(transProfitDetail.getParentAgentId());
         profitDetailMonthTemp.setStatus("4");
+        profitDetailMonthTemp.setBusPlatform(transProfitDetail.getBusCode());
         profitDetailMonthTemp.setPayCompany(transProfitDetail.getPayCompany());
         // 获取账户信息
         List<AgentColinfo> agentColinfos = agentColinfoService.queryAgentColinfoService(transProfitDetail.getAgentId(), null, AgStatus.Approved.status);

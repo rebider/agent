@@ -33,4 +33,6 @@ public interface TaxDeductionDetailMapper {
     long queryCountAndSubordinate(TaxDeductionDetail taxDeductionDetail);
 
     void deleteByMonth(@Param("profitMonth") String profitMonth);
+
+    List<Map<String,Object>> queryTaxDeductionZFAgentList(Map<String,Object> params);
 }
