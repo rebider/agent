@@ -4,7 +4,6 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.TaxDeductionDetailMapper;
-import com.ryx.credit.profit.pojo.PosRewardExample;
 import com.ryx.credit.profit.pojo.TaxDeductionDetail;
 import com.ryx.credit.profit.pojo.TaxDeductionDetailExample;
 import com.ryx.credit.profit.service.ITaxDeductionDetailService;
@@ -34,6 +33,33 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         }
         if(StringUtils.isNotBlank(taxDeductionDetail.getProfitMonth())){
             criteria.andProfitMonthEqualTo(taxDeductionDetail.getProfitMonth());
+        }
+        if(StringUtils.isNotBlank(taxDeductionDetail.getBusPlatform())){
+            criteria.andBusPlatformNotEqualTo(taxDeductionDetail.getBusPlatform());
+        }
+        List<TaxDeductionDetail> taxDeductionDetails = taxDeductionDetailMapper.selectByExample(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(taxDeductionDetails);
+        pageInfo.setTotal((int)taxDeductionDetailMapper.countByExample(example));
+        return pageInfo;
+    }
+
+    @Override
+    public PageInfo posDirectlyDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page) {
+        TaxDeductionDetailExample example=new TaxDeductionDetailExample();
+        example.setPage(page);
+        TaxDeductionDetailExample.Criteria criteria=example.createCriteria();
+        if(StringUtils.isNotBlank(taxDeductionDetail.getAgentName())){
+            criteria.andAgentNameEqualTo(taxDeductionDetail.getAgentName());
+        }
+        if(StringUtils.isNotBlank(taxDeductionDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(taxDeductionDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(taxDeductionDetail.getProfitMonth())){
+            criteria.andProfitMonthEqualTo(taxDeductionDetail.getProfitMonth());
+        }
+        if(StringUtils.isNotBlank(taxDeductionDetail.getBusPlatform())){
+            criteria.andBusPlatformEqualTo(taxDeductionDetail.getBusPlatform());
         }
         List<TaxDeductionDetail> taxDeductionDetails = taxDeductionDetailMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
@@ -96,5 +122,7 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         }
         return example;
     }
+
+
 
 }
