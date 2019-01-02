@@ -149,36 +149,38 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             throw new MessageException("导入数据为空");
         }
         for (List<Object> supply : data) {
-            ProfitSupply profitSupply = new ProfitSupply();
-            profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
-            profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
-            try {
-                //01 退单补款 02:机具返现 99：其它
-                if ("02".equals(sign)) {
-                    profitSupply.setBusBigType("02");
-                } else{
-                    profitSupply.setBusBigType("99");
-                }
-                profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
-                profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
-                profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
-                profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
-                profitSupply.setSupplyType(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//补款类型
-                profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(5))));//补款金额
-                profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7).replace("-",""));//月份
+                ProfitSupply profitSupply = new ProfitSupply();
+                profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
+                profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
+                try {
+                    //01 退单补款 02:机具返现 99：其它
+                    if ("02".equals(sign)) {
+                        profitSupply.setBusBigType("02");
+                    } else{
+                        profitSupply.setBusBigType("99");
+                    }
+                    profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
+                    profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
+                    profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
+                    profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
+                    profitSupply.setSupplyType(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//补款类型
+                    profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(5))));//补款金额
+                    profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7).replace("-",""));//月份
 
 //                profitSupply.setSupplyDate(null!=supply.get(6)?String.valueOf(supply.get(6)):"");//月份
 //                profitSupply.setSupplyCode(supply.get(7)!=null?"":String.valueOf(supply.get(7)));//补款码
-                if (pProfitSupplyMapper.insertSelective(profitSupply)==0) {
-                    logger.info("导入失败！");
-                    throw new MessageException(supply.toString() + "导入失败！");
+                    if (pProfitSupplyMapper.insertSelective(profitSupply)==0) {
+                        logger.info("导入失败！");
+                        throw new MessageException(supply.toString() + "导入失败！");
+                    }
+                    logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
+                    list.add(profitSupply.getId());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw e;
                 }
-                logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
-                list.add(profitSupply.getId());
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw e;
-            }
+
+
         }
         return list;
     }
