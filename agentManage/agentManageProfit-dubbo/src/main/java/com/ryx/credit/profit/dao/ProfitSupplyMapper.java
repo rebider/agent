@@ -12,7 +12,7 @@ public interface ProfitSupplyMapper {
 
     int deleteByExample(ProfitSupplyExample example);
 
-    int resetData(String busBigType);
+    int resetData(Map Param);
 
     int insert(ProfitSupply record);
 
