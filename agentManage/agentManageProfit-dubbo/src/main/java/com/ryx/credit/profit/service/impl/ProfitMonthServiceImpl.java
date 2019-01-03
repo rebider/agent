@@ -657,14 +657,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 //        BigDecimal otherAmt = BigDecimal.ZERO;
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
-        param.put("agentId", profitDetailMonthTemp.getAgentId());
-        param.put("computeType", computType);
-        param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
         param.put("sourceId", "4");// 罚款
         BigDecimal fk = profitDeductionServiceImpl.otherDeductionByType(param);
 //        otherAmt = otherAmt.add(fk);
         sumAmt = sumAmt.subtract(fk);
-
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "5"); // 预发分润
         BigDecimal yfk = profitDeductionServiceImpl.otherDeductionByType(param);

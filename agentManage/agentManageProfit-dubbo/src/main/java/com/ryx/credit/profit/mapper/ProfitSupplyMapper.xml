@@ -280,6 +280,7 @@
     where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE != '退单补款'
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+    <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>
       /*AND SUPPLY_CODE != '0'*/
   </select>
 
@@ -293,6 +294,7 @@
     <if test="parentAgentId == null ">AND PARENT_AGENT_ID is null </if>
     <if test="sourceId != null and sourceId != ''">AND SOURCE_ID = #{sourceId}</if>
     <if test="busType != null and busType != ''">AND BUS_TYPE = #{busType}</if>
+    <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>
 
   </select>
 
