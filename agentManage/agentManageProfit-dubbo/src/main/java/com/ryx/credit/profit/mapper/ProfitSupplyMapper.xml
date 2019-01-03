@@ -89,9 +89,9 @@
     </if>
   </delete>
 
-  <delete id="resetData" parameterType="java.lang.String"  >
+  <delete id="resetData" parameterType="java.util.Map"  >
     delete from P_PROFIT_SUPPLY
-    where SUPPLY_DATE = to_char(sysdate-30 ,'yyyymm') and SUPPLY_TYPE != '退单补款'and BUS_BIG_TYPE = #{busBigType,jdbcType=VARCHAR}
+    where SUPPLY_DATE = #{SUPPLY_DATE,jdbcType=VARCHAR} and SUPPLY_TYPE != '退单补款'and BUS_BIG_TYPE = #{busBigType,jdbcType=VARCHAR}
   </delete>
 
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
