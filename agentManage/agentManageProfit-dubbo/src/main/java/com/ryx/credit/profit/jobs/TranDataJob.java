@@ -60,7 +60,7 @@ public class TranDataJob {
             if (agentResult != null && agentResult.getData() != null) {
                 JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
                 if (json != null) {
-                    LOG.info(JSONObject.toJSONString(json));
+                    //LOG.info(JSONObject.toJSONString(json));
                     BigDecimal tranAmt = BigDecimal.ZERO;
                     BigDecimal zyssAmt = BigDecimal.ZERO;
                     BigDecimal posAmt = BigDecimal.ZERO;
