@@ -58,6 +58,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public PageInfo posRewardList(PosReward record, Page page) {
         PosRewardExample example = rewardEqualsTo(record);
+        example.setPage(page);
         example.setOrderByClause("TOTAL_END_MONTH "+Page.ORDER_DIRECTION_DESC);
         List<PosReward> profitD = rewardMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
