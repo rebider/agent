@@ -205,27 +205,28 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         InvoiceDetailExample example = new InvoiceDetailExample();
         example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(agentName)){
-            criteria.andAgentNameEqualTo(agentName);
-        }
         if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
             criteria.andProfitMonthBetween(dateStart,dateEnd);
         }else if(StringUtils.isNotBlank(dateStart)){
-            criteria.andProfitMonthEqualTo(dateStart);
+            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
+            //criteria.andProfitMonthEqualTo(dateStart);
         }else if(StringUtils.isNotBlank(dateEnd)){
-            criteria.andProfitMonthEqualTo(dateEnd);
+            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
+            //criteria.andProfitMonthEqualTo(dateEnd);
         }
         if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
         }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
-            String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
-            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
-            lists.add(agentIde);
+                String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+                List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
+                lists.add(agentIde);
             criteria.andAgentIdIn(lists);
         }else if(StringUtils.isNotBlank(agentId)){
             criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         Long count =invoiceDetailMapper.countByExample(example);
@@ -331,7 +332,9 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         String agentPid = invoiceDetailMapper.getAgentPidByAgentId(agentId);//获取代理商唯一码
         invoice.setAgentPid(agentPid);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");//将每次导入的欠票月份当设为当月
-        invoice.setFactorMonth(sdf.format(new Date()));
+        Date date = new Date();
+        String month = sdf.format(date);
+        invoice.setFactorMonth(month);
         invoice.setInvoiceAmt(amt);
         invoice.setStatus("1");
         SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -343,8 +346,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             invoiceMapper.setStatusToInvoice(invoice);
         }
         invoiceMapper.insertSelective(invoice);
-        //欠票导入后进行计算
-        ownInvoiceReComputer(invoice);
+        ownInvoiceReComputer(invoice);//欠票导入或者重导后计算
     }
 
     /**

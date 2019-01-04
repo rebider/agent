@@ -461,8 +461,9 @@
     select distinct  af.AGENT_ID from (select ad.ID from (select ab.ID from (select ID from A_AGENT_BUSINFO where AGENT_ID=#{agentId})aa
       join A_AGENT_BUSINFO ab on aa.ID=ab.BUS_PARENT) ac  join A_AGENT_BUSINFO ad on ac.ID = ad.BUS_PARENT) ae join A_AGENT_BUSINFO af on ae.ID = af.BUS_PARENT
   </select>
-  <select id="getAgentIdbyAgentName" resultType="java.lang.String">
-    select AGENT_ID from  P_INVOICE_DETAIL where AGENT_NAME = #{agentId}
+
+  <select id="getAgentIdbyAgentName" resultType="java.lang.String" parameterType="java.lang.String">
+    select distinct AGENT_ID from  P_INVOICE_DETAIL where AGENT_NAME = #{agentName}
   </select>
 
     <delete id="deleteByMonth" parameterType="java.lang.String">
