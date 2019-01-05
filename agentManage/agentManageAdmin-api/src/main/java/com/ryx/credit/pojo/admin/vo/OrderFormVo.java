@@ -21,6 +21,8 @@ public class OrderFormVo extends OOrder{
 
     private List<Attachment> attachments;
 
+    private String isApproveWhenSubmit;
+
     public OPayment getoPayment() {
         return oPayment;
     }
@@ -59,5 +61,13 @@ public class OrderFormVo extends OOrder{
 
     public void setoCashReceivables(List<OCashReceivablesVo> oCashReceivables) {
         this.oCashReceivables = oCashReceivables;
+    }
+
+    public String getIsApproveWhenSubmit() {
+        return isApproveWhenSubmit;
+    }
+
+    public void setIsApproveWhenSubmit(String isApproveWhenSubmit) {
+        this.isApproveWhenSubmit = isApproveWhenSubmit;
     }
 }
