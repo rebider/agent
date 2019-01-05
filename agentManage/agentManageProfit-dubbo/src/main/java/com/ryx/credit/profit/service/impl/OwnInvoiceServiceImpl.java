@@ -61,6 +61,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             InvoiceDetailExample example = new InvoiceDetailExample();
             InvoiceDetailExample.Criteria criteria = example.createCriteria();
             criteria.andAgentIdEqualTo(agentId);
+            criteria.andProfitMonthEqualTo(profitMonth);
             List<InvoiceDetail> list = invoiceDetailMapper.selectByExample(example);
             if (list != null && list.size() > 0) {
                 // 更新
@@ -75,6 +76,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 invoiceDetail.setOwnInvoice(ownInvoice);
                 invoiceDetail.setAddInvoiceAmt(invoice.getInvoiceAmt());
                 invoiceDetail.setUpdateTime(DateUtils.dateToStringss(new Date()));
+                invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
             } else {
                 //插入
                 Map<String, Object> params = new HashMap<>();
@@ -82,6 +84,10 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 params.put("preMonth", new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -2)));
                 params.put("agentId", invoice.getAgentId());
                 List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceAgents(params);
+                if (agentList != null && agentList.size() > 0) {
+                    Map<String, Object> map = agentList.get(0);
+                    insertInvoiceOwnDetail(map, profitMonth);
+                }
             }
         } catch (Exception e) {
             logger.error("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败", e);
@@ -214,22 +220,26 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
             //criteria.andProfitMonthEqualTo(dateEnd);
         }
-        if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
+        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
+        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
+            String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
+            lists.add(agentIde);
         }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
                 String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
                 List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
                 lists.add(agentIde);
             criteria.andAgentIdIn(lists);
-        }else if(StringUtils.isNotBlank(agentId)){
+        } else if (StringUtils.isNotBlank(agentId)) {
             criteria.andAgentIdEqualTo(agentId);
         }else if(StringUtils.isNotBlank(agentName)){
             criteria.andAgentNameEqualTo(agentName);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
-        Long count =invoiceDetailMapper.countByExample(example);
+        Long count = invoiceDetailMapper.countByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(lists);
         pageInfo.setTotal(count.intValue());
@@ -237,25 +247,25 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * @Author CQT
-     * 向欠票导入表中导入数据
      * @param datas
      * @param loginName
+     * @Author CQT
+     * 向欠票导入表中导入数据
      */
     @Override
-    public void exportData(List<List<Object>> datas,String loginName) {
-        if(datas != null && datas.size() > 0 ) {
-            datas.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list->{
-                insertInvoice(list,loginName);
+    public void exportData(List<List<Object>> datas, String loginName) {
+        if (datas != null && datas.size() > 0) {
+            datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list -> {
+                insertInvoice(list, loginName);
             });
         }
     }
 
     /**
-     * @Author CQT
-     * 根据id获取对应代理商数据信息
      * @param id
      * @return
+     * @Author CQT
+     * 根据id获取对应代理商数据信息
      */
     @Override
     public InvoiceDetail getInvoiceById(String id) {
@@ -263,45 +273,45 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * @Author CQT
-     * 设置调整金额
      * @param invoiceDetail
      * @return
+     * @Author CQT
+     * 设置调整金额
      */
     @Override
     public void setAdjustAMT(InvoiceDetail invoiceDetail) {
-        ownInvoiceAdjust(invoiceDetail.getId(),new BigDecimal(invoiceDetail.getAdjustAmt().toString()),invoiceDetail.getAdjustAccount(),invoiceDetail.getAdjustReson());
+        ownInvoiceAdjust(invoiceDetail.getId(), new BigDecimal(invoiceDetail.getAdjustAmt().toString()), invoiceDetail.getAdjustAccount(), invoiceDetail.getAdjustReson());
     }
 
     /**
-     * @Author CQT
-     * @Description导出数据
      * @param agentId
      * @param agentName
      * @param concludeChild
      * @param dateStart
      * @param dateEnd
      * @return
+     * @Author CQT
+     * @Description导出数据
      */
     @Override
     public List<InvoiceDetail> exportInvoiceData(String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
         InvoiceDetailExample example = new InvoiceDetailExample();
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(agentName)){
+        if (StringUtils.isNotBlank(agentName)) {
             criteria.andAgentNameEqualTo(agentName);
         }
-        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
-            criteria.andProfitMonthBetween(dateStart,dateEnd);
-        }else if(StringUtils.isNotBlank(dateStart)){
+        if (StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)) {
+            criteria.andProfitMonthBetween(dateStart, dateEnd);
+        } else if (StringUtils.isNotBlank(dateStart)) {
             criteria.andProfitMonthEqualTo(dateStart);
-        }else if(StringUtils.isNotBlank(dateEnd)){
+        } else if (StringUtils.isNotBlank(dateEnd)) {
             criteria.andProfitMonthEqualTo(dateEnd);
         }
-        if("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)){
+        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
-        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
+        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
             String agent = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agent);
             lists.add(agent);
@@ -314,18 +324,18 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * @Author CQT
-     *@Description 插入数据
      * @param list
      * @param loginName
+     * @Author CQT
+     * @Description 插入数据
      */
-    private void insertInvoice(List list,String loginName){
+    private void insertInvoice(List list, String loginName) {
         Invoice invoice = new Invoice();
         String agentId = list.get(1).toString();
         String agentName = list.get(0).toString();
         BigDecimal amt = new BigDecimal(list.get(2).toString());
         UUID uuid = UUID.randomUUID();
-        String str = uuid.toString().replace("-","");
+        String str = uuid.toString().replace("-", "");
         invoice.setId(str); //设置id
         invoice.setAgentId(agentId);
         invoice.setAgentName(agentName);
@@ -341,7 +351,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         invoice.setOptDate(ss.format(new Date()));
         invoice.setOptUser(loginName);
         boolean isHave = getInvoiceByInvoice(invoice);
-        if(isHave == false){
+        if (isHave == false) {
             //表示存在有效记录，将其设置为无效
             invoiceMapper.setStatusToInvoice(invoice);
         }
@@ -350,14 +360,14 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
+     * @param invoice
+     * @return 不存在，返回true
      * @Author CQT
      * @Description判断导入欠票表中是否存在有效且已有数据
-     * @param invoice
-     * @return  不存在，返回true
      */
-    private boolean getInvoiceByInvoice(Invoice invoice){
+    private boolean getInvoiceByInvoice(Invoice invoice) {
         Invoice invoce = invoiceMapper.getInvoiceByInvoice(invoice);
-        if(invoce == null){
+        if (invoce == null) {
             return true;
         }
         return false;

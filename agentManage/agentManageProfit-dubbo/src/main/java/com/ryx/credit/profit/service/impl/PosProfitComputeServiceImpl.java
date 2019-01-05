@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.profit.dao.TransProfitDetailMapper;
 import com.ryx.credit.profit.jobs.ProfitAmtSumJob;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
@@ -45,6 +46,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private ProfitMonthService profitMonthService;
     @Autowired
     private ProfitAmtSumJob profitAmtSumJob;
+    @Autowired
+    TransProfitDetailMapper transProfitDetailMapper;
+
     private static final String PLATFORM_CODE = "100003";
     /**
      * 2:机构 3:机构一代 6:标准一代
@@ -78,12 +82,18 @@ public class PosProfitComputeServiceImpl implements DeductService {
             long khstart = System.currentTimeMillis();
             String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
             posRewardSDetailService.deleteCurrentDate(currentDate);
-            Supplier<TransProfitDetail> details = TransProfitDetail::new;
+            /*Supplier<TransProfitDetail> details = TransProfitDetail::new;
             TransProfitDetail detail = details.get();
             detail.setProfitDate(currentDate);
             detail.setBusCode(PLATFORM_CODE);
+            List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);*/
+
             //交易分润月度明细
-            List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
+            Map<String,Object> params = new HashMap<>();
+            params.put("profitDate",currentDate);
+            params.put("busCode",PLATFORM_CODE);
+            params.put("agentTypeList","'2','3','6'");
+            List<TransProfitDetail> list = transProfitDetailMapper.selectListByParams(params);
             LOG.info("总条数：{}", list.size());
 
             //通用奖励模板
@@ -161,6 +171,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
             List<PosRewardDetail> jgList = detailList.parallelStream().filter(posRewardDetail -> Objects.equals(AGENT_TYPE_2, posRewardDetail.getPosMechanismType())).collect(Collectors.toList());
             jgList.parallelStream().forEach(posRewardDetail -> {
                 List childAgentList = JSONObject.parseObject(posRewardDetail.getChildAgentIdList(), List.class);
+                childAgentList.remove(posRewardDetail.getPosAgentId());//不包含自己
                 BigDecimal downReward = BigDecimal.ZERO;
                 if (childAgentList.size() > 0) {
                     List<PosRewardDetail> childDetail = posRewardSDetailService.getPosRewardDetailList(posDetatil, null, childAgentList);

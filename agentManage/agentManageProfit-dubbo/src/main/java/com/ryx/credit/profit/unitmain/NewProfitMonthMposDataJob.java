@@ -185,12 +185,15 @@ public class NewProfitMonthMposDataJob {
 
             detail.setSourceInfo("MPOS");
 
-            ProfitSupplyDiff where = new ProfitSupplyDiff();
-            where.setDiffDate(transDate);
-            where.setAgentId(json.getString("AGENCYID"));
-            where.setParentAgentid(json.getString("ONLINEAGENCYID"));
-            BigDecimal supplyAmt = diffMapper.selectAmtByWhere(where);
-            detail.setSupplyAmt(supplyAmt == null ? BigDecimal.ZERO : supplyAmt);//补差金额
+            //手刷只有5000平台有补差
+            if("5000".equals(json.getString("PLATFORMNUM"))){
+                ProfitSupplyDiff where = new ProfitSupplyDiff();
+                where.setDiffDate(transDate);
+                where.setParentAgentid(json.getString("AGENCYID"));
+                BigDecimal supplyAmt = diffMapper.selectAmtByWhere(where);
+                detail.setSupplyAmt(supplyAmt == null ? BigDecimal.ZERO : supplyAmt);//补差金额
+            }
+
 
             //计算
             /*AgentResult agentResult = orderService.queryPaymentXXDK(json.getString("AGENCYID"));//查询线下打款数据信息

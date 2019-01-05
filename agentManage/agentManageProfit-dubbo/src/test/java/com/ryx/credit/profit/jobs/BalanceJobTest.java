@@ -13,7 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 退单任务测试
+ * 出款测试
  * @author zhaodw
  * @create 2018/7/30
  * @since 1.0.0

@@ -277,7 +277,8 @@
   <select id="getTotalByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE != '退单补款'
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+    <!--AND SUPPLY_TYPE != '退单补款'-->
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
     <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>

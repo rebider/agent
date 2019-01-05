@@ -1181,4 +1181,11 @@
 
   </select>
 
+
+  <update id="updateRealProfitAmt">
+    UPDATE P_PROFIT_DETAIL_M SET
+    REAL_PROFIT_AMT = BASICS_PROFIT_AMT - DEDUCTION_TAX_MONTH_AMT + SUPPLY_TAX_AMT
+    where PROFIT_DATE = #{profitMonth,jdbcType=VARCHAR}
+  </update>
+
 </mapper>

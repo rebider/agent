@@ -73,12 +73,8 @@
     select
     SUM(DIFF_AMT)
     from P_PROFIT_SUPPLY_DIFF
-    where
-    DIFF_DATE = #{diffDate,jdbcType=VARCHAR}
-    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
-    <if test="parentAgentid != null">
+    where DIFF_DATE = #{diffDate,jdbcType=VARCHAR}
       AND PARENT_AGENTID=#{parentAgentid,jdbcType=VARCHAR}
-    </if>
   </select>
 
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyDiffExample">

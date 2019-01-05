@@ -222,6 +222,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         supply.setAgentId(agentId);
         supply.setParentAgentId(parentId);
         supply.setSupplyDate(month);
+        supply.setBusBigType("99");//其它补款
         BigDecimal totalSupply = profitSupplyMapper.getTotalByMonthAndPid(supply);
         if(null == totalSupply){
             totalSupply = BigDecimal.ZERO;
