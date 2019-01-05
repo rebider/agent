@@ -688,7 +688,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 //        otherAmt = otherAmt.add(mposk);
 
         //pos奖励考核扣款
-        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt());
+        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPosRewardDeductionAmt());
 
         //其它考核扣款
         sumAmt = doKhDuction(profitDetailMonthTemp, sumAmt, computType);
@@ -727,11 +727,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @Date: 16:23 2019/1/4
      */
     private BigDecimal doKhDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType) {
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0, 7).replace("-", "");
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
         param.put("agentId", profitDetailMonthTemp.getAgentId());
         param.put("computeType", computType);
         param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
+        param.put("deductionDate", deductionDate);
 
         // 考核扣款实扣
         BigDecimal realDeductionAMt = profitDeductionServiceImpl.khDeduction(param);

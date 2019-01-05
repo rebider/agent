@@ -178,7 +178,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             deduction.setSourceId("2");
         } else if ("罚款".equals(deduction.getRemark())) {
             deduction.setSourceId("4");
-        } else if ("预发分润".equals(deduction.getRemark())) {
+        } else if ("预发分润扣款".equals(deduction.getRemark())) {
             deduction.setSourceId("5");
         } else {
             deduction.setSourceId("3");
@@ -223,7 +223,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())) {
             criteria.andParentAgentIdEqualTo(profitDeduction.getParentAgentId());
+        }else {
+            criteria.andParentAgentIdIsNull();
         }
+
         if (StringUtils.isNotBlank(profitDeduction.getDeductionStatus())) {
             if ("N6".equals(profitDeduction.getDeductionStatus())) {
                 criteria.andDeductionStatusNotEqualTo("6");

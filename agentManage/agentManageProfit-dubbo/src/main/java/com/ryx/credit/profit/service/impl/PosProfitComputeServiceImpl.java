@@ -175,7 +175,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 BigDecimal downReward = BigDecimal.ZERO;
                 if (childAgentList.size() > 0) {
                     List<PosRewardDetail> childDetail = posRewardSDetailService.getPosRewardDetailList(posDetatil, null, childAgentList);
-                    BigDecimal childDownReward = childDetail.stream().map(s -> new BigDecimal(s.getPosReawrdProfit())).reduce(BigDecimal::add).get();
+                    BigDecimal childDownReward = childDetail.stream().map(s -> new BigDecimal(s.getPosReawrdProfit())).reduce(BigDecimal::add).orElseGet(() -> new BigDecimal("0")) ;
                     downReward = downReward.add(childDownReward);
                 }
                 LOG.info("代理商唯一码：{}，扣减机构一代POS奖励：{}", posRewardDetail.getPosAgentId(), downReward);
