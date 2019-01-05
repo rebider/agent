@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -74,6 +75,11 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
     private IUserService iUserService;
     @Autowired
     private AgentQueryService agentQueryService;
+    @Autowired
+    private AgentEnterService agentEnterService;
+
+
+
     @Override
     public PageInfo queryBusinessPlatformList(AgentBusInfo agentBusInfo, Agent agent, Page page,String flag,String isZpos) {
         Map<String, Object> reqMap = new HashMap<>();
@@ -207,15 +213,32 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
         if (busInfoVoList.size()==0) {
             throw new MessageException("信息错误");
         }
-        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-            AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-            agentBusInfoVo.setVersion(agbus.getVersion());
-            int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
-            if (i!=1) {
-                throw new MessageException("更新失败");
+        try{
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busInfoVoList.get(0).getId());
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agentBusInfo.getAgentId());
+            for (AgentBusInfoVo item : busInfoVoList) {
+                agentBusInfos.add(item);
             }
-        }
+            String json = JsonUtil.objectToJson(agentBusInfos);
+            List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
+            agentEnterService.verifyOther(agentBusInfoVos);
 
+            for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                agentBusInfoVo.setVersion(agbus.getVersion());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                if (i!=1) {
+                    throw new MessageException("更新失败");
+                }
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
     }
 
 
@@ -248,6 +271,15 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                     return new AgentResult(500, "业务已添加,请勿重复添加", "");
                 }
             }
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByAgenId(agent.getId());
+            for (AgentBusInfoVo item : agentVo.getBusInfoVoList()) {
+                agentBusInfos.add(item);
+            }
+            String json = JsonUtil.objectToJson(agentBusInfos);
+            List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
+            agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
+            agentEnterService.verifyOther(agentBusInfoVos);
+
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcUser(agent.getcUser());
@@ -281,9 +313,12 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 agentBusInfoList.add(agentBusInfo);
             }
             return AgentResult.ok(agentBusInfoList);
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new ProcessException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ProcessException("业务平台信息录入失败");
+            throw new Exception(e.getLocalizedMessage());
         }
     }
 

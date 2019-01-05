@@ -175,6 +175,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      * @param busInfoVoList
      * @throws Exception
      */
+    @Override
     public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception {
         Set<String> BusTypeSet = new HashSet<>();
         for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
@@ -196,6 +197,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
      * @param busInfoVoList
      * @throws Exception
      */
+    @Override
     public void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception {
         Set<String> busParentSet = new HashSet<>();
         for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
@@ -798,7 +800,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
         try {
-
+            verifyOrgAndBZYD(agent.getBusInfoVoList());
+            verifyOther(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
