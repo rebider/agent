@@ -660,11 +660,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
 //        BigDecimal otherAmt = BigDecimal.ZERO;
         Map<String, Object> param = new HashMap<>(5);
+        param.put("agentId", profitDetailMonthTemp.getAgentId());
+        param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
+        param.put("deductionDate", profitDetailMonthTemp.getProfitDate());
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "4");// 罚款
         BigDecimal fk = profitDeductionServiceImpl.otherDeductionByType(param);
 //        otherAmt = otherAmt.add(fk);
         sumAmt = sumAmt.subtract(fk);
+
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "5"); // 预发分润
         BigDecimal yfk = profitDeductionServiceImpl.otherDeductionByType(param);
@@ -702,7 +706,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("sourceId", "3");
         long qkstart = System.currentTimeMillis();
         BigDecimal qt = profitDeductionServiceImpl.otherDeductionByType(param);
-        profitDetailMonthTemp.setOtherDeductionAmt(qt);
+        profitDetailMonthTemp.setOtherDeductionAmt(qt.add(fk));
         sumAmt = sumAmt.subtract(qt);
 //        otherAmt = otherAmt.add(qt);
 

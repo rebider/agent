@@ -184,7 +184,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                     logger.info("导入失败！");
                     throw new MessageException(supply.toString() + "导入失败！");
                 }
-                logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
+                logger.info("补款数据导入信息：{}", JSONObject.toJSON(profitSupply));
                 list.add(profitSupply.getId());
             } catch (Exception e) {
                 e.printStackTrace();

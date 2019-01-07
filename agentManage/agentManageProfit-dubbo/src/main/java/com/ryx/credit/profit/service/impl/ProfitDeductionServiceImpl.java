@@ -850,10 +850,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     @Override
     public BigDecimal khDeduction(Map<String, Object> param) {
-
-
-        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0, 7).replace("-", "");
-        param.put("deductionDate", deductionDate);
         param.put("type", DeductionType.POS_REWARD_DEDUCT.getType());
         param.put("deductionStatus", "0");
         //查询所有考核未扣款记录
