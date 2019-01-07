@@ -93,9 +93,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             logger.error("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败", e);
             throw new RuntimeException("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败");
         }
+
     }
-
-
     /**
      * @Author: Zhang Lei
      * @Description: 欠票调整
@@ -349,6 +348,14 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             invoiceMapper.setStatusToInvoice(invoice);
         }
         invoiceMapper.insertSelective(invoice);
+        //获取系统当前时间
+        Calendar curr = Calendar.getInstance();
+        curr.setTime(new Date(System.currentTimeMillis()));
+        curr.add(Calendar.MONTH, -1);
+        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyyMM");
+        String profitMonth = simpleDateFormatMonth.format(curr.getTime());
+        invoice.setFactorMonth(profitMonth);
+
         ownInvoiceReComputer(invoice);//欠票导入或者重导后计算
     }
 

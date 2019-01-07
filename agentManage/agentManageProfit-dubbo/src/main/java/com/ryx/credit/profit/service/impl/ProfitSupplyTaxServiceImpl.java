@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.ProfitDirectMapper;
@@ -14,6 +15,7 @@ import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitSupplyTax;
 import com.ryx.credit.profit.service.ProfitSupplyTaxService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -188,7 +190,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
             profitDetailMonthMapper.updateByPrimaryKeySelective(pdm);
 
             //记录补税点明细
-            insertProfitSupplyTax(pdm, addTaxAmt, pdm);
+            insertProfitSupplyTax(pdm, addTaxAmt, pdm,"02");
         }
 
 
@@ -239,7 +241,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
                 logger.info("{}给上级{}补税点金额：{}", subAgentId, parentAgentId, addTaxAmt);
 
                 //记录补税点明细
-                insertProfitSupplyTax(sub, addTaxAmt, parentProfitDetailMonth);
+                insertProfitSupplyTax(sub, addTaxAmt, parentProfitDetailMonth,"01");
             }
         }
 
@@ -259,17 +261,17 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
      * @Description: 记录补税点明细
      * @Date: 17:14 2018/12/21
      */
-    private void insertProfitSupplyTax(ProfitDetailMonth sub, BigDecimal addTaxAmt, ProfitDetailMonth parentProfitDetailMonth) {
+    private void insertProfitSupplyTax(ProfitDetailMonth sub, BigDecimal addTaxAmt, ProfitDetailMonth parentProfitDetailMonth, String platType) {
         ProfitSupplyTax profitSupplyTax = new ProfitSupplyTax();
         profitSupplyTax.setId(idService.genId(TabId.PROFIT_SUPPLU_TAX));
         profitSupplyTax.setSupplyTaxDate(parentProfitDetailMonth.getProfitDate());
         profitSupplyTax.setSupplyTaxAgentId(parentProfitDetailMonth.getAgentId());
         profitSupplyTax.setSupplyTaxAgentName(parentProfitDetailMonth.getAgentName());
-        //todo profitSupplyTax.setSupplyTaxType(parentProfitDetailMonth.getBusType());
+        profitSupplyTax.setSupplyTaxPlatform(platType);
         profitSupplyTax.setSupplyTaxSubId(sub.getAgentId());
         profitSupplyTax.setSupplyTaxSubName(sub.getAgentName());
         profitSupplyTax.setSupplyTaxAmt(addTaxAmt);
-        profitSupplyTax.setSupplyTaxPlatform(parentProfitDetailMonth.getBusPlatform());
+        //profitSupplyTax.setSupplyTaxType(parentProfitDetailMonth.get);
         profitSupplyTax.setCreateTime(DateUtils.dateToStringss(new Date()));
         profitSupplyTaxMapper.insertSelective(profitSupplyTax);
     }

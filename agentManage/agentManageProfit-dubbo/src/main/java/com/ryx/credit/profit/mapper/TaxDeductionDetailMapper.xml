@@ -503,7 +503,7 @@
     <!--保理-->
     left join ( select AGENT_ID,PARENT_AGENT_ID,sum(BUCKLE_AMT) BL_AMT
       from P_PROFIT_FACTOR  where FACTOR_MONTH='${profitMonth}' group by AGENT_ID,PARENT_AGENT_ID
-    ) b on a.AGENT_ID = b.AGENT_ID and a.PARENT_AGENT_ID = b.PARENT_AGENT_ID
+    ) b on a.AGENT_ID = b.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(b.PARENT_AGENT_ID,'-')
 
     <!--日结分润、返现-->
     left join (
@@ -511,24 +511,24 @@
       P_PROFIT_D  where REMIT_DATE &gt;='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31'
       and PAY_COMPANY != 'Q000029564'
       group by AGENT_ID,PARENT_AGENT_ID
-    ) c on a.AGENT_ID = c.AGENT_ID and a.PARENT_AGENT_ID = c.PARENT_AGENT_ID
+    ) c on a.AGENT_ID = c.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(c.PARENT_AGENT_ID,'-')
 
     <!--垫资-->
     left join (
       select AGENT_ID,PARENT_AGENT_ID,sum(SUPPLY_AMT) DZ_AMT
-      from P_PROFIT_SUPPLY
-      where SUPPLY_DATE='${profitMonth}' and BUS_BIG_TYPE='99' and SUPPLY_TYPE like'%垫资%' group by AGENT_ID,PARENT_AGENT_ID
-    ) d on a.AGENT_ID=d.AGENT_ID and a.PARENT_AGENT_ID = d.PARENT_AGENT_ID
+      from P_DEDUCTION
+      where DEDUCTION_DATE='${profitMonth}' and DEDUCTION_TYPE='03' and SUPPLY_TYPE like'%垫资%' group by AGENT_ID,PARENT_AGENT_ID
+    ) d on a.AGENT_ID=d.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(d.PARENT_AGENT_ID,'-')
 
     <!--调整金额-->
-    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and a.PARENT_AGENT_ID=e.PARENT_AGENT_ID
+    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(e.PARENT_AGENT_ID,'-')
 
-    left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and a.PARENT_AGENT_ID = f.PARENT_AGENT_ID
+    left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(f.PARENT_AGENT_ID,'-')
 
     <!--上月未开票机具款-->
     left join (select AGENT_ID,BUS_PARENT_AGENT_ID PARENT_AGENT_ID, sum(PAY_AMOUNT) PAY_AMOUNT from O_CASH_SUMMARY_MOUTH
                 where IS_CLO_INVOICE='0' and DAY_STR = '${profitMonth}'
-                group by AGENT_ID,BUS_PARENT_AGENT_ID) h on a.AGENT_ID=h.AGENT_ID and a.PARENT_AGENT_ID=h.PARENT_AGENT_ID
+                group by AGENT_ID,BUS_PARENT_AGENT_ID) h on a.AGENT_ID=h.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-')=nvl(h.PARENT_AGENT_ID,'-')
 
     left join A_AGENT g on a.PARENT_AGENT_ID = g.ID
 
@@ -559,11 +559,11 @@
           P_PROFIT_D  where REMIT_DATE &gt;='${profitMonth}01' and REMIT_DATE &lt;= '${profitMonth}31'
         and PAY_COMPANY != 'Q000029564'
         group by AGENT_ID,PARENT_AGENT_ID
-    ) c on a.AGENT_ID = c.AGENT_ID and a.PARENT_AGENT_ID = c.PARENT_AGENT_ID
+    ) c on a.AGENT_ID = c.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(c.PARENT_AGENT_ID,'-')
 
     <!--调整金额-->
-    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and a.PARENT_AGENT_ID=e.PARENT_AGENT_ID
-    left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and a.PARENT_AGENT_ID = f.PARENT_AGENT_ID
+    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-')=nvl(e.PARENT_AGENT_ID,'-')
+    left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(f.PARENT_AGENT_ID,'-')
 
     where a.TRANS_MONTH = '${profitMonth}'
     and a.PAYCOMPANY_NUM != 'Q000029564'
