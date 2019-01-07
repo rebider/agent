@@ -82,6 +82,11 @@ public class PosProfitComputeServiceImpl implements DeductService {
             TransProfitDetail detail = details.get();
             detail.setProfitDate(currentDate);
             detail.setBusCode(PLATFORM_CODE);
+           /* List<String> bustype = new ArrayList<>();
+            bustype.add("2");
+            bustype.add("3");
+            bustype.add("6");*/
+           detail.setAgentType("2,3,6");
             //交易分润月度明细
             List<TransProfitDetail> list = transProfitDetailService.getTransProfitDetailList(detail);
             LOG.info("总条数：{}", list.size());
@@ -162,7 +167,9 @@ public class PosProfitComputeServiceImpl implements DeductService {
             jgList.parallelStream().forEach(posRewardDetail -> {
                 List childAgentList = JSONObject.parseObject(posRewardDetail.getChildAgentIdList(), List.class);
                 BigDecimal downReward = BigDecimal.ZERO;
+                childAgentList.remove(posRewardDetail.getPosAgentId());
                 if (childAgentList.size() > 0) {
+
                     List<PosRewardDetail> childDetail = posRewardSDetailService.getPosRewardDetailList(posDetatil, null, childAgentList);
                     BigDecimal childDownReward = childDetail.stream().map(s -> new BigDecimal(s.getPosReawrdProfit())).reduce(BigDecimal::add).get();
                     downReward = downReward.add(childDownReward);
@@ -172,17 +179,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     PosRewardDetail updateDetail = new PosRewardDetail();
                     updateDetail.setId(posRewardDetail.getId());
                     if (new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) == 0) {
-                        //  return;
-                        //  本级posReawrdProfit为0时 posOwnReward
                         updateDetail.setPosDownReward(downReward.toString());
-                        updateDetail.setPosOwnReward(downReward.toString());
-
                     } else if (new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(downReward) >= 0) {
                         updateDetail.setPosDownReward(downReward.toString());
                         BigDecimal posReawrdProfit = new BigDecimal(posRewardDetail.getPosReawrdProfit()).subtract(downReward);
                         updateDetail.setPosReawrdProfit(posReawrdProfit.toString());
                     } else if (downReward.compareTo(new BigDecimal(posRewardDetail.getPosReawrdProfit())) > 0) {
-                        updateDetail.setPosOwnReward(downReward.toString());
                         updateDetail.setPosDownReward(downReward.toString());
                         updateDetail.setPosReawrdProfit("0");
                     }
