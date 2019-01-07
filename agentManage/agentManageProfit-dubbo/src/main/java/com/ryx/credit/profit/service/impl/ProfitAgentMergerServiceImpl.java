@@ -1,10 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -12,28 +9,19 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
-import com.ryx.credit.pojo.admin.agent.BusActRel;
 
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
-import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PAgentMergeMapper;
-import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
 import com.ryx.credit.profit.pojo.PAgentMerge;
-import com.ryx.credit.profit.pojo.PAgentQuit;
 import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.profit.service.IProfitAgentMergerService;
 import com.ryx.credit.service.ActivityService;
-import com.ryx.credit.service.agent.AgentBusinfoService;
-import com.ryx.credit.service.agent.AgentEnterService;
-import com.ryx.credit.service.agent.AgentService;
-import com.ryx.credit.service.agent.CapitalService;
-import com.ryx.credit.service.agent.TaskApprovalService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Table;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +61,12 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
     private AgentService agentService;
     @Autowired
     private IProfitAgentMergerService profitAgentMergerService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+    @Autowired
+    private ApaycompService apaycompService;
+    @Autowired
+    private AgentQueryService agentQueryService;
 
     /**
      * 列表展示
@@ -231,17 +225,23 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 Agent agent = agentService.getAgentById(pAgentMerge.getSubAgentId());
                 agent.setAgName(pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")");
                 if (1 != agentService.updateByPrimaryKeySelective(agent)) {
-                    throw new ProcessException("更新数据库异常");
+                    throw new ProcessException("更新数据库异常！");
                 }
-
                 String sendMsg = "";
                 BigDecimal isSuccess = Status.STATUS_1.status;
-                //二、手刷改名接口(agentName、agentId)
-                String agentName = pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")";
+
+                //二、手刷改名接口(agentName、agentId、agentColinfo)
+                String agentName = pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")";//变更后名称=主名称+(自己名称)
                 List<String> platId = new ArrayList<>();
                 platId.add(pAgentMerge.getSubAgentId());
+//                List<AgentBusInfo> agentBusInfoList = agentBusinfoService.agentBusInfoList(pAgentMerge.getSubAgentId());
+//                AgentBusInfo busInfo = agentBusInfoList.get(0);
+//                PayComp payComp = apaycompService.selectById(busInfo.getCloPayCompany());
+//                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(pAgentMerge.getSubAgentId(), busInfo.getId());
+//                agentColinfo.setAccountId(payComp.getId());
+//                agentColinfo.setAccountName(payComp.getComName());
                 try {
-                    AgentResult mpos = busiPlatService.mPos_updateAgName(agentName, platId);
+                    AgentResult mpos = busiPlatService.mPos_updateAgName(agentName, platId, null);
                     sendMsg = mpos.getMsg();
                     if (!mpos.isOK()) {
                         isSuccess = Status.STATUS_0.status;
@@ -249,8 +249,9 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 } catch (Exception e) {
                     logger.error("======mPos_updateAgName", e);
                     e.printStackTrace();
-                    sendMsg = "首刷通知业务系统失败";
+                    sendMsg = "首刷通知业务系统失败！";
                 }
+
                 //三、POS改名接口(uniqueId、orgName、orgType)
                 List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
                 for (AgentBusInfo agentBusInfo : list) {
@@ -265,7 +266,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                     AgentResult pos_Item = busiPlatService.pos_updateAgName(agentNotifyVo);
                     sendMsg = sendMsg + "_" + pos_Item.getMsg();
                     if (!pos_Item.isOK()) {
-                            isSuccess = Status.STATUS_0.status;
+                        isSuccess = Status.STATUS_0.status;
                     }
                 }
                 pAgentMerge.setSynStatus(isSuccess);
@@ -277,6 +278,33 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 logger.info("2.更新审批流与业务对象");
                 rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
+
+//                //主代理商同步附代理商收款账户，根据主AG码查询，插入附AG码
+//                AgentColinfo ACByAgentId = agentQueryService.queryUserColinfo(pAgentMerge.getMainAgentId());
+//                ACByAgentId.setId(idService.genId(TabId.a_agent_colinfo));
+//                ACByAgentId.setAgentId(pAgentMerge.getSubAgentId());
+//
+//                //插入数据前需把之前的附代理商数据状态更改为无效
+//                AgentColinfo subAgentId = agentQueryService.queryUserColinfo(pAgentMerge.getSubAgentId());
+//                subAgentId.setStatus(Status.STATUS_0.status);
+//                if (!agentColinfoService.updateAgentColinfo(subAgentId).isOK()) {
+//                    throw new MessageException("更新收款信息失败！");
+//                }
+//
+//                //根据附代理商的收款账户、收款账户名、支行联行号、总行联行号进行比对，判断此条数据是否重复插入
+//                AgentColinfo isRepeat = agentQueryService.queryUserColinfo(pAgentMerge.getSubAgentId());
+//                if (isRepeat.getCloRealname().equals(ACByAgentId.getCloRealname())
+//                        || isRepeat.getAccountName().equals(ACByAgentId.getAccountName())
+//                        || isRepeat.getBranchLineNum().equals(ACByAgentId.getBranchLineNum())
+//                        || isRepeat.getAllLineNum().equals(ACByAgentId.getAllLineNum())) {
+//                    logger.info("对比数据已存在...");
+//                } else {
+//                    //插入附代理商数据
+//                    AgentResult result = agentColinfoService.saveAgentColinfo(ACByAgentId);
+//                    if (!result.isOK()) {
+//                        throw new MessageException("新增收款信息失败！");
+//                    }
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -289,6 +317,7 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
      * 手动更改手刷、POS代理商名称
      * @param insid
      */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public AgentResult updateAgentName(String insid) throws Exception{
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -298,34 +327,41 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
             BusActRel rel = taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 PAgentMerge pAgentMerge = pAgentMergeMapper.selectByPrimaryKey(rel.getBusId());
-
                 String sendMsg = "";
                 BigDecimal isSuccess = Status.STATUS_1.status;
-                //一、手刷改名接口(agentName、agentId)
+
+                //一、手刷改名接口(agentName、agentId、agentColinfo)
                 String agentName = pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")";
                 List<String> platId = new ArrayList<>();
                 platId.add(pAgentMerge.getSubAgentId());
+//                List<AgentBusInfo> agentBusInfoList = agentBusinfoService.agentBusInfoList(pAgentMerge.getSubAgentId());
+//                AgentBusInfo busInfo = agentBusInfoList.get(0);
+//                PayComp payComp = apaycompService.selectById(busInfo.getCloPayCompany());
+//                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(pAgentMerge.getSubAgentId(), busInfo.getId());
+//                agentColinfo.setAccountId(payComp.getId());
+//                agentColinfo.setAccountName(payComp.getComName());
                 try {
-                    AgentResult mpos = busiPlatService.mPos_updateAgName(agentName, platId);
+                    AgentResult mpos = busiPlatService.mPos_updateAgName(agentName, platId, null);
                     sendMsg = mpos.getMsg();
                     if (!mpos.isOK()) {
                         isSuccess = Status.STATUS_0.status;
                     }
                 } catch (Exception e) {
-                    logger.error("======mPos_updateAgName" ,e);
+                    logger.error("======mPos_updateAgName", e);
                     e.printStackTrace();
                     sendMsg = "首刷通知业务系统失败！";
                 }
+
                 //二、POS改名接口(uniqueId、orgName、orgType)
-                List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());//根据附代理商ID查询平台编号
+                List<AgentBusInfo> list = pAgentMergeMapper.getByBusPlatform(pAgentMerge.getSubAgentId());
                 for (AgentBusInfo agentBusInfo : list) {
                     AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
-                    agentNotifyVo.setUniqueId(agentBusInfo.getId());//代理商AB码
-                    agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")");//变更后名称=主名称+(自己名称)
+                    agentNotifyVo.setUniqueId(agentBusInfo.getId());
+                    agentNotifyVo.setOrgName(pAgentMerge.getMainAgentName() + "(" + pAgentMerge.getSubAgentName() + ")");
                     if (agentBusInfo.getBusType().equals("2") || agentBusInfo.getBusType().equals("6")) {
-                        agentNotifyVo.setOrgType("01");//机构类型：01-普通机构
+                        agentNotifyVo.setOrgType("01");
                     } else {
-                        agentNotifyVo.setOrgType("02");//机构类型：02-直签机构
+                        agentNotifyVo.setOrgType("02");
                     }
                     AgentResult pos_Item = busiPlatService.pos_updateAgName(agentNotifyVo);
                     sendMsg = sendMsg + "_" + pos_Item.getMsg();
@@ -335,9 +371,36 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
                 }
                 pAgentMerge.setSynStatus(isSuccess);
                 pAgentMerge.setSynMsg(sendMsg);
-                pAgentMerge.setMergeDate(df.format(new Date()));//合并日期（生效日期）
+                pAgentMerge.setMergeDate(df.format(new Date()));
                 pAgentMergeMapper.updateByPrimaryKeySelective(pAgentMerge);
                 taskApprovalService.updateABusActRel(rel);
+
+//                //主代理商同步附代理商收款账户，根据主AG码查询，插入附AG码
+//                AgentColinfo ACByAgentId = agentQueryService.queryUserColinfo(pAgentMerge.getMainAgentId());
+//                ACByAgentId.setId(idService.genId(TabId.a_agent_colinfo));
+//                ACByAgentId.setAgentId(pAgentMerge.getSubAgentId());
+//
+//                //插入数据前需把之前的附代理商数据状态更改为无效
+//                AgentColinfo subAgentId = agentQueryService.queryUserColinfo(pAgentMerge.getSubAgentId());
+//                subAgentId.setStatus(Status.STATUS_0.status);
+//                if (!agentColinfoService.updateAgentColinfo(subAgentId).isOK()) {
+//                    throw new MessageException("更新收款信息失败！");
+//                }
+//
+//                //根据附代理商的收款账户、收款账户名、支行联行号、总行联行号进行比对，判断此条数据是否重复插入
+//                AgentColinfo isRepeat = agentQueryService.queryUserColinfo(pAgentMerge.getSubAgentId());
+//                if (isRepeat.getCloRealname().equals(ACByAgentId.getCloRealname())
+//                        || isRepeat.getAccountName().equals(ACByAgentId.getAccountName())
+//                        || isRepeat.getBranchLineNum().equals(ACByAgentId.getBranchLineNum())
+//                        || isRepeat.getAllLineNum().equals(ACByAgentId.getAllLineNum())) {
+//                    logger.info("对比数据已存在...");
+//                } else {
+//                    //插入附代理商数据
+//                    AgentResult result = agentColinfoService.saveAgentColinfo(ACByAgentId);
+//                    if (!result.isOK()) {
+//                        throw new MessageException("新增收款信息失败！");
+//                    }
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -361,11 +424,9 @@ public class ProfitAgentMergerServiceImpl implements IProfitAgentMergerService {
         }
     }
 
-
     @Override
     public List<PAgentMerge> selectBySubAgenId(String subAgentId) {
         return pAgentMergeMapper.selectBySubAgenId(subAgentId);
     }
-
 
 }
