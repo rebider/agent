@@ -89,7 +89,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from P_DEDUCTION
     where ID = #{id,jdbcType=VARCHAR}
@@ -376,7 +376,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -438,4 +438,28 @@
     delete from P_DEDUCTION
     where DEDUCTION_TYPE = #{type} and DEDUCTION_DATE = to_char(sysdate-30 ,'yyyyMM')
   </delete>
+
+    <!--查询所有未扣款记录，包含未扣足记录-->
+    <select id="getNotDeductListByParams" resultMap="BaseResultMap">
+        select
+          <include refid="Base_Column_List"/>
+        from P_DEDUCTION a
+        where a.DEDUCTION_STATUS = '0'
+        <if test="deductionDate != null and deductionDate!=''">
+          and a.DEDUCTION_DATE = '${deductionDate}'
+        </if>
+        <if test="deductionType != null and deductionType!=''">
+          and a.DEDUCTION_TYPE = '${deductionType}'
+        </if>
+        and a.AGENT_ID = #{agentId,jdbcType=VARCHAR}
+        and a.STAGING_STATUS in('0','2')
+        <choose>
+          <when test="parentAgentId != null and parentAgentId!=''">
+            and PARENT_AGENT_ID = #{parentAgentId,jdbcType=CHAR},
+          </when>
+          <otherwise>
+            and PARENT_AGENT_ID is null
+          </otherwise>
+        </choose>
+    </select>
 </mapper>

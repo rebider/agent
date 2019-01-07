@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 交易量比对测试
+ * 机具扣款数据同步
  * @author zhaodw
  * @create 2018/7/30
  * @since 1.0.0
@@ -17,22 +17,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 加载配置文件
 @ContextConfiguration(locations = { "classpath:spring-context.xml", "classpath:spring-mybatis.xml" })
-public class TranDataJobTest {
+public class ToolsDeductionDataJobTest {
 
-    private Logger logger = LoggerFactory.getLogger(TranDataJobTest.class);
+    private Logger logger = LoggerFactory.getLogger(ToolsDeductionDataJobTest.class);
 
     @Autowired
-    private TranDataJob tranDataJob;
+    private ToolsDeductJob toolsDeductJob;
 
-    /*** 
-    * @Description: 测试任务处理
-    * @Param:  
-    * @return:  
-    * @Author: zhaodw 
-    * @Date: 2018/7/30 
-    */
     @Test
     public void testDeal() {
-        tranDataJob.deal();
+        toolsDeductJob.execut();
     }
 }

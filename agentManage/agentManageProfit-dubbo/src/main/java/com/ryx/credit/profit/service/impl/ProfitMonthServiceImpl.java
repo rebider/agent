@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
+import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
@@ -436,10 +437,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         int count = this.getProfitDetailMonthCount(null, profitDetailMonth);
         if (count > 0) {
 
-            //其他扣款
+            // 其他扣款
             FORK_JOIN_POOL.invoke(new ProfitMonthServiceImpl.ComputStep(0, count, profitDetailMonth, computType));
 
-            //合并代理商扣分润计算
+            // 合并代理商扣分润计算
             notDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 List<Map<String, Object>> hbList = getAgentIdProfitAmt(profitDetailMonthTemp.getAgentId(), profitAmtMap);
                 if (hbList != null && hbList.size() > 0) {
@@ -452,14 +453,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 doHbToolDeduction(profitDetailMonthTemp, computType, null, "3");
             });
 
-            //扣税
+            // 扣税
             taxDeductionService.taxDeductionComputer();
 
-            //补税点
+            // 补税点
             profitSupplyTaxService.taxSupplyComputer(params);
 
-            //欠票计算
+            // 欠票计算
             ownInvoiceService.invoiceOwnComputer(params);
+
+            // 更新实发分润
+            profitDetailMonthMapper.updateRealProfitAmt(params);
 
             /*// 计算税点及实发分润
             try {
@@ -656,44 +660,53 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
 //        BigDecimal otherAmt = BigDecimal.ZERO;
         Map<String, Object> param = new HashMap<>(5);
+        param.put("agentId", profitDetailMonthTemp.getAgentId());
+        param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
+        param.put("deductionDate", profitDetailMonthTemp.getProfitDate());
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "4");// 罚款
         BigDecimal fk = profitDeductionServiceImpl.otherDeductionByType(param);
 //        otherAmt = otherAmt.add(fk);
         sumAmt = sumAmt.subtract(fk);
+
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "5"); // 预发分润
         BigDecimal yfk = profitDeductionServiceImpl.otherDeductionByType(param);
         profitDetailMonthTemp.setZnposProfitAmt(yfk);
         sumAmt = sumAmt.subtract(yfk);
 
-        param.put("profitAmt", sumAmt);
+        /*param.put("profitAmt", sumAmt);
         param.put("sourceId", "1");
         //POS考核扣款（新国都、瑞易送）-
         profitDetailMonthTemp.setPosKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
         BigDecimal posk = profitDeductionServiceImpl.otherDeductionByType(param);
-        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());
+        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosKhDeductionAmt());*/
 //        otherAmt = otherAmt.add(posk);
 
-        param.put("profitAmt", sumAmt);
+        /*param.put("profitAmt", sumAmt);
         param.put("sourceId", "2");
         //手刷考核扣款（小蓝牙、MPOS）-
         BigDecimal mposk = profitDeductionServiceImpl.otherDeductionByType(param);
         profitDetailMonthTemp.setMposKhDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
-        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());
+        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getMposKhDeductionAmt());*/
 //        otherAmt = otherAmt.add(mposk);
+
+        //pos奖励考核扣款
+        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPosRewardDeductionAmt());
+
+        //其它考核扣款
+        sumAmt = doKhDuction(profitDetailMonthTemp, sumAmt, computType);
 
         //保理扣款-
         profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentId(), null));
         sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
 
+        //其他扣款-
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "3");
-        //其他扣款-
         long qkstart = System.currentTimeMillis();
-        profitDetailMonthTemp.setOtherDeductionAmt(profitDeductionServiceImpl.otherDeductionByType(param));
         BigDecimal qt = profitDeductionServiceImpl.otherDeductionByType(param);
-        profitDetailMonthTemp.setOtherDeductionAmt(qt);
+        profitDetailMonthTemp.setOtherDeductionAmt(qt.add(fk));
         sumAmt = sumAmt.subtract(qt);
 //        otherAmt = otherAmt.add(qt);
 
@@ -701,14 +714,35 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         long jkstart = System.currentTimeMillis();
         sumAmt = doToolDeduction(profitDetailMonthTemp, sumAmt, computType);
         long jkend = System.currentTimeMillis();
-        System.out.println("机具扣款处理时间" + (jkend - jkstart));
+        //System.out.println("机具扣款处理时间" + (jkend - jkstart));
 
         //基础分润
         profitDetailMonthTemp.setBasicsProfitAmt(sumAmt);
         long updatestart = System.currentTimeMillis();
         profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
         long updateend = System.currentTimeMillis();
-        System.out.println("修改处理时间" + (updateend - updatestart));
+        //System.out.println("修改处理时间" + (updateend - updatestart));
+        return sumAmt;
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 考核扣款
+     * @Date: 16:23 2019/1/4
+     */
+    private BigDecimal doKhDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType) {
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0, 7).replace("-", "");
+        Map<String, Object> param = new HashMap<>(5);
+        param.put("profitAmt", sumAmt);
+        param.put("agentId", profitDetailMonthTemp.getAgentId());
+        param.put("computeType", computType);
+        param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
+        param.put("deductionDate", deductionDate);
+
+        // 考核扣款实扣
+        BigDecimal realDeductionAMt = profitDeductionServiceImpl.khDeduction(param);
+        profitDetailMonthTemp.setPosKhDeductionAmt(realDeductionAMt);
+        sumAmt = sumAmt.subtract(realDeductionAMt);
         return sumAmt;
     }
 
@@ -792,7 +826,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt, String computType) {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentPid", profitDetailMonthTemp.getAgentId()); //业务平台编号
-        map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7));   //扣款月份
+        map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-",""));   //扣款月份
         map.put("agentProfitAmt", agentProfitAmt);     //代理商分润
         map.put("computType", computType);
         map.put("rotation", "1");
@@ -832,12 +866,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId(profitDetailMonthTemp.getAgentId());
         profitDeduction.setParentAgentId(profitDetailMonthTemp.getParentAgentId());
-        profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0, 7));
+        profitDeduction.setDeductionDate(LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-",""));
+        profitDeduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
         profitDeduction.setSourceId("02");
         // pos退单应扣款
         BigDecimal posMustDeductionAmt = profitDeductionServiceImpl.getSettleErrDeductionAmt(profitDeduction);
         posMustDeductionAmt = posMustDeductionAmt == null ? BigDecimal.ZERO : posMustDeductionAmt;
         profitDetailMonthTemp.setPosTdMustDeductionAmt(posMustDeductionAmt);
+
+        // pos实扣
         Map<String, Object> param = new HashMap<>(5);
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "02");
@@ -852,12 +889,15 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         } else {
             profitDetailMonthTemp.setPosTdRealDeductionAmt(BigDecimal.ZERO);
         }
-        // mpos退单扣款
+
+
+        // mpos退单应扣款
         profitDeduction.setSourceId("01");
         BigDecimal mposMustDeductionAmt = profitDeductionServiceImpl.getSettleErrDeductionAmt(profitDeduction);
         mposMustDeductionAmt = mposMustDeductionAmt == null ? BigDecimal.ZERO : mposMustDeductionAmt;
         profitDetailMonthTemp.setMposTdMustDeductionAmt(mposMustDeductionAmt);
 
+        // mpos退单实扣款
         if (mposMustDeductionAmt.doubleValue() > 0) {
             param.put("profitAmt", sumAmt);
             param.put("sourceId", "01");

@@ -10,10 +10,7 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AssProtoColMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
@@ -77,6 +74,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private PlatFormService platFormService;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     /**
      * 商户入网
@@ -88,6 +87,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
+            verifyOrgAndBZYD(agentVo.getBusInfoVoList());
+            verifyOther(agentVo.getBusInfoVoList());
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
@@ -169,6 +170,55 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
     }
 
+    /**
+     * 代理商入网开通的业务平台类型为机构与标准一代时，新增业务平台业务类型也必须为机构或标准一代。
+     * @param busInfoVoList
+     * @throws Exception
+     */
+    @Override
+    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+        Set<String> BusTypeSet = new HashSet<>();
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            BusTypeSet.add(agentBusInfoVo.getBusType());
+        }
+        for (String busType : BusTypeSet) {
+            if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
+                for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                    if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
+                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 代理商新签入网业务平台类型为机构一代、二代直签直发、直签不直发、一代X时，所有业务平台上级必须为同一个。
+     * @param busInfoVoList
+     * @throws Exception
+     */
+    @Override
+    public void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+        Set<String> busParentSet = new HashSet<>();
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            String busParent = "";
+            if(StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
+                busParent = agentBusInfo.getAgentId();
+            }else{
+                busParent = agentBusInfoVo.getBusParent();
+            }
+            busParentSet.add(busParent);
+        }
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            if(agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.JGYD.key)
+            || agentBusInfoVo.getBusType().equals(BusType.YDX.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key)){
+                if(busParentSet.size()!=1){
+                    throw new ProcessException("上级不是同一个");
+                }
+            }
+        }
+    }
 
     /**
      * 启动代理商审批
@@ -750,7 +800,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
         try {
-
+            verifyOrgAndBZYD(agent.getBusInfoVoList());
+            verifyOther(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {

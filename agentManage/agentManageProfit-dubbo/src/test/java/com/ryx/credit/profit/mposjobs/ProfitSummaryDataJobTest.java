@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @Author: Zhang Lei
- * @Description: 手刷日结数据同步测试
+ * @Description: 手刷月汇总
  * @Date: 16:12 2018/12/24
  */
 @RunWith(SpringJUnit4ClassRunner.class)
