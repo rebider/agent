@@ -183,17 +183,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
                     PosRewardDetail updateDetail = new PosRewardDetail();
                     updateDetail.setId(posRewardDetail.getId());
                     if (new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(BigDecimal.ZERO) == 0) {
-                        //  return;
-                        //  本级posReawrdProfit为0时 posOwnReward
                         updateDetail.setPosDownReward(downReward.toString());
-                        updateDetail.setPosOwnReward(downReward.toString());
-
                     } else if (new BigDecimal(posRewardDetail.getPosReawrdProfit()).compareTo(downReward) >= 0) {
                         updateDetail.setPosDownReward(downReward.toString());
                         BigDecimal posReawrdProfit = new BigDecimal(posRewardDetail.getPosReawrdProfit()).subtract(downReward);
                         updateDetail.setPosReawrdProfit(posReawrdProfit.toString());
                     } else if (downReward.compareTo(new BigDecimal(posRewardDetail.getPosReawrdProfit())) > 0) {
-                        updateDetail.setPosOwnReward(downReward.toString());
                         updateDetail.setPosDownReward(downReward.toString());
                         updateDetail.setPosReawrdProfit("0");
                     }
