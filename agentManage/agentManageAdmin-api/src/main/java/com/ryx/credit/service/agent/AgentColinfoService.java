@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
+import net.sf.ehcache.search.impl.BaseResult;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -50,4 +51,8 @@ public interface AgentColinfoService {
     AgentColinfo selectByAgentId(String agentId);
 
     AgentColinfo selectByAgentIdAndBusId(String agentId,String agentbusId);
+
+    AgentResult updateAgentColinfo(AgentColinfo agentColinfo);
+
+    AgentResult saveAgentColinfo(AgentColinfo agentColinfo);
 }
