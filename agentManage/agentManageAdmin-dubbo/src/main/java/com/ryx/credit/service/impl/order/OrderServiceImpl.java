@@ -3043,4 +3043,22 @@ public class OrderServiceImpl implements OrderService {
         }
         return AgentResult.fail();
     }
+
+
+    @Autowired
+    private CashSummaryMouthMapper cashSummaryMouthMapper;
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult insertSelectiveCashSummaryMouth(CashSummaryMouth cashSummaryMouth) {
+        if(null==cashSummaryMouthMapper.selectByPrimaryKey(cashSummaryMouth)){
+            cashSummaryMouth.setStatus(Status.STATUS_1.status);
+            cashSummaryMouth.setcDate(Calendar.getInstance().getTime());
+            if(cashSummaryMouthMapper.insertSelective(cashSummaryMouth)==1){
+                return AgentResult.ok();
+            }else{
+                return AgentResult.fail("插入失败");
+            }
+        }
+        return AgentResult.ok();
+    }
 }
