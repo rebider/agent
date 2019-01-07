@@ -215,23 +215,17 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             criteria.andProfitMonthBetween(dateStart,dateEnd);
         }else if(StringUtils.isNotBlank(dateStart)){
             criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
-            //criteria.andProfitMonthEqualTo(dateStart);
         }else if(StringUtils.isNotBlank(dateEnd)){
             criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
-            //criteria.andProfitMonthEqualTo(dateEnd);
         }
         if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
         } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
-            String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
-            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
-            lists.add(agentIde);
-        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
-                String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
-                List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
-                lists.add(agentIde);
+           String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
+            lists.add(aId);
             criteria.andAgentIdIn(lists);
         } else if (StringUtils.isNotBlank(agentId)) {
             criteria.andAgentIdEqualTo(agentId);
@@ -297,27 +291,26 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     public List<InvoiceDetail> exportInvoiceData(String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
         InvoiceDetailExample example = new InvoiceDetailExample();
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if (StringUtils.isNotBlank(agentName)) {
-            criteria.andAgentNameEqualTo(agentName);
-        }
-        if (StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)) {
-            criteria.andProfitMonthBetween(dateStart, dateEnd);
-        } else if (StringUtils.isNotBlank(dateStart)) {
-            criteria.andProfitMonthEqualTo(dateStart);
-        } else if (StringUtils.isNotBlank(dateEnd)) {
-            criteria.andProfitMonthEqualTo(dateEnd);
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
         }
         if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
         } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
-            String agent = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
-            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agent);
-            lists.add(agent);
+            String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
+            lists.add(aId);
             criteria.andAgentIdIn(lists);
-        }else if(StringUtils.isNotBlank(agentId)){
+        }else if (StringUtils.isNotBlank(agentId)) {
             criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         return lists;
