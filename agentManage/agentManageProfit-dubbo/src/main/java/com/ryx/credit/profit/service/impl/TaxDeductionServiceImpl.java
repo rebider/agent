@@ -183,6 +183,7 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         BigDecimal taxBase = tdd.getPreLdAmt().add(tdd.getDayProfitAmt()).add(tdd.getDayBackAmt()).add(tdd.getBasicProfitAmt())
                 .add(tdd.getBlAmt()).subtract(tdd.getMerchanOrderAmt()).add(tdd.getAgentDfAmt())
                 .add(tdd.getAdjustAmt());
+        tdd.setTaxBase(taxBase);
 
         //本月扣税基数小于等于0时，表示代理商给1我司款项多，不进行扣税计算，基数留底到下月
         if (taxBase.compareTo(BigDecimal.ZERO) > 0) {
@@ -247,6 +248,7 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
         BigDecimal taxBase = tdd.getPreLdAmt().add(tdd.getDayProfitAmt()).add(tdd.getDayBackAmt()).add(tdd.getBasicProfitAmt())
                 .add(tdd.getBlAmt()).subtract(tdd.getMerchanOrderAmt()).add(tdd.getAgentDfAmt())
                 .add(tdd.getAdjustAmt());
+        tdd.setTaxBase(taxBase);
 
         //本月扣税基数小于等于0时，表示代理商给1我司款项多，不进行扣税计算，基数留底到下月
         if (taxBase.compareTo(BigDecimal.ZERO) > 0) {
