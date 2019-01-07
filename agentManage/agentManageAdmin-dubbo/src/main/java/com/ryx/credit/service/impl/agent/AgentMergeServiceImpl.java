@@ -1,6 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.service.agent.AgentMargeService;
+import com.ryx.credit.service.agent.AgentMergeService;
 import org.springframework.stereotype.Service;
 
 /***
@@ -11,6 +11,6 @@ import org.springframework.stereotype.Service;
  * @Param
  * @return
  **/
-@Service("agentMargeService")
-public class AgentMargeServiceImpl implements AgentMargeService {
+@Service("agentMergeService")
+public class AgentMergeServiceImpl implements AgentMergeService {
 }
