@@ -38,7 +38,6 @@ public class CashSummaryMouthDataTask {
      * 每月1号的0点十分
      */
     @Scheduled(cron = "0 10 0 1 * ?")
-//    @Scheduled(cron = "0/10 * * * * ?")
     public void CashSummaryMouth(){
         logger.info("======代理商月度打款金额开票不开票信息统计任务执行======");
         Calendar c = Calendar.getInstance();
