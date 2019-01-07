@@ -487,9 +487,6 @@
       <if test="par.proName != null and par.proName!=''" >
         and suborder.pro_name like '${par.proName}'
       </if>
-      <if test="par.oInuretime != null and par.oInuretime!=''" >
-        and to_char(o.O_INURETIME,'yyyy-MM-dd') =  #{par.oInuretime}
-      </if>
     <if test="par.vender != null and par.vender!=''" >
         and
          exists(
