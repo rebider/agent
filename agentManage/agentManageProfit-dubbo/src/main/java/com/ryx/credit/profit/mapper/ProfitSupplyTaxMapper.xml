@@ -249,11 +249,23 @@
 
   <select id="getProfitSupplyTaxList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    SELECT
-    <include refid="Base_Column_List" />
-    FROM PROFIT_SUPPLY_TAX
-    <include refid="BASE_WHERE_SQL" />
-    <include refid="SORT" />
+    select ps.*,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
+    join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
+    left join A_agent_businfo aab on  pst.supply_Tax_agent_id = aab.Agent_id )
+    aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where
+    1=1
+    <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and ps.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+    <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
+    <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
+    <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and ps.SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
+    <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and ps.SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
+    <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and ps.SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
+    <if test="SUPPLY_TAX_TYPE != null and SUPPLY_TAX_TYPE !='' "> and ps.SUPPLY_TAX_TYPE = #{SUPPLY_TAX_TYPE} </if>
+    <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and ps.SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
+
+    <if test="CREATE_TIME != null and CREATE_TIME !='' "> and ps.CREATE_TIME = #{CREATE_TIME} </if>
+    <if test="UPDATE_TIME != null and UPDATE_TIME !='' "> and ps.UPDATE_TIME = #{UPDATE_TIME} </if>
+    ORDER BY ps.SUPPLY_TAX_DATE DESC
     <include refid="PAGING_END" />
   </select>
 
