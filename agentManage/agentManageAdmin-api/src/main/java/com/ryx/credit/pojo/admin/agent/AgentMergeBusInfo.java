@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentMergeBusInfo implements Serializable{
+public class AgentMergeBusInfo implements Serializable {
     private String id;
 
     private String agentMargeId;
@@ -68,6 +68,8 @@ public class AgentMergeBusInfo implements Serializable{
     private Date cUtime;
 
     private String cUser;
+
+    private BigDecimal mergeStatus;
 
     private BigDecimal status;
 
@@ -333,6 +335,14 @@ public class AgentMergeBusInfo implements Serializable{
 
     public void setcUser(String cUser) {
         this.cUser = cUser == null ? null : cUser.trim();
+    }
+
+    public BigDecimal getMergeStatus() {
+        return mergeStatus;
+    }
+
+    public void setMergeStatus(BigDecimal mergeStatus) {
+        this.mergeStatus = mergeStatus;
     }
 
     public BigDecimal getStatus() {

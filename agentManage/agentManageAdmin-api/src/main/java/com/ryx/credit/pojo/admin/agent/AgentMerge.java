@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentMerge implements Serializable {
+public class AgentMerge implements Serializable{
     private String id;
 
     private String mainAgentId;
@@ -18,8 +18,6 @@ public class AgentMerge implements Serializable {
     private BigDecimal subAgentDebt;
 
     private BigDecimal subAgentOweTicket;
-
-    private String subAgentBusIds;
 
     private String cloReviewStatus;
 
@@ -89,14 +87,6 @@ public class AgentMerge implements Serializable {
 
     public void setSubAgentOweTicket(BigDecimal subAgentOweTicket) {
         this.subAgentOweTicket = subAgentOweTicket;
-    }
-
-    public String getSubAgentBusIds() {
-        return subAgentBusIds;
-    }
-
-    public void setSubAgentBusIds(String subAgentBusIds) {
-        this.subAgentBusIds = subAgentBusIds == null ? null : subAgentBusIds.trim();
     }
 
     public String getCloReviewStatus() {

@@ -2278,6 +2278,66 @@ public class AgentMergeBusInfoExample {
             return (Criteria) this;
         }
 
+        public Criteria andMergeStatusIsNull() {
+            addCriterion("MERGE_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusIsNotNull() {
+            addCriterion("MERGE_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusEqualTo(BigDecimal value) {
+            addCriterion("MERGE_STATUS =", value, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusNotEqualTo(BigDecimal value) {
+            addCriterion("MERGE_STATUS <>", value, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusGreaterThan(BigDecimal value) {
+            addCriterion("MERGE_STATUS >", value, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("MERGE_STATUS >=", value, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusLessThan(BigDecimal value) {
+            addCriterion("MERGE_STATUS <", value, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("MERGE_STATUS <=", value, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusIn(List<BigDecimal> values) {
+            addCriterion("MERGE_STATUS in", values, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusNotIn(List<BigDecimal> values) {
+            addCriterion("MERGE_STATUS not in", values, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MERGE_STATUS between", value1, value2, "mergeStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MERGE_STATUS not between", value1, value2, "mergeStatus");
+            return (Criteria) this;
+        }
+
         public Criteria andStatusIsNull() {
             addCriterion("STATUS is null");
             return (Criteria) this;

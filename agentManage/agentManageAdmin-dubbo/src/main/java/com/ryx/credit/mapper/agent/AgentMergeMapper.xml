@@ -9,7 +9,6 @@
     <result column="SUB_AGENT_NAME" jdbcType="VARCHAR" property="subAgentName" />
     <result column="SUB_AGENT_DEBT" jdbcType="DECIMAL" property="subAgentDebt" />
     <result column="SUB_AGENT_OWE_TICKET" jdbcType="DECIMAL" property="subAgentOweTicket" />
-    <result column="SUB_AGENT_BUS_IDS" jdbcType="VARCHAR" property="subAgentBusIds" />
     <result column="CLO_REVIEW_STATUS" jdbcType="VARCHAR" property="cloReviewStatus" />
     <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
@@ -49,8 +48,8 @@
   </sql>
   <sql id="Base_Column_List">
     ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT, 
-    SUB_AGENT_OWE_TICKET, SUB_AGENT_BUS_IDS, CLO_REVIEW_STATUS, C_TIME, U_TIME, C_USER, 
-    U_USER, STATUS, VERSION
+    SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, 
+    VERSION
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -83,16 +82,14 @@
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
     insert into A_AGENT_MERGE (ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, 
       SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT, 
-      SUB_AGENT_OWE_TICKET, SUB_AGENT_BUS_IDS, CLO_REVIEW_STATUS, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, STATUS, VERSION
-      )
+      SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, 
+      U_TIME, C_USER, U_USER, 
+      STATUS, VERSION)
     values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR}, 
       #{subAgentId,jdbcType=VARCHAR}, #{subAgentName,jdbcType=VARCHAR}, #{subAgentDebt,jdbcType=DECIMAL}, 
-      #{subAgentOweTicket,jdbcType=DECIMAL}, #{subAgentBusIds,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+      #{subAgentOweTicket,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
+      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
     insert into A_AGENT_MERGE
@@ -117,9 +114,6 @@
       </if>
       <if test="subAgentOweTicket != null">
         SUB_AGENT_OWE_TICKET,
-      </if>
-      <if test="subAgentBusIds != null">
-        SUB_AGENT_BUS_IDS,
       </if>
       <if test="cloReviewStatus != null">
         CLO_REVIEW_STATUS,
@@ -164,9 +158,6 @@
       </if>
       <if test="subAgentOweTicket != null">
         #{subAgentOweTicket,jdbcType=DECIMAL},
-      </if>
-      <if test="subAgentBusIds != null">
-        #{subAgentBusIds,jdbcType=VARCHAR},
       </if>
       <if test="cloReviewStatus != null">
         #{cloReviewStatus,jdbcType=VARCHAR},
@@ -218,9 +209,6 @@
       <if test="subAgentOweTicket != null">
         SUB_AGENT_OWE_TICKET = #{subAgentOweTicket,jdbcType=DECIMAL},
       </if>
-      <if test="subAgentBusIds != null">
-        SUB_AGENT_BUS_IDS = #{subAgentBusIds,jdbcType=VARCHAR},
-      </if>
       <if test="cloReviewStatus != null">
         CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=VARCHAR},
       </if>
@@ -253,7 +241,6 @@
       SUB_AGENT_NAME = #{subAgentName,jdbcType=VARCHAR},
       SUB_AGENT_DEBT = #{subAgentDebt,jdbcType=DECIMAL},
       SUB_AGENT_OWE_TICKET = #{subAgentOweTicket,jdbcType=DECIMAL},
-      SUB_AGENT_BUS_IDS = #{subAgentBusIds,jdbcType=VARCHAR},
       CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=VARCHAR},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       U_TIME = #{uTime,jdbcType=TIMESTAMP},
