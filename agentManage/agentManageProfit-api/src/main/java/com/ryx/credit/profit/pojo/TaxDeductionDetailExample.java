@@ -2032,7 +2032,7 @@ public class TaxDeductionDetailExample {
         }
 
         public Criteria andBusPlatformNotEqualTo(String value) {
-            addCriterion("BUS_PLATFORM <>", value, "busPlatform");
+            addCriterion("nvl(BUS_PLATFORM,'-') <>", value, "busPlatform");
             return (Criteria) this;
         }
 
