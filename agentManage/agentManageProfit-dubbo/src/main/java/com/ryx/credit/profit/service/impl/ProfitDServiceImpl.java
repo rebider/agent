@@ -97,8 +97,8 @@ public class ProfitDServiceImpl implements IProfitDService {
         if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentId())) {
             criteria.andAgentIdEqualTo(record.getAgentId());
         }
-        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getTransDate())) {
-            criteria.andTransDateEqualTo(record.getTransDate());
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getRemitDate())) {
+            criteria.andRemitDateEqualTo(record.getRemitDate());
         }
         List<Map<String,Object>> profitD = profitDMapper.selectIncludePayComByExample(example);
         PageInfo pageInfo = new PageInfo();
