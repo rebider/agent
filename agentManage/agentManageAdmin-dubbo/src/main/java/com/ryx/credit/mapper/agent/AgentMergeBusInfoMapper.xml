@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentMergeBusInfoMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_MARGE_ID" jdbcType="VARCHAR" property="agentMargeId" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="MAIN_AGENT_ID" jdbcType="VARCHAR" property="mainAgentId" />
+    <result column="SUB_AGENT_ID" jdbcType="VARCHAR" property="subAgentId" />
+    <result column="BUS_NUM" jdbcType="VARCHAR" property="busNum" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+    <result column="BUS_PARENT" jdbcType="VARCHAR" property="busParent" />
+    <result column="BUS_RISK_PARENT" jdbcType="VARCHAR" property="busRiskParent" />
+    <result column="BUS_ACTIVATION_PARENT" jdbcType="VARCHAR" property="busActivationParent" />
+    <result column="BUS_REGION" jdbcType="VARCHAR" property="busRegion" />
+    <result column="BUS_SENT_DIRECTLY" jdbcType="DECIMAL" property="busSentDirectly" />
+    <result column="BUS_DIRECT_CASHBACK" jdbcType="DECIMAL" property="busDirectCashback" />
+    <result column="BUS_INDE_ASS" jdbcType="DECIMAL" property="busIndeAss" />
+    <result column="BUS_CONTACT" jdbcType="VARCHAR" property="busContact" />
+    <result column="BUS_CONTACT_MOBILE" jdbcType="VARCHAR" property="busContactMobile" />
+    <result column="BUS_CONTACT_EMAIL" jdbcType="VARCHAR" property="busContactEmail" />
+    <result column="BUS_CONTACT_PERSON" jdbcType="VARCHAR" property="busContactPerson" />
+    <result column="BUS_RISK_EMAIL" jdbcType="VARCHAR" property="busRiskEmail" />
+    <result column="CLO_TAX_POINT" jdbcType="DECIMAL" property="cloTaxPoint" />
+    <result column="CLO_INVOICE" jdbcType="DECIMAL" property="cloInvoice" />
+    <result column="CLO_RECEIPT" jdbcType="DECIMAL" property="cloReceipt" />
+    <result column="CLO_PAY_COMPANY" jdbcType="VARCHAR" property="cloPayCompany" />
+    <result column="CLO_AGENT_COLINFO" jdbcType="VARCHAR" property="cloAgentColinfo" />
+    <result column="AG_ZBH" jdbcType="VARCHAR" property="agZbh" />
+    <result column="BUS_STATUS" jdbcType="DECIMAL" property="busStatus" />
+    <result column="BUS_USE_ORGAN" jdbcType="VARCHAR" property="busUseOrgan" />
+    <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="C_UTIME" jdbcType="TIMESTAMP" property="cUtime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="BUS_SCOPE" jdbcType="VARCHAR" property="busScope" />
+    <result column="DREDGE_S0" jdbcType="DECIMAL" property="dredgeS0" />
+    <result column="BUS_LOGIN_NUM" jdbcType="VARCHAR" property="busLoginNum" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_MARGE_ID, BUS_ID, MAIN_AGENT_ID, SUB_AGENT_ID, BUS_NUM, BUS_PLATFORM, BUS_TYPE, 
+    BUS_PARENT, BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION, BUS_SENT_DIRECTLY, 
+    BUS_DIRECT_CASHBACK, BUS_INDE_ASS, BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL, 
+    BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY, 
+    CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS, BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME, 
+    C_UTIME, C_USER, STATUS, VERSION, BUS_SCOPE, DREDGE_S0, BUS_LOGIN_NUM
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfoExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_MERGE_BUSINFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_AGENT_MERGE_BUSINFO
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfoExample">
+    delete from A_AGENT_MERGE_BUSINFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
+    insert into A_AGENT_MERGE_BUSINFO (ID, AGENT_MARGE_ID, BUS_ID, 
+      MAIN_AGENT_ID, SUB_AGENT_ID, BUS_NUM, 
+      BUS_PLATFORM, BUS_TYPE, BUS_PARENT, 
+      BUS_RISK_PARENT, BUS_ACTIVATION_PARENT, BUS_REGION, 
+      BUS_SENT_DIRECTLY, BUS_DIRECT_CASHBACK, BUS_INDE_ASS, 
+      BUS_CONTACT, BUS_CONTACT_MOBILE, BUS_CONTACT_EMAIL, 
+      BUS_CONTACT_PERSON, BUS_RISK_EMAIL, CLO_TAX_POINT, 
+      CLO_INVOICE, CLO_RECEIPT, CLO_PAY_COMPANY, 
+      CLO_AGENT_COLINFO, AG_ZBH, BUS_STATUS, 
+      BUS_USE_ORGAN, CLO_REVIEW_STATUS, C_TIME, 
+      C_UTIME, C_USER, STATUS, 
+      VERSION, BUS_SCOPE, DREDGE_S0, 
+      BUS_LOGIN_NUM)
+    values (#{id,jdbcType=VARCHAR}, #{agentMargeId,jdbcType=VARCHAR}, #{busId,jdbcType=VARCHAR}, 
+      #{mainAgentId,jdbcType=VARCHAR}, #{subAgentId,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, 
+      #{busPlatform,jdbcType=VARCHAR}, #{busType,jdbcType=VARCHAR}, #{busParent,jdbcType=VARCHAR}, 
+      #{busRiskParent,jdbcType=VARCHAR}, #{busActivationParent,jdbcType=VARCHAR}, #{busRegion,jdbcType=VARCHAR}, 
+      #{busSentDirectly,jdbcType=DECIMAL}, #{busDirectCashback,jdbcType=DECIMAL}, #{busIndeAss,jdbcType=DECIMAL}, 
+      #{busContact,jdbcType=VARCHAR}, #{busContactMobile,jdbcType=VARCHAR}, #{busContactEmail,jdbcType=VARCHAR}, 
+      #{busContactPerson,jdbcType=VARCHAR}, #{busRiskEmail,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, 
+      #{cloInvoice,jdbcType=DECIMAL}, #{cloReceipt,jdbcType=DECIMAL}, #{cloPayCompany,jdbcType=VARCHAR}, 
+      #{cloAgentColinfo,jdbcType=VARCHAR}, #{agZbh,jdbcType=VARCHAR}, #{busStatus,jdbcType=DECIMAL}, 
+      #{busUseOrgan,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP}, 
+      #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
+      #{version,jdbcType=DECIMAL}, #{busScope,jdbcType=VARCHAR}, #{dredgeS0,jdbcType=DECIMAL}, 
+      #{busLoginNum,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
+    insert into A_AGENT_MERGE_BUSINFO
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentMargeId != null">
+        AGENT_MARGE_ID,
+      </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
+      <if test="mainAgentId != null">
+        MAIN_AGENT_ID,
+      </if>
+      <if test="subAgentId != null">
+        SUB_AGENT_ID,
+      </if>
+      <if test="busNum != null">
+        BUS_NUM,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="busType != null">
+        BUS_TYPE,
+      </if>
+      <if test="busParent != null">
+        BUS_PARENT,
+      </if>
+      <if test="busRiskParent != null">
+        BUS_RISK_PARENT,
+      </if>
+      <if test="busActivationParent != null">
+        BUS_ACTIVATION_PARENT,
+      </if>
+      <if test="busRegion != null">
+        BUS_REGION,
+      </if>
+      <if test="busSentDirectly != null">
+        BUS_SENT_DIRECTLY,
+      </if>
+      <if test="busDirectCashback != null">
+        BUS_DIRECT_CASHBACK,
+      </if>
+      <if test="busIndeAss != null">
+        BUS_INDE_ASS,
+      </if>
+      <if test="busContact != null">
+        BUS_CONTACT,
+      </if>
+      <if test="busContactMobile != null">
+        BUS_CONTACT_MOBILE,
+      </if>
+      <if test="busContactEmail != null">
+        BUS_CONTACT_EMAIL,
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON,
+      </if>
+      <if test="busRiskEmail != null">
+        BUS_RISK_EMAIL,
+      </if>
+      <if test="cloTaxPoint != null">
+        CLO_TAX_POINT,
+      </if>
+      <if test="cloInvoice != null">
+        CLO_INVOICE,
+      </if>
+      <if test="cloReceipt != null">
+        CLO_RECEIPT,
+      </if>
+      <if test="cloPayCompany != null">
+        CLO_PAY_COMPANY,
+      </if>
+      <if test="cloAgentColinfo != null">
+        CLO_AGENT_COLINFO,
+      </if>
+      <if test="agZbh != null">
+        AG_ZBH,
+      </if>
+      <if test="busStatus != null">
+        BUS_STATUS,
+      </if>
+      <if test="busUseOrgan != null">
+        BUS_USE_ORGAN,
+      </if>
+      <if test="cloReviewStatus != null">
+        CLO_REVIEW_STATUS,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="cUtime != null">
+        C_UTIME,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="busScope != null">
+        BUS_SCOPE,
+      </if>
+      <if test="dredgeS0 != null">
+        DREDGE_S0,
+      </if>
+      <if test="busLoginNum != null">
+        BUS_LOGIN_NUM,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentMargeId != null">
+        #{agentMargeId,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentId != null">
+        #{mainAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentId != null">
+        #{subAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null">
+        #{busType,jdbcType=VARCHAR},
+      </if>
+      <if test="busParent != null">
+        #{busParent,jdbcType=VARCHAR},
+      </if>
+      <if test="busRiskParent != null">
+        #{busRiskParent,jdbcType=VARCHAR},
+      </if>
+      <if test="busActivationParent != null">
+        #{busActivationParent,jdbcType=VARCHAR},
+      </if>
+      <if test="busRegion != null">
+        #{busRegion,jdbcType=VARCHAR},
+      </if>
+      <if test="busSentDirectly != null">
+        #{busSentDirectly,jdbcType=DECIMAL},
+      </if>
+      <if test="busDirectCashback != null">
+        #{busDirectCashback,jdbcType=DECIMAL},
+      </if>
+      <if test="busIndeAss != null">
+        #{busIndeAss,jdbcType=DECIMAL},
+      </if>
+      <if test="busContact != null">
+        #{busContact,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactMobile != null">
+        #{busContactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactEmail != null">
+        #{busContactEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        #{busContactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="busRiskEmail != null">
+        #{busRiskEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="cloTaxPoint != null">
+        #{cloTaxPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="cloInvoice != null">
+        #{cloInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="cloReceipt != null">
+        #{cloReceipt,jdbcType=DECIMAL},
+      </if>
+      <if test="cloPayCompany != null">
+        #{cloPayCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="cloAgentColinfo != null">
+        #{cloAgentColinfo,jdbcType=VARCHAR},
+      </if>
+      <if test="agZbh != null">
+        #{agZbh,jdbcType=VARCHAR},
+      </if>
+      <if test="busStatus != null">
+        #{busStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="busUseOrgan != null">
+        #{busUseOrgan,jdbcType=VARCHAR},
+      </if>
+      <if test="cloReviewStatus != null">
+        #{cloReviewStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null">
+        #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="busScope != null">
+        #{busScope,jdbcType=VARCHAR},
+      </if>
+      <if test="dredgeS0 != null">
+        #{dredgeS0,jdbcType=DECIMAL},
+      </if>
+      <if test="busLoginNum != null">
+        #{busLoginNum,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfoExample" resultType="java.lang.Long">
+    select count(*) from A_AGENT_MERGE_BUSINFO
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
+    update A_AGENT_MERGE_BUSINFO
+    <set>
+      <if test="agentMargeId != null">
+        AGENT_MARGE_ID = #{agentMargeId,jdbcType=VARCHAR},
+      </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentId != null">
+        MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentId != null">
+        SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="busNum != null">
+        BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null">
+        BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      </if>
+      <if test="busParent != null">
+        BUS_PARENT = #{busParent,jdbcType=VARCHAR},
+      </if>
+      <if test="busRiskParent != null">
+        BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
+      </if>
+      <if test="busActivationParent != null">
+        BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
+      </if>
+      <if test="busRegion != null">
+        BUS_REGION = #{busRegion,jdbcType=VARCHAR},
+      </if>
+      <if test="busSentDirectly != null">
+        BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
+      </if>
+      <if test="busDirectCashback != null">
+        BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
+      </if>
+      <if test="busIndeAss != null">
+        BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
+      </if>
+      <if test="busContact != null">
+        BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactMobile != null">
+        BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactEmail != null">
+        BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="busContactPerson != null">
+        BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="busRiskEmail != null">
+        BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="cloTaxPoint != null">
+        CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+      </if>
+      <if test="cloInvoice != null">
+        CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+      </if>
+      <if test="cloReceipt != null">
+        CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
+      </if>
+      <if test="cloPayCompany != null">
+        CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="cloAgentColinfo != null">
+        CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
+      </if>
+      <if test="agZbh != null">
+        AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+      </if>
+      <if test="busStatus != null">
+        BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="busUseOrgan != null">
+        BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
+      </if>
+      <if test="cloReviewStatus != null">
+        CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUtime != null">
+        C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="busScope != null">
+        BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
+      </if>
+      <if test="dredgeS0 != null">
+        DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
+      </if>
+      <if test="busLoginNum != null">
+        BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo">
+    update A_AGENT_MERGE_BUSINFO
+    set AGENT_MARGE_ID = #{agentMargeId,jdbcType=VARCHAR},
+      BUS_ID = #{busId,jdbcType=VARCHAR},
+      MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
+      SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
+      BUS_NUM = #{busNum,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      BUS_PARENT = #{busParent,jdbcType=VARCHAR},
+      BUS_RISK_PARENT = #{busRiskParent,jdbcType=VARCHAR},
+      BUS_ACTIVATION_PARENT = #{busActivationParent,jdbcType=VARCHAR},
+      BUS_REGION = #{busRegion,jdbcType=VARCHAR},
+      BUS_SENT_DIRECTLY = #{busSentDirectly,jdbcType=DECIMAL},
+      BUS_DIRECT_CASHBACK = #{busDirectCashback,jdbcType=DECIMAL},
+      BUS_INDE_ASS = #{busIndeAss,jdbcType=DECIMAL},
+      BUS_CONTACT = #{busContact,jdbcType=VARCHAR},
+      BUS_CONTACT_MOBILE = #{busContactMobile,jdbcType=VARCHAR},
+      BUS_CONTACT_EMAIL = #{busContactEmail,jdbcType=VARCHAR},
+      BUS_CONTACT_PERSON = #{busContactPerson,jdbcType=VARCHAR},
+      BUS_RISK_EMAIL = #{busRiskEmail,jdbcType=VARCHAR},
+      CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+      CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+      CLO_RECEIPT = #{cloReceipt,jdbcType=DECIMAL},
+      CLO_PAY_COMPANY = #{cloPayCompany,jdbcType=VARCHAR},
+      CLO_AGENT_COLINFO = #{cloAgentColinfo,jdbcType=VARCHAR},
+      AG_ZBH = #{agZbh,jdbcType=VARCHAR},
+      BUS_STATUS = #{busStatus,jdbcType=DECIMAL},
+      BUS_USE_ORGAN = #{busUseOrgan,jdbcType=VARCHAR},
+      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      C_UTIME = #{cUtime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      BUS_SCOPE = #{busScope,jdbcType=VARCHAR},
+      DREDGE_S0 = #{dredgeS0,jdbcType=DECIMAL},
+      BUS_LOGIN_NUM = #{busLoginNum,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
