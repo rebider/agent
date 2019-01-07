@@ -54,7 +54,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
      * @Description: 欠票导入或重导后重算
      * @Date: 17:38 2018/12/22
      */
-    /*public void ownInvoiceReComputer(Invoice invoice) {
+    public void ownInvoiceReComputer(Invoice invoice) {
         try {
             String profitMonth = invoice.getFactorMonth();
             String agentId = invoice.getAgentId();
@@ -94,59 +94,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             throw new RuntimeException("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败");
         }
 
-    }*/
-    public void ownInvoiceReComputer(Invoice invoice) {
-        try {
-            //获取系统当前时间
-            Calendar curr = Calendar.getInstance();
-            curr.setTime(new Date(System.currentTimeMillis()));
-            curr.add(Calendar.MONTH, -1);
-            SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyyMM");
-            String profitMonth = simpleDateFormatMonth.format(curr.getTime());
-            //agentId
-            String agentId = invoice.getAgentId();
-            InvoiceDetailExample example = new InvoiceDetailExample();
-            InvoiceDetailExample.Criteria criteria = example.createCriteria();
-            criteria.andAgentIdEqualTo(agentId);
-            criteria.andProfitMonthEqualTo(profitMonth);
-            List<InvoiceDetail> list = invoiceDetailMapper.selectByExample(example);
-            if (list != null && list.size() > 0) {
-                // 更新
-                InvoiceDetail invoiceDetail = list.get(0);
-                //计算本月到票（累计）
-                BigDecimal addInvoiceAmt = invoiceDetail.getAddInvoiceAmt().add(invoice.getInvoiceAmt());
-                invoiceDetail.setAddInvoiceAmt(addInvoiceAmt);
-                //计算本月欠票 =上月剩余欠票基数+本月日返现+本月日分润+上月月分润+上月瑞银信保理款+调整金额-本月实际到票
-                BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()
-                        .add(invoiceDetail.getDayProfitAmt())
-                        .add(invoiceDetail.getDayBackAmt())
-                        .add(invoiceDetail.getPreProfitMonthAmt())
-                        .add(invoiceDetail.getPreProfitMonthBlAmt())
-                        .add(invoiceDetail.getAdjustAmt())
-                        .subtract(addInvoiceAmt);
-                invoiceDetail.setOwnInvoice(ownInvoice);
-                invoiceDetail.setUpdateTime(DateUtils.dateToStringss(new Date()));
-                invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
-            } else {
-                //插入
-                Map<String, Object> params = new HashMap<>();
-                params.put("profitMonth", profitMonth);
-                params.put("preMonth", new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -2)));
-                params.put("agentId", invoice.getAgentId());
-                List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceAgents(params);
-                if (agentList != null && agentList.size() > 0) {
-                    Map<String, Object> map = agentList.get(0);
-                    insertInvoiceOwnDetail(map, profitMonth);
-                }
-            }
-        } catch (Exception e) {
-            logger.error("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败", e);
-            throw new RuntimeException("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败");
-        }
-
     }
-
-
     /**
      * @Author: Zhang Lei
      * @Description: 欠票调整
@@ -400,6 +348,14 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             invoiceMapper.setStatusToInvoice(invoice);
         }
         invoiceMapper.insertSelective(invoice);
+        //获取系统当前时间
+        Calendar curr = Calendar.getInstance();
+        curr.setTime(new Date(System.currentTimeMillis()));
+        curr.add(Calendar.MONTH, -1);
+        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyyMM");
+        String profitMonth = simpleDateFormatMonth.format(curr.getTime());
+        invoice.setFactorMonth(profitMonth);
+
         ownInvoiceReComputer(invoice);//欠票导入或者重导后计算
     }
 
