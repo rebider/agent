@@ -247,11 +247,11 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
      */
     @Override
     public void exportData(List<List<Object>> datas, String loginName) {
-        if (datas != null && datas.size() > 0) {
-            datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list -> {
-                insertInvoice(list, loginName);
-            });
-        }
+            if (datas != null && datas.size() > 0) {
+                datas.stream().filter(list -> list != null && list.size()== 3 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list -> {
+                    insertInvoice(list, loginName);
+                });
+            }
     }
 
     /**
