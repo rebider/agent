@@ -523,7 +523,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Approved.status);
         if(StringUtils.isNotBlank(bus.getBusNum())){
-            bus.setBusStatus(Status.STATUS_0.status);
+            bus.setBusStatus(BusinessStatus.pause.status);
         }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批通过，更新业务本信息失败{}:{}", processingId, bus.getId());
@@ -594,7 +594,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Refuse.status);
         if(StringUtils.isNotBlank(bus.getBusNum())){
-            bus.setBusStatus(Status.STATUS_0.status);
+            bus.setBusStatus(BusinessStatus.pause.status);
         }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, bus.getId());
@@ -660,7 +660,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId(), null, AgStatus.Approving.status);
         for (AgentBusInfo agentBusInfo : aginfo) {
             if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
-                agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                agentBusInfo.setBusStatus(BusinessStatus.pause.status);
             }
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
@@ -758,7 +758,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Refuse.status);
             if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
-                agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                agentBusInfo.setBusStatus(BusinessStatus.pause.status);
             }
             if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                 logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, agentBusInfo.getId());

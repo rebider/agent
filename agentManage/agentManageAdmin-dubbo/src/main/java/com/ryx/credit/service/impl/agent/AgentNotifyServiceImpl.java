@@ -261,7 +261,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地代理商{},更新失败",userid,updateAgent.getId(),"入网成功");
                     }
                     log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地平台{}",userid,agentBusInfo.getBusNum(),"入网成功");
-                    agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
                     agentBusInfo.setBusLoginNum(agentBusInfo.getBusNum());
                     if(agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)==1){
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",userid,agentBusInfo.getId(),"入网成功");
@@ -274,7 +274,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
                 }else{
 
-                    agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                    agentBusInfo.setBusStatus(BusinessStatus.pause.status);
                     if(1==agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                         log.info("开平台升级接口请求发起用户{}开平台{}平台编号不为空走升级接口,更新本地业务平台{},更新成功",userid,agentBusInfo.getId(),"入网失败");
                     }else{
@@ -474,7 +474,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 updateBusInfo.setId(agentBusInfo.getId());
                 if(agentBusInfo.getBusNum()!=null){
                     updateBusInfo.setBusNum(jsonObject.getString("orgId"));
-                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                    updateBusInfo.setBusStatus(BusinessStatus.Enabled.status);
                     log.info("已有编号进行入网修改：更新orgId到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
                 }else{
                     log.info("已有编号进行入网修改：更新orgId到库,已存在不更新到库,id:{},业务ID:{},返回结果:{}", record.getId(), busId, jsonObject.toJSONString());
@@ -581,7 +581,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                             }
                         }
 
-                        agentBusInfo.setBusStatus(Status.STATUS_1.status);
+                        agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
                         if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网成功状态更新失败");
                         }else{
@@ -603,7 +603,7 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
                     }else{
 
-                        agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                        agentBusInfo.setBusStatus(BusinessStatus.pause.status);
                         if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo)){
                             log.info("升级开户接口{}平台编号不为空走升级接口,更新业务{}",agentBusInfo.getBusNum(),"入网失败状态更新失败");
                         }else{
@@ -805,15 +805,15 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     PlatForm p = platForms.get(0);
                     //首刷初始状态为开户未激活s
                     if(PlatformType.MPOS.code.equals(p.getPlatformType()+"")){
-                        updateBusInfo.setBusStatus(Status.STATUS_2.status);
+                        updateBusInfo.setBusStatus(BusinessStatus.inactive.status);
                     }else{
-                        updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                        updateBusInfo.setBusStatus(BusinessStatus.Enabled.status);
                     }
                 }else{
-                    updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                    updateBusInfo.setBusStatus(BusinessStatus.Enabled.status);
                 }
             }else{
-                updateBusInfo.setBusStatus(Status.STATUS_1.status);
+                updateBusInfo.setBusStatus(BusinessStatus.Enabled.status);
             }
             int upResult2 = agentBusInfoMapper.updateByPrimaryKeySelective(updateBusInfo);
             log.info("入网开户修改操作: 接收入网更新入网状态,业务id：{},upResult2:{}",upResult2);
