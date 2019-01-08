@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.dao.ProfitSupplyTaxMapper">
+<mapper namespace="com.ryx.credit.profit.pojo.ProfitSupplyTaxMapper">
   <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     <result column="ID" jdbcType="VARCHAR" property="id" />
     <result column="SUPPLY_TAX_DATE" jdbcType="VARCHAR" property="supplyTaxDate" />
@@ -73,8 +73,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, 
-    SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT,SUPPLY_TAX_TYPE,SUPPLY_TAX_PLATFORM,CREATE_TIME,UPDATE_TIME
+    ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID,
+    SUPPLY_TAX_SUB_NAME, SUPPLY_TAX_AMT, SUPPLY_TAX_TYPE, SUPPLY_TAX_PLATFORM, CREATE_TIME,
+    UPDATE_TIME
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -99,14 +100,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
-    insert into PROFIT_SUPPLY_TAX (ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID, 
-      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME,SUPPLY_TAX_AMT
-      ,SUPPLY_TAX_TYPE,SUPPLY_TAX_PLATFORM,CREATE_TIME,UPDATE_TIME
-      )
-    values (#{id,jdbcType=VARCHAR}, #{supplyTaxDate,jdbcType=VARCHAR}, #{supplyTaxAgentId,jdbcType=VARCHAR}, 
-      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR}, #{supplyTaxAmt,jdbcType=DECIMAL}
-
-      )
+    insert into PROFIT_SUPPLY_TAX (ID, SUPPLY_TAX_DATE, SUPPLY_TAX_AGENT_ID,
+      SUPPLY_TAX_AGENT_NAME, SUPPLY_TAX_SUB_ID, SUPPLY_TAX_SUB_NAME,
+      SUPPLY_TAX_AMT, SUPPLY_TAX_TYPE, SUPPLY_TAX_PLATFORM,
+      CREATE_TIME, UPDATE_TIME)
+    values (#{id,jdbcType=VARCHAR}, #{supplyTaxDate,jdbcType=VARCHAR}, #{supplyTaxAgentId,jdbcType=VARCHAR},
+      #{supplyTaxAgentName,jdbcType=VARCHAR}, #{supplyTaxSubId,jdbcType=VARCHAR}, #{supplyTaxSubName,jdbcType=VARCHAR},
+      #{supplyTaxAmt,jdbcType=DECIMAL}, #{supplyTaxType,jdbcType=VARCHAR}, #{supplyTaxPlatform,jdbcType=VARCHAR},
+      #{createTime,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     insert into PROFIT_SUPPLY_TAX
@@ -132,6 +133,18 @@
       <if test="supplyTaxAmt != null">
         SUPPLY_TAX_AMT,
       </if>
+      <if test="supplyTaxType != null">
+        SUPPLY_TAX_TYPE,
+      </if>
+      <if test="supplyTaxPlatform != null">
+        SUPPLY_TAX_PLATFORM,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -155,9 +168,18 @@
       <if test="supplyTaxAmt != null">
         #{supplyTaxAmt,jdbcType=DECIMAL},
       </if>
-        <if test="supplyTaxType != null">
-            #{supplyTaxType,jdbcType=VARCHAR},
-        </if>
+      <if test="supplyTaxType != null">
+        #{supplyTaxType,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTaxPlatform != null">
+        #{supplyTaxPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitSupplyTaxExample" resultType="java.lang.Long">
@@ -190,9 +212,18 @@
       <if test="record.supplyTaxAmt != null">
         SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
       </if>
-        <if test="record.supplyTaxType != null">
-            SUPPLY_TAX_AMT = #{record.supplyTaxType,jdbcType=VARCHAR},
-        </if>
+      <if test="record.supplyTaxType != null">
+        SUPPLY_TAX_TYPE = #{record.supplyTaxType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTaxPlatform != null">
+        SUPPLY_TAX_PLATFORM = #{record.supplyTaxPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateTime != null">
+        UPDATE_TIME = #{record.updateTime,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -201,20 +232,23 @@
   <update id="updateByExample" parameterType="map">
     update PROFIT_SUPPLY_TAX
     set ID = #{record.id,jdbcType=VARCHAR},
-      SUPPLY_TAX_DATE = #{record.supplyTaxDate,jdbcType=VARCHAR},
-      SUPPLY_TAX_AGENT_ID = #{record.supplyTaxAgentId,jdbcType=VARCHAR},
-      SUPPLY_TAX_AGENT_NAME = #{record.supplyTaxAgentName,jdbcType=VARCHAR},
-      SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
-      SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
-      SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL}
-      SUPPLY_TAX_TYPE= #{record.supplyTaxType,jdbcType=VARCHAR}
+    SUPPLY_TAX_DATE = #{record.supplyTaxDate,jdbcType=VARCHAR},
+    SUPPLY_TAX_AGENT_ID = #{record.supplyTaxAgentId,jdbcType=VARCHAR},
+    SUPPLY_TAX_AGENT_NAME = #{record.supplyTaxAgentName,jdbcType=VARCHAR},
+    SUPPLY_TAX_SUB_ID = #{record.supplyTaxSubId,jdbcType=VARCHAR},
+    SUPPLY_TAX_SUB_NAME = #{record.supplyTaxSubName,jdbcType=VARCHAR},
+    SUPPLY_TAX_AMT = #{record.supplyTaxAmt,jdbcType=DECIMAL},
+    SUPPLY_TAX_TYPE = #{record.supplyTaxType,jdbcType=VARCHAR},
+    SUPPLY_TAX_PLATFORM = #{record.supplyTaxPlatform,jdbcType=VARCHAR},
+    CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+    UPDATE_TIME = #{record.updateTime,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -222,6 +256,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
 
   <select id="getProfitSupplyTaxCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
@@ -249,7 +284,9 @@
 
   <select id="getProfitSupplyTaxList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    select ps.*,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
+    select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
+    ps.SUPPLY_TAX_PLATFORM,ps.SUPPLY_TAX_SUB_ID,ps.SUPPLY_TAX_SUB_NAME,ps.SUPPLY_TAX_AMT,
+    ps.CREATE_TIME,ps.UPDATE_TIME,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
     join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
     left join A_agent_businfo aab on  pst.supply_Tax_agent_id = aab.Agent_id )
     aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where
@@ -257,28 +294,24 @@
     <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and ps.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
     <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
     <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
-    <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and ps.SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
-    <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and ps.SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
-    <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and ps.SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
-    <if test="SUPPLY_TAX_TYPE != null and SUPPLY_TAX_TYPE !='' "> and ps.SUPPLY_TAX_TYPE = #{SUPPLY_TAX_TYPE} </if>
     <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and ps.SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
-
-    <if test="CREATE_TIME != null and CREATE_TIME !='' "> and ps.CREATE_TIME = #{CREATE_TIME} </if>
-    <if test="UPDATE_TIME != null and UPDATE_TIME !='' "> and ps.UPDATE_TIME = #{UPDATE_TIME} </if>
     ORDER BY ps.SUPPLY_TAX_DATE DESC
     <include refid="PAGING_END" />
   </select>
 
   <select id="getClassificationList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    SELECT
-    <include refid="Base_Column_List" />
-    FROM PROFIT_SUPPLY_TAX
+    select ps.ID,ps.SUPPLY_TAX_DATE ,ps.SUPPLY_TAX_AGENT_ID,ps.SUPPLY_TAX_AGENT_NAME,
+    ps.SUPPLY_TAX_PLATFORM,ps.SUPPLY_TAX_SUB_ID,ps.SUPPLY_TAX_SUB_NAME,ps.SUPPLY_TAX_AMT,
+    ps.CREATE_TIME,ps.UPDATE_TIME,aa.bus_type as SUPPLY_TAX_TYPE from PROFIT_SUPPLY_TAX ps left
+    join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
+    left join A_agent_businfo aab on  pst.supply_Tax_agent_id = aab.Agent_id )
+    aa on ps.supply_Tax_agent_id = aa.AGENT_IDA
     START WITH
-    SUPPLY_TAX_PLATFORM = '01'
-    <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
-    <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
-    CONNECT BY PRIOR SUPPLY_TAX_SUB_ID=SUPPLY_TAX_AGENT_ID
+    ps.SUPPLY_TAX_PLATFORM = '01'
+    <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
+    <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
+    CONNECT BY PRIOR ps.SUPPLY_TAX_SUB_ID=ps.SUPPLY_TAX_AGENT_ID
     <include refid="PAGING_END" />
   </select>
 
