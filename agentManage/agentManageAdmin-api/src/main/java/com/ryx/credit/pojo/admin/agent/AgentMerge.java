@@ -19,7 +19,7 @@ public class AgentMerge implements Serializable{
 
     private BigDecimal subAgentOweTicket;
 
-    private String cloReviewStatus;
+    private BigDecimal cloReviewStatus;
 
     private Date cTime;
 
@@ -32,6 +32,8 @@ public class AgentMerge implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private BigDecimal mergeType;
 
     public String getId() {
         return id;
@@ -89,12 +91,12 @@ public class AgentMerge implements Serializable{
         this.subAgentOweTicket = subAgentOweTicket;
     }
 
-    public String getCloReviewStatus() {
+    public BigDecimal getCloReviewStatus() {
         return cloReviewStatus;
     }
 
-    public void setCloReviewStatus(String cloReviewStatus) {
-        this.cloReviewStatus = cloReviewStatus == null ? null : cloReviewStatus.trim();
+    public void setCloReviewStatus(BigDecimal cloReviewStatus) {
+        this.cloReviewStatus = cloReviewStatus;
     }
 
     public Date getcTime() {
@@ -143,5 +145,13 @@ public class AgentMerge implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public BigDecimal getMergeType() {
+        return mergeType;
+    }
+
+    public void setMergeType(BigDecimal mergeType) {
+        this.mergeType = mergeType;
     }
 }

@@ -9,13 +9,14 @@
     <result column="SUB_AGENT_NAME" jdbcType="VARCHAR" property="subAgentName" />
     <result column="SUB_AGENT_DEBT" jdbcType="DECIMAL" property="subAgentDebt" />
     <result column="SUB_AGENT_OWE_TICKET" jdbcType="DECIMAL" property="subAgentOweTicket" />
-    <result column="CLO_REVIEW_STATUS" jdbcType="VARCHAR" property="cloReviewStatus" />
+    <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
     <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
     <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="MERGE_TYPE" jdbcType="DECIMAL" property="mergeType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -47,9 +48,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT, 
-    SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS, 
-    VERSION
+    ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT,
+    SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS,
+    VERSION, MERGE_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -68,7 +69,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_AGENT_MERGE
     where ID = #{id,jdbcType=VARCHAR}
@@ -80,16 +81,18 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
-    insert into A_AGENT_MERGE (ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, 
-      SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT, 
-      SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, 
-      U_TIME, C_USER, U_USER, 
-      STATUS, VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR}, 
-      #{subAgentId,jdbcType=VARCHAR}, #{subAgentName,jdbcType=VARCHAR}, #{subAgentDebt,jdbcType=DECIMAL}, 
-      #{subAgentOweTicket,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, 
-      #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, 
-      #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL})
+    insert into A_AGENT_MERGE (ID, MAIN_AGENT_ID, MAIN_AGENT_NAME,
+    SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT,
+    SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME,
+    U_TIME, C_USER, U_USER,
+    STATUS, VERSION, MERGE_TYPE
+    )
+    values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR},
+    #{subAgentId,jdbcType=VARCHAR}, #{subAgentName,jdbcType=VARCHAR}, #{subAgentDebt,jdbcType=DECIMAL},
+    #{subAgentOweTicket,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{mergeType,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
     insert into A_AGENT_MERGE
@@ -136,6 +139,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="mergeType != null">
+        MERGE_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -160,7 +166,7 @@
         #{subAgentOweTicket,jdbcType=DECIMAL},
       </if>
       <if test="cloReviewStatus != null">
-        #{cloReviewStatus,jdbcType=VARCHAR},
+        #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
       <if test="cTime != null">
         #{cTime,jdbcType=TIMESTAMP},
@@ -179,6 +185,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="mergeType != null">
+        #{mergeType,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -210,7 +219,7 @@
         SUB_AGENT_OWE_TICKET = #{subAgentOweTicket,jdbcType=DECIMAL},
       </if>
       <if test="cloReviewStatus != null">
-        CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=VARCHAR},
+        CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
       </if>
       <if test="cTime != null">
         C_TIME = #{cTime,jdbcType=TIMESTAMP},
@@ -230,6 +239,9 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="mergeType != null">
+        MERGE_TYPE = #{mergeType,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -241,18 +253,19 @@
       SUB_AGENT_NAME = #{subAgentName,jdbcType=VARCHAR},
       SUB_AGENT_DEBT = #{subAgentDebt,jdbcType=DECIMAL},
       SUB_AGENT_OWE_TICKET = #{subAgentOweTicket,jdbcType=DECIMAL},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=VARCHAR},
+      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
       C_TIME = #{cTime,jdbcType=TIMESTAMP},
       U_TIME = #{uTime,jdbcType=TIMESTAMP},
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+      VERSION = #{version,jdbcType=DECIMAL},
+      MERGE_TYPE = #{mergeType,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

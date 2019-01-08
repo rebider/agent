@@ -618,62 +618,52 @@ public class AgentMergeExample {
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusEqualTo(String value) {
+        public Criteria andCloReviewStatusEqualTo(BigDecimal value) {
             addCriterion("CLO_REVIEW_STATUS =", value, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusNotEqualTo(String value) {
+        public Criteria andCloReviewStatusNotEqualTo(BigDecimal value) {
             addCriterion("CLO_REVIEW_STATUS <>", value, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusGreaterThan(String value) {
+        public Criteria andCloReviewStatusGreaterThan(BigDecimal value) {
             addCriterion("CLO_REVIEW_STATUS >", value, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusGreaterThanOrEqualTo(String value) {
+        public Criteria andCloReviewStatusGreaterThanOrEqualTo(BigDecimal value) {
             addCriterion("CLO_REVIEW_STATUS >=", value, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusLessThan(String value) {
+        public Criteria andCloReviewStatusLessThan(BigDecimal value) {
             addCriterion("CLO_REVIEW_STATUS <", value, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusLessThanOrEqualTo(String value) {
+        public Criteria andCloReviewStatusLessThanOrEqualTo(BigDecimal value) {
             addCriterion("CLO_REVIEW_STATUS <=", value, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusLike(String value) {
-            addCriterion("CLO_REVIEW_STATUS like", value, "cloReviewStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andCloReviewStatusNotLike(String value) {
-            addCriterion("CLO_REVIEW_STATUS not like", value, "cloReviewStatus");
-            return (Criteria) this;
-        }
-
-        public Criteria andCloReviewStatusIn(List<String> values) {
+        public Criteria andCloReviewStatusIn(List<BigDecimal> values) {
             addCriterion("CLO_REVIEW_STATUS in", values, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusNotIn(List<String> values) {
+        public Criteria andCloReviewStatusNotIn(List<BigDecimal> values) {
             addCriterion("CLO_REVIEW_STATUS not in", values, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusBetween(String value1, String value2) {
+        public Criteria andCloReviewStatusBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("CLO_REVIEW_STATUS between", value1, value2, "cloReviewStatus");
             return (Criteria) this;
         }
 
-        public Criteria andCloReviewStatusNotBetween(String value1, String value2) {
+        public Criteria andCloReviewStatusNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("CLO_REVIEW_STATUS not between", value1, value2, "cloReviewStatus");
             return (Criteria) this;
         }
@@ -1055,6 +1045,66 @@ public class AgentMergeExample {
 
         public Criteria andVersionNotBetween(BigDecimal value1, BigDecimal value2) {
             addCriterion("VERSION not between", value1, value2, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeIsNull() {
+            addCriterion("MERGE_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeIsNotNull() {
+            addCriterion("MERGE_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeEqualTo(BigDecimal value) {
+            addCriterion("MERGE_TYPE =", value, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeNotEqualTo(BigDecimal value) {
+            addCriterion("MERGE_TYPE <>", value, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeGreaterThan(BigDecimal value) {
+            addCriterion("MERGE_TYPE >", value, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("MERGE_TYPE >=", value, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeLessThan(BigDecimal value) {
+            addCriterion("MERGE_TYPE <", value, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("MERGE_TYPE <=", value, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeIn(List<BigDecimal> values) {
+            addCriterion("MERGE_TYPE in", values, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeNotIn(List<BigDecimal> values) {
+            addCriterion("MERGE_TYPE not in", values, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MERGE_TYPE between", value1, value2, "mergeType");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeTypeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MERGE_TYPE not between", value1, value2, "mergeType");
             return (Criteria) this;
         }
     }
