@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ryx.credit.profit.pojo.ProfitSupplyTaxMapper">
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitSupplyTax">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitSupplyTaxMapper">
+    <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitSupplyTax">
     <result column="ID" jdbcType="VARCHAR" property="id" />
     <result column="SUPPLY_TAX_DATE" jdbcType="VARCHAR" property="supplyTaxDate" />
     <result column="SUPPLY_TAX_AGENT_ID" jdbcType="VARCHAR" property="supplyTaxAgentId" />
