@@ -435,8 +435,9 @@
 
     left join
     (select AGENT_ID,sum(SUCCESS_MONEY) DAYS_PROFIT_AMT,sum(RETURN_MONEY) RETURN_MONEY from    <!--日结分润、返现-->
-    P_PROFIT_D where REMIT_DATE>='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31' group by AGENT_ID) c on
-    a.AGENT_ID = c.AGENT_ID
+    P_PROFIT_D where REMIT_DATE>='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31'
+      and PAY_COMPANY = 'Q000029564' group by AGENT_ID) c
+      on a.AGENT_ID = c.AGENT_ID
 
     left join
     (select AGENT_ID,OWN_INVOICE from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}') d on a.AGENT_ID =

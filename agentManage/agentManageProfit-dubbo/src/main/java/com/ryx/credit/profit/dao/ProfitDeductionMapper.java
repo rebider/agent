@@ -41,5 +41,5 @@ public interface ProfitDeductionMapper {
 
     int resetDataDeduction(String type);
 
-    List<ProfitDeduction> getNotDeductListByParams(Map<String,Object> param);
+    List<ProfitDeduction> selectDeductListByParams(Map<String,Object> param);
 }

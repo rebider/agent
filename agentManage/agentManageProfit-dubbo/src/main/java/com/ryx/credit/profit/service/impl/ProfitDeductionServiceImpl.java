@@ -850,10 +850,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     @Override
     public BigDecimal khDeduction(Map<String, Object> param) {
-        param.put("type", DeductionType.POS_REWARD_DEDUCT.getType());
-        param.put("deductionStatus", "0");
         //查询所有考核未扣款记录
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
+        List<ProfitDeduction> deductionList = profitDeductionMapper.selectDeductListByParams(param);
 
         if (deductionList != null && deductionList.size() > 0) {
             return getDeductionAmt(deductionList, param);
