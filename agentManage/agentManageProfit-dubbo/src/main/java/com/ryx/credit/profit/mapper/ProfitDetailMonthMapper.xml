@@ -1195,7 +1195,7 @@
    SELECT
     nvl(SUM(SUB_ADD_TAX),0.00) SUB_TAX_BASE_TOTAL
     FROM (
-      SELECT a.*,b.CLO_TAX_POINT PARENT_TAX,TAX_BASE*(b.CLO_TAX_POINT-TAX) SUB_ADD_TAX FROM(
+      SELECT a.*,b.CLO_TAX_POINT PARENT_TAX,TAX_BASE*(TAX-b.CLO_TAX_POINT) SUB_ADD_TAX FROM(
         select
           ID,
           AGENT_ID,
@@ -1207,10 +1207,10 @@
         from P_PROFIT_DETAIL_M
         where PROFIT_DATE = '${profitDate}'
         start with PARENT_AGENT_ID = '${parentAgentId}' and AGENT_ID = '${subAgentId}'
-              <if test="parentTax != null and parentTax !=''">
+              <!--<if test="parentTax != null and parentTax !=''">
                 AND TAX &lt; '${parentTax}'
                 AND TAX > 0
-              </if>
+              </if>-->
         connect by prior AGENT_ID = PARENT_AGENT_ID AND PAY_COMPANY != 'Q000029564'
       ) a
       left join A_agent_colinfo b on a.PARENT_AGENT_ID= b.AGENT_ID

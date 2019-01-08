@@ -5,6 +5,7 @@ import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
@@ -43,6 +44,8 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
     ProfitDirectMapper directMapper;
     @Autowired
     private AgentColinfoService agentColinfoService;
+    @Autowired
+    private AgentBusinfoService businfoService;
 
     private List<String> computedAgentIds = new ArrayList<>();
 
@@ -122,11 +125,11 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         computedAgentIds.clear();
 
         logger.info("======={}补税点计算开始======", profitMonth);
-        profitSupplyTaxMapper.deleteByMonth(profitMonth);
+        //profitSupplyTaxMapper.deleteByMonth(profitMonth);
 
         logger.info("直签开票代理商无需补税点计算");
 
-        logger.info("开始直签扣税代理商补税点计算 (只需计算税点小于6%且不开票的代理商)");
+        logger.info("开始直签扣税代理商补税点计算 (只需计算税点小于6%且扣税的代理商)");
         List<Map<String, Object>> zqTaxAgents = profitSupplyTaxMapper.getZqTaxAgents(params);
         for (Map<String, Object> map : zqTaxAgents) {
             String parentAgentId = (String) map.get("AGENT_ID");
@@ -136,15 +139,17 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         logger.info("开始直发开票代理商补税点计算");
         List<Map<String, Object>> zfInvoiceAgents = profitSupplyTaxMapper.getZfInvoiceAgents(params);
         for (Map<String, Object> map : zfInvoiceAgents) {
-            String parentAgentId = (String) map.get("AGENT_ID");
-            doTaxSupplyComputer_ZF(parentAgentId, profitMonth, 1);
+            String busNum = (String) map.get("BUS_NUM");
+            String firstAgentId = (String) map.get("AGENT_ID");
+            doTaxSupplyComputer_ZF(firstAgentId, busNum, profitMonth, 1);
         }
 
         logger.info("开始直发扣税代理商补税点计算（税率非6%）");
         List<Map<String, Object>> zfTaxAgents = profitSupplyTaxMapper.getZfTaxAgents(params);
         for (Map<String, Object> map : zfTaxAgents) {
-            String parentAgentId = (String) map.get("AGENT_ID");
-            doTaxSupplyComputer_ZF(parentAgentId, profitMonth, 2);
+            String busNum = (String) map.get("BUS_NUM");
+            String firstAgentId = (String) map.get("AGENT_ID");
+            doTaxSupplyComputer_ZF(firstAgentId, busNum, profitMonth, 2);
         }
         logger.info("======={}补税点计算结束======", profitMonth);
 
@@ -155,32 +160,58 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
      * @Description: 直发代理商补税点计算
      * @Date: 18:31 2018/12/21
      */
-    private void doTaxSupplyComputer_ZF(String parentAgentId, String profitMonth, int type) {
+    private void doTaxSupplyComputer_ZF(String firstAgentId, String parentBusNum, String profitMonth, int type) {
+        logger.info("直发代理商{},{}", parentBusNum, firstAgentId);
         ProfitDirect dirct = new ProfitDirect();
-        dirct.setFristAgentPid(parentAgentId);
+        dirct.setFristAgentPid(parentBusNum);
         dirct.setTransMonth(profitMonth);
         BigDecimal shouldProfitAmt = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总
-        if (shouldProfitAmt==null || shouldProfitAmt.compareTo(BigDecimal.ZERO) <= 0) {
+        if (shouldProfitAmt == null || shouldProfitAmt.compareTo(BigDecimal.ZERO) <= 0) {
+            logger.info("无下级分润代理商，不计算");
             return;
         }
 
+        //补税点总数
         BigDecimal tax = BigDecimal.ZERO;
+        BigDecimal addTaxAmt = BigDecimal.ZERO;
         if (type == 1) {    //开票
             tax = new BigDecimal("0.06");
+            addTaxAmt = shouldProfitAmt.multiply(tax);
         } else if (type == 2) { //扣税且税率小于0.06
             AgentColinfo where = new AgentColinfo();
-            where.setAgentId(parentAgentId);
+            where.setAgentId(firstAgentId);
             AgentColinfo agentColinfo = agentColinfoService.queryPoint(where);
             tax = new BigDecimal("0.06").subtract(agentColinfo.getCloTaxPoint());
+            addTaxAmt = shouldProfitAmt.multiply(tax);
         }
 
-        //补税点总数
-        BigDecimal addTaxAmt = shouldProfitAmt.multiply(tax);
-        logger.info("直发代理商{}补税点金额：{}", parentAgentId, addTaxAmt);
+
+        logger.info("直发代理商{}补税点金额：{}", firstAgentId, addTaxAmt);
+
+        //查询一代上级代理商
+        AgentBusInfo Busime = businfoService.getByBusidAndCode("6000", parentBusNum);
+        if (Busime == null) {
+            logger.error("直发代理商{}补税点计算失败，未找到代理商业务信息基础数据", parentBusNum);
+            throw new RuntimeException("直发代理商{" + parentBusNum + "}补税点计算失败，未找到代理商业务信息基础数据");
+        }
+
+        String parentAgentId = "";
+        String parentId = Busime.getBusParent();
+        if(StringUtils.isNotBlank(parentId)){
+            AgentBusInfo agentBusInfo = businfoService.getById(parentId);
+            parentAgentId = agentBusInfo.getAgentId();
+        }
 
         ProfitDetailMonthExample example = new ProfitDetailMonthExample();
         ProfitDetailMonthExample.Criteria where = example.createCriteria();
-        where.andAgentIdEqualTo(parentAgentId);
+        where.andAgentIdEqualTo(firstAgentId);
+
+        if(StringUtils.isNotBlank(parentAgentId)){
+            where.andParentAgentIdEqualTo(parentAgentId);
+        }else {
+            where.andParentAgentIdIsNull();
+        }
+
         where.andProfitDateEqualTo(profitMonth);
         List<ProfitDetailMonth> parentProfitDetailMonths = profitDetailMonthMapper.selectByExample(example);
         if (parentProfitDetailMonths != null && parentProfitDetailMonths.size() > 0) {
@@ -189,7 +220,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
             profitDetailMonthMapper.updateByPrimaryKeySelective(pdm);
 
             //记录补税点明细
-            insertProfitSupplyTax(pdm, addTaxAmt, pdm,"02");
+            insertProfitSupplyTax(pdm, addTaxAmt, pdm, "02");
         }
 
 
@@ -240,7 +271,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
                 logger.info("{}给上级{}补税点金额：{}", subAgentId, parentAgentId, addTaxAmt);
 
                 //记录补税点明细
-                insertProfitSupplyTax(sub, addTaxAmt, parentProfitDetailMonth,"01");
+                insertProfitSupplyTax(sub, addTaxAmt, parentProfitDetailMonth, "01");
             }
         }
 
