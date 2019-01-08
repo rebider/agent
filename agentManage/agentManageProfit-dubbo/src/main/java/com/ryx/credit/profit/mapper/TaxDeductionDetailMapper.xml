@@ -515,9 +515,9 @@
 
     <!--垫资-->
     left join (
-      select AGENT_ID,PARENT_AGENT_ID,sum(SUPPLY_AMT) DZ_AMT
+      select AGENT_ID,PARENT_AGENT_ID,sum(MUST_DEDUCTION_AMT) DZ_AMT
       from P_DEDUCTION
-      where DEDUCTION_DATE='${profitMonth}' and DEDUCTION_TYPE='03' and SUPPLY_TYPE like'%垫资%' group by AGENT_ID,PARENT_AGENT_ID
+      where DEDUCTION_DATE='${profitMonth}' and DEDUCTION_TYPE='03' and REMARK like'%垫款%' group by AGENT_ID,PARENT_AGENT_ID
     ) d on a.AGENT_ID=d.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(d.PARENT_AGENT_ID,'-')
 
     <!--调整金额-->
