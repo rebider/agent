@@ -315,7 +315,17 @@
     <include refid="PAGING_END" />
   </select>
 
-
+  <select id="getClassificationCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    select COUNT(1) from PROFIT_SUPPLY_TAX ps left
+    join (select  distinct  aab.bus_type ,aab.AGENT_ID as AGENT_IDA  from PROFIT_SUPPLY_TAX  pst
+    left join A_agent_businfo aab on  pst.supply_Tax_agent_id = aab.Agent_id )
+    aa on ps.supply_Tax_agent_id = aa.AGENT_IDA
+    START WITH
+    ps.SUPPLY_TAX_PLATFORM = '01'
+    <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
+    <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
+    CONNECT BY PRIOR ps.SUPPLY_TAX_SUB_ID=ps.SUPPLY_TAX_AGENT_ID
+  </select>
 
 
 

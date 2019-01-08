@@ -50,9 +50,8 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
     public PageInfo getProfitSupplyTaxList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = 0L;
         List<Map<String, Object>> listAll;
-
         if ("1".equals(param.get("chekbox"))) {
-            count = profitSupplyTaxMapper.getProfitSupplyTaxCount(param);
+            count = profitSupplyTaxMapper.getClassificationCount(param);
             listAll = profitSupplyTaxMapper.getClassificationList(param);
             /*if ("".equals(param.get("SUPPLY_TAX_AGENT_NAME"))&&("".equals(param.get("SUPPLY_TAX_AGENT_ID")))){
                 param.put("SUPPLY_TAX_TYPE", BusType.JG.key);
