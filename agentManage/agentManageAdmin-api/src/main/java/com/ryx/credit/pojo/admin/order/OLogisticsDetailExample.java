@@ -2627,6 +2627,76 @@ public class OLogisticsDetailExample {
             addCriterion("STAND_TIME not between", value1, value2, "standTime");
             return (Criteria) this;
         }
+
+        public Criteria andBusIdIsNull() {
+            addCriterion("BUS_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIsNotNull() {
+            addCriterion("BUS_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdEqualTo(String value) {
+            addCriterion("BUS_ID =", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotEqualTo(String value) {
+            addCriterion("BUS_ID <>", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdGreaterThan(String value) {
+            addCriterion("BUS_ID >", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdGreaterThanOrEqualTo(String value) {
+            addCriterion("BUS_ID >=", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLessThan(String value) {
+            addCriterion("BUS_ID <", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLessThanOrEqualTo(String value) {
+            addCriterion("BUS_ID <=", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdLike(String value) {
+            addCriterion("BUS_ID like", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotLike(String value) {
+            addCriterion("BUS_ID not like", value, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdIn(List<String> values) {
+            addCriterion("BUS_ID in", values, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotIn(List<String> values) {
+            addCriterion("BUS_ID not in", values, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdBetween(String value1, String value2) {
+            addCriterion("BUS_ID between", value1, value2, "busId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusIdNotBetween(String value1, String value2) {
+            addCriterion("BUS_ID not between", value1, value2, "busId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
