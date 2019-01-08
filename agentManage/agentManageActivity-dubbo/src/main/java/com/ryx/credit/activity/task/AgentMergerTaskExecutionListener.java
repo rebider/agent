@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
+ * 代理商合并
  * MergeTaskExecutionListener
  * Created by IntelliJ IDEA.
  *

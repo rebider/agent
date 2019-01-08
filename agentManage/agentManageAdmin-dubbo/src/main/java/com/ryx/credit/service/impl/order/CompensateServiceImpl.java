@@ -734,6 +734,8 @@ public class CompensateServiceImpl implements CompensateService {
                         oLogisticsDetail.setPosType(activity.getPosType());
                         oLogisticsDetail.setPosSpePrice(activity.getPosSpePrice());
                         oLogisticsDetail.setStandTime(activity.getStandTime());
+                        OOrder oOrder = oOrderMapper.selectByPrimaryKey(oLogisticsDetail.getOrderId());
+                        oLogisticsDetail.setBusId(oOrder.getBusId());
                         int insert = logisticsDetailMapper.insert(oLogisticsDetail);
                         if(1!=insert){
                             throw new ProcessException("退补差价数据新增完成失败");
