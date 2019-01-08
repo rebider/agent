@@ -428,15 +428,16 @@
     from (
     select distinct
     a.AGENT_ID,a.AGENT_NAME,b.REAL_PROFIT_AMT,c.DAYS_PROFIT_AMT,c.RETURN_MONEY,d.OWN_INVOICE,e.BL_AMT,f.ADD_INVOICE_AMT,f.ADJUST_AMT
-    from P_PROFIT_DETAIL_M a
+    from ( select distinct AGENT_ID, AGENT_NAME from P_PROFIT_DETAIL_M where PROFIT_DATE = '${profitMonth}' AND PAY_COMPANY = 'Q000029564') a
     left join
     (select AGENT_ID,sum(REAL_PROFIT_AMT) REAL_PROFIT_AMT  <!--前月月分润-->
     from P_PROFIT_DETAIL_M a where PROFIT_DATE='${preMonth}' group by AGENT_ID) b on a.AGENT_ID = b.AGENT_ID
 
     left join
     (select AGENT_ID,sum(SUCCESS_MONEY) DAYS_PROFIT_AMT,sum(RETURN_MONEY) RETURN_MONEY from    <!--日结分润、返现-->
-    P_PROFIT_D where REMIT_DATE>='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31' group by AGENT_ID) c on
-    a.AGENT_ID = c.AGENT_ID
+    P_PROFIT_D where REMIT_DATE>='${profitMonth}01' and REMIT_DATE &lt;='${profitMonth}31'
+      and PAY_COMPANY = 'Q000029564' group by AGENT_ID) c
+      on a.AGENT_ID = c.AGENT_ID
 
     left join
     (select AGENT_ID,OWN_INVOICE from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}') d on a.AGENT_ID =
@@ -447,10 +448,9 @@
     P_PROFIT_FACTOR where FACTOR_MONTH='${profitMonth}' group by AGENT_ID) e on a.AGENT_ID = e.AGENT_ID
 
     left join
-    (select AGENT_ID,ADD_INVOICE_AMT,ADJUST_AMT from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}') f on
+    (select AGENT_ID,ADD_INVOICE_AMT,ADJUST_AMT from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}' ) f on
     a.AGENT_ID = f.AGENT_ID
 
-    where a.PROFIT_DATE = '${profitMonth}' AND a.PAY_COMPANY = 'Q000029564'
     <if test="agentId!=null and agentId!=''">
       and a.AGENT_ID = '${agentId}'
     </if>
