@@ -43,6 +43,14 @@ public interface AgentMergeService {
      */
     AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception;
 
+    /**
+     * 处理任务
+     * @param agentVo
+     * @param userId
+     * @param busId
+     * @return
+     * @throws Exception
+     */
     AgentResult approvalAgentMergeTask(AgentVo agentVo, String userId, String busId) throws Exception;
 
     /**
@@ -53,6 +61,23 @@ public interface AgentMergeService {
      * @throws Exception
      */
     AgentResult compressAgentMergeActivity(String proIns, BigDecimal agStatus) throws Exception;
+
+    /**
+     * 根据ID查询数据
+     * @param mergeId
+     * @return
+     */
+    AgentMerge queryAgentMerge(String mergeId);
+
+    /**
+     * 修改数据
+     * @param agentMerge
+     * @param busType
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser)throws Exception;
 
 
     AgentResult updateAgentName(String busId) throws Exception;

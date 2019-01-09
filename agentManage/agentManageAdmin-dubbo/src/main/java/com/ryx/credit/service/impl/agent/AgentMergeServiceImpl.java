@@ -7,13 +7,14 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentMergeMapper;
+import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
-import com.ryx.credit.profit.pojo.PAgentMerge;
 import com.ryx.credit.service.ActivityService;
-import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
@@ -31,7 +32,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -59,8 +59,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private CuserAgentMapper cUserAgentMapper;
     @Autowired
     private AgentMergeMapper agentMergeMapper;
-    @Autowired
-    private IUserService iUserService;
     @Autowired
     private BusActRelMapper busActRelMapper;
     @Autowired
@@ -252,6 +250,53 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     }
 
     /**
+     * 根据ID查询数据
+     * @param mergeId
+     * @return
+     */
+    @Override
+    public AgentMerge queryAgentMerge(String mergeId) {
+        if (StringUtils.isBlank(mergeId)) {
+            return null;
+        }
+        AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(mergeId);
+        if (null == agentMerge) {
+            return null;
+        }
+        return agentMerge;
+    }
+
+    /**
+     * 修改数据
+     * @param agentMerge
+     * @param busType
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser) throws Exception {
+        if(StringUtils.isBlank(agentMerge.getId())){
+            throw new MessageException("数据ID为空！");
+        }
+        try {
+            agentMerge.setuTime(new Date());
+            agentMerge.setuUser(cUser);
+            if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
+                logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
+                throw new MessageException("更新合并数据失败！");
+            }
+            return AgentResult.ok();
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("更新数据失败！");
+        }
+    }
+
+    /**
      * 审批结果监听
      * @param proIns
      * @param agStatus
@@ -270,6 +315,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new MessageException("审批和数据关系有误");
         }
         BusActRel busActRel = list.get(0);
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        int z = busActRelMapper.updateByPrimaryKey(busActRel);
+        if(z!=1) {
+            logger.info("审批任务结束{}{}，终端划拨更新失败2", proIns, agStatus);
+            throw new MessageException("终端划拨更新失败");
+        }
         AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busActRel.getBusId());
         agentMerge.setCloReviewStatus(agStatus);
         agentMerge.setuTime(new Date());
@@ -439,7 +490,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         return AgentResult.ok();
     }
-
 
     /**
      * 通知手刷
