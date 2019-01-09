@@ -11,7 +11,6 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.bank.DPosRegionMapper;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.bank.DPosRegion;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.service.bank.PosRegionService;
@@ -984,15 +983,18 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     if (respXML.contains("data") && respXML.contains("orgId")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                         log.info(dataObj.toJSONString());
-                        return AgentResult.ok(dataObj);
+                        if(StringUtils.isBlank(respXMLObj.get("data").toString())){
+                            AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                        }
+                        log.info(dataObj.toJSONString());
+                        return AgentResult.ok(respXML);
                     }else{
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警");
                         log.info("http请求超时返回错误:{}",respXML);
                         throw new Exception("http返回有误");
                     }
                 }
-                return new AgentResult(500,"http请求异常","");
+                return new AgentResult(500,"http请求异常",respXML);
             }
         } catch (Exception e) {
             AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
@@ -1035,7 +1037,10 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             if (httpResult.contains("data") && httpResult.contains("orgId")){
                 JSONObject respXMLObj = JSONObject.parseObject(httpResult);
                 JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                 log.info(dataObj.toJSONString());
+                log.info(dataObj.toJSONString());
+                if(StringUtils.isBlank(respXMLObj.get("data").toString())){
+                    AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
+                }
                 return AgentResult.ok(dataObj);
             }else{
                 AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
