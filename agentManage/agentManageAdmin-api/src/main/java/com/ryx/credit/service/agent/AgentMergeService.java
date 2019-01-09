@@ -53,5 +53,8 @@ public interface AgentMergeService {
      * @throws Exception
      */
     AgentResult compressAgentMergeActivity(String proIns, BigDecimal agStatus) throws Exception;
+
+
+    AgentResult updateAgentName(String busId) throws Exception;
 }
 
