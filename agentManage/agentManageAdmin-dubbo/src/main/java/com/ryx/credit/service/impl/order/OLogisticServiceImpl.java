@@ -793,6 +793,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setuTime(Calendar.getInstance().getTime());
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
                     OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                     detail.setReturnOrderId(detail1.getReturnId());
@@ -878,6 +880,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setuTime(Calendar.getInstance().getTime());
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
                     OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                     detail.setReturnOrderId(detail1.getReturnId());

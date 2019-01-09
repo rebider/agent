@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.DateJsonDeserializer;
 import com.ryx.credit.common.util.DateJsonSerializer;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
+import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.order.*;
 
 import java.io.Serializable;

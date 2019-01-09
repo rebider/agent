@@ -2177,7 +2177,7 @@ public class OrderServiceImpl implements OrderService {
             //未激活业务
             if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().compareTo(Status.STATUS_2.status)==0){
                 logger.info("代理商订单审批完审批完成激活业务{}",rel.getBusId());
-                ab_check.setBusStatus(Status.STATUS_1.status);
+                ab_check.setBusStatus(BusinessStatus.Enabled.status);
                 if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(ab_check)){
                     logger.error("更新业务 未激活 到 启用 失败{}{}",order.getId(),ab_check.getId());
                 }
