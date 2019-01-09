@@ -4,6 +4,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import sun.management.resources.agent;
@@ -78,5 +79,10 @@ public interface AgentEnterService {
      */
 
     public List<AgentoutVo> exportAgent(Map map,Long userId) throws ParseException;
+
+
+    void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception;
+
+    void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
 }
