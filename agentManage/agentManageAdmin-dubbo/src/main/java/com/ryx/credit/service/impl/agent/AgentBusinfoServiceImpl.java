@@ -629,5 +629,16 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 		}
 		return null;
 	}
+
+	@Override
+	public List<AgentBusInfo> selectExistsById(String id){
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andIdEqualTo(id);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		return agentBusInfos;
+	}
 }
 
