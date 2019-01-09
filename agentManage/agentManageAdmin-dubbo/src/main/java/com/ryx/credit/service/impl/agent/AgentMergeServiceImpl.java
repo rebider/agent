@@ -1,29 +1,27 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AgentMergeMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
+import com.ryx.credit.profit.pojo.PAgentMerge;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
-import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.*;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMergeBusInfoMapper;
 import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
-import com.ryx.credit.service.agent.AgentMergeService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +31,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -72,6 +71,25 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private AgentEnterService agentEnterService;
     @Autowired
     private AgentMapper agentMapper;
+    @Autowired
+    private TaskApprovalService taskApprovalService;
+    @Autowired
+    private PlatFormMapper platFormMapper;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private ApaycompService apaycompService;
+    @Autowired
+    private AgentColinfoService agentColinfoService;
+    @Autowired
+    private AgentNotifyService agentNotifyService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private AgentService agentService;
+    @Autowired
+    private AgentPlatFormSynMapper agentPlatFormSynMapper;
+
 
     /**
      * 合并列表
@@ -313,8 +331,142 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         //如果财务填写了，合并到那个被合并代理商的分期订单欠款,同步到分润其他扣款
 
         //通知业务系统
+        updateAgentName(busActRel.getBusId());
 
         return AgentResult.ok();
+    }
+
+
+    /**
+     * 手动更改手刷、POS代理商名称
+     * @param busId
+     */
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Override
+    public AgentResult updateAgentName(String busId) throws Exception{
+        try {
+            AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busId);
+            if(agentMerge==null){
+                throw new MessageException("未找到合并信息");
+            }
+            AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+            AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+            criteria.andAgentMargeIdEqualTo(busId);
+            criteria.andMergeStatusEqualTo(MergeStatus.WXS.getValue());
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+            if(agentMergeBusInfos.size()==0){
+                throw new MessageException("查询合并业务失败");
+            }
+            String agentName = agentMerge.getMainAgentName() + "(" + agentMerge.getSubAgentName() + ")";
+
+            List<String> mPosOrgList = new ArrayList<>();
+            for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+                String platType = platFormMapper.selectPlatType(agentMergeBusInfo.getBusPlatform());
+                if(platType.equals(PlatformType.MPOS.getValue())){
+                    mPosOrgList.add(agentMergeBusInfo.getBusNum());
+                }
+                //调用Pos
+                if(platType.equals(PlatformType.MPOS.getValue()) || platType.equals(PlatformType.ZPOS.getValue())){
+                    AgentPlatFormSyn record = new AgentPlatFormSyn();
+                    AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+                    agentNotifyVo.setOrgName(agentName);
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
+                    Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
+                    agentNotifyVo.setUniqueId(agentBusInfo.getId());
+                    agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
+                    agentNotifyVo.setOrgName(agent.getAgName());
+                    agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
+                    agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
+                    agentNotifyVo.setBaseMessage(agent);
+                    agentNotifyVo.setBusMessage(agentBusInfo);
+                    agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
+                    agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
+                    agentNotifyVo.setBusiType(platType.equals(PlatformType.POS.getValue())?"01":"02");
+                    Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
+                    agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
+                    AgentBusInfo agentParent = null;
+                    if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+                        //取出上级业务
+                        agentParent = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+                        if(null!=agentParent){
+                            agentNotifyVo.setSupDorgId(agentParent.getBusNum());
+                        }
+                    }
+                    String sendJson = JsonUtil.objectToJson(agentNotifyVo);
+                    record.setId(idService.genId(TabId.a_agent_platformsyn));
+                    record.setNotifyTime(new Date());
+                    record.setBusId(busId);
+                    record.setPlatformCode(agentMergeBusInfo.getBusPlatform());
+                    record.setVersion(Status.STATUS_1.status);
+                    record.setcTime(new Date());
+                    record.setNotifyStatus(Status.STATUS_0.status);
+                    record.setNotifyCount(Status.STATUS_1.status);
+                    record.setcUser(agentMergeBusInfo.getcUser());
+                    record.setSendJson(sendJson);
+                    AgentResult agentResult = agentNotifyService.httpRequestForPos(agentNotifyVo);
+                    record.setNotifyJson(String.valueOf(agentResult.getData()));
+                    agentPlatFormSynMapper.insert(record);
+                }
+            }
+            //调用手刷接口
+            if(mPosOrgList.size()!=0){
+                List<AgentBusInfo> agentBusInfoList = agentBusinfoService.agentBusInfoList(agentMerge.getMainAgentId());
+                AgentBusInfo busInfo = agentBusInfoList.get(0);
+                PayComp payComp = apaycompService.selectById(busInfo.getCloPayCompany());
+                AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agentMerge.getMainAgentId(), busInfo.getId());
+                agentColinfo.setAccountId(payComp.getId());
+                agentColinfo.setAccountName(payComp.getComName());
+                AgentPlatFormSyn record = new AgentPlatFormSyn();
+                String id = idService.genId(TabId.a_agent_platformsyn);
+                record.setSendJson("agentName:"+agentName+",mPosOrgList:"+mPosOrgList.toString()+",agentColinfo:"+JsonUtil.objectToJson(agentColinfo));
+                AgentResult agentResult = mPos_updateAgName(agentName, mPosOrgList, agentColinfo);
+                record.setId(id);
+                record.setNotifyTime(new Date());
+                record.setBusId(busId);
+                record.setPlatformCode(busInfo.getBusPlatform());
+                record.setVersion(Status.STATUS_1.status);
+                record.setcTime(new Date());
+                record.setNotifyStatus(Status.STATUS_0.status);
+                record.setNotifyCount(Status.STATUS_1.status);
+                record.setcUser(busInfo.getcUser());
+                record.setNotifyJson(String.valueOf(agentResult.getData()));
+                agentPlatFormSynMapper.insert(record);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("代理商合并申请-更改代理商名称异常，activId：{}" + busId);
+        }
+        return AgentResult.ok();
+    }
+
+
+    /**
+     * 通知手刷
+     * @param agentName
+     * @param mPosOrgList
+     * @param agentColinfo
+     * @return
+     */
+    public AgentResult mPos_updateAgName(String agentName, List<String> mPosOrgList, AgentColinfo agentColinfo) {
+        HashMap<String,String> map = new HashMap<String,String>();
+
+        map.put("companyname", agentName);//代理商名称
+        map.put("batchIds", mPosOrgList.toString());//AG码
+        map.put("colinfoMessage", JsonUtil.objectToJson(agentColinfo));//收款账户
+        String params = JsonUtil.objectToJson(map);
+        logger.info("======mPos_updateAgName:{}",params);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.upAgName"),params);
+        logger.info("======mPos_updateAgName结果:{}",res);
+        JSONObject resObj = JSONObject.parseObject(res);
+        if(!resObj.get("respCode").equals("000000")){
+            logger.error("请求失败！");
+            AppConfig.sendEmails("代理商更名失败:"+res,"代理商更名失败");
+            return AgentResult.fail(resObj.toString());
+        }
+        logger.info("代理商更名成功！{}",resObj.get("respMsg"));
+        return AgentResult.ok(resObj.toString());
     }
 
 }

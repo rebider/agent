@@ -1061,14 +1061,21 @@ public class OLogisticServiceImpl implements OLogisticsService {
             lowerHairMachineVo.setoLogisticsId(logistics.getId());
             //sn明细
             List<MposSnVo> listSn = new ArrayList<MposSnVo>();
+            String sBusProCode= "";
             for (OLogisticsDetail forsendSn : listDetails) {
                 listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
                         ,forsendSn.getSnNum()+forsendSn.getTerminalidCheck()
                         ,forsendSn.getTerminalidKey()
                         ,forsendSn.getBusProCode()
                         ,forsendSn.getTermtype()));
+                if(org.apache.commons.lang.StringUtils.isEmpty(sBusProCode)) {
+                    sBusProCode = forsendSn.getBusProCode();
+                }
             }
             lowerHairMachineVo.setListSn(listSn);
+            lowerHairMachineVo.setActCode(sBusProCode);
+            lowerHairMachineVo.setPlatFormNum(agentBusInfo.getBusPlatform());
+
             //机具下发接口
             OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
             try {
