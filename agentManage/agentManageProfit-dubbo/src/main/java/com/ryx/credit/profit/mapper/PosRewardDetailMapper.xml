@@ -539,6 +539,7 @@
     <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
     <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
     <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
+    <if test="PROFIT_POS_DATE != null and PROFIT_POS_DATE !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE} </if>
     <include refid="PAGING_END" />
   </select>
   <sql id="PAGING_START">

@@ -8,7 +8,7 @@ package com.ryx.credit.profit.enums;
  * @date 2018/7/2516:08
  */
 public enum DeductionType {
-    //退单，机具,其他
+    //01退单，02机具,03其他,04 考核扣款
     SETTLE_ERR("01"),MACHINE("02"),OTHER("03"),POS_REWARD_DEDUCT("04");
 
     private String type;

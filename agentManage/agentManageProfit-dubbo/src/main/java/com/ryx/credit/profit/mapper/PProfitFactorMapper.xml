@@ -202,12 +202,7 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.math.BigDecimal">
-    select SUM(BUCKLE_AMT) from P_PROFIT_FACTOR
-     where
-    FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
-    AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
-  </select>
+
   <update id="updateByExampleSelective" parameterType="map">
     update P_PROFIT_FACTOR
     <set>
@@ -336,6 +331,32 @@
   </sql>
 
 
+  <sql id='SORTING'>
+    ORDER BY FACTOR_DATE DESC
+  </sql>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end >0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end >0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
+    </if>
+  </sql>
+
+
+  <sql id="BASE_WHERE_SQL">
+    <where>
+      <trim prefixOverrides="and">
+        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID}</if>
+      </trim>
+    </where>
+  </sql>
+
   <delete id="resetDataFactor" >
     delete from P_PROFIT_FACTOR
     where FACTOR_MONTH = to_char(sysdate-30 ,'yyyymm')
@@ -365,28 +386,10 @@
     <include refid="BASE_WHERE_SQL"></include>
   </select>
 
-  <sql id="BASE_WHERE_SQL">
-    <where>
-      <trim prefixOverrides="and">
-        <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
-        <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID}</if>
-      </trim>
-    </where>
-  </sql>
-
-  <sql id='SORTING'>
-    ORDER BY FACTOR_DATE DESC
-  </sql>
-
-  <sql id="PAGING_START">
-    <if test="begin != null  and end != null and end >0">
-      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
-    </if>
-  </sql>
-
-  <sql id="PAGING_END">
-    <if test="begin != null  and end != null and end >0">
-      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN > #{begin}
-    </if>
-  </sql>
+  <select id="getSumFactor" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultType="java.math.BigDecimal">
+    select SUM(BUCKLE_AMT) from P_PROFIT_FACTOR
+     where
+    FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
+    AND AGENT_PID = #{agentPid,jdbcType=VARCHAR}
+  </select>
 </mapper>

@@ -9,6 +9,8 @@ import java.util.List;
 public interface ITaxDeductionDetailService {
     PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page);
 
+    PageInfo posDirectlyDeductTaxList (TaxDeductionDetail taxDeductionDetail,Page page);
+
     int updateAdjust(TaxDeductionDetail taxDeductionDetail);
 
     TaxDeductionDetail selectById(String id);

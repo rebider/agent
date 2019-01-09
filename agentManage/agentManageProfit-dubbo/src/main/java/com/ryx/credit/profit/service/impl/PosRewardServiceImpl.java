@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -58,6 +60,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public PageInfo posRewardList(PosReward record, Page page) {
         PosRewardExample example = rewardEqualsTo(record);
+        example.setPage(page);
         example.setOrderByClause("TOTAL_END_MONTH "+Page.ORDER_DIRECTION_DESC);
         List<PosReward> profitD = rewardMapper.selectByExample(example);
         PageInfo pageInfo = new PageInfo();
@@ -77,6 +80,9 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         if(StringUtils.isNotBlank(reward.getAgentId())){
             criteria.andAgentIdEqualTo(reward.getAgentId());
+        }
+        if(StringUtils.isNotBlank(reward.getApplyStatus())){
+            criteria.andApplyStatusEqualTo(reward.getApplyStatus());
         }
         return posRewardExample;
     }
@@ -165,7 +171,29 @@ public class PosRewardServiceImpl implements IPosRewardService {
             if (rel != null) {
                 PosReward posReward = rewardMapper.selectByPrimaryKey(rel.getBusId());
                 posReward.setApplyStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
-                rewardMapper.updateByPrimaryKeySelective(posReward);
+                String agentId=posReward.getAgentId();
+                PosReward tempPosReward=new PosReward();
+                tempPosReward.setAgentId(agentId);
+                tempPosReward.setApplyStatus(RewardStatus.PASS.getStatus());
+                List<PosReward> oldList=rewardMapper.selectByExample(rewardEqualsTo(tempPosReward));//查出之前此代理商通过的所有特殊奖励申请单
+                rewardMapper.updateByPrimaryKeySelective(posReward);//将此审批通过的申请更新到数据库
+                List<PosReward> updateList=new ArrayList<PosReward>();
+                List<String> monthList=getMonthBetween(posReward.getTotalConsMonth(),posReward.getCreditConsMonth());
+                oldList.stream().forEach(oldPosReward->{
+                    List<String> tempMonth=getMonthBetween(oldPosReward.getTotalConsMonth(),oldPosReward.getCreditConsMonth());
+                    for (String str1:tempMonth){
+                        for (String str2:monthList){
+                            if(str1.equals(str2)){
+                                oldPosReward.setApplyStatus(RewardStatus.UN_PASS.getStatus());
+                                updateList.add(oldPosReward);
+                                return;
+                            }
+                        }
+                    }
+                });
+                for (PosReward updatePosReward:updateList){
+                    rewardMapper.updateByPrimaryKeySelective(updatePosReward);
+                }
                 logger.info("2更新审批流与业务对象");
                 rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
@@ -256,6 +284,30 @@ public class PosRewardServiceImpl implements IPosRewardService {
             criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
         }
         return rewardMapper.selectByExample(example);
+    }
+    private static List<String> getMonthBetween(String minDate, String maxDate) {
+        try {
+            ArrayList<String> result = new ArrayList<String>();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");//格式化为年月
+
+            Calendar min = Calendar.getInstance();
+            Calendar max = Calendar.getInstance();
+
+            min.setTime(sdf.parse(minDate));
+            min.set(min.get(Calendar.YEAR), min.get(Calendar.MONTH), 1);
+
+            max.setTime(sdf.parse(maxDate));
+            max.set(max.get(Calendar.YEAR), max.get(Calendar.MONTH), 2);
+
+            Calendar curr = min;
+            while (curr.before(max)) {
+                result.add(sdf.format(curr.getTime()));
+                curr.add(Calendar.MONTH, 1);
+            }
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }

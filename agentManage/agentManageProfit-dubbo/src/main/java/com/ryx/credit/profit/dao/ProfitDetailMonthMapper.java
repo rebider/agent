@@ -92,4 +92,6 @@ public interface ProfitDetailMonthMapper {
     List<ProfitDetailMonth> selectListByParams(Map<String, Object> param);
 
     BigDecimal getSubAgentTaxBaseTotal(Map<String,Object> params);
+
+    void updateRealProfitAmt(Map<String,Object> params);
 }

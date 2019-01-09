@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ProfitDServiceImpl
@@ -96,10 +97,10 @@ public class ProfitDServiceImpl implements IProfitDService {
         if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentId())) {
             criteria.andAgentIdEqualTo(record.getAgentId());
         }
-        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getTransDate())) {
-            criteria.andTransDateEqualTo(record.getTransDate());
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getRemitDate())) {
+            criteria.andRemitDateEqualTo(record.getRemitDate());
         }
-        List<ProfitDay> profitD = profitDMapper.selectByExample(example);
+        List<Map<String,Object>> profitD = profitDMapper.selectIncludePayComByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);
         pageInfo.setTotal(profitDMapper.countByExample(example));

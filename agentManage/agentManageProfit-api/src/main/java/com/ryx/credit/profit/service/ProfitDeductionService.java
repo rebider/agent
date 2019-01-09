@@ -146,5 +146,10 @@ public interface ProfitDeductionService {
      */
     public void batchInsertCheckDeduction(List<List<Object>> datas , String userId);
 
-
+    /**
+     * @Author: Zhang Lei
+     * @Description: 计算考核扣款
+     * @Date: 16:35 2019/1/4
+     */
+    BigDecimal khDeduction(Map<String,Object> param);
 }

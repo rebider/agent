@@ -89,9 +89,9 @@
     </if>
   </delete>
 
-  <delete id="resetData" parameterType="java.lang.String"  >
+  <delete id="resetData" parameterType="java.util.Map"  >
     delete from P_PROFIT_SUPPLY
-    where SUPPLY_DATE = to_char(sysdate-30 ,'yyyymm') and SUPPLY_TYPE != '退单补款'and BUS_BIG_TYPE = #{busBigType,jdbcType=VARCHAR}
+    where SUPPLY_DATE = #{SUPPLY_DATE,jdbcType=VARCHAR}and BUS_BIG_TYPE = #{busBigType,jdbcType=VARCHAR}
   </delete>
 
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
@@ -277,22 +277,25 @@
   <select id="getTotalByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE != '退单补款'
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+    <!--AND SUPPLY_TYPE != '退单补款'-->
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+    <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>
       /*AND SUPPLY_CODE != '0'*/
   </select>
 
   <select id="getBuckleByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE='退单补款'
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
     <if test="parentAgentId == null ">AND PARENT_AGENT_ID is null </if>
     <if test="sourceId != null and sourceId != ''">AND SOURCE_ID = #{sourceId}</if>
     <if test="busType != null and busType != ''">AND BUS_TYPE = #{busType}</if>
+    <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>
 
   </select>
 
