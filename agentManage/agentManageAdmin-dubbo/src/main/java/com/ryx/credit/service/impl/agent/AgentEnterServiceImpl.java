@@ -206,7 +206,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
                 busParent = agentBusInfo.getAgentId();
             }else{
-                busParent = agentBusInfoVo.getBusParent();
+                busParent = "";
             }
             busParentSet.add(busParent);
         }
