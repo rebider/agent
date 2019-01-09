@@ -128,6 +128,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag) throws Exception {
         if (StringUtils.isBlank(cUser)) {
@@ -152,6 +153,55 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 logger.info("代理商合并提交审批，新增数据失败:{}", cUser);
                 throw new MessageException("代理商合并提交审批，新增数据失败！");
             }
+
+            for(int i=0;i<busType.length;i++){
+                String busId = busType[i];
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+
+                AgentMergeBusInfo agentMergeBusInfo = new AgentMergeBusInfo();
+                String mergeBusInfoId = idService.genId(TabId.A_AGENT_MERGE_BUSINFO);
+                agentMergeBusInfo.setId(mergeBusInfoId);
+                agentMergeBusInfo.setMergeStatus(MergeStatus.WXS.getValue());
+                agentMergeBusInfo.setAgentMargeId(mergeId);
+                agentMergeBusInfo.setBusId(agentBusInfo.getId());
+                agentMergeBusInfo.setMainAgentId(agentMerge.getMainAgentId());
+                agentMergeBusInfo.setSubAgentId(agentMerge.getSubAgentId());
+                agentMergeBusInfo.setcTime(new Date());
+                agentMergeBusInfo.setcUtime(new Date());
+                agentMergeBusInfo.setcUser(cUser);
+                agentMergeBusInfo.setStatus(Status.STATUS_1.status);
+                agentMergeBusInfo.setVersion(Status.STATUS_1.status);
+                //以下是复制信息
+                agentMergeBusInfo.setBusNum(agentBusInfo.getBusNum());
+                agentMergeBusInfo.setBusPlatform(agentBusInfo.getBusPlatform());
+                agentMergeBusInfo.setBusType(agentBusInfo.getBusType());
+                agentMergeBusInfo.setBusParent(agentBusInfo.getBusParent());
+                agentMergeBusInfo.setBusRiskParent(agentBusInfo.getBusRiskParent());
+                agentMergeBusInfo.setBusActivationParent(agentBusInfo.getBusActivationParent());
+                agentMergeBusInfo.setBusRegion(agentBusInfo.getBusRegion());
+                agentMergeBusInfo.setBusSentDirectly(agentBusInfo.getBusSentDirectly());
+                agentMergeBusInfo.setBusDirectCashback(agentBusInfo.getBusDirectCashback());
+                agentMergeBusInfo.setBusIndeAss(agentBusInfo.getBusIndeAss());
+                agentMergeBusInfo.setBusContact(agentBusInfo.getBusContact());
+                agentMergeBusInfo.setBusContactEmail(agentBusInfo.getBusContactEmail());
+                agentMergeBusInfo.setBusContactMobile(agentBusInfo.getBusContactMobile());
+                agentMergeBusInfo.setBusContactPerson(agentBusInfo.getBusContactPerson());
+                agentMergeBusInfo.setBusRiskEmail(agentBusInfo.getBusRiskEmail());
+                agentMergeBusInfo.setCloTaxPoint(agentBusInfo.getCloTaxPoint());
+                agentMergeBusInfo.setCloInvoice(agentBusInfo.getCloInvoice());
+                agentMergeBusInfo.setCloReceipt(agentBusInfo.getCloReceipt());
+                agentMergeBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
+                agentMergeBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
+                agentMergeBusInfo.setAgZbh(agentBusInfo.getAgZbh());
+                agentMergeBusInfo.setBusStatus(agentBusInfo.getBusStatus());
+                agentMergeBusInfo.setBusUseOrgan(agentBusInfo.getBusUseOrgan());
+                agentMergeBusInfo.setCloReviewStatus(agentBusInfo.getCloReviewStatus());
+                agentMergeBusInfo.setBusScope(agentBusInfo.getBusScope());
+                agentMergeBusInfo.setDredgeS0(agentBusInfo.getDredgeS0());
+                agentMergeBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());
+                agentMergeBusInfoMapper.insertSelective(agentMergeBusInfo);
+            }
+
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 startAgentMergeActivity(mergeId, cUser,true);
             }
