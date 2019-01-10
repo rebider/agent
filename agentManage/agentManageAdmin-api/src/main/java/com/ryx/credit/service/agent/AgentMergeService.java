@@ -4,9 +4,11 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
+import com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by RYX on 2019/1/7.
@@ -43,6 +45,14 @@ public interface AgentMergeService {
      */
     AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception;
 
+    /**
+     * 处理任务
+     * @param agentVo
+     * @param userId
+     * @param busId
+     * @return
+     * @throws Exception
+     */
     AgentResult approvalAgentMergeTask(AgentVo agentVo, String userId, String busId) throws Exception;
 
     /**
@@ -54,7 +64,27 @@ public interface AgentMergeService {
      */
     AgentResult compressAgentMergeActivity(String proIns, BigDecimal agStatus) throws Exception;
 
+    /**
+     * 根据ID查询数据
+     * @param mergeId
+     * @return
+     */
+    AgentMerge queryAgentMerge(String mergeId);
 
-    AgentResult updateAgentName(String busId) throws Exception;
+    /**
+     * 修改数据
+     * @param agentMerge
+     * @param busType
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser)throws Exception;
+
+
+    AgentResult updateAgentName(String busId,List<AgentMergeBusInfo> agentMergeBusInfos) throws Exception;
+
+
+    void manualAgentMergeNotify(String busId,String platformCode) throws Exception;
 }
 

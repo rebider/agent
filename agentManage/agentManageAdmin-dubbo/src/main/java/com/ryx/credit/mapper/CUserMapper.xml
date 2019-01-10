@@ -155,7 +155,7 @@
 
     <update id="updateStatusByPrimaryKey" parameterType="java.lang.Long">
         update C_USER
-        set status = 1,
+        set status = 1
         where ID = #{id}
     </update>
 

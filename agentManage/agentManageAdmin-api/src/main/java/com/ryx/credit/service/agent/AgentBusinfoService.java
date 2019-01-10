@@ -89,4 +89,6 @@ public interface AgentBusinfoService {
     public List<AgentBusInfo> selectByAgenId(String agentId);
 
     AgentBusInfo selectBusInfo(String busNum);
+
+    List<AgentBusInfo> selectExistsById(String id);
 }
