@@ -3,6 +3,7 @@ package com.ryx.credit.pojo.admin.agent;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class AgentMerge implements Serializable{
     private String id;
@@ -34,6 +35,16 @@ public class AgentMerge implements Serializable{
     private BigDecimal version;
 
     private BigDecimal mergeType;
+
+    private List<AgentMergeBusInfo> agentMergeBusInfosList;
+
+    public List<AgentMergeBusInfo> getAgentMergeBusInfosList() {
+        return agentMergeBusInfosList;
+    }
+
+    public void setAgentMergeBusInfosList(List<AgentMergeBusInfo> agentMergeBusInfosList) {
+        this.agentMergeBusInfosList = agentMergeBusInfosList;
+    }
 
     public String getId() {
         return id;

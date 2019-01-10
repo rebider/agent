@@ -10,12 +10,14 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.*;
 import com.ryx.credit.dao.CUserMapper;
@@ -72,8 +74,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     @Autowired
     private AgentMapper agentMapper;
     @Autowired
-    private TaskApprovalService taskApprovalService;
-    @Autowired
     private PlatFormMapper platFormMapper;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
@@ -101,6 +101,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private OReceiptOrderMapper receiptOrderMapper;
     @Autowired
     private ReceiptPlanMapper receiptPlanMapper;
+    @Autowired
+    private PlatFormService platFormService;
 
 
     /**
@@ -513,7 +515,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     }
 
     /**
-     * 根据ID查询数据
+     * 根据ID查询合并数据
      * @param mergeId
      * @return
      */
@@ -527,6 +529,62 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             return null;
         }
         return agentMerge;
+    }
+
+    /**
+     * 根据合并ID查询合并业务信息
+     * @param mergeId
+     * @return
+     */
+    @Override
+    public List<AgentMergeBusInfo> queryAgentMergeBusInfo(String mergeId) {
+        if (StringUtils.isBlank(mergeId)) {
+            return null;
+        }
+        AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+        AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+        criteria.andAgentMargeIdEqualTo(mergeId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+        if (agentMergeBusInfos.size() == 0) {
+            return null;
+        }
+        for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+            PlatForm platForm = platFormService.selectByPlatformNum(agentMergeBusInfo.getBusPlatform());
+            if (null != platForm) {
+                agentMergeBusInfo.setBusPlatformType(platForm.getPlatformType());
+            }
+            Agent agent = agentService.getAgentById(agentMergeBusInfo.getSubAgentId());
+            if (null != agent) {
+                agentMergeBusInfo.setSubAgentName(agent.getAgName());
+            }
+        }
+        return agentMergeBusInfos;
+    }
+
+    /**
+     * 根据主代理商查询被合并代理商业务
+     * @param mainAgentId
+     * @return
+     */
+    @Override
+    public List<AgentMergeBusInfo> queryMainAgentMergeBus(String mainAgentId) {
+        if (StringUtils.isBlank(mainAgentId)) {
+            return null;
+        }
+        AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+        AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+        criteria.andMainAgentIdEqualTo(mainAgentId);
+        criteria.andMergeStatusEqualTo(MergeStatus.SX.getValue());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+        for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+            Agent agent = agentService.getAgentById(agentMergeBusInfo.getSubAgentId());
+            if (null != agent) {
+                agentMergeBusInfo.setSubAgentName(agent.getAgName());
+            }
+        }
+        return agentMergeBusInfos;
     }
 
     /**

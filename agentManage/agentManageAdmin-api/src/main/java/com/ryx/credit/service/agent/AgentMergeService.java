@@ -65,11 +65,25 @@ public interface AgentMergeService {
     AgentResult compressAgentMergeActivity(String proIns, BigDecimal agStatus) throws Exception;
 
     /**
-     * 根据ID查询数据
+     * 根据ID查询合并数据
      * @param mergeId
      * @return
      */
     AgentMerge queryAgentMerge(String mergeId);
+
+    /**
+     * 根据合并ID查询合并业务信息
+     * @param mergeId
+     * @return
+     */
+    List<AgentMergeBusInfo> queryAgentMergeBusInfo(String mergeId);
+
+    /**
+     * 根据主代理商查询被合并代理商业务
+     * @param mainAgentId
+     * @return
+     */
+    List<AgentMergeBusInfo> queryMainAgentMergeBus(String mainAgentId);
 
     /**
      * 修改数据
