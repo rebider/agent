@@ -152,4 +152,11 @@
             <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
         </if>
     </sql>
+
+    <update id="updateStatusByPrimaryKey" parameterType="java.lang.Long">
+        update C_USER
+        set status = 1,
+        where ID = #{id}
+    </update>
+
 </mapper>

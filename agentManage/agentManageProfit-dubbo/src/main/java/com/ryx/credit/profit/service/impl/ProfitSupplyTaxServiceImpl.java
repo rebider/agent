@@ -265,9 +265,11 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
                 params.put("profitDate", profitMonth);
                 params.put("parentTax", parentProfitDetailMonth.getTax());
                 BigDecimal addTaxAmt = profitDetailMonthMapper.getSubAgentTaxBaseTotal(params);
-                BigDecimal tmp = sub.getSupplyTaxAmt() == null ? BigDecimal.ZERO : sub.getSupplyTaxAmt();
-                sub.setSupplyTaxAmt(tmp.add(addTaxAmt));
-                profitDetailMonthMapper.updateByPrimaryKeySelective(sub);
+
+                //上级补税点合计
+                BigDecimal tmp = parentProfitDetailMonth.getSupplyTaxAmt() == null ? BigDecimal.ZERO : parentProfitDetailMonth.getSupplyTaxAmt();
+                parentProfitDetailMonth.setSupplyTaxAmt(tmp.add(addTaxAmt));
+                profitDetailMonthMapper.updateByPrimaryKeySelective(parentProfitDetailMonth);
                 logger.info("{}给上级{}补税点金额：{}", subAgentId, parentAgentId, addTaxAmt);
 
                 //记录补税点明细

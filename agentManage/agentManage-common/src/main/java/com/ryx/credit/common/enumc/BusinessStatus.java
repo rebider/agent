@@ -8,7 +8,10 @@ import java.math.BigDecimal;
  */
 public enum BusinessStatus {
 
-    Enabled(1,"启用"),pause(2,"注销");
+    pause(0,"注销"),
+    Enabled(1,"启用"),
+    inactive(2,"未激活"),
+    lock(3,"锁定");
 
     public BigDecimal status;
 

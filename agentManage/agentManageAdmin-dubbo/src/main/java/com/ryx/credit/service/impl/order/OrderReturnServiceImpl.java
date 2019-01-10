@@ -1784,6 +1784,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 detail.setuTime(Calendar.getInstance().getTime());
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
                     OReturnOrderDetail detail1 = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                     detail.setReturnOrderId(detail1.getReturnId());

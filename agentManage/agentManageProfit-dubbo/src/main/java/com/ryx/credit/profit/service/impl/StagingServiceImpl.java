@@ -175,7 +175,7 @@ public class StagingServiceImpl implements StagingService {
      * @param profitStaging 分期对象
      */
     private void validate(ProfitStaging profitStaging) {
-        String profitnew = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String profitnew = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ofPattern("yyyyMM"));
         if (profitStaging.getSumAmt()== null || StringUtils.isBlank(profitStaging.getSumAmt().toString())) {
             throw new StagingException("分期总金额不能为空");
         }
