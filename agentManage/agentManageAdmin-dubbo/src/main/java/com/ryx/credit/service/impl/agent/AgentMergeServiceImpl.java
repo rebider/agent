@@ -10,8 +10,10 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -87,6 +89,18 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private AgentService agentService;
     @Autowired
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
+    @Autowired
+    private OOrderMapper orderMapper;
+    @Autowired
+    private OSupplementMapper supplementMapper;
+    @Autowired
+    private ORefundPriceDiffMapper refundPriceDiffMapper;
+    @Autowired
+    private OReturnOrderMapper returnOrderMapper;
+    @Autowired
+    private OReceiptOrderMapper receiptOrderMapper;
+    @Autowired
+    private ReceiptPlanMapper receiptPlanMapper;
 
 
     /**
@@ -136,6 +150,13 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             return AgentResult.fail("代理商合并提交，操作用户为空！");
         }
         try {
+            //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
+            //mainAndSubMustHaveLower(agentMerge);
+            //合并中不能重复发起
+            verifyMergeing(agentMerge);
+            //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
+            //verifypprovaling(agentMerge.getSubAgentId());
+
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 agentMerge.setCloReviewStatus(AgStatus.Approving.status);
             } else {
@@ -154,9 +175,17 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 throw new MessageException("代理商合并提交审批，新增数据失败！");
             }
 
+            //查看被合并代理商有没有合并过
+            verifyAgentMerge(agentMerge,mergeId,cUser);
+
             for(int i=0;i<busType.length;i++){
                 String busId = busType[i];
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+                agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+                int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (j!=1) {
+                    throw new MessageException("更新业务锁定失败");
+                }
 
                 AgentMergeBusInfo agentMergeBusInfo = new AgentMergeBusInfo();
                 String mergeBusInfoId = idService.genId(TabId.A_AGENT_MERGE_BUSINFO);
@@ -213,6 +242,170 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             e.printStackTrace();
             throw new Exception("新增数据失败！");
         }
+    }
+
+
+    /**
+     * 查看被合并代理商有没有合并过
+     * @param agentMerge
+     * @param mergeId
+     * @param cUser
+     * @throws Exception
+     */
+    public void verifyAgentMerge(AgentMerge agentMerge,String mergeId,String cUser)throws Exception{
+
+        AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+        AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andMergeStatusEqualTo(MergeStatus.SX.getValue());
+        criteria.andMainAgentIdEqualTo(agentMerge.getSubAgentId());
+        List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+        if(agentMergeBusInfos.size()!=0){
+            for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+                agentMergeBusInfo.setStatus(Status.STATUS_0.status);
+                int i = agentMergeBusInfoMapper.updateByPrimaryKey(agentMergeBusInfo);
+                if(i!=1){
+                    throw new MessageException("代理商合并，处理失败！");
+                }
+                String mergeBusInfoId = idService.genId(TabId.A_AGENT_MERGE_BUSINFO);
+                agentMergeBusInfo.setId(mergeBusInfoId);
+                agentMergeBusInfo.setAgentMargeId(mergeId);
+                agentMergeBusInfo.setStatus(Status.STATUS_1.status);
+                agentMergeBusInfo.setMainAgentId(agentMerge.getMainAgentId());
+                agentMergeBusInfo.setSubAgentId(agentMerge.getSubAgentId());
+                agentMergeBusInfo.setcTime(new Date());
+                agentMergeBusInfo.setcUtime(new Date());
+                agentMergeBusInfo.setcUser(cUser);
+                agentMergeBusInfoMapper.insertSelective(agentMergeBusInfo);
+            }
+        }
+
+    }
+
+
+    /**
+     * 主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
+     * @param agentMerge
+     * @throws Exception
+     */
+    public void mainAndSubMustHaveLower(AgentMerge agentMerge)throws Exception{
+        String mainAgentId = agentMerge.getMainAgentId();
+        String subAgentId = agentMerge.getSubAgentId();
+
+        AgentBusInfoExample mainAgentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria mainCriteria = mainAgentBusInfoExample.createCriteria();
+        mainCriteria.andAgentIdEqualTo(mainAgentId);
+        List<AgentBusInfo> mainAgentBusInfos = agentBusInfoMapper.selectByExample(mainAgentBusInfoExample);
+        for (AgentBusInfo mainAgentBusInfo : mainAgentBusInfos) {
+            if(!mainAgentBusInfo.getBusType().equals(BusType.BZYD.key) || !mainAgentBusInfo.getBusType().equals(BusType.JG.key)){
+                throw new MessageException("主代理商不是标准一代或机构");
+            }
+        }
+        AgentBusInfoExample subAgentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria subCriteria = mainAgentBusInfoExample.createCriteria();
+        subCriteria.andAgentIdEqualTo(subAgentId);
+        List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
+        for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
+            if(!subAgentBusInfo.getBusType().equals(BusType.BZYD.key) || !subAgentBusInfo.getBusType().equals(BusType.JG.key)){
+                throw new MessageException("副代理商不是标准一代或机构");
+            }
+            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
+            if(childLevelBusInfos.size()!=0){
+                throw new MessageException("副代理商不能有下级");
+            }
+        }
+    }
+
+    /**
+     * 合并中不能重复发起
+     * @param agentMerge
+     */
+    public void verifyMergeing(AgentMerge agentMerge)throws Exception{
+        String mainAgentId = agentMerge.getMainAgentId();
+        String subAgentId = agentMerge.getSubAgentId();
+        AgentMergeExample agentMergeExample = new AgentMergeExample();
+        AgentMergeExample.Criteria criteria = agentMergeExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andMainAgentIdEqualTo(mainAgentId);
+        criteria.andSubAgentIdEqualTo(subAgentId);
+        criteria.andCloReviewStatusEqualTo(AgStatus.Approving.getValue());
+        List<AgentMerge> agentMerges = agentMergeMapper.selectByExample(agentMergeExample);
+        if(agentMerges.size()!=0){
+            throw new MessageException("合并中不能重复发起");
+        }
+    }
+
+    /**
+     *补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
+     * @param subAgentId
+     */
+    public void verifypprovaling(String subAgentId)throws Exception{
+
+        //订单
+        OOrderExample oOrderExample = new OOrderExample();
+        OOrderExample.Criteria criteria = oOrderExample.createCriteria();
+        criteria.andAgentIdEqualTo(subAgentId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andOrderStatusEqualTo(OrderStatus.ENABLE.status);
+        criteria.andReviewStatusEqualTo(AgStatus.Approving.getValue());
+        List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
+        if(oOrders.size()!=0){
+            throw new MessageException("有审批中的订单,不能发起合并");
+        }
+
+        //补款
+        OSupplementExample supplementExample = new OSupplementExample();
+        OSupplementExample.Criteria supplementCriteria = supplementExample.createCriteria();
+        supplementCriteria.andAgentIdEqualTo(subAgentId);
+        supplementCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        supplementCriteria.andReviewStatusEqualTo(AgStatus.Approving.getValue());
+        List<OSupplement> oSupplements = supplementMapper.selectByExample(supplementExample);
+        if(oSupplements.size()!=0){
+            throw new MessageException("有审批中的补款,不能发起合并");
+        }
+
+        //补差价
+        ORefundPriceDiffExample refundPriceDiffExample = new ORefundPriceDiffExample();
+        ORefundPriceDiffExample.Criteria refundPriceDiffCriteria = refundPriceDiffExample.createCriteria();
+        refundPriceDiffCriteria.andAgentIdEqualTo(subAgentId);
+        refundPriceDiffCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        refundPriceDiffCriteria.andReviewStatusEqualTo(AgStatus.Approving.getValue());
+        List<ORefundPriceDiff> oRefundPriceDiffs = refundPriceDiffMapper.selectByExample(refundPriceDiffExample);
+        if(oRefundPriceDiffs.size()!=0){
+            throw new MessageException("有审批中的补差价,不能发起合并");
+        }
+
+        //退货
+        OReturnOrderExample returnOrderExample = new OReturnOrderExample();
+        OReturnOrderExample.Criteria returnOrderCriteria = returnOrderExample.createCriteria();
+        returnOrderCriteria.andAgentIdEqualTo(subAgentId);
+        returnOrderCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        returnOrderCriteria.andRetScheduleEqualTo(new BigDecimal(RetSchedule.SPZ.code));
+        List<OReturnOrder> oReturnOrders = returnOrderMapper.selectByExample(returnOrderExample);
+        if(oReturnOrders.size()!=0){
+            throw new MessageException("有审批中的退货,不能发起合并");
+        }
+
+        //未排单
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("agStatus", AgStatus.Approved.name());
+        reqMap.put("cIncomStatus", AgentInStatus.NO.status);
+        reqMap.put("cloReviewStatus", AgStatus.Approved.status);
+        reqMap.put("agentId", subAgentId);
+        int i = receiptOrderMapper.queryPlannerCount(reqMap);
+        if(i!=0){
+            throw new MessageException("有审批中的排单,不能发起合并");
+        }
+
+        //未发货
+        Map<String, Object> param = new HashMap<>();
+        param.put("agentId",subAgentId);
+        param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
+        Long count = receiptPlanMapper.getReceipPlanCount(param);
+        if(count!=0){
+            throw new MessageException("有审批中的已排单（未发货）,不能发起合并");
+        }
+
     }
 
     /**
