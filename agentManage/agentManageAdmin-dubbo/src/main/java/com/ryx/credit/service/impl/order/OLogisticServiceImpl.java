@@ -537,6 +537,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                         //机具下发接口
                         OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
                         try {
+                            logger.info("导入物流：下发到首刷平台请求参数:{}",JSONObject.toJSONString(lowerHairMachineVo));
                             AgentResult lowerHairMachineRes = termMachineService.lowerHairMachine(lowerHairMachineVo);
                             logger.info("导入物流：下发到首刷平台结果:{}",lowerHairMachineRes.getMsg());
                             if(lowerHairMachineRes.isOK()) {
@@ -792,6 +793,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setuTime(Calendar.getInstance().getTime());
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
                     OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                     detail.setReturnOrderId(detail1.getReturnId());
@@ -877,6 +880,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 detail.setuTime(Calendar.getInstance().getTime());
                 detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                 detail.setOptId(orderId);
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                detail.setBusId(oOrder.getBusId());
                 if(StringUtils.isNotBlank(planVo.getReturnOrderDetailId())) {
                     OReturnOrderDetail detail1 = oReturnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
                     detail.setReturnOrderId(detail1.getReturnId());
@@ -1056,14 +1061,21 @@ public class OLogisticServiceImpl implements OLogisticsService {
             lowerHairMachineVo.setoLogisticsId(logistics.getId());
             //sn明细
             List<MposSnVo> listSn = new ArrayList<MposSnVo>();
+            String sBusProCode= "";
             for (OLogisticsDetail forsendSn : listDetails) {
                 listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
                         ,forsendSn.getSnNum()+forsendSn.getTerminalidCheck()
                         ,forsendSn.getTerminalidKey()
                         ,forsendSn.getBusProCode()
                         ,forsendSn.getTermtype()));
+                if(org.apache.commons.lang.StringUtils.isEmpty(sBusProCode)) {
+                    sBusProCode = forsendSn.getBusProCode();
+                }
             }
             lowerHairMachineVo.setListSn(listSn);
+            lowerHairMachineVo.setActCode(sBusProCode);
+            lowerHairMachineVo.setPlatFormNum(agentBusInfo.getBusPlatform());
+
             //机具下发接口
             OLogistics logistics_send = oLogisticsMapper.selectByPrimaryKey(lowerHairMachineVo.getoLogisticsId());
             try {

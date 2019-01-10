@@ -309,7 +309,7 @@
     <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
     <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
     <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and ps.SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
-    ORDER BY ps.SUPPLY_TAX_DATE DESC
+    ORDER BY ps.SUPPLY_TAX_AMT DESC
     <include refid="PAGING_END" />
   </select>
 

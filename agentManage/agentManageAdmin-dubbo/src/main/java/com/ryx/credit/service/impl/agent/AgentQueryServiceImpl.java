@@ -370,8 +370,9 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 .andStatusEqualTo(Status.STATUS_1.status)
                 .andPayStatusEqualTo(ColinfoPayStatus.C.code)
                 .andAgentIdEqualTo(agentId);
-        example.setOrderByClause(" c_utime DES ");
-        agentColinfoMapper.selectByExample(example);
-        return null;
+        example.setOrderByClause(" c_utime DESC ");
+        List<AgentColinfo> colinfoList = agentColinfoMapper.selectByExample(example);
+        return colinfoList.size()==1?colinfoList.get(0):null;
     }
+
 }

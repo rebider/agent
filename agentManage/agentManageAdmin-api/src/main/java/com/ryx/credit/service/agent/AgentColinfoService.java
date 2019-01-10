@@ -50,4 +50,8 @@ public interface AgentColinfoService {
     AgentColinfo selectByAgentId(String agentId);
 
     AgentColinfo selectByAgentIdAndBusId(String agentId,String agentbusId);
+
+    AgentResult updateAgentColinfo(AgentColinfo agentColinfo);
+
+    AgentResult saveAgentColinfo(AgentColinfo agentColinfo);
 }

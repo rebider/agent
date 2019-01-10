@@ -1020,20 +1020,23 @@
     ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
     ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
     ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
-    nvl((ppd.pos_td_supply_amt+ppd.mpos_td_supply_amt+ppd.tools_return_amt+ppd.other_supply_amt),0) as profitSupplySum,
+    nvl(ppd.pos_td_supply_amt,'0')+nvl(ppd.mpos_td_supply_amt,'0')+nvl(ppd.tools_return_amt,'0')+nvl(ppd.other_supply_amt,'0') as profitSupplySum,
     ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,
-    nvl((ppd.pos_td_real_deduction_amt
-    +ppd.mpos_td_real_deduction_amt
-    +ppd.znpos_profit_amt
-    +ppd.other_deduction_amt
-    +(ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt)),0) as profitChargeSum,
+    nvl(ppd.pos_td_real_deduction_amt,0)
+    +nvl(ppd.mpos_td_real_deduction_amt,0)
+    +nvl(ppd.pos_kh_deduction_amt,0)+nvl(ppd.mpos_kh_deduction_amt,0)+nvl(ppd.pos_reward_deduction_amt,0)
+    +nvl(ppd.znpos_profit_amt,0)
+    +nvl(ppd.rhb_dg_real_deduction_amt,0)+nvl(ppd.pos_dg_real_deduction_amt,0)+nvl(ppd.zpos_td_real_deduction_amt,0)
+    +nvl(ppd.BU_DEDUCTION_AMT,0)
+    +nvl(ppd.other_deduction_amt,0)
+    as profitChargeSum,
     ppd.pos_td_real_deduction_amt, ppd.mpos_td_real_deduction_amt,
-    nvl((ppd.pos_kh_deduction_amt+ppd.mpos_kh_deduction_amt+ppd.pos_reward_deduction_amt),0) as khDeductionAmt,
+    nvl(ppd.pos_kh_deduction_amt,0)+nvl(ppd.mpos_kh_deduction_amt,0)+nvl(ppd.pos_reward_deduction_amt,0) as khDeductionAmt,
     ppd.znpos_profit_amt,
-    nvl((ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt),0) as toolshargeAmt,
+    nvl(ppd.rhb_dg_real_deduction_amt,0)+nvl(ppd.pos_dg_real_deduction_amt,0)+nvl(ppd.zpos_td_real_deduction_amt,0) as toolshargeAmt,
     ppd.other_deduction_amt,
     ppd.BASICS_PROFIT_AMT as sssxqyffrhz,
-    nvl((ppd.deduction_tax_month_amt+ppd.deduction_tax_month_ago_amt),0) as taxPayDeduct,
+    nvl(ppd.deduction_tax_month_amt,0)+nvl(ppd.deduction_tax_month_ago_amt,0) as taxPayDeduct,
     ppd.supply_tax_amt,
     ppd.account_name, ppd.status
     from P_PROFIT_DETAIL_M ppd
