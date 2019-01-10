@@ -160,7 +160,10 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         }
         for (List<Object> supply : data) {
             if (supply.size() == 6){
-                ProfitSupply profitSupply = new ProfitSupply();
+                if (null!=supply.get(0) && !"".equals(supply.get(0))&& null!=supply.get(1) && !"".equals(supply.get(1))&& null!=supply.get(4) && !"".equals(supply.get(4))
+                        && null!=supply.get(5) && !"".equals(supply.get(5))) {
+
+             ProfitSupply profitSupply = new ProfitSupply();
             profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
             profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
             try {
@@ -188,10 +191,11 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 list.add(profitSupply.getId());
             } catch (Exception e) {
                 e.printStackTrace();
-                throw e;
+                throw new MessageException(supply.toString() + "导入格式错误！");
             }
 
         }
+            }
         }
         return list;
     }
