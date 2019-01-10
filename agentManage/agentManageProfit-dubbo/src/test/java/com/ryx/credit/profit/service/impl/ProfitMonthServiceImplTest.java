@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
+import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.service.ProfitMonthService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -26,8 +28,13 @@ public class ProfitMonthServiceImplTest {
 
     @Test
     public void testPayMoney() throws Exception {
-        profitMonthService.computeProfitAmt();
+        profitMonthService.testComputeProfitAmt();
     }
+
+    /*@Test
+    public void testPayMoney() throws Exception {
+        profitMonthService.computeProfitAmt();
+    }*/
 
 //    @Test
 //    public void testDept() throws Exception {
@@ -40,4 +47,14 @@ public class ProfitMonthServiceImplTest {
 //        List<String> lis = profitDetailMonthMapper.getProAgent("210");
 //        lis.forEach(s -> System.out.println(s));
 //    }
+
+    /*@Test
+    public void testDoKhDeductino() throws Exception {
+        ProfitDetailMonth p = new ProfitDetailMonth();
+        p.setProfitDate("201812");
+        p.setAgentId("AG20181121000000000012621");
+        p.setParentAgentId("AG20181121000000000011648");
+        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByIdAndParent(p);
+        profitMonthService.doKhDuction(profitDetailMonth,new BigDecimal("100000"),"2");
+    }*/
 }

@@ -190,4 +190,6 @@ public interface ProfitMonthService {
     PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth);
 
     ProfitDetailMonth getByAgentId(String agentId);
+
+    BigDecimal doKhDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType);
 }
