@@ -1039,8 +1039,16 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth) {
-        Long count = profitDetailMonthMapper.queryProfitDetailMonthCount(param);
-        List<Map<String, Object>> list = profitDetailMonthMapper.queryProfitDetailMonthList(param);
+        Long count = 0L;
+        List<Map<String, Object>> list;
+        if ("1".equals(param.get("chekbox"))) {
+            count=profitDetailMonthMapper.queryProfitDetailLowerMonthCount(param);
+            list = profitDetailMonthMapper.queryProfitDetailLowerMonthList(param);
+        }else{
+             count = profitDetailMonthMapper.queryProfitDetailMonthCount(param);
+           list = profitDetailMonthMapper.queryProfitDetailMonthList(param);
+        }
+
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
         return pageInfo;
