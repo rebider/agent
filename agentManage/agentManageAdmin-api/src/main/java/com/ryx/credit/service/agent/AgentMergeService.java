@@ -83,5 +83,8 @@ public interface AgentMergeService {
 
 
     AgentResult updateAgentName(String busId,List<AgentMergeBusInfo> agentMergeBusInfos) throws Exception;
+
+
+    void manualAgentMergeNotify(String busId,String platformCode) throws Exception;
 }
 

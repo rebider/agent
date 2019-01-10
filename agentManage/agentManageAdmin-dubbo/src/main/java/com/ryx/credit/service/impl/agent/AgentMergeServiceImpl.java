@@ -756,7 +756,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(busInfo.getcUser());
-            record.setNotifyJson(String.valueOf(agentResult.getData()));
+            record.setNotifyJson(String.valueOf(agentResult.getMsg()));
             record.setNotifyType(NotifyType.AgentMerge.getValue());
             //接口请求成功
             if(agentResult.isOK()) {
@@ -797,4 +797,27 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         return AgentResult.ok(resObj.toString());
     }
 
+
+    /**
+     * 手动调用
+     * @param busId
+     * @param platformCode
+     * @throws Exception
+     */
+    @Override
+    public void manualAgentMergeNotify(String busId,String platformCode) throws Exception{
+
+        AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+        AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+        criteria.andAgentMargeIdEqualTo(busId);
+        if(!platformCode.equals("999999")){//手刷
+            criteria.andBusPlatformEqualTo(platformCode);
+        }
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+        if(agentMergeBusInfos.size()==0){
+            throw new MessageException("查询合并业务失败");
+        }
+        updateAgentName(busId,agentMergeBusInfos);
+    }
 }
