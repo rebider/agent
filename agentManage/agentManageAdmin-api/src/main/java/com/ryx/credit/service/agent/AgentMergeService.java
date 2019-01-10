@@ -4,9 +4,11 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
+import com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Created by RYX on 2019/1/7.
@@ -80,6 +82,6 @@ public interface AgentMergeService {
     AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser)throws Exception;
 
 
-    AgentResult updateAgentName(String busId) throws Exception;
+    AgentResult updateAgentName(String busId,List<AgentMergeBusInfo> agentMergeBusInfos) throws Exception;
 }
 
