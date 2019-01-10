@@ -94,4 +94,8 @@ public interface ProfitDetailMonthMapper {
     BigDecimal getSubAgentTaxBaseTotal(Map<String,Object> params);
 
     void updateRealProfitAmt(Map<String,Object> params);
+
+    List<Map<String,Object>> queryProfitDetailLowerMonthList (Map<String, Object> param);
+
+    Long queryProfitDetailLowerMonthCount(Map<String, Object> param);
 }
