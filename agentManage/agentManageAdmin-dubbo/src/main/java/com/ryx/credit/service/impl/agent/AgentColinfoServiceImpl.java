@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentDataHistoryService;
 import com.ryx.credit.service.dict.IdService;
+import net.sf.ehcache.search.impl.BaseResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -514,5 +515,21 @@ public class AgentColinfoServiceImpl implements AgentColinfoService {
         AgentColinfoRel agentColinfoRel = agentColinfoRels.get(0);
         AgentColinfo agentColinfo = agentColinfoMapper.selectByPrimaryKey(agentColinfoRel.getAgentColinfoid());
         return agentColinfo;
+    }
+
+    @Override
+    public AgentResult updateAgentColinfo(AgentColinfo agentColinfo) {
+        if (1 != agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo)) {
+            return AgentResult.fail("更新失败！");
+        }
+        return AgentResult.ok("更新成功！");
+    }
+
+    @Override
+    public AgentResult saveAgentColinfo(AgentColinfo agentColinfo) {
+        if (1 != agentColinfoMapper.insertSelective(agentColinfo)) {
+            return AgentResult.fail("新增失败！");
+        }
+        return AgentResult.ok("新增成功！");
     }
 }

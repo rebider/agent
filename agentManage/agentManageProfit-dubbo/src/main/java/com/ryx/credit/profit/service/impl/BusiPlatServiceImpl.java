@@ -5,6 +5,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
 import com.ryx.credit.common.util.JsonUtil;
+import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.profit.service.BusiPlatService;
 import com.ryx.credit.service.agent.AgentNotifyService;
@@ -40,7 +41,7 @@ public class BusiPlatServiceImpl implements BusiPlatService {
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.refuse"), params);
         log.debug("请求信息：" + res);
-        if(!JSONObject.parseObject(res).get("respCode").equals("000000")){
+        if (!JSONObject.parseObject(res).get("respCode").equals("000000")) {
             log.error("请求失败！");
             AppConfig.sendEmails("代理商冻结失败" + res,"代理商冻结失败");
             return true;
@@ -75,12 +76,12 @@ public class BusiPlatServiceImpl implements BusiPlatService {
     }
 
     @Override
-    public AgentResult mPos_updateAgName(String agentName, List<String> platId) {
+    public AgentResult mPos_updateAgName(String agentName, List<String> platId, AgentColinfo agentColinfo) {
         HashMap<String,String> map = new HashMap<String,String>();
-        map.put("companyname",agentName);
-        map.put("batchIds",platId.toString());
-        map.put("colinfoMessage","AgentColinfo");
 
+        map.put("companyname", agentName);//代理商名称
+        map.put("batchIds", platId.toString());//AG码
+        map.put("colinfoMessage", agentColinfo.toString());//收款账户
         String params = JsonUtil.objectToJson(map);
         log.info("======mPos_updateAgName:{}",params);
         String res = HttpClientUtil.doPostJson

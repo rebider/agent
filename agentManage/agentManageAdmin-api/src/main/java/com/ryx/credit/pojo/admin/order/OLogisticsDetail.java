@@ -79,6 +79,8 @@ public class OLogisticsDetail implements Serializable {
 
     private BigDecimal standTime;
 
+    private String busId;
+
     public String getId() {
         return id;
     }
@@ -373,5 +375,13 @@ public class OLogisticsDetail implements Serializable {
 
     public void setStandTime(BigDecimal standTime) {
         this.standTime = standTime;
+    }
+
+    public String getBusId() {
+        return busId;
+    }
+
+    public void setBusId(String busId) {
+        this.busId = busId;
     }
 }
