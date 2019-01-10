@@ -672,7 +672,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 continue;
             }
             //调用Pos
-            if(platType.equals(PlatformType.MPOS.getValue()) || platType.equals(PlatformType.ZPOS.getValue())){
+            if(platType.equals(PlatformType.POS.getValue()) || platType.equals(PlatformType.ZPOS.getValue())){
                 AgentPlatFormSyn record = new AgentPlatFormSyn();
                 AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
                 agentNotifyVo.setOrgName(agentName);
@@ -725,7 +725,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                     record.setNotifyStatus(Status.STATUS_1.status);
                 }
                 record.setNotifyJson(String.valueOf(agentResult.getData()));
-                agentPlatFormSynMapper.insert(record);
+                try {
+                    agentPlatFormSynMapper.insert(record);
+                } catch (Exception e) {
+                    logger.info("代理商合并通知pos异常：{}"+e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
         //调用手刷接口
@@ -764,7 +769,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 record.setSuccesTime(new Date());
                 record.setNotifyStatus(Status.STATUS_1.status);
             }
-            agentPlatFormSynMapper.insert(record);
+            try {
+                agentPlatFormSynMapper.insert(record);
+            } catch (Exception e) {
+                logger.info("代理商合并通知手刷异常：{}"+e.getMessage());
+                e.printStackTrace();
+            }
         }
         return AgentResult.ok();
     }

@@ -3071,7 +3071,7 @@ public class OrderServiceImpl implements OrderService {
         logger.info("==1===="+order.getoNum());
         //两个事物 都更新 或者 一个事物更新
 //        order.setoNum("21173445661830078");
-//        order.setoNum("21173445661830079");
+        order.setoNum("21173445661830079");
         orderMapper.updateByPrimaryKeySelective(order);
         OOrder order1 = orderMapper.selectByPrimaryKey("OO20181121000000000001830");
         logger.info("==2===="+order1.getoNum());
