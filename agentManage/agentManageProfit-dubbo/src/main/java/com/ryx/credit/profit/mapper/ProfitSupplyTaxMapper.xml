@@ -267,7 +267,14 @@
   <sql id="BASE_WHERE_SQL">
     <where>
       1=1
-      <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+      <choose>
+        <when test="DATESTART !=null and DATESTART != '' and DATEEND !=null and DATEEND != ''">
+          and SUPPLY_TAX_DATE between #{DATESTART} and #{DATEEND}
+        </when>
+        <otherwise>
+          <if test="DATESTART != null and DATESTART !='' "> and SUPPLY_TAX_DATE = #{DATESTART} </if>
+        </otherwise>
+      </choose>
       <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
       <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
       <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
@@ -291,7 +298,14 @@
     left join A_agent_businfo aab on  pst.supply_Tax_agent_id = aab.Agent_id )
     aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where
     1=1
-    <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and ps.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+    <choose>
+      <when test="DATESTART !=null and DATESTART != '' and DATEEND !=null and DATEEND != ''">
+        and ps.SUPPLY_TAX_DATE between #{DATESTART} and #{DATEEND}
+      </when>
+      <otherwise>
+        <if test="DATESTART != null and DATESTART !='' "> and ps.SUPPLY_TAX_DATE = #{DATESTART} </if>
+      </otherwise>
+    </choose>
     <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
     <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
     <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and ps.SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
@@ -314,7 +328,15 @@
     <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and ps.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
     CONNECT BY PRIOR ps.SUPPLY_TAX_SUB_ID=ps.SUPPLY_TAX_AGENT_ID) aaa
     where  1=1
-    <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and aaa.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+    <choose>
+      <when test="DATESTART !=null and DATESTART != '' and DATEEND !=null and DATEEND != ''">
+        and aaa.SUPPLY_TAX_DATE between #{DATESTART} and #{DATEEND}
+      </when>
+      <otherwise>
+        <if test="DATESTART != null and DATESTART !='' "> and aaa.SUPPLY_TAX_DATE = #{DATESTART} </if>
+      </otherwise>
+    </choose>
+   <!-- <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and aaa.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>-->
     <include refid="PAGING_END" />
   </select>
 
@@ -333,7 +355,15 @@
     <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and ps.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
     CONNECT BY PRIOR ps.SUPPLY_TAX_SUB_ID=ps.SUPPLY_TAX_AGENT_ID) aaa
     where  1=1
-    <if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and aaa.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>
+    <choose>
+      <when test="DATESTART !=null and DATESTART != '' and DATEEND !=null and DATEEND != ''">
+        and aaa.SUPPLY_TAX_DATE between #{DATESTART} and #{DATEEND}
+      </when>
+      <otherwise>
+        <if test="DATESTART != null and DATESTART !='' "> and aaa.SUPPLY_TAX_DATE = #{DATESTART} </if>
+      </otherwise>
+    </choose>
+    <!--<if test="SUPPLY_TAX_DATE != null and SUPPLY_TAX_DATE !='' "> and aaa.SUPPLY_TAX_DATE = #{SUPPLY_TAX_DATE} </if>-->
 
   </select>
 

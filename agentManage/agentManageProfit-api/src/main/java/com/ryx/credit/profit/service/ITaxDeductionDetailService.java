@@ -7,9 +7,10 @@ import com.ryx.credit.profit.pojo.TaxDeductionDetail;
 import java.util.List;
 
 public interface ITaxDeductionDetailService {
-    PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page);
 
-    PageInfo posDirectlyDeductTaxList (TaxDeductionDetail taxDeductionDetail,Page page);
+    PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd);
+
+    PageInfo posDirectlyDeductTaxList (TaxDeductionDetail taxDeductionDetail,Page page,String dateStart,String dateEnd);
 
     int updateAdjust(TaxDeductionDetail taxDeductionDetail);
 

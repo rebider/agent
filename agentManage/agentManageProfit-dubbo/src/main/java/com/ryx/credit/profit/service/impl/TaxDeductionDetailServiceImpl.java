@@ -21,7 +21,8 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
     private TaxDeductionDetailMapper taxDeductionDetailMapper;
 
     @Override
-    public PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page) {
+    public PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd) {
+        //获取直签数据列表
         TaxDeductionDetailExample example=new TaxDeductionDetailExample();
         example.setPage(page);
         TaxDeductionDetailExample.Criteria criteria=example.createCriteria();
@@ -31,9 +32,13 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         if(StringUtils.isNotBlank(taxDeductionDetail.getAgentId())){
             criteria.andAgentIdEqualTo(taxDeductionDetail.getAgentId());
         }
-        if(StringUtils.isNotBlank(taxDeductionDetail.getProfitMonth())){
-            criteria.andProfitMonthEqualTo(taxDeductionDetail.getProfitMonth());
+        //修改:根据区间日期进行查询
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthEqualTo(dateStart);
         }
+
         if(StringUtils.isNotBlank(taxDeductionDetail.getBusPlatform())){
             criteria.andBusPlatformNotEqualTo(taxDeductionDetail.getBusPlatform());
         }
@@ -45,7 +50,7 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
     }
 
     @Override
-    public PageInfo posDirectlyDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page) {
+    public PageInfo posDirectlyDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd) {
         TaxDeductionDetailExample example=new TaxDeductionDetailExample();
         example.setPage(page);
         TaxDeductionDetailExample.Criteria criteria=example.createCriteria();
@@ -55,9 +60,14 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         if(StringUtils.isNotBlank(taxDeductionDetail.getAgentId())){
             criteria.andAgentIdEqualTo(taxDeductionDetail.getAgentId());
         }
-        if(StringUtils.isNotBlank(taxDeductionDetail.getProfitMonth())){
-            criteria.andProfitMonthEqualTo(taxDeductionDetail.getProfitMonth());
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthEqualTo(dateStart);
         }
+       /* if(StringUtils.isNotBlank(taxDeductionDetail.getProfitMonth())){
+            criteria.andProfitMonthEqualTo(taxDeductionDetail.getProfitMonth());
+        }*/
         if(StringUtils.isNotBlank(taxDeductionDetail.getBusPlatform())){
             criteria.andBusPlatformEqualTo(taxDeductionDetail.getBusPlatform());
         }

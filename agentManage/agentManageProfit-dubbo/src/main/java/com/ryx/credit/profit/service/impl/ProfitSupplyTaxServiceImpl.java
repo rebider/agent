@@ -53,7 +53,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
     public PageInfo getProfitSupplyTaxList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = 0L;
         List<Map<String, Object>> listAll;
-        if ("1".equals(param.get("chekbox"))) {
+        if ("1".equals(param.get("concludeChild"))) {//包含下级
             count = profitSupplyTaxMapper.getClassificationCount(param);
             listAll = profitSupplyTaxMapper.getClassificationList(param);
             /*if ("".equals(param.get("SUPPLY_TAX_AGENT_NAME"))&&("".equals(param.get("SUPPLY_TAX_AGENT_ID")))){
