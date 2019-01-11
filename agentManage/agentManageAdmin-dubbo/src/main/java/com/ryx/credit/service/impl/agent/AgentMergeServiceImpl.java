@@ -172,6 +172,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMerge.setuUser(cUser);
             agentMerge.setStatus(Status.STATUS_1.status);
             agentMerge.setVersion(Status.STATUS_1.status);
+            String strBusType = "";
+            for(int i=0;i<busType.length;i++){
+                strBusType+=busType[i];
+                if(i!=busType.length-1){
+                    strBusType+=",";
+                }
+            }
+            agentMerge.setMergeBusIds(strBusType);
             if (1 != agentMergeMapper.insertSelective(agentMerge)) {
                 logger.info("代理商合并提交审批，新增数据失败:{}", cUser);
                 throw new MessageException("代理商合并提交审批，新增数据失败！");
@@ -179,59 +187,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
 
             //查看被合并代理商有没有合并过
             verifyAgentMerge(agentMerge,mergeId,cUser);
-
-            for(int i=0;i<busType.length;i++){
-                String busId = busType[i];
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
-                agentBusInfo.setBusStatus(BusinessStatus.lock.status);
-                int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-                if (j!=1) {
-                    throw new MessageException("更新业务锁定失败");
-                }
-
-                AgentMergeBusInfo agentMergeBusInfo = new AgentMergeBusInfo();
-                String mergeBusInfoId = idService.genId(TabId.A_AGENT_MERGE_BUSINFO);
-                agentMergeBusInfo.setId(mergeBusInfoId);
-                agentMergeBusInfo.setMergeStatus(MergeStatus.WXS.getValue());
-                agentMergeBusInfo.setAgentMargeId(mergeId);
-                agentMergeBusInfo.setBusId(agentBusInfo.getId());
-                agentMergeBusInfo.setMainAgentId(agentMerge.getMainAgentId());
-                agentMergeBusInfo.setSubAgentId(agentMerge.getSubAgentId());
-                agentMergeBusInfo.setcTime(new Date());
-                agentMergeBusInfo.setcUtime(new Date());
-                agentMergeBusInfo.setcUser(cUser);
-                agentMergeBusInfo.setStatus(Status.STATUS_1.status);
-                agentMergeBusInfo.setVersion(Status.STATUS_1.status);
-                //以下是复制信息
-                agentMergeBusInfo.setBusNum(agentBusInfo.getBusNum());
-                agentMergeBusInfo.setBusPlatform(agentBusInfo.getBusPlatform());
-                agentMergeBusInfo.setBusType(agentBusInfo.getBusType());
-                agentMergeBusInfo.setBusParent(agentBusInfo.getBusParent());
-                agentMergeBusInfo.setBusRiskParent(agentBusInfo.getBusRiskParent());
-                agentMergeBusInfo.setBusActivationParent(agentBusInfo.getBusActivationParent());
-                agentMergeBusInfo.setBusRegion(agentBusInfo.getBusRegion());
-                agentMergeBusInfo.setBusSentDirectly(agentBusInfo.getBusSentDirectly());
-                agentMergeBusInfo.setBusDirectCashback(agentBusInfo.getBusDirectCashback());
-                agentMergeBusInfo.setBusIndeAss(agentBusInfo.getBusIndeAss());
-                agentMergeBusInfo.setBusContact(agentBusInfo.getBusContact());
-                agentMergeBusInfo.setBusContactEmail(agentBusInfo.getBusContactEmail());
-                agentMergeBusInfo.setBusContactMobile(agentBusInfo.getBusContactMobile());
-                agentMergeBusInfo.setBusContactPerson(agentBusInfo.getBusContactPerson());
-                agentMergeBusInfo.setBusRiskEmail(agentBusInfo.getBusRiskEmail());
-                agentMergeBusInfo.setCloTaxPoint(agentBusInfo.getCloTaxPoint());
-                agentMergeBusInfo.setCloInvoice(agentBusInfo.getCloInvoice());
-                agentMergeBusInfo.setCloReceipt(agentBusInfo.getCloReceipt());
-                agentMergeBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
-                agentMergeBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
-                agentMergeBusInfo.setAgZbh(agentBusInfo.getAgZbh());
-                agentMergeBusInfo.setBusStatus(agentBusInfo.getBusStatus());
-                agentMergeBusInfo.setBusUseOrgan(agentBusInfo.getBusUseOrgan());
-                agentMergeBusInfo.setCloReviewStatus(agentBusInfo.getCloReviewStatus());
-                agentMergeBusInfo.setBusScope(agentBusInfo.getBusScope());
-                agentMergeBusInfo.setDredgeS0(agentBusInfo.getDredgeS0());
-                agentMergeBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());
-                agentMergeBusInfoMapper.insertSelective(agentMergeBusInfo);
-            }
+            insert(busType,mergeId,agentMerge,cUser);
 
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 startAgentMergeActivity(mergeId, cUser,true);
@@ -246,7 +202,64 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
     }
 
+    /**
+     * 新增
+     * @param busType
+     * @param mergeId
+     * @param agentMerge
+     * @param cUser
+     * @throws Exception
+     */
+    private void insert(String[] busType,String mergeId,AgentMerge agentMerge,String cUser)throws Exception{
 
+        for(int i=0;i<busType.length;i++){
+            String busId = busType[i];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+            AgentMergeBusInfo agentMergeBusInfo = new AgentMergeBusInfo();
+            String mergeBusInfoId = idService.genId(TabId.A_AGENT_MERGE_BUSINFO);
+            agentMergeBusInfo.setId(mergeBusInfoId);
+            agentMergeBusInfo.setMergeStatus(MergeStatus.WXS.getValue());
+            agentMergeBusInfo.setAgentMargeId(mergeId);
+            agentMergeBusInfo.setBusId(agentBusInfo.getId());
+            agentMergeBusInfo.setMainAgentId(agentMerge.getMainAgentId());
+            agentMergeBusInfo.setSubAgentId(agentMerge.getSubAgentId());
+            agentMergeBusInfo.setcTime(new Date());
+            agentMergeBusInfo.setcUtime(new Date());
+            agentMergeBusInfo.setcUser(cUser);
+            agentMergeBusInfo.setStatus(Status.STATUS_1.status);
+            agentMergeBusInfo.setVersion(Status.STATUS_1.status);
+            //以下是复制信息
+            agentMergeBusInfo.setBusNum(agentBusInfo.getBusNum());
+            agentMergeBusInfo.setBusPlatform(agentBusInfo.getBusPlatform());
+            agentMergeBusInfo.setBusType(agentBusInfo.getBusType());
+            agentMergeBusInfo.setBusParent(agentBusInfo.getBusParent());
+            agentMergeBusInfo.setBusRiskParent(agentBusInfo.getBusRiskParent());
+            agentMergeBusInfo.setBusActivationParent(agentBusInfo.getBusActivationParent());
+            agentMergeBusInfo.setBusRegion(agentBusInfo.getBusRegion());
+            agentMergeBusInfo.setBusSentDirectly(agentBusInfo.getBusSentDirectly());
+            agentMergeBusInfo.setBusDirectCashback(agentBusInfo.getBusDirectCashback());
+            agentMergeBusInfo.setBusIndeAss(agentBusInfo.getBusIndeAss());
+            agentMergeBusInfo.setBusContact(agentBusInfo.getBusContact());
+            agentMergeBusInfo.setBusContactEmail(agentBusInfo.getBusContactEmail());
+            agentMergeBusInfo.setBusContactMobile(agentBusInfo.getBusContactMobile());
+            agentMergeBusInfo.setBusContactPerson(agentBusInfo.getBusContactPerson());
+            agentMergeBusInfo.setBusRiskEmail(agentBusInfo.getBusRiskEmail());
+            agentMergeBusInfo.setCloTaxPoint(agentBusInfo.getCloTaxPoint());
+            agentMergeBusInfo.setCloInvoice(agentBusInfo.getCloInvoice());
+            agentMergeBusInfo.setCloReceipt(agentBusInfo.getCloReceipt());
+            agentMergeBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
+            agentMergeBusInfo.setCloPayCompany(agentBusInfo.getCloPayCompany());
+            agentMergeBusInfo.setAgZbh(agentBusInfo.getAgZbh());
+            agentMergeBusInfo.setBusStatus(agentBusInfo.getBusStatus());
+            agentMergeBusInfo.setBusUseOrgan(agentBusInfo.getBusUseOrgan());
+            agentMergeBusInfo.setCloReviewStatus(agentBusInfo.getCloReviewStatus());
+            agentMergeBusInfo.setBusScope(agentBusInfo.getBusScope());
+            agentMergeBusInfo.setDredgeS0(agentBusInfo.getDredgeS0());
+            agentMergeBusInfo.setBusLoginNum(agentBusInfo.getBusLoginNum());
+            agentMergeBusInfoMapper.insertSelective(agentMergeBusInfo);
+        }
+
+    }
     /**
      * 查看被合并代理商有没有合并过
      * @param agentMerge
@@ -453,6 +466,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 throw new MessageException("提交审批处理失败！");
             }
         }
+        //提交审批进行锁定
+        String strMergeBusIds = agentMerge.getMergeBusIds();
+        String[] mergeBusIds = strMergeBusIds.split(",");
+        for(int i=0;i<mergeBusIds.length;i++){
+            String mergeBusId = mergeBusIds[i];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+            agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+            int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+            if (j!=1) {
+                throw new MessageException("更新业务锁定失败");
+            }
+        }
+
         Map startPar = agentEnterService.startPar(String.valueOf(cUser));
         if (null == startPar) {
             throw new ProcessException("启动部门参数为空！");
@@ -528,6 +554,22 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if (null == agentMerge) {
             return null;
         }
+        AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+        AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andMergeStatusEqualTo(MergeStatus.WXS.getValue());
+        criteria.andAgentMargeIdEqualTo(agentMerge.getId());
+        List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+        for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+            agentMergeBusInfo.setBusPlatformName(Platform.getContentByValue(agentMergeBusInfo.getBusPlatform()));
+            agentMergeBusInfo.setBusTypeName(BusType.getContentByValue(agentMergeBusInfo.getBusType()));
+        }
+        agentMerge.setAgentMergeBusInfosList(agentMergeBusInfos);
+        List<Map<String,Object>> data = agentBusInfoMapper.queryEditAgentMerge(FastMap.fastMap("agentId",agentMerge.getSubAgentId()));
+        for (Map datum : data) {
+            datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+        }
+        agentMerge.setSubAgentBusInfoList(data);
         return agentMerge;
     }
 
@@ -595,18 +637,43 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser) throws Exception {
         if(StringUtils.isBlank(agentMerge.getId())){
             throw new MessageException("数据ID为空！");
         }
         try {
+            //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
+            //mainAndSubMustHaveLower(agentMerge);
+            //合并中不能重复发起
+            verifyMergeing(agentMerge,busType);
+            //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
+            //verifypprovaling(agentMerge.getSubAgentId());
+
             agentMerge.setuTime(new Date());
             agentMerge.setuUser(cUser);
             if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                 logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                 throw new MessageException("更新合并数据失败！");
             }
+            AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+            AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andAgentMargeIdEqualTo(agentMerge.getId());
+            List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+            for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+                agentMergeBusInfo.setStatus(Status.STATUS_0.status);
+                int i = agentMergeBusInfoMapper.updateByPrimaryKeySelective(agentMergeBusInfo);
+                if (1 != 1) {
+                    logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
+                    throw new MessageException("更新合并数据失败！");
+                }
+            }
+            //查看被合并代理商有没有合并过
+            verifyAgentMerge(agentMerge,agentMerge.getId(),cUser);
+            insert(busType,agentMerge.getId(),agentMerge,cUser);
+
             return AgentResult.ok();
         } catch (MessageException e) {
             e.printStackTrace();

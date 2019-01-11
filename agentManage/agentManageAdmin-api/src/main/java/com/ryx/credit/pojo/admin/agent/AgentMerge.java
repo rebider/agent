@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class AgentMerge implements Serializable{
     private String id;
@@ -36,7 +37,25 @@ public class AgentMerge implements Serializable{
 
     private BigDecimal mergeType;
 
+    private BigDecimal suppType;
+
+    private String suppAgentId;
+
+    private String suppAgentName;
+
+    private String mergeBusIds;
+
     private List<AgentMergeBusInfo> agentMergeBusInfosList;
+
+    private List<Map<String,Object>> subAgentBusInfoList;
+
+    public List<Map<String, Object>> getSubAgentBusInfoList() {
+        return subAgentBusInfoList;
+    }
+
+    public void setSubAgentBusInfoList(List<Map<String, Object>> subAgentBusInfoList) {
+        this.subAgentBusInfoList = subAgentBusInfoList;
+    }
 
     public List<AgentMergeBusInfo> getAgentMergeBusInfosList() {
         return agentMergeBusInfosList;
@@ -164,5 +183,37 @@ public class AgentMerge implements Serializable{
 
     public void setMergeType(BigDecimal mergeType) {
         this.mergeType = mergeType;
+    }
+
+    public BigDecimal getSuppType() {
+        return suppType;
+    }
+
+    public void setSuppType(BigDecimal suppType) {
+        this.suppType = suppType;
+    }
+
+    public String getSuppAgentId() {
+        return suppAgentId;
+    }
+
+    public void setSuppAgentId(String suppAgentId) {
+        this.suppAgentId = suppAgentId;
+    }
+
+    public String getSuppAgentName() {
+        return suppAgentName;
+    }
+
+    public void setSuppAgentName(String suppAgentName) {
+        this.suppAgentName = suppAgentName;
+    }
+
+    public String getMergeBusIds() {
+        return mergeBusIds;
+    }
+
+    public void setMergeBusIds(String mergeBusIds) {
+        this.mergeBusIds = mergeBusIds;
     }
 }
