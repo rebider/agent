@@ -315,6 +315,41 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         return lists;
     }
 
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        Map<String,Object> map=null;
+        InvoiceDetailExample example = new InvoiceDetailExample();
+        InvoiceDetailExample.Criteria criteria = example.createCriteria();
+        String dateStart=param.get("dateStart")==null?null:param.get("dateStart").toString();
+        String dateEnd=param.get("dateEnd")==null?null:param.get("dateEnd").toString();
+        String agentId=param.get("agentId")==null?null:param.get("agentId").toString();
+        String agentName=param.get("agentName")==null?null:param.get("agentName").toString();
+        String concludeChild=param.get("concludeChild")==null?null:param.get("concludeChild").toString();
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
+        }
+        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
+            lists.add(agentId);
+            criteria.andAgentIdIn(lists);
+        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
+            String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
+            lists.add(aId);
+            criteria.andAgentIdIn(lists);
+        }else if (StringUtils.isNotBlank(agentId)) {
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
+        }
+        map=invoiceDetailMapper.profitCount(example);
+        return map;
+    }
+
     /**
      * @param list
      * @param loginName

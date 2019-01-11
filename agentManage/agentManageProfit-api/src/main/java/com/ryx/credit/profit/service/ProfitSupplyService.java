@@ -41,4 +41,6 @@ public interface ProfitSupplyService {
     int resetData(String busBigType);
 
     List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception;
+
+    Map<String,Object> profitCount(Map<String, Object> param);
 }

@@ -580,6 +580,23 @@
     </choose>
     <include refid="PAGING_END" />
   </select>
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(POS_OWN_REWARD) as totalMoney from POS_REWARD_DETAIL
+    where 1=1
+    <choose>
+      <when test="PROFIT_POS_DATE_START !=null and PROFIT_POS_DATE_START != '' and PROFIT_POS_DATE_END !=null and PROFIT_POS_DATE_END != ''">
+        and PROFIT_POS_DATE between #{PROFIT_POS_DATE_START} and #{PROFIT_POS_DATE_END}
+      </when>
+      <otherwise>
+        <if test="PROFIT_POS_DATE_START != null and PROFIT_POS_DATE_START !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE_START} </if>
+      </otherwise>
+    </choose>
+    <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' "> and POS_AGENT_ID = #{POS_AGENT_ID} </if>
+    <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+    <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
+    <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
+    <if test="PROFIT_POS_DATE != null and PROFIT_POS_DATE !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE} </if>
+  </select>
   <sql id="PAGING_START">
     <if test="begin != null  and end != null and end &gt;0">
       SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (

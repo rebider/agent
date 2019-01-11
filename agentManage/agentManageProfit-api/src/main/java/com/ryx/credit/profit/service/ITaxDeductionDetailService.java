@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.TaxDeductionDetail;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ITaxDeductionDetailService {
 
@@ -19,4 +20,6 @@ public interface ITaxDeductionDetailService {
     List<TaxDeductionDetail> query(TaxDeductionDetail taxDeductionDetail);
 
     PageInfo queryAndSubordinate(TaxDeductionDetail taxDeductionDetail,Page page);
+
+    Map<String,Object> profitCount(Map<String,Object> param,boolean isQuerySubordinate);
 }

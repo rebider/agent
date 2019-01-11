@@ -82,6 +82,13 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
+  <select id="profitCount" resultType="java.util.Map" parameterType="com.ryx.credit.profit.pojo.InvoiceDetailExample">
+    select count(1) as totalNum,sum(OWN_INVOICE) as totalMoney from P_INVOICE_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

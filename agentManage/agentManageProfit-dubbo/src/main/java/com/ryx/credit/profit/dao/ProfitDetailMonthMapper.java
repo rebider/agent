@@ -95,6 +95,10 @@ public interface ProfitDetailMonthMapper {
 
     void updateRealProfitAmt(Map<String,Object> params);
 
+    Map<String,Object> profitCount(Map<String, Object> param);
+
+    Map<String,Object> profitCountWithSubordinate(Map<String, Object> param);
+
     List<Map<String,Object>> queryProfitDetailLowerMonthList (Map<String, Object> param);
 
     Long queryProfitDetailLowerMonthCount(Map<String, Object> param);

@@ -35,4 +35,8 @@ public interface TaxDeductionDetailMapper {
     void deleteByMonth(@Param("profitMonth") String profitMonth);
 
     List<Map<String,Object>> queryTaxDeductionZFAgentList(Map<String,Object> params);
+
+    Map<String, Object> profitCount(TaxDeductionDetailExample example);
+
+    Map<String, Object> profitCountWithSubordinate(Map<String, Object> param);
 }

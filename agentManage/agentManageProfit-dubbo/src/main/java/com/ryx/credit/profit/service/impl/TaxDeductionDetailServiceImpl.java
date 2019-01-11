@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+
 @Service("taxDeductionDetailService")
 public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService {
     Logger logger = LoggerFactory.getLogger(TaxDeductionDetailServiceImpl.class);
@@ -108,6 +110,37 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         pageInfo.setRows(taxDeductionDetails);
         pageInfo.setTotal((int)taxDeductionDetailMapper.queryCountAndSubordinate(taxDeductionDetail));
         return pageInfo;
+    }
+
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param, boolean isQuerySubordinate) {
+        if (isQuerySubordinate){
+            return taxDeductionDetailMapper.profitCountWithSubordinate(param);
+        }else{
+            TaxDeductionDetailExample example=new TaxDeductionDetailExample();
+            TaxDeductionDetailExample.Criteria criteria=example.createCriteria();
+            if(StringUtils.isNotBlank(param.get("agentName").toString())){
+                criteria.andAgentNameEqualTo(param.get("agentName").toString());
+            }
+            if(StringUtils.isNotBlank(param.get("agentId").toString())){
+                criteria.andAgentIdEqualTo(param.get("agentId").toString());
+            }
+            String dateStart=param.get("DATESTART").toString();
+            String dateEnd=param.get("DATEEND").toString();
+            if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+                criteria.andProfitMonthBetween(dateStart,dateEnd);
+            }else if(StringUtils.isNotBlank(dateStart)){
+                criteria.andProfitMonthEqualTo(dateStart);
+            }
+            if(StringUtils.isNotBlank(param.get("busPlatform").toString())){
+                if((boolean)param.get("directly")){
+                    criteria.andBusPlatformEqualTo(param.get("busPlatform").toString());
+                }else{
+                    criteria.andBusPlatformNotEqualTo(param.get("busPlatform").toString());
+                }
+            }
+            return taxDeductionDetailMapper.profitCount(example);
+        }
     }
 
     /**

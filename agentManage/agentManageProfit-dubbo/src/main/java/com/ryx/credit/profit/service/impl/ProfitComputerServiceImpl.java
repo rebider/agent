@@ -159,6 +159,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return totalDay;
     }
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 保理扣款计算
+     * @Date: 14:45 2019/1/10
+     */
     @Override
     public BigDecimal total_factor(String agentPid,String month) {
         if(null==month || "".equals(month)){

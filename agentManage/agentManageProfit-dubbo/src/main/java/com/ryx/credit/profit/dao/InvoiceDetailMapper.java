@@ -35,4 +35,6 @@ public interface InvoiceDetailMapper {
     String getAgentIdbyAgentName(String agentName);
 
     void deleteByMonth(String profitMonth);
+
+    Map<String,Object> profitCount(InvoiceDetailExample example);
 }

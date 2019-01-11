@@ -22,4 +22,6 @@ public interface ProfitFactorService {
     PProfitFactor selectByData(PProfitFactor profitFactor);
 
     int resetDataFactor();
+
+    Map<String,Object> profitCount(Map<String, Object> param);
 }
