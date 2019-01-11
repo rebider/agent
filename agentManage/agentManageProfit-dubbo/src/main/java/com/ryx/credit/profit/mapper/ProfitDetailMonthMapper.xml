@@ -1047,7 +1047,7 @@
 
 <select id="queryProfitDetailLowerMonthList" parameterType="java.util.Map" resultType="java.util.Map">
   <include refid="paging_start" />
-  select cc.*  from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
+ select zzz.* from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
   ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
   ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,ppd.REAL_PROFIT_AMT,
   ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
@@ -1071,15 +1071,17 @@
   ppd.account_name, ppd.status
   from P_PROFIT_DETAIL_M ppd
   order by ppd.profit_date desc) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
-  START WITH
-  1=1
-  <if test="agentId != null and agentId !=''">and bb.agent_id = #{agentId}</if>
-  <if test="agentName != null and agentName !=''">and bb.agent_name = #{agentName}</if>
+  where  1=1
   <if test="profitDateStart != null and profitDateStart != ''">and bb.PROFIT_DATE &gt;= #{profitDateStart}</if>
   <if test="profitDateEnd != null and profitDateEnd != ''">and bb.PROFIT_DATE &lt;= #{profitDateEnd}</if>
-  CONNECT BY PRIOR bb.agent_id = bb.PARENT_AGENT_ID) cc where 1=1
-  <if test="profitDateStart != null and profitDateStart != ''">and cc.PROFIT_DATE &gt;= #{profitDateStart}</if>
-  <if test="profitDateEnd != null and profitDateEnd != ''">and cc.PROFIT_DATE &lt;= #{profitDateEnd}</if>
+  ) zzz
+  START WITH
+  1=1
+  <if test="agentId != null and agentId !=''">and zzz.agent_id = #{agentId}</if>
+  <if test="agentName != null and agentName !=''">and zzz.agent_name = #{agentName}</if>
+  <if test="profitDateStart != null and profitDateStart != ''">and zzz.PROFIT_DATE &gt;= #{profitDateStart}</if>
+  <if test="profitDateEnd != null and profitDateEnd != ''">and zzz.PROFIT_DATE &lt;= #{profitDateEnd}</if>
+  CONNECT BY PRIOR zzz.agent_id = zzz.PARENT_AGENT_ID
   <include refid="paging_end" />
 </select>
 
@@ -1094,16 +1096,18 @@
   </select>
 
   <select id="queryProfitDetailLowerMonthCount" parameterType="java.util.Map" resultType="java.lang.Long">
-   select count(1)  from (select * from(
+   select count(1)  from (select * from(select * from(
     select ppd.*
     from P_PROFIT_DETAIL_M ppd
-    START WITH
-    1=1
-    <if test="agentId != null and agentId !=''">and ppd.agent_id = #{agentId}</if>
-    <if test="agentName != null and agentName !=''">and ppd.agent_name = #{agentName}</if>
+    where 1=1
     <if test="profitDateStart != null and profitDateStart != ''">and ppd.PROFIT_DATE &gt;= #{profitDateStart}</if>
     <if test="profitDateEnd != null and profitDateEnd != ''">and ppd.PROFIT_DATE &lt;= #{profitDateEnd}</if>
-    CONNECT BY PRIOR ppd.agent_id = ppd.PARENT_AGENT_ID)) cc where 1=1
+    ) aaa
+    START WITH
+    1=1
+    <if test="agentId != null and agentId !=''">and aaa.agent_id = #{agentId}</if>
+    <if test="agentName != null and agentName !=''">and aaa.agent_name = #{agentName}</if>
+    CONNECT BY PRIOR aaa.agent_id = aaa.PARENT_AGENT_ID)) cc where 1=1
     <if test="profitDateStart != null and profitDateStart != ''">and cc.PROFIT_DATE &gt;= #{profitDateStart}</if>
     <if test="profitDateEnd != null and profitDateEnd != ''">and cc.PROFIT_DATE &lt;= #{profitDateEnd}</if>
   </select>
