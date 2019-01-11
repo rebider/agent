@@ -650,7 +650,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             verifyMergeing(agentMerge,busType);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
             //verifypprovaling(agentMerge.getSubAgentId());
-
+            String strBusType = "";
+            for(int i=0;i<busType.length;i++){
+                strBusType+=busType[i];
+                if(i!=busType.length-1){
+                    strBusType+=",";
+                }
+            }
+            agentMerge.setMergeBusIds(strBusType);
             agentMerge.setuTime(new Date());
             agentMerge.setuUser(cUser);
             if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
