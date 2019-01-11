@@ -79,6 +79,11 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
     }
 
     @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        return pProfitFactorMapper.profitCount(param);
+    }
+
+    @Override
     public int insertImportData(PProfitFactor pProfitFactor) {
         return pProfitFactorMapper.insertSelective(pProfitFactor);
     }

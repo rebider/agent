@@ -309,6 +309,11 @@
     <include refid="PAGING_END" />
   </select>
 
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(SUPPLY_AMT) as totalMoney from P_PROFIT_SUPPLY
+    <include refid="BASE_WHERE_SQL"></include>
+  </select>
+
   <select id="getProfitSupplyCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM P_PROFIT_SUPPLY

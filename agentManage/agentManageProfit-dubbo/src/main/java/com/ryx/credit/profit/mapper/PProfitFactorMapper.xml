@@ -380,6 +380,22 @@
     <include refid="PAGING_END" />
   </select>
 
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select  count(1) as totalNum,sum(BUCKLE_AMT) as totalMoney
+    FROM P_PROFIT_FACTOR
+    where 1=1
+    <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+    <if test="AGENT_PID != null and AGENT_PID != ''">AND AGENT_PID = #{AGENT_PID}</if>
+    <choose>
+      <when test="DATESTART !=null and DATESTART != '' and DATEEND !=null and DATEEND != ''">
+        and FACTOR_MONTH between #{DATESTART} and #{DATEEND}
+      </when>
+      <otherwise>
+        <if test="DATESTART != null and DATESTART !='' "> and FACTOR_MONTH = #{DATESTART} </if>
+      </otherwise>
+    </choose>
+  </select>
+
   <sql id="BASE_WHERE_SQL_TWO">
     <where>
       <trim prefixOverrides="and">

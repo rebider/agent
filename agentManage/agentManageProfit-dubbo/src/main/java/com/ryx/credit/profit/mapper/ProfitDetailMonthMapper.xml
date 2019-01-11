@@ -1229,6 +1229,16 @@
     </where>
   </sql>
 
+  <sql id="countWhere">
+    <where>
+      1=1
+      <if test="agentId != null and agentId !=''">and AGENT_ID = #{agentId}</if>
+      <if test="agentName != null and agentName !=''">and AGENT_NAME = #{agentName}</if>
+      <if test="profitDateStart != null and profitDateStart != ''">and PROFIT_DATE &gt;= #{profitDateStart}</if>
+      <if test="profitDateEnd != null and profitDateEnd != ''">and PROFIT_DATE &lt;= #{profitDateEnd}</if>
+    </where>
+  </sql>
+
   <select id="selectListByParams" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     <include refid="Base_Column_List" />
@@ -1289,4 +1299,50 @@
       <![CDATA[ ) row_ ) where rownum_ > #{start} and rownum_ <= #{end} ]]>
   </select>
 
+
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(REAL_PROFIT_AMT) as totalMoney from P_PROFIT_DETAIL_M
+    <include refid="countWhere"/>
+  </select>
+
+  <select id="profitCountWithSubordinate" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(REAL_PROFIT_AMT) as totalMoney from
+    (
+      select cc.* from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
+      ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
+      ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,ppd.REAL_PROFIT_AMT,
+      ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
+      ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
+      ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
+      nvl((ppd.pos_td_supply_amt+ppd.mpos_td_supply_amt+ppd.tools_return_amt+ppd.other_supply_amt),0) as profitSupplySum,
+      ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,
+      nvl((ppd.pos_td_real_deduction_amt
+      +ppd.mpos_td_real_deduction_amt
+      +ppd.znpos_profit_amt
+      +ppd.other_deduction_amt
+      +(ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt)),0) as
+      profitChargeSum,
+      ppd.pos_td_real_deduction_amt, ppd.mpos_td_real_deduction_amt,
+      nvl((ppd.pos_kh_deduction_amt+ppd.mpos_kh_deduction_amt+ppd.pos_reward_deduction_amt),0) as khDeductionAmt,
+      ppd.znpos_profit_amt,
+      nvl((ppd.rhb_dg_real_deduction_amt+ppd.pos_dg_real_deduction_amt+ppd.zpos_td_real_deduction_amt),0) as
+      toolshargeAmt,
+      ppd.other_deduction_amt,
+      ppd.BASICS_PROFIT_AMT as sssxqyffrhz,
+      nvl((ppd.deduction_tax_month_amt+ppd.deduction_tax_month_ago_amt),0) as taxPayDeduct,
+      ppd.supply_tax_amt,
+      ppd.account_name, ppd.status
+      from P_PROFIT_DETAIL_M ppd
+      order by ppd.profit_date desc) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
+      START WITH
+      1=1
+      <if test="agentId != null and agentId !=''">and bb.agent_id = #{agentId}</if>
+      <if test="agentName != null and agentName !=''">and bb.agent_name = #{agentName}</if>
+      <if test="profitDateStart != null and profitDateStart != ''">and bb.PROFIT_DATE &gt;= #{profitDateStart}</if>
+      <if test="profitDateEnd != null and profitDateEnd != ''">and bb.PROFIT_DATE &lt;= #{profitDateEnd}</if>
+      CONNECT BY PRIOR bb.agent_id = bb.PARENT_AGENT_ID) cc where 1=1
+      <if test="profitDateStart != null and profitDateStart != ''">and cc.PROFIT_DATE &gt;= #{profitDateStart}</if>
+      <if test="profitDateEnd != null and profitDateEnd != ''">and cc.PROFIT_DATE &lt;= #{profitDateEnd}</if>
+    )
+  </select>
 </mapper>

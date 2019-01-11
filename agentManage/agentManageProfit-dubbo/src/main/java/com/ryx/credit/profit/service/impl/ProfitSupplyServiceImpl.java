@@ -200,4 +200,10 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         return list;
     }
 
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        Map<String,Object> map=pProfitSupplyMapper.profitCount(param);
+        return map;
+    }
+
 }

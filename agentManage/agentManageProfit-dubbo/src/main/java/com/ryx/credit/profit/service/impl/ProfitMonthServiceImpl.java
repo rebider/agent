@@ -1059,6 +1059,18 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
+    public Map<String,Object> profitCount(Map<String, Object> param) {
+        String checkbox=param.get("checkbox").toString();
+        Map<String,Object> map=null;
+        if("1".equals(checkbox)){
+            map=profitDetailMonthMapper.profitCountWithSubordinate(param);
+        }else{
+            map=profitDetailMonthMapper.profitCount(param);
+        }
+        return map;
+    }
+
+    @Override
     public ProfitDetailMonth getByAgentId(String agentId) {
         return profitDetailMonthMapper.selectByAgentId(agentId);
     }

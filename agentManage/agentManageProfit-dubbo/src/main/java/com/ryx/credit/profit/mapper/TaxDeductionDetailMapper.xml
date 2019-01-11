@@ -116,7 +116,30 @@
       CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
     )
   </select>
-
+  <select id="profitCount" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultType="java.util.Map">
+    select count(1) as totalNum,sum(REAL_TAX_AMT) as totalMoney
+    from P_TAX_DEDUCTION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <!--连带下级统计-->
+  <select id="profitCountWithSubordinate" parameterType="java.util.Map" resultType="java.util.Map">
+    select  count(1) as totalNum,sum(REAL_TAX_AMT) as totalMoney from (
+    select
+    distinct
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    START WITH PROFIT_MONTH=#{profitMonth}
+    <if test="agentId!=null and agentId!=''">
+      AND AGENT_ID=#{agentId}
+    </if>
+    <if test="agentName!=null and agentName!=''">
+      AND AGENT_NAME=#{agentName}
+    </if>
+    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
+    )
+  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
