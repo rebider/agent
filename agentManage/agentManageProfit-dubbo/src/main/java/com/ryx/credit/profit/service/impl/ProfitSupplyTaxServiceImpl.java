@@ -125,7 +125,7 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         computedAgentIds.clear();
 
         logger.info("======={}补税点计算开始======", profitMonth);
-        //profitSupplyTaxMapper.deleteByMonth(profitMonth);
+        profitSupplyTaxMapper.deleteByMonth(profitMonth);
 
         logger.info("直签开票代理商无需补税点计算");
 
@@ -165,7 +165,14 @@ public class ProfitSupplyTaxServiceImpl implements ProfitSupplyTaxService {
         ProfitDirect dirct = new ProfitDirect();
         dirct.setFristAgentPid(parentBusNum);
         dirct.setTransMonth(profitMonth);
-        BigDecimal shouldProfitAmt = directMapper.selectSumTaxAmt(dirct);//下级应发分润汇总
+
+        BigDecimal shouldProfitAmt = BigDecimal.ZERO;
+        if(type==1){
+            shouldProfitAmt = directMapper.selectSumTaxAmt(dirct);
+        }else if(type==2){
+            shouldProfitAmt = directMapper.selectSumTaxAmt2(dirct);
+        }
+
         if (shouldProfitAmt == null || shouldProfitAmt.compareTo(BigDecimal.ZERO) <= 0) {
             logger.info("无下级分润代理商，不计算");
             return;

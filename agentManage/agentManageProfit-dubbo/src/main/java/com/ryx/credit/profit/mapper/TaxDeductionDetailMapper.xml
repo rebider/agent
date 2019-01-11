@@ -532,7 +532,7 @@
 
     left join A_AGENT g on a.PARENT_AGENT_ID = g.ID
 
-    where a.PROFIT_DATE = '${profitMonth}'
+    where a.PROFIT_DATE = '${profitMonth}' and  a.PAY_COMPANY != 'Q000029564'
   </select>
 
   <!--直发扣税代理商查询-->

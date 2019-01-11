@@ -125,6 +125,8 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 String agentName = map.get("AGENT_NAME") == null ? "" : (String) map.get("AGENT_NAME");
                 String parentAgentId = map.get("PARENT_AGENT_ID") == null ? "" : (String) map.get("PARENT_AGENT_ID");
                 String parentAgentName = map.get("PARENT_AGENT_NAME") == null ? "" : (String) map.get("PARENT_AGENT_NAME");
+                String firstAgentId = map.get("FRIST_AGENT_ID") == null ? "" : (String) map.get("FRIST_AGENT_ID");
+                String firstAgentName = map.get("FRIST_AGENT_NAME") == null ? "" : (String) map.get("FRIST_AGENT_NAME");
                 logger.info("直发代理商计算扣税,{}，{}", agentId, parentAgentId);
                 BigDecimal payDailyAmt = (BigDecimal) map.get("PAY_DAILY_AMT");  //打款成功日分润
                 BigDecimal tranDailyAmt = (BigDecimal) map.get("TRAN_DAILY_AMT"); //交易日分润汇总
@@ -137,11 +139,14 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 BigDecimal tax = (BigDecimal) map.get("TAX");   //税率
                 BigDecimal adjustAmt = (BigDecimal) map.get("ADJUST_AMT");   //调整金额
                 String busPlatform = (String) map.get("BUS_PLATFORM");
+
                 //扣税明细
                 TaxDeductionDetail taxDeductionDetail = new TaxDeductionDetail();
                 taxDeductionDetail.setId(idService.genId(TabId.P_TAX_DEDUCTION_DETAIL));
                 taxDeductionDetail.setAgentId(agentId);
                 taxDeductionDetail.setAgentName(agentName);
+                taxDeductionDetail.setFristAgentId(firstAgentId);
+                taxDeductionDetail.setFristAgentName(firstAgentName);
                 taxDeductionDetail.setProfitMonth(profitMonth);
                 taxDeductionDetail.setAgentPid("");
                 taxDeductionDetail.setParentAgentId(parentAgentId);
@@ -149,7 +154,7 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 taxDeductionDetail.setPreLdAmt(preTaxBase);
                 taxDeductionDetail.setDayProfitAmt(payDailyAmt);//已打款日分润
                 taxDeductionDetail.setDayBackAmt(BigDecimal.ZERO);
-                taxDeductionDetail.setBasicProfitAmt(profitAmt.subtract(tranDailyAmt).add(supplyAmt).subtract(buckleAmt).subtract(parentBuckle));//涉税前月分润=月份润-交易日期的日分润 +退单补款-退单扣款
+                taxDeductionDetail.setBasicProfitAmt(profitAmt.add(supplyAmt).subtract(buckleAmt).subtract(parentBuckle));//涉税前月分润=月份润 +退单补款-退单扣款
                 taxDeductionDetail.setBlAmt(BigDecimal.ZERO);
                 taxDeductionDetail.setMerchanOrderAmt(BigDecimal.ZERO);
                 taxDeductionDetail.setAgentDfAmt(BigDecimal.ZERO);
@@ -185,7 +190,7 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 .add(tdd.getAdjustAmt());
         tdd.setTaxBase(taxBase);
 
-        //本月扣税基数小于等于0时，表示代理商给1我司款项多，不进行扣税计算，基数留底到下月
+        //本月扣税基数小于等于0时，表示代理商给我司款项多，不进行扣税计算，基数留底到下月
         if (taxBase.compareTo(BigDecimal.ZERO) > 0) {
             //本月新增扣税
             BigDecimal addTaxAmt = taxBase.multiply(tdd.getTaxRate());
@@ -250,7 +255,7 @@ public class TaxDeductionServiceImpl implements ITaxDeductionService {
                 .add(tdd.getAdjustAmt());
         tdd.setTaxBase(taxBase);
 
-        //本月扣税基数小于等于0时，表示代理商给1我司款项多，不进行扣税计算，基数留底到下月
+        //本月扣税基数小于等于0时，表示代理商给我司款项多，不进行扣税计算，基数留底到下月
         if (taxBase.compareTo(BigDecimal.ZERO) > 0) {
             //本月新增扣税
             BigDecimal addTaxAmt = taxBase.multiply(tdd.getTaxRate());
