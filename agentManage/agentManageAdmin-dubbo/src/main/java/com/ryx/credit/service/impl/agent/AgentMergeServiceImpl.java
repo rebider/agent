@@ -378,14 +378,15 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 if(StringUtils.isBlank(agentMerge.getSuppAgentName())){
                     throw new MessageException("补缴类型为代理商代扣,代理商名称必填");
                 }
-            }
-            if(agentMerge.getSuppType().compareTo(mergeSuppType.XXDK.getValue())==0){
+            }else if(agentMerge.getSuppType().compareTo(mergeSuppType.XXDK.getValue())==0){
                 if(oCashReceivables==null){
                     throw new MessageException("补缴类型为线下补款,请填写打款记录");
                 }
                 if(oCashReceivables.size()==0){
                     throw new MessageException("补缴类型为线下补款,请填写打款记录");
                 }
+            }else{
+                throw new MessageException("请选择补缴类型");
             }
         }
 
@@ -519,6 +520,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if (null == startPar) {
             throw new ProcessException("启动部门参数为空！");
         }
+        AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTMERGE,id,cUser);
+        if(!agentResult.isOK()){
+            logger.info("代理商合并更新打款信息失败");
+            throw new MessageException("代理商合并更新打款信息失败");
+        }
         //启动审批流
         String proceId = activityService.createDeloyFlow(null, "mergeCity1.0", null, null, startPar);
         if (proceId == null) {
@@ -565,11 +571,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
                 Map<String, Object> map = orgCodeRes.get(0);
                 Object orgCode = map.get("ORGANIZATIONCODE");
+                //于华审批
                 if (String.valueOf(orgCode).equals("manage")) {
                     AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busId);
                     agentMerge.setMergeType(agentVo.getMergeType());
                     if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                         throw new MessageException("合并类型更新失败！");
+                    }
+                }
+                //财务审批
+                if (String.valueOf(orgCode).equals("finance")) {
+                    AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.AGENTMERGE,busId,userId,new Date(),agentVo.getoCashReceivablesVoList());
+                    if(!cashAgentResult.isOK()){
+                        throw new ProcessException("更新收款信息失败");
                     }
                 }
             }
@@ -713,6 +727,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                 throw new MessageException("更新合并数据失败！");
             }
+
+            //打款记录
+            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,agentMerge.getSubAgentId(),CashPayType.AGENTMERGE,agentMerge.getId());
+            if(!agentResult.isOK()){
+                logger.info("代理商合并保存打款记录失败1");
+                throw new ProcessException("保存打款记录失败");
+            }
+
             AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
             AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
             criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -721,7 +743,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
                 agentMergeBusInfo.setStatus(Status.STATUS_0.status);
                 int i = agentMergeBusInfoMapper.updateByPrimaryKeySelective(agentMergeBusInfo);
-                if (1 != 1) {
+                if (i != 1) {
                     logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                     throw new MessageException("更新合并数据失败！");
                 }
@@ -772,6 +794,16 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(i!=1){
             logger.info("审批任务结束{}{}，代理商合并更新失败1", proIns, agStatus);
             throw new MessageException("代理商合并更新失败");
+        }
+        AgentResult agentResult = AgentResult.fail();
+        if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+            agentResult = cashReceivablesService.refuseProcing(CashPayType.AGENTMERGE,agentMerge.getId(),agentMerge.getcUser());
+        }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            agentResult = cashReceivablesService.finishProcing(CashPayType.AGENTMERGE,agentMerge.getId(),agentMerge.getcUser());
+        }
+        if(!agentResult.isOK()){
+            throw new ProcessException("更新打款记录失败");
         }
 
         AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
