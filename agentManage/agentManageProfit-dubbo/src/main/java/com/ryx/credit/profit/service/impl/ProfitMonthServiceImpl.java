@@ -88,6 +88,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitSupplyMapper profitSupplyMapper;
     @Resource
     IOwnInvoiceService ownInvoiceService;
+    @Resource
+    ProfitFactorService profitFactorService;
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -699,8 +701,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         sumAmt = doKhDuction(profitDetailMonthTemp, sumAmt, computType);
 
         //保理扣款-
-        profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentId(), null));
-        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
+        //profitDetailMonthTemp.setBuDeductionAmt(profitComputerService.total_factor(profitDetailMonthTemp.getAgentId(), null));
+        //sumAmt = sumAmt.subtract(profitDetailMonthTemp.getBuDeductionAmt());
+        sumAmt = doBLDuction(profitDetailMonthTemp, sumAmt, computType);
 
         //其他扣款-
         param.put("profitAmt", sumAmt);
@@ -723,6 +726,28 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
         long updateend = System.currentTimeMillis();
         //System.out.println("修改处理时间" + (updateend - updatestart));
+        return sumAmt;
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 保理扣款计算
+     * @Date: 16:53 2019/1/14
+     */
+    private BigDecimal doBLDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType) {
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0, 7).replace("-", "");
+        Map<String, Object> param = new HashMap<>();
+        param.put("profitAmt", sumAmt);
+        param.put("computeType", computType);
+        param.put("agentId", profitDetailMonthTemp.getAgentId());
+        param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
+        param.put("factorMonth", deductionDate);
+        param.put("deductionStatus", "0");
+
+        // 保理扣款实扣
+        BigDecimal realDeductionAMt = profitFactorService.blDeduction(param);
+        profitDetailMonthTemp.setPosRewardDeductionAmt(realDeductionAMt);
+        sumAmt = sumAmt.subtract(realDeductionAMt);
         return sumAmt;
     }
 

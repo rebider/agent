@@ -11,8 +11,6 @@ import org.apache.ibatis.annotations.Param;
 public interface PProfitFactorMapper {
     long countByExample(PProfitFactorExample example);
 
-    BigDecimal getSumFactor(PProfitFactor record);
-
     int deleteByExample(PProfitFactorExample example);
 
     int insert(PProfitFactor record);
@@ -32,6 +30,8 @@ public interface PProfitFactorMapper {
     int updateByPrimaryKey(PProfitFactor record);
 
 
+    BigDecimal getSumFactor(PProfitFactor record);
+
     List<Map<String,Object>> getProfitFactorList(Map <String, Object> param);
 
     Long getProfitFactorCount(Map <String, Object> param);
@@ -41,4 +41,6 @@ public interface PProfitFactorMapper {
     int resetDataFactor(String date);
 
     Map<String, Object> profitCount(Map<String, Object> param);
+
+    List<PProfitFactor> selectBlDeductListByParams(Map<String,Object> param);
 }

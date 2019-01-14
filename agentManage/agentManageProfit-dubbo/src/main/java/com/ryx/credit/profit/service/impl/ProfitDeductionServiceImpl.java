@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.profit.dao.PProfitFactorMapper;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
@@ -68,6 +69,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Autowired
     private ProfitSettleErrLsService profitSettleErrLsServiceImpl;
+    @Autowired
+    PProfitFactorMapper pProfitFactorMapper;
 
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
@@ -873,5 +876,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         return BigDecimal.ZERO;
     }
+
+
 
 }

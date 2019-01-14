@@ -181,7 +181,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return totalFactor;
     }
 
-    @Override
+    /*@Override
     public BigDecimal new_total_factor(String agentId,String parentId,String month) {
         if(null==month || "".equals(month)){
             month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
@@ -197,7 +197,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
         logger.info(agentId+"在【"+month+"】商业保理扣款共计："+totalFactor);
         return totalFactor;
-    }
+    }*/
 
     @Override
     public BigDecimal total_supply(String agentPid,String month) {

@@ -1,7 +1,6 @@
 package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -418,6 +417,146 @@ public class PProfitFactorExample {
             return (Criteria) this;
         }
 
+        public Criteria andParentAgentIdIsNull() {
+            addCriterion("PARENT_AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdIsNotNull() {
+            addCriterion("PARENT_AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID =", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID <>", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdGreaterThan(String value) {
+            addCriterion("PARENT_AGENT_ID >", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID >=", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdLessThan(String value) {
+            addCriterion("PARENT_AGENT_ID <", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_ID <=", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdLike(String value) {
+            addCriterion("PARENT_AGENT_ID like", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotLike(String value) {
+            addCriterion("PARENT_AGENT_ID not like", value, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdIn(List<String> values) {
+            addCriterion("PARENT_AGENT_ID in", values, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotIn(List<String> values) {
+            addCriterion("PARENT_AGENT_ID not in", values, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_ID between", value1, value2, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentIdNotBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_ID not between", value1, value2, "parentAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNull() {
+            addCriterion("PARENT_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNotNull() {
+            addCriterion("PARENT_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME =", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <>", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThan(String value) {
+            addCriterion("PARENT_AGENT_NAME >", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME >=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThan(String value) {
+            addCriterion("PARENT_AGENT_NAME <", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLike(String value) {
+            addCriterion("PARENT_AGENT_NAME like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotLike(String value) {
+            addCriterion("PARENT_AGENT_NAME not like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME not in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME not between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
         public Criteria andFactorMonthIsNull() {
             addCriterion("FACTOR_MONTH is null");
             return (Criteria) this;
@@ -668,6 +807,436 @@ public class PProfitFactorExample {
             return (Criteria) this;
         }
 
+        public Criteria andSumDeductionAmtIsNull() {
+            addCriterion("SUM_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtIsNotNull() {
+            addCriterion("SUM_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("SUM_DEDUCTION_AMT =", value, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("SUM_DEDUCTION_AMT <>", value, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("SUM_DEDUCTION_AMT >", value, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUM_DEDUCTION_AMT >=", value, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("SUM_DEDUCTION_AMT <", value, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUM_DEDUCTION_AMT <=", value, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("SUM_DEDUCTION_AMT in", values, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("SUM_DEDUCTION_AMT not in", values, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUM_DEDUCTION_AMT between", value1, value2, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andSumDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUM_DEDUCTION_AMT not between", value1, value2, "sumDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtIsNull() {
+            addCriterion("ADD_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtIsNotNull() {
+            addCriterion("ADD_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("ADD_DEDUCTION_AMT =", value, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("ADD_DEDUCTION_AMT <>", value, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("ADD_DEDUCTION_AMT >", value, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ADD_DEDUCTION_AMT >=", value, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("ADD_DEDUCTION_AMT <", value, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ADD_DEDUCTION_AMT <=", value, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("ADD_DEDUCTION_AMT in", values, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("ADD_DEDUCTION_AMT not in", values, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ADD_DEDUCTION_AMT between", value1, value2, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andAddDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ADD_DEDUCTION_AMT not between", value1, value2, "addDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtIsNull() {
+            addCriterion("MUST_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtIsNotNull() {
+            addCriterion("MUST_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("MUST_DEDUCTION_AMT =", value, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("MUST_DEDUCTION_AMT <>", value, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("MUST_DEDUCTION_AMT >", value, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("MUST_DEDUCTION_AMT >=", value, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("MUST_DEDUCTION_AMT <", value, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("MUST_DEDUCTION_AMT <=", value, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("MUST_DEDUCTION_AMT in", values, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("MUST_DEDUCTION_AMT not in", values, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MUST_DEDUCTION_AMT between", value1, value2, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MUST_DEDUCTION_AMT not between", value1, value2, "mustDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtIsNull() {
+            addCriterion("ACTUAL_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtIsNotNull() {
+            addCriterion("ACTUAL_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_DEDUCTION_AMT =", value, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_DEDUCTION_AMT <>", value, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("ACTUAL_DEDUCTION_AMT >", value, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_DEDUCTION_AMT >=", value, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("ACTUAL_DEDUCTION_AMT <", value, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ACTUAL_DEDUCTION_AMT <=", value, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("ACTUAL_DEDUCTION_AMT in", values, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("ACTUAL_DEDUCTION_AMT not in", values, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTUAL_DEDUCTION_AMT between", value1, value2, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andActualDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ACTUAL_DEDUCTION_AMT not between", value1, value2, "actualDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtIsNull() {
+            addCriterion("NOT_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtIsNotNull() {
+            addCriterion("NOT_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("NOT_DEDUCTION_AMT =", value, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("NOT_DEDUCTION_AMT <>", value, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("NOT_DEDUCTION_AMT >", value, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("NOT_DEDUCTION_AMT >=", value, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("NOT_DEDUCTION_AMT <", value, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("NOT_DEDUCTION_AMT <=", value, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("NOT_DEDUCTION_AMT in", values, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("NOT_DEDUCTION_AMT not in", values, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NOT_DEDUCTION_AMT between", value1, value2, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andNotDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("NOT_DEDUCTION_AMT not between", value1, value2, "notDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtIsNull() {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtIsNotNull() {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT =", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtNotEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT <>", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtGreaterThan(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT >", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT >=", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtLessThan(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT <", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT <=", value, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtIn(List<BigDecimal> values) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT in", values, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtNotIn(List<BigDecimal> values) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT not in", values, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT between", value1, value2, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpperNotDeductionAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("UPPER_NOT_DEDUCTION_AMT not between", value1, value2, "upperNotDeductionAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusIsNull() {
+            addCriterion("DEDUCTION_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusIsNotNull() {
+            addCriterion("DEDUCTION_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS =", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusNotEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS <>", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusGreaterThan(String value) {
+            addCriterion("DEDUCTION_STATUS >", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS >=", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusLessThan(String value) {
+            addCriterion("DEDUCTION_STATUS <", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusLessThanOrEqualTo(String value) {
+            addCriterion("DEDUCTION_STATUS <=", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusLike(String value) {
+            addCriterion("DEDUCTION_STATUS like", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusNotLike(String value) {
+            addCriterion("DEDUCTION_STATUS not like", value, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusIn(List<String> values) {
+            addCriterion("DEDUCTION_STATUS in", values, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusNotIn(List<String> values) {
+            addCriterion("DEDUCTION_STATUS not in", values, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusBetween(String value1, String value2) {
+            addCriterion("DEDUCTION_STATUS between", value1, value2, "deductionStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andDeductionStatusNotBetween(String value1, String value2) {
+            addCriterion("DEDUCTION_STATUS not between", value1, value2, "deductionStatus");
+            return (Criteria) this;
+        }
+
         public Criteria andRemarkIsNull() {
             addCriterion("REMARK is null");
             return (Criteria) this;
@@ -738,6 +1307,66 @@ public class PProfitFactorExample {
             return (Criteria) this;
         }
 
+        public Criteria andUpdateDateIsNull() {
+            addCriterion("UPDATE_DATE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateIsNotNull() {
+            addCriterion("UPDATE_DATE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateEqualTo(Date value) {
+            addCriterion("UPDATE_DATE =", value, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateNotEqualTo(Date value) {
+            addCriterion("UPDATE_DATE <>", value, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateGreaterThan(Date value) {
+            addCriterion("UPDATE_DATE >", value, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateGreaterThanOrEqualTo(Date value) {
+            addCriterion("UPDATE_DATE >=", value, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateLessThan(Date value) {
+            addCriterion("UPDATE_DATE <", value, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateLessThanOrEqualTo(Date value) {
+            addCriterion("UPDATE_DATE <=", value, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateIn(List<Date> values) {
+            addCriterion("UPDATE_DATE in", values, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateNotIn(List<Date> values) {
+            addCriterion("UPDATE_DATE not in", values, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateBetween(Date value1, Date value2) {
+            addCriterion("UPDATE_DATE between", value1, value2, "updateDate");
+            return (Criteria) this;
+        }
+
+        public Criteria andUpdateDateNotBetween(Date value1, Date value2) {
+            addCriterion("UPDATE_DATE not between", value1, value2, "updateDate");
+            return (Criteria) this;
+        }
+
         public Criteria andFactorDateIsNull() {
             addCriterion("FACTOR_DATE is null");
             return (Criteria) this;
@@ -778,16 +1407,6 @@ public class PProfitFactorExample {
             return (Criteria) this;
         }
 
-        public Criteria andFactorDateLike(Date value) {
-            addCriterion("FACTOR_DATE like", value, "factorDate");
-            return (Criteria) this;
-        }
-
-        public Criteria andFactorDateNotLike(Date value) {
-            addCriterion("FACTOR_DATE not like", value, "factorDate");
-            return (Criteria) this;
-        }
-
         public Criteria andFactorDateIn(List<Date> values) {
             addCriterion("FACTOR_DATE in", values, "factorDate");
             return (Criteria) this;
@@ -808,143 +1427,213 @@ public class PProfitFactorExample {
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdIsNull() {
-            addCriterion("PARENT_AGENT_ID is null");
+        public Criteria andStagingStatusIsNull() {
+            addCriterion("STAGING_STATUS is null");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdIsNotNull() {
-            addCriterion("PARENT_AGENT_ID is not null");
+        public Criteria andStagingStatusIsNotNull() {
+            addCriterion("STAGING_STATUS is not null");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdEqualTo(String value) {
-            addCriterion("PARENT_AGENT_ID =", value, "parentAgentId");
+        public Criteria andStagingStatusEqualTo(String value) {
+            addCriterion("STAGING_STATUS =", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdNotEqualTo(String value) {
-            addCriterion("PARENT_AGENT_ID <>", value, "parentAgentId");
+        public Criteria andStagingStatusNotEqualTo(String value) {
+            addCriterion("STAGING_STATUS <>", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdGreaterThan(String value) {
-            addCriterion("PARENT_AGENT_ID >", value, "parentAgentId");
+        public Criteria andStagingStatusGreaterThan(String value) {
+            addCriterion("STAGING_STATUS >", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdGreaterThanOrEqualTo(String value) {
-            addCriterion("PARENT_AGENT_ID >=", value, "parentAgentId");
+        public Criteria andStagingStatusGreaterThanOrEqualTo(String value) {
+            addCriterion("STAGING_STATUS >=", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdLessThan(String value) {
-            addCriterion("PARENT_AGENT_ID <", value, "parentAgentId");
+        public Criteria andStagingStatusLessThan(String value) {
+            addCriterion("STAGING_STATUS <", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdLessThanOrEqualTo(String value) {
-            addCriterion("PARENT_AGENT_ID <=", value, "parentAgentId");
+        public Criteria andStagingStatusLessThanOrEqualTo(String value) {
+            addCriterion("STAGING_STATUS <=", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdLike(String value) {
-            addCriterion("PARENT_AGENT_ID like", value, "parentAgentId");
+        public Criteria andStagingStatusLike(String value) {
+            addCriterion("STAGING_STATUS like", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdNotLike(String value) {
-            addCriterion("PARENT_AGENT_ID not like", value, "parentAgentId");
+        public Criteria andStagingStatusNotLike(String value) {
+            addCriterion("STAGING_STATUS not like", value, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdIn(List<String> values) {
-            addCriterion("PARENT_AGENT_ID in", values, "parentAgentId");
+        public Criteria andStagingStatusIn(List<String> values) {
+            addCriterion("STAGING_STATUS in", values, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdNotIn(List<String> values) {
-            addCriterion("PARENT_AGENT_ID not in", values, "parentAgentId");
+        public Criteria andStagingStatusNotIn(List<String> values) {
+            addCriterion("STAGING_STATUS not in", values, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdBetween(String value1, String value2) {
-            addCriterion("PARENT_AGENT_ID between", value1, value2, "parentAgentId");
+        public Criteria andStagingStatusBetween(String value1, String value2) {
+            addCriterion("STAGING_STATUS between", value1, value2, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentIdNotBetween(String value1, String value2) {
-            addCriterion("PARENT_AGENT_ID not between", value1, value2, "parentAgentId");
+        public Criteria andStagingStatusNotBetween(String value1, String value2) {
+            addCriterion("STAGING_STATUS not between", value1, value2, "stagingStatus");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameIsNull() {
-            addCriterion("PARENT_AGENT_NAME is null");
+        public Criteria andDeductionDescIsNull() {
+            addCriterion("DEDUCTION_DESC is null");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameIsNotNull() {
-            addCriterion("PARENT_AGENT_NAME is not null");
+        public Criteria andDeductionDescIsNotNull() {
+            addCriterion("DEDUCTION_DESC is not null");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameEqualTo(String value) {
-            addCriterion("PARENT_AGENT_NAME =", value, "parentAgentName");
+        public Criteria andDeductionDescEqualTo(String value) {
+            addCriterion("DEDUCTION_DESC =", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameNotEqualTo(String value) {
-            addCriterion("PARENT_AGENT_NAME <>", value, "parentAgentName");
+        public Criteria andDeductionDescNotEqualTo(String value) {
+            addCriterion("DEDUCTION_DESC <>", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameGreaterThan(String value) {
-            addCriterion("PARENT_AGENT_NAME >", value, "parentAgentName");
+        public Criteria andDeductionDescGreaterThan(String value) {
+            addCriterion("DEDUCTION_DESC >", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameGreaterThanOrEqualTo(String value) {
-            addCriterion("PARENT_AGENT_NAME >=", value, "parentAgentName");
+        public Criteria andDeductionDescGreaterThanOrEqualTo(String value) {
+            addCriterion("DEDUCTION_DESC >=", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameLessThan(String value) {
-            addCriterion("PARENT_AGENT_NAME <", value, "parentAgentName");
+        public Criteria andDeductionDescLessThan(String value) {
+            addCriterion("DEDUCTION_DESC <", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameLessThanOrEqualTo(String value) {
-            addCriterion("PARENT_AGENT_NAME <=", value, "parentAgentName");
+        public Criteria andDeductionDescLessThanOrEqualTo(String value) {
+            addCriterion("DEDUCTION_DESC <=", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameLike(String value) {
-            addCriterion("PARENT_AGENT_NAME like", value, "parentAgentName");
+        public Criteria andDeductionDescLike(String value) {
+            addCriterion("DEDUCTION_DESC like", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameNotLike(String value) {
-            addCriterion("PARENT_AGENT_NAME not like", value, "parentAgentName");
+        public Criteria andDeductionDescNotLike(String value) {
+            addCriterion("DEDUCTION_DESC not like", value, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameIn(List<String> values) {
-            addCriterion("PARENT_AGENT_NAME in", values, "parentAgentName");
+        public Criteria andDeductionDescIn(List<String> values) {
+            addCriterion("DEDUCTION_DESC in", values, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameNotIn(List<String> values) {
-            addCriterion("PARENT_AGENT_NAME not in", values, "parentAgentName");
+        public Criteria andDeductionDescNotIn(List<String> values) {
+            addCriterion("DEDUCTION_DESC not in", values, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameBetween(String value1, String value2) {
-            addCriterion("PARENT_AGENT_NAME between", value1, value2, "parentAgentName");
+        public Criteria andDeductionDescBetween(String value1, String value2) {
+            addCriterion("DEDUCTION_DESC between", value1, value2, "deductionDesc");
             return (Criteria) this;
         }
 
-        public Criteria andParentAgentNameNotBetween(String value1, String value2) {
-            addCriterion("PARENT_AGENT_NAME not between", value1, value2, "parentAgentName");
+        public Criteria andDeductionDescNotBetween(String value1, String value2) {
+            addCriterion("DEDUCTION_DESC not between", value1, value2, "deductionDesc");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdIsNull() {
+            addCriterion("NEXT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdIsNotNull() {
+            addCriterion("NEXT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdEqualTo(String value) {
+            addCriterion("NEXT_ID =", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdNotEqualTo(String value) {
+            addCriterion("NEXT_ID <>", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdGreaterThan(String value) {
+            addCriterion("NEXT_ID >", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdGreaterThanOrEqualTo(String value) {
+            addCriterion("NEXT_ID >=", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdLessThan(String value) {
+            addCriterion("NEXT_ID <", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdLessThanOrEqualTo(String value) {
+            addCriterion("NEXT_ID <=", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdLike(String value) {
+            addCriterion("NEXT_ID like", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdNotLike(String value) {
+            addCriterion("NEXT_ID not like", value, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdIn(List<String> values) {
+            addCriterion("NEXT_ID in", values, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdNotIn(List<String> values) {
+            addCriterion("NEXT_ID not in", values, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdBetween(String value1, String value2) {
+            addCriterion("NEXT_ID between", value1, value2, "nextId");
+            return (Criteria) this;
+        }
+
+        public Criteria andNextIdNotBetween(String value1, String value2) {
+            addCriterion("NEXT_ID not between", value1, value2, "nextId");
             return (Criteria) this;
         }
     }
