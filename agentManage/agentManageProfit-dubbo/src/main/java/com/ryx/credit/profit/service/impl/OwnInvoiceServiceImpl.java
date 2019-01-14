@@ -361,36 +361,35 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         String agentId = list.get(1).toString();
         String agentName = list.get(0).toString();
         BigDecimal amt = new BigDecimal(list.get(2).toString());
-        UUID uuid = UUID.randomUUID();
-        String str = uuid.toString().replace("-", "");
-        invoice.setId(str); //设置id
-        invoice.setAgentId(agentId);
-        invoice.setAgentName(agentName);
-        String agentPid = invoiceDetailMapper.getAgentPidByAgentId(agentId);//获取代理商唯一码
-        invoice.setAgentPid(agentPid);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");//将每次导入的欠票月份当设为当月
-        Date date = new Date();
-        String month = sdf.format(date);
-        invoice.setFactorMonth(month);
-        invoice.setInvoiceAmt(amt);
-        invoice.setStatus("1");
-        SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        invoice.setOptDate(ss.format(new Date()));
-        invoice.setOptUser(loginName);
-        boolean isHave = getInvoiceByInvoice(invoice);
-        if (isHave == false) {
-            //表示存在有效记录，将其设置为无效
-            invoiceMapper.setStatusToInvoice(invoice);
-        }
-        invoiceMapper.insertSelective(invoice);
         //获取系统当前时间
         Calendar curr = Calendar.getInstance();
         curr.setTime(new Date(System.currentTimeMillis()));
         curr.add(Calendar.MONTH, -1);
         SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyyMM");
         String profitMonth = simpleDateFormatMonth.format(curr.getTime());
-        invoice.setFactorMonth(profitMonth);
+        //设置id
+        UUID uuid = UUID.randomUUID();
+        String str = uuid.toString().replace("-", "");
 
+        invoice.setId(str); //设置id
+        invoice.setFactorMonth(profitMonth);
+        invoice.setAgentId(agentId);
+        invoice.setAgentName(agentName);
+        String agentPid = invoiceDetailMapper.getAgentPidByAgentId(agentId);//获取代理商唯一码
+        invoice.setAgentPid(agentPid);
+        invoice.setInvoiceAmt(amt);
+        invoice.setStatus("1");
+        SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        invoice.setOptDate(ss.format(new Date()));
+        invoice.setOptUser(loginName);
+
+        boolean isHave = getInvoiceByInvoice(invoice);
+        if (isHave == false) {
+            //表示存在有效记录，将其设置为无效
+            invoiceMapper.setStatusToInvoice(invoice);
+        }
+
+        invoiceMapper.insertSelective(invoice);//插入欠票表中
         ownInvoiceReComputer(invoice);//欠票导入或者重导后计算
     }
 
