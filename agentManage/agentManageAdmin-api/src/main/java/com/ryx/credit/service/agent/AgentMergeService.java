@@ -93,12 +93,31 @@ public interface AgentMergeService {
      * @return
      * @throws Exception
      */
-    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser)throws Exception;
+    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser) throws Exception;
 
 
     AgentResult updateAgentName(String busId,List<AgentMergeBusInfo> agentMergeBusInfos) throws Exception;
 
 
     void manualAgentMergeNotify(String busId,String platformCode) throws Exception;
+
+    /**
+     * 删除合并业务数据
+     * @param mergeId
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    AgentResult deleteAgentMerge(String mergeId, String cUser) throws Exception;
+
+    /**
+     * 合并业务明细列表
+     * @param agentMerge
+     * @param page
+     * @param dataRole
+     * @param userId
+     * @return
+     */
+    PageInfo selectMergeBusinfoList(AgentMergeBusInfo agentMergeBusInfo, Page page, String dataRole, Long userId);
 }
 

@@ -543,4 +543,35 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="selectMergeBusinfoList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    b.*, ma.ag_name as MAIN_AG_NAME, sa.ag_name as SUB_AG_NAME
+    from a_agent_merge_businfo b
+    left join a_agent ma on b.main_agent_id = ma.id
+    left join a_agent sa on b.sub_agent_id = sa.id
+    <include refid="mergeBusinfoListWhere" />
+    order by b.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="selectMergeBusinfoCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from a_agent_merge_businfo b
+    left join a_agent ma on b.main_agent_id = ma.id
+    left join a_agent sa on b.sub_agent_id = sa.id
+    <include refid="mergeBusinfoListWhere" />
+  </select>
+
+  <sql id="mergeBusinfoListWhere">
+    <where>
+      b.status = #{map.status} and ma.status = #{map.status}
+      <if test="map.agentMargeId != null and map.agent_marge_id != ''"> and b.agent_marge_id = #{map.agentMargeId} </if>
+      <if test="map.bsuId != null and map.bsuId != ''"> and b.bsu_id = #{map.bsuId} </if>
+      <if test="map.mainAgentId != null and map.orgId != ''"> and b.main_agent_id = #{map.mainAgentId} </if>
+      <if test="map.subAgentId != null and map.subAgentId != ''"> and m.sub_agent_id = #{map.subAgentId} </if>
+    </where>
+  </sql>
 </mapper>

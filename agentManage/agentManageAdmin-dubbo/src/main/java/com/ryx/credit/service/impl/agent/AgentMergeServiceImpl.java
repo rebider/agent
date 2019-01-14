@@ -10,7 +10,6 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
-import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
@@ -103,6 +102,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private ReceiptPlanMapper receiptPlanMapper;
     @Autowired
     private PlatFormService platFormService;
+    @Autowired
+    private IUserService iUserService;
 
 
     /**
@@ -520,22 +521,35 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public AgentResult approvalAgentMergeTask(AgentVo agentVo, String userId, String busId) throws Exception{
+    public AgentResult approvalAgentMergeTask(AgentVo agentVo, String userId, String busId) throws Exception {
         try {
-            if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
-
+            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+                if (null == orgCodeRes) {
+                    throw new ProcessException("部门参数为空！");
+                }
+                Map<String, Object> map = orgCodeRes.get(0);
+                Object orgCode = map.get("ORGANIZATIONCODE");
+                if (String.valueOf(orgCode).equals("manage")) {
+                    AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busId);
+                    agentMerge.setMergeType(agentVo.getMergeType());
+                    agentMergeMapper.updateByPrimaryKeySelective(agentMerge);
+                    if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
+                        throw new MessageException("合并类型更新失败！");
+                    }
+                }
             }
-            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo,userId);
-            if(!result.isOK()){
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
+            if (!result.isOK()) {
                 logger.error(result.getMsg());
                 throw new MessageException("工作流处理任务异常");
             }
-        }catch (MessageException e) {
+        } catch (MessageException e) {
             e.printStackTrace();
             throw new MessageException(e.getMsg());
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常!" );
+            throw new MessageException("catch工作流处理任务异常！" );
         }
         return AgentResult.ok();
     }
@@ -962,4 +976,71 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         updateAgentName(busId,agentMergeBusInfos);
     }
+
+    /**
+     * 删除合并业务数据
+     * @param mergeId
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult deleteAgentMerge(String mergeId, String cUser) throws Exception {
+        if (StringUtils.isBlank(mergeId)) {
+            throw new MessageException("数据ID为空！");
+        }
+        AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(mergeId);
+        agentMerge.setStatus(Status.STATUS_0.status);
+        agentMerge.setuTime(new Date());
+        agentMerge.setuUser(cUser);
+        if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
+            throw new MessageException("合并数据处理失败！");
+        }
+        AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
+        AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
+        criteria.andAgentMargeIdEqualTo(mergeId);
+        List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
+        for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
+            agentMergeBusInfo.setStatus(Status.STATUS_0.status);
+            agentMergeBusInfo.setcUtime(new Date());
+            agentMergeBusInfo.setcUser(cUser);
+            if (1 != agentMergeBusInfoMapper.updateByPrimaryKeySelective(agentMergeBusInfo)) {
+                throw new MessageException("合并业务数据处理失败！");
+            }
+        }
+        return AgentResult.ok();
+    }
+
+    /**
+     * 合并业务明细列表
+     * @param agentMergeBusInfo
+     * @param page
+     * @param dataRole
+     * @param userId
+     * @return
+     */
+    @Override
+    public PageInfo selectMergeBusinfoList(AgentMergeBusInfo agentMergeBusInfo, Page page, String dataRole, Long userId) {
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("status", Status.STATUS_1.status);
+        if (StringUtils.isNotBlank(agentMergeBusInfo.getAgentMargeId())) {
+            reqMap.put("agentMargeId", agentMergeBusInfo.getAgentMargeId());
+        }
+        if (StringUtils.isNotBlank(agentMergeBusInfo.getBusId())) {
+            reqMap.put("busId", agentMergeBusInfo.getBusId());
+        }
+        if (StringUtils.isNotBlank(agentMergeBusInfo.getMainAgentId())) {
+            reqMap.put("mainAgentId", agentMergeBusInfo.getMainAgentId());
+        }
+        if (StringUtils.isNotBlank(agentMergeBusInfo.getSubAgentId())) {
+            reqMap.put("subAgentId", agentMergeBusInfo.getSubAgentId());
+        }
+        List<Map<String,Object>> agentMergeList = agentMergeBusInfoMapper.selectMergeBusinfoList(reqMap, page);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(agentMergeList);
+        pageInfo.setTotal(agentMergeBusInfoMapper.selectMergeBusinfoCount(reqMap));
+        return pageInfo;
+    }
+
 }

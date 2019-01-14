@@ -78,6 +78,7 @@ public class AgentVo implements Serializable {
     private TerminalTransfer terminalTransfer;
     private String debt;  //欠款
     private String oweTicket;  //欠票
+    private BigDecimal mergeType;
 
     public OReturnOrder getoReturnOrder() {
         return oReturnOrder;
@@ -421,5 +422,13 @@ public class AgentVo implements Serializable {
 
     public void setOweTicket(String oweTicket) {
         this.oweTicket = oweTicket;
+    }
+
+    public BigDecimal getMergeType() {
+        return mergeType;
+    }
+
+    public void setMergeType(BigDecimal mergeType) {
+        this.mergeType = mergeType;
     }
 }
