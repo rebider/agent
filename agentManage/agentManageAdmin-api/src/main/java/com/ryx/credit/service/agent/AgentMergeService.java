@@ -5,7 +5,9 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.AgentMergeBusInfo;
+import com.ryx.credit.pojo.admin.order.OCashReceivables;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,7 +35,7 @@ public interface AgentMergeService {
      * @return
      * @throws Exception
      */
-    AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag) throws Exception;
+    AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag,List<OCashReceivablesVo> oCashReceivables) throws Exception;
 
     /**
      * 提交数据并审批
@@ -93,7 +95,7 @@ public interface AgentMergeService {
      * @return
      * @throws Exception
      */
-    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser) throws Exception;
+    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,List<OCashReceivablesVo> oCashReceivables)throws Exception;
 
 
     AgentResult updateAgentName(String busId,List<AgentMergeBusInfo> agentMergeBusInfos) throws Exception;

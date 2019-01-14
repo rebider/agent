@@ -15,6 +15,7 @@ import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -27,6 +28,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OCashReceivablesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +106,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private PlatFormService platFormService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private OCashReceivablesService cashReceivablesService;
+
 
 
     /**
@@ -147,7 +152,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag) throws Exception {
+    public AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag,List<OCashReceivablesVo> oCashReceivables) throws Exception {
         if (StringUtils.isBlank(cUser)) {
             logger.info("代理商合并提交，操作用户为空:{}", cUser);
             return AgentResult.fail("代理商合并提交，操作用户为空！");
@@ -155,8 +160,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         try {
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
             //mainAndSubMustHaveLower(agentMerge);
-            //合并中不能重复发起
-            verifyMergeing(agentMerge,busType);
+            //合并中不能重复发起,判断是否有欠票欠款情况
+            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
             //verifypprovaling(agentMerge.getSubAgentId());
 
@@ -184,6 +189,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if (1 != agentMergeMapper.insertSelective(agentMerge)) {
                 logger.info("代理商合并提交审批，新增数据失败:{}", cUser);
                 throw new MessageException("代理商合并提交审批，新增数据失败！");
+            }
+            //打款记录
+            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,agentMerge.getSubAgentId(),CashPayType.AGENTMERGE,mergeId);
+            if(!agentResult.isOK()){
+                logger.info("代理商合并保存打款记录失败1");
+                throw new ProcessException("保存打款记录失败");
             }
 
             //查看被合并代理商有没有合并过
@@ -339,9 +350,10 @@ public class AgentMergeServiceImpl implements AgentMergeService {
 
     /**
      * 合并中不能重复发起,检查合并的业务是否有效
+     * 判断是否有欠票欠款情况
      * @param agentMerge
      */
-    public void verifyMergeing(AgentMerge agentMerge,String[] busTypes)throws Exception{
+    public void verifyMergeing(AgentMerge agentMerge,String[] busTypes,List<OCashReceivablesVo> oCashReceivables)throws Exception{
         String mainAgentId = agentMerge.getMainAgentId();
         String subAgentId = agentMerge.getSubAgentId();
         AgentMergeExample agentMergeExample = new AgentMergeExample();
@@ -354,6 +366,29 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(agentMerges.size()!=0){
             throw new MessageException("合并中不能重复发起");
         }
+        //判断是否有欠票欠款情况
+        if(agentMerge.getSubAgentDebt().compareTo(new BigDecimal(0))==1 || agentMerge.getSubAgentOweTicket().compareTo(new BigDecimal(0))==1){
+            if(null==agentMerge.getSuppType()){
+                throw new MessageException("请选择补缴类型");
+            }
+            if(agentMerge.getSuppType().compareTo(mergeSuppType.DLSDK.getValue())==0){
+                if(StringUtils.isBlank(agentMerge.getSuppAgentId())){
+                    throw new MessageException("补缴类型为代理商代扣,代理商ID必填");
+                }
+                if(StringUtils.isBlank(agentMerge.getSuppAgentName())){
+                    throw new MessageException("补缴类型为代理商代扣,代理商名称必填");
+                }
+            }
+            if(agentMerge.getSuppType().compareTo(mergeSuppType.XXDK.getValue())==0){
+                if(oCashReceivables==null){
+                    throw new MessageException("补缴类型为线下补款,请填写打款记录");
+                }
+                if(oCashReceivables.size()==0){
+                    throw new MessageException("补缴类型为线下补款,请填写打款记录");
+                }
+            }
+        }
+
         for(int i=0;i<busTypes.length;i++){
             String busId = busTypes[i];
             AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
@@ -653,17 +688,18 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser) throws Exception {
+    public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,List<OCashReceivablesVo> oCashReceivables) throws Exception {
         if(StringUtils.isBlank(agentMerge.getId())){
             throw new MessageException("数据ID为空！");
         }
         try {
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
             //mainAndSubMustHaveLower(agentMerge);
-            //合并中不能重复发起
-            verifyMergeing(agentMerge,busType);
+            //合并中不能重复发起,判断是否有欠票欠款情况
+            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
             //verifypprovaling(agentMerge.getSubAgentId());
+
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
                 strBusType+=busType[i];
