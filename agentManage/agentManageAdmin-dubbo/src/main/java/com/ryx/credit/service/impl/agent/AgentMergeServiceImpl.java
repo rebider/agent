@@ -533,7 +533,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 if (String.valueOf(orgCode).equals("manage")) {
                     AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busId);
                     agentMerge.setMergeType(agentVo.getMergeType());
-                    agentMergeMapper.updateByPrimaryKeySelective(agentMerge);
                     if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                         throw new MessageException("合并类型更新失败！");
                     }
