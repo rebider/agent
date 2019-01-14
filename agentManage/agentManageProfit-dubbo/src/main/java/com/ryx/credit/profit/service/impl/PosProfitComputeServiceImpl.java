@@ -9,6 +9,7 @@ import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.jobs.ProfitAmtSumJob;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
     TransProfitDetailMapper transProfitDetailMapper;
     @Resource
     ProfitDeductionService profitDeductionService;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
 
     private static final String PLATFORM_CODE = "100003";
     /**
@@ -265,8 +268,10 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 }
                 LOG.info("考核代理商唯一码：{}，考核总扣款金额：{}", tempDetail.getPosAgentId(), deductAmt);
                 if (deductAmt.compareTo(BigDecimal.ZERO) != 0) {
-                    /*//记录扣款到其他扣款表中deduction_type=05
-                    ProfitDeduction profitDeduction = new ProfitDeduction();
+                    //记录扣款到其他扣款表中deduction_type=05
+                    /*ProfitDeduction profitDeduction = new ProfitDeduction();
+                    profitDeduction.setAgentId(previewRewardDetail.getPosAgentId());
+
                     profitDeduction.setParentAgentId(previewRewardDetail.getPosAgentId());
                     profitDeduction.setParentAgentPid(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
                     profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
