@@ -11,7 +11,8 @@ import java.util.Map;
 public enum mergeSuppType {
 
     XXDK(new BigDecimal("1"),"线下补款"),
-    DLSDK(new BigDecimal("2"),"代理商代扣");
+    DLSDK(new BigDecimal("2"),"代理商代扣"),
+    W(new BigDecimal("3"),"无");
 
 
     public BigDecimal key;
@@ -62,7 +63,9 @@ public enum mergeSuppType {
         Map<BigDecimal, String> hashMap = new LinkedHashMap<>();
         mergeSuppType[] busType = mergeSuppType.values();
         for(mergeSuppType bt : busType){
-            hashMap.put(bt.key,bt.msg);
+            if(bt.key.compareTo(mergeSuppType.W.getValue())!=0){
+                hashMap.put(bt.key,bt.msg);
+            }
         }
         return hashMap;
     }
