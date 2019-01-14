@@ -21,10 +21,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @Author Lihl
@@ -75,7 +73,11 @@ public class ProfitFactorServiceImpl implements ProfitFactorService{
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return pProfitFactorMapper.resetDataFactor();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        return pProfitFactorMapper.resetDataFactor(dateStr);
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -750,7 +751,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return profitDeductionMapper.resetDataDeduction(deductionType);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        return profitDeductionMapper.resetDataDeduction(deductionType,dateStr);
     }
 
     @Override

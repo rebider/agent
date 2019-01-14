@@ -38,7 +38,7 @@ public interface PProfitFactorMapper {
 
     PProfitFactor selectByData(PProfitFactor profitFactor);
 
-    int resetDataFactor();
+    int resetDataFactor(String date);
 
     Map<String, Object> profitCount(Map<String, Object> param);
 }
