@@ -27,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -94,7 +95,14 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
 
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())) {
-            criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+            if("04".equals(profitDeduction.getDeductionType())){//查询考核扣款
+                List<String> list = new ArrayList<String>();
+                list.add("04");
+                list.add("05");
+                criteria.andDeductionTypeIn(list);
+            }else{//查询其他扣款
+                criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+            }
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())) {
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
@@ -745,7 +753,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return profitDeductionMapper.resetDataDeduction(deductionType);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        return profitDeductionMapper.resetDataDeduction(deductionType,dateStr);
     }
 
     @Override

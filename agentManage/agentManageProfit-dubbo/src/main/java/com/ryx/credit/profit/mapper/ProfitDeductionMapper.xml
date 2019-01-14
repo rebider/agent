@@ -436,7 +436,7 @@
 
   <delete id="resetDataDeduction">
     delete from P_DEDUCTION
-    where DEDUCTION_TYPE = #{type} and DEDUCTION_DATE = to_char(add_months(sysdate,-1) ,'yyyyMM') and STAGING_STATUS !='6'
+    where DEDUCTION_TYPE = #{type} and DEDUCTION_DATE = #{date} and STAGING_STATUS !='6'
   </delete>
 
     <!--根据条件查询扣款记录-->

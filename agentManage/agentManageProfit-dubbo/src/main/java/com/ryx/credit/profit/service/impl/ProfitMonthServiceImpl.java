@@ -1082,6 +1082,24 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return pageInfo;
     }
 
+    /**
+     * 导出数据
+     * @param param
+     * @return
+     */
+    @Override
+    public List<Map<String,Object>> exportByF(Map<String, Object> param){
+        List<Map<String,Object>> list;
+        if ("1".equals(param.get("chekbox"))) {  //包含下级
+            list = profitDetailMonthMapper.exportByFNoChild(param);
+        }else{ //不包含下级
+            list = profitDetailMonthMapper.exportByFNoChild(param);
+        }
+        return list;
+    }
+
+
+
     @Override
     public Map<String,Object> profitCount(Map<String, Object> param) {
         String checkbox=param.get("checkbox").toString();
