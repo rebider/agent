@@ -692,7 +692,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 //        otherAmt = otherAmt.add(mposk);
 
         //pos奖励考核扣款
-        sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPosRewardDeductionAmt());
+        //sumAmt = sumAmt.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt()==null?BigDecimal.ZERO:profitDetailMonthTemp.getPosRewardDeductionAmt());
+        sumAmt = doRewardDuction(profitDetailMonthTemp, sumAmt, computType);
 
         //其它考核扣款
         sumAmt = doKhDuction(profitDetailMonthTemp, sumAmt, computType);
@@ -722,6 +723,29 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonthTemp);
         long updateend = System.currentTimeMillis();
         //System.out.println("修改处理时间" + (updateend - updatestart));
+        return sumAmt;
+    }
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 05-考核扣款系统计算部分
+     * @Date: 15:00 2019/1/14
+     */
+    private BigDecimal doRewardDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType) {
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0, 7).replace("-", "");
+        Map<String, Object> param = new HashMap<>();
+        param.put("profitAmt", sumAmt);
+        param.put("computeType", computType);
+        param.put("agentId", profitDetailMonthTemp.getAgentId());
+        param.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
+        param.put("deductionDate", deductionDate);
+        param.put("deductionType", DeductionType.POS_REWARD_CALCU_DEDUCT.getType());
+        param.put("deductionStatus", "0");
+
+        // 考核扣款实扣
+        BigDecimal realDeductionAMt = profitDeductionServiceImpl.khDeduction(param);
+        profitDetailMonthTemp.setPosRewardDeductionAmt(realDeductionAMt);
+        sumAmt = sumAmt.subtract(realDeductionAMt);
         return sumAmt;
     }
 

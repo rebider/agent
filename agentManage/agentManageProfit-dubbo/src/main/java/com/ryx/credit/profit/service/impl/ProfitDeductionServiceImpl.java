@@ -602,6 +602,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);
             profitDeductionTemp.setDeductionStatus("0");//未扣款
             profitDeductionTemp.setCreateDateTime(new Date());
+            profitDeductionTemp.setStagingStatus("6");//变为下期扣款标记
             updateStagingDetail(profitAmt, profitDeductionTemp);
         }
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionTemp);
@@ -683,6 +684,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             profitDeductionTemp.setActualDeductionAmt(null);// 实扣清0
             profitDeductionTemp.setAddDeductionAmt(null);
             profitDeductionTemp.setCreateDateTime(new Date());
+            profitDeductionTemp.setStagingStatus("6");//变为下期扣款标记
             profitDeductionTemp.setDeductionStatus("0");//未扣款
 //            }
         }

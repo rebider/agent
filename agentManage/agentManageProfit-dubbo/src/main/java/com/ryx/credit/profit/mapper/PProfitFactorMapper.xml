@@ -359,7 +359,7 @@
 
   <delete id="resetDataFactor" >
     delete from P_PROFIT_FACTOR
-    where FACTOR_MONTH = to_char(sysdate-30 ,'yyyymm')
+    where FACTOR_MONTH = o_char(add_months(sysdate,-1) ,'yyyyMM')
   </delete>
 
   <select id="selectByData" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultMap="BaseResultMap">

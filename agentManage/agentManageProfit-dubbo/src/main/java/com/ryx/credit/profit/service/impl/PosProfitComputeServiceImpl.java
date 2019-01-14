@@ -57,6 +57,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
     ProfitDeductionService profitDeductionService;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
+    @Resource
+    ProfitAgentServiceImpl profitAgentService;
 
     private static final String PLATFORM_CODE = "100003";
     /**
@@ -90,6 +92,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
         try {
             long khstart = System.currentTimeMillis();
             String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+            String preDate = LocalDate.now().plusMonths(-2).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
             LOG.info("{}pos奖励计算开始",currentDate);
 
             //清除pos奖励明细数据
@@ -268,31 +271,37 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 }
                 LOG.info("考核代理商唯一码：{}，考核总扣款金额：{}", tempDetail.getPosAgentId(), deductAmt);
                 if (deductAmt.compareTo(BigDecimal.ZERO) != 0) {
-                    //记录扣款到其他扣款表中deduction_type=05
-                    /*ProfitDeduction profitDeduction = new ProfitDeduction();
-                    profitDeduction.setAgentId(previewRewardDetail.getPosAgentId());
 
+                    //代理商基本信息
+                    Map<String,Object> ps = new HashMap<>();
+                    ps.put("agentId",previewRewardDetail.getPosAgentId());
+                    ps.put("platformNum",PLATFORM_CODE);
+                    Map<String,Object> map = profitAgentService.getAgentWithParentInfo(ps);
+
+                    //记录扣款到其他扣款表中deduction_type=05
+                    ProfitDeduction profitDeduction = new ProfitDeduction();
+                    profitDeduction.setAgentId(previewRewardDetail.getPosAgentId());
                     profitDeduction.setParentAgentId(previewRewardDetail.getPosAgentId());
-                    profitDeduction.setParentAgentPid(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
                     profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
-                    profitDeduction.setAgentPid(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
                     profitDeduction.setAgentName(map.get("AG_NAME") == null ? "" : map.get("AG_NAME").toString());
-                    profitDeduction.setDeductionDesc(map.get("ORDER_PLATFORM") == null ? "" : map.get("ORDER_PLATFORM").toString());
-                    profitDeduction.setDeductionDate(deductionDate);
-                    profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
-                    profitDeduction.setSumDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
-                    profitDeduction.setAddDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
-                    profitDeduction.setMustDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
+                    profitDeduction.setParentAgentId(map.get("PARENT_AGENT_ID") == null ? "" : map.get("PARENT_AGENT_ID").toString());
+                    profitDeduction.setParentAgentName(map.get("PARENT_AGENT_NAME") == null ? "" : map.get("PARENT_AGENT_NAME").toString());
+                    profitDeduction.setDeductionDesc("POS考核奖励扣款（系统计算）");
+                    profitDeduction.setDeductionType(DeductionType.POS_REWARD_CALCU_DEDUCT.getType());
+                    profitDeduction.setSumDeductionAmt(deductAmt);
+                    profitDeduction.setAddDeductionAmt(deductAmt);
+                    profitDeduction.setMustDeductionAmt(deductAmt);
                     profitDeduction.setActualDeductionAmt(BigDecimal.ZERO);
                     profitDeduction.setNotDeductionAmt(BigDecimal.ZERO);
-                    profitDeduction.setSourceId(map.get("ID").toString());
+                    profitDeduction.setSourceId("01");//01-本月新增  02-上月未扣足移到本月
                     profitDeduction.setUpperNotDeductionAmt(BigDecimal.ZERO);
                     profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+                    profitDeduction.setDeductionStatus("0");
                     profitDeduction.setCreateDateTime(new Date());
-                    profitDeductionService.insert(profitDeduction);*/
+                    profitDeductionService.insert(profitDeduction);
 
-                    PosRewardDetail updateDetail = new PosRewardDetail();
                     //此时previewRewardDetail为预发周期结束月的pos奖励明细
+                    PosRewardDetail updateDetail = new PosRewardDetail();
                     updateDetail.setId(previewRewardDetail.getId());
                     updateDetail.setPosCheckDeductAmt(deductAmt.abs().toString());
                     posRewardSDetailService.updatePosRewardDetail(updateDetail);
