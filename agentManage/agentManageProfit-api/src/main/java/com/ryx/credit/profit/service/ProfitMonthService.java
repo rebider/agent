@@ -194,4 +194,13 @@ public interface ProfitMonthService {
     ProfitDetailMonth getByAgentId(String agentId);
 
     BigDecimal doKhDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType);
+
+    /**
+     * 导出数据：
+     * @Authorchenqiutian
+     * @Date 2019/1/11
+     * @param param
+     * @return
+     */
+    List<Map<String,Object>> exportByF(Map<String, Object> param);
 }
