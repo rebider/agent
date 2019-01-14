@@ -455,8 +455,7 @@
     P_PROFIT_FACTOR where FACTOR_MONTH='${profitMonth}' group by AGENT_ID) e on a.AGENT_ID = e.AGENT_ID
 
     left join
-    (select AGENT_ID,ADD_INVOICE_AMT,ADJUST_AMT from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}' ) f on
-    a.AGENT_ID = f.AGENT_ID
+    (select AGENT_ID,ADD_INVOICE_AMT,ADJUST_AMT from P_INVOICE_DETAIL where PROFIT_MONTH = '${profitMonth}' ) f on a.AGENT_ID = f.AGENT_ID
 
     <if test="agentId!=null and agentId!=''">
       and a.AGENT_ID = '${agentId}'

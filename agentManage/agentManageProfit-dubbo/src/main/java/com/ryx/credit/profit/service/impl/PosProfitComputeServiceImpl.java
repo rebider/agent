@@ -2,7 +2,10 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
+import com.ryx.credit.profit.enums.DeductionStatus;
+import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.jobs.ProfitAmtSumJob;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sun.rmi.runtime.Log;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -48,6 +52,8 @@ public class PosProfitComputeServiceImpl implements DeductService {
     private ProfitAmtSumJob profitAmtSumJob;
     @Autowired
     TransProfitDetailMapper transProfitDetailMapper;
+    @Resource
+    ProfitDeductionService profitDeductionService;
 
     private static final String PLATFORM_CODE = "100003";
     /**
@@ -81,7 +87,12 @@ public class PosProfitComputeServiceImpl implements DeductService {
         try {
             long khstart = System.currentTimeMillis();
             String currentDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+            LOG.info("{}pos奖励计算开始",currentDate);
+
+            //清除pos奖励明细数据
             posRewardSDetailService.deleteCurrentDate(currentDate);
+            //清除考核扣款数据-计算部分
+            profitDeductionService.resetDataDeduction(DeductionType.POS_REWARD_CALCU_DEDUCT.getType());
             /*Supplier<TransProfitDetail> details = TransProfitDetail::new;
             TransProfitDetail detail = details.get();
             detail.setProfitDate(currentDate);
@@ -254,6 +265,27 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 }
                 LOG.info("考核代理商唯一码：{}，考核总扣款金额：{}", tempDetail.getPosAgentId(), deductAmt);
                 if (deductAmt.compareTo(BigDecimal.ZERO) != 0) {
+                    /*//记录扣款到其他扣款表中deduction_type=05
+                    ProfitDeduction profitDeduction = new ProfitDeduction();
+                    profitDeduction.setParentAgentId(previewRewardDetail.getPosAgentId());
+                    profitDeduction.setParentAgentPid(map.get("GUARANTEE_AGENT") == null ? "" : map.get("GUARANTEE_AGENT").toString());
+                    profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
+                    profitDeduction.setAgentPid(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
+                    profitDeduction.setAgentName(map.get("AG_NAME") == null ? "" : map.get("AG_NAME").toString());
+                    profitDeduction.setDeductionDesc(map.get("ORDER_PLATFORM") == null ? "" : map.get("ORDER_PLATFORM").toString());
+                    profitDeduction.setDeductionDate(deductionDate);
+                    profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+                    profitDeduction.setSumDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
+                    profitDeduction.setAddDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
+                    profitDeduction.setMustDeductionAmt(map.get("PAY_AMOUNT") == null ? BigDecimal.ZERO : new BigDecimal(map.get("PAY_AMOUNT").toString()));
+                    profitDeduction.setActualDeductionAmt(BigDecimal.ZERO);
+                    profitDeduction.setNotDeductionAmt(BigDecimal.ZERO);
+                    profitDeduction.setSourceId(map.get("ID").toString());
+                    profitDeduction.setUpperNotDeductionAmt(BigDecimal.ZERO);
+                    profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+                    profitDeduction.setCreateDateTime(new Date());
+                    profitDeductionService.insert(profitDeduction);*/
+
                     PosRewardDetail updateDetail = new PosRewardDetail();
                     //此时previewRewardDetail为预发周期结束月的pos奖励明细
                     updateDetail.setId(previewRewardDetail.getId());

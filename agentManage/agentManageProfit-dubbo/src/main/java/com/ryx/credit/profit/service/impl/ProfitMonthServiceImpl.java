@@ -727,7 +727,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     /**
      * @Author: Zhang Lei
-     * @Description: 考核扣款
+     * @Description: 04-考核扣款导入部分
      * @Date: 16:23 2019/1/4
      */
     public BigDecimal doKhDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType) {
@@ -741,9 +741,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("deductionType", DeductionType.POS_REWARD_DEDUCT.getType());
         param.put("deductionStatus", "0");
 
-        if(profitDetailMonthTemp.getAgentId().equals("AG20181121000000000012621")){
+        /*if(profitDetailMonthTemp.getAgentId().equals("AG20181121000000000012621")){
             System.out.print(profitDetailMonthTemp.getParentAgentId());
-        }
+        }*/
 
         // 考核扣款实扣
         BigDecimal realDeductionAMt = profitDeductionServiceImpl.khDeduction(param);
