@@ -350,6 +350,16 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         return map;
     }
 
+    @Override
+    public Map<String, Object> getOwmInvoice(Map<String, String> map) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH,-1);
+        Date date = calendar.getTime();
+        String profitMonth = new SimpleDateFormat("yyyyMM").format(date);
+        map.put("profitMonth",profitMonth);
+        return invoiceDetailMapper.getOwnInvoice(map);
+    }
+
     /**
      * @param list
      * @param loginName

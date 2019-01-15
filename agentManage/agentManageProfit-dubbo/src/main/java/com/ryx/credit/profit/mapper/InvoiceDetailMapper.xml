@@ -487,5 +487,20 @@
         where PROFIT_MONTH = '${profitMonth}'
     </delete>
 
+
+  <!--Map<String,Object> getOwnInvoice(Map<String,String> map);-->
+  <select id="getOwnInvoice" resultType="java.util.Map" parameterType="java.util.Map">
+    select PROFIT_MONTH as profitMonth, OWN_INVOICE as owmInvoice
+    from P_INVOICE_DETAIL
+  <where>
+    PROFIT_MONTH = #{profitMonth}
+    <if test=" agentId!=null and agentId!='' ">
+      and AGENT_ID=#{agentId}
+    </if>
+    <if test=" agentName!= null and agentName!= '' ">
+      and AGENT_NAME=#{agentName}
+    </if>
+  </where>
+  </select>
 </mapper>
 

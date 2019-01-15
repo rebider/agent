@@ -62,4 +62,11 @@ public interface IOwnInvoiceService {
     List<InvoiceDetail> exportInvoiceData(String agentId, String agentName, String concludeChild, String dateStart, String dateEnd);
 
     Map<String,Object> profitCount(Map<String,Object> param);
+
+    /**
+     * 根据AG码或者代理商名称获得本月欠票
+     * @param map
+     * @return
+     */
+    Map<String,Object> getOwmInvoice(Map<String,String> map);
 }
