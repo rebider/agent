@@ -154,6 +154,7 @@ public class RefundJob {
             profitSupply.setAgentId((String)agentMap.get("AGENT_ID"));
             profitSupply.setAgentName((String)agentMap.get("AG_NAME"));
             profitSupply.setParentAgentId((String)agentMap.get("parentAgentId"));
+            profitSupply.setParentAgentName((String)agentMap.get("parentAgentName"));
         }else {
             profitSupply.setAgentId(instId);
         }
@@ -229,6 +230,7 @@ public class RefundJob {
         if (agentMap!=null) {
             deduction.setAgentId((String) agentMap.get("AGENT_ID"));
             deduction.setParentAgentId((String) agentMap.get("parentAgentId"));
+            deduction.setParentAgentName((String)agentMap.get("parentAgentName"));
             deduction.setAgentName((String) agentMap.get("AG_NAME"));
         }else{
             deduction.setAgentId(instId);

@@ -531,7 +531,7 @@
 
     <delete id="resetDataFactor" parameterType="java.lang.String">
         delete from P_PROFIT_FACTOR
-        where FACTOR_MONTH = #{date} and STAGING_STATUS != '6'
+        where FACTOR_MONTH = #{date} and nvl(STAGING_STATUS,'-') != '6'
     </delete>
 
     <select id="selectByData" parameterType="com.ryx.credit.profit.pojo.PProfitFactor" resultMap="BaseResultMap">
