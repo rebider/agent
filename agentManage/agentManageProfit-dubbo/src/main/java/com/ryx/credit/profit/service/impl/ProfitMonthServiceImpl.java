@@ -426,6 +426,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         }
     }
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 分润计算流程
+     * @Date: 13:49 2019/1/15
+     */
     private void comput(String computType) {
 
         // 获取所有代理商月度分润明细
