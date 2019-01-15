@@ -155,7 +155,7 @@ public class StagingServiceImpl implements StagingService {
     }
 
     @Override
-    public void addStaging(ProfitStaging profitStaging, String workId) {
+    public void addStaging(ProfitStaging profitStaging, String workId,String bustype) {
         LOG.info("新建分期");
         validate(profitStaging);
         ProfitDeduction deduction = profitDeductionServiceImpl.getProfitDeductionById(profitStaging.getSourceId());
@@ -163,7 +163,7 @@ public class StagingServiceImpl implements StagingService {
         profitDeductionServiceImpl.updateProfitDeduction(deduction);
         profitStaging.setId(idService.genId(TabId.P_STAGING));
         profitStagingMapper.insert(profitStaging);
-        startActivity(profitStaging, workId, deduction);
+        startActivity(profitStaging, workId, deduction,bustype);
         // 增加扣款分期状态为分期审核中
         LOG.info("生成分期明细");
         splitStaging(profitStaging);
@@ -203,14 +203,14 @@ public class StagingServiceImpl implements StagingService {
      *启动审批流
      * @param  profitStaging 分期对象
      */
-    private void startActivity(ProfitStaging profitStaging, String workId, ProfitDeduction deduction) {
+    private void startActivity(ProfitStaging profitStaging, String workId, ProfitDeduction deduction,String bustype) {
             //启动审批
             String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
             if (proceId == null) {
                 LOG.error("审批流启动失败{}");
                 throw new ProcessException("审批流启动失败!");
             }
-            addABusActRel(profitStaging,proceId,workId, deduction);
+            addABusActRel(profitStaging,proceId,workId, deduction,bustype);
 
     }
 
@@ -317,7 +317,7 @@ public class StagingServiceImpl implements StagingService {
      * @param proce 审批实例
      * @param workId 模板id
      */
-    private void addABusActRel(ProfitStaging profitStaging, String proce, String workId, ProfitDeduction deduction) {
+    private void addABusActRel(ProfitStaging profitStaging, String proce, String workId, ProfitDeduction deduction,String bustype) {
         BusActRel record = new BusActRel();
         record.setBusId(profitStaging.getId());
         record.setActivId(proce);
@@ -326,9 +326,9 @@ public class StagingServiceImpl implements StagingService {
         record.setStatus(Status.STATUS_1.status);
         record.setAgentId(deduction.getAgentId());
         record.setAgentName(deduction.getAgentName());
-        if("otherDeductAgent".equals(workId) || "otherDeductCity".equals(workId)) {
+        if(("otherDeductAgent".equals(workId)&&"1".equals(bustype)) || ("otherDeductCity".equals(workId)&&"1".equals(bustype))) {
             record.setBusType(BusActRelBusType.OTHER_DEDUCTION.name());
-        }else if("assessDeductAgent".equals(workId) || "assessDeductCity".equals(workId)){
+        }else if(("otherDeductAgent".equals(workId)&&"2".equals(bustype)) || ("otherDeductAgent".equals(workId)&&"2".equals(bustype))){
             record.setBusType(BusActRelBusType.ASSESS_DEDUCTION.name());
         }else{
             record.setBusType(BusActRelBusType.STAGING.name());
