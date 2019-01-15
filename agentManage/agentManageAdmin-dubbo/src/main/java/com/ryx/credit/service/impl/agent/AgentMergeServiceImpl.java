@@ -921,7 +921,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
                 agentNotifyVo.setAgHeadMobile(agent.getAgHeadMobile());
-                agentNotifyVo.setOrgName(agent.getAgName());
                 agentNotifyVo.setUseOrgan(agentBusInfo.getBusUseOrgan());
                 agentNotifyVo.setBusPlatform(agentBusInfo.getBusPlatform());
                 agentNotifyVo.setBaseMessage(agent);
