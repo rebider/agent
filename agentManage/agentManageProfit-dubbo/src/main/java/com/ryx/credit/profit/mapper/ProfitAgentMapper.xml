@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitAgentMapper">
+
+  <select id="getAgentWithParentInfo" resultType="map" parameterType="map">
+    select a.AGENT_ID,d.AG_NAME AGENT_NAME,A.BUS_TYPE,a.BUS_NUM,A.CLO_PAY_COMPANY,
+      c.AGENT_ID PARENT_AGENT_ID, e.AG_NAME PARENT_AGENT_NAME,C.BUS_TYPE PARENT_BUS_TYPE,c.BUS_NUM PARENT_BUS_NUM,C.CLO_PAY_COMPANY PARENT_CLO_PAY_COMPANY
+    from A_AGENT_BUSINFO a
+      left join A_AGENT_BUSINFO b on a.BUS_PARENT = b.ID and b.BUS_STATUS = '1'
+      left join A_AGENT_BUSINFO c on c.ID = b.ID and c.BUS_STATUS = '1'
+      left join A_AGENT d on a.AGENT_ID = d.ID
+      left join A_AGENT e on c.AGENT_ID = e.ID
+    where a.BUS_PLATFORM = '${platformNum}' and a.AGENT_ID = '${agentId}' AND a.BUS_STATUS = '1';
+  </select>
+
+</mapper>

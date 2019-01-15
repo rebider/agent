@@ -8,6 +8,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.profit.dao.PProfitFactorMapper;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
@@ -27,6 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -67,6 +69,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Autowired
     private ProfitSettleErrLsService profitSettleErrLsServiceImpl;
+    @Autowired
+    PProfitFactorMapper pProfitFactorMapper;
 
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
@@ -94,7 +98,14 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
 
         if (StringUtils.isNotBlank(profitDeduction.getDeductionType())) {
-            criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+            if("04".equals(profitDeduction.getDeductionType())){//查询考核扣款
+                List<String> list = new ArrayList<String>();
+                list.add("04");
+                list.add("05");
+                criteria.andDeductionTypeIn(list);
+            }else{//查询其他扣款
+                criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
+            }
         }
         if (StringUtils.isNotBlank(profitDeduction.getSourceId())) {
             criteria.andSourceIdEqualTo(profitDeduction.getSourceId());
@@ -602,6 +613,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             profitDeductionTemp.setActualDeductionAmt(BigDecimal.ZERO);
             profitDeductionTemp.setDeductionStatus("0");//未扣款
             profitDeductionTemp.setCreateDateTime(new Date());
+            profitDeductionTemp.setStagingStatus("6");//变为下期扣款标记
             updateStagingDetail(profitAmt, profitDeductionTemp);
         }
         profitDeductionMapper.updateByPrimaryKeySelective(profitDeductionTemp);
@@ -683,6 +695,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             profitDeductionTemp.setActualDeductionAmt(null);// 实扣清0
             profitDeductionTemp.setAddDeductionAmt(null);
             profitDeductionTemp.setCreateDateTime(new Date());
+            profitDeductionTemp.setStagingStatus("6");//变为下期扣款标记
             profitDeductionTemp.setDeductionStatus("0");//未扣款
 //            }
         }
@@ -743,7 +756,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return profitDeductionMapper.resetDataDeduction(deductionType);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        return profitDeductionMapper.resetDataDeduction(deductionType,dateStr);
     }
 
     @Override
@@ -858,5 +876,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         return BigDecimal.ZERO;
     }
+
+
 
 }
