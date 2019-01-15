@@ -159,11 +159,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         try {
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-            //mainAndSubMustHaveLower(agentMerge);
+            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
             verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-            //verifypprovaling(agentMerge.getSubAgentId());
+            verifypprovaling(agentMerge.getSubAgentId());
 
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 agentMerge.setCloReviewStatus(AgStatus.Approving.status);
@@ -324,21 +324,33 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         AgentBusInfoExample.Criteria mainCriteria = mainAgentBusInfoExample.createCriteria();
         mainCriteria.andAgentIdEqualTo(mainAgentId);
         mainCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        mainCriteria.andBusStatusEqualTo(BusinessStatus.Enabled.status);
+        List<BigDecimal> mainBusStatusList = new ArrayList<>();
+        mainBusStatusList.add(BusinessStatus.Enabled.status);
+        mainBusStatusList.add(BusinessStatus.inactive.status);
+        mainCriteria.andBusStatusIn(mainBusStatusList);
         List<AgentBusInfo> mainAgentBusInfos = agentBusInfoMapper.selectByExample(mainAgentBusInfoExample);
+        if(mainAgentBusInfos.size()==0){
+            throw new MessageException("主代理商业务信息有误");
+        }
         for (AgentBusInfo mainAgentBusInfo : mainAgentBusInfos) {
-            if(!mainAgentBusInfo.getBusType().equals(BusType.BZYD.key) || !mainAgentBusInfo.getBusType().equals(BusType.JG.key)){
+            if(!mainAgentBusInfo.getBusType().equals(BusType.BZYD.key) && !mainAgentBusInfo.getBusType().equals(BusType.JG.key)){
                 throw new MessageException("主代理商不是标准一代或机构");
             }
         }
         AgentBusInfoExample subAgentBusInfoExample = new AgentBusInfoExample();
-        AgentBusInfoExample.Criteria subCriteria = mainAgentBusInfoExample.createCriteria();
+        AgentBusInfoExample.Criteria subCriteria = subAgentBusInfoExample.createCriteria();
         subCriteria.andAgentIdEqualTo(subAgentId);
         subCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        subCriteria.andBusStatusEqualTo(BusinessStatus.Enabled.status);
+        List<BigDecimal> subBusStatusList = new ArrayList<>();
+        subBusStatusList.add(BusinessStatus.Enabled.status);
+        subBusStatusList.add(BusinessStatus.inactive.status);
+        subCriteria.andBusStatusIn(subBusStatusList);
         List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
+        if(subAgentBusInfos.size()==0){
+            throw new MessageException("副代理商业务信息有误");
+        }
         for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
-            if(!subAgentBusInfo.getBusType().equals(BusType.BZYD.key) || !subAgentBusInfo.getBusType().equals(BusType.JG.key)){
+            if(!subAgentBusInfo.getBusType().equals(BusType.BZYD.key) && !subAgentBusInfo.getBusType().equals(BusType.JG.key)){
                 throw new MessageException("副代理商不是标准一代或机构");
             }
             List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
@@ -366,6 +378,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(agentMerges.size()!=0){
             throw new MessageException("合并中不能重复发起");
         }
+        if(subAgentId.equals(mainAgentId)){
+            throw new MessageException("主副代理商不能是同一个人");
+        }
         //判断是否有欠票欠款情况
         if(agentMerge.getSubAgentDebt().compareTo(new BigDecimal(0))==1 || agentMerge.getSubAgentOweTicket().compareTo(new BigDecimal(0))==1){
             if(null==agentMerge.getSuppType()){
@@ -377,6 +392,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
                 if(StringUtils.isBlank(agentMerge.getSuppAgentName())){
                     throw new MessageException("补缴类型为代理商代扣,代理商名称必填");
+                }
+                AgentExample agentExample = new AgentExample();
+                AgentExample.Criteria agentCriteria = agentExample.createCriteria();
+                agentCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                agentCriteria.andAgStatusEqualTo(AgStatus.Approved.name());
+                agentCriteria.andIdEqualTo(agentMerge.getSuppAgentId());
+                agentCriteria.andAgNameEqualTo(agentMerge.getSuppAgentName());
+                List<Agent> agents = agentMapper.selectByExample(agentExample);
+                if(agents==null){
+                    throw new MessageException("补缴类型为代理商代扣,代理商必须存在,且审批通过");
+                }
+                if(agents.size()!=1){
+                    throw new MessageException("补缴类型为代理商代扣,代理商必须存在,且审批通过");
                 }
             }else if(agentMerge.getSuppType().compareTo(mergeSuppType.XXDK.getValue())==0){
                 if(oCashReceivables==null){
@@ -707,11 +735,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         try {
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-            //mainAndSubMustHaveLower(agentMerge);
+            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
             verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-            //verifypprovaling(agentMerge.getSubAgentId());
+            verifypprovaling(agentMerge.getSubAgentId());
 
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
