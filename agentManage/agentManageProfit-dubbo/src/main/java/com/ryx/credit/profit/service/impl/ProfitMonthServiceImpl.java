@@ -746,7 +746,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
         // 保理扣款实扣
         BigDecimal realDeductionAMt = profitFactorService.blDeduction(param);
-        profitDetailMonthTemp.setPosRewardDeductionAmt(realDeductionAMt);
+        profitDetailMonthTemp.setBuDeductionAmt(realDeductionAMt);
         sumAmt = sumAmt.subtract(realDeductionAMt);
         return sumAmt;
     }
