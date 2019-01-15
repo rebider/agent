@@ -154,6 +154,19 @@ public class PosRegionServiceImpl implements PosRegionService {
     }
 
     @Override
+    public String queryNameByCodes(String codes){
+        List<DPosRegion> dPosRegions = queryByCodes(codes);
+        String result = "";
+        for (DPosRegion dPosRegion : dPosRegions) {
+            result+=dPosRegion.getName()+",";
+        }
+        if(StringUtils.isBlank(result)){
+            result = result.substring(0,result.length()-1);
+        }
+        return result;
+    }
+
+    @Override
     public List<DPosRegion> queryByParentCode(String parentCode){
         if(StringUtils.isBlank(parentCode)){
             return null;
