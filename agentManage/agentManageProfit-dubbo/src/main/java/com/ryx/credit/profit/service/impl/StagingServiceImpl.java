@@ -328,7 +328,7 @@ public class StagingServiceImpl implements StagingService {
         record.setAgentName(deduction.getAgentName());
         if(("otherDeductAgent".equals(workId)&&"1".equals(bustype)) || ("otherDeductCity".equals(workId)&&"1".equals(bustype))) {
             record.setBusType(BusActRelBusType.OTHER_DEDUCTION.name());
-        }else if(("otherDeductAgent".equals(workId)&&"2".equals(bustype)) || ("otherDeductAgent".equals(workId)&&"2".equals(bustype))){
+        }else if(("otherDeductAgent".equals(workId)&&"2".equals(bustype)) || ("otherDeductCity".equals(workId)&&"2".equals(bustype))){
             record.setBusType(BusActRelBusType.ASSESS_DEDUCTION.name());
         }else{
             record.setBusType(BusActRelBusType.STAGING.name());
