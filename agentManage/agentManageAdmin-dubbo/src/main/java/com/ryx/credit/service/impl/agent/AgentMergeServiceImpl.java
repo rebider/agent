@@ -16,6 +16,7 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -108,7 +109,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private IUserService iUserService;
     @Autowired
     private OCashReceivablesService cashReceivablesService;
-
 
 
     /**
@@ -381,6 +381,20 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(subAgentId.equals(mainAgentId)){
             throw new MessageException("主副代理商不能是同一个人");
         }
+        //判断是否是当前省区下的代理商
+        List<Map<String, Object>>  org = iUserService.orgCode(Long.valueOf(agentMerge.getcUser()));
+        if(org.size()==0){throw new ProcessException("部门信息未找到");}
+        String orgId = String.valueOf(org.get(0).get("ORGID"));
+        if(StringUtils.isBlank(orgId)){
+            throw new ProcessException("省区部门参数为空");
+        }
+        UserVo userVo = iUserService.selectByLoginName(mainAgentId);
+        if(null==userVo){
+            throw new ProcessException("代理商登录用户不存在");
+        }
+        if(!orgId.equals(userVo.getOrganizationId())){
+            throw new ProcessException("只能提交自己省区的代理商合并");
+        }
         //判断是否有欠票欠款情况
         if(agentMerge.getSubAgentDebt().compareTo(new BigDecimal(0))==1 || agentMerge.getSubAgentOweTicket().compareTo(new BigDecimal(0))==1){
             if(null==agentMerge.getSuppType()){
@@ -544,17 +558,26 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             }
         }
 
-        Map startPar = agentEnterService.startPar(String.valueOf(cUser));
-        if (null == startPar) {
-            throw new ProcessException("启动部门参数为空！");
-        }
         AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTMERGE,id,cUser);
         if(!agentResult.isOK()){
             logger.info("代理商合并更新打款信息失败");
             throw new MessageException("代理商合并更新打款信息失败");
         }
+
+        Map reqMap = new HashMap();
+        Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
+        Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
+        reqMap.put(mainAgent.getAgDocDistrict(),mainAgent.getAgDocDistrict());
+        reqMap.put(subAgent.getAgDocDistrict(),subAgent.getAgDocDistrict());
+        //判断省区是否相同
+        if(mainAgent.getAgDocPro().equals(subAgent.getAgDocPro())){
+            reqMap.put("city","1");
+        }else{
+            reqMap.put("city","2");
+        }
+
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, "mergeCity1.0", null, null, startPar);
+        String proceId = activityService.createDeloyFlow(null, "mergeCity1.0", null, null, reqMap);
         if (proceId == null) {
             logger.info("代理商合并提交审批，审批流启动失败{}:{}", id, cUser);
             throw new MessageException("审批流启动失败！");
@@ -599,9 +622,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
                 Map<String, Object> map = orgCodeRes.get(0);
                 Object orgCode = map.get("ORGANIZATIONCODE");
+                AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busId);
                 //于华审批
                 if (String.valueOf(orgCode).equals("manage")) {
-                    AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(busId);
                     agentMerge.setMergeType(agentVo.getMergeType());
                     if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                         throw new MessageException("合并类型更新失败！");
@@ -614,6 +637,15 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                         throw new ProcessException("更新收款信息失败");
                     }
                 }
+                if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67")){
+                    Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
+                    Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
+
+                    mainAgent.getAgDocDistrict();
+                    subAgent.getAgDocDistrict();
+
+                }
+
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {

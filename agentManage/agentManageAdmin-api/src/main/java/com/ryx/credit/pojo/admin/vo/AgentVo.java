@@ -79,6 +79,24 @@ public class AgentVo implements Serializable {
     private String debt;  //欠款
     private String oweTicket;  //欠票
     private BigDecimal mergeType;
+    private String mainDocDistrict; //主代理商大区
+    private String subDocDistrict;  //副代理商大区
+
+    public String getMainDocDistrict() {
+        return mainDocDistrict;
+    }
+
+    public void setMainDocDistrict(String mainDocDistrict) {
+        this.mainDocDistrict = mainDocDistrict;
+    }
+
+    public String getSubDocDistrict() {
+        return subDocDistrict;
+    }
+
+    public void setSubDocDistrict(String subDocDistrict) {
+        this.subDocDistrict = subDocDistrict;
+    }
 
     public OReturnOrder getoReturnOrder() {
         return oReturnOrder;

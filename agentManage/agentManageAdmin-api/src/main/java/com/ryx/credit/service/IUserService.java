@@ -34,4 +34,6 @@ public interface IUserService extends IService<CUser> {
     List<Map<String, Object>> orgCode(Long userID);
 
     List<UserVo> selectListByName(String name);
+
+    UserVo selectByLoginName(String loginName);
 }
