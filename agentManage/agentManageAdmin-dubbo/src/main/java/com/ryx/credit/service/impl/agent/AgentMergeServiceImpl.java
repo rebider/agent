@@ -7,10 +7,12 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.order.*;
@@ -109,6 +111,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private IUserService iUserService;
     @Autowired
     private OCashReceivablesService cashReceivablesService;
+    @Autowired
+    private COrganizationMapper organizationMapper;
 
 
     /**
@@ -158,6 +162,15 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             return AgentResult.fail("代理商合并提交，操作用户为空！");
         }
         try {
+            String mergeId = idService.genId(TabId.A_AGENT_MERGE);
+            agentMerge.setId(mergeId);
+            agentMerge.setcTime(new Date());
+            agentMerge.setuTime(new Date());
+            agentMerge.setcUser(cUser);
+            agentMerge.setuUser(cUser);
+            agentMerge.setStatus(Status.STATUS_1.status);
+            agentMerge.setVersion(Status.STATUS_1.status);
+
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
             mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
@@ -170,14 +183,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             } else {
                 agentMerge.setCloReviewStatus(AgStatus.Create.status);
             }
-            String mergeId = idService.genId(TabId.A_AGENT_MERGE);
-            agentMerge.setId(mergeId);
-            agentMerge.setcTime(new Date());
-            agentMerge.setuTime(new Date());
-            agentMerge.setcUser(cUser);
-            agentMerge.setuUser(cUser);
-            agentMerge.setStatus(Status.STATUS_1.status);
-            agentMerge.setVersion(Status.STATUS_1.status);
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
                 strBusType+=busType[i];
@@ -210,7 +215,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception("新增数据失败！");
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -297,6 +302,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 String mergeBusInfoId = idService.genId(TabId.A_AGENT_MERGE_BUSINFO);
                 agentMergeBusInfo.setId(mergeBusInfoId);
                 agentMergeBusInfo.setAgentMargeId(mergeId);
+                agentMergeBusInfo.setMergeStatus(MergeStatus.WXS.getValue());
                 agentMergeBusInfo.setStatus(Status.STATUS_1.status);
                 agentMergeBusInfo.setMainAgentId(agentMerge.getMainAgentId());
                 agentMergeBusInfo.setSubAgentId(agentMerge.getSubAgentId());
@@ -388,11 +394,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(StringUtils.isBlank(orgId)){
             throw new ProcessException("省区部门参数为空");
         }
-        UserVo userVo = iUserService.selectByLoginName(mainAgentId);
-        if(null==userVo){
+        Agent mainAgent = agentMapper.selectByPrimaryKey(mainAgentId);
+        if(null==mainAgent){
             throw new ProcessException("代理商登录用户不存在");
         }
-        if(!orgId.equals(userVo.getOrganizationId())){
+        if(!orgId.equals(mainAgent.getAgDocPro())){
             throw new ProcessException("只能提交自己省区的代理商合并");
         }
         //判断是否有欠票欠款情况
@@ -567,11 +573,28 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         Map reqMap = new HashMap();
         Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
         Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
-        reqMap.put(mainAgent.getAgDocDistrict(),mainAgent.getAgDocDistrict());
-        reqMap.put(subAgent.getAgDocDistrict(),subAgent.getAgDocDistrict());
         //判断省区是否相同
         if(mainAgent.getAgDocPro().equals(subAgent.getAgDocPro())){
             reqMap.put("city","1");
+            COrganization mainOrganization = organizationMapper.selectByPrimaryKey(mainAgent.getAgDocDistrict());
+            if(null==mainOrganization){
+                throw new MessageException("主代理商部门信息错误");
+            }
+            COrganization subOrganization = organizationMapper.selectByPrimaryKey(subAgent.getAgDocDistrict());
+            if(null==subOrganization){
+                throw new MessageException("副代理商部门信息错误");
+            }
+            reqMap.put(mainOrganization.getCode(),mainOrganization.getCode());
+            reqMap.put(subOrganization.getCode(),subOrganization.getCode());
+            if(!reqMap.containsValue("beijing")){
+                reqMap.put("beijing","");
+            }
+            if(!reqMap.containsValue("south")){
+                reqMap.put("south","");
+            }
+            if(!reqMap.containsValue("north")){
+                reqMap.put("north","");
+            }
         }else{
             reqMap.put("city","2");
         }
@@ -591,11 +614,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.MERGE.name());
         record.setActivStatus(AgStatus.Approving.name());
-        record.setAgentId(agentMerge.getMainAgentId());
-        Agent agent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
-        if (null != agent) {
-            record.setAgentName(agent.getAgName());
-        }
+        record.setAgentId(subAgent.getId());
+        record.setAgentName(subAgent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proceId);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
@@ -640,12 +660,17 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67")){
                     Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
                     Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
-
-                    mainAgent.getAgDocDistrict();
-                    subAgent.getAgDocDistrict();
-
+                    COrganization mainOrganization = organizationMapper.selectByPrimaryKey(mainAgent.getAgDocDistrict());
+                    if(null==mainOrganization){
+                        throw new MessageException("主代理商部门信息错误");
+                    }
+                    COrganization subOrganization = organizationMapper.selectByPrimaryKey(subAgent.getAgDocDistrict());
+                    if(null==subOrganization){
+                        throw new MessageException("副代理商部门信息错误");
+                    }
+                    agentVo.setMainDocDistrict(mainOrganization.getCode());
+                    agentVo.setSubDocDistrict(subOrganization.getCode());
                 }
-
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {

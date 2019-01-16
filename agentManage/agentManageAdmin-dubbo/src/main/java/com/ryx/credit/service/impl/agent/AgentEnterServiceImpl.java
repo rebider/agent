@@ -450,8 +450,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
         reqMap.put("taskId", agentVo.getTaskId());
         reqMap.put("dept", agentVo.getDept());
-        reqMap.put(agentVo.getMainDocDistrict(),agentVo.getMainDocDistrict());
-        reqMap.put(agentVo.getSubDocDistrict(),agentVo.getSubDocDistrict());
+        if(StringUtils.isNotBlank(agentVo.getMainDocDistrict()) && StringUtils.isNotBlank(agentVo.getSubDocDistrict())){
+            reqMap.put(agentVo.getMainDocDistrict(),agentVo.getMainDocDistrict());
+            reqMap.put(agentVo.getSubDocDistrict(),agentVo.getSubDocDistrict());
+            if(!reqMap.containsValue("beijing")){
+                reqMap.put("beijing","");
+            }
+            if(!reqMap.containsValue("south")){
+                reqMap.put("south","");
+            }
+            if(!reqMap.containsValue("north")){
+                reqMap.put("north","");
+            }
+        }
 
         //传递部门信息
         Map startPar = startPar(userId);
