@@ -32,6 +32,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
+import com.ryx.credit.service.order.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +114,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private OCashReceivablesService cashReceivablesService;
     @Autowired
     private COrganizationMapper organizationMapper;
+    @Autowired
+    private OrderService orderService;
 
 
     /**
@@ -404,6 +407,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(!orgId.equals(mainAgent.getAgDocPro())){
             throw new ProcessException("只能提交自己省区的代理商合并");
         }
+        BigDecimal subAgentOweTicket = getSubAgentOweTicket(agentMerge.getSubAgentId());
+        if(subAgentOweTicket.compareTo(new BigDecimal(0))!=0){
+            throw new ProcessException("副代理商欠票不可以提交");
+        }
+
         //判断是否有欠票欠款情况
         if(agentMerge.getSubAgentDebt().compareTo(new BigDecimal(0))==1 || agentMerge.getSubAgentOweTicket().compareTo(new BigDecimal(0))==1){
             if(null==agentMerge.getSuppType()){
@@ -1197,4 +1205,26 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         return pageInfo;
     }
 
+
+    /**
+     * 欠款
+     * @param agentId
+     * @return
+     */
+    @Override
+    public BigDecimal getSubAgentDebt(String agentId){
+        //订单欠款
+        BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
+        return orderDebt;
+    }
+
+    /**
+     * 欠票
+     * @param agentId
+     * @return
+     */
+    @Override
+    public BigDecimal getSubAgentOweTicket(String agentId){
+        return new BigDecimal(1000);
+    }
 }

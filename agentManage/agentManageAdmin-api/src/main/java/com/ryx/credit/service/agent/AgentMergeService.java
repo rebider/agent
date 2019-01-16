@@ -114,12 +114,19 @@ public interface AgentMergeService {
 
     /**
      * 合并业务明细列表
-     * @param agentMerge
      * @param page
      * @param dataRole
      * @param userId
      * @return
      */
     PageInfo selectMergeBusinfoList(AgentMergeBusInfo agentMergeBusInfo, Page page, String dataRole, Long userId);
+
+
+    BigDecimal getSubAgentDebt(String agentId);
+
+
+    BigDecimal getSubAgentOweTicket(String agentId);
+
+
 }
 
