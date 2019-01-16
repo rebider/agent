@@ -34,5 +34,4 @@ public interface CUserMapper extends BaseMapper<CUser> {
 
     int updateStatusByPrimaryKey(Long id);
 
-    UserVo selectByLoginName(String loginName);
 }

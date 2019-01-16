@@ -159,8 +159,4 @@
         where ID = #{id}
     </update>
 
-    <select id="selectByLoginName" resultMap="userVoResultMap" parameterType="java.lang.String">
-        select * from C_USER where login_name = #{loginName}
-    </select>
-
 </mapper>

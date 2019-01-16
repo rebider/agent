@@ -141,8 +141,4 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         return cUserOrgCodelist;
     }
 
-    @Override
-    public UserVo selectByLoginName(String loginName) {
-        return userMapper.selectByLoginName(loginName);
-    }
 }

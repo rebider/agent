@@ -359,6 +359,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if(!subAgentBusInfo.getBusType().equals(BusType.BZYD.key) && !subAgentBusInfo.getBusType().equals(BusType.JG.key)){
                 throw new MessageException("副代理商不是标准一代或机构");
             }
+            if(StringUtils.isBlank(subAgentBusInfo.getBusNum())){
+                throw new MessageException("副代理商业务平台未入网成功");
+            }
             List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
             if(childLevelBusInfos.size()!=0){
                 throw new MessageException("副代理商不能有下级");

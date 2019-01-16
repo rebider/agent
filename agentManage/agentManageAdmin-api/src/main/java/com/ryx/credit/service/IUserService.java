@@ -35,5 +35,4 @@ public interface IUserService extends IService<CUser> {
 
     List<UserVo> selectListByName(String name);
 
-    UserVo selectByLoginName(String loginName);
 }
