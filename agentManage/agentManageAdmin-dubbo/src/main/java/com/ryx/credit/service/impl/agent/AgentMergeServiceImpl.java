@@ -385,7 +385,10 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andMainAgentIdEqualTo(mainAgentId);
         criteria.andSubAgentIdEqualTo(subAgentId);
-        criteria.andCloReviewStatusEqualTo(AgStatus.Approving.getValue());
+        List<BigDecimal> cloReviewStatusList = new ArrayList<>();
+        cloReviewStatusList.add(AgStatus.Create.getValue());
+        cloReviewStatusList.add(AgStatus.Approving.getValue());
+        criteria.andCloReviewStatusIn(cloReviewStatusList);
         List<AgentMerge> agentMerges = agentMergeMapper.selectByExample(agentMergeExample);
         if(agentMerges.size()!=0){
             throw new MessageException("合并中不能重复发起");
