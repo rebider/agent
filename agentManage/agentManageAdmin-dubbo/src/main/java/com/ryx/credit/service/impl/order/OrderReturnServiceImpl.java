@@ -265,71 +265,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     }
 
 
-    /**
-     * @Author: Zhang Lei
-     * @Description: 业务审批
-     * @Date: 10:20 2018/7/30
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
-    public Map<String, Object> bizAudit(String returnId, String plans, String remark, String userid, String auditResult) {
 
-        if (auditResult.equals("no")) {
-
-            return null;
-        }
-
-        JSONArray jsonArray = JSONObject.parseArray(plans);
-        for (Object obj : jsonArray) {
-            JSONObject jsonObject = (JSONObject) obj;
-            ReceiptPlan receiptPlan = new ReceiptPlan();
-            receiptPlan.setProId(jsonObject.getString("receiptProId"));
-            receiptPlan.setcUser(userid);
-            receiptPlan.setUserId(userid);
-            receiptPlan.setOrderId(jsonObject.getString("orderId"));
-            receiptPlan.setReceiptId(jsonObject.getString("receiptId"));
-            receiptPlan.setProCom(jsonObject.getString("proCom"));
-            receiptPlan.setModel(jsonObject.getString("model"));
-            receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
-            String receiptProId = jsonObject.getString("receiptProId");
-            try {
-                plannerService.savePlanner(receiptPlan, receiptProId,"");
-            } catch (Exception e) {
-                throw new ProcessException("保存排单信息失败");
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @Author: Zhang Lei
-     * @Description: 财务审核
-     * @Date: 9:08 2018/7/31
-     */
-    @Override
-    public Map<String, Object> cwAudit(String returnId, String remark, String userid, String auditResult, String[] attachments) throws ProcessException {
-
-        //审核拒绝
-        if (auditResult.equals("no")) {
-            return null;
-        }
-
-        //审核通过
-        //保存附件
-        for (String attach : attachments) {
-            AttachmentRel attachmentRel = new AttachmentRel();
-            attachmentRel.setId(idService.genId(TabId.a_attachment_rel));
-            attachmentRel.setSrcId(returnId);
-            attachmentRel.setAttId(attach);
-            attachmentRel.setBusType(AttachmentRelType.Return.name());
-            attachmentRel.setcTime(new Date());
-            attachmentRel.setcUser(userid);
-            attachmentRel.setStatus(Status.STATUS_1.status);
-        }
-
-        return null;
-    }
 
 
     /**
@@ -1101,7 +1037,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 //机具型号要和退货的机具型号和厂家要一样
                 receiptPlan.setProCom(orderActivity.getVender());
                 receiptPlan.setModel(orderActivity.getProModel());
-                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId,"");
+                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId,orderActivity.getActivityId());
                 log.info("退货排单信息保存:{}{}",receiptPlan.getReturnOrderDetailId(),receiptPlan.getProId(),result.getMsg());
             }
 
