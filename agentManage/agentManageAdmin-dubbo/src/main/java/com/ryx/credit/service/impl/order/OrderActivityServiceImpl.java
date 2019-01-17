@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.PlatformType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
@@ -353,7 +350,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             item.put("proModel",oActivity.getProModel());
             item.put("standTime",oActivity.getStandTime()+"");
             item.put("standAmt",oActivity.getStandAmt()+"");
-            item.put("backType",oActivity.getBackType()+"");
+            item.put("backType", BackType.getContentByValue(oActivity.getBackType())+"");
             item.put("busProName",oActivity.getBusProName()+"");
             item.put("id",oActivity.getId());
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(),DictGroup.MANUFACTURER.name(),oActivity.getVender());

@@ -1024,8 +1024,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             //机构和标准一代不存在上级直接传本级
             reqMap.put("PARENT_AGENT_ID",subAgentId);
             reqMap.put("PARENT_AGENT_NAME",subAgentName);
-            reqMap.put("RRPLACE_AGENT_ID",agentMerge.getSuppAgentId());
-            reqMap.put("RRPLACE_AGENT_NAME",agentMerge.getSuppAgentName());
+            reqMap.put("RPLACE_AGENT_ID",agentMerge.getSuppAgentId());
+            reqMap.put("RPLACE_AGENT_NAME",agentMerge.getSuppAgentName());
             reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
             reqMap.put("REMARK",agentMerge.getRemark());
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);

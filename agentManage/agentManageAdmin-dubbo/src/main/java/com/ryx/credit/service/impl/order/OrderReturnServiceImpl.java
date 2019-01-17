@@ -293,7 +293,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             receiptPlan.setPlanProNum(jsonObject.getBigDecimal("planProNum"));
             String receiptProId = jsonObject.getString("receiptProId");
             try {
-                plannerService.savePlanner(receiptPlan, receiptProId);
+                plannerService.savePlanner(receiptPlan, receiptProId,"");
             } catch (Exception e) {
                 throw new ProcessException("保存排单信息失败");
             }
@@ -1101,7 +1101,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 //机具型号要和退货的机具型号和厂家要一样
                 receiptPlan.setProCom(orderActivity.getVender());
                 receiptPlan.setModel(orderActivity.getProModel());
-                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId);
+                AgentResult result = plannerService.savePlanner(receiptPlan, receiptProId,"");
                 log.info("退货排单信息保存:{}{}",receiptPlan.getReturnOrderDetailId(),receiptPlan.getProId(),result.getMsg());
             }
 
