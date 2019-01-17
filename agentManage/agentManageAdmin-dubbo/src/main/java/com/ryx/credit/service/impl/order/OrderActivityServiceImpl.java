@@ -16,8 +16,6 @@ import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.OActivityMapper;
 import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.MposTermBatchVo;
-import com.ryx.credit.machine.vo.MposTermTypeVo;
 import com.ryx.credit.machine.vo.TermMachineVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
@@ -130,7 +128,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (TermMachineVo termMachineVo : termMachineVos) {
                     if (activity.getBusProCode().equals(termMachineVo.getId())) {
                         activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
-                        activity.setBackType(termMachineVo.getStandAmt());
+                        activity.setBackType(termMachineVo.getBackType());
                     }
                 }
             } catch (Exception e) {
@@ -185,6 +183,21 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             }
         }
         activity.setuTime(new Date());
+
+        if (StringUtils.isNotBlank(platFormType)) {
+            try {
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                for (TermMachineVo termMachineVo : termMachineVos) {
+                    if (activity.getBusProCode().equals(termMachineVo.getId())) {
+                        activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
+                        activity.setBackType(termMachineVo.getBackType());
+                    }
+                }
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
         OActivityExample oActivityExample = new OActivityExample();
         oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status).andIdNotEqualTo(activity.getId());
