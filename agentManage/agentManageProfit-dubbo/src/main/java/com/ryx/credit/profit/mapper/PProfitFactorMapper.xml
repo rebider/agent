@@ -604,6 +604,16 @@
         select
           <include refid="Base_Column_List"/>
         from P_PROFIT_FACTOR
-        where FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR} and DEDUCTION_STATUS = '0'
+        where FACTOR_MONTH = #{factorMonth,jdbcType=VARCHAR}
+        and nvl(DEDUCTION_STATUS,'0') = '0'
+        and AGENT_ID = #{agentId,jdbcType=VARCHAR}
+        <choose>
+            <when test="parentAgentId != null and parentAgentId!=''">
+                and PARENT_AGENT_ID = #{parentAgentId,jdbcType=CHAR}
+            </when>
+            <otherwise>
+                and PARENT_AGENT_ID is null
+            </otherwise>
+        </choose>
     </select>
 </mapper>
