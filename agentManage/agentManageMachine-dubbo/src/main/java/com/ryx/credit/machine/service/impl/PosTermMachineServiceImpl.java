@@ -1,6 +1,7 @@
 package com.ryx.credit.machine.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.BackType;
 import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
@@ -58,7 +59,11 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         for (ImsTermMachine imsTermMachine : list) {
             TermMachineVo newvo = new TermMachineVo();
             newvo.setId(imsTermMachine.getMachineId());
-            newvo.setMechineName(imsTermMachine.getModel()+"|"+imsTermMachine.getPrice());
+            newvo.setMechineName("型号:"+imsTermMachine.getModel()+"|价格:"+imsTermMachine.getPrice()
+                    +"|达标金额:" +imsTermMachine.getStandAmt()+"|返还类型:"+ BackType.getContentByValue(imsTermMachine.getBackType())
+                    +"|备注:" +imsTermMachine.getRemark());
+            newvo.setStandAmt(String.valueOf(imsTermMachine.getStandAmt()));
+            newvo.setBackType(imsTermMachine.getBackType());
             termMachineVoList.add(newvo);
         }
         return termMachineVoList;
