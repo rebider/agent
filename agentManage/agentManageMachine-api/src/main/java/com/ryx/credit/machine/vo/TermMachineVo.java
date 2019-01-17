@@ -13,6 +13,10 @@ public class TermMachineVo implements Serializable{
 
     public String mechineName;
 
+    public String standAmt;
+
+    public String backType;
+
     public String getId() {
         return id;
     }
@@ -27,5 +31,21 @@ public class TermMachineVo implements Serializable{
 
     public void setMechineName(String mechineName) {
         this.mechineName = mechineName;
+    }
+
+    public String getStandAmt() {
+        return standAmt;
+    }
+
+    public void setStandAmt(String standAmt) {
+        this.standAmt = standAmt;
+    }
+
+    public String getBackType() {
+        return backType;
+    }
+
+    public void setBackType(String backType) {
+        this.backType = backType;
     }
 }
