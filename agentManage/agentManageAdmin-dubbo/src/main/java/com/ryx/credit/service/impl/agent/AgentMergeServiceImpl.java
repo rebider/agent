@@ -297,7 +297,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
         if(agentMergeBusInfos.size()!=0){
             for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
-                agentMergeBusInfo.setStatus(Status.STATUS_0.status);
+                agentMergeBusInfo.setMergeStatus(MergeStatus.BHB.getValue());
                 int i = agentMergeBusInfoMapper.updateByPrimaryKey(agentMergeBusInfo);
                 if(i!=1){
                     throw new MessageException("代理商合并，处理失败！");
@@ -761,6 +761,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if (null != agent) {
                 agentMergeBusInfo.setSubAgentName(agent.getAgName());
             }
+            agentMergeBusInfo.setMergeStatusName(MergeStatus.getContentByValue(agentMergeBusInfo.getMergeStatus()));
         }
         return agentMergeBusInfos;
     }
@@ -786,6 +787,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if (null != agent) {
                 agentMergeBusInfo.setSubAgentName(agent.getAgName());
             }
+            agentMergeBusInfo.setMergeStatusName(MergeStatus.getContentByValue(agentMergeBusInfo.getMergeStatus()));
         }
         return agentMergeBusInfos;
     }
@@ -953,7 +955,20 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 throw new MessageException("代理商合并更新失败");
             }
         }
-        //如果财务填写了，合并到那个被合并代理商的分期订单欠款,同步到分润其他扣款
+        //如果填写了，合并到那个被合并代理商的分期订单欠款,同步到分润其他扣款
+        if(agentMerge.getSuppType().compareTo(mergeSuppType.DLSDK.getValue())==0){
+            Map<String,String> reqMap = new HashMap<>();
+            String subAgentName = agentMerge.getSubAgentName();
+            String subAgentId = agentMerge.getSubAgentId();
+            reqMap.put("AGENT_NAME",subAgentName);
+            reqMap.put("AGENT_ID",subAgentId);
+            //机构和标准一代不存在上级直接传本级
+            reqMap.put("PARENT_AGENT_ID",subAgentId);
+            reqMap.put("PARENT_AGENT_NAME",subAgentName);
+            reqMap.put("RRPLACE_AGENT_ID",agentMerge.getSuppAgentId());
+            reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
+            logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
+        }
 
         //通知业务系统
         updateAgentName(busActRel.getBusId(),agentMergeBusInfos);
@@ -1218,6 +1233,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     public BigDecimal getSubAgentDebt(String agentId){
         //订单欠款
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
+        logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
         return orderDebt;
     }
 
@@ -1228,6 +1244,10 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      */
     @Override
     public BigDecimal getSubAgentOweTicket(String agentId){
+        Map<String,String> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+
+        logger.info("代理商合并查询欠票：代理商id:{},欠票：{}",agentId);
         return new BigDecimal(1000);
     }
 }
