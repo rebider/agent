@@ -32,7 +32,7 @@ public class ToolsDeductJob {
     @Autowired
     private ToolsDeductService toolsDeductService;
 
-    //@Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0 1 1 * ?")
     public void execut(){
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         try {
