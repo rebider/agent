@@ -116,7 +116,10 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private COrganizationMapper organizationMapper;
     @Autowired
     private OrderService orderService;
-
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
     /**
      * 合并列表
@@ -159,7 +162,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag,List<OCashReceivablesVo> oCashReceivables) throws Exception {
+    public AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag,
+                                      List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles) throws Exception {
         if (StringUtils.isBlank(cUser)) {
             logger.info("代理商合并提交，操作用户为空:{}", cUser);
             return AgentResult.fail("代理商合并提交，操作用户为空！");
@@ -175,11 +179,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMerge.setVersion(Status.STATUS_1.status);
 
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-            mainAndSubMustHaveLower(agentMerge);
+//            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
-            verifyMergeing(agentMerge,busType,oCashReceivables);
+//            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-            verifypprovaling(agentMerge.getSubAgentId());
+//            verifypprovaling(agentMerge.getSubAgentId());
 
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 agentMerge.setCloReviewStatus(AgStatus.Approving.status);
@@ -204,7 +208,24 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 logger.info("代理商合并保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
             }
-
+            //添加新的附件
+            if (agentMergeFiles != null && agentMergeFiles.length!=0) {
+                for(int i=0;i<agentMergeFiles.length;i++){
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(agentMergeFiles[i]);
+                    record.setSrcId(mergeId);
+                    record.setcUser(cUser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.agentMerge.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int f = attachmentRelMapper.insertSelective(record);
+                    if (1 != f) {
+                        logger.info("代理商合并保存附件关系失败");
+                        throw new ProcessException("保存附件失败");
+                    }
+                }
+            }
             //查看被合并代理商有没有合并过
             verifyAgentMerge(agentMerge,mergeId,cUser);
             insert(busType,mergeId,agentMerge,cUser);
@@ -731,6 +752,10 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
         }
         agentMerge.setSubAgentBusInfoList(data);
+        //查询关联附件
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(mergeId, AttachmentRelType.agentMerge.name());
+        agentMerge.setAttachments(attachments);
+
         return agentMerge;
     }
 
@@ -802,17 +827,18 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,List<OCashReceivablesVo> oCashReceivables) throws Exception {
+    public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,
+                                      List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles) throws Exception {
         if(StringUtils.isBlank(agentMerge.getId())){
             throw new MessageException("数据ID为空！");
         }
         try {
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-            mainAndSubMustHaveLower(agentMerge);
+//            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
-            verifyMergeing(agentMerge,busType,oCashReceivables);
+//            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-            verifypprovaling(agentMerge.getSubAgentId());
+//            verifypprovaling(agentMerge.getSubAgentId());
 
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
@@ -834,6 +860,39 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if(!agentResult.isOK()){
                 logger.info("代理商合并保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
+            }
+
+            //附件修改
+            if(null!=agentMergeFiles && agentMergeFiles.length!=0){
+                AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+                AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+                criteria.andSrcIdEqualTo(agentMerge.getId());
+                criteria.andBusTypeEqualTo(AttachmentRelType.agentMerge.name());
+                List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+                attachmentRels.forEach(row->{
+                    row.setStatus(Status.STATUS_0.status);
+                    int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                    if (1 != i) {
+                        logger.info("删除代理商合并附件关系失败");
+                        throw new ProcessException("删除附件失败");
+                    }
+                });
+
+                for(int i=0;i<agentMergeFiles.length;i++){
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(agentMergeFiles[i]);
+                    record.setSrcId(agentMerge.getId());
+                    record.setcUser(cUser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.agentMerge.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int f = attachmentRelMapper.insertSelective(record);
+                    if (1 != f) {
+                        logger.info("代理商合并附件关系失败");
+                        throw new ProcessException("附件关系失败");
+                    }
+                }
             }
 
             AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
@@ -966,7 +1025,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             reqMap.put("PARENT_AGENT_ID",subAgentId);
             reqMap.put("PARENT_AGENT_NAME",subAgentName);
             reqMap.put("RRPLACE_AGENT_ID",agentMerge.getSuppAgentId());
+            reqMap.put("RRPLACE_AGENT_NAME",agentMerge.getSuppAgentName());
             reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
+            reqMap.put("REMARK",agentMerge.getRemark());
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
         }
 

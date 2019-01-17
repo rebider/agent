@@ -35,7 +35,7 @@ public interface AgentMergeService {
      * @return
      * @throws Exception
      */
-    AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag,List<OCashReceivablesVo> oCashReceivables) throws Exception;
+    AgentResult saveAgentMerge(AgentMerge agentMerge, String[] busType, String cUser, String saveFlag,List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles) throws Exception;
 
     /**
      * 提交数据并审批
@@ -95,7 +95,7 @@ public interface AgentMergeService {
      * @return
      * @throws Exception
      */
-    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,List<OCashReceivablesVo> oCashReceivables)throws Exception;
+    AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles)throws Exception;
 
 
     AgentResult updateAgentName(String busId,List<AgentMergeBusInfo> agentMergeBusInfos) throws Exception;
