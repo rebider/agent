@@ -2147,6 +2147,136 @@ public class OSubOrderActivityExample {
             addCriterion("STAND_TIME not between", value1, value2, "standTime");
             return (Criteria) this;
         }
+
+        public Criteria andStandAmtIsNull() {
+            addCriterion("STAND_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtIsNotNull() {
+            addCriterion("STAND_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtEqualTo(BigDecimal value) {
+            addCriterion("STAND_AMT =", value, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtNotEqualTo(BigDecimal value) {
+            addCriterion("STAND_AMT <>", value, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtGreaterThan(BigDecimal value) {
+            addCriterion("STAND_AMT >", value, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAND_AMT >=", value, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtLessThan(BigDecimal value) {
+            addCriterion("STAND_AMT <", value, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("STAND_AMT <=", value, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtIn(List<BigDecimal> values) {
+            addCriterion("STAND_AMT in", values, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtNotIn(List<BigDecimal> values) {
+            addCriterion("STAND_AMT not in", values, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAND_AMT between", value1, value2, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andStandAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("STAND_AMT not between", value1, value2, "standAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeIsNull() {
+            addCriterion("BACK_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeIsNotNull() {
+            addCriterion("BACK_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeEqualTo(String value) {
+            addCriterion("BACK_TYPE =", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeNotEqualTo(String value) {
+            addCriterion("BACK_TYPE <>", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeGreaterThan(String value) {
+            addCriterion("BACK_TYPE >", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("BACK_TYPE >=", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeLessThan(String value) {
+            addCriterion("BACK_TYPE <", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeLessThanOrEqualTo(String value) {
+            addCriterion("BACK_TYPE <=", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeLike(String value) {
+            addCriterion("BACK_TYPE like", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeNotLike(String value) {
+            addCriterion("BACK_TYPE not like", value, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeIn(List<String> values) {
+            addCriterion("BACK_TYPE in", values, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeNotIn(List<String> values) {
+            addCriterion("BACK_TYPE not in", values, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeBetween(String value1, String value2) {
+            addCriterion("BACK_TYPE between", value1, value2, "backType");
+            return (Criteria) this;
+        }
+
+        public Criteria andBackTypeNotBetween(String value1, String value2) {
+            addCriterion("BACK_TYPE not between", value1, value2, "backType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
