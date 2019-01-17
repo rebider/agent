@@ -224,4 +224,7 @@ public interface OrderService {
      * @return
      */
     AgentResult insertSelectiveCashSummaryMouth(CashSummaryMouth cashSummaryMouth);
+
+
+    void testRepeatableRead();
 }

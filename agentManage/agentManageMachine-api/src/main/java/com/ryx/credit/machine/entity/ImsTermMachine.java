@@ -38,6 +38,14 @@ public class ImsTermMachine implements Serializable{
 
     private BigDecimal deposit;
 
+    private BigDecimal standAmt;
+
+    private String machineType;
+
+    private BigDecimal standTime;
+
+    private String backType;
+
     public String getMachineId() {
         return machineId;
     }
@@ -172,5 +180,37 @@ public class ImsTermMachine implements Serializable{
 
     public void setDeposit(BigDecimal deposit) {
         this.deposit = deposit;
+    }
+
+    public BigDecimal getStandAmt() {
+        return standAmt;
+    }
+
+    public void setStandAmt(BigDecimal standAmt) {
+        this.standAmt = standAmt;
+    }
+
+    public String getMachineType() {
+        return machineType;
+    }
+
+    public void setMachineType(String machineType) {
+        this.machineType = machineType;
+    }
+
+    public BigDecimal getStandTime() {
+        return standTime;
+    }
+
+    public void setStandTime(BigDecimal standTime) {
+        this.standTime = standTime;
+    }
+
+    public String getBackType() {
+        return backType;
+    }
+
+    public void setBackType(String backType) {
+        this.backType = backType;
     }
 }

@@ -19,6 +19,10 @@
     <result column="IS_NON_CONN" jdbcType="VARCHAR" property="isNonConn" />
     <result column="IS_ELECT_SIGN" jdbcType="VARCHAR" property="isElectSign" />
     <result column="DEPOSIT" jdbcType="DECIMAL" property="deposit" />
+    <result column="STAND_AMT" jdbcType="DECIMAL" property="standAmt" />
+    <result column="MACHINE_TYPE" jdbcType="VARCHAR" property="machineType" />
+    <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
+    <result column="BACK_TYPE" jdbcType="CHAR" property="backType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -52,7 +56,7 @@
   <sql id="Base_Column_List">
     MACHINE_ID, MODEL, PRICE, MIN_ORD_QTY, STATUS, REMARK, CREATE_TIME, CREATE_PERSON, 
     UPDATE_TIME, UPDATE_PERSON, TERM_TYPE, COMM_TYPE, MACHINE_MANUF, IS_OUTER_PINPAD, 
-    IS_NON_CONN, IS_ELECT_SIGN, DEPOSIT
+    IS_NON_CONN, IS_ELECT_SIGN, DEPOSIT, STAND_AMT, MACHINE_TYPE, STAND_TIME, BACK_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsTermMachineExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -88,13 +92,17 @@
       CREATE_TIME, CREATE_PERSON, UPDATE_TIME, 
       UPDATE_PERSON, TERM_TYPE, COMM_TYPE, 
       MACHINE_MANUF, IS_OUTER_PINPAD, IS_NON_CONN, 
-      IS_ELECT_SIGN, DEPOSIT)
+      IS_ELECT_SIGN, DEPOSIT, STAND_AMT, 
+      MACHINE_TYPE, STAND_TIME, BACK_TYPE
+      )
     values (#{machineId,jdbcType=VARCHAR}, #{model,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, 
       #{minOrdQty,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=VARCHAR}, #{createPerson,jdbcType=VARCHAR}, #{updateTime,jdbcType=VARCHAR}, 
       #{updatePerson,jdbcType=VARCHAR}, #{termType,jdbcType=VARCHAR}, #{commType,jdbcType=VARCHAR}, 
       #{machineManuf,jdbcType=VARCHAR}, #{isOuterPinpad,jdbcType=VARCHAR}, #{isNonConn,jdbcType=VARCHAR}, 
-      #{isElectSign,jdbcType=VARCHAR}, #{deposit,jdbcType=DECIMAL})
+      #{isElectSign,jdbcType=VARCHAR}, #{deposit,jdbcType=DECIMAL}, #{standAmt,jdbcType=DECIMAL}, 
+      #{machineType,jdbcType=VARCHAR}, #{standTime,jdbcType=DECIMAL}, #{backType,jdbcType=CHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsTermMachine">
     insert into IMS_TERM_MACHINE
@@ -150,6 +158,18 @@
       <if test="deposit != null">
         DEPOSIT,
       </if>
+      <if test="standAmt != null">
+        STAND_AMT,
+      </if>
+      <if test="machineType != null">
+        MACHINE_TYPE,
+      </if>
+      <if test="standTime != null">
+        STAND_TIME,
+      </if>
+      <if test="backType != null">
+        BACK_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="machineId != null">
@@ -202,6 +222,18 @@
       </if>
       <if test="deposit != null">
         #{deposit,jdbcType=DECIMAL},
+      </if>
+      <if test="standAmt != null">
+        #{standAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="machineType != null">
+        #{machineType,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        #{standTime,jdbcType=DECIMAL},
+      </if>
+      <if test="backType != null">
+        #{backType,jdbcType=CHAR},
       </if>
     </trim>
   </insert>
@@ -262,6 +294,18 @@
       <if test="deposit != null">
         DEPOSIT = #{deposit,jdbcType=DECIMAL},
       </if>
+      <if test="standAmt != null">
+        STAND_AMT = #{standAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="machineType != null">
+        MACHINE_TYPE = #{machineType,jdbcType=VARCHAR},
+      </if>
+      <if test="standTime != null">
+        STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      </if>
+      <if test="backType != null">
+        BACK_TYPE = #{backType,jdbcType=CHAR},
+      </if>
     </set>
     where MACHINE_ID = #{machineId,jdbcType=VARCHAR}
   </update>
@@ -282,7 +326,11 @@
       IS_OUTER_PINPAD = #{isOuterPinpad,jdbcType=VARCHAR},
       IS_NON_CONN = #{isNonConn,jdbcType=VARCHAR},
       IS_ELECT_SIGN = #{isElectSign,jdbcType=VARCHAR},
-      DEPOSIT = #{deposit,jdbcType=DECIMAL}
+      DEPOSIT = #{deposit,jdbcType=DECIMAL},
+      STAND_AMT = #{standAmt,jdbcType=DECIMAL},
+      MACHINE_TYPE = #{machineType,jdbcType=VARCHAR},
+      STAND_TIME = #{standTime,jdbcType=DECIMAL},
+      BACK_TYPE = #{backType,jdbcType=CHAR}
     where MACHINE_ID = #{machineId,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

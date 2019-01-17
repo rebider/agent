@@ -71,4 +71,7 @@ public interface AgentBusInfoMapper {
 
     /*业务信息上级查询*/
     Map<String,Object> queryBusInfoParent(Map<String,Object> reqMap);
+
+    List<Map<String,Object>> queryEditAgentMerge(Map<String,Object> reqMap);
+
 }

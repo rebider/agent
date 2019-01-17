@@ -28,4 +28,9 @@
         from c_organization where pid =#{orgPid}
     </select>
 
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="string" >
+        select
+        <include refid="Base_Column_List" />
+        from C_ORGANIZATION where ID = #{id}
+    </select>
 </mapper> 

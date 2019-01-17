@@ -65,6 +65,9 @@ public class OSubOrderActivity implements Serializable{
 
     private BigDecimal standTime;
 
+    private BigDecimal standAmt;
+
+    private String backType;
 
     public String getId() {
         return id;
@@ -304,5 +307,21 @@ public class OSubOrderActivity implements Serializable{
 
     public void setStandTime(BigDecimal standTime) {
         this.standTime = standTime;
+    }
+
+    public BigDecimal getStandAmt() {
+        return standAmt;
+    }
+
+    public void setStandAmt(BigDecimal standAmt) {
+        this.standAmt = standAmt;
+    }
+
+    public String getBackType() {
+        return backType;
+    }
+
+    public void setBackType(String backType) {
+        this.backType = backType == null ? null : backType.trim();
     }
 }

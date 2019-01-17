@@ -81,6 +81,40 @@ public class AgentMergeBusInfo implements Serializable {
 
     private String busLoginNum;
 
+    private String busPlatformType;
+
+    private String subAgentName;
+
+    private String busPlatformName;
+
+    private String busTypeName;
+
+    private String mergeStatusName;
+
+    public String getMergeStatusName() {
+        return mergeStatusName;
+    }
+
+    public void setMergeStatusName(String mergeStatusName) {
+        this.mergeStatusName = mergeStatusName;
+    }
+
+    public String getBusTypeName() {
+        return busTypeName;
+    }
+
+    public void setBusTypeName(String busTypeName) {
+        this.busTypeName = busTypeName;
+    }
+
+    public String getBusPlatformName() {
+        return busPlatformName;
+    }
+
+    public void setBusPlatformName(String busPlatformName) {
+        this.busPlatformName = busPlatformName;
+    }
+
     public String getId() {
         return id;
     }
@@ -383,5 +417,21 @@ public class AgentMergeBusInfo implements Serializable {
 
     public void setBusLoginNum(String busLoginNum) {
         this.busLoginNum = busLoginNum == null ? null : busLoginNum.trim();
+    }
+
+    public String getBusPlatformType() {
+        return busPlatformType;
+    }
+
+    public void setBusPlatformType(String busPlatformType) {
+        this.busPlatformType = busPlatformType;
+    }
+
+    public String getSubAgentName() {
+        return subAgentName;
+    }
+
+    public void setSubAgentName(String subAgentName) {
+        this.subAgentName = subAgentName;
     }
 }
