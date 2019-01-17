@@ -3,6 +3,7 @@ package com.ryx.credit.profit.service;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.PProfitFactor;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -22,4 +23,13 @@ public interface ProfitFactorService {
     PProfitFactor selectByData(PProfitFactor profitFactor);
 
     int resetDataFactor();
+
+    Map<String,Object> profitCount(Map<String, Object> param);
+
+    /**
+     * @Author: Zhang Lei
+     * @Description: 计算保理扣款
+     * @Date: 16:58 2019/1/14
+     */
+    BigDecimal blDeduction(Map<String,Object> param);
 }

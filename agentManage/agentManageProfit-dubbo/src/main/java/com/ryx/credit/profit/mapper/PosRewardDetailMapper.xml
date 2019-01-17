@@ -488,11 +488,41 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
   <select id="getRewardDetailCount" parameterType="java.util.Map" resultType="java.lang.Long">
     SELECT COUNT(1)
     FROM POS_REWARD_DETAIL
-    <include refid="BASE_WHERE_SQL"></include>
+    <include refid="BASE_WHERE_SQL_GG"></include>
   </select>
+
+  <sql id="BASE_WHERE_SQL_GG">
+    <where>
+      1=1
+      <choose>
+        <when test="PROFIT_POS_DATE_START !=null and PROFIT_POS_DATE_START != '' and PROFIT_POS_DATE_END !=null and PROFIT_POS_DATE_END != ''">
+          and PROFIT_POS_DATE between #{PROFIT_POS_DATE_START} and #{PROFIT_POS_DATE_END}
+        </when>
+        <otherwise>
+          <if test="PROFIT_POS_DATE_START != null and PROFIT_POS_DATE_START !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE_START} </if>
+        </otherwise>
+      </choose>
+      <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' "> and POS_AGENT_ID = #{POS_AGENT_ID} </if>
+      <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+      <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
+      <if test="POS_MECHANISM_ID != null and POS_MECHANISM_ID !='' "> and POS_MECHANISM_ID = #{POS_MECHANISM_ID} </if>
+      <if test="POS_COMPARE_COUNT != null and POS_COMPARE_COUNT !='' "> and POS_COMPARE_COUNT = #{POS_COMPARE_COUNT} </if>
+      <if test="POS_CURRENT_COUNT != null and POS_CURRENT_COUNT !='' "> and POS_CURRENT_COUNT = #{POS_CURRENT_COUNT} </if>
+      <if test="POS_COMPARE_LOAN_COUNT != null and POS_COMPARE_LOAN_COUNT !='' "> and POS_COMPARE_LOAN_COUNT = #{POS_COMPARE_LOAN_COUNT} </if>
+      <if test="POS_CURRENT_LOAN_COUNT != null and POS_CURRENT_LOAN_COUNT !='' "> and POS_CURRENT_LOAN_COUNT = #{POS_CURRENT_LOAN_COUNT} </if>
+      <if test="POS_AMT != null and POS_AMT !='' "> and POS_AMT = #{POS_AMT} </if>
+      <if test="POS_STANDARD != null and POS_STANDARD !='' "> and POS_STANDARD = #{POS_STANDARD} </if>
+      <if test="POS_OWN_REWARD != null and POS_OWN_REWARD !='' "> and POS_OWN_REWARD = #{POS_OWN_REWARD} </if>
+      <if test="POS_DOWN_REWARD != null and POS_DOWN_REWARD !='' "> and POS_DOWN_REWARD = #{POS_DOWN_REWARD} </if>
+      <if test="POS_REAWRD_PROFIT != null and POS_REAWRD_PROFIT !='' "> and POS_REAWRD_PROFIT = #{POS_REAWRD_PROFIT} </if>
+      <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
+    </where>
+  </sql>
+
   <sql id="BASE_WHERE_SQL">
     <where>
       1=1
@@ -539,7 +569,33 @@
     <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
     <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
     <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
+    <!--<if test="PROFIT_POS_DATE != null and PROFIT_POS_DATE !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE} </if>-->
+    <choose>
+      <when test="PROFIT_POS_DATE_START !=null and PROFIT_POS_DATE_START != '' and PROFIT_POS_DATE_END !=null and PROFIT_POS_DATE_END != ''">
+        and PROFIT_POS_DATE between #{PROFIT_POS_DATE_START} and #{PROFIT_POS_DATE_END}
+      </when>
+      <otherwise>
+        <if test="PROFIT_POS_DATE_START != null and PROFIT_POS_DATE_START !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE_START} </if>
+      </otherwise>
+    </choose>
     <include refid="PAGING_END" />
+  </select>
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(POS_OWN_REWARD) as totalMoney from POS_REWARD_DETAIL
+    where 1=1
+    <choose>
+      <when test="PROFIT_POS_DATE_START !=null and PROFIT_POS_DATE_START != '' and PROFIT_POS_DATE_END !=null and PROFIT_POS_DATE_END != ''">
+        and PROFIT_POS_DATE between #{PROFIT_POS_DATE_START} and #{PROFIT_POS_DATE_END}
+      </when>
+      <otherwise>
+        <if test="PROFIT_POS_DATE_START != null and PROFIT_POS_DATE_START !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE_START} </if>
+      </otherwise>
+    </choose>
+    <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' "> and POS_AGENT_ID = #{POS_AGENT_ID} </if>
+    <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' "> and POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+    <if test="POS_MECHANISM_TYPE != null and POS_MECHANISM_TYPE !='' "> and POS_MECHANISM_TYPE = #{POS_MECHANISM_TYPE} </if>
+    <if test="POS_REMARK != null and POS_REMARK !='' "> and POS_REMARK = #{POS_REMARK} </if>
+    <if test="PROFIT_POS_DATE != null and PROFIT_POS_DATE !='' "> and PROFIT_POS_DATE = #{PROFIT_POS_DATE} </if>
   </select>
   <sql id="PAGING_START">
     <if test="begin != null  and end != null and end &gt;0">

@@ -16,6 +16,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +68,7 @@ public class DailyProfitMposDataJob {
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
-//    @Scheduled(cron = "0 0 5 * * ?")
+    @Scheduled(cron = "0 0 5 * * ?")
     public void synchroProfitDay(String frDate) {
         try {
 
@@ -78,9 +79,9 @@ public class DailyProfitMposDataJob {
             map.put("pageSize", "50");
             String params = JsonUtil.objectToJson(map);
 
-            logger.info("日结数据同步请求参数：{}", params);
+            logger.debug("日结数据同步请求参数：{}", params);
             String res = HttpClientUtil.doPostJson(AppConfig.getProperty("profit.newday"), params);
-            logger.info("日结数据同步返回数据：{}", res);
+            logger.debug("日结数据同步返回数据：{}", res);
 
             JSONObject object = JSONObject.parseObject(res);
             if (!object.get("respCode").equals("000000")) {

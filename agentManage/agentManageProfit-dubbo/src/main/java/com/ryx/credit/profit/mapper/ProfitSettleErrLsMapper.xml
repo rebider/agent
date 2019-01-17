@@ -692,7 +692,7 @@
   </select>
   <select id="getNotSupplyProfitSettleErrLsList" resultMap="BaseResultMap">
      select    s.* from P_SETTLE_ERR_LS S
-     inner join p_profit_supply d on d.id = S.Source_Id and d.supply_type='退单补款' and d.supply_date=#{supplyDate}
+     inner join p_profit_supply d on d.id = S.Source_Id and d.BUS_BIG_TYPE='01' and d.supply_date=#{supplyDate}
      where s.BUSINESS_TYPE=#{bussType} and S.ERR_FLAG is null order by s.source_id
   </select>
 </mapper>

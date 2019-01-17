@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 交易金额汇总任务测试
+ * 交易量比对测试
  * @author zhaodw
  * @create 2018/7/30
  * @since 1.0.0

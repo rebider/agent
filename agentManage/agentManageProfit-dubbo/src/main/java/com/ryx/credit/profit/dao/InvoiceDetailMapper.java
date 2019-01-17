@@ -32,7 +32,13 @@ public interface InvoiceDetailMapper {
     /**根据上级获取全部下级的agentId*/
     List<String> getAgentIdByBusParent(String agentId);
 
-    String getAgentIdbyAgentName(String agentId);
+    String getAgentIdbyAgentName(String agentName);
 
-    void deleteByMonth(String profitMonth);
+    void deleteByMonth(@Param("profitMonth") String profitMonth);
+
+    Map<String,Object> profitCount(InvoiceDetailExample example);
+
+    /**根据agentId或者agentName获得本月欠票**/
+    Map<String,Object> getOwnInvoice(Map<String,String> map);
+
 }

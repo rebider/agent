@@ -38,7 +38,9 @@ public interface ProfitSupplyService {
 
     int updateByPrimaryKey(ProfitSupply record);
 
-    int resetData();
+    int resetData(String busBigType);
 
     List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception;
+
+    Map<String,Object> profitCount(Map<String, Object> param);
 }

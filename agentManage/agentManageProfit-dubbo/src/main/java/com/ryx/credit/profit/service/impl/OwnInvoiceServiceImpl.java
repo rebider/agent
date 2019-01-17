@@ -61,6 +61,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             InvoiceDetailExample example = new InvoiceDetailExample();
             InvoiceDetailExample.Criteria criteria = example.createCriteria();
             criteria.andAgentIdEqualTo(agentId);
+            criteria.andProfitMonthEqualTo(profitMonth);
             List<InvoiceDetail> list = invoiceDetailMapper.selectByExample(example);
             if (list != null && list.size() > 0) {
                 // 更新
@@ -75,6 +76,7 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 invoiceDetail.setOwnInvoice(ownInvoice);
                 invoiceDetail.setAddInvoiceAmt(invoice.getInvoiceAmt());
                 invoiceDetail.setUpdateTime(DateUtils.dateToStringss(new Date()));
+                invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
             } else {
                 //插入
                 Map<String, Object> params = new HashMap<>();
@@ -82,14 +84,17 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 params.put("preMonth", new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -2)));
                 params.put("agentId", invoice.getAgentId());
                 List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceAgents(params);
+                if (agentList != null && agentList.size() > 0) {
+                    Map<String, Object> map = agentList.get(0);
+                    insertInvoiceOwnDetail(map, profitMonth);
+                }
             }
         } catch (Exception e) {
             logger.error("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败", e);
             throw new RuntimeException("{" + invoice.getAgentId() + "}欠票导入或重导后重算失败");
         }
+
     }
-
-
     /**
      * @Author: Zhang Lei
      * @Description: 欠票调整
@@ -205,30 +210,29 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         InvoiceDetailExample example = new InvoiceDetailExample();
         example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(agentName)){
-            criteria.andAgentNameEqualTo(agentName);
-        }
         if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
             criteria.andProfitMonthBetween(dateStart,dateEnd);
         }else if(StringUtils.isNotBlank(dateStart)){
-            criteria.andProfitMonthEqualTo(dateStart);
+            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
         }else if(StringUtils.isNotBlank(dateEnd)){
-            criteria.andProfitMonthEqualTo(dateEnd);
+            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
         }
-        if("1".equals(concludeChild)  && StringUtils.isNotBlank(agentId)){
+        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
-        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
-            String agentIde = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
-            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentIde);
-            lists.add(agentIde);
+        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
+           String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
+            lists.add(aId);
             criteria.andAgentIdIn(lists);
-        }else if(StringUtils.isNotBlank(agentId)){
+        } else if (StringUtils.isNotBlank(agentId)) {
             criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
-        Long count =invoiceDetailMapper.countByExample(example);
+        Long count = invoiceDetailMapper.countByExample(example);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(lists);
         pageInfo.setTotal(count.intValue());
@@ -236,25 +240,25 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * @Author CQT
-     * 向欠票导入表中导入数据
      * @param datas
      * @param loginName
+     * @Author CQT
+     * 向欠票导入表中导入数据
      */
     @Override
-    public void exportData(List<List<Object>> datas,String loginName) {
-        if(datas != null && datas.size() > 0 ) {
-            datas.stream().filter(list->list!=null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list->{
-                insertInvoice(list,loginName);
-            });
-        }
+    public void exportData(List<List<Object>> datas, String loginName) {
+            if (datas != null && datas.size() > 0) {
+                datas.stream().filter(list -> list != null && list.size()== 3 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list -> {
+                    insertInvoice(list, loginName);
+                });
+            }
     }
 
     /**
-     * @Author CQT
-     * 根据id获取对应代理商数据信息
      * @param id
      * @return
+     * @Author CQT
+     * 根据id获取对应代理商数据信息
      */
     @Override
     public InvoiceDetail getInvoiceById(String id) {
@@ -262,100 +266,152 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
     }
 
     /**
-     * @Author CQT
-     * 设置调整金额
      * @param invoiceDetail
      * @return
+     * @Author CQT
+     * 设置调整金额
      */
     @Override
     public void setAdjustAMT(InvoiceDetail invoiceDetail) {
-        ownInvoiceAdjust(invoiceDetail.getId(),new BigDecimal(invoiceDetail.getAdjustAmt().toString()),invoiceDetail.getAdjustAccount(),invoiceDetail.getAdjustReson());
+        ownInvoiceAdjust(invoiceDetail.getId(), new BigDecimal(invoiceDetail.getAdjustAmt().toString()), invoiceDetail.getAdjustAccount(), invoiceDetail.getAdjustReson());
     }
 
     /**
-     * @Author CQT
-     * @Description导出数据
      * @param agentId
      * @param agentName
      * @param concludeChild
      * @param dateStart
      * @param dateEnd
      * @return
+     * @Author CQT
+     * @Description导出数据
      */
     @Override
     public List<InvoiceDetail> exportInvoiceData(String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
         InvoiceDetailExample example = new InvoiceDetailExample();
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(agentName)){
-            criteria.andAgentNameEqualTo(agentName);
-        }
         if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
             criteria.andProfitMonthBetween(dateStart,dateEnd);
         }else if(StringUtils.isNotBlank(dateStart)){
-            criteria.andProfitMonthEqualTo(dateStart);
+            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
         }else if(StringUtils.isNotBlank(dateEnd)){
-            criteria.andProfitMonthEqualTo(dateEnd);
+            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
         }
-        if("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)){
+        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
             lists.add(agentId);
             criteria.andAgentIdIn(lists);
-        }else if("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)){
-            String agent = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
-            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agent);
-            lists.add(agent);
+        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
+            String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
+            lists.add(aId);
             criteria.andAgentIdIn(lists);
-        }else if(StringUtils.isNotBlank(agentId)){
+        }else if (StringUtils.isNotBlank(agentId)) {
             criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
         }
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         return lists;
     }
 
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        Map<String,Object> map=null;
+        InvoiceDetailExample example = new InvoiceDetailExample();
+        InvoiceDetailExample.Criteria criteria = example.createCriteria();
+        String dateStart=param.get("dateStart")==null?null:param.get("dateStart").toString();
+        String dateEnd=param.get("dateEnd")==null?null:param.get("dateEnd").toString();
+        String agentId=param.get("agentId")==null?null:param.get("agentId").toString();
+        String agentName=param.get("agentName")==null?null:param.get("agentName").toString();
+        String concludeChild=param.get("concludeChild")==null?null:param.get("concludeChild").toString();
+        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthBetween(dateStart,dateEnd);
+        }else if(StringUtils.isNotBlank(dateStart)){
+            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
+        }else if(StringUtils.isNotBlank(dateEnd)){
+            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
+        }
+        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
+            lists.add(agentId);
+            criteria.andAgentIdIn(lists);
+        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
+            String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
+            lists.add(aId);
+            criteria.andAgentIdIn(lists);
+        }else if (StringUtils.isNotBlank(agentId)) {
+            criteria.andAgentIdEqualTo(agentId);
+        }else if(StringUtils.isNotBlank(agentName)){
+            criteria.andAgentNameEqualTo(agentName);
+        }
+        map=invoiceDetailMapper.profitCount(example);
+        return map;
+    }
+
+    @Override
+    public Map<String, Object> getOwmInvoice(Map<String, String> map) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH,-1);
+        Date date = calendar.getTime();
+        String profitMonth = new SimpleDateFormat("yyyyMM").format(date);
+        map.put("profitMonth",profitMonth);
+        return invoiceDetailMapper.getOwnInvoice(map);
+    }
+
     /**
-     * @Author CQT
-     *@Description 插入数据
      * @param list
      * @param loginName
+     * @Author CQT
+     * @Description 插入数据
      */
-    private void insertInvoice(List list,String loginName){
+    private void insertInvoice(List list, String loginName) {
         Invoice invoice = new Invoice();
         String agentId = list.get(1).toString();
         String agentName = list.get(0).toString();
         BigDecimal amt = new BigDecimal(list.get(2).toString());
+        //获取系统当前时间
+        Calendar curr = Calendar.getInstance();
+        curr.setTime(new Date(System.currentTimeMillis()));
+        curr.add(Calendar.MONTH, -1);
+        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("yyyyMM");
+        String profitMonth = simpleDateFormatMonth.format(curr.getTime());
+        //设置id
         UUID uuid = UUID.randomUUID();
-        String str = uuid.toString().replace("-","");
+        String str = uuid.toString().replace("-", "");
+
         invoice.setId(str); //设置id
+        invoice.setFactorMonth(profitMonth);
         invoice.setAgentId(agentId);
         invoice.setAgentName(agentName);
         String agentPid = invoiceDetailMapper.getAgentPidByAgentId(agentId);//获取代理商唯一码
         invoice.setAgentPid(agentPid);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");//将每次导入的欠票月份当设为当月
-        invoice.setFactorMonth(sdf.format(new Date()));
         invoice.setInvoiceAmt(amt);
         invoice.setStatus("1");
         SimpleDateFormat ss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         invoice.setOptDate(ss.format(new Date()));
         invoice.setOptUser(loginName);
+
         boolean isHave = getInvoiceByInvoice(invoice);
-        if(isHave == false){
+        if (isHave == false) {
             //表示存在有效记录，将其设置为无效
             invoiceMapper.setStatusToInvoice(invoice);
         }
-        invoiceMapper.insertSelective(invoice);
-        //欠票导入后进行计算
-        ownInvoiceReComputer(invoice);
+
+        invoiceMapper.insertSelective(invoice);//插入欠票表中
+        ownInvoiceReComputer(invoice);//欠票导入或者重导后计算
     }
 
     /**
+     * @param invoice
+     * @return 不存在，返回true
      * @Author CQT
      * @Description判断导入欠票表中是否存在有效且已有数据
-     * @param invoice
-     * @return  不存在，返回true
      */
-    private boolean getInvoiceByInvoice(Invoice invoice){
+    private boolean getInvoiceByInvoice(Invoice invoice) {
         Invoice invoce = invoiceMapper.getInvoiceByInvoice(invoice);
-        if(invoce == null){
+        if (invoce == null) {
             return true;
         }
         return false;

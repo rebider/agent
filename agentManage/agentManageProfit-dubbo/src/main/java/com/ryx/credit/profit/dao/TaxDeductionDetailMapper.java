@@ -19,6 +19,7 @@ public interface TaxDeductionDetailMapper {
 
     List<TaxDeductionDetail> selectByExample(TaxDeductionDetailExample example);
 
+
     TaxDeductionDetail selectByPrimaryKey(String id);
 
     int updateByPrimaryKeySelective(TaxDeductionDetail record);
@@ -32,4 +33,10 @@ public interface TaxDeductionDetailMapper {
     long queryCountAndSubordinate(TaxDeductionDetail taxDeductionDetail);
 
     void deleteByMonth(@Param("profitMonth") String profitMonth);
+
+    List<Map<String,Object>> queryTaxDeductionZFAgentList(Map<String,Object> params);
+
+    Map<String, Object> profitCount(TaxDeductionDetailExample example);
+
+    Map<String, Object> profitCountWithSubordinate(Map<String, Object> param);
 }

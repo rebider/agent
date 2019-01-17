@@ -45,4 +45,6 @@ public interface PosRewardDetailMapper {
     List<String> queryChildLevelByAgentId(String agentId);
 
     String querySuperAgentId(String agentId);
+
+    Map<String,Object> profitCount(Map<String,Object> param);
 }

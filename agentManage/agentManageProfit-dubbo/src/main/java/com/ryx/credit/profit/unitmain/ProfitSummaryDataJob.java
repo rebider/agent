@@ -99,9 +99,9 @@ public class ProfitSummaryDataJob {
                 BigDecimal rhbDay = dayMapper.totalProfitAndReturnById(day);//瑞和宝日结分润-
                 rhbDay = rhbDay==null?BigDecimal.ZERO:rhbDay;
                 detailMonth.setRhbProfitAmt(detail.getProfitAmt().subtract(rhbDay));*/
-                detailMonth.setRhbProfitAmt(detail.getProfitAmt().subtract(detail.getNotaxAmt()));
+                detailMonth.setRhbProfitAmt(detail.getProfitAmt());
             } else if (detail.getBusCode().equals("6000")) {//直发
-                detailMonth.setZfProfitAmt(detail.getProfitAmt().subtract(detail.getNotaxAmt()));
+                detailMonth.setZfProfitAmt(detail.getProfitAmt());
             } else if (detail.getBusCode().equals("2000")) {//瑞刷
                 detailMonth.setRsProfitAmt(detail.getProfitAmt());
             } else if (detail.getBusCode().equals("1111")) {//瑞银信活动
@@ -132,6 +132,7 @@ public class ProfitSummaryDataJob {
                 detailMonth.setAgentId(detail.getAgentId());
                 detailMonth.setParentAgentId(detail.getParentAgentId());
                 detailMonth.setAgentPid(detail.getAgentId());
+                detailMonth.setBusPlatform(detail.getBusCode());
                 detailMonthMapper.insertSelective(detailMonth);
             } else {//更新汇总
                 detailMonthMapper.updateByPrimaryKeySelective(detailMonth);

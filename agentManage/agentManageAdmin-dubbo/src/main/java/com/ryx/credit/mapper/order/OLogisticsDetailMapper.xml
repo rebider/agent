@@ -39,6 +39,7 @@
     <result column="POS_SPE_PRICE" jdbcType="DECIMAL" property="posSpePrice" />
     <result column="POS_TYPE" jdbcType="VARCHAR" property="posType" />
     <result column="STAND_TIME" jdbcType="DECIMAL" property="standTime" />
+    <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -74,7 +75,8 @@
     G_TIME, SN_NUM, AGENT_ID, OPT_ID, OPT_TYPE, RETURN_ORDER_ID, C_TIME, U_TIME, C_USER,
     U_USER, STATUS, RECORD_STATUS, VERSION, ORDER_NUM, TERMINALID, TERMINALID_KEY, TERMINALID_SEQ,
     TERMINALID_TYPE, BUS_PRO_CODE, BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME, TERMTYPE,
-    TERMTYPENAME, SEND_STATUS, TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE, STAND_TIME
+    TERMTYPENAME, SEND_STATUS, TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE, STAND_TIME,
+    BUS_ID
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -117,7 +119,7 @@
     BUS_PRO_NAME, TERM_BATCHCODE, TERM_BATCHNAME,
     TERMTYPE, TERMTYPENAME, SEND_STATUS,
     TERMINALID_CHECK, POS_SPE_PRICE, POS_TYPE,
-    STAND_TIME)
+    STAND_TIME, BUS_ID)
     values (#{id,jdbcType=VARCHAR}, #{orderId,jdbcType=VARCHAR}, #{logisticsId,jdbcType=VARCHAR},
     #{proId,jdbcType=VARCHAR}, #{proName,jdbcType=VARCHAR}, #{settlementPrice,jdbcType=DECIMAL},
     #{activityId,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{gTime,jdbcType=DECIMAL},
@@ -130,7 +132,7 @@
     #{busProName,jdbcType=VARCHAR}, #{termBatchcode,jdbcType=VARCHAR}, #{termBatchname,jdbcType=VARCHAR},
     #{termtype,jdbcType=VARCHAR}, #{termtypename,jdbcType=VARCHAR}, #{sendStatus,jdbcType=DECIMAL},
     #{terminalidCheck,jdbcType=VARCHAR}, #{posSpePrice,jdbcType=DECIMAL}, #{posType,jdbcType=VARCHAR},
-    #{standTime,jdbcType=DECIMAL})
+    #{standTime,jdbcType=DECIMAL}, #{busId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OLogisticsDetail">
     insert into O_LOGISTICS_DETAIL
@@ -246,6 +248,9 @@
       <if test="standTime != null">
         STAND_TIME,
       </if>
+      <if test="busId != null">
+        BUS_ID,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -358,6 +363,9 @@
       </if>
       <if test="standTime != null">
         #{standTime,jdbcType=DECIMAL},
+      </if>
+      <if test="busId != null">
+        #{busId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -478,6 +486,9 @@
       <if test="standTime != null">
         STAND_TIME = #{standTime,jdbcType=DECIMAL},
       </if>
+      <if test="busId != null">
+        BUS_ID = #{busId,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -518,7 +529,8 @@
     TERMINALID_CHECK = #{terminalidCheck,jdbcType=VARCHAR},
     POS_SPE_PRICE = #{posSpePrice,jdbcType=DECIMAL},
     POS_TYPE = #{posType,jdbcType=VARCHAR},
-    STAND_TIME = #{standTime,jdbcType=DECIMAL}
+    STAND_TIME = #{standTime,jdbcType=DECIMAL},
+    BUS_ID = #{busId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

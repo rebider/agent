@@ -91,4 +91,9 @@ public class PosRewardSDetailServiceImpl implements PosRewardSDetailService {
 
         return posRewardDetailMapper.selectByExample(posRewardDetailExample);
     }
+
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        return posRewardDetailMapper.profitCount(param);
+    }
 }

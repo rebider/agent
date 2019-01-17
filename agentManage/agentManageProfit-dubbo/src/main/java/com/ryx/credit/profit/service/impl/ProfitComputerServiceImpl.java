@@ -159,6 +159,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return totalDay;
     }
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 保理扣款计算
+     * @Date: 14:45 2019/1/10
+     */
     @Override
     public BigDecimal total_factor(String agentPid,String month) {
         if(null==month || "".equals(month)){
@@ -176,7 +181,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         return totalFactor;
     }
 
-    @Override
+    /*@Override
     public BigDecimal new_total_factor(String agentId,String parentId,String month) {
         if(null==month || "".equals(month)){
             month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
@@ -192,7 +197,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
         logger.info(agentId+"在【"+month+"】商业保理扣款共计："+totalFactor);
         return totalFactor;
-    }
+    }*/
 
     @Override
     public BigDecimal total_supply(String agentPid,String month) {
@@ -203,6 +208,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         ProfitSupply supply = new ProfitSupply();
         supply.setAgentPid(agentPid);
         supply.setSupplyDate(month);
+        supply.setBusBigType("99");//其他补款
         BigDecimal totalSupply = profitSupplyMapper.getTotalByMonthAndPid(supply);
         if(null == totalSupply){
             totalSupply = BigDecimal.ZERO;
@@ -221,6 +227,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         supply.setAgentId(agentId);
         supply.setParentAgentId(parentId);
         supply.setSupplyDate(month);
+        supply.setBusBigType("99");//其它补款
         BigDecimal totalSupply = profitSupplyMapper.getTotalByMonthAndPid(supply);
         if(null == totalSupply){
             totalSupply = BigDecimal.ZERO;

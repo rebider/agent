@@ -28,7 +28,7 @@ public class TaxDeductionTest {
     @Test
     public void test() throws Exception {
         Map<String,Object> map = new HashMap<>();
-        taxDeductionService.taxDeductionComputer(map);
+        taxDeductionService.taxDeductionComputer();
     }
 
 
