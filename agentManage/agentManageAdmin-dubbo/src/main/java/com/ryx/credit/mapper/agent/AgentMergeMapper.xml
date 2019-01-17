@@ -21,6 +21,7 @@
     <result column="SUPP_AGENT_ID" jdbcType="VARCHAR" property="suppAgentId" />
     <result column="SUPP_AGENT_NAME" jdbcType="VARCHAR" property="suppAgentName" />
     <result column="MERGE_BUS_IDS" jdbcType="VARCHAR" property="mergeBusIds" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -54,7 +55,7 @@
   <sql id="Base_Column_List">
     ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT,
     SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS,
-    VERSION, MERGE_TYPE, SUPP_TYPE, SUPP_AGENT_ID, SUPP_AGENT_NAME, MERGE_BUS_IDS
+    VERSION, MERGE_TYPE, SUPP_TYPE, SUPP_AGENT_ID, SUPP_AGENT_NAME, MERGE_BUS_IDS, REMARK
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -91,14 +92,14 @@
     U_TIME, C_USER, U_USER,
     STATUS, VERSION, MERGE_TYPE,
     SUPP_TYPE, SUPP_AGENT_ID, SUPP_AGENT_NAME,
-    MERGE_BUS_IDS)
+    MERGE_BUS_IDS, REMARK)
     values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR},
     #{subAgentId,jdbcType=VARCHAR}, #{subAgentName,jdbcType=VARCHAR}, #{subAgentDebt,jdbcType=DECIMAL},
     #{subAgentOweTicket,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
     #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
     #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{mergeType,jdbcType=DECIMAL},
     #{suppType,jdbcType=DECIMAL}, #{suppAgentId,jdbcType=VARCHAR}, #{suppAgentName,jdbcType=VARCHAR},
-    #{mergeBusIds,jdbcType=VARCHAR})
+    #{mergeBusIds,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
     insert into A_AGENT_MERGE
@@ -160,6 +161,9 @@
       <if test="mergeBusIds != null">
         MERGE_BUS_IDS,
       </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -218,6 +222,9 @@
       </if>
       <if test="mergeBusIds != null">
         #{mergeBusIds,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -284,6 +291,9 @@
       <if test="mergeBusIds != null">
         MERGE_BUS_IDS = #{mergeBusIds,jdbcType=VARCHAR},
       </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -306,7 +316,8 @@
     SUPP_TYPE = #{suppType,jdbcType=DECIMAL},
     SUPP_AGENT_ID = #{suppAgentId,jdbcType=VARCHAR},
     SUPP_AGENT_NAME = #{suppAgentName,jdbcType=VARCHAR},
-    MERGE_BUS_IDS = #{mergeBusIds,jdbcType=VARCHAR}
+    MERGE_BUS_IDS = #{mergeBusIds,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

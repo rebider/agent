@@ -45,9 +45,13 @@ public class AgentMerge implements Serializable{
 
     private String mergeBusIds;
 
+    private String remark;
+
     private List<AgentMergeBusInfo> agentMergeBusInfosList;
 
     private List<Map<String,Object>> subAgentBusInfoList;
+
+    private List<Attachment> attachments;
 
     public List<Map<String, Object>> getSubAgentBusInfoList() {
         return subAgentBusInfoList;
@@ -215,5 +219,21 @@ public class AgentMerge implements Serializable{
 
     public void setMergeBusIds(String mergeBusIds) {
         this.mergeBusIds = mergeBusIds;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }
