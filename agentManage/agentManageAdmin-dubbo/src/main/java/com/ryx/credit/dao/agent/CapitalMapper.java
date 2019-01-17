@@ -26,4 +26,6 @@ public interface CapitalMapper {
     public List<Capital> paymentQuery(String id);
 
     public List<Capital> selectAmount(String paymentId);
+
+    List<Capital> selectByAgenId(String agentId);
 }

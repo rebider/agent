@@ -9,7 +9,8 @@ public enum CashPayType {
 
     PAYMENT("PAYMENT","订单付款单"),
     SUPPLEMENT("SUPPLEMENT","补款"),
-    REFUNDPRICEDIFF("REFUNDPRICEDIFF","补差价");
+    REFUNDPRICEDIFF("REFUNDPRICEDIFF","补差价"),
+    AGENTMERGE("AGENTMERGE","代理商合并");
 
 
     public String code;

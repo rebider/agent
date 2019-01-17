@@ -3,6 +3,8 @@ package com.ryx.credit.pojo.admin.agent;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class AgentMerge implements Serializable{
     private String id;
@@ -34,6 +36,38 @@ public class AgentMerge implements Serializable{
     private BigDecimal version;
 
     private BigDecimal mergeType;
+
+    private BigDecimal suppType;
+
+    private String suppAgentId;
+
+    private String suppAgentName;
+
+    private String mergeBusIds;
+
+    private String remark;
+
+    private List<AgentMergeBusInfo> agentMergeBusInfosList;
+
+    private List<Map<String,Object>> subAgentBusInfoList;
+
+    private List<Attachment> attachments;
+
+    public List<Map<String, Object>> getSubAgentBusInfoList() {
+        return subAgentBusInfoList;
+    }
+
+    public void setSubAgentBusInfoList(List<Map<String, Object>> subAgentBusInfoList) {
+        this.subAgentBusInfoList = subAgentBusInfoList;
+    }
+
+    public List<AgentMergeBusInfo> getAgentMergeBusInfosList() {
+        return agentMergeBusInfosList;
+    }
+
+    public void setAgentMergeBusInfosList(List<AgentMergeBusInfo> agentMergeBusInfosList) {
+        this.agentMergeBusInfosList = agentMergeBusInfosList;
+    }
 
     public String getId() {
         return id;
@@ -153,5 +187,53 @@ public class AgentMerge implements Serializable{
 
     public void setMergeType(BigDecimal mergeType) {
         this.mergeType = mergeType;
+    }
+
+    public BigDecimal getSuppType() {
+        return suppType;
+    }
+
+    public void setSuppType(BigDecimal suppType) {
+        this.suppType = suppType;
+    }
+
+    public String getSuppAgentId() {
+        return suppAgentId;
+    }
+
+    public void setSuppAgentId(String suppAgentId) {
+        this.suppAgentId = suppAgentId;
+    }
+
+    public String getSuppAgentName() {
+        return suppAgentName;
+    }
+
+    public void setSuppAgentName(String suppAgentName) {
+        this.suppAgentName = suppAgentName;
+    }
+
+    public String getMergeBusIds() {
+        return mergeBusIds;
+    }
+
+    public void setMergeBusIds(String mergeBusIds) {
+        this.mergeBusIds = mergeBusIds;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }

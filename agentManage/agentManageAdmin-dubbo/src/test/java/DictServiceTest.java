@@ -18,6 +18,7 @@ import com.ryx.credit.service.agent.DateChangeReqService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 
+import com.ryx.credit.service.order.OrderService;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,8 @@ public class DictServiceTest extends BaseSpringTest {
     private AgentQueryService agentQueryService;
     @Autowired
     private CashSummaryMouthMapper cashSummaryMouthMapper;
+    @Autowired
+    private OrderService orderService;
     
     @Test
     public void testId(){
@@ -133,6 +136,11 @@ public class DictServiceTest extends BaseSpringTest {
 
     @Test
     public void notifyBean() {
+    }
+
+    @Test
+    public void testRepr(){
+        orderService.testRepeatableRead();
     }
 
 }
