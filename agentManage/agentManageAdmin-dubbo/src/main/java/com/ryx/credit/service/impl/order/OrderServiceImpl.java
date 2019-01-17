@@ -596,6 +596,8 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setPosType(activity.getPosType());
                     oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
                     oSubOrderActivity.setStandTime(activity.getStandTime());
+                    oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                    oSubOrderActivity.setBackType(activity.getBackType());
                     if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
                         logger.info("下订单:{}{}", activity.getActivityName(), "商品添加活动失败");
                         throw new MessageException("商品添加活动失败");
@@ -918,6 +920,8 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setPosType(activity.getPosType());
                     oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
                     oSubOrderActivity.setStandTime(activity.getStandTime());
+                    oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                    oSubOrderActivity.setBackType(activity.getBackType());
                 } else {
                     //设置商品实际单价
                     throw new MessageException("商品必须选择指定的活动");

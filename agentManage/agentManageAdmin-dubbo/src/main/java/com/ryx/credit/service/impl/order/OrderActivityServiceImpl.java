@@ -351,6 +351,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             Map<String,String> item = new HashMap<>();
             item.put("proCom",oActivity.getVender());
             item.put("proModel",oActivity.getProModel());
+            item.put("standTime",oActivity.getStandTime()+"");
+            item.put("standAmt",oActivity.getStandAmt()+"");
+            item.put("backType",oActivity.getBackType()+"");
+            item.put("busProName",oActivity.getBusProName()+"");
+            item.put("id",oActivity.getId());
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(),DictGroup.MANUFACTURER.name(),oActivity.getVender());
             if(dict!=null){
                 item.put("proComName",dict.getdItemname());
