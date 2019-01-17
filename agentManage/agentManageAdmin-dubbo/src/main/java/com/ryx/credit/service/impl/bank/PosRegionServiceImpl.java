@@ -160,7 +160,7 @@ public class PosRegionServiceImpl implements PosRegionService {
         for (DPosRegion dPosRegion : dPosRegions) {
             result+=dPosRegion.getName()+",";
         }
-        if(StringUtils.isBlank(result)){
+        if(StringUtils.isNotBlank(result)){
             result = result.substring(0,result.length()-1);
         }
         return result;
