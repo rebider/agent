@@ -316,6 +316,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Override
 	public List<Map> agentBus(String agentId) {
 		List<Map> data = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("agentId",agentId));
+		for (Map datum : data) {
+			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+		}
 		return data;
 	}
 
@@ -628,6 +631,17 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 			return agentBusInfos.get(0);
 		}
 		return null;
+	}
+
+	@Override
+	public List<AgentBusInfo> selectExistsById(String id){
+		AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+		AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+		criteria.andStatusEqualTo(Status.STATUS_1.status);
+		criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+		criteria.andIdEqualTo(id);
+		List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+		return agentBusInfos;
 	}
 }
 

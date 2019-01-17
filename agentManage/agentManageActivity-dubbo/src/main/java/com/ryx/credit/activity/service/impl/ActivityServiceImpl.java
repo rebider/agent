@@ -140,9 +140,9 @@ public class ActivityServiceImpl implements ActivityService {
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(approvalPerson));
             String approvalDep = String.valueOf(orgCodeRes.get(0).get("ORGID"));
             ActRuTask actRuTask = actRuTaskService.selectByPrimaryKey(taskId);
-            String executionId = String.valueOf(actRuTask.getExecutionId());
+            String procInstId = String.valueOf(actRuTask.getProcInstId());
             String taskName = String.valueOf(actRuTask.getName());
-            BusActRel busActRel = busActRelService.findById(executionId);
+            BusActRel busActRel = busActRelService.findById(procInstId);
             String busId = busActRel.getBusId();
             String busType = busActRel.getBusType();
 
@@ -152,7 +152,7 @@ public class ActivityServiceImpl implements ActivityService {
             approvalFlowRecord.setTaskName(taskName);
             approvalFlowRecord.setApprovalDep(approvalDep);
             approvalFlowRecord.setApprovalTime(approvalTime);
-            approvalFlowRecord.setExecutionId(executionId);
+            approvalFlowRecord.setExecutionId(procInstId);
             approvalFlowRecord.setTaskId(taskId);
             approvalFlowRecord.setApprovalOpinion(approvalOpinion);
             approvalFlowRecord.setApprovalPerson(approvalPerson);

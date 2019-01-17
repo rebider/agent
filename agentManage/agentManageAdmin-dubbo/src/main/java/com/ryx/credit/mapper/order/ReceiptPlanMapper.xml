@@ -400,6 +400,7 @@
         <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
         <if test="model!=null and model!=''"> and R.MODEL=#{model} </if>
         <if test="beginTime!=null and endTime!=''"> and (to_char(R.c_date,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
+        <if test="agentId!=null and agentId!=''"> and agent.id = #{agentId}</if>
       </trim>
     </where>
   </sql>

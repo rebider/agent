@@ -12,7 +12,8 @@ import java.math.BigDecimal;
 public enum MergeStatus {
 
     WXS(new BigDecimal("0"),"未生效"),
-    SX(new BigDecimal("1"),"已生效");
+    SX(new BigDecimal("1"),"已生效"),
+    BHB(new BigDecimal("2"),"被合并");
 
     public BigDecimal code;
 
@@ -39,5 +40,19 @@ public enum MergeStatus {
         return this.msg;
     }
 
+    /**
+     * 根据值获取内容
+     * @param value
+     * @return
+     */
+    public static String getContentByValue(BigDecimal value) {
+        MergeStatus[] mergeStatus = MergeStatus.values();
+        for (MergeStatus cc : mergeStatus) {
+            if(cc.code.compareTo(value)==0){
+                return cc.msg;
+            }
+        }
+        return "";
+    }
 
 }
