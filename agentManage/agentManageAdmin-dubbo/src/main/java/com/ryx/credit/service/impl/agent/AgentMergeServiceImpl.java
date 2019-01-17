@@ -1074,7 +1074,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 agentNotifyVo.setBusMessage(agentBusInfo);
                 agentNotifyVo.setHasS0(agentBusInfo.getDredgeS0().equals(new BigDecimal(1))?"0":"1");
                 agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
-                agentNotifyVo.setBusiType(platType.equals(PlatformType.POS.getValue())?"01":"02");
+                agentNotifyVo.setBusiType(platType.equals(PlatformType.POS.getValue())?"01":"02"); //cxinfo 新增瑞易送，瑞享送的等平台 pos结构 业务类型 变更
                 Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
                 agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
                 AgentBusInfo agentParent = null;
