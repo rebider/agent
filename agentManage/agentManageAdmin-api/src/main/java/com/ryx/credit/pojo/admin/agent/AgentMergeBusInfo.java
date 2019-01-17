@@ -89,6 +89,16 @@ public class AgentMergeBusInfo implements Serializable {
 
     private String busTypeName;
 
+    private String mergeStatusName;
+
+    public String getMergeStatusName() {
+        return mergeStatusName;
+    }
+
+    public void setMergeStatusName(String mergeStatusName) {
+        this.mergeStatusName = mergeStatusName;
+    }
+
     public String getBusTypeName() {
         return busTypeName;
     }

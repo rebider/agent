@@ -297,7 +297,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
         if(agentMergeBusInfos.size()!=0){
             for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
-                agentMergeBusInfo.setStatus(Status.STATUS_0.status);
+                agentMergeBusInfo.setMergeStatus(MergeStatus.BHB.getValue());
                 int i = agentMergeBusInfoMapper.updateByPrimaryKey(agentMergeBusInfo);
                 if(i!=1){
                     throw new MessageException("代理商合并，处理失败！");
@@ -761,6 +761,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if (null != agent) {
                 agentMergeBusInfo.setSubAgentName(agent.getAgName());
             }
+            agentMergeBusInfo.setMergeStatusName(MergeStatus.getContentByValue(agentMergeBusInfo.getMergeStatus()));
         }
         return agentMergeBusInfos;
     }
@@ -786,6 +787,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             if (null != agent) {
                 agentMergeBusInfo.setSubAgentName(agent.getAgName());
             }
+            agentMergeBusInfo.setMergeStatusName(MergeStatus.getContentByValue(agentMergeBusInfo.getMergeStatus()));
         }
         return agentMergeBusInfos;
     }
