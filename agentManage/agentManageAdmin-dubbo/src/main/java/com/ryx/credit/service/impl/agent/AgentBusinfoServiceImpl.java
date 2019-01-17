@@ -316,6 +316,9 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
 	@Override
 	public List<Map> agentBus(String agentId) {
 		List<Map> data = agentBusInfoMapper.queryTreeByBusInfo(FastMap.fastMap("agentId",agentId));
+		for (Map datum : data) {
+			datum.put("BUS_TYPE_NAME",BusType.getContentByValue(String.valueOf(datum.get("BUS_TYPE"))));
+		}
 		return data;
 	}
 

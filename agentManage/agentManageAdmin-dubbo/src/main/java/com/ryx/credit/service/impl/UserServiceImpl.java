@@ -140,4 +140,5 @@ public class UserServiceImpl extends ServiceImpl<CUserMapper, CUser> implements 
         }
         return cUserOrgCodelist;
     }
+
 }

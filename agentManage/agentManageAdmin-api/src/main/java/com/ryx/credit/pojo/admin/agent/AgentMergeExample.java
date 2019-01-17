@@ -1107,6 +1107,346 @@ public class AgentMergeExample {
             addCriterion("MERGE_TYPE not between", value1, value2, "mergeType");
             return (Criteria) this;
         }
+
+        public Criteria andSuppTypeIsNull() {
+            addCriterion("SUPP_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeIsNotNull() {
+            addCriterion("SUPP_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeEqualTo(BigDecimal value) {
+            addCriterion("SUPP_TYPE =", value, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeNotEqualTo(BigDecimal value) {
+            addCriterion("SUPP_TYPE <>", value, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeGreaterThan(BigDecimal value) {
+            addCriterion("SUPP_TYPE >", value, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUPP_TYPE >=", value, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeLessThan(BigDecimal value) {
+            addCriterion("SUPP_TYPE <", value, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SUPP_TYPE <=", value, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeIn(List<BigDecimal> values) {
+            addCriterion("SUPP_TYPE in", values, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeNotIn(List<BigDecimal> values) {
+            addCriterion("SUPP_TYPE not in", values, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUPP_TYPE between", value1, value2, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppTypeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SUPP_TYPE not between", value1, value2, "suppType");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdIsNull() {
+            addCriterion("SUPP_AGENT_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdIsNotNull() {
+            addCriterion("SUPP_AGENT_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdEqualTo(String value) {
+            addCriterion("SUPP_AGENT_ID =", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdNotEqualTo(String value) {
+            addCriterion("SUPP_AGENT_ID <>", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdGreaterThan(String value) {
+            addCriterion("SUPP_AGENT_ID >", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdGreaterThanOrEqualTo(String value) {
+            addCriterion("SUPP_AGENT_ID >=", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdLessThan(String value) {
+            addCriterion("SUPP_AGENT_ID <", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdLessThanOrEqualTo(String value) {
+            addCriterion("SUPP_AGENT_ID <=", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdLike(String value) {
+            addCriterion("SUPP_AGENT_ID like", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdNotLike(String value) {
+            addCriterion("SUPP_AGENT_ID not like", value, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdIn(List<String> values) {
+            addCriterion("SUPP_AGENT_ID in", values, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdNotIn(List<String> values) {
+            addCriterion("SUPP_AGENT_ID not in", values, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdBetween(String value1, String value2) {
+            addCriterion("SUPP_AGENT_ID between", value1, value2, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentIdNotBetween(String value1, String value2) {
+            addCriterion("SUPP_AGENT_ID not between", value1, value2, "suppAgentId");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameIsNull() {
+            addCriterion("SUPP_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameIsNotNull() {
+            addCriterion("SUPP_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameEqualTo(String value) {
+            addCriterion("SUPP_AGENT_NAME =", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameNotEqualTo(String value) {
+            addCriterion("SUPP_AGENT_NAME <>", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameGreaterThan(String value) {
+            addCriterion("SUPP_AGENT_NAME >", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("SUPP_AGENT_NAME >=", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameLessThan(String value) {
+            addCriterion("SUPP_AGENT_NAME <", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("SUPP_AGENT_NAME <=", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameLike(String value) {
+            addCriterion("SUPP_AGENT_NAME like", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameNotLike(String value) {
+            addCriterion("SUPP_AGENT_NAME not like", value, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameIn(List<String> values) {
+            addCriterion("SUPP_AGENT_NAME in", values, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameNotIn(List<String> values) {
+            addCriterion("SUPP_AGENT_NAME not in", values, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameBetween(String value1, String value2) {
+            addCriterion("SUPP_AGENT_NAME between", value1, value2, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andSuppAgentNameNotBetween(String value1, String value2) {
+            addCriterion("SUPP_AGENT_NAME not between", value1, value2, "suppAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsIsNull() {
+            addCriterion("MERGE_BUS_IDS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsIsNotNull() {
+            addCriterion("MERGE_BUS_IDS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsEqualTo(String value) {
+            addCriterion("MERGE_BUS_IDS =", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsNotEqualTo(String value) {
+            addCriterion("MERGE_BUS_IDS <>", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsGreaterThan(String value) {
+            addCriterion("MERGE_BUS_IDS >", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsGreaterThanOrEqualTo(String value) {
+            addCriterion("MERGE_BUS_IDS >=", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsLessThan(String value) {
+            addCriterion("MERGE_BUS_IDS <", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsLessThanOrEqualTo(String value) {
+            addCriterion("MERGE_BUS_IDS <=", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsLike(String value) {
+            addCriterion("MERGE_BUS_IDS like", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsNotLike(String value) {
+            addCriterion("MERGE_BUS_IDS not like", value, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsIn(List<String> values) {
+            addCriterion("MERGE_BUS_IDS in", values, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsNotIn(List<String> values) {
+            addCriterion("MERGE_BUS_IDS not in", values, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsBetween(String value1, String value2) {
+            addCriterion("MERGE_BUS_IDS between", value1, value2, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andMergeBusIdsNotBetween(String value1, String value2) {
+            addCriterion("MERGE_BUS_IDS not between", value1, value2, "mergeBusIds");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkIsNull() {
+            addCriterion("REMARK is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkIsNotNull() {
+            addCriterion("REMARK is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkEqualTo(String value) {
+            addCriterion("REMARK =", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkNotEqualTo(String value) {
+            addCriterion("REMARK <>", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkGreaterThan(String value) {
+            addCriterion("REMARK >", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkGreaterThanOrEqualTo(String value) {
+            addCriterion("REMARK >=", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkLessThan(String value) {
+            addCriterion("REMARK <", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkLessThanOrEqualTo(String value) {
+            addCriterion("REMARK <=", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkLike(String value) {
+            addCriterion("REMARK like", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkNotLike(String value) {
+            addCriterion("REMARK not like", value, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkIn(List<String> values) {
+            addCriterion("REMARK in", values, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkNotIn(List<String> values) {
+            addCriterion("REMARK not in", values, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkBetween(String value1, String value2) {
+            addCriterion("REMARK between", value1, value2, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemarkNotBetween(String value1, String value2) {
+            addCriterion("REMARK not between", value1, value2, "remark");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
