@@ -18,7 +18,7 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
-import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.profit.service.IOwnInvoiceService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -120,6 +120,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
     private AttachmentMapper attachmentMapper;
+    @Autowired
+    private IOwnInvoiceService ownInvoiceService;
 
     /**
      * 合并列表
@@ -432,6 +434,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new ProcessException("只能提交自己省区的代理商合并");
         }
         BigDecimal subAgentOweTicket = getSubAgentOweTicket(agentMerge.getSubAgentId());
+        if(subAgentOweTicket==null){
+            throw new ProcessException("副代理商查询欠票失败");
+        }
         if(subAgentOweTicket.compareTo(new BigDecimal(0))!=0){
             throw new ProcessException("副代理商欠票不可以提交");
         }
@@ -1307,8 +1312,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     public BigDecimal getSubAgentOweTicket(String agentId){
         Map<String,String> reqMap = new HashMap<>();
         reqMap.put("agentId",agentId);
-
-        logger.info("代理商合并查询欠票：代理商id:{},欠票：{}",agentId);
-        return new BigDecimal(1000);
+        Map<String, Object> resultMap = ownInvoiceService.getOwmInvoice(reqMap);
+        logger.info("代理商合并查询欠票：代理商id:{},欠票：{}",resultMap);
+        if(resultMap==null){
+            return new BigDecimal(0);
+        }
+        String owminvoice = String.valueOf(resultMap.get("OWMINVOICE"));
+        return new BigDecimal(owminvoice);
     }
 }
