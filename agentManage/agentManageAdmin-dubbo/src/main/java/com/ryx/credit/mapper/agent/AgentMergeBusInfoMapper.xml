@@ -572,6 +572,7 @@
       <if test="map.bsuId != null and map.bsuId != ''"> and b.bsu_id = #{map.bsuId} </if>
       <if test="map.mainAgentId != null and map.orgId != ''"> and b.main_agent_id = #{map.mainAgentId} </if>
       <if test="map.subAgentId != null and map.subAgentId != ''"> and m.sub_agent_id = #{map.subAgentId} </if>
+      <if test="map.orgId != null and map.orgId != ''"> and (ma.AG_DOC_PRO = #{map.orgId} or ma.AG_DOC_DISTRICT = #{map.orgId}) </if>
     </where>
   </sql>
 </mapper>
