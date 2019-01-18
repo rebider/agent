@@ -721,7 +721,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                         throw new ProcessException("更新收款信息失败");
                     }
                 }
-                if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67")){
+                //退回修改节点和第二个省区
+                if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67") || agentVo.getSid().equals("sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE")){
                     Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
                     Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
                     COrganization mainOrganization = organizationMapper.selectByPrimaryKey(mainAgent.getAgDocDistrict());
@@ -857,7 +858,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,
-                                      List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles) throws Exception {
+                                      List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles,String proIns) throws Exception {
         if(StringUtils.isBlank(agentMerge.getId())){
             throw new MessageException("数据ID为空！");
         }
@@ -936,6 +937,18 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 if (i != 1) {
                     logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                     throw new MessageException("更新合并数据失败！");
+                }
+            }
+            AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
+            if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                BusActRel busActRel = new BusActRel();
+                busActRel.setBusId(agentMerge.getId());
+                busActRel.setActivId(proIns);
+                busActRel.setAgentId(agentMerge.getSubAgentId());
+                busActRel.setAgentName(agentMerge.getSubAgentName());
+                int i = busActRelMapper.updateByPrimaryKey(busActRel);
+                if (i != 1) {
+                    throw new MessageException("更新合并工作流关系失败！");
                 }
             }
             //查看被合并代理商有没有合并过
