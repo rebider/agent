@@ -108,6 +108,7 @@
     <dubbo:reference interface="com.ryx.credit.machine.service.ImsTermTransferDetailService" id="imsTermTransferDetailService"  timeout="1200000" registry="${zk.group}"  check="false" />
     <dubbo:reference interface="com.ryx.credit.machine.service.ImsTermTransferService" id="imsTermTransferService"  timeout="1200000" registry="${zk.group}"  check="false" />
     <dubbo:reference interface="com.ryx.credit.machine.service.ImsTermWarehouseDetailService" id="imsTermWarehouseDetailService"  timeout="1200000" registry="${zk.group}" check="false" />
+    <dubbo:reference interface="com.ryx.credit.profit.service.IOwnInvoiceService" id="ownInvoiceService"  timeout="1200000" registry="${zk.group}" check="false" />
 
     <dubbo:service interface="com.ryx.credit.service.ISendSMSService" ref="sendSMSService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.ICuserAgentService" ref="cuserAgentService"  timeout="1200000" registry="${zk.group}" />
