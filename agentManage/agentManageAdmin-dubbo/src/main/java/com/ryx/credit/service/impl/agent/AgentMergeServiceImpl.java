@@ -181,11 +181,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMerge.setVersion(Status.STATUS_1.status);
 
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-//            mainAndSubMustHaveLower(agentMerge);
+            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
-//            verifyMergeing(agentMerge,busType,oCashReceivables);
+            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-//            verifypprovaling(agentMerge.getSubAgentId());
+            verifypprovaling(agentMerge.getSubAgentId());
 
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 agentMerge.setCloReviewStatus(AgStatus.Approving.status);
@@ -839,11 +839,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         try {
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-//            mainAndSubMustHaveLower(agentMerge);
+            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
-//            verifyMergeing(agentMerge,busType,oCashReceivables);
+            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-//            verifypprovaling(agentMerge.getSubAgentId());
+            verifypprovaling(agentMerge.getSubAgentId());
 
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
@@ -1055,7 +1055,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(agentMerge==null){
             throw new MessageException("未找到合并信息");
         }
-        String agentName = agentMerge.getMainAgentName() + "(" + agentMerge.getSubAgentName() + ")";
+        String agentName = agentMerge.getMainAgentName() + "-" + agentMerge.getSubAgentName();
 
         List<String> mPosOrgList = new ArrayList<>();
         for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
