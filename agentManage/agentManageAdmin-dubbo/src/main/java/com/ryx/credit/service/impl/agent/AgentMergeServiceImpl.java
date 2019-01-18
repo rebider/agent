@@ -1161,7 +1161,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(busInfo.getcUser());
-            record.setNotifyJson(String.valueOf(agentResult.getMsg()));
+            record.setNotifyJson(String.valueOf(agentResult.getData()));
             record.setNotifyType(NotifyType.AgentMerge.getValue());
             //接口请求成功
             if(agentResult.isOK()) {
@@ -1203,7 +1203,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             return AgentResult.fail(resObj.toString());
         }
         logger.info("代理商更名成功！{}",resObj.get("respMsg"));
-        return AgentResult.ok(resObj.toString());
+        return AgentResult.ok(res);
     }
 
 
