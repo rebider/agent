@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
-import com.ryx.credit.common.enumc.DictGroup;
-import com.ryx.credit.common.enumc.PlatformType;
-import com.ryx.credit.common.enumc.Status;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
@@ -16,8 +13,6 @@ import com.ryx.credit.dao.agent.PlatFormMapper;
 import com.ryx.credit.dao.order.OActivityMapper;
 import com.ryx.credit.dao.order.OProductMapper;
 import com.ryx.credit.machine.service.TermMachineService;
-import com.ryx.credit.machine.vo.MposTermBatchVo;
-import com.ryx.credit.machine.vo.MposTermTypeVo;
 import com.ryx.credit.machine.vo.TermMachineVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.Dict;
@@ -112,6 +107,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             logger.info("商品原价格不能为空");
             throw new MessageException("商品原价格不能为空");
         }
+        if (activity.getBusProCode()==null) {
+            logger.info("BusProCode不能为空");
+            throw new MessageException("BusProCode不能为空");
+        }
         activity.setId(idService.genId(TabId.o_activity));
         Date nowDate = new Date();
         activity.setcTime(nowDate);
@@ -119,6 +118,21 @@ public class OrderActivityServiceImpl implements OrderActivityService {
         activity.setStatus(Status.STATUS_1.status);
         activity.setVersion(Status.STATUS_1.status);
 
+        String platFormType = platFormMapper.selectPlatType(activity.getPlatform());
+        if (StringUtils.isNotBlank(platFormType)) {
+            try {
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                for (TermMachineVo termMachineVo : termMachineVos) {
+                    if (activity.getBusProCode().equals(termMachineVo.getId())) {
+                        activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
+                        activity.setBackType(termMachineVo.getBackType());
+                    }
+                }
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
         OActivityExample oActivityExample = new OActivityExample();
         oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status);
@@ -166,6 +180,21 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             }
         }
         activity.setuTime(new Date());
+
+        if (StringUtils.isNotBlank(platFormType)) {
+            try {
+                List<TermMachineVo> termMachineVos = termMachineService.queryTermMachine(PlatformType.getContentEnum(platFormType));
+                for (TermMachineVo termMachineVo : termMachineVos) {
+                    if (activity.getBusProCode().equals(termMachineVo.getId())) {
+                        activity.setStandAmt(BigDecimal.valueOf(Integer.valueOf(termMachineVo.getStandAmt())));
+                        activity.setBackType(termMachineVo.getBackType());
+                    }
+                }
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                e.printStackTrace();
+            }
+        }
 
         OActivityExample oActivityExample = new OActivityExample();
         oActivityExample.or().andActCodeEqualTo(activity.getActCode()).andStatusEqualTo(Status.STATUS_1.status).andIdNotEqualTo(activity.getId());
@@ -332,6 +361,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             Map<String,String> item = new HashMap<>();
             item.put("proCom",oActivity.getVender());
             item.put("proModel",oActivity.getProModel());
+            item.put("standTime",oActivity.getStandTime()+"");
+            item.put("standAmt",oActivity.getStandAmt()+"");
+            item.put("backType", BackType.getContentByValue(oActivity.getBackType())+"");
+            item.put("busProName",oActivity.getBusProName()+"");
+            item.put("id",oActivity.getId());
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(),DictGroup.MANUFACTURER.name(),oActivity.getVender());
             if(dict!=null){
                 item.put("proComName",dict.getdItemname());

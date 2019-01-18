@@ -166,6 +166,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
         criteria.andAgentIdEqualTo(agentId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         if(StringUtils.isBlank(isZpos)){
             criteria.andBusPlatformNotEqualTo(Platform.ZPOS.getValue());
         }else if(isZpos.equals("true")){
@@ -370,8 +371,9 @@ public class AgentQueryServiceImpl implements AgentQueryService {
                 .andStatusEqualTo(Status.STATUS_1.status)
                 .andPayStatusEqualTo(ColinfoPayStatus.C.code)
                 .andAgentIdEqualTo(agentId);
-        example.setOrderByClause(" c_utime DES ");
-        agentColinfoMapper.selectByExample(example);
-        return null;
+        example.setOrderByClause(" c_utime DESC ");
+        List<AgentColinfo> colinfoList = agentColinfoMapper.selectByExample(example);
+        return colinfoList.size()==1?colinfoList.get(0):null;
     }
+
 }

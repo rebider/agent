@@ -14,5 +14,6 @@ public interface ITaxDeductionService {
      * @Description: 扣税计算
      * @Date: 11:10 2018/12/20
      */
-    void taxDeductionComputer(Map<String,Object> params);
+    //void taxDeductionComputer(Map<String,Object> params);
+    void taxDeductionComputer();
 }

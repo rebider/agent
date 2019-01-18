@@ -89,9 +89,9 @@
     </if>
   </delete>
 
-  <delete id="resetData" >
+  <delete id="resetData" parameterType="java.util.Map"  >
     delete from P_PROFIT_SUPPLY
-    where SUPPLY_DATE = to_char(sysdate-30 ,'yyyymm') and SUPPLY_TYPE != '退单补款'
+    where SUPPLY_DATE = #{SUPPLY_DATE,jdbcType=VARCHAR}and BUS_BIG_TYPE = #{busBigType,jdbcType=VARCHAR}
   </delete>
 
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" >
@@ -277,22 +277,25 @@
   <select id="getTotalByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE != '退单补款'
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
+    <!--AND SUPPLY_TYPE != '退单补款'-->
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+    <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>
       /*AND SUPPLY_CODE != '0'*/
   </select>
 
   <select id="getBuckleByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
-    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR} AND SUPPLY_TYPE='退单补款'
+    where SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR}
     <if test="agentId != null and agentId !=''">AND AGENT_ID = #{agentId}</if>
     <if test="agentPid != null and agentPid != ''">AND AGENT_PID = #{agentPid}</if>
     <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
     <if test="parentAgentId == null ">AND PARENT_AGENT_ID is null </if>
     <if test="sourceId != null and sourceId != ''">AND SOURCE_ID = #{sourceId}</if>
     <if test="busType != null and busType != ''">AND BUS_TYPE = #{busType}</if>
+    <if test="busBigType != null and busBigType != ''">AND BUS_BIG_TYPE = #{busBigType}</if>
 
   </select>
 
@@ -304,6 +307,11 @@
     <include refid="BASE_WHERE_SQL"></include>
     <include refid="SORTING"></include>
     <include refid="PAGING_END" />
+  </select>
+
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(SUPPLY_AMT) as totalMoney from P_PROFIT_SUPPLY
+    <include refid="BASE_WHERE_SQL"></include>
   </select>
 
   <select id="getProfitSupplyCount" parameterType="java.util.Map" resultType="java.lang.Long">
@@ -318,10 +326,13 @@
         <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME,jdbcType=VARCHAR}</if>
         <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID,jdbcType=VARCHAR}</if>
         <if test="SUPPLY_TYPE != null and SUPPLY_TYPE != ''">AND SUPPLY_TYPE = #{SUPPLY_TYPE,jdbcType=CHAR}</if>
-        <if test="SUPPLY_DATE_START != null and SUPPLY_DATE_START != ''">AND SOURCE_ID &gt;= #{SUPPLY_DATE_START,jdbcType=VARCHAR}</if>
-        <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SOURCE_ID &lt;= #{SUPPLY_DATE_END,jdbcType=VARCHAR}</if>
+       <!-- <if test="SUPPLY_DATE_START != null and SUPPLY_DATE_START != ''">AND SOURCE_ID &gt;= #{SUPPLY_DATE_START,jdbcType=VARCHAR}</if>
+        <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SOURCE_ID &lt;= #{SUPPLY_DATE_END,jdbcType=VARCHAR}</if>-->
         <if test="SOURCE_ID != null and SOURCE_ID != ''">AND SOURCE_ID = #{SOURCE_ID,jdbcType=VARCHAR}</if>
-        <if test="SUPPLY_DATE != null and SUPPLY_DATE != ''">AND SUPPLY_DATE = #{SUPPLY_DATE,jdbcType=VARCHAR}</if>
+
+        <if test="SUPPLY_DATE_START != null and SUPPLY_DATE_START != ''">AND SUPPLY_DATE &gt;= #{SUPPLY_DATE_START,jdbcType=VARCHAR}</if>
+        <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SUPPLY_DATE &lt;= #{SUPPLY_DATE_END,jdbcType=VARCHAR}</if>
+
         <if test="BUS_TYPE != null and BUS_TYPE != ''">AND BUS_TYPE = #{BUS_TYPE,jdbcType=VARCHAR}</if>
         <if test="BUS_BIG_TYPE != null and BUS_BIG_TYPE != ''">AND BUS_BIG_TYPE = #{BUS_BIG_TYPE,jdbcType=VARCHAR}</if>
         <!--<if test="BUS_TYPE != null and BUS_TYPE != ''">AND BUS_TYPE = #{BUS_TYPE,jdbcType=VARCHAR}</if>-->

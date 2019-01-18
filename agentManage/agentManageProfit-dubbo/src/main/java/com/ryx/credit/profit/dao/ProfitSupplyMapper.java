@@ -12,7 +12,7 @@ public interface ProfitSupplyMapper {
 
     int deleteByExample(ProfitSupplyExample example);
 
-    int resetData();
+    int resetData(Map Param);
 
     int insert(ProfitSupply record);
 
@@ -35,4 +35,6 @@ public interface ProfitSupplyMapper {
     BigDecimal getBuckleByMonthAndPid(ProfitSupply record);
 
     List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
+
+    Map<String,Object> profitCount(Map <String, Object> param);
 }

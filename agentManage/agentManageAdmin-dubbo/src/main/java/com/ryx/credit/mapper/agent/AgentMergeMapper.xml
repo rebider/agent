@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.AgentMergeMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.AgentMerge">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="MAIN_AGENT_ID" jdbcType="VARCHAR" property="mainAgentId" />
+    <result column="MAIN_AGENT_NAME" jdbcType="VARCHAR" property="mainAgentName" />
+    <result column="SUB_AGENT_ID" jdbcType="VARCHAR" property="subAgentId" />
+    <result column="SUB_AGENT_NAME" jdbcType="VARCHAR" property="subAgentName" />
+    <result column="SUB_AGENT_DEBT" jdbcType="DECIMAL" property="subAgentDebt" />
+    <result column="SUB_AGENT_OWE_TICKET" jdbcType="DECIMAL" property="subAgentOweTicket" />
+    <result column="CLO_REVIEW_STATUS" jdbcType="DECIMAL" property="cloReviewStatus" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="MERGE_TYPE" jdbcType="DECIMAL" property="mergeType" />
+    <result column="SUPP_TYPE" jdbcType="DECIMAL" property="suppType" />
+    <result column="SUPP_AGENT_ID" jdbcType="VARCHAR" property="suppAgentId" />
+    <result column="SUPP_AGENT_NAME" jdbcType="VARCHAR" property="suppAgentName" />
+    <result column="MERGE_BUS_IDS" jdbcType="VARCHAR" property="mergeBusIds" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, MAIN_AGENT_ID, MAIN_AGENT_NAME, SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT,
+    SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME, U_TIME, C_USER, U_USER, STATUS,
+    VERSION, MERGE_TYPE, SUPP_TYPE, SUPP_AGENT_ID, SUPP_AGENT_NAME, MERGE_BUS_IDS, REMARK
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_MERGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from A_AGENT_MERGE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeExample">
+    delete from A_AGENT_MERGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
+    insert into A_AGENT_MERGE (ID, MAIN_AGENT_ID, MAIN_AGENT_NAME,
+    SUB_AGENT_ID, SUB_AGENT_NAME, SUB_AGENT_DEBT,
+    SUB_AGENT_OWE_TICKET, CLO_REVIEW_STATUS, C_TIME,
+    U_TIME, C_USER, U_USER,
+    STATUS, VERSION, MERGE_TYPE,
+    SUPP_TYPE, SUPP_AGENT_ID, SUPP_AGENT_NAME,
+    MERGE_BUS_IDS, REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{mainAgentId,jdbcType=VARCHAR}, #{mainAgentName,jdbcType=VARCHAR},
+    #{subAgentId,jdbcType=VARCHAR}, #{subAgentName,jdbcType=VARCHAR}, #{subAgentDebt,jdbcType=DECIMAL},
+    #{subAgentOweTicket,jdbcType=DECIMAL}, #{cloReviewStatus,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
+    #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR},
+    #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, #{mergeType,jdbcType=DECIMAL},
+    #{suppType,jdbcType=DECIMAL}, #{suppAgentId,jdbcType=VARCHAR}, #{suppAgentName,jdbcType=VARCHAR},
+    #{mergeBusIds,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
+    insert into A_AGENT_MERGE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="mainAgentId != null">
+        MAIN_AGENT_ID,
+      </if>
+      <if test="mainAgentName != null">
+        MAIN_AGENT_NAME,
+      </if>
+      <if test="subAgentId != null">
+        SUB_AGENT_ID,
+      </if>
+      <if test="subAgentName != null">
+        SUB_AGENT_NAME,
+      </if>
+      <if test="subAgentDebt != null">
+        SUB_AGENT_DEBT,
+      </if>
+      <if test="subAgentOweTicket != null">
+        SUB_AGENT_OWE_TICKET,
+      </if>
+      <if test="cloReviewStatus != null">
+        CLO_REVIEW_STATUS,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="uTime != null">
+        U_TIME,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="mergeType != null">
+        MERGE_TYPE,
+      </if>
+      <if test="suppType != null">
+        SUPP_TYPE,
+      </if>
+      <if test="suppAgentId != null">
+        SUPP_AGENT_ID,
+      </if>
+      <if test="suppAgentName != null">
+        SUPP_AGENT_NAME,
+      </if>
+      <if test="mergeBusIds != null">
+        MERGE_BUS_IDS,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentId != null">
+        #{mainAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentName != null">
+        #{mainAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentId != null">
+        #{subAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentName != null">
+        #{subAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentDebt != null">
+        #{subAgentDebt,jdbcType=DECIMAL},
+      </if>
+      <if test="subAgentOweTicket != null">
+        #{subAgentOweTicket,jdbcType=DECIMAL},
+      </if>
+      <if test="cloReviewStatus != null">
+        #{cloReviewStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="mergeType != null">
+        #{mergeType,jdbcType=DECIMAL},
+      </if>
+      <if test="suppType != null">
+        #{suppType,jdbcType=DECIMAL},
+      </if>
+      <if test="suppAgentId != null">
+        #{suppAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="suppAgentName != null">
+        #{suppAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeBusIds != null">
+        #{mergeBusIds,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentMergeExample" resultType="java.lang.Long">
+    select count(*) from A_AGENT_MERGE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
+    update A_AGENT_MERGE
+    <set>
+      <if test="mainAgentId != null">
+        MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="mainAgentName != null">
+        MAIN_AGENT_NAME = #{mainAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentId != null">
+        SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentName != null">
+        SUB_AGENT_NAME = #{subAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="subAgentDebt != null">
+        SUB_AGENT_DEBT = #{subAgentDebt,jdbcType=DECIMAL},
+      </if>
+      <if test="subAgentOweTicket != null">
+        SUB_AGENT_OWE_TICKET = #{subAgentOweTicket,jdbcType=DECIMAL},
+      </if>
+      <if test="cloReviewStatus != null">
+        CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="mergeType != null">
+        MERGE_TYPE = #{mergeType,jdbcType=DECIMAL},
+      </if>
+      <if test="suppType != null">
+        SUPP_TYPE = #{suppType,jdbcType=DECIMAL},
+      </if>
+      <if test="suppAgentId != null">
+        SUPP_AGENT_ID = #{suppAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="suppAgentName != null">
+        SUPP_AGENT_NAME = #{suppAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeBusIds != null">
+        MERGE_BUS_IDS = #{mergeBusIds,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentMerge">
+    update A_AGENT_MERGE
+    set MAIN_AGENT_ID = #{mainAgentId,jdbcType=VARCHAR},
+    MAIN_AGENT_NAME = #{mainAgentName,jdbcType=VARCHAR},
+    SUB_AGENT_ID = #{subAgentId,jdbcType=VARCHAR},
+    SUB_AGENT_NAME = #{subAgentName,jdbcType=VARCHAR},
+    SUB_AGENT_DEBT = #{subAgentDebt,jdbcType=DECIMAL},
+    SUB_AGENT_OWE_TICKET = #{subAgentOweTicket,jdbcType=DECIMAL},
+    CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    MERGE_TYPE = #{mergeType,jdbcType=DECIMAL},
+    SUPP_TYPE = #{suppType,jdbcType=DECIMAL},
+    SUPP_AGENT_ID = #{suppAgentId,jdbcType=VARCHAR},
+    SUPP_AGENT_NAME = #{suppAgentName,jdbcType=VARCHAR},
+    MERGE_BUS_IDS = #{mergeBusIds,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="selectAgentMergeList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    m.*, a.ag_name, cu.name as C_USER_NAME, uu.name as U_USER_NAME
+    from a_agent_merge m
+    left join a_agent a on m.main_agent_id = a.id
+    left join c_user cu on m.c_user = cu.id
+    left join c_user uu on m.u_user = uu.id
+    <include refid="agentMergeListWhere" />
+    order by m.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="selectAgentMergeCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from a_agent_merge m
+    left join a_agent a on m.main_agent_id = a.id
+    left join c_user cu on m.c_user = cu.id
+    left join c_user uu on m.u_user = uu.id
+    <include refid="agentMergeListWhere" />
+  </select>
+
+  <sql id="agentMergeListWhere">
+    <where>
+      m.status = #{map.status} and a.status = #{map.status}
+      <if test="map.id != null"> and m.id = #{map.id} </if>
+      <if test="map.mainAgentId != null"> and m.main_agent_id = #{map.mainAgentId} </if>
+      <if test="map.mainAgentName != null"> and m.main_agent_name = #{map.mainAgentName} </if>
+      <if test="map.cloReviewStatus != null"> and m.clo_review_status = #{map.cloReviewStatus} </if>
+      <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
+    </where>
+  </sql>
+</mapper>

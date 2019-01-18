@@ -39,5 +39,7 @@ public interface ProfitDeductionMapper {
 
     BigDecimal getCurrentDeductionAmtSum(ProfitDeduction profitDeduction);
 
-    int resetDataDeduction(String type);
+    int resetDataDeduction(@Param("type") String type,@Param("date") String date);
+
+    List<ProfitDeduction> selectDeductListByParams(Map<String,Object> param);
 }

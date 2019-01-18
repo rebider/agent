@@ -189,5 +189,18 @@ public interface ProfitMonthService {
 
     PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth);
 
+    Map<String,Object> profitCount(Map<String, Object> param);
+
     ProfitDetailMonth getByAgentId(String agentId);
+
+    BigDecimal doKhDuction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal sumAmt, String computType);
+
+    /**
+     * 导出数据：
+     * @Authorchenqiutian
+     * @Date 2019/1/11
+     * @param param
+     * @return
+     */
+    List<Map<String,Object>> exportByF(Map<String, Object> param);
 }

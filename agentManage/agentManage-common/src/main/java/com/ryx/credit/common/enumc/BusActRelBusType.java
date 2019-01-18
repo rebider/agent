@@ -15,6 +15,7 @@ public enum BusActRelBusType {
     ORDER("/BusActRelBusType/ORDER","订单审批"),
     STAGING("/BusActRelBusType/STAGING","退单分期"),
     OTHER_DEDUCTION("/BusActRelBusType/OTHER_DEDUCTION","其他扣款分期"),
+    ASSESS_DEDUCTION("/BusActRelBusType/ASSESS_DEDUCTION","考核扣款分期"),
     THAW("/BusActRelBusType/THAW","分润解冻申请"),
     PkType("/BusActRelBusType/PkType","订单补款"),
     refund("/BusActRelBusType/refund","退货审批"),

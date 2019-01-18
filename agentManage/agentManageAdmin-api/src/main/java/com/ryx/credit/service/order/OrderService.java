@@ -217,4 +217,14 @@ public interface OrderService {
      */
     AgentResult updateStatus(String id, String user);
 
+
+    /**
+     * 代理商月度打款金额开票不开票信息统计数据入库
+     * @param cashSummaryMouth
+     * @return
+     */
+    AgentResult insertSelectiveCashSummaryMouth(CashSummaryMouth cashSummaryMouth);
+
+
+    void testRepeatableRead();
 }

@@ -237,7 +237,7 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultType="java.lang.Long">
+  <select id="countByExample"  parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultType="java.lang.Integer">
     select count(*) from P_PROFIT_D
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
@@ -405,5 +405,33 @@
     delete from P_PROFIT_D
     where REMIT_DATE = '${frDate}'
   </delete>
+
+  <!-- List<Map<String,Object>> selectIncludePayComByExample(ProfitDayExample example);-->
+  <select id="selectIncludePayComByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDayExample" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+    distinct
+  </if>
+    <include refid="BASE_COM_NAME_INCLUDE" />
+    from P_PROFIT_D left join A_PAY_COMP on  P_PROFIT_D.PAY_COMPANY = A_PAY_COMP.ID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <sql id="BASE_COM_NAME_INCLUDE">
+      P_PROFIT_D.ID as id,P_PROFIT_D.AGENT_PID as agentPid, P_PROFIT_D.AGENT_ID as agentId,
+      P_PROFIT_D.AGENT_NAME as agentName, P_PROFIT_D.TRANS_DATE as transDate,P_PROFIT_D.REMIT_DATE as remitDate,
+      P_PROFIT_D.REDO_MONEY as redoMoney,P_PROFIT_D.RETURN_MONEY as returnMoney, P_PROFIT_D.TOTAL_PROFIT as totalProfit,
+      P_PROFIT_D.REAL_MONEY as realMoney,
+      P_PROFIT_D.FROZEN_MONEY as frozenMoney,
+      P_PROFIT_D.SUCCESS_MONEY as successMoney,
+      P_PROFIT_D.FAIL_MONEY as failMoney,
+      A_PAY_COMP.COM_NAME as comName
+  </sql>
 
 </mapper>

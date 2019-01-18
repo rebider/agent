@@ -362,4 +362,19 @@
     where SOURCE_INFO = '${sourceInfo}' and PROFIT_DATE = '${transDate}'
   </delete>
 
+
+  <select id="selectListByParams" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from TRANS_PROFIT_DETAIL
+    where
+    PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="busCode!=null and busCode!=''">
+      and BUS_CODE = #{busCode,jdbcType=VARCHAR}
+    </if>
+    <if test="agentTypeList!=null and agentTypeList!=''">
+      and AGENT_TYPE in (${agentTypeList})
+    </if>
+  </select>
+
 </mapper>

@@ -89,7 +89,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from P_DEDUCTION
     where ID = #{id,jdbcType=VARCHAR}
@@ -370,13 +370,13 @@
       STAGING_STATUS = #{stagingStatus,jdbcType=CHAR},
       USER_ID = #{userId,jdbcType=VARCHAR},
       CREATE_DATE_TIME = #{createDateTime,jdbcType=TIMESTAMP},
-       DEDUCTION_STATUS = #{deductionStatus,jdbcType=CHAR}
-      NEXT_ID = #{nextId,jdbcType=VARCHAR},
+       DEDUCTION_STATUS = #{deductionStatus,jdbcType=CHAR},
+      NEXT_ID = #{nextId,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -412,7 +412,7 @@
     and DEDUCTION_STATUS ='0'
   </select>
   <delete id="deleteById">
-    delete  P_DEDUCTION where id = #{id}
+    delete from P_DEDUCTION where id = #{id}
   </delete>
 
   <select id="getNotDeductDetail" resultType="java.util.Map">
@@ -436,6 +436,37 @@
 
   <delete id="resetDataDeduction">
     delete from P_DEDUCTION
-    where DEDUCTION_TYPE = '03' and DEDUCTION_DATE = to_char(sysdate-30 ,'yyyy-MM')
+    where DEDUCTION_TYPE = #{type} and DEDUCTION_DATE = #{date} and nvl(STAGING_STATUS,'-') !='6'
   </delete>
+
+    <!--根据条件查询扣款记录-->
+    <select id="selectDeductListByParams" resultMap="BaseResultMap">
+      select
+          <include refid="Base_Column_List"/>
+      from P_DEDUCTION a
+      where 1=1
+      <if test="deductionStatus != null and deductionStatus!=''">
+        and a.DEDUCTION_STATUS = '${deductionStatus}'
+      </if>
+      <if test="deductionDate != null and deductionDate!=''">
+        and a.DEDUCTION_DATE = '${deductionDate}'
+      </if>
+      <if test="deductionType != null and deductionType!=''">
+        and a.DEDUCTION_TYPE = '${deductionType}'
+      </if>
+      <if test="agentId != null and agentId!=''">
+        and a.AGENT_ID = #{agentId,jdbcType=VARCHAR}
+      </if>
+      <if test="stagingStatus != null and stagingStatus!=''">
+        and a.STAGING_STATUS = #{stagingStatus,jdbcType=VARCHAR}
+      </if>
+      <choose>
+        <when test="parentAgentId != null and parentAgentId!=''">
+          and a.PARENT_AGENT_ID = #{parentAgentId,jdbcType=CHAR}
+        </when>
+        <otherwise>
+          and a.PARENT_AGENT_ID is null
+        </otherwise>
+      </choose>
+    </select>
 </mapper>

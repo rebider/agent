@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface TransProfitDetailMapper {
     long countByExample(TransProfitDetailExample example);
@@ -42,4 +43,6 @@ public interface TransProfitDetailMapper {
     BigDecimal selectAmtBySummary(String profitDate);
 
     void deleteBySourceIdAndMonth(@Param("sourceInfo") String sourceInfo, @Param("transDate") String transDate);
+
+    List<TransProfitDetail> selectListByParams(Map<String,Object> params);
 }

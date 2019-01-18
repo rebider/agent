@@ -55,7 +55,7 @@ public interface StagingService {
      *
      * @param profitStaging 分期对象
      */
-    void addStaging(ProfitStaging profitStaging, String workId);
+    void addStaging(ProfitStaging profitStaging, String workId,String bustype);
 
     /**
      * 流程结束修改业务数据

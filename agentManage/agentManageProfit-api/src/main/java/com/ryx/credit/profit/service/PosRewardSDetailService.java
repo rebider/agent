@@ -38,4 +38,5 @@ public interface PosRewardSDetailService {
 
     List<PosRewardDetail> getPosRewardDetailList(PosRewardDetail posRewardDetail, List<String> type, List<String> childAgentList);
 
+    Map<String,Object> profitCount(Map<String,Object> param);
 }

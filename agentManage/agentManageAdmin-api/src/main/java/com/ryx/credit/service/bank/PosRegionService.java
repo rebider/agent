@@ -26,4 +26,6 @@ public interface PosRegionService {
     List<DPosRegion> queryByParentCode(String parentCode);
 
     Set<String> queryCityByCode(String codes);
+
+    String queryNameByCodes(String codes);
 }

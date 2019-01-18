@@ -596,6 +596,8 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setPosType(activity.getPosType());
                     oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
                     oSubOrderActivity.setStandTime(activity.getStandTime());
+                    oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                    oSubOrderActivity.setBackType(activity.getBackType());
                     if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
                         logger.info("下订单:{}{}", activity.getActivityName(), "商品添加活动失败");
                         throw new MessageException("商品添加活动失败");
@@ -918,6 +920,8 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setPosType(activity.getPosType());
                     oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
                     oSubOrderActivity.setStandTime(activity.getStandTime());
+                    oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                    oSubOrderActivity.setBackType(activity.getBackType());
                 } else {
                     //设置商品实际单价
                     throw new MessageException("商品必须选择指定的活动");
@@ -2177,7 +2181,7 @@ public class OrderServiceImpl implements OrderService {
             //未激活业务
             if(ab_check.getBusStatus()!=null && ab_check.getBusStatus().compareTo(Status.STATUS_2.status)==0){
                 logger.info("代理商订单审批完审批完成激活业务{}",rel.getBusId());
-                ab_check.setBusStatus(Status.STATUS_1.status);
+                ab_check.setBusStatus(BusinessStatus.Enabled.status);
                 if(1!=agentBusInfoMapper.updateByPrimaryKeySelective(ab_check)){
                     logger.error("更新业务 未激活 到 启用 失败{}{}",order.getId(),ab_check.getId());
                 }
@@ -3042,5 +3046,40 @@ public class OrderServiceImpl implements OrderService {
             return AgentResult.ok("成功");
         }
         return AgentResult.fail();
+    }
+
+
+    @Autowired
+    private CashSummaryMouthMapper cashSummaryMouthMapper;
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult insertSelectiveCashSummaryMouth(CashSummaryMouth cashSummaryMouth) {
+        if(null==cashSummaryMouthMapper.selectByPrimaryKey(cashSummaryMouth)){
+            cashSummaryMouth.setStatus(Status.STATUS_1.status);
+            cashSummaryMouth.setcDate(Calendar.getInstance().getTime());
+            if(cashSummaryMouthMapper.insertSelective(cashSummaryMouth)==1){
+                return AgentResult.ok();
+            }else{
+                return AgentResult.fail("插入失败");
+            }
+        }
+        return AgentResult.ok();
+    }
+
+
+    @Transactional
+    @Override
+    public void testRepeatableRead() {
+
+        OOrder order = orderMapper.selectByPrimaryKey("OO20181121000000000001830");
+        logger.info("==1===="+order.getoNum());
+        //两个事物 都更新 或者 一个事物更新
+//        order.setoNum("21173445661830078");
+//        order.setoNum("21173445661830079");
+//        orderMapper.updateByPrimaryKeySelective(order);
+        logger.info("==2===="+order.getoNum());
+        OOrder order1 = orderMapper.selectByPrimaryKey("OO20181121000000000001830");
+        logger.info("==2===="+order1.getoNum());
+        logger.info("==3====");
     }
 }

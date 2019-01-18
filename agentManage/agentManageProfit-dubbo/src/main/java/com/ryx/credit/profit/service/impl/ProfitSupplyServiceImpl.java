@@ -23,12 +23,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author Lihl
@@ -124,7 +122,8 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      * @return
      */
     @Override
-    public int resetData() {
+
+    public int resetData(String busBigType) {
         // 终审后不能清除
         String finalStatus = redisService.getValue("commitFinal");
         if (StringUtils.isBlank(finalStatus)) {
@@ -133,7 +132,18 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 throw new ProcessException("终审状态不能清除！");
             }
         }
-        return pProfitSupplyMapper.resetData();
+        Map<String,Object> param = new HashMap<>();
+        param.put("busBigType",busBigType);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(date);
+        dateStr = dateStr.substring(0,7).replaceAll("-","");
+
+        param.put("SUPPLY_DATE",dateStr);
+        return pProfitSupplyMapper.resetData(param);
     }
 
     /**
@@ -142,45 +152,58 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
-    public List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception {
+    public  List<String> importSupplyList(List<List<Object>> data,String sign) throws Exception {
         List<String> list = new ArrayList<>();
         if (null == data && data.size() == 0) {
             logger.info("导入数据为空");
             throw new MessageException("导入数据为空");
         }
         for (List<Object> supply : data) {
-            ProfitSupply profitSupply = new ProfitSupply();
+            if (supply.size() == 6){
+                if (null!=supply.get(0) && !"".equals(supply.get(0))&& null!=supply.get(1) && !"".equals(supply.get(1))&& null!=supply.get(4) && !"".equals(supply.get(4))
+                        && null!=supply.get(5) && !"".equals(supply.get(5))) {
+
+             ProfitSupply profitSupply = new ProfitSupply();
             profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
             profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
             try {
                 //01 退单补款 02:机具返现 99：其它
                 if ("02".equals(sign)) {
                     profitSupply.setBusBigType("02");
-                } else{
+                } else {
                     profitSupply.setBusBigType("99");
                 }
-                profitSupply.setAgentId(null!=supply.get(0)?String.valueOf(supply.get(0)):"");//代理商编码
-                profitSupply.setAgentName(null!=supply.get(1)?String.valueOf(supply.get(1)):"");//代理商名称
-                profitSupply.setParentAgentId(null!=supply.get(2)?String.valueOf(supply.get(2)):"");//上级代理商编号
-                profitSupply.setParentAgentName(null!=supply.get(3)?String.valueOf(supply.get(3)):"");//上级代理商名称
-                profitSupply.setSupplyType(null!=supply.get(4)?String.valueOf(supply.get(4)):"");//补款类型
+                profitSupply.setAgentId(null != supply.get(0) ? String.valueOf(supply.get(0)) : "");//代理商编码
+                profitSupply.setAgentName(null != supply.get(1) ? String.valueOf(supply.get(1)) : "");//代理商名称
+                profitSupply.setParentAgentId(null != supply.get(2) ? String.valueOf(supply.get(2)) : "");//上级代理商编号
+                profitSupply.setParentAgentName(null != supply.get(3) ? String.valueOf(supply.get(3)) : "");//上级代理商名称
+                profitSupply.setSupplyType(null != supply.get(4) ? String.valueOf(supply.get(4)) : "");//补款类型
                 profitSupply.setSupplyAmt(new BigDecimal(String.valueOf(supply.get(5))));//补款金额
-                profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0,7).replace("-",""));//月份
+                profitSupply.setSupplyDate(LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_DATE).substring(0, 7).replace("-", ""));//月份
 
 //                profitSupply.setSupplyDate(null!=supply.get(6)?String.valueOf(supply.get(6)):"");//月份
 //                profitSupply.setSupplyCode(supply.get(7)!=null?"":String.valueOf(supply.get(7)));//补款码
-                if (pProfitSupplyMapper.insertSelective(profitSupply)==0) {
+                if (pProfitSupplyMapper.insertSelective(profitSupply) == 0) {
                     logger.info("导入失败！");
                     throw new MessageException(supply.toString() + "导入失败！");
                 }
-                logger.info("补款数据信息：", JSONObject.toJSON(profitSupply));
+                logger.info("补款数据导入信息：{}", JSONObject.toJSON(profitSupply));
                 list.add(profitSupply.getId());
             } catch (Exception e) {
                 e.printStackTrace();
-                throw e;
+                throw new MessageException(supply.toString() + "导入格式错误！");
+            }
+
+        }
             }
         }
         return list;
+    }
+
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        Map<String,Object> map=pProfitSupplyMapper.profitCount(param);
+        return map;
     }
 
 }

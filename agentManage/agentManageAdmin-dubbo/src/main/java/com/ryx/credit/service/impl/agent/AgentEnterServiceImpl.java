@@ -10,10 +10,7 @@ import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AssProtoColMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
-import com.ryx.credit.dao.agent.PlatFormMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.ActivityService;
@@ -77,6 +74,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private PlatFormService platFormService;
     @Autowired
     private PlatFormMapper platFormMapper;
+    @Autowired
+    private AgentBusInfoMapper agentBusInfoMapper;
 
     /**
      * 商户入网
@@ -88,6 +87,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
+            verifyOrgAndBZYD(agentVo.getBusInfoVoList());
+            verifyOther(agentVo.getBusInfoVoList());
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
@@ -169,6 +170,55 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         }
     }
 
+    /**
+     * 代理商入网开通的业务平台类型为机构与标准一代时，新增业务平台业务类型也必须为机构或标准一代。
+     * @param busInfoVoList
+     * @throws Exception
+     */
+    @Override
+    public void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+        Set<String> BusTypeSet = new HashSet<>();
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            BusTypeSet.add(agentBusInfoVo.getBusType());
+        }
+        for (String busType : BusTypeSet) {
+            if(busType.equals(BusType.JG.key) || busType.equals(BusType.BZYD.key)){
+                for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+                    if(!agentBusInfoVo.getBusType().equals(BusType.JG.key) && !agentBusInfoVo.getBusType().equals(BusType.BZYD.key)){
+                        throw new ProcessException("业务平台类型为机构与标准一代时不能选择其他");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 代理商新签入网业务平台类型为机构一代、二代直签直发、直签不直发、一代X时，所有业务平台上级必须为同一个。
+     * @param busInfoVoList
+     * @throws Exception
+     */
+    @Override
+    public void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+        Set<String> busParentSet = new HashSet<>();
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            String busParent = "";
+            if(StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
+                busParent = agentBusInfo.getAgentId();
+            }else{
+                busParent = "";
+            }
+            busParentSet.add(busParent);
+        }
+        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+            if(agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.JGYD.key)
+            || agentBusInfoVo.getBusType().equals(BusType.YDX.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key)){
+                if(busParentSet.size()!=1){
+                    throw new ProcessException("上级不是同一个");
+                }
+            }
+        }
+    }
 
     /**
      * 启动代理商审批
@@ -400,6 +450,19 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
         reqMap.put("taskId", agentVo.getTaskId());
         reqMap.put("dept", agentVo.getDept());
+        if(StringUtils.isNotBlank(agentVo.getMainDocDistrict()) && StringUtils.isNotBlank(agentVo.getSubDocDistrict())){
+            reqMap.put(agentVo.getMainDocDistrict(),agentVo.getMainDocDistrict());
+            reqMap.put(agentVo.getSubDocDistrict(),agentVo.getSubDocDistrict());
+            if(!reqMap.containsValue("beijing")){
+                reqMap.put("beijing","");
+            }
+            if(!reqMap.containsValue("south")){
+                reqMap.put("south","");
+            }
+            if(!reqMap.containsValue("north")){
+                reqMap.put("north","");
+            }
+        }
 
         //传递部门信息
         Map startPar = startPar(userId);
@@ -473,7 +536,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Approved.status);
         if(StringUtils.isNotBlank(bus.getBusNum())){
-            bus.setBusStatus(Status.STATUS_0.status);
+            bus.setBusStatus(BusinessStatus.pause.status);
         }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批通过，更新业务本信息失败{}:{}", processingId, bus.getId());
@@ -544,7 +607,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         bus.setcUtime(Calendar.getInstance().getTime());
         bus.setCloReviewStatus(AgStatus.Refuse.status);
         if(StringUtils.isNotBlank(bus.getBusNum())){
-            bus.setBusStatus(Status.STATUS_0.status);
+            bus.setBusStatus(BusinessStatus.pause.status);
         }
         if (agentBusinfoService.updateAgentBusInfo(bus) != 1) {
             logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, bus.getId());
@@ -610,7 +673,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         List<AgentBusInfo> aginfo = agentBusinfoService.agentBusInfoList(agent.getId(), null, AgStatus.Approving.status);
         for (AgentBusInfo agentBusInfo : aginfo) {
             if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
-                agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                agentBusInfo.setBusStatus(BusinessStatus.pause.status);
             }
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Approved.status);
@@ -708,7 +771,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             agentBusInfo.setcUtime(Calendar.getInstance().getTime());
             agentBusInfo.setCloReviewStatus(AgStatus.Refuse.status);
             if(StringUtils.isNotBlank(agentBusInfo.getBusNum())){
-                agentBusInfo.setBusStatus(Status.STATUS_0.status);
+                agentBusInfo.setBusStatus(BusinessStatus.pause.status);
             }
             if (agentBusinfoService.updateAgentBusInfo(agentBusInfo) != 1) {
                 logger.info("代理商审批拒绝，更新业务本信息失败{}:{}", processingId, agentBusInfo.getId());
@@ -750,7 +813,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     @Override
     public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
         try {
-
+            verifyOrgAndBZYD(agent.getBusInfoVoList());
+            verifyOther(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {

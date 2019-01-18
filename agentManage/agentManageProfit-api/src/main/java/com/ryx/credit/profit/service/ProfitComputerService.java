@@ -55,7 +55,7 @@ public interface ProfitComputerService {
      * @param month 月份
      * @return
      */
-    BigDecimal new_total_factor(String agentId,String parentId,String month);
+    //BigDecimal new_total_factor(String agentId,String parentId,String month);
     /**
      * 其他补款汇总
      * @param agentPid

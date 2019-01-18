@@ -92,4 +92,29 @@ public interface ProfitDetailMonthMapper {
     List<ProfitDetailMonth> selectListByParams(Map<String, Object> param);
 
     BigDecimal getSubAgentTaxBaseTotal(Map<String,Object> params);
+
+    void updateRealProfitAmt(Map<String,Object> params);
+
+    Map<String,Object> profitCount(Map<String, Object> param);
+
+    Map<String,Object> profitCountWithSubordinate(Map<String, Object> param);
+
+    List<Map<String,Object>> queryProfitDetailLowerMonthList (Map<String, Object> param);
+
+    Long queryProfitDetailLowerMonthCount(Map<String, Object> param);
+
+    /**
+     * 不包含下级的导出数据
+     * @param param
+     * @return
+     */
+    List<Map<String,Object>> exportByFNoChild (Map<String, Object> param);
+
+    /**
+     * 包含数据的导出下级
+     * @param param
+     * @return
+     */
+    List<Map<String,Object>> exportByFHaveChild (Map<String, Object> param);
+
 }

@@ -60,4 +60,6 @@ public interface ProfitDirectMapper {
     BigDecimal selectAmtByDeal(String transMonth);
 
     void deleteByMonth(@Param("transMonth") String transMonth);
+
+    BigDecimal selectSumTaxAmt2(ProfitDirect dirct);
 }
