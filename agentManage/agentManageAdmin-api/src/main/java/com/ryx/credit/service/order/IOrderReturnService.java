@@ -31,9 +31,7 @@ public interface IOrderReturnService {
 
     Map<String, Object> delCut(String returnId,String cutId,String userid)throws ProcessException;
 
-    Map<String, Object> bizAudit(String returnId, String plans, String remark, String userid, String auditResult) throws ProcessException;
 
-    Map<String, Object> cwAudit(String returnId, String remark, String userid, String auditResult, String[] attachments) throws ProcessException;
 
     AgentResult approvalTaskAjustPeople(OReturnOrder oReturnOrder) throws ProcessException;
 

@@ -119,7 +119,7 @@ public class PlannerServiceImpl implements PlannerService {
      */
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public AgentResult savePlanner(ReceiptPlan receiptPlan, String receiptProId) throws Exception {
+    public AgentResult savePlanner(ReceiptPlan receiptPlan, String receiptProId,String activityId) throws Exception {
         AgentResult result = new AgentResult(500, "系统异常", "");
         try {
 
@@ -159,10 +159,7 @@ public class PlannerServiceImpl implements PlannerService {
             OActivity activity =oActivityMapper.selectByPrimaryKey(oSubOrderActivities.get(0).getActivityId());
             //根据活动代码和厂家和型号更新采购单活动快表信息
             OActivityExample oActivityQuery = new OActivityExample();
-            oActivityQuery.or().andActCodeEqualTo(activity.getActCode())
-                    .andProductIdEqualTo(OSubOrderActivityItem.getProId())
-                    .andVenderEqualTo(receiptPlan.getProCom())
-                    .andProModelEqualTo(receiptPlan.getModel());
+            oActivityQuery.or().andIdEqualTo(activityId);
             List<OActivity>  venderModeActivity =  oActivityMapper.selectByExample(oActivityQuery);
 
             if(venderModeActivity.size()!=1){
@@ -188,6 +185,8 @@ public class PlannerServiceImpl implements PlannerService {
             OSubOrderActivityItem.setPosType(real_activity.getPosType());
             OSubOrderActivityItem.setPosSpePrice(real_activity.getPosSpePrice());
             OSubOrderActivityItem.setStandTime(real_activity.getStandTime());
+            OSubOrderActivityItem.setBackType(real_activity.getBackType());
+            OSubOrderActivityItem.setStandAmt(real_activity.getStandAmt());
             if(1!=oSubOrderActivityMapper.updateByPrimaryKeySelective(OSubOrderActivityItem)){
                 throw new MessageException("更新活动失败!");
             }
@@ -257,7 +256,7 @@ public class PlannerServiceImpl implements PlannerService {
             try {
                 receiptPlan.setUserId(userId);
                 receiptPlan.setcUser(userId);
-                result = savePlanner(receiptPlan, receiptPlan.getProId());
+                result = savePlanner(receiptPlan, receiptPlan.getProId(),receiptPlan.getActivityId());
             } catch (MessageException e) {
                 result.setMsg("第"+i+"条"+e.getMsg());
                 throw new MessageException("第"+i+"条"+e.getMsg()+",请核对发货数量");

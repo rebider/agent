@@ -49,6 +49,9 @@ public class ReceiptPlan implements Serializable{
 
     private String model;
 
+    private String activityId;
+
+
     public String getId() {
         return id;
     }
@@ -207,5 +210,13 @@ public class ReceiptPlan implements Serializable{
 
     public void setModel(String model) {
         this.model = model == null ? null : model.trim();
+    }
+
+    public String getActivityId() {
+        return activityId;
+    }
+
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 }
