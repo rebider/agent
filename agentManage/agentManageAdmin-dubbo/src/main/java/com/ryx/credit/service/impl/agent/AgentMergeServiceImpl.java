@@ -1187,14 +1187,23 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      * @return
      */
     public AgentResult mPos_updateAgName(String agentName, List<String> mPosOrgList, AgentColinfo agentColinfo) {
-        HashMap<String,Object> map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();
         map.put("companyname", agentName);//代理商名称
-        map.put("batchIds", mPosOrgList);//AG码
-        map.put("colinfoMessage", agentColinfo);//收款账户
-        String params = JsonUtil.objectToJson(map);
+        map.put("batchIds", JsonUtil.objectToJson(mPosOrgList));//AG码
+        Map<String,Object> colinfoMap = new HashMap<>();
+        colinfoMap.put("cloType",String.valueOf(agentColinfo.getCloType()));
+        colinfoMap.put("cloRealname",agentColinfo.getCloRealname());
+        colinfoMap.put("cloBank",agentColinfo.getCloBank());
+        colinfoMap.put("cloBankBranch",agentColinfo.getCloBankBranch());
+        colinfoMap.put("cloBankAccount",agentColinfo.getCloBankAccount());
+        colinfoMap.put("branchLineNum",agentColinfo.getBranchLineNum());
+        colinfoMap.put("allLineNum",agentColinfo.getAllLineNum());
+        colinfoMap.put("accountId",agentColinfo.getAccountId());
+        colinfoMap.put("accountName",agentColinfo.getAccountName());
+        map.put("colinfoMessage", colinfoMap);//收款账户
+        String params = JsonUtil .objectToJson(map);
         logger.info("代理商合并通知手刷请求:{}",params);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("busiPlat.upAgName"),params);
+        String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.upAgName"),params);
         logger.info("代理商合并通知手刷结果:{}",res);
         JSONObject resObj = JSONObject.parseObject(res);
         if(!resObj.get("respCode").equals("000000")){
