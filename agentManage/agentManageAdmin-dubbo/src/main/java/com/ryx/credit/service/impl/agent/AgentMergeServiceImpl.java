@@ -384,6 +384,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         List<BigDecimal> subBusStatusList = new ArrayList<>();
         subBusStatusList.add(BusinessStatus.Enabled.status);
         subBusStatusList.add(BusinessStatus.inactive.status);
+        AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
+        if(queryAgentMerge!=null){
+            if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                subBusStatusList.add(BusinessStatus.lock.status);
+            }
+        }
         subCriteria.andBusStatusIn(subBusStatusList);
         List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
         if(subAgentBusInfos.size()==0){
@@ -421,14 +427,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         cloReviewStatusList.add(AgStatus.Approving.getValue());
         criteria.andCloReviewStatusIn(cloReviewStatusList);
         List<AgentMerge> agentMerges = agentMergeMapper.selectByExample(agentMergeExample);
-        if(agentMerges.size()!=0){
-            throw new MessageException("合并中不能重复发起");
+        AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
+        if(queryAgentMerge!=null){
+            if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())!=0){
+                if(agentMerges.size()!=0){
+                    throw new MessageException("合并中不能重复发起");
+                }
+            }
         }
         if(subAgentId.equals(mainAgentId)){
             throw new MessageException("主副代理商不能是同一个人");
         }
         //判断是否是当前省区下的代理商
-        List<Map<String, Object>>  org = iUserService.orgCode(Long.valueOf(agentMerge.getcUser()));
+        List<Map<String, Object>>  org = iUserService.orgCode(Long.valueOf(agentMerge.getuUser()));
         if(org.size()==0){throw new ProcessException("部门信息未找到");}
         String orgId = String.valueOf(org.get(0).get("ORGID"));
         if(StringUtils.isBlank(orgId)){
@@ -495,6 +506,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             List<BigDecimal> busStatusList = new ArrayList<>();
             busStatusList.add(BusinessStatus.Enabled.status);
             busStatusList.add(BusinessStatus.inactive.status);
+            if(queryAgentMerge!=null){
+                if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                    busStatusList.add(BusinessStatus.lock.status);
+                }
+            }
             agentBusInfoCriteria.andBusStatusIn(busStatusList);
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
             if(agentBusInfos.size()==0){
@@ -846,6 +862,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new MessageException("数据ID为空！");
         }
         try {
+
+            agentMerge.setuTime(new Date());
+            agentMerge.setuUser(cUser);
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
             mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
@@ -861,8 +880,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
             }
             agentMerge.setMergeBusIds(strBusType);
-            agentMerge.setuTime(new Date());
-            agentMerge.setuUser(cUser);
             if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                 logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                 throw new MessageException("更新合并数据失败！");
