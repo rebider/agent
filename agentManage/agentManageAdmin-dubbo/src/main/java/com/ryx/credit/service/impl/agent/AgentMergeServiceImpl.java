@@ -1161,7 +1161,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(busInfo.getcUser());
-            record.setNotifyJson(String.valueOf(agentResult.getMsg()));
+            record.setNotifyJson(String.valueOf(agentResult.getData()));
             record.setNotifyType(NotifyType.AgentMerge.getValue());
             //接口请求成功
             if(agentResult.isOK()) {
@@ -1187,16 +1187,15 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      * @return
      */
     public AgentResult mPos_updateAgName(String agentName, List<String> mPosOrgList, AgentColinfo agentColinfo) {
-        HashMap<String,String> map = new HashMap<String,String>();
-
+        HashMap<String,Object> map = new HashMap<>();
         map.put("companyname", agentName);//代理商名称
-        map.put("batchIds", mPosOrgList.toString());//AG码
-        map.put("colinfoMessage", JsonUtil.objectToJson(agentColinfo));//收款账户
+        map.put("batchIds", mPosOrgList);//AG码
+        map.put("colinfoMessage", agentColinfo);//收款账户
         String params = JsonUtil.objectToJson(map);
-        logger.info("======mPos_updateAgName:{}",params);
+        logger.info("代理商合并通知手刷请求:{}",params);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.upAgName"),params);
-        logger.info("======mPos_updateAgName结果:{}",res);
+        logger.info("代理商合并通知手刷结果:{}",res);
         JSONObject resObj = JSONObject.parseObject(res);
         if(!resObj.get("respCode").equals("000000")){
             logger.error("请求失败！");
@@ -1204,7 +1203,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             return AgentResult.fail(resObj.toString());
         }
         logger.info("代理商更名成功！{}",resObj.get("respMsg"));
-        return AgentResult.ok(resObj.toString());
+        return AgentResult.ok(res);
     }
 
 
@@ -1289,6 +1288,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         if (StringUtils.isNotBlank(agentMergeBusInfo.getSubAgentId())) {
             reqMap.put("subAgentId", agentMergeBusInfo.getSubAgentId());
+        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
         }
         List<Map<String,Object>> agentMergeList = agentMergeBusInfoMapper.selectMergeBusinfoList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
