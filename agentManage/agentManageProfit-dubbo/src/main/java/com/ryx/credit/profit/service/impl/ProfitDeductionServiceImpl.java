@@ -367,7 +367,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         }
         BigDecimal stagAmt = getNextStagAmt(profitDeductionTemp);
         // 未扣足或分期还存在，进行下期扣款生成
-        if (resultAmt.doubleValue() < 0 || stagAmt!=null) {
+        if (resultAmt.doubleValue() < 0 || profitAmt.doubleValue()==0 || stagAmt!=null) {
             // 将当期扣款对象存入历史
             createHisDeduction(profitDeductionTemp);
             profitDeductionTemp.setUpperNotDeductionAmt(profitDeductionTemp.getNotDeductionAmt());//上月未扣足
