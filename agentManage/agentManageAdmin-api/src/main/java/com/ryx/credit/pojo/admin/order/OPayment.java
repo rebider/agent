@@ -100,6 +100,8 @@ public class OPayment implements Serializable{
     )
     private Date actualReceiptDate;
 
+    private BigDecimal profitTaxAmt;
+
     public String getId() {
         return id;
     }
@@ -322,5 +324,13 @@ public class OPayment implements Serializable{
 
     public void setActualReceiptDate(Date actualReceiptDate) {
         this.actualReceiptDate = actualReceiptDate;
+    }
+
+    public BigDecimal getProfitTaxAmt() {
+        return profitTaxAmt;
+    }
+
+    public void setProfitTaxAmt(BigDecimal profitTaxAmt) {
+        this.profitTaxAmt = profitTaxAmt;
     }
 }
