@@ -938,6 +938,15 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                     logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                     throw new MessageException("更新合并数据失败！");
                 }
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
+                if(agentBusInfo.getBusStatus().compareTo(BusinessStatus.lock.status)==0){
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (j != 1) {
+                        logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
+                        throw new MessageException("更新合并数据失败！");
+                    }
+                }
             }
             AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
             if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
@@ -949,6 +958,17 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 int i = busActRelMapper.updateByPrimaryKeySelective(busActRel);
                 if (i != 1) {
                     throw new MessageException("更新合并工作流关系失败！");
+                }
+                String strMergeBusIds = agentMerge.getMergeBusIds();
+                String[] mergeBusIds = strMergeBusIds.split(",");
+                for(int j=0;j<mergeBusIds.length;j++){
+                    String mergeBusId = mergeBusIds[j];
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+                    agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+                    int p = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (p!=1) {
+                        throw new MessageException("更新业务锁定失败");
+                    }
                 }
             }
             //查看被合并代理商有没有合并过
