@@ -20,6 +20,7 @@ import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.profit.service.IOwnInvoiceService;
 import com.ryx.credit.profit.service.IProfitMergeDeductionService;
+import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -125,6 +126,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private IOwnInvoiceService ownInvoiceService;
     @Autowired
     private IProfitMergeDeductionService profitMergeDeductionServiceImpl;
+    @Autowired
+    private ProfitDeductionService profitDeductionServiceImpl;
 
     /**
      * 合并列表
@@ -1382,7 +1385,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         //订单欠款
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
-        return orderDebt;
+        Map<String,String> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+        Map<String, BigDecimal> notDeduction = profitDeductionServiceImpl.getNotDeduction(reqMap);
+        BigDecimal checkNotDeductionAmt = notDeduction.get("checkNotDeductionAmt");
+        BigDecimal bLNotDeductionAmt = notDeduction.get("BLNotDeductionAmt");
+        BigDecimal otherNotDeductionAmt = notDeduction.get("otherNotDeductionAmt");
+        BigDecimal chargeBackNotDeductionAmt = notDeduction.get("chargeBackNotDeductionAmt");
+        BigDecimal toolNotDeductionAmt = notDeduction.get("ToolNotDeductionAmt");
+
+        BigDecimal sum = new BigDecimal(0);
+        sum = sum.add(orderDebt).add(checkNotDeductionAmt).add(bLNotDeductionAmt).add(otherNotDeductionAmt).
+                add(chargeBackNotDeductionAmt).add(toolNotDeductionAmt);
+        return sum;
     }
 
     /**
