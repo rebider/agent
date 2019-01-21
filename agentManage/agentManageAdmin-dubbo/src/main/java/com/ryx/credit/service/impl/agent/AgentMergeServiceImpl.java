@@ -19,6 +19,7 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.profit.service.IOwnInvoiceService;
+import com.ryx.credit.profit.service.IProfitMergeDeductionService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -122,6 +123,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private IOwnInvoiceService ownInvoiceService;
+    @Autowired
+    private IProfitMergeDeductionService profitMergeDeductionServiceImpl;
 
     /**
      * 合并列表
@@ -1092,6 +1095,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
             reqMap.put("REMARK",agentMerge.getRemark());
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
+            Map map = profitMergeDeductionServiceImpl.ProfitMergeDeduction(reqMap);
+            String rusult_code = String.valueOf(map.get("rusult_code"));
+            if(!rusult_code.equals("00")){
+                throw new MessageException("欠款同步分润失败");
+            }
         }
 
         //通知业务系统
