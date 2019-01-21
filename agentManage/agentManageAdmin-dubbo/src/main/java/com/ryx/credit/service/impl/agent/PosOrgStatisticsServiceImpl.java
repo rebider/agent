@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.enumc.TerminalPlatformType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -150,4 +152,18 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
+    @Override
+    public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
+
+        if(TerminalPlatformType.MPOS.getValue().compareTo(new BigDecimal(termType))==0){
+            AgentResult agentResult = httpForMpos(orgId,"",termType);
+            agentResult.setMsg(PlatformType.MPOS.getValue());
+            return agentResult;
+        }else if(TerminalPlatformType.POS.getValue().compareTo(new BigDecimal(termType))==0){
+            AgentResult agentResult = httpForPos(orgId,orgId);
+            agentResult.setMsg(PlatformType.POS.getValue());
+            return agentResult;
+        }
+        return AgentResult.fail();
+    }
 }
