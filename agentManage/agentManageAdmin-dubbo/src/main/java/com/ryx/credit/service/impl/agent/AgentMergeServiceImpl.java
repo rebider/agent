@@ -946,7 +946,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 busActRel.setActivId(proIns);
                 busActRel.setAgentId(agentMerge.getSubAgentId());
                 busActRel.setAgentName(agentMerge.getSubAgentName());
-                int i = busActRelMapper.updateByPrimaryKey(busActRel);
+                int i = busActRelMapper.updateByPrimaryKeySelective(busActRel);
                 if (i != 1) {
                     throw new MessageException("更新合并工作流关系失败！");
                 }
