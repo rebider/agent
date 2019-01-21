@@ -26,4 +26,10 @@ public interface ProfitStagingMapper {
     int updateByPrimaryKey(ProfitStaging record);
 
     ProfitStaging getNotDeductionAmt(Map<String, Object> param);
+
+    /**获取分期未扣款*/
+    ProfitStaging getNotDeductionAmtTwo(Map<String, String> param);
+
+
+
 }

@@ -1,5 +1,6 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.exceptions.DeductionException;
@@ -152,5 +153,12 @@ public interface ProfitDeductionService {
      * @Date: 16:35 2019/1/4
      */
     BigDecimal khDeduction(Map<String,Object> param);
+
+    /**
+     * 获取当前代理商总欠款
+     * @param map
+     * @return
+     */
+    Map<String,BigDecimal> getNotDeduction(Map<String,String> map);
 
 }

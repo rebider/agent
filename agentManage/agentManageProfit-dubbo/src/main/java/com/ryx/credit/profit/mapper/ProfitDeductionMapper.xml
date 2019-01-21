@@ -492,4 +492,20 @@
         </otherwise>
       </choose>
     </select>
+
+  <select id="getNotDeductionAmt" parameterType="java.util.Map" resultType="java.math.BigDecimal">
+    select sum(MUST_DEDUCTION_AMT) from P_DEDUCTION
+    <where>
+      DEDUCTION_DATE = #{date} AND DEDUCTION_STATUS='0' AND DEDUCTION_TYPE=#{type}
+      <if test="agentId != null and agentId != ''">
+        and AGENT_ID = #{agentId}
+      </if>
+      <if test="agentName != null and agentName != ''">
+        and AGENT_NAME = #{agentName}
+      </if>
+
+    </where>
+  </select>
+
+
 </mapper>
