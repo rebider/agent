@@ -55,5 +55,10 @@
     <dubbo:reference interface="com.ryx.credit.service.order.OrderService" id="orderService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentEnterService" id="agentEnterService"   timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentNotifyService" id="agentNotifyService"   timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.PAdjustMService" ref="pAdjustMService"  timeout="1200000" registry="${zk.group}"  />
+    <dubbo:service interface="com.ryx.credit.profit.service.ProfitSupplyTaxService" ref="profitSupplyTaxService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ProfitDeducttionDetailService" ref="profitDeducttionDetailService"  timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.profit.service.ITaxDeductionDetailService" ref="taxDeductionDetailService"  timeout="1200000" registry="${zk.group}"/>
 
+    <dubbo:service interface="com.ryx.credit.profit.service.IOwnInvoiceService" ref="ownInvoiceService"  timeout="1200000" registry="${zk.group}"/>
 </beans>
