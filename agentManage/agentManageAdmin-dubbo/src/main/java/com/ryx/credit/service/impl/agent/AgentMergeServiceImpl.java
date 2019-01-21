@@ -678,8 +678,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.MERGE.name());
         record.setActivStatus(AgStatus.Approving.name());
-        record.setAgentId(subAgent.getId());
-        record.setAgentName(subAgent.getAgName());
+        record.setAgentId(mainAgent.getId());
+        record.setAgentName(mainAgent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proceId);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
@@ -944,8 +944,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 BusActRel busActRel = new BusActRel();
                 busActRel.setBusId(agentMerge.getId());
                 busActRel.setActivId(proIns);
-                busActRel.setAgentId(agentMerge.getSubAgentId());
-                busActRel.setAgentName(agentMerge.getSubAgentName());
+                busActRel.setAgentId(agentMerge.getMainAgentId());
+                busActRel.setAgentName(agentMerge.getMainAgentName());
                 int i = busActRelMapper.updateByPrimaryKeySelective(busActRel);
                 if (i != 1) {
                     throw new MessageException("更新合并工作流关系失败！");
