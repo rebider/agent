@@ -56,6 +56,9 @@ public class ProfitDeduction implements Serializable {
 
     private String nextId;
 
+    private String rrplaceAgentId;
+    private String  rrplaceAgentName;
+
    public String getId() {
         return id;
     }
@@ -254,5 +257,21 @@ public class ProfitDeduction implements Serializable {
 
     public void setNextId(String nextId) {
         this.nextId = nextId;
+    }
+
+    public String getRrplaceAgentId() {
+        return rrplaceAgentId;
+    }
+
+    public void setRrplaceAgentId(String rrplaceAgentId) {
+        this.rrplaceAgentId = rrplaceAgentId;
+    }
+
+    public String getRrplaceAgentName() {
+        return rrplaceAgentName;
+    }
+
+    public void setRrplaceAgentName(String rrplaceAgentName) {
+        this.rrplaceAgentName = rrplaceAgentName;
     }
 }

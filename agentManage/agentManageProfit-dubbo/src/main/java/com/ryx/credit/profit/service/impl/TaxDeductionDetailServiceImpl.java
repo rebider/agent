@@ -62,6 +62,12 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         if(StringUtils.isNotBlank(taxDeductionDetail.getAgentId())){
             criteria.andAgentIdEqualTo(taxDeductionDetail.getAgentId());
         }
+        if (StringUtils.isNotBlank(taxDeductionDetail.getFristAgentId())) {
+            criteria.andFristAgentIdEqualTo(taxDeductionDetail.getFristAgentId());
+        }
+        if(StringUtils.isNotBlank(taxDeductionDetail.getFristAgentName())){
+            criteria.andFristAgentNameEqualTo(taxDeductionDetail.getFristAgentName());
+        }
         if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
             criteria.andProfitMonthBetween(dateStart,dateEnd);
         }else if(StringUtils.isNotBlank(dateStart)){
