@@ -25,6 +25,10 @@ public class PlatForm implements Serializable{
 
     private String platformType;
 
+    private String posanameprefix;
+
+    private String posbusitype;
+
     public String getId() {
         return id;
     }
@@ -103,5 +107,21 @@ public class PlatForm implements Serializable{
 
     public void setPlatformType(String platformType) {
         this.platformType = platformType == null ? null : platformType.trim();
+    }
+
+    public String getPosanameprefix() {
+        return posanameprefix;
+    }
+
+    public void setPosanameprefix(String posanameprefix) {
+        this.posanameprefix = posanameprefix == null ? null : posanameprefix.trim();
+    }
+
+    public String getPosbusitype() {
+        return posbusitype;
+    }
+
+    public void setPosbusitype(String posbusitype) {
+        this.posbusitype = posbusitype == null ? null : posbusitype.trim();
     }
 }

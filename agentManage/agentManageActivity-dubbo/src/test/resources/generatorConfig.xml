@@ -42,7 +42,10 @@
 		<!--<table tableName="P_AGENT_MERGE" domainObjectName="PAgentMerge" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 
-		<table tableName="O_CASH_SUMMARY_MOUTH" domainObjectName="CashSummaryMouth" enableUpdateByExample="false"
+		<!--<table tableName="O_CASH_SUMMARY_MOUTH" domainObjectName="CashSummaryMouth" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
+
+		<table tableName="a_platform" domainObjectName="PlatForm" enableUpdateByExample="false"
 			   enableDeleteByPrimaryKey="false"/>
 
 	</context>
