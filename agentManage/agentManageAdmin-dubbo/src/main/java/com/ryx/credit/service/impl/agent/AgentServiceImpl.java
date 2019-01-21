@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
@@ -534,6 +535,28 @@ public class AgentServiceImpl implements AgentService {
         pageInfo.setRows(list);
         pageInfo.setTotal(agentMapper.queryAgentTierCount(reqMap));
         return pageInfo;
+    }
+
+    /**
+     * 代理商解冻
+     * @param agentId
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public AgentResult agentUnfreeze(String agentId, String cUser) throws Exception {
+        if (StringUtils.isBlank(agentId)) {
+            throw new MessageException("数据ID为空！");
+        }
+        Agent agent = agentMapper.selectByPrimaryKey(agentId);
+        agent.setFreestatus(FreeStatus.JD.getValue());
+        agent.setcUtime(new Date());
+        agent.setcUser(cUser);
+        if (1 != agentMapper.updateByPrimaryKeySelective(agent)) {
+            throw new MessageException("合并数据处理失败！");
+        }
+        return AgentResult.ok();
     }
 
 }
