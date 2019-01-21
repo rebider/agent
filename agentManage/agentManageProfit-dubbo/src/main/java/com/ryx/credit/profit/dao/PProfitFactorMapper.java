@@ -43,4 +43,7 @@ public interface PProfitFactorMapper {
     Map<String, Object> profitCount(Map<String, Object> param);
 
     List<PProfitFactor> selectBlDeductListByParams(Map<String,Object> param);
+
+    /**获得商业保理分润月未扣足*/
+    BigDecimal getSurplusAmt(Map<String,String> map);
 }
