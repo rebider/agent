@@ -331,9 +331,9 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
                     throw new MessageException("请填写首付金额");
                 }
-                //5号后校验 cxinfo
+                // cxinfo 日期校验
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("5号以后必须选择下个月");
+                    throw new MessageException("分期日期有误");
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
@@ -358,8 +358,9 @@ public class OrderServiceImpl implements OrderService {
                 if (payment.getDownPayment() == null || payment.getDownPayment().compareTo(BigDecimal.ZERO) == 0) {
                     throw new MessageException("请填写首付金额");
                 }
+                // cxinfo 日期校验
                 if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("5号以后必须选择下个月");
+                    throw new MessageException("分期日期有误");
                 }
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
@@ -386,9 +387,7 @@ public class OrderServiceImpl implements OrderService {
                 if (cash_FKFQ==null || cash_FKFQ.size()> 0) {
                     agentVo.setoCashReceivables(new ArrayList<>());
                 }
-                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("5号以后必须选择下个月");
-                }
+
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
@@ -400,9 +399,7 @@ public class OrderServiceImpl implements OrderService {
                 if (cash_FRFQ==null || cash_FRFQ.size()> 0) {
                     agentVo.setoCashReceivables(new ArrayList<>());
                 }
-                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(new Date()) < 0) {
-                    throw new MessageException("5号以后必须选择下个月");
-                }
+
                 if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
                     throw new MessageException("分期期数有误");
                 }
