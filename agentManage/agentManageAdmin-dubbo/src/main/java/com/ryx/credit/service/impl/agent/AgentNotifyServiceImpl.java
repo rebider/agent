@@ -983,11 +983,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                     if (respXML.contains("data") && respXML.contains("orgId")){
                         JSONObject respXMLObj = JSONObject.parseObject(respXML);
                         JSONObject dataObj = JSONObject.parseObject(respXMLObj.get("data").toString());
-                        if(StringUtils.isBlank(respXMLObj.get("data").toString())){
+                        if(StringUtils.isBlank(String.valueOf(respXMLObj.get("data"))) || "null".equals(String.valueOf(respXMLObj.get("data")))){
                             AppConfig.sendEmails(respXML, "入网通知POS失败报警");
                         }
                         log.info(dataObj.toJSONString());
-                        return AgentResult.ok(respXML);
+                        return AgentResult.ok(dataObj);
                     }else{
                         AppConfig.sendEmails(respXML, "入网通知POS失败报警");
                         log.info("http请求超时返回错误:{}",respXML);

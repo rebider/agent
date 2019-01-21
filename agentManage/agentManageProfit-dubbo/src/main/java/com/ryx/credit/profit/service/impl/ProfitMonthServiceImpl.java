@@ -1121,7 +1121,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public List<Map<String,Object>> exportByF(Map<String, Object> param){
         List<Map<String,Object>> list;
         if ("1".equals(param.get("chekbox"))) {  //包含下级
-            list = profitDetailMonthMapper.exportByFNoChild(param);
+            list = profitDetailMonthMapper.exportByFHaveChild(param);
         }else{ //不包含下级
             list = profitDetailMonthMapper.exportByFNoChild(param);
         }

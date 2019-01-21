@@ -208,6 +208,16 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("不能提交其他省区的退补差价");
                 }
             }
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andBusStatusNotEqualTo(BusinessStatus.pause.status);
+            criteria.andIdEqualTo(String.valueOf(stringObjectMap.get("BUS_ID")));
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if(agentBusInfos.size()==0){
+                throw new ProcessException("SN不在平台下");
+            }
+
             String gTime = String.valueOf(stringObjectMap.get("G_TIME"));
             if(StringUtils.isNotBlank(gTime) && gTime!="null"){
                 BigDecimal gTimeB = new BigDecimal(gTime);

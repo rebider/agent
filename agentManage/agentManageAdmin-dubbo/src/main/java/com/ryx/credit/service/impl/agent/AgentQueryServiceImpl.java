@@ -166,6 +166,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
         criteria.andAgentIdEqualTo(agentId);
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
         if(StringUtils.isBlank(isZpos)){
             criteria.andBusPlatformNotEqualTo(Platform.ZPOS.getValue());
         }else if(isZpos.equals("true")){

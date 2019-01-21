@@ -81,7 +81,7 @@ public class RefundJob {
     @Autowired
     private AgentService agentService;
 
-    @Scheduled(cron = "0 0 0 1 * ?")
+    @Scheduled(cron = "0 0 1 1 * ?")
     public void deal() {
         // 上月的开始及结束日期
         JSONObject param = new JSONObject();

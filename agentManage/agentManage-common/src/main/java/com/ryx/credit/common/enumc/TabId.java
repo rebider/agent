@@ -83,7 +83,8 @@ public enum TabId {
     P_TAX_DEDUCTION_DETAIL("TAXDD%s%015d"),
     P_INVOICE_DETAIL("IDTL_%s%015d"),
     PROFIT_SUPPLU_TAX("PST%s%015d"),
-    A_AGENT_MERGE("AM%s%015d");
+    A_AGENT_MERGE("AM%s%015d"),
+    A_AGENT_MERGE_BUSINFO("AMB%s%015d");
 
 
     TabId(String thePatt){

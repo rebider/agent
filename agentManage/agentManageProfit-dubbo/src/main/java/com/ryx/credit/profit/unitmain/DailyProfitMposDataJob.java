@@ -16,6 +16,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,9 +45,11 @@ public class DailyProfitMposDataJob {
 
     private int index = 1;  //页数
 
+    private String frDate = "";
+
     @Transactional
-    public void excute(String frDate) {
-        frDate = frDate == null ? DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2)) : frDate;
+    public void excute(String profitDay) {
+        frDate = profitDay == null ? DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2)) : profitDay;
         logger.info("======={}日结分润数据同步开始=======", frDate);
         index = 1;
         long t1 = System.currentTimeMillis();
@@ -54,7 +57,7 @@ public class DailyProfitMposDataJob {
         //删除现有数据
         profitDayMapper.deleteByDay(frDate);
 
-        synchroProfitDay(frDate);
+        synchroProfitDay();
 
         long t2 = System.currentTimeMillis();
         logger.info("======={}日结分润数据同步结束，耗时{}ms=======", frDate, (t2 - t1));
@@ -67,8 +70,8 @@ public class DailyProfitMposDataJob {
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
-//    @Scheduled(cron = "0 0 5 * * ?")
-    public void synchroProfitDay(String frDate) {
+    @Scheduled(cron = "0 0 5 * * ?")
+    public void synchroProfitDay() {
         try {
 
             //同步新数据
@@ -143,7 +146,7 @@ public class DailyProfitMposDataJob {
 
             profitDService.insertSelective(profitD);
         }
-        synchroProfitDay(frDate);
+        //synchroProfitDay(frDate);
     }
 
     public static void main(String agrs[]) {

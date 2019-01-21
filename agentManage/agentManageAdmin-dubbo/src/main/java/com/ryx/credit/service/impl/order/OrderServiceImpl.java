@@ -596,6 +596,8 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setPosType(activity.getPosType());
                     oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
                     oSubOrderActivity.setStandTime(activity.getStandTime());
+                    oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                    oSubOrderActivity.setBackType(activity.getBackType());
                     if (1 != oSubOrderActivityMapper.insertSelective(oSubOrderActivity)) {
                         logger.info("下订单:{}{}", activity.getActivityName(), "商品添加活动失败");
                         throw new MessageException("商品添加活动失败");
@@ -918,6 +920,8 @@ public class OrderServiceImpl implements OrderService {
                     oSubOrderActivity.setPosType(activity.getPosType());
                     oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
                     oSubOrderActivity.setStandTime(activity.getStandTime());
+                    oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                    oSubOrderActivity.setBackType(activity.getBackType());
                 } else {
                     //设置商品实际单价
                     throw new MessageException("商品必须选择指定的活动");
@@ -3060,5 +3064,22 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         return AgentResult.ok();
+    }
+
+
+    @Transactional
+    @Override
+    public void testRepeatableRead() {
+
+        OOrder order = orderMapper.selectByPrimaryKey("OO20181121000000000001830");
+        logger.info("==1===="+order.getoNum());
+        //两个事物 都更新 或者 一个事物更新
+//        order.setoNum("21173445661830078");
+//        order.setoNum("21173445661830079");
+//        orderMapper.updateByPrimaryKeySelective(order);
+        logger.info("==2===="+order.getoNum());
+        OOrder order1 = orderMapper.selectByPrimaryKey("OO20181121000000000001830");
+        logger.info("==2===="+order1.getoNum());
+        logger.info("==3====");
     }
 }

@@ -182,9 +182,9 @@ public class ProfitFactorServiceImpl implements ProfitFactorService {
         BigDecimal realDeductionAmt = BigDecimal.ZERO;
         if (profitAmt.doubleValue() > 0) {
             currentProfit = profitAmt;
-            profitAmt = profitAmt.subtract(profitFactorTemp.getMustDeductionAmt());
+            profitAmt = profitAmt.subtract(profitFactorTemp.getBuckleAmt());
             if (profitAmt.doubleValue() > 0) {
-                realDeductionAmt = profitFactorTemp.getMustDeductionAmt();
+                realDeductionAmt = profitFactorTemp.getBuckleAmt();
             } else {
                 realDeductionAmt = currentProfit;
             }
@@ -229,6 +229,7 @@ public class ProfitFactorServiceImpl implements ProfitFactorService {
             // 更新当期为下期扣款
             profitFactorTemp.setFactorMonth(LocalDate.now().toString().substring(0, 7).replaceAll("-", ""));
             profitFactorTemp.setUpperNotDeductionAmt(profitFactorTemp.getNotDeductionAmt());//上月未扣足=未扣足
+            profitFactorTemp.setBuckleAmt(profitFactorTemp.getNotDeductionAmt());
             profitFactorTemp.setMustDeductionAmt(profitFactorTemp.getNotDeductionAmt());
             profitFactorTemp.setSumDeductionAmt(profitFactorTemp.getNotDeductionAmt());
             profitFactorTemp.setNotDeductionAmt(null); // 未扣足请0

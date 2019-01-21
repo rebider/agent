@@ -71,6 +71,28 @@ public class OActivity implements Serializable{
 
     private BigDecimal standTime;
 
+    private String venderName;
+
+    private BigDecimal standAmt;
+
+    private String backType;
+
+    public BigDecimal getStandAmt() {
+        return standAmt;
+    }
+
+    public void setStandAmt(BigDecimal standAmt) {
+        this.standAmt = standAmt;
+    }
+
+    public String getBackType() {
+        return backType;
+    }
+
+    public void setBackType(String backType) {
+        this.backType = backType == null ? null : backType.trim();
+    }
+
     public String getProTypeName() {
         return proTypeName;
     }
@@ -78,7 +100,6 @@ public class OActivity implements Serializable{
     public void setProTypeName(String proTypeName) {
         this.proTypeName = proTypeName;
     }
-    private String venderName;
 
     public String getVenderName() {
         return venderName;

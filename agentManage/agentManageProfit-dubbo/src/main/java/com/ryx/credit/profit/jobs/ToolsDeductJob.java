@@ -32,9 +32,9 @@ public class ToolsDeductJob {
     @Autowired
     private ToolsDeductService toolsDeductService;
 
-    //@Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0 1 1 * ?")
     public void execut(){
-        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String deductDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             LOG.info("从订单系统，获取到需要扣款的机具欠款总计：{} 条", list  != null && !list.isEmpty() ? list.size() : 0);

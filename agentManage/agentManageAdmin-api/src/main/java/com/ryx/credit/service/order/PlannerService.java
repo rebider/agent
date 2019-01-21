@@ -18,7 +18,7 @@ public interface PlannerService {
 
     PageInfo queryPlannerList(OReceiptOrder receiptOrder, OReceiptPro receiptPro, Page page,Map map);
 
-    AgentResult savePlanner(ReceiptPlan receiptPlan,String receiptProId) throws Exception;
+    AgentResult savePlanner(ReceiptPlan receiptPlan,String receiptProId,String activityId) throws Exception;
 
     List<Map<String, Object>> queryOrderReceiptPlanInfo(Map<String, String> params) throws ProcessException;
 
