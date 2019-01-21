@@ -1817,6 +1817,66 @@ public class TerminalTransferDetailExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andPlatformTypeIsNull() {
+            addCriterion("PLATFORM_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIsNotNull() {
+            addCriterion("PLATFORM_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_TYPE =", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_TYPE <>", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeGreaterThan(BigDecimal value) {
+            addCriterion("PLATFORM_TYPE >", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_TYPE >=", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLessThan(BigDecimal value) {
+            addCriterion("PLATFORM_TYPE <", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_TYPE <=", value, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeIn(List<BigDecimal> values) {
+            addCriterion("PLATFORM_TYPE in", values, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotIn(List<BigDecimal> values) {
+            addCriterion("PLATFORM_TYPE not in", values, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PLATFORM_TYPE between", value1, value2, "platformType");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformTypeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PLATFORM_TYPE not between", value1, value2, "platformType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

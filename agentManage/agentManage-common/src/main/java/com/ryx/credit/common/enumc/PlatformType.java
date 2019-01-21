@@ -1,8 +1,6 @@
 package com.ryx.credit.common.enumc;
 
 
-import sun.tools.jar.Main;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,6 +76,13 @@ public enum PlatformType {
                 resultMap.put(cc.code,cc.msg);
             }
         }
+        return resultMap;
+    }
+
+    public static Map<String,Object> getContentMapPosMpos(){
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put(PlatformType.POS.getValue(),PlatformType.POS.getContent());
+        resultMap.put(PlatformType.MPOS.getValue(),PlatformType.MPOS.getContent());
         return resultMap;
     }
 

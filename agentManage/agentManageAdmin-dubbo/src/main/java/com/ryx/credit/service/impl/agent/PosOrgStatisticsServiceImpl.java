@@ -37,13 +37,13 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     private AgentBusInfoMapper agentBusInfoMapper;
 
     @Override
-    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId)throws Exception{
+    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
         PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
         String platformType = platForm.getPlatformType();
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
         AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
         if(PlatformType.MPOS.getValue().equals(platformType)){
-            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum());
+            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
             agentResult.setMsg(platformType);
             return agentResult;
         }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
@@ -129,11 +129,12 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
-    private AgentResult httpForMpos(String orgId,String parentAgencyId)throws Exception{
+    private AgentResult httpForMpos(String orgId,String parentAgencyId,String termType)throws Exception{
         try {
             Map<String, String> map = new HashMap<>();
             map.put("agencyId",orgId);
             map.put("parentAgencyId",parentAgencyId);
+            map.put("type",termType);
             String toJson = JsonUtil.objectToJson(map);
             log.info("手刷机构统计信息查询请求参数:{}",toJson);
             String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("pos_org_statistics_url"), toJson);
