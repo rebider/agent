@@ -18,7 +18,9 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
-import com.ryx.credit.pojo.admin.vo.UserVo;
+import com.ryx.credit.profit.service.IOwnInvoiceService;
+import com.ryx.credit.profit.service.IProfitMergeDeductionService;
+import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -120,6 +122,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private AttachmentRelMapper attachmentRelMapper;
     @Autowired
     private AttachmentMapper attachmentMapper;
+    @Autowired
+    private IOwnInvoiceService ownInvoiceService;
+    @Autowired
+    private IProfitMergeDeductionService profitMergeDeductionServiceImpl;
+    @Autowired
+    private ProfitDeductionService profitDeductionServiceImpl;
 
     /**
      * 合并列表
@@ -144,6 +152,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         if (null != agentMerge.getCloReviewStatus()) {
             reqMap.put("cloReviewStatus", agentMerge.getCloReviewStatus());
+        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
         }
         List<Map<String,Object>> agentMergeList = agentMergeMapper.selectAgentMergeList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
@@ -179,11 +195,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             agentMerge.setVersion(Status.STATUS_1.status);
 
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-//            mainAndSubMustHaveLower(agentMerge);
+            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
-//            verifyMergeing(agentMerge,busType,oCashReceivables);
+            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-//            verifypprovaling(agentMerge.getSubAgentId());
+            verifypprovaling(agentMerge.getSubAgentId());
 
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 agentMerge.setCloReviewStatus(AgStatus.Approving.status);
@@ -374,6 +390,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         List<BigDecimal> subBusStatusList = new ArrayList<>();
         subBusStatusList.add(BusinessStatus.Enabled.status);
         subBusStatusList.add(BusinessStatus.inactive.status);
+        AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
+        if(queryAgentMerge!=null){
+            if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                subBusStatusList.add(BusinessStatus.lock.status);
+            }
+        }
         subCriteria.andBusStatusIn(subBusStatusList);
         List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
         if(subAgentBusInfos.size()==0){
@@ -411,14 +433,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         cloReviewStatusList.add(AgStatus.Approving.getValue());
         criteria.andCloReviewStatusIn(cloReviewStatusList);
         List<AgentMerge> agentMerges = agentMergeMapper.selectByExample(agentMergeExample);
-        if(agentMerges.size()!=0){
-            throw new MessageException("合并中不能重复发起");
+        AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
+        if(queryAgentMerge!=null){
+            if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())!=0){
+                if(agentMerges.size()!=0){
+                    throw new MessageException("合并中不能重复发起");
+                }
+            }
         }
         if(subAgentId.equals(mainAgentId)){
             throw new MessageException("主副代理商不能是同一个人");
         }
         //判断是否是当前省区下的代理商
-        List<Map<String, Object>>  org = iUserService.orgCode(Long.valueOf(agentMerge.getcUser()));
+        List<Map<String, Object>>  org = iUserService.orgCode(Long.valueOf(agentMerge.getuUser()));
         if(org.size()==0){throw new ProcessException("部门信息未找到");}
         String orgId = String.valueOf(org.get(0).get("ORGID"));
         if(StringUtils.isBlank(orgId)){
@@ -432,6 +459,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new ProcessException("只能提交自己省区的代理商合并");
         }
         BigDecimal subAgentOweTicket = getSubAgentOweTicket(agentMerge.getSubAgentId());
+        if(subAgentOweTicket==null){
+            throw new ProcessException("副代理商查询欠票失败");
+        }
         if(subAgentOweTicket.compareTo(new BigDecimal(0))!=0){
             throw new ProcessException("副代理商欠票不可以提交");
         }
@@ -482,6 +512,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             List<BigDecimal> busStatusList = new ArrayList<>();
             busStatusList.add(BusinessStatus.Enabled.status);
             busStatusList.add(BusinessStatus.inactive.status);
+            if(queryAgentMerge!=null){
+                if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                    busStatusList.add(BusinessStatus.lock.status);
+                }
+            }
             agentBusInfoCriteria.andBusStatusIn(busStatusList);
             List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
             if(agentBusInfos.size()==0){
@@ -649,8 +684,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.MERGE.name());
         record.setActivStatus(AgStatus.Approving.name());
-        record.setAgentId(subAgent.getId());
-        record.setAgentName(subAgent.getAgName());
+        record.setAgentId(mainAgent.getId());
+        record.setAgentName(mainAgent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proceId);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
@@ -692,7 +727,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                         throw new ProcessException("更新收款信息失败");
                     }
                 }
-                if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67")){
+                //退回修改节点和第二个省区
+                if(agentVo.getSid().equals("sid-8BFF457F-18DB-4AF9-A1F9-90C19812BE67") || agentVo.getSid().equals("sid-5C0AE792-7539-46D2-86BA-243B6A42D9FE")){
                     Agent mainAgent = agentMapper.selectByPrimaryKey(agentMerge.getMainAgentId());
                     Agent subAgent = agentMapper.selectByPrimaryKey(agentMerge.getSubAgentId());
                     COrganization mainOrganization = organizationMapper.selectByPrimaryKey(mainAgent.getAgDocDistrict());
@@ -828,17 +864,20 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult editAgentMerge(AgentMerge agentMerge, String[] busType, String cUser,
-                                      List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles) throws Exception {
+                                      List<OCashReceivablesVo> oCashReceivables, String[] agentMergeFiles,String proIns) throws Exception {
         if(StringUtils.isBlank(agentMerge.getId())){
             throw new MessageException("数据ID为空！");
         }
         try {
+
+            agentMerge.setuTime(new Date());
+            agentMerge.setuUser(cUser);
             //主代理商和副代理商必须是标准一代或机构，副代理商且不能有下级
-//            mainAndSubMustHaveLower(agentMerge);
+            mainAndSubMustHaveLower(agentMerge);
             //合并中不能重复发起,判断是否有欠票欠款情况
-//            verifyMergeing(agentMerge,busType,oCashReceivables);
+            verifyMergeing(agentMerge,busType,oCashReceivables);
             //补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
-//            verifypprovaling(agentMerge.getSubAgentId());
+            verifypprovaling(agentMerge.getSubAgentId());
 
             String strBusType = "";
             for(int i=0;i<busType.length;i++){
@@ -848,8 +887,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 }
             }
             agentMerge.setMergeBusIds(strBusType);
-            agentMerge.setuTime(new Date());
-            agentMerge.setuUser(cUser);
             if (1 != agentMergeMapper.updateByPrimaryKeySelective(agentMerge)) {
                 logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                 throw new MessageException("更新合并数据失败！");
@@ -906,6 +943,38 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                 if (i != 1) {
                     logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                     throw new MessageException("更新合并数据失败！");
+                }
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
+                if(agentBusInfo.getBusStatus().compareTo(BusinessStatus.lock.status)==0){
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (j != 1) {
+                        logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
+                        throw new MessageException("更新合并数据失败！");
+                    }
+                }
+            }
+            AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
+            if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                BusActRel busActRel = new BusActRel();
+                busActRel.setBusId(agentMerge.getId());
+                busActRel.setActivId(proIns);
+                busActRel.setAgentId(agentMerge.getMainAgentId());
+                busActRel.setAgentName(agentMerge.getMainAgentName());
+                int i = busActRelMapper.updateByPrimaryKeySelective(busActRel);
+                if (i != 1) {
+                    throw new MessageException("更新合并工作流关系失败！");
+                }
+                String strMergeBusIds = agentMerge.getMergeBusIds();
+                String[] mergeBusIds = strMergeBusIds.split(",");
+                for(int j=0;j<mergeBusIds.length;j++){
+                    String mergeBusId = mergeBusIds[j];
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+                    agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+                    int p = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (p!=1) {
+                        throw new MessageException("更新业务锁定失败");
+                    }
                 }
             }
             //查看被合并代理商有没有合并过
@@ -1029,6 +1098,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
             reqMap.put("REMARK",agentMerge.getRemark());
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
+            Map map = profitMergeDeductionServiceImpl.ProfitMergeDeduction(reqMap);
+            String rusult_code = String.valueOf(map.get("rusult_code"));
+            if(!rusult_code.equals("00")){
+                throw new MessageException("欠款同步分润失败");
+            }
         }
 
         //通知业务系统
@@ -1050,7 +1124,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(agentMerge==null){
             throw new MessageException("未找到合并信息");
         }
-        String agentName = agentMerge.getMainAgentName() + "(" + agentMerge.getSubAgentName() + ")";
+        String agentName = agentMerge.getMainAgentName() + "-" + agentMerge.getSubAgentName();
 
         List<String> mPosOrgList = new ArrayList<>();
         for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
@@ -1148,7 +1222,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             record.setNotifyStatus(Status.STATUS_0.status);
             record.setNotifyCount(Status.STATUS_1.status);
             record.setcUser(busInfo.getcUser());
-            record.setNotifyJson(String.valueOf(agentResult.getMsg()));
+            record.setNotifyJson(String.valueOf(agentResult.getData()));
             record.setNotifyType(NotifyType.AgentMerge.getValue());
             //接口请求成功
             if(agentResult.isOK()) {
@@ -1174,16 +1248,24 @@ public class AgentMergeServiceImpl implements AgentMergeService {
      * @return
      */
     public AgentResult mPos_updateAgName(String agentName, List<String> mPosOrgList, AgentColinfo agentColinfo) {
-        HashMap<String,String> map = new HashMap<String,String>();
-
+        Map<String,Object> map = new HashMap<>();
         map.put("companyname", agentName);//代理商名称
-        map.put("batchIds", mPosOrgList.toString());//AG码
-        map.put("colinfoMessage", JsonUtil.objectToJson(agentColinfo));//收款账户
-        String params = JsonUtil.objectToJson(map);
-        logger.info("======mPos_updateAgName:{}",params);
-        String res = HttpClientUtil.doPostJson
-                (AppConfig.getProperty("busiPlat.upAgName"),params);
-        logger.info("======mPos_updateAgName结果:{}",res);
+        map.put("batchIds", JsonUtil.objectToJson(mPosOrgList));//AG码
+        Map<String,Object> colinfoMap = new HashMap<>();
+        colinfoMap.put("cloType",String.valueOf(agentColinfo.getCloType()));
+        colinfoMap.put("cloRealname",agentColinfo.getCloRealname());
+        colinfoMap.put("cloBank",agentColinfo.getCloBank());
+        colinfoMap.put("cloBankBranch",agentColinfo.getCloBankBranch());
+        colinfoMap.put("cloBankAccount",agentColinfo.getCloBankAccount());
+        colinfoMap.put("branchLineNum",agentColinfo.getBranchLineNum());
+        colinfoMap.put("allLineNum",agentColinfo.getAllLineNum());
+        colinfoMap.put("accountId",agentColinfo.getAccountId());
+        colinfoMap.put("accountName",agentColinfo.getAccountName());
+        map.put("colinfoMessage", colinfoMap);//收款账户
+        String params = JsonUtil .objectToJson(map);
+        logger.info("代理商合并通知手刷请求:{}",params);
+        String res = HttpClientUtil.doPostJson(AppConfig.getProperty("busiPlat.upAgName"),params);
+        logger.info("代理商合并通知手刷结果:{}",res);
         JSONObject resObj = JSONObject.parseObject(res);
         if(!resObj.get("respCode").equals("000000")){
             logger.error("请求失败！");
@@ -1191,7 +1273,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             return AgentResult.fail(resObj.toString());
         }
         logger.info("代理商更名成功！{}",resObj.get("respMsg"));
-        return AgentResult.ok(resObj.toString());
+        return AgentResult.ok(res);
     }
 
 
@@ -1277,6 +1359,14 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if (StringUtils.isNotBlank(agentMergeBusInfo.getSubAgentId())) {
             reqMap.put("subAgentId", agentMergeBusInfo.getSubAgentId());
         }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId",String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String,Object>> agentMergeList = agentMergeBusInfoMapper.selectMergeBusinfoList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMergeList);
@@ -1295,7 +1385,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         //订单欠款
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
-        return orderDebt;
+        Map<String,String> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+        Map<String, BigDecimal> notDeduction = profitDeductionServiceImpl.getNotDeduction(reqMap);
+        BigDecimal checkNotDeductionAmt = notDeduction.get("checkNotDeductionAmt");
+        BigDecimal bLNotDeductionAmt = notDeduction.get("BLNotDeductionAmt");
+        BigDecimal otherNotDeductionAmt = notDeduction.get("otherNotDeductionAmt");
+        BigDecimal chargeBackNotDeductionAmt = notDeduction.get("chargeBackNotDeductionAmt");
+        BigDecimal toolNotDeductionAmt = notDeduction.get("ToolNotDeductionAmt");
+
+        BigDecimal sum = new BigDecimal(0);
+        sum = sum.add(orderDebt).add(checkNotDeductionAmt).add(bLNotDeductionAmt).add(otherNotDeductionAmt).
+                add(chargeBackNotDeductionAmt).add(toolNotDeductionAmt);
+        return sum;
     }
 
     /**
@@ -1307,8 +1409,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     public BigDecimal getSubAgentOweTicket(String agentId){
         Map<String,String> reqMap = new HashMap<>();
         reqMap.put("agentId",agentId);
-
-        logger.info("代理商合并查询欠票：代理商id:{},欠票：{}",agentId);
-        return new BigDecimal(1000);
+        Map<String, Object> resultMap = ownInvoiceService.getOwmInvoice(reqMap);
+        logger.info("代理商合并查询欠票：代理商id:{},欠票：{}",resultMap);
+        if(resultMap==null){
+            return new BigDecimal(0);
+        }
+        String owminvoice = String.valueOf(resultMap.get("OWMINVOICE"));
+        return new BigDecimal(owminvoice);
     }
 }

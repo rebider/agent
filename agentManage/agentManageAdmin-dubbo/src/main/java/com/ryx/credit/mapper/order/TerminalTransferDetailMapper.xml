@@ -27,6 +27,7 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="PLATFORM_TYPE" jdbcType="DECIMAL" property="platformType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -58,10 +59,10 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM, SN_END_NUM, PRO_COM, PRO_MODEL, ORIGINAL_ORG_ID, 
-    ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, ADJUST_TIME, 
-    SN_COUNT, BUTT_JOINT_PERSON, ADJUST_STATUS, REMARK, BATCH_NUM, AGENT_ID, C_TIME, 
-    U_TIME, C_USER, U_USER, STATUS, VERSION
+    ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM, SN_END_NUM, PRO_COM, PRO_MODEL, ORIGINAL_ORG_ID,
+    ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, ADJUST_TIME,
+    SN_COUNT, BUTT_JOINT_PERSON, ADJUST_STATUS, REMARK, BATCH_NUM, AGENT_ID, C_TIME,
+    U_TIME, C_USER, U_USER, STATUS, VERSION, PLATFORM_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -80,7 +81,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from O_TERMINAL_TRANSFER_DETAIL
     where ID = #{id,jdbcType=VARCHAR}
@@ -92,24 +93,24 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
-    insert into O_TERMINAL_TRANSFER_DETAIL (ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM, 
-      SN_END_NUM, PRO_COM, PRO_MODEL, 
-      ORIGINAL_ORG_ID, ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID, 
-      GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID, 
-      ADJUST_TIME, SN_COUNT, BUTT_JOINT_PERSON, 
-      ADJUST_STATUS, REMARK, BATCH_NUM, 
-      AGENT_ID, C_TIME, U_TIME, 
-      C_USER, U_USER, STATUS, 
-      VERSION)
-    values (#{id,jdbcType=VARCHAR}, #{terminalTransferId,jdbcType=VARCHAR}, #{snBeginNum,jdbcType=VARCHAR}, 
-      #{snEndNum,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR}, 
-      #{originalOrgId,jdbcType=VARCHAR}, #{originalOrgName,jdbcType=VARCHAR}, #{originalBusId,jdbcType=VARCHAR}, 
-      #{goalOrgId,jdbcType=VARCHAR}, #{goalOrgName,jdbcType=VARCHAR}, #{goalBusId,jdbcType=VARCHAR}, 
-      #{adjustTime,jdbcType=TIMESTAMP}, #{snCount,jdbcType=DECIMAL}, #{buttJointPerson,jdbcType=VARCHAR}, 
-      #{adjustStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR}, 
-      #{agentId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
-      #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{version,jdbcType=DECIMAL})
+    insert into O_TERMINAL_TRANSFER_DETAIL (ID, TERMINAL_TRANSFER_ID, SN_BEGIN_NUM,
+    SN_END_NUM, PRO_COM, PRO_MODEL,
+    ORIGINAL_ORG_ID, ORIGINAL_ORG_NAME, ORIGINAL_BUS_ID,
+    GOAL_ORG_ID, GOAL_ORG_NAME, GOAL_BUS_ID,
+    ADJUST_TIME, SN_COUNT, BUTT_JOINT_PERSON,
+    ADJUST_STATUS, REMARK, BATCH_NUM,
+    AGENT_ID, C_TIME, U_TIME,
+    C_USER, U_USER, STATUS,
+    VERSION, PLATFORM_TYPE)
+    values (#{id,jdbcType=VARCHAR}, #{terminalTransferId,jdbcType=VARCHAR}, #{snBeginNum,jdbcType=VARCHAR},
+    #{snEndNum,jdbcType=VARCHAR}, #{proCom,jdbcType=VARCHAR}, #{proModel,jdbcType=VARCHAR},
+    #{originalOrgId,jdbcType=VARCHAR}, #{originalOrgName,jdbcType=VARCHAR}, #{originalBusId,jdbcType=VARCHAR},
+    #{goalOrgId,jdbcType=VARCHAR}, #{goalOrgName,jdbcType=VARCHAR}, #{goalBusId,jdbcType=VARCHAR},
+    #{adjustTime,jdbcType=TIMESTAMP}, #{snCount,jdbcType=DECIMAL}, #{buttJointPerson,jdbcType=VARCHAR},
+    #{adjustStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{batchNum,jdbcType=VARCHAR},
+    #{agentId,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{platformType,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     insert into O_TERMINAL_TRANSFER_DETAIL
@@ -189,6 +190,9 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -265,6 +269,9 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -349,40 +356,44 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="platformType != null">
+        PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.TerminalTransferDetail">
     update O_TERMINAL_TRANSFER_DETAIL
     set TERMINAL_TRANSFER_ID = #{terminalTransferId,jdbcType=VARCHAR},
-      SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
-      SN_END_NUM = #{snEndNum,jdbcType=VARCHAR},
-      PRO_COM = #{proCom,jdbcType=VARCHAR},
-      PRO_MODEL = #{proModel,jdbcType=VARCHAR},
-      ORIGINAL_ORG_ID = #{originalOrgId,jdbcType=VARCHAR},
-      ORIGINAL_ORG_NAME = #{originalOrgName,jdbcType=VARCHAR},
-      ORIGINAL_BUS_ID = #{originalBusId,jdbcType=VARCHAR},
-      GOAL_ORG_ID = #{goalOrgId,jdbcType=VARCHAR},
-      GOAL_ORG_NAME = #{goalOrgName,jdbcType=VARCHAR},
-      GOAL_BUS_ID = #{goalBusId,jdbcType=VARCHAR},
-      ADJUST_TIME = #{adjustTime,jdbcType=TIMESTAMP},
-      SN_COUNT = #{snCount,jdbcType=DECIMAL},
-      BUTT_JOINT_PERSON = #{buttJointPerson,jdbcType=VARCHAR},
-      ADJUST_STATUS = #{adjustStatus,jdbcType=DECIMAL},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    SN_BEGIN_NUM = #{snBeginNum,jdbcType=VARCHAR},
+    SN_END_NUM = #{snEndNum,jdbcType=VARCHAR},
+    PRO_COM = #{proCom,jdbcType=VARCHAR},
+    PRO_MODEL = #{proModel,jdbcType=VARCHAR},
+    ORIGINAL_ORG_ID = #{originalOrgId,jdbcType=VARCHAR},
+    ORIGINAL_ORG_NAME = #{originalOrgName,jdbcType=VARCHAR},
+    ORIGINAL_BUS_ID = #{originalBusId,jdbcType=VARCHAR},
+    GOAL_ORG_ID = #{goalOrgId,jdbcType=VARCHAR},
+    GOAL_ORG_NAME = #{goalOrgName,jdbcType=VARCHAR},
+    GOAL_BUS_ID = #{goalBusId,jdbcType=VARCHAR},
+    ADJUST_TIME = #{adjustTime,jdbcType=TIMESTAMP},
+    SN_COUNT = #{snCount,jdbcType=DECIMAL},
+    BUTT_JOINT_PERSON = #{buttJointPerson,jdbcType=VARCHAR},
+    ADJUST_STATUS = #{adjustStatus,jdbcType=DECIMAL},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    BATCH_NUM = #{batchNum,jdbcType=VARCHAR},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    PLATFORM_TYPE = #{platformType,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

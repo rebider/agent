@@ -787,6 +787,146 @@ public class PlatFormExample {
             addCriterion("PLATFORM_TYPE not between", value1, value2, "platformType");
             return (Criteria) this;
         }
+
+        public Criteria andPosanameprefixIsNull() {
+            addCriterion("POSANAMEPREFIX is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixIsNotNull() {
+            addCriterion("POSANAMEPREFIX is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixEqualTo(String value) {
+            addCriterion("POSANAMEPREFIX =", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixNotEqualTo(String value) {
+            addCriterion("POSANAMEPREFIX <>", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixGreaterThan(String value) {
+            addCriterion("POSANAMEPREFIX >", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixGreaterThanOrEqualTo(String value) {
+            addCriterion("POSANAMEPREFIX >=", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixLessThan(String value) {
+            addCriterion("POSANAMEPREFIX <", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixLessThanOrEqualTo(String value) {
+            addCriterion("POSANAMEPREFIX <=", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixLike(String value) {
+            addCriterion("POSANAMEPREFIX like", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixNotLike(String value) {
+            addCriterion("POSANAMEPREFIX not like", value, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixIn(List<String> values) {
+            addCriterion("POSANAMEPREFIX in", values, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixNotIn(List<String> values) {
+            addCriterion("POSANAMEPREFIX not in", values, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixBetween(String value1, String value2) {
+            addCriterion("POSANAMEPREFIX between", value1, value2, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosanameprefixNotBetween(String value1, String value2) {
+            addCriterion("POSANAMEPREFIX not between", value1, value2, "posanameprefix");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeIsNull() {
+            addCriterion("POSBUSITYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeIsNotNull() {
+            addCriterion("POSBUSITYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeEqualTo(String value) {
+            addCriterion("POSBUSITYPE =", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeNotEqualTo(String value) {
+            addCriterion("POSBUSITYPE <>", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeGreaterThan(String value) {
+            addCriterion("POSBUSITYPE >", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeGreaterThanOrEqualTo(String value) {
+            addCriterion("POSBUSITYPE >=", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeLessThan(String value) {
+            addCriterion("POSBUSITYPE <", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeLessThanOrEqualTo(String value) {
+            addCriterion("POSBUSITYPE <=", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeLike(String value) {
+            addCriterion("POSBUSITYPE like", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeNotLike(String value) {
+            addCriterion("POSBUSITYPE not like", value, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeIn(List<String> values) {
+            addCriterion("POSBUSITYPE in", values, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeNotIn(List<String> values) {
+            addCriterion("POSBUSITYPE not in", values, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeBetween(String value1, String value2) {
+            addCriterion("POSBUSITYPE between", value1, value2, "posbusitype");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosbusitypeNotBetween(String value1, String value2) {
+            addCriterion("POSBUSITYPE not between", value1, value2, "posbusitype");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
