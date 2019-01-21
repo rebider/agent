@@ -8,10 +8,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.profit.dao.PProfitFactorMapper;
-import com.ryx.credit.profit.dao.ProfitDeductionMapper;
-import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
-import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
+import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
@@ -71,6 +68,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     private ProfitSettleErrLsService profitSettleErrLsServiceImpl;
     @Autowired
     PProfitFactorMapper pProfitFactorMapper;
+
+    @Autowired
+    private ProfitStagingMapper profitStagingMapper;
 
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
@@ -159,6 +159,73 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 insertDeduction(list, userId);
             });
         }
+    }
+
+
+    @Override
+    public Map<String,BigDecimal> getNotDeduction(Map<String,String> map){
+        Map<String,BigDecimal> resultMap = new HashMap<String,BigDecimal>();
+        //获取分润月份
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH,-1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        map.put("date",dateStr);
+        //map.put("date","201810");
+        BigDecimal BLNotDeductionAmt = getBLDeduction(map);//保理欠款
+        resultMap.put("BLNotDeductionAmt",BLNotDeductionAmt);
+
+        BigDecimal ToolNotDeductionAmt = getDeductionAmt(map,"02"); //机具扣款
+        resultMap.put("ToolNotDeductionAmt",ToolNotDeductionAmt);
+
+        BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03");//其他扣款  03
+        resultMap.put("otherNotDeductionAmt",otherNotDeductionAmt);
+
+        BigDecimal chargeBackNotDeductionAmt = getDeductionAmt(map,"01"); //退单扣款
+        resultMap.put("chargeBackNotDeductionAmt",chargeBackNotDeductionAmt);
+
+        BigDecimal checkNotDeductionAmt = getDeductionAmt(map,"05").add(getDeductionAmt(map,"04")); //考核扣款 04，05
+        resultMap.put("checkNotDeductionAmt",checkNotDeductionAmt);
+
+        return resultMap;
+    }
+
+   /**获得未扣款**/
+    private BigDecimal getDeductionAmt(Map<String,String> map,String type){
+        map.put("type",type);
+        //获得未扣款
+        BigDecimal notDeductionAmt = profitDeductionMapper.getNotDeductionAmt(map)!=null ?profitDeductionMapper.getNotDeductionAmt(map):BigDecimal.ZERO;
+        //获得分期未扣
+        BigDecimal notStagingAmt = getNotDeductionAmt(map)!= null?getNotDeductionAmt(map) : BigDecimal.ZERO;
+
+        return notDeductionAmt.add(notStagingAmt);
+    }
+
+
+    /**
+     * 获取分期欠款总计
+     * @param param
+     * @return
+     */
+    private BigDecimal getNotDeductionAmt(Map<String, String> param){
+        ProfitStaging profitStaging = profitStagingMapper.getNotDeductionAmtTwo(param);
+        if (profitStaging != null) {
+            return profitStaging.getStagAmt();
+        }
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * 得到保理欠款
+     * @param map
+     * @return
+     */
+    private BigDecimal getBLDeduction(Map<String,String> map){
+        BigDecimal result = pProfitFactorMapper.getSurplusAmt(map);
+        if(result != null){
+            return result;
+        }
+        return BigDecimal.ZERO;
     }
 
     /***

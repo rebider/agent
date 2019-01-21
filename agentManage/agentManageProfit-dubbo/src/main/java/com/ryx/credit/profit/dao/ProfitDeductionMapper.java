@@ -42,4 +42,10 @@ public interface ProfitDeductionMapper {
     int resetDataDeduction(@Param("type") String type,@Param("date") String date);
 
     List<ProfitDeduction> selectDeductListByParams(Map<String,Object> param);
+
+    /**获取未扣款**/
+    BigDecimal getNotDeductionAmt(Map<String,String> param);
+
+
+
 }
