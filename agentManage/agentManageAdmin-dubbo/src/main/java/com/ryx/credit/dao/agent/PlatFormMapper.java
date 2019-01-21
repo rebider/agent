@@ -20,8 +20,6 @@ public interface PlatFormMapper {
 
     PlatForm selectByPlatFormNum(String platFormNum);
 
-    ////////////////////////////////////////////////////////////////////
-
     int countPlatForm(Map<String, Object> condition);
 
     List<PlatForm> selectPlatForm(Map<String, Object> condition);
@@ -29,8 +27,6 @@ public interface PlatFormMapper {
     PlatForm selectByPrimaryKey(String id);
 
     long seqId();   // id自增
-
-    int insertPlatForm(PlatForm platForm);
 
     int updateByPrimaryKeySelective(PlatForm record);  // 删除（编辑）状态
 
