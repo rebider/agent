@@ -3,6 +3,7 @@ package com.ryx.credit.profit.service.impl;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
+import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.service.IProfitMergeDeductionService;
 import com.ryx.credit.service.dict.IdService;
@@ -48,6 +49,8 @@ public class ProfitMergeDeductionServiceImpl implements IProfitMergeDeductionSer
             deduction.setMustDeductionAmt(amt);
             deduction.setRemark(remark);
             deduction.setDeductionType("06");
+            deduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
+            deduction.setDeductionStatus("0");
             Calendar cale = null;
             cale = Calendar.getInstance();
             int year = cale.get(Calendar.YEAR);
