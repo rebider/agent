@@ -7,10 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.profit.pojo.InvoiceDetail;
-
-import java.util.List;
 
 /**
  * @Author: Zhang Lei
@@ -34,7 +30,7 @@ public interface IOwnInvoiceService {
     /**
      * 向欠票导入表中导入数据
      */
-    void exportData(List<List<Object>> datas, String loginName);
+    void exportData(List<List<Object>> datas, String loginName) throws RuntimeException;
 
     /**
      * 根据id获取代理商信息
