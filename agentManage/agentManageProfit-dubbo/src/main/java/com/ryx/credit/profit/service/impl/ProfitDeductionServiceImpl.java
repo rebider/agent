@@ -1,6 +1,5 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.alibaba.dubbo.common.threadpool.support.fixed.FixedThreadPool;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
@@ -17,22 +16,17 @@ import com.ryx.credit.profit.exceptions.StagingException;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.dict.IdService;
-import javafx.concurrent.ScheduledService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author zhaodw
@@ -154,11 +148,25 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Override
     public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
-        if (deductionist != null && deductionist.size() > 0) {
+        if(deductionist == null || deductionist.size() == 0){
+            throw new RuntimeException("导入数据为空");
+        }
+        for (List<Object> list: deductionist) {
+            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
+                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
+                throw new RuntimeException("数据不能为空");
+            }
+            try{
+                insertDeduction(list, userId);
+            }catch (Exception e){
+                throw  new RuntimeException("数据格式异常！");
+            }
+        }
+        /*if (deductionist != null && deductionist.size() > 0) {
             deductionist.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null && list.get(3) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
                 insertDeduction(list, userId);
             });
-        }
+        }*/
     }
 
 
@@ -893,11 +901,26 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     @Override
     public void batchInsertCheckDeduction(List<List<Object>> datas, String userId) {
-        if (datas != null && datas.size() > 0) {
+        if(datas == null || datas.size() == 0){
+            throw new RuntimeException("导入数据为空");
+        }
+        for (List<Object> list: datas) {
+            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
+                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
+                throw new RuntimeException("数据不能为空");
+            }
+            try{
+                insertDeduction(list, userId);
+            }catch (Exception e){
+                throw  new RuntimeException("数据格式异常！");
+            }
+        }
+
+       /* if (datas != null && datas.size() > 0) {
             datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
                 insertCheckDeduction(list, userId);
             });
-        }
+        }*/
     }
 
 
