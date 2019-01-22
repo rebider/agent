@@ -55,6 +55,8 @@ public class TerminalTransferDetail implements Serializable{
 
     private BigDecimal version;
 
+    private BigDecimal platformType;
+
     private String adjustMsg;
 
     public String getId() {
@@ -263,5 +265,13 @@ public class TerminalTransferDetail implements Serializable{
 
     public void setAdjustMsg(String adjustMsg) {
         this.adjustMsg = adjustMsg;
+    }
+
+    public BigDecimal getPlatformType() {
+        return platformType;
+    }
+
+    public void setPlatformType(BigDecimal platformType) {
+        this.platformType = platformType;
     }
 }

@@ -372,8 +372,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
             agentNotifyVo.setLoginName(agentBusInfo.getBusLoginNum());
         }
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        //cxinfo posbusIType 从数据库中获取
         if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-            agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
+            agentNotifyVo.setBusiType(platForm.getPosbusitype());
         }
         //如果是直签 就传02：直签机构  否则就传递 01：普通机构
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
@@ -404,9 +405,11 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
 
             //调用POST接口
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-                //智能POS代理商名加N区分
-                if(platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-                    agentNotifyVo.setOrgName("N"+agentNotifyVo.getOrgName());
+                //智能POS代理商名加N区分 CXINFO pos平台的名称前缀从数据库中获取
+                if(org.apache.commons.lang.StringUtils.isNotEmpty(platForm.getPosanameprefix())){
+                    agentNotifyVo.setOrgName(platForm.getPosanameprefix()+agentNotifyVo.getOrgName());
+                }else{
+                    agentNotifyVo.setOrgName(agentNotifyVo.getOrgName());
                 }
                 //POS传递的唯一ID是业务平台记录ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());
@@ -712,8 +715,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
         }
 
         PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        //cxinfo 业务类型使用数据库字段
         if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-            agentNotifyVo.setBusiType(platForm.getPlatformType().equals(PlatformType.POS.getValue())?"01":"02");
+            agentNotifyVo.setBusiType(platForm.getPosbusitype());
         }
         Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.BUS_TYPE.name(), agentBusInfo.getBusType());
         agentNotifyVo.setOrgType(dictByValue.getdItemname().contains(OrgType.STR.getContent())?OrgType.STR.getValue():OrgType.ORG.getValue());
@@ -741,9 +745,9 @@ public class AgentNotifyServiceImpl implements AgentNotifyService {
                 log.info("入网开户修改操作: 通知pos手刷业务平台未知");
             }
             if(platForm.getPlatformType().equals(PlatformType.POS.getValue()) || platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-                //智能POS代理商名加N区分
-                if(platForm.getPlatformType().equals(PlatformType.ZPOS.getValue())){
-                    agentNotifyVo.setOrgName("N"+agentNotifyVo.getOrgName());
+                //智能POS代理商名加N区分 cxinfo pos商户名称使用数据库配置字段
+                if(org.apache.commons.lang.StringUtils.isNotEmpty(platForm.getPosanameprefix())){
+                    agentNotifyVo.setOrgName(platForm.getPosanameprefix()+agentNotifyVo.getOrgName());
                 }
                 //POS传递业务ID
                 agentNotifyVo.setUniqueId(agentBusInfo.getId());

@@ -69,7 +69,7 @@ public class PlatFormServiceImpl implements PlatFormService{
     @Override
     public boolean insertPlatForm(PlatForm platForm) {
         if(StringUtils.isEmpty(platForm.getId()))platForm.setId(platFormMapper.seqId()+"");
-        if(1 == platFormMapper.insertPlatForm(platForm)) {
+        if(1 == platFormMapper.insertSelective(platForm)) {
             return true;
         }else{
             return false;
