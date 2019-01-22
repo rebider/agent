@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.PlatformType;
+import com.ryx.credit.common.enumc.TerminalPlatformType;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.HttpClientUtil;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -37,13 +39,13 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
     private AgentBusInfoMapper agentBusInfoMapper;
 
     @Override
-    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId)throws Exception{
+    public AgentResult posOrgStatistics(String busPlatform,String orgId,String busId,String termType)throws Exception{
         PlatForm platForm = platFormMapper.selectByPlatFormNum(busPlatform);
         String platformType = platForm.getPlatformType();
         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
         AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
         if(PlatformType.MPOS.getValue().equals(platformType)){
-            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum());
+            AgentResult agentResult = httpForMpos(orgId,parentBusInfo.getBusNum(),termType);
             agentResult.setMsg(platformType);
             return agentResult;
         }else if(PlatformType.POS.getValue().equals(platformType) || PlatformType.ZPOS.getValue().equals(platformType)){
@@ -129,11 +131,12 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
-    private AgentResult httpForMpos(String orgId,String parentAgencyId)throws Exception{
+    private AgentResult httpForMpos(String orgId,String parentAgencyId,String termType)throws Exception{
         try {
             Map<String, String> map = new HashMap<>();
             map.put("agencyId",orgId);
             map.put("parentAgencyId",parentAgencyId);
+            map.put("type",termType);
             String toJson = JsonUtil.objectToJson(map);
             log.info("手刷机构统计信息查询请求参数:{}",toJson);
             String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("pos_org_statistics_url"), toJson);
@@ -149,4 +152,18 @@ public class PosOrgStatisticsServiceImpl implements PosOrgStatisticsService {
         }
     }
 
+    @Override
+    public AgentResult posOrgStatistics(String orgId,String termType)throws Exception{
+
+        if(TerminalPlatformType.MPOS.getValue().compareTo(new BigDecimal(termType))==0){
+            AgentResult agentResult = httpForMpos(orgId,"",termType);
+            agentResult.setMsg(PlatformType.MPOS.getValue());
+            return agentResult;
+        }else if(TerminalPlatformType.POS.getValue().compareTo(new BigDecimal(termType))==0){
+            AgentResult agentResult = httpForPos(orgId,orgId);
+            agentResult.setMsg(PlatformType.POS.getValue());
+            return agentResult;
+        }
+        return AgentResult.fail();
+    }
 }

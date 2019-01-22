@@ -42,8 +42,6 @@ public class ImsTermMachine implements Serializable{
 
     private String machineType;
 
-    private BigDecimal standTime;
-
     private String backType;
 
     public String getMachineId() {
@@ -196,14 +194,6 @@ public class ImsTermMachine implements Serializable{
 
     public void setMachineType(String machineType) {
         this.machineType = machineType;
-    }
-
-    public BigDecimal getStandTime() {
-        return standTime;
-    }
-
-    public void setStandTime(BigDecimal standTime) {
-        this.standTime = standTime;
     }
 
     public String getBackType() {

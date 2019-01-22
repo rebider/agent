@@ -85,6 +85,8 @@ public class Agent extends AgentExtends implements Serializable {
 
     private boolean isImport = false;
 
+    private BigDecimal freestatus;
+
     public String getId() {
         return id;
     }
@@ -339,5 +341,13 @@ public class Agent extends AgentExtends implements Serializable {
 
     public void setImport(boolean anImport) {
         isImport = anImport;
+    }
+
+    public BigDecimal getFreestatus() {
+        return freestatus;
+    }
+
+    public void setFreestatus(BigDecimal freestatus) {
+        this.freestatus = freestatus;
     }
 }

@@ -61,4 +61,12 @@ public interface AgentService {
 
     PageInfo queryAgentTierList(Page page, Agent agent, Long userId);
 
+    /**
+     * 代理商解冻
+     * @param agentId
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
+    AgentResult agentUnfreeze(String agentId, String cUser) throws Exception;
 }
