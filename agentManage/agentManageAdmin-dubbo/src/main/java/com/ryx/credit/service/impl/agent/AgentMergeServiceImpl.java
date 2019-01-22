@@ -581,10 +581,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         reqMap.put("agStatus", AgStatus.Approved.name());
         reqMap.put("cIncomStatus", AgentInStatus.NO.status);
         reqMap.put("cloReviewStatus", AgStatus.Approved.status);
+        reqMap.put("receiptProStatus", OReceiptStatus.WAITING_LIST.code);
         reqMap.put("agentId", subAgentId);
         int i = receiptOrderMapper.queryPlannerCount(reqMap);
         if(i!=0){
-            throw new MessageException("有审批中的排单,不能发起合并");
+            throw new MessageException("有未排单,不能发起合并");
         }
 
         //未发货
@@ -593,7 +594,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         if(count!=0){
-            throw new MessageException("有审批中的已排单（未发货）,不能发起合并");
+            throw new MessageException("有未发货,不能发起合并");
         }
 
     }
