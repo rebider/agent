@@ -118,10 +118,15 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
         directMapper.updateByStatus(profitDirectSingleList);
     }
 
+    @Override
+    public Map<String, Object> profitCount(Map<String, Object> param) {
+        return directMapper.profitCount(param);
+    }
+
     //直发分润导出
     @Override
-    public List<ProfitDirect> exportProfitDirect(ProfitDirect record) {
-        return directMapper.selectByWhere(record);
+    public List<ProfitDirect> exportProfitDirect(Map<String, Object> param) {
+        return directMapper.selectByWhere(param);
     }
 
     /*@Override
