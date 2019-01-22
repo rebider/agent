@@ -2,16 +2,14 @@ package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.ApprovalFlowRecordService;
@@ -25,6 +23,9 @@ import org.springframework.stereotype.Service;
 import sun.font.CreatedFontTracker;
 import sun.rmi.runtime.Log;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -56,8 +57,9 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     @Autowired
     private CapitalMapper capitalMapper;
     @Autowired
-    AgentBusinfoService agentBusinfoService;
-
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private DateChangeRequestMapper dateChangeRequestMapper;
 
     @Override
     public String insert(ApprovalFlowRecord record)throws Exception{
@@ -155,13 +157,12 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     }
 
     /**
-     * 导出代理商合并数据
+     * 导出查询
      * @param approvalFlowRecord
      * @return
      */
-    @Override
-    public List<Map<String, Object>> exportAgentMerge(ApprovalFlowRecord approvalFlowRecord) throws Exception {
-        List<Map<String, Object>> resultList = new ArrayList<>();
+    private List<ApprovalFlowRecord> exprotCommon(ApprovalFlowRecord approvalFlowRecord){
+
         ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
         ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
         Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
@@ -205,6 +206,19 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         criteria.andStatusEqualTo(Status.STATUS_1.status);
 
         List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
+        return approvalFlowRecords;
+    }
+
+    /**
+     * 导出代理商合并数据
+     * @param approvalFlowRecord
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> exportAgentMerge(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
         if (null != approvalFlowRecords && approvalFlowRecords.size() != 0) {
             for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
                 Map<String, Object> resultMap = new HashMap<>();
@@ -265,50 +279,9 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
      */
     @Override
     public List<Map<String, Object>> exportAgentNetln(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+
         List<Map<String, Object>> resultList = new ArrayList<>();
-        ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
-        ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
-        Date beginTime = DateUtil.format(approvalFlowRecord.getBeginTime());
-        Date endTime = DateUtil.format(approvalFlowRecord.getEndTime());
-
-        if (StringUtils.isNotBlank(approvalFlowRecord.getApprovalPerson())) {
-            String[] split = approvalFlowRecord.getApprovalPerson().split(",");
-            List<String> personList = new ArrayList<>();
-            for (int i=0; i<split.length; i++) {
-                personList.add(split[i]);
-            }
-            criteria.andApprovalPersonIn(personList);
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getApprovalDep())) {
-            criteria.andApprovalDepEqualTo(approvalFlowRecord.getApprovalDep());
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getAgentId())) {
-            criteria.andAgentIdEqualTo(approvalFlowRecord.getAgentId());
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getAgentName())) {
-            criteria.andAgentNameEqualTo(approvalFlowRecord.getAgentName());
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getApprovalResult())) {
-            criteria.andApprovalResultEqualTo(approvalFlowRecord.getApprovalResult());
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getBusId())) {
-            criteria.andBusIdEqualTo(approvalFlowRecord.getBusId());
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getBusType())) {
-            criteria.andBusTypeEqualTo(approvalFlowRecord.getBusType());
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getBeginTime())) {
-            criteria.andApprovalTimeGreaterThanOrEqualTo(beginTime);
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getEndTime())) {
-            criteria.andApprovalTimeLessThanOrEqualTo(endTime);
-        }
-        if (StringUtils.isNotBlank(approvalFlowRecord.getBeginTime()) && StringUtils.isNotBlank(approvalFlowRecord.getEndTime())) {
-            criteria.andApprovalTimeBetween(beginTime, endTime);
-        }
-        criteria.andStatusEqualTo(Status.STATUS_1.status);
-
-        List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
+        List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
         if (null != approvalFlowRecords && approvalFlowRecords.size() != 0) {
             for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
                 Map<String, Object> resultMap = new HashMap<>();
@@ -368,5 +341,52 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         return resultList;
     }
 
+
+    @Override
+    public List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception {
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
+        for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
+            String busId = flowRecord.getBusId();
+            DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(busId);
+            String dataContent = dateChangeRequest.getDataContent();
+            AgentVo dataAgentVo = JsonUtil.jsonToPojo(dataContent, AgentVo.class);
+            String dataPreContent = dateChangeRequest.getDataPreContent();
+            AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dataPreContent, AgentVo.class);
+            List<String> strings = contrastObj(dataPreAgentVo.getAgent(), dataAgentVo.getAgent());
+            System.out.println(strings);
+        }
+        return resultList;
+    }
+
+    private static List<String> contrastObj(Object obj1, Object obj2) {
+        if (obj1 instanceof Agent && obj2 instanceof Agent) {
+            Agent pojo1 = (Agent) obj1;
+            Agent pojo2 = (Agent) obj2;
+            List<String> textList = new ArrayList<>();
+            try {
+                Class clazz = pojo1.getClass();
+                Field[] fields = pojo1.getClass().getDeclaredFields();
+                for (Field field : fields) {
+                    PropertyDescriptor pd = new PropertyDescriptor(field.getName(), clazz);
+                    Method getMethod = pd.getReadMethod();
+                    Object o1 = getMethod.invoke(pojo1);
+                    Object o2 = getMethod.invoke(pojo2);
+                    String s1 = o1 == null ? "" : o1.toString();
+                    String s2 = o2 == null ? "" : o2.toString();
+                    if (!s1.equals(s2)) {
+                        if(!field.getName().equals("agUniqNum") && !field.getName().equals("agStatus") ){
+                            textList.add(field.getName()+" 修改前：" + s1 + ",修改后：" + s2);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            return textList;
+        }
+        return null;
+    }
 
 }
