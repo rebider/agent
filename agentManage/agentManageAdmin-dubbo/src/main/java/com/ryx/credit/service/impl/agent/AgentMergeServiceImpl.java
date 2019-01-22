@@ -754,7 +754,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常！" );
+            throw new MessageException(e.getMessage());
         }
         return AgentResult.ok();
     }
