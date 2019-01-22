@@ -1,7 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.ryx.credit.common.common.FieldTranslate;
 import com.ryx.credit.common.enumc.*;
-import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
@@ -9,19 +9,19 @@ import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.agent.*;
-import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
+import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.agent.ApprovalFlowRecordService;
 import com.ryx.credit.service.agent.BusActRelService;
 import com.ryx.credit.service.bank.PosRegionService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.font.CreatedFontTracker;
-import sun.rmi.runtime.Log;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -60,6 +60,11 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private DateChangeRequestMapper dateChangeRequestMapper;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private ApaycompService apaycompService;
+
 
     @Override
     public String insert(ApprovalFlowRecord record)throws Exception{
@@ -348,45 +353,118 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         List<Map<String, Object>> resultList = new ArrayList<>();
         List<ApprovalFlowRecord> approvalFlowRecords = exprotCommon(approvalFlowRecord);
         for (ApprovalFlowRecord flowRecord : approvalFlowRecords) {
+            Map<String, Object> resultMap = new HashMap<>();
+            List<String> diffList = new ArrayList<>();
             String busId = flowRecord.getBusId();
             DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(busId);
-            String dataContent = dateChangeRequest.getDataContent();
-            AgentVo dataAgentVo = JsonUtil.jsonToPojo(dataContent, AgentVo.class);
-            String dataPreContent = dateChangeRequest.getDataPreContent();
-            AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dataPreContent, AgentVo.class);
-            List<String> strings = contrastObj(dataPreAgentVo.getAgent(), dataAgentVo.getAgent());
-            System.out.println(strings);
+            AgentVo dataPreAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataPreContent(), AgentVo.class);
+            AgentVo dataAgentVo = JsonUtil.jsonToPojo(dateChangeRequest.getDataContent(), AgentVo.class);
+            contrastObj(dataPreAgentVo.getAgent(), dataAgentVo.getAgent(),diffList);
+
+            List<CapitalVo> preCapitalVoList = dataPreAgentVo.getCapitalVoList();
+            List<CapitalVo> capitalVoList = dataAgentVo.getCapitalVoList();
+            if (preCapitalVoList != null && capitalVoList != null) {
+                if(capitalVoList.size()>preCapitalVoList.size() && preCapitalVoList.size()==0){
+                    for (CapitalVo capitalVo : capitalVoList) {
+                        if(StringUtils.isNotBlank(capitalVo.getcType())){
+                            Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name(), capitalVo.getcType());
+                            diffList.add("新增缴纳款项："+dictByValue.getdItemname());
+                        }
+                        if(null!=capitalVo.getcAmount())
+                        diffList.add("新增缴纳金额："+capitalVo.getcAmount());
+                        if(StringUtils.isNotBlank(capitalVo.getcPayType())){
+                            Dict payType = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.PAY_TYPE.name(),capitalVo.getcPayType());
+                            diffList.add("新增打款方式："+payType.getdItemname());
+                        }
+                        if(null!=capitalVo.getcFqCount())
+                        diffList.add("新增分期期数："+capitalVo.getcFqCount());
+                        if(null!=capitalVo.getcPaytime())
+                        diffList.add("新增打款时间："+capitalVo.getcPaytime());
+                        if(StringUtils.isNotBlank(capitalVo.getcPayuser()))
+                        diffList.add("新增打款人："+capitalVo.getcPayuser());
+                        if(StringUtils.isNotBlank(capitalVo.getcInCom())){
+                            PayComp payComp = apaycompService.selectById(capitalVo.getcInCom());
+                            diffList.add("新增收款地方："+payComp.getComName());
+                        }
+                        if(StringUtils.isNotBlank(capitalVo.getRemark()))
+                        diffList.add("新增备注："+capitalVo.getRemark());
+                    }
+                }else{
+                    int i = 0;
+                    for (CapitalVo preCapitalVo : preCapitalVoList) {
+                        CapitalVo capitalVo = capitalVoList.get(i);
+                        contrastObj(preCapitalVo, capitalVo,diffList);
+                        i++;
+                    }
+                }
+            }
+
+            List<AgentContractVo> preContractVoList = dataPreAgentVo.getContractVoList();
+            List<AgentContractVo> contractVoList = dataAgentVo.getContractVoList();
+            if (preContractVoList != null && contractVoList != null) {
+                if (contractVoList.size() > preContractVoList.size() && preContractVoList.size() == 0) {
+                    for (AgentContractVo agentContractVo : contractVoList) {
+                        Dict contractType = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.CONTRACT_TYPE.name(),String.valueOf(agentContractVo.getContType()));
+                        diffList.add("新增合同类型："+contractType.getdItemname());
+                        diffList.add("新增合同号："+agentContractVo.getContNum());
+                        diffList.add("新增合同签约时间："+agentContractVo.getContDate());
+                        diffList.add("新增合同到期时间："+agentContractVo.getContEndDate());
+                        Dict yesOrNo = dictOptionsService.findDictByValue(DictGroup.ALL.name(), DictGroup.YESORNO.name(),String.valueOf(agentContractVo.getAppendAgree()));
+                        diffList.add("新增是否附加协议："+yesOrNo.getdItemname());
+                        diffList.add("新增备注："+agentContractVo.getRemark());
+                    }
+                }
+            }else{
+                int j = 0;
+                for (AgentContractVo preContractVo : preContractVoList) {
+                    AgentContractVo contractVo = contractVoList.get(j);
+                    contrastObj(preContractVo, contractVo,diffList);
+                    j++;
+                }
+            }
+
+            List<AgentBusInfoVo> preBusInfoVoList = dataPreAgentVo.getBusInfoVoList();
+            List<AgentBusInfoVo> busInfoVoList = dataAgentVo.getBusInfoVoList();
+            if(busInfoVoList!=null && preBusInfoVoList!=null && busInfoVoList.size()!=0 && preBusInfoVoList.size()!=0){
+                int k = 0;
+                for (AgentBusInfoVo preBusInfoVo : preBusInfoVoList) {
+                    AgentBusInfoVo busInfoVo = busInfoVoList.get(k);
+                    contrastObj(preBusInfoVo, busInfoVo,diffList);
+                    k++;
+                }
+            }
+            resultMap.put("dateChange",diffList.toString());
+            resultList.add(resultMap);
+            resultMap.put("agentId",dateChangeRequest.getDataId());
+            Agent agent = agentMapper.selectByPrimaryKey(dateChangeRequest.getDataId());
+            resultMap.put("agentName",agent.getAgName());
+            COrganization cOrganizationSub = cOrganizationMapper.selectByPrimaryKey(agent.getAgDocPro());
+            resultMap.put("agDocPro",cOrganizationSub.getName());
         }
         return resultList;
     }
 
-    private static List<String> contrastObj(Object obj1, Object obj2) {
-        if (obj1 instanceof Agent && obj2 instanceof Agent) {
-            Agent pojo1 = (Agent) obj1;
-            Agent pojo2 = (Agent) obj2;
-            List<String> textList = new ArrayList<>();
-            try {
-                Class clazz = pojo1.getClass();
-                Field[] fields = pojo1.getClass().getDeclaredFields();
-                for (Field field : fields) {
-                    PropertyDescriptor pd = new PropertyDescriptor(field.getName(), clazz);
-                    Method getMethod = pd.getReadMethod();
-                    Object o1 = getMethod.invoke(pojo1);
-                    Object o2 = getMethod.invoke(pojo2);
-                    String s1 = o1 == null ? "" : o1.toString();
-                    String s2 = o2 == null ? "" : o2.toString();
-                    if (!s1.equals(s2)) {
-                        if(!field.getName().equals("agUniqNum") && !field.getName().equals("agStatus") ){
-                            textList.add(field.getName()+" 修改前：" + s1 + ",修改后：" + s2);
-                        }
+    private static List<String> contrastObj(Object obj1, Object obj2,List<String> textList) {
+        try {
+            Class clazz = obj1.getClass();
+            Field[] fields = obj1.getClass().getDeclaredFields();
+            for (Field field : fields) {
+                PropertyDescriptor pd = new PropertyDescriptor(field.getName(), clazz);
+                Method getMethod = pd.getReadMethod();
+                Object o1 = getMethod.invoke(obj1);
+                Object o2 = getMethod.invoke(obj2);
+                String s1 = o1 == null ? "" : o1.toString();
+                String s2 = o2 == null ? "" : o2.toString();
+                if (!s1.equals(s2)) {
+                    if(!field.getName().equals("agUniqNum") && !field.getName().equals("agStatus") ){
+                        textList.add(FieldTranslate.getNameByField(field.getName())+" 修改前：" + s1 + ",修改后：" + s2);
                     }
                 }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
             }
-            return textList;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-        return null;
+        return textList;
     }
 
 }
