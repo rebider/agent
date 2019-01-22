@@ -1124,19 +1124,24 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(agentMerge==null){
             throw new MessageException("未找到合并信息");
         }
-        String agentName = agentMerge.getMainAgentName() + "-" + agentMerge.getSubAgentName();
 
         List<String> mPosOrgList = new ArrayList<>();
         for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
-            String platType = platFormMapper.selectPlatType(agentMergeBusInfo.getBusPlatform());
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentMergeBusInfo.getBusPlatform());
+            String platType = platForm.getPlatformType();
             if(platType.equals(PlatformType.MPOS.getValue())){
                 mPosOrgList.add(agentMergeBusInfo.getBusNum());
                 continue;
             }
             //调用Pos
             if(platType.equals(PlatformType.POS.getValue()) || platType.equals(PlatformType.ZPOS.getValue())){
+
+                String subAgentName = StringUtils.isNotBlank(platForm.getPosanameprefix()) ? platForm.getPosanameprefix()+agentMerge.getSubAgentName() : agentMerge.getSubAgentName();
+                String agentName = agentMerge.getMainAgentName()+"-"+subAgentName;
+
                 AgentPlatFormSyn record = new AgentPlatFormSyn();
                 AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+
                 agentNotifyVo.setOrgName(agentName);
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
                 Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
@@ -1196,6 +1201,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         //调用手刷接口
         if(mPosOrgList.size()!=0){
+            String agentName = agentMerge.getMainAgentName() + "-" + agentMerge.getSubAgentName();
             List<AgentBusInfo> agentBusInfoList = agentBusinfoService.agentBusInfoList(agentMerge.getMainAgentId());
             AgentBusInfo busInfo = agentBusInfoList.get(0);
             PayComp payComp = apaycompService.selectById(busInfo.getCloPayCompany());
