@@ -25,8 +25,18 @@
     <result column="CREATE_DATE_TIME" jdbcType="TIMESTAMP" property="createDateTime" />
     <result column="DEDUCTION_STATUS" jdbcType="CHAR" property="deductionStatus" />
     <result column="NEXT_ID" jdbcType="VARCHAR" property="nextId" />
+
       <result column="RRPLACE_AGENT_ID" jdbcType="VARCHAR" property="rrplaceAgentId" />
       <result column="RRPLACE_AGENT_NAME" jdbcType="VARCHAR" property="rrplaceAgentName" />
+
+      <result column="DETAIL_ID" jdbcType="VARCHAR" property="detailId" />
+      <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+      <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+      <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+      <result column="REV4" jdbcType="VARCHAR" property="rev4" />
+      <result column="REV5" jdbcType="VARCHAR" property="rev5" />
+
+
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -67,7 +77,7 @@
     DEDUCTION_DATE, DEDUCTION_TYPE, DEDUCTION_DESC, SUM_DEDUCTION_AMT, ADD_DEDUCTION_AMT,
     MUST_DEDUCTION_AMT, ACTUAL_DEDUCTION_AMT, NOT_DEDUCTION_AMT, REMARK, SOURCE_ID, UPPER_NOT_DEDUCTION_AMT,
     STAGING_STATUS, USER_ID, CREATE_DATE_TIME, DEDUCTION_STATUS, NEXT_ID, RRPLACE_AGENT_ID,
-    RRPLACE_AGENT_NAME
+    RRPLACE_AGENT_NAME,DETAIL_ID,REV1,REV2,REV3,REV4,REV5
   </sql>
   <sql id="Base_Column_List_query">
     N.ID, PARENT_AGENT_PID, PARENT_AGENT_ID, PARENT_AGENT_NAME, AGENT_PID, AGENT_ID, AGENT_NAME,
@@ -206,6 +216,26 @@
             <if test="rrplaceAgentName != null">
                 RRPLACE_AGENT_NAME,
             </if>
+            <if test="detailId != null">
+                DETAIL_ID,
+            </if>
+
+            <if test="rev1 != null">
+                REV1,
+            </if>
+            <if test="rev2 != null">
+                REV2,
+            </if>
+            <if test="rev3 != null">
+                REV3,
+            </if>
+            <if test="rev4 != null">
+                REV4,
+            </if>
+            <if test="rev5 != null">
+                REV5,
+            </if>
+
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -283,6 +313,27 @@
             <if test="rrplaceAgentName != null">
                 #{rrplaceAgentName,jdbcType=VARCHAR},
             </if>
+
+            <if test="detailId != null">
+                #{detailId,jdbcType=VARCHAR},
+            </if>
+
+            <if test="rev1 != null">
+                #{rev1,jdbcType=VARCHAR},
+            </if>
+            <if test="rev2 != null">
+                #{rev2,jdbcType=VARCHAR},
+            </if>
+            <if test="rev3 != null">
+                #{rev3,jdbcType=VARCHAR},
+            </if>
+            <if test="rev4 != null">
+                #{rev4,jdbcType=VARCHAR},
+            </if>
+            <if test="rev5 != null">
+                #{rev5,jdbcType=VARCHAR},
+            </if>
+
         </trim>
     </insert>
     <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDeductionExample" resultType="java.lang.Integer">

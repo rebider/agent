@@ -14,5 +14,5 @@ public interface IProfitMergeDeductionService {
      */
     int insert(ProfitDeduction deduction);
 
-    Map ProfitMergeDeduction(Map<String, String> params);
+    Map ProfitMergeDeduction(Map<String,Object> params);
 }
