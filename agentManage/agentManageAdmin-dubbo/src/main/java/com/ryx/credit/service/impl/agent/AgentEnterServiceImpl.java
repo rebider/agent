@@ -702,14 +702,14 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("收款状态更新失败");
             }
         }
-        List<Capital> capitals = accountPaidItemService.queryCap(agent.getId(), null, null, AgStatus.Create.status);
+        List<Capital> capitals = accountPaidItemService.queryCap(agent.getId(), null, null, AgStatus.Approving.status);
         for (Capital capital : capitals) {
             capital.setCloReviewStatus(AgStatus.Approved.status);
             if (1 != accountPaidItemService.update(capital)) {
                 logger.info("代理商审批，合同状态更新失败{}:{}",processingId, capital.getId());
                 throw new ProcessException("合同状态更新失败");
             }
-            if(PayType.FRDK.equals(capital.getcPayType()+"")) {
+            if(PayType.FRDK.code.equals(capital.getcPayType())) {
                 try {
                     //生成保证金等分期数据
                     AgentResult capitalFq = accountPaidItemService.capitalFq(capital);
@@ -798,7 +798,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 throw new ProcessException("收款状态更新失败");
             }
         }
-        List<Capital> capitals = accountPaidItemService.queryCap(agent.getId(), null, null, AgStatus.Create.status);
+        List<Capital> capitals = accountPaidItemService.queryCap(agent.getId(), null, null, AgStatus.Approving.status);
         for (Capital capital : capitals) {
             capital.setCloReviewStatus(AgStatus.Refuse.status);
             if (1 != accountPaidItemService.update(capital)) {
