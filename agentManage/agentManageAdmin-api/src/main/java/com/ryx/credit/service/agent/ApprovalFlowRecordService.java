@@ -31,4 +31,8 @@ public interface ApprovalFlowRecordService {
      * @return
      */
     List<Map<String, Object>> exportAgentNetln(ApprovalFlowRecord approvalFlowRecord) throws Exception;
+
+
+    List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception;
+
 }

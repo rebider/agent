@@ -429,4 +429,54 @@
         and status=1
     </select>
 
+    <select id="getAllDebtDetail" parameterType="map" resultType="map">
+      select * from
+      ( select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
+      detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,o.ORDER_PLATFORM,'订单分期' as DETAIN_NAME,'' as DETAIN_CODE
+      from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
+      on detail.AGENT_ID=agent.id
+      left join O_ORDER o on detail.ORDER_ID=o.id where
+      detail.status=1 and payment.status=1 and agent.status=1 and (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
+      and detail.PAYMENT_TYPE in('ORDER_FKD','ORDER_PDT','ORDER_BZJ')
+      <if test="map.agentId != null and map.agentId != '' ">
+         and detail.AGENT_ID = #{map.agentId}
+      </if>
+      union
+      select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,cash.agent_id,'' as ORDER_ID,
+      detail.PAYMENT_TYPE,a.ag_name as AG_NAME ,
+      (
+      select o_Payment.guarantee_agent from O_REFUND_PRICE_DIFF_DETAIL dfde
+      left join o_Payment on o_Payment.order_id = dfde.order_id
+      where dfde.Refund_price_diff_id = diff.id and dfde.status=1 and o_Payment.status=1 and rownum =1
+      )
+      as GUARANTEE_AGENT,
+      (
+      select o.order_platform from O_REFUND_PRICE_DIFF_DETAIL dfde
+      left join o_order o on o.id = dfde.order_id
+      where dfde.Refund_price_diff_id = diff.id and dfde.status=1 and rownum =1
+      ) as ORDER_PLATFORM,'订单分期' as DETAIN_NAME,'' as DETAIN_CODE
+      from O_PAYMENT_DETAIL detail
+      left join o_Cash_Receivables cash on cash.id=detail.Payment_id and cash.cashpay_type='REFUNDPRICEDIFF'
+      left join O_REFUND_PRICE_DIFF diff on cash.src_id = diff.id
+      left join a_agent a on a.id = diff.agent_id
+      where detail.status=1 and  (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
+      and detail.PAYMENT_TYPE='ORDER_XX'
+      <if test="map.agentId != null and map.agentId != '' ">
+         and detail.AGENT_ID = #{map.agentId}
+      </if>
+      union
+      select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
+      detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,'',d.d_itemname as DETAIN_NAME,ac.c_type
+      from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
+      on detail.AGENT_ID=agent.id left join A_capital ac on detail.payment_id=ac.id
+      left join d_dict d on d.d_itemvalue = ac.c_type and d_group = 'AGENT' and d_artifact='CAPITAL_TYPE'
+      where detail.status=1
+      and detail.PAYMENT_TYPE ='ORDER_BZJ'
+      <if test="map.agentId != null and map.agentId != '' ">
+         and detail.AGENT_ID = #{map.agentId}
+      </if>
+      )a
+      ORDER BY a.C_DATE DESC
+    </select>
+
 </mapper>

@@ -36,4 +36,11 @@ public interface OPaymentDetailMapper {
     BigDecimal querySupplementXXDK(@Param("map") Map<String, Object> map);
 
     OPaymentDetail selectMoney(@Param("id") String srcid);
+
+    /**
+     * 获取代理商所有欠款明细
+     * @param map
+     * @return
+     */
+    List<Map<String, Object>> getAllDebtDetail(@Param("map") Map<String, Object> map);
 }

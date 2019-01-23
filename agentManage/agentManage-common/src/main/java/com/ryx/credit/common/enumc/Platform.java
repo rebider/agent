@@ -19,7 +19,11 @@ public enum Platform {
     RHBZF("6000","手刷-瑞和宝直发平台"),
     RZT("4000","手刷-瑞众通"),
     POS("100003","POS"),
-    ZPOS("100002","智能POS");
+    ZPOS("100002","智能POS"),
+    REF("100004","POS-瑞e付"),
+    RYF("100005","POS-瑞银付"),
+    RXS("100006","POS-瑞享送"),
+    RF("100007","POS-瑞付");
 
     public String code;
 
