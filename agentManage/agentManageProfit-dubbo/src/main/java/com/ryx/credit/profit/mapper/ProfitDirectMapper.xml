@@ -464,9 +464,12 @@
 
   <select id="getProfitDirectList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="PAGING_START" />
-    SELECT
-    <include refid="Base_Column_List" />
-    FROM P_PROFIT_DIRECT
+    select AGENT_ID, AGENT_NAME,TRANS_MONTH, FRIST_AGENT_PID,
+    FRIST_AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME,
+    PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT, BASIC_PROFIT_AMT as SHOULD_PROFIT,
+    REAL_TAX_AMT ,(BASIC_PROFIT_AMT-REAL_TAX_AMT) as ACTUAL_PROFIT,PARENT_BUCKLE,STATUS
+    FROM (select ppd.*,ptdd.BASIC_PROFIT_AMT,ptdd.REAL_TAX_AMT from
+    P_PROFIT_DIRECT ppd left join P_TAX_DEDUCTION_DETAIL ptdd on ppd.AGENT_ID=ptdd.AGENT_ID and ppd.TRANS_MONTH=ptdd.PROFIT_MONTH)
     <include refid="BASE_WHERE_SQL" />
     <include refid="SORTING" />
     <include refid="PAGING_END" />
@@ -489,6 +492,14 @@
       <trim prefixOverrides="and">
         <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
         <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID}</if>
+        <if test="FIRST_AGENT_NAME != null and FIRST_AGENT_NAME !=''">AND FRIST_AGENT_NAME = #{FIRST_AGENT_NAME}</if>
+        <if test="FIRST_AGENT_ID != null and FIRST_AGENT_ID != ''">AND FRIST_AGENT_PID = #{FIRST_AGENT_ID}</if>
+        <choose>
+          <when test="DATESTART != null and DATESTART !='' and DATEEND !=null and DATEEND !=''">AND TRANS_MONTH between #{DATESTART} and #{DATEEND}</when>
+          <otherwise>
+            <if test="DATESTART != null and DATESTART !=''">AND TRANS_MONTH = #{DATESTART}</if>
+          </otherwise>
+        </choose>
       </trim>
     </where>
   </sql>
@@ -541,19 +552,22 @@
     where FRIST_AGENT_PID = #{fristAgentPid,jdbcType=VARCHAR}
   </update>
 
-  <select id="selectByWhere" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" >
+  <select id="selectByWhere" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select
     <include refid="Base_Column_List" />
     from P_PROFIT_DIRECT
-    <where>
+    where
       1=1
-      <if test='null!= agentName and agentName !="" '>
-        AND AGENT_NAME = #{agentName}
-      </if>
-      <if test='null!= agentId and agentId !="" '>
-        AND AGENT_ID = #{agentId}
-      </if>
-    </where>
+      <if test="AGENT_NAME != null and AGENT_NAME !=''">AND AGENT_NAME = #{AGENT_NAME}</if>
+      <if test="AGENT_ID != null and AGENT_ID != ''">AND AGENT_ID = #{AGENT_ID}</if>
+      <if test="FIRST_AGENT_NAME != null and FIRST_AGENT_NAME !=''">AND FRIST_AGENT_NAME = #{FIRST_AGENT_NAME}</if>
+      <if test="FIRST_AGENT_ID != null and FIRST_AGENT_ID != ''">AND FRIST_AGENT_PID = #{FIRST_AGENT_ID}</if>
+      <choose>
+        <when test="DATESTART != null and DATESTART !='' and DATEEND !=null and DATEEND !=''">AND TRANS_MONTH between #{DATESTART} and #{DATEEND}</when>
+        <otherwise>
+          <if test="DATESTART != null and DATESTART !=''">AND TRANS_MONTH = #{DATESTART}</if>
+        </otherwise>
+      </choose>
   </select>
 
   <select id="selectAmtByDeal" parameterType="com.ryx.credit.profit.pojo.ProfitDirect" resultType="java.math.BigDecimal">
@@ -562,6 +576,13 @@
     from P_PROFIT_DIRECT
     where
     TRANS_MONTH = #{transMonth,jdbcType=VARCHAR}
+  </select>
+
+  <select id="profitCount" parameterType="java.util.Map" resultType="java.util.Map">
+    select count(1) as totalNum,sum(BASIC_PROFIT_AMT-REAL_TAX_AMT) as totalMoney
+    from (select ppd.*,ptdd.BASIC_PROFIT_AMT,ptdd.REAL_TAX_AMT from
+    P_PROFIT_DIRECT ppd left join P_TAX_DEDUCTION_DETAIL ptdd on ppd.AGENT_ID=ptdd.AGENT_ID and ppd.TRANS_MONTH=ptdd.PROFIT_MONTH)
+    <include refid="BASE_WHERE_SQL" />
   </select>
 
   <delete id="deleteByMonth" parameterType="java.lang.String">

@@ -316,7 +316,7 @@
                 DEDUCTION_DATE = #{deductionDate,jdbcType=VARCHAR},
             </if>
             <if test="deductionType != null">
-                DEDUCTION_TYPE in(${deductionType}),
+                DEDUCTION_TYPE = #{deductionType,jdbcType=CHAR},
             </if>
             <if test="deductionDesc != null">
                 DEDUCTION_DESC = #{deductionDesc,jdbcType=VARCHAR},
