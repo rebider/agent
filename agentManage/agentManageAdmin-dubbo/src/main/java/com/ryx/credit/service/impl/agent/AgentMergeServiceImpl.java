@@ -1100,23 +1100,22 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             reqMap.put("RPLACE_AGENT_NAME",agentMerge.getSuppAgentName());
             reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
             reqMap.put("REMARK",agentMerge.getRemark());
-            reqMap.put("DEDUCTION_TYPE","06");
+            reqMap.put("DEDUCTION_TYPE","06"); //代理商合并
             HashMap<String, Object> queryMap = new HashMap<>();
             queryMap.put("agentId", subAgentId);
             List<Map<String, Object>> maps = oPaymentDetailMapper.getAllDebtDetail(queryMap);
             for (Map<String, Object> map : maps) {
                 String id = String.valueOf(map.get("ID"));
-                OPaymentDetail paymentDetail = new OPaymentDetail();
-                paymentDetail.setId(id);
+                OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
                 paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
-                int j = oPaymentDetailMapper.updateByPrimaryKey(paymentDetail);
+                int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
                 if(j!=1){
                     throw new MessageException("代理商合并：更新付款明细失败");
                 }
             }
             reqMap.put("DETAILS",maps);
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
-            Map map = profitMergeDeductionServiceImpl.ProfitMergeDeduction(null);
+            Map map = profitMergeDeductionServiceImpl.ProfitMergeDeduction(reqMap);
             String rusult_code = String.valueOf(map.get("rusult_code"));
             if(!rusult_code.equals("00")){
                 throw new MessageException("欠款同步分润失败");
