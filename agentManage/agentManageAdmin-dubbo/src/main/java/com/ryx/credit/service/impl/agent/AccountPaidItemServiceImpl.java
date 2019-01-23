@@ -229,7 +229,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         Capital db_capital = capitalMapper.selectByPrimaryKey(capital.getId());
         if(db_capital==null)return AgentResult.fail();
 
-        if(PayType.FRDK.equals(db_capital.getcPayType())) {
+        if(PayType.FRDK.code.equals(db_capital.getcPayType())) {
             Calendar temp = Calendar.getInstance();
             String batchCode =temp.getTime().getTime()+"";
             //分期数据
