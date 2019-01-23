@@ -52,17 +52,16 @@ public class ProfitMergeDeductionServiceImpl implements IProfitMergeDeductionSer
                     String remark = (String) detailIdMap.get("DETAIN_NAME");
                     Date cDate = (Date) detailIdMap.get("C_DATE");
                     String id = (String) detailIdMap.get("ID");
-                    String supplyAmt = (String) detailIdMap.get("PAYMENT_AMT");
+                    BigDecimal supplyAmt = (BigDecimal) detailIdMap.get("PAY_AMOUNT");
                     String detainCode = (String) detailIdMap.get("DETAIN_CODE");
 
 
                     deduction.setRemark(remark);
                     deduction.setCreateDateTime(cDate);
                     deduction.setDetailId(id);
-                    BigDecimal amt = new BigDecimal(supplyAmt.toString());
-                    deduction.setAddDeductionAmt(amt);
-                    deduction.setSumDeductionAmt(amt);
-                    deduction.setMustDeductionAmt(amt);
+                    deduction.setAddDeductionAmt(supplyAmt);
+                    deduction.setSumDeductionAmt(supplyAmt);
+                    deduction.setMustDeductionAmt(supplyAmt);
                     deduction.setSourceId(detainCode);
 
 
