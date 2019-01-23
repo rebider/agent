@@ -6,6 +6,7 @@ import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -36,7 +37,7 @@ public interface IProfitDService {
 
     int updateByPrimaryKey(ProfitDay record);
 
-    PageInfo profitDList(ProfitDay record, Page page);
+    PageInfo profitDList(Map<String,String> map, Page page);
 
     public List<ProfitDay> exportProfitD(ProfitDay profitD);
 }

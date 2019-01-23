@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
 import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.pojo.ProfitDayExample;
@@ -87,18 +88,25 @@ public class ProfitDServiceImpl implements IProfitDService {
     }
 
     @Override
-    public PageInfo profitDList(ProfitDay record, Page page) {
+    public PageInfo profitDList(Map<String,String> map, Page page) {
         ProfitDayExample example = new ProfitDayExample();
         example.setPage(page);
         ProfitDayExample.Criteria criteria = example.createCriteria();
-        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentName())) {
-            criteria.andAgentNameEqualTo(record.getAgentName());
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(map.get("agentName"))) {
+            criteria.andAgentNameEqualTo(map.get("agentName"));
         }
-        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getAgentId())) {
-            criteria.andAgentIdEqualTo(record.getAgentId());
+        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(map.get("agentId"))) {
+            criteria.andAgentIdEqualTo(map.get("agentId"));
         }
-        if (com.ryx.credit.commons.utils.StringUtils.isNotBlank(record.getRemitDate())) {
-            criteria.andRemitDateEqualTo(record.getRemitDate());
+        String startDate = map.get("startDate");
+        String endDate = map.get("endDate");
+
+        if(StringUtils.isNotBlank(startDate) && StringUtils.isNotBlank(endDate)){
+            criteria.andRemitDateBetween(startDate,endDate);
+        }else if(StringUtils.isNotBlank(startDate)){
+            criteria.andRemitDateEqualTo(startDate);
+        }else if(StringUtils.isNotBlank(endDate)){
+            criteria.andRemitDateEqualTo(endDate);
         }
         List<Map<String,Object>> profitD = profitDMapper.selectIncludePayComByExample(example);
         PageInfo pageInfo = new PageInfo();
