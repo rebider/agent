@@ -470,7 +470,7 @@
       from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
       on detail.AGENT_ID=agent.id left join A_capital ac on detail.payment_id=ac.id
       left join d_dict d on d.d_itemvalue = ac.c_type and d_group = 'AGENT' and d_artifact='CAPITAL_TYPE'
-      where detail.status=1
+      where detail.status=1 and ac.status = 1 and agent.status = 1
       and detail.PAYMENT_TYPE ='ORDER_BZJ'
       <if test="map.agentId != null and map.agentId != '' ">
          and detail.AGENT_ID = #{map.agentId}
