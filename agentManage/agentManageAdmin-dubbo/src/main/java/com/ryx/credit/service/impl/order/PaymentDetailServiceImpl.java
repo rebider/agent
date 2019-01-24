@@ -366,6 +366,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                oPaymentDetail.setSrcId(srcId);
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("付款明细更新数据失败");
                     throw new ProcessException("付款明细更新数据失败");

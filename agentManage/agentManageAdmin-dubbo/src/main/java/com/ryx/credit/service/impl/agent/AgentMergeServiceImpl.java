@@ -1116,6 +1116,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             reqMap.put("DETAILS",maps);
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
             Map map = profitMergeDeductionServiceImpl.ProfitMergeDeduction(reqMap);
+            logger.info("代理商合并欠款代理商代扣返回：{}",map);
             String rusult_code = String.valueOf(map.get("rusult_code"));
             if(!rusult_code.equals("00")){
                 throw new MessageException("欠款同步分润失败");
