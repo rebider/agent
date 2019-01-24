@@ -436,8 +436,8 @@
       from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
       on detail.AGENT_ID=agent.id
       left join O_ORDER o on detail.ORDER_ID=o.id where
-      detail.status=1 and payment.status=1 and agent.status=1 and (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE='FRFQ'
-      and detail.PAYMENT_TYPE in('ORDER_FKD','ORDER_PDT','ORDER_BZJ')
+      detail.status=1 and payment.status=1 and agent.status=1 and (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3) and detail.PAY_TYPE in('FRFQ','FKFQ')
+      and detail.PAYMENT_TYPE in('ORDER_FKD','ORDER_PDT')
       <if test="map.agentId != null and map.agentId != '' ">
          and detail.AGENT_ID = #{map.agentId}
       </if>
@@ -470,7 +470,7 @@
       from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
       on detail.AGENT_ID=agent.id left join A_capital ac on detail.payment_id=ac.id
       left join d_dict d on d.d_itemvalue = ac.c_type and d_group = 'AGENT' and d_artifact='CAPITAL_TYPE'
-      where detail.status=1
+      where detail.status=1 and ac.status = 1 and agent.status = 1
       and detail.PAYMENT_TYPE ='ORDER_BZJ'
       <if test="map.agentId != null and map.agentId != '' ">
          and detail.AGENT_ID = #{map.agentId}
@@ -479,4 +479,19 @@
       ORDER BY a.C_DATE DESC
     </select>
 
+    <select id="getCapitalDebt" parameterType="map" resultType="map">
+        select detail.c_date,detail.id,detail.PLAN_PAY_TIME,detail.PAY_AMOUNT,detail.AGENT_ID,detail.ORDER_ID,
+        detail.PAYMENT_TYPE,payment.GUARANTEE_AGENT,agent.AG_NAME ,'',d.d_itemname as DETAIN_NAME,ac.c_type
+        from O_PAYMENT_DETAIL detail left join O_PAYMENT payment on detail.PAYMENT_ID=payment.ID left join A_AGENT agent
+        on detail.AGENT_ID=agent.id left join A_capital ac on detail.payment_id=ac.id
+        left join d_dict d on d.d_itemvalue = ac.c_type and d_group = 'AGENT' and d_artifact='CAPITAL_TYPE'
+        where detail.status=1 and ac.status = 1 and agent.status = 1
+        and detail.PAYMENT_TYPE ='ORDER_BZJ' and (detail.PAYMENT_STATUS=1 or detail.PAYMENT_STATUS=3)
+        <if test="map.agentId != null and map.agentId != '' ">
+            and detail.AGENT_ID = #{map.agentId}
+        </if>
+        <if test="map.time != null and map.time != '' ">
+            and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')&lt;= #{map.time}
+        </if>
+    </select>
 </mapper>

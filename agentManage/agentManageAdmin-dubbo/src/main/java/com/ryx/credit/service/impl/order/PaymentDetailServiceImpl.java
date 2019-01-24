@@ -156,6 +156,22 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             HashMap<String, Object> map = new HashMap<>();
             map.put("time", time);
             maps = oPaymentDetailMapper.selectShareMoney(map);
+        }else if (method.equals(GetMethod.ALLCAPITAL.code)) {
+            if (StringUtils.isBlank(time)) {
+                logger.info("分润查询:{}", "时间为空");
+                throw new ProcessException("时间为空");
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("time", time);
+            maps = oPaymentDetailMapper.getCapitalDebt(map);
+        }else if (method.equals(GetMethod.CAPITAL.code)) {
+            if (StringUtils.isBlank(agentId)) {
+                logger.info("分润查询:{}", "代理商id为空");
+                throw new ProcessException("代理商id为空");
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("agentId", agentId);
+            maps = oPaymentDetailMapper.getCapitalDebt(map);
         }
         return maps;
     }
@@ -366,6 +382,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
                 oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
                 oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                oPaymentDetail.setSrcId(srcId);
                 if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
                     logger.info("付款明细更新数据失败");
                     throw new ProcessException("付款明细更新数据失败");
