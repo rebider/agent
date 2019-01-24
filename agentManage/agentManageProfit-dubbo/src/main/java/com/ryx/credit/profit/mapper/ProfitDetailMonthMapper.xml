@@ -1458,4 +1458,13 @@
       <if test="profitDateEnd != null and profitDateEnd != ''">and cc.PROFIT_DATE &lt;= #{profitDateEnd}</if>
     )
   </select>
+
+  <update id="updateAgentInfoBeforeComput" parameterType="java.lang.String">
+    update P_PROFIT_DETAIL_M a
+    set(TAX) =
+      (select TAX from A_AGENT_COLINFO b where b.AGENT_ID=a.AGENT_ID)
+    where a.PROFIT_DATE = '${profitDate}'
+          and exists(select 1 from A_AGENT_COLINFO c where c.AGENT_ID=a.AGENT_ID)
+  </update>
+
 </mapper>

@@ -17,6 +17,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,16 +51,23 @@ public class ProfitSummaryDataJob {
 
     private int index = 1;
 
+
+    /**
+     * 手刷月汇总
+     * transDate 交易月份（空则为上一月）
+     * 每月3号上午11点30
+     */
+    @Scheduled(cron = "0 30 11 3 * ?")
+    public void doCron(){
+        String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+        excute(transDate);
+    }
+
     public void excute(String transDate) {
         MPos_Summary(transDate);
     }
 
-    /**
-     * 汇总数据
-     * transDate 交易月份（空则为上一月）
-     * 每月12号上午12点：@Scheduled(cron = "0 0 12 12 * ?")
-     */
-//    @Scheduled(cron = "0 6 11 22 * ?")
+
     @Transactional
     public void MPos_Summary(String transDate) {
 
