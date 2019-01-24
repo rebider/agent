@@ -16,6 +16,7 @@ import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,9 +45,20 @@ public class ProfitZhiFaDataJob {
     @Autowired
     ProfitDirectMapper profitDirectMapper;
 
-    private String month = "";
     private int index = 1;
     private static int c = 1;
+
+
+    /**
+     * 同步直发分润数据
+     * 交易月份（空则为上一月）
+     * 每月3号上午10点
+     */
+    @Scheduled(cron = "0 0 10 3 * ?")
+    public void doCron(){
+        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+        excute(month);
+    }
 
 
     @Transactional
@@ -54,8 +66,6 @@ public class ProfitZhiFaDataJob {
         logger.info("==========={}月手刷直发分润数据同步开始===========", transDate);
         index = 1;
         long t1 = System.currentTimeMillis();
-        month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
-        transDate = transDate == null ? month : transDate;
 
         profitDirectMapper.deleteByMonth(transDate);
         synchroProfitDirect(transDate);
@@ -64,12 +74,7 @@ public class ProfitZhiFaDataJob {
         logger.info("==========={}月手刷直发分润数据同步结束,耗时{}ms===========", transDate, (t2 - t1));
     }
 
-    /**
-     * 同步直发分润数据
-     * 交易月份（空则为上一月）
-     * 每月5号上午10点：@Scheduled(cron = "0 0 5 10 * ?")
-     */
-//    @Scheduled(cron = "0 42 10 22 * ?")
+
     public void synchroProfitDirect(String transDate) {
 
         HashMap<String, String> map = new HashMap<String, String>();

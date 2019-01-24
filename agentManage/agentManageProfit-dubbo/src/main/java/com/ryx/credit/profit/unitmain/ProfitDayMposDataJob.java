@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 手刷日结分润数据同步、定时
+ * 手刷日结分润数据同步、定时(废弃)
  */
 @Service
 @Transactional(rollbackFor=RuntimeException.class)

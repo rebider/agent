@@ -83,7 +83,19 @@ public class NewProfitDataJob {
     @Qualifier("posProfitComputeServiceImpl")
     private DeductService posProfitComputeServiceImpl;
 
-    //@Scheduled(cron = "0 0 11 10 * ?")
+    /**
+     * @Author: Zhang Lei
+     * POS分润明细数据同步（TransProfitDetail）
+     * 同步完成后执行月汇总（ProfitDetailMonth）
+     * 每月3号9点10分执行
+     * @Date: 11:25 2019/1/24
+     */
+    @Scheduled(cron = "0 10 9 3 * ?")
+    public void doCron() {
+        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
+        deal(profitDate);
+    }
+
     public void deal(String profitDate) {
 
         profitDate = profitDate == null ? LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6) : profitDate;

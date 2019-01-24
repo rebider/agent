@@ -12,8 +12,6 @@ import com.ryx.credit.profit.pojo.ProfitDay;
 import com.ryx.credit.profit.service.IProfitDService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.dict.IdService;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -43,41 +41,41 @@ public class DailyProfitMposDataJob {
     @Autowired
     ProfitDayMapper profitDayMapper;
 
-    private int index = 1;  //页数
-
-    private String frDate = "";
-
-    @Transactional
-    public void excute(String profitDay) {
-        frDate = profitDay == null ? DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2)) : profitDay;
-        logger.info("======={}日结分润数据同步开始=======", frDate);
-        index = 1;
-        long t1 = System.currentTimeMillis();
-
-        //删除现有数据
-        profitDayMapper.deleteByDay(frDate);
-
-        synchroProfitDay();
-
-        long t2 = System.currentTimeMillis();
-        logger.info("======={}日结分润数据同步结束，耗时{}ms=======", frDate, (t2 - t1));
-
-    }
-
 
     /**
-     * 同步日结分润数据
+     * 同步日结分润数据(ProfitDay)
      * 分润月份（空则为当前日期上2天）yyyymmdd
      * 每日凌晨5点：@Scheduled(cron = "0 0 5 * * ?")
      */
     @Scheduled(cron = "0 0 5 * * ?")
-    public void synchroProfitDay() {
+    public void doCron() {
+        String profitDay = DateUtil.sdfDays.format(DateUtil.addDay(new Date(), -2));
+        excute(profitDay);
+    }
+
+    @Transactional
+    public void excute(String profitDay) {
+        logger.info("======={}日结分润数据同步开始=======", profitDay);
+        long t1 = System.currentTimeMillis();
+
+        //删除现有数据
+        profitDayMapper.deleteByDay(profitDay);
+
+        synchroProfitDay(profitDay, 1);
+
+        long t2 = System.currentTimeMillis();
+        logger.info("======={}日结分润数据同步结束，耗时{}ms=======", profitDay, (t2 - t1));
+
+    }
+
+
+    public void synchroProfitDay(String frDate, int pageNumber) {
         try {
 
             //同步新数据
             HashMap<String, String> map = new HashMap<String, String>();
             map.put("frDate", frDate);
-            map.put("pageNumber", index++ + "");
+            map.put("pageNumber", pageNumber++ + "");
             map.put("pageSize", "50");
             String params = JsonUtil.objectToJson(map);
 
@@ -96,7 +94,7 @@ public class DailyProfitMposDataJob {
             List<JSONObject> list = JSONObject.parseObject(data, List.class);
 
             if (list.size() > 0) {
-                insertProfitD(list, frDate);
+                insertProfitD(list, frDate, pageNumber);
             }
 
         } catch (Exception e) {
@@ -108,7 +106,7 @@ public class DailyProfitMposDataJob {
 
     }
 
-    public void insertProfitD(List<JSONObject> profitDays, String frDate) throws Exception {
+    public void insertProfitD(List<JSONObject> profitDays, String frDate, int pageNumber) throws Exception {
         for (JSONObject json : profitDays) {
             logger.info("{}日结数据同步{}", frDate, json.getString("AGENCYID"));
             ProfitDay profitD = new ProfitDay();
@@ -146,7 +144,7 @@ public class DailyProfitMposDataJob {
 
             profitDService.insertSelective(profitD);
         }
-        //synchroProfitDay(frDate);
+        synchroProfitDay(frDate, pageNumber);
     }
 
     public static void main(String agrs[]) {
