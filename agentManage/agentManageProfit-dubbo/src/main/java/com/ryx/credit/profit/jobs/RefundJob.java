@@ -38,7 +38,7 @@ import java.util.*;
  * @author zhaodw
  * @Title: RefundJob
  * @ProjectName agentManage
- * @Description: 退单任务
+ * @Description: 退单数据同步
  * @date 2018/7/2911:33
  */
 @Service("refundJob")
@@ -81,6 +81,11 @@ public class RefundJob {
     @Autowired
     private AgentService agentService;
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 退单数据同步 每月1号凌晨1点执行
+     * @Date: 11:50 2019/1/24
+     */
     @Scheduled(cron = "0 0 1 1 * ?")
     public void deal() {
         // 上月的开始及结束日期

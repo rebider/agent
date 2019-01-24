@@ -13,7 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * 分润数据同步任务测试
+ * POS数据同步
  * @author zhaodw
  * @create 2018/7/30
  * @since 1.0.0

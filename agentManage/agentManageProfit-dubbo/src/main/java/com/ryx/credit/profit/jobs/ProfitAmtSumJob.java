@@ -43,7 +43,11 @@ public class ProfitAmtSumJob {
     @Autowired
     private ProfitSupplyMapper profitSupplyMapper;
 
-    //@Scheduled(cron = "0 0 12 10 * ?")
+    /**
+     * @Author: Zhang Lei
+     * @Description: 分润金额汇总任务，执行pos考核奖励完成后自动触发
+     * @Date: 11:51 2019/1/24
+     */
     public void deal() {
         String settleMonth = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
         LOG.info("分润月份" + settleMonth);
