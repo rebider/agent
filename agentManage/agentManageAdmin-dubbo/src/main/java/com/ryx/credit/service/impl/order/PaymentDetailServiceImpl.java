@@ -156,6 +156,22 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             HashMap<String, Object> map = new HashMap<>();
             map.put("time", time);
             maps = oPaymentDetailMapper.selectShareMoney(map);
+        }else if (method.equals(GetMethod.ALLCAPITAL.code)) {
+            if (StringUtils.isBlank(time)) {
+                logger.info("分润查询:{}", "时间为空");
+                throw new ProcessException("时间为空");
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("time", time);
+            maps = oPaymentDetailMapper.getCapitalDebt(map);
+        }else if (method.equals(GetMethod.CAPITAL.code)) {
+            if (StringUtils.isBlank(agentId)) {
+                logger.info("分润查询:{}", "代理商id为空");
+                throw new ProcessException("代理商id为空");
+            }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("agentId", agentId);
+            maps = oPaymentDetailMapper.getCapitalDebt(map);
         }
         return maps;
     }
