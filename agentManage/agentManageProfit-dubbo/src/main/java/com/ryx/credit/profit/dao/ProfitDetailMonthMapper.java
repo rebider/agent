@@ -3,6 +3,7 @@ package com.ryx.credit.profit.dao;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
+import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -117,4 +118,10 @@ public interface ProfitDetailMonthMapper {
      */
     List<Map<String,Object>> exportByFHaveChild (Map<String, Object> param);
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 分润计算前更新代理商信息
+     * @Date: 12:42 2019/1/24
+     */
+    void updateAgentInfoBeforeComput(@Param("profitDate") String profitDate);
 }
