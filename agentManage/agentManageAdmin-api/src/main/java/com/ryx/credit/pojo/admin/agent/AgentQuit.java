@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentQuit {
+public class AgentQuit implements Serializable {
     private String id;
 
     private String agentId;
@@ -59,6 +60,8 @@ public class AgentQuit {
     private BigDecimal version;
 
     private String quitBusId;
+
+    private BigDecimal appRefund;
 
     public String getId() {
         return id;
@@ -282,5 +285,13 @@ public class AgentQuit {
 
     public void setQuitBusId(String quitBusId) {
         this.quitBusId = quitBusId == null ? null : quitBusId.trim();
+    }
+
+    public BigDecimal getAppRefund() {
+        return appRefund;
+    }
+
+    public void setAppRefund(BigDecimal appRefund) {
+        this.appRefund = appRefund;
     }
 }

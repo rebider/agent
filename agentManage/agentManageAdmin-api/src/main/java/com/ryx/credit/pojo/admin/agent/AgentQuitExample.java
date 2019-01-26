@@ -1917,6 +1917,66 @@ public class AgentQuitExample {
             addCriterion("QUIT_BUS_ID not between", value1, value2, "quitBusId");
             return (Criteria) this;
         }
+
+        public Criteria andAppRefundIsNull() {
+            addCriterion("APP_REFUND is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundIsNotNull() {
+            addCriterion("APP_REFUND is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundEqualTo(BigDecimal value) {
+            addCriterion("APP_REFUND =", value, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundNotEqualTo(BigDecimal value) {
+            addCriterion("APP_REFUND <>", value, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundGreaterThan(BigDecimal value) {
+            addCriterion("APP_REFUND >", value, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("APP_REFUND >=", value, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundLessThan(BigDecimal value) {
+            addCriterion("APP_REFUND <", value, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("APP_REFUND <=", value, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundIn(List<BigDecimal> values) {
+            addCriterion("APP_REFUND in", values, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundNotIn(List<BigDecimal> values) {
+            addCriterion("APP_REFUND not in", values, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("APP_REFUND between", value1, value2, "appRefund");
+            return (Criteria) this;
+        }
+
+        public Criteria andAppRefundNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("APP_REFUND not between", value1, value2, "appRefund");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

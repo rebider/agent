@@ -30,6 +30,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="QUIT_BUS_ID" jdbcType="VARCHAR" property="quitBusId" />
+    <result column="APP_REFUND" jdbcType="DECIMAL" property="appRefund" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -61,10 +62,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, AGENT_ID, AGENT_NAME, QUIT_PLATFORM, CAPITAL_DEBT, ORDER_DEBT, PROFIT_DEBT, AGENT_DEPT, 
-    SUPP_TYPE, SUPP_DEPT, REALITY_SUPP_DEPT, AGENT_OWE_TICKET, SUPP_TICKET, SUBTRACT_AMT, 
-    MIGRATION_PLATFORM, CONTRACT_STATUS, REFUND_AMT_STATUS, REFUND_AMT_DEADLINE, APPROVE_TIME, 
-    CLO_REVIEW_STATUS, REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, QUIT_BUS_ID
+    ID, AGENT_ID, AGENT_NAME, QUIT_PLATFORM, CAPITAL_DEBT, ORDER_DEBT, PROFIT_DEBT, AGENT_DEPT,
+    SUPP_TYPE, SUPP_DEPT, REALITY_SUPP_DEPT, AGENT_OWE_TICKET, SUPP_TICKET, SUBTRACT_AMT,
+    MIGRATION_PLATFORM, CONTRACT_STATUS, REFUND_AMT_STATUS, REFUND_AMT_DEADLINE, APPROVE_TIME,
+    CLO_REVIEW_STATUS, REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, QUIT_BUS_ID,
+    APP_REFUND
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentQuitExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -83,7 +85,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_AGENT_QUIT
     where ID = #{id,jdbcType=VARCHAR}
@@ -95,26 +97,26 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.AgentQuit">
-    insert into A_AGENT_QUIT (ID, AGENT_ID, AGENT_NAME, 
-      QUIT_PLATFORM, CAPITAL_DEBT, ORDER_DEBT, 
-      PROFIT_DEBT, AGENT_DEPT, SUPP_TYPE, 
-      SUPP_DEPT, REALITY_SUPP_DEPT, AGENT_OWE_TICKET, 
-      SUPP_TICKET, SUBTRACT_AMT, MIGRATION_PLATFORM, 
-      CONTRACT_STATUS, REFUND_AMT_STATUS, REFUND_AMT_DEADLINE, 
-      APPROVE_TIME, CLO_REVIEW_STATUS, REMARK, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, STATUS, VERSION, 
-      QUIT_BUS_ID)
-    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
-      #{quitPlatform,jdbcType=CHAR}, #{capitalDebt,jdbcType=DECIMAL}, #{orderDebt,jdbcType=DECIMAL}, 
-      #{profitDebt,jdbcType=DECIMAL}, #{agentDept,jdbcType=DECIMAL}, #{suppType,jdbcType=CHAR}, 
-      #{suppDept,jdbcType=DECIMAL}, #{realitySuppDept,jdbcType=DECIMAL}, #{agentOweTicket,jdbcType=DECIMAL}, 
-      #{suppTicket,jdbcType=DECIMAL}, #{subtractAmt,jdbcType=DECIMAL}, #{migrationPlatform,jdbcType=VARCHAR}, 
-      #{contractStatus,jdbcType=DECIMAL}, #{refundAmtStatus,jdbcType=DECIMAL}, #{refundAmtDeadline,jdbcType=DECIMAL}, 
-      #{approveTime,jdbcType=TIMESTAMP}, #{cloReviewStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
-      #{quitBusId,jdbcType=VARCHAR})
+    insert into A_AGENT_QUIT (ID, AGENT_ID, AGENT_NAME,
+    QUIT_PLATFORM, CAPITAL_DEBT, ORDER_DEBT,
+    PROFIT_DEBT, AGENT_DEPT, SUPP_TYPE,
+    SUPP_DEPT, REALITY_SUPP_DEPT, AGENT_OWE_TICKET,
+    SUPP_TICKET, SUBTRACT_AMT, MIGRATION_PLATFORM,
+    CONTRACT_STATUS, REFUND_AMT_STATUS, REFUND_AMT_DEADLINE,
+    APPROVE_TIME, CLO_REVIEW_STATUS, REMARK,
+    C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION,
+    QUIT_BUS_ID, APP_REFUND)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+    #{quitPlatform,jdbcType=CHAR}, #{capitalDebt,jdbcType=DECIMAL}, #{orderDebt,jdbcType=DECIMAL},
+    #{profitDebt,jdbcType=DECIMAL}, #{agentDept,jdbcType=DECIMAL}, #{suppType,jdbcType=CHAR},
+    #{suppDept,jdbcType=DECIMAL}, #{realitySuppDept,jdbcType=DECIMAL}, #{agentOweTicket,jdbcType=DECIMAL},
+    #{suppTicket,jdbcType=DECIMAL}, #{subtractAmt,jdbcType=DECIMAL}, #{migrationPlatform,jdbcType=VARCHAR},
+    #{contractStatus,jdbcType=DECIMAL}, #{refundAmtStatus,jdbcType=DECIMAL}, #{refundAmtDeadline,jdbcType=DECIMAL},
+    #{approveTime,jdbcType=TIMESTAMP}, #{cloReviewStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{quitBusId,jdbcType=VARCHAR}, #{appRefund,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentQuit">
     insert into A_AGENT_QUIT
@@ -203,6 +205,9 @@
       <if test="quitBusId != null">
         QUIT_BUS_ID,
       </if>
+      <if test="appRefund != null">
+        APP_REFUND,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -288,6 +293,9 @@
       </if>
       <if test="quitBusId != null">
         #{quitBusId,jdbcType=VARCHAR},
+      </if>
+      <if test="appRefund != null">
+        #{appRefund,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -381,6 +389,9 @@
       <if test="quitBusId != null">
         QUIT_BUS_ID = #{quitBusId,jdbcType=VARCHAR},
       </if>
+      <if test="appRefund != null">
+        APP_REFUND = #{appRefund,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -412,12 +423,13 @@
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
       VERSION = #{version,jdbcType=DECIMAL},
-      QUIT_BUS_ID = #{quitBusId,jdbcType=VARCHAR}
+      QUIT_BUS_ID = #{quitBusId,jdbcType=VARCHAR},
+      APP_REFUND = #{appRefund,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

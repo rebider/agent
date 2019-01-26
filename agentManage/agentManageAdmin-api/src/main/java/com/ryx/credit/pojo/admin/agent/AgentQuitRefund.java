@@ -1,9 +1,10 @@
 package com.ryx.credit.pojo.admin.agent;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentQuitRefund {
+public class AgentQuitRefund implements Serializable{
     private String id;
 
     private String quitId;
