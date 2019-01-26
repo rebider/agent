@@ -1,7 +1,6 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.activity.entity.ActIdUser;
-import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
@@ -22,12 +21,12 @@ import java.util.List;
  *
  * @author Wang Qi
  * @version 1.0 2018/7/19 9:37
- * @see QuitTaskExecutionListener
+ * @see QuitRefundTaskExecutionListener
  * To change this template use File | Settings | File Templates.
  */
 
-public class QuitTaskExecutionListener implements TaskListener, ExecutionListener {
-    private static final Logger logger = LoggerFactory.getLogger(QuitTaskExecutionListener.class);
+public class QuitRefundTaskExecutionListener implements TaskListener, ExecutionListener {
+    private static final Logger logger = LoggerFactory.getLogger(QuitRefundTaskExecutionListener.class);
 
 
     @Override
@@ -42,7 +41,6 @@ public class QuitTaskExecutionListener implements TaskListener, ExecutionListene
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
