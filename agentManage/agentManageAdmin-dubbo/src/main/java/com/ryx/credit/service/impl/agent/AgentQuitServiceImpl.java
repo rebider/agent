@@ -470,4 +470,9 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
         return AgentResult.ok();
     }
+    @Override
+    public AgentQuit getAgentQuitById(String quitId) {
+        return agentQuitMapper.selectByPrimaryKey(quitId);
+    }
+
 }

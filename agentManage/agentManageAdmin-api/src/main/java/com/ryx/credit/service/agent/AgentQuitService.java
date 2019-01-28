@@ -44,4 +44,6 @@ public interface AgentQuitService {
 
     AgentResult compressAgentQuitActivity(String proIns, BigDecimal agStatus)throws Exception;
 
+
+    AgentQuit getAgentQuitById(String quitId);
 }

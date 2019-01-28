@@ -393,12 +393,48 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
     <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
+  </sql>
+
+  <select id="queryQuitRefundList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    r.*, a.ag_name, cu.name as C_USER_NAME, uu.name as U_USER_NAME
+    from a_agent_quit_refund r
+    left join a_agent a on r.agent_id = a.id
+    left join c_user cu on r.c_user = cu.id
+    left join c_user uu on r.u_user = uu.id
+    <include refid="quitRefundListWhere" />
+    order by r.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryQuitRefundCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from a_agent_quit_refund r
+    left join a_agent a on r.agent_id = a.id
+    left join c_user cu on r.c_user = cu.id
+    left join c_user uu on r.u_user = uu.id
+    <include refid="quitRefundListWhere" />
+  </select>
+
+  <sql id="quitRefundListWhere">
+    <where>
+      r.status = #{map.status} and a.status = #{map.status}
+      <if test="map.quitId != null"> and r.quit_id = #{map.quitId} </if>
+      <if test="map.agentId != null"> and r.agent_id = #{map.agentId} </if>
+      <if test="map.agentName != null"> and r.agent_name = #{map.agentName} </if>
+      <if test="map.approveTimeStart != null"> and r.approve_time &gt;= #{map.approveTimeStart} </if>
+      <if test="map.approveTimeEnd != null"> and r.approve_time &lt;= #{map.approveTimeEnd} </if>
+      <if test="map.cloReviewStatus != null"> and r.clo_review_status = #{map.cloReviewStatus} </if>
+      <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
+    </where>
   </sql>
 </mapper>
