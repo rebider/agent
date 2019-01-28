@@ -34,4 +34,6 @@ public interface AgentQuitService {
 
     Map<String,Object> calculateSuppDept(String agentId);
 
+
+    AgentQuit queryAgentQuit(String id);
 }

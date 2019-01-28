@@ -3,6 +3,7 @@ package com.ryx.credit.pojo.admin.agent;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class AgentQuit implements Serializable{
     private String id;
@@ -64,6 +65,8 @@ public class AgentQuit implements Serializable{
     private BigDecimal appRefund;
 
     private BigDecimal platformStatus;
+
+    private List<Attachment> attachments;
 
     public String getId() {
         return id;
@@ -303,5 +306,13 @@ public class AgentQuit implements Serializable{
 
     public void setPlatformStatus(BigDecimal platformStatus) {
         this.platformStatus = platformStatus;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }

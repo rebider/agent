@@ -64,6 +64,9 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private AgentEnterService agentEnterService;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+
 
     /**
      * 退出列表
@@ -334,7 +337,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             }
         }
 
-        AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTMERGE,id,cUser);
+        AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTQUIT,id,cUser);
         if(!agentResult.isOK()){
             logger.info("代理商合并更新打款信息失败");
             throw new MessageException("代理商合并更新打款信息失败");
@@ -378,6 +381,20 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new MessageException("审批流启动失败：添加审批关系失败！");
         }
         return AgentResult.ok();
+    }
+
+    /**
+     * 查看
+     * @param id
+     * @return
+     */
+    @Override
+    public AgentQuit queryAgentQuit(String id){
+        AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(id);
+        //查询关联附件
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(agentQuit.getId(), AttachmentRelType.agentQuit.name());
+        agentQuit.setAttachments(attachments);
+        return agentQuit;
     }
 
 }
