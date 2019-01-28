@@ -130,6 +130,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private ProfitDeductionService profitDeductionServiceImpl;
     @Autowired
     private OPaymentDetailMapper oPaymentDetailMapper;
+    @Autowired
+    private OPaymentMapper paymentMapper;
 
     /**
      * 合并列表
@@ -1399,7 +1401,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
 
 
     /**
-     * 欠款
+     * 总欠款
      * @param agentId
      * @return
      */
@@ -1408,6 +1410,17 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         //订单欠款
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
+        BigDecimal bigDecimal = profitDebt(agentId);
+        return orderDebt.add(bigDecimal);
+    }
+
+    /**
+     * 分润欠款
+     * @param agentId
+     * @return
+     */
+    @Override
+    public BigDecimal profitDebt(String agentId){
         Map<String,String> reqMap = new HashMap<>();
         reqMap.put("agentId",agentId);
         Map<String, BigDecimal> notDeduction = profitDeductionServiceImpl.getNotDeduction(reqMap);
@@ -1416,12 +1429,50 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         BigDecimal otherNotDeductionAmt = notDeduction.get("otherNotDeductionAmt");
         BigDecimal chargeBackNotDeductionAmt = notDeduction.get("chargeBackNotDeductionAmt");
         BigDecimal toolNotDeductionAmt = notDeduction.get("ToolNotDeductionAmt");
-
-        BigDecimal sum = new BigDecimal(0);
-        sum = sum.add(orderDebt).add(checkNotDeductionAmt).add(bLNotDeductionAmt).add(otherNotDeductionAmt).
+        return checkNotDeductionAmt.add(bLNotDeductionAmt).add(otherNotDeductionAmt).
                 add(chargeBackNotDeductionAmt).add(toolNotDeductionAmt);
-        return sum;
     }
+
+    /**
+     * 订单欠款
+     * @param agentId
+     * @return
+     */
+    @Override
+    public BigDecimal getOrderDebt(String agentId){
+        //订单欠款
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+        List<String> typeList = new ArrayList<>();
+        typeList.add(PamentIdType.ORDER_FKD.code);
+        typeList.add(PamentIdType.ORDER_XX.code);
+        typeList.add(PamentIdType.ORDER_PDT.code);
+        reqMap.put("paymentTypes",typeList);
+        BigDecimal orderDebt = paymentMapper.queryAgentDebtByType(reqMap);
+        logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
+        BigDecimal bigDecimal = profitDebt(agentId);
+        return orderDebt.add(bigDecimal);
+    }
+
+    /**
+     * 缴纳款欠款
+     * @param agentId
+     * @return
+     */
+    @Override
+    public BigDecimal getCapitalDebt(String agentId){
+
+        Map<String,Object> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+        List<String> typeList = new ArrayList<>();
+        typeList.add(PamentIdType.ORDER_BZJ.code);
+        reqMap.put("paymentTypes",typeList);
+        BigDecimal orderDebt = paymentMapper.queryAgentDebtByType(reqMap);
+        logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
+        BigDecimal bigDecimal = profitDebt(agentId);
+        return orderDebt.add(bigDecimal);
+    }
+
 
     /**
      * 欠票

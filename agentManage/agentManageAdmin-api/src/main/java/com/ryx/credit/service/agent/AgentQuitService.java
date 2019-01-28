@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentQuit;
@@ -18,4 +19,9 @@ public interface AgentQuitService {
      * @return
      */
     PageInfo queryAgentQuitList(AgentQuit agentQuit, Page page, String dataRole, Long userId);
+
+
+    AgentResult saveAgentQuit(AgentQuit agentQuit, String[] agentQuitFiles, String cUser)throws Exception;
+
+
 }

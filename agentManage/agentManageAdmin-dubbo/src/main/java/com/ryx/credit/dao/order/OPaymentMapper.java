@@ -6,6 +6,7 @@ import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.order.OPaymentExample;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -29,4 +30,6 @@ public interface OPaymentMapper {
     List<Map<String,Object>> queryPaymentXXDK(@Param("params") Map<String,Object> params);
 
     Double queryAgentDebt(@Param("agentId")String agentId);
+
+    BigDecimal queryAgentDebtByType(Map<String,Object> params);
 }

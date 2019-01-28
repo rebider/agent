@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 public enum PlatformStatus {
 
     SUCCESS(new BigDecimal("0"),"失败"),
-    FAIL(new BigDecimal("1"),"成功");
+    FAIL(new BigDecimal("1"),"成功"),
+    NODISPOSE(new BigDecimal("2"),"未处理");
 
 
     public BigDecimal key;

@@ -127,6 +127,10 @@ public interface AgentMergeService {
 
     BigDecimal getSubAgentOweTicket(String agentId);
 
+    BigDecimal profitDebt(String agentId);
 
+    BigDecimal getOrderDebt(String agentId);
+
+    BigDecimal getCapitalDebt(String agentId);
 }
 
