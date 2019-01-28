@@ -4,6 +4,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentQuit;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 
 import java.math.BigDecimal;
@@ -36,4 +37,11 @@ public interface AgentQuitService {
 
 
     AgentQuit queryAgentQuit(String id);
+
+
+    AgentResult approvalAgentQuitTask(AgentVo agentVo, String userId, String busId) throws Exception;
+
+
+    AgentResult compressAgentQuitActivity(String proIns, BigDecimal agStatus)throws Exception;
+
 }

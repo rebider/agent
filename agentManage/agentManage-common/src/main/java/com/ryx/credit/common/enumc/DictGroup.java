@@ -63,8 +63,8 @@ public enum DictGroup {
     MERGE_MARKET("代理商合并审批市场部参数"),
     MERGE_YUHUA("代理商合并审批于华参数"),
     NETIN_MARKET("代理商入网审批市场部参数"),
-    AGENTQUIT("代理商退出审批流名称");
-
+    AGENTQUIT("代理商退出审批流名称"),
+    QUIT_MARKET("代理商退出审批市场部参数");
 
     public String  msg;
 

@@ -10,6 +10,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -136,7 +137,11 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         agentQuit.setContractStatus(Status.STATUS_0.status);
         agentQuit.setRefundAmtStatus(Status.STATUS_0.status);
         agentQuit.setAppRefund(PlatformStatus.NODISPOSE.getValue());
-        agentQuit.setCloReviewStatus(AgStatus.Create.getValue());
+        if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
+            agentQuit.setCloReviewStatus(AgStatus.Approving.status);
+        } else {
+            agentQuit.setCloReviewStatus(AgStatus.Create.status);
+        }
         agentQuit.setAgentName(agent.getAgName());
         agentQuit.setAgentOweTicket(getSubAgentOweTicket(agent.getId()));
         agentQuit.setSuppTicket(getSubAgentOweTicket(agent.getId()));
@@ -397,4 +402,72 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         return agentQuit;
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalAgentQuitTask(AgentVo agentVo, String userId, String busId) throws Exception {
+        try{
+            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+
+            }
+
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
+            if (!result.isOK()) {
+                logger.error(result.getMsg());
+                throw new MessageException("工作流处理任务异常");
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMessage());
+        }
+        return AgentResult.ok();
+    }
+
+
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult compressAgentQuitActivity(String proIns, BigDecimal agStatus)throws Exception{
+
+
+        BusActRelExample example = new BusActRelExample();
+        example.or().andActivIdEqualTo(proIns).andStatusEqualTo(Status.STATUS_1.status).andActivStatusEqualTo(AgStatus.Approving.name());
+        List<BusActRel> list = busActRelMapper.selectByExample(example);
+        if (list.size() != 1) {
+            logger.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
+            throw new MessageException("审批和数据关系有误");
+        }
+        BusActRel busActRel = list.get(0);
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        int z = busActRelMapper.updateByPrimaryKey(busActRel);
+        if(z!=1) {
+            logger.info("审批任务结束{}{}，代理商退出更新失败2", proIns, agStatus);
+            throw new MessageException("代理商退出更新失败");
+        }
+        AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(busActRel.getBusId());
+        agentQuit.setCloReviewStatus(agStatus);
+        agentQuit.setuTime(new Date());
+        agentQuit.setApproveTime(new Date());
+        int i = agentQuitMapper.updateByPrimaryKeySelective(agentQuit);
+        if(i!=1){
+            logger.info("审批任务结束{}{}，代理商合并更新失败1", proIns, agStatus);
+            throw new MessageException("代理商合并更新失败");
+        }
+        AgentResult agentResult = AgentResult.fail();
+        if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+            agentResult = cashReceivablesService.refuseProcing(CashPayType.AGENTMERGE,agentQuit.getId(),agentQuit.getcUser());
+        }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            agentResult = cashReceivablesService.finishProcing(CashPayType.AGENTMERGE,agentQuit.getId(),agentQuit.getcUser());
+        }
+        if(!agentResult.isOK()){
+            throw new ProcessException("更新打款记录失败");
+        }
+
+
+        return AgentResult.ok();
+    }
 }

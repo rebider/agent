@@ -1,10 +1,12 @@
 package com.ryx.credit.activity.task;
 
 import com.ryx.credit.activity.entity.ActIdUser;
+import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
+import com.ryx.credit.service.agent.AgentQuitService;
 import com.ryx.credit.service.order.OrderService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -38,15 +40,16 @@ public class QuitTaskExecutionListener implements TaskListener, ExecutionListene
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            OrderService orderService = (OrderService)MySpringContextHandler.applicationContext.getBean("orderService");
+            AgentQuitService agentQuitService = (AgentQuitService)MySpringContextHandler.applicationContext.getBean("agentQuitService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-
+                AgentResult res = agentQuitService.compressAgentQuitActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                AgentResult res = agentQuitService.compressAgentQuitActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
