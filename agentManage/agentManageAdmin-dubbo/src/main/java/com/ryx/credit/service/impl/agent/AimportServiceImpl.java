@@ -36,7 +36,7 @@ import java.util.*;
 @Service("aimportService")
 public class AimportServiceImpl implements AimportService {
 
-    private Logger logger = LoggerFactory.getLogger(AimportServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger("AimportServiceImpl");
 
     public static List<String> yesorno = Arrays.asList("否","是");
     public static  List<String> gs = Arrays.asList("无","对公","对私");
@@ -97,17 +97,31 @@ public class AimportServiceImpl implements AimportService {
     public List<String> addList(List<List<Object>> data, String dataType,String user,String batch)throws Exception {
         List<String> ids = new ArrayList<>();
         for (List<Object> datum : data) {
-            if(datum==null||datum.size()==0 || StringUtils.isBlank(datum.get(0)+""))break;
-            ImportAgent importAgent = new ImportAgent();
-            importAgent.setBatchcode(batch);
-            importAgent.setcUser(user);
-            importAgent.setDatacontent(JSONArray.toJSONString(datum));
-            importAgent.setDataid(datum.get(0)+"");
-            importAgent.setDatatype(dataType);
-            if(1!=insertAgentImportData(importAgent)){
-                throw new ProcessException("插入失败");
+            if(!AgImportType.BUSINESS.name().equals(dataType)) {
+                if (datum == null || datum.size() == 0 || StringUtils.isBlank(datum.get(0) + "")) break;
+                ImportAgent importAgent = new ImportAgent();
+                importAgent.setBatchcode(batch);
+                importAgent.setcUser(user);
+                importAgent.setDatacontent(JSONArray.toJSONString(datum));
+                importAgent.setDataid(datum.get(0) + "");
+                importAgent.setDatatype(dataType);
+                if (1 != insertAgentImportData(importAgent)) {
+                    throw new ProcessException("插入失败");
+                }
+                ids.add(importAgent.getId());
+            }else{
+                if (datum == null || datum.size() == 0 || StringUtils.isBlank(datum.get(3) + "")) break;
+                ImportAgent importAgent = new ImportAgent();
+                importAgent.setBatchcode(batch);
+                importAgent.setcUser(user);
+                importAgent.setDatacontent(JSONArray.toJSONString(datum));
+                importAgent.setDataid(datum.get(3) + "");
+                importAgent.setDatatype(dataType);
+                if (1 != insertAgentImportData(importAgent)) {
+                    throw new ProcessException("插入失败");
+                }
+                ids.add(importAgent.getId());
             }
-            ids.add(importAgent.getId());
         }
         return ids;
     }
@@ -442,6 +456,7 @@ public class AimportServiceImpl implements AimportService {
                     AgentContract agentContract =  parseContractFromJson(array);
                     agentContract.setAgentId(agent.getId());
                     agentContract.setcUser(userid);
+                    agentContract.setRemark(agentContract.getRemark()+"(导入)");
                     AgentContractExample agentContractExample = new AgentContractExample();
                     agentContractExample.or().andAgentIdEqualTo(agentContract.getAgentId())
                             .andContNumEqualTo(agentContract.getContNum())
@@ -461,7 +476,7 @@ public class AimportServiceImpl implements AimportService {
                         contract.setContNum(agentContract.getContNum());
                         contract.setContDate(agentContract.getContDate());
                         contract.setContEndDate(agentContract.getContEndDate());
-                        contract.setRemark(agentContract.getRemark());
+                        contract.setRemark(agentContract.getRemark()+"(导入)");
                         contract.setcUser(userid);
                         logger.info("导入代理商合同信息{}记录应存在",datum.getId());
                         con.setDealmsg("添加成功");
@@ -566,6 +581,21 @@ public class AimportServiceImpl implements AimportService {
                             busItem.setcUser(userid);
                             busItem =  agentBusinfoService.agentBusInfoInsert(busItem);
                         }
+
+                        //更新导入业务
+                        ImportAgentExample importAgentExample = new ImportAgentExample();
+                        importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name())
+                                .andDealstatusEqualTo(Status.STATUS_0.status)
+                                .andDataidEqualTo(busItem.getBusNum());
+                        List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
+                        for (ImportAgent agentsBusiness : importAgentsBusiness) {
+                            agentsBusiness.setDealTime(new Date());
+                            agentsBusiness.setDealstatus(Status.STATUS_2.status);
+                            agentsBusiness.setDealmsg("处理完成");
+                            importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
+                        }
+
+
                         List<AgentColinfo> colinfos = busItem.getAgentColinfoList();
                         if(colinfos.size()>0){
                             AgentColinfoExample agentColinfoExample_uniq  = new AgentColinfoExample();
@@ -638,17 +668,7 @@ public class AimportServiceImpl implements AimportService {
 
             }
 
-            //更新导入业务
-            //            ImportAgentExample importAgentExample = new ImportAgentExample();
-            //            importAgentExample.or().andDatatypeEqualTo(AgImportType.BUSINESS.name())
-            //                    .andDealstatusEqualTo(Status.STATUS_0.status)
-            //                    .andDataidEqualTo(uniqnum);
-            //            List<ImportAgent>  importAgentsBusiness = importAgentMapper.selectByExample(importAgentExample);
-            //            for (ImportAgent agentsBusiness : importAgentsBusiness) {
-            //                agentsBusiness.setDealTime(new Date());
-            //                agentsBusiness.setDealstatus(Status.STATUS_2.status);
-            //                importAgentMapper.updateByPrimaryKeySelective(agentsBusiness);
-            //            }
+
 
             return ResultVO.success(null);
         } catch (Exception e) {
@@ -766,7 +786,7 @@ public class AimportServiceImpl implements AimportService {
                 c.setcPaytime(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
             }
             if(obj.size()>5 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
-                c.setRemark(obj.getString(5));
+                c.setRemark(obj.getString(5)+"(导入)");
             }
 
             return c;
@@ -928,7 +948,9 @@ public class AimportServiceImpl implements AimportService {
             String pn =    obj.getString("pn");
 
             ImportAgentExample importAgentExample = new ImportAgentExample();
-            importAgentExample.or().andDataidEqualTo(uniqNum).andDatatypeEqualTo(AgImportType.BUSINESS.name()).andDealstatusEqualTo(Status.STATUS_0.status);
+            //根据业务平台编号查询业务平台信息
+//            importAgentExample.or().andDataidEqualTo(uniqNum).andDatatypeEqualTo(AgImportType.BUSINESS.name()).andDealstatusEqualTo(Status.STATUS_0.status);
+            importAgentExample.or().andDataidEqualTo(pn).andDatatypeEqualTo(AgImportType.BUSINESS.name()).andDealstatusEqualTo(Status.STATUS_0.status);
             List<ImportAgent>  list = importAgentMapper.selectByExampleWithBLOBs(importAgentExample);
             if(list.size()==0)return null;
             ImportAgent img_db = list.get(0);
@@ -1077,6 +1099,7 @@ public class AimportServiceImpl implements AimportService {
         List<ImportAgent> list = importAgentMapper.selectByExample(example);
         page.setRows(list);
         page.setTotal(count);
+        logger.info("=======================");
         return page;
     }
 
