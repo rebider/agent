@@ -1977,6 +1977,66 @@ public class AgentQuitExample {
             addCriterion("APP_REFUND not between", value1, value2, "appRefund");
             return (Criteria) this;
         }
+
+        public Criteria andPlatformStatusIsNull() {
+            addCriterion("PLATFORM_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusIsNotNull() {
+            addCriterion("PLATFORM_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_STATUS =", value, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusNotEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_STATUS <>", value, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusGreaterThan(BigDecimal value) {
+            addCriterion("PLATFORM_STATUS >", value, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_STATUS >=", value, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusLessThan(BigDecimal value) {
+            addCriterion("PLATFORM_STATUS <", value, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PLATFORM_STATUS <=", value, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusIn(List<BigDecimal> values) {
+            addCriterion("PLATFORM_STATUS in", values, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusNotIn(List<BigDecimal> values) {
+            addCriterion("PLATFORM_STATUS not in", values, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PLATFORM_STATUS between", value1, value2, "platformStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andPlatformStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PLATFORM_STATUS not between", value1, value2, "platformStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

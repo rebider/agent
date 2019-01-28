@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentQuit implements Serializable {
+public class AgentQuit implements Serializable{
     private String id;
 
     private String agentId;
@@ -62,6 +62,8 @@ public class AgentQuit implements Serializable {
     private String quitBusId;
 
     private BigDecimal appRefund;
+
+    private BigDecimal platformStatus;
 
     public String getId() {
         return id;
@@ -293,5 +295,13 @@ public class AgentQuit implements Serializable {
 
     public void setAppRefund(BigDecimal appRefund) {
         this.appRefund = appRefund;
+    }
+
+    public BigDecimal getPlatformStatus() {
+        return platformStatus;
+    }
+
+    public void setPlatformStatus(BigDecimal platformStatus) {
+        this.platformStatus = platformStatus;
     }
 }

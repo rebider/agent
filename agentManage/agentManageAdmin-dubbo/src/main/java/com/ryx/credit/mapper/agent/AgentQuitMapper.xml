@@ -31,6 +31,7 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="QUIT_BUS_ID" jdbcType="VARCHAR" property="quitBusId" />
     <result column="APP_REFUND" jdbcType="DECIMAL" property="appRefund" />
+    <result column="PLATFORM_STATUS" jdbcType="DECIMAL" property="platformStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -66,7 +67,7 @@
     SUPP_TYPE, SUPP_DEPT, REALITY_SUPP_DEPT, AGENT_OWE_TICKET, SUPP_TICKET, SUBTRACT_AMT,
     MIGRATION_PLATFORM, CONTRACT_STATUS, REFUND_AMT_STATUS, REFUND_AMT_DEADLINE, APPROVE_TIME,
     CLO_REVIEW_STATUS, REMARK, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, QUIT_BUS_ID,
-    APP_REFUND
+    APP_REFUND, PLATFORM_STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.AgentQuitExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -106,7 +107,8 @@
     APPROVE_TIME, CLO_REVIEW_STATUS, REMARK,
     C_TIME, U_TIME, C_USER,
     U_USER, STATUS, VERSION,
-    QUIT_BUS_ID, APP_REFUND)
+    QUIT_BUS_ID, APP_REFUND, PLATFORM_STATUS
+    )
     values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
     #{quitPlatform,jdbcType=CHAR}, #{capitalDebt,jdbcType=DECIMAL}, #{orderDebt,jdbcType=DECIMAL},
     #{profitDebt,jdbcType=DECIMAL}, #{agentDept,jdbcType=DECIMAL}, #{suppType,jdbcType=CHAR},
@@ -116,7 +118,8 @@
     #{approveTime,jdbcType=TIMESTAMP}, #{cloReviewStatus,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{quitBusId,jdbcType=VARCHAR}, #{appRefund,jdbcType=DECIMAL})
+    #{quitBusId,jdbcType=VARCHAR}, #{appRefund,jdbcType=DECIMAL}, #{platformStatus,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.AgentQuit">
     insert into A_AGENT_QUIT
@@ -208,6 +211,9 @@
       <if test="appRefund != null">
         APP_REFUND,
       </if>
+      <if test="platformStatus != null">
+        PLATFORM_STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -296,6 +302,9 @@
       </if>
       <if test="appRefund != null">
         #{appRefund,jdbcType=DECIMAL},
+      </if>
+      <if test="platformStatus != null">
+        #{platformStatus,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -392,39 +401,43 @@
       <if test="appRefund != null">
         APP_REFUND = #{appRefund,jdbcType=DECIMAL},
       </if>
+      <if test="platformStatus != null">
+        PLATFORM_STATUS = #{platformStatus,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.AgentQuit">
     update A_AGENT_QUIT
     set AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      QUIT_PLATFORM = #{quitPlatform,jdbcType=CHAR},
-      CAPITAL_DEBT = #{capitalDebt,jdbcType=DECIMAL},
-      ORDER_DEBT = #{orderDebt,jdbcType=DECIMAL},
-      PROFIT_DEBT = #{profitDebt,jdbcType=DECIMAL},
-      AGENT_DEPT = #{agentDept,jdbcType=DECIMAL},
-      SUPP_TYPE = #{suppType,jdbcType=CHAR},
-      SUPP_DEPT = #{suppDept,jdbcType=DECIMAL},
-      REALITY_SUPP_DEPT = #{realitySuppDept,jdbcType=DECIMAL},
-      AGENT_OWE_TICKET = #{agentOweTicket,jdbcType=DECIMAL},
-      SUPP_TICKET = #{suppTicket,jdbcType=DECIMAL},
-      SUBTRACT_AMT = #{subtractAmt,jdbcType=DECIMAL},
-      MIGRATION_PLATFORM = #{migrationPlatform,jdbcType=VARCHAR},
-      CONTRACT_STATUS = #{contractStatus,jdbcType=DECIMAL},
-      REFUND_AMT_STATUS = #{refundAmtStatus,jdbcType=DECIMAL},
-      REFUND_AMT_DEADLINE = #{refundAmtDeadline,jdbcType=DECIMAL},
-      APPROVE_TIME = #{approveTime,jdbcType=TIMESTAMP},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      QUIT_BUS_ID = #{quitBusId,jdbcType=VARCHAR},
-      APP_REFUND = #{appRefund,jdbcType=DECIMAL}
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    QUIT_PLATFORM = #{quitPlatform,jdbcType=CHAR},
+    CAPITAL_DEBT = #{capitalDebt,jdbcType=DECIMAL},
+    ORDER_DEBT = #{orderDebt,jdbcType=DECIMAL},
+    PROFIT_DEBT = #{profitDebt,jdbcType=DECIMAL},
+    AGENT_DEPT = #{agentDept,jdbcType=DECIMAL},
+    SUPP_TYPE = #{suppType,jdbcType=CHAR},
+    SUPP_DEPT = #{suppDept,jdbcType=DECIMAL},
+    REALITY_SUPP_DEPT = #{realitySuppDept,jdbcType=DECIMAL},
+    AGENT_OWE_TICKET = #{agentOweTicket,jdbcType=DECIMAL},
+    SUPP_TICKET = #{suppTicket,jdbcType=DECIMAL},
+    SUBTRACT_AMT = #{subtractAmt,jdbcType=DECIMAL},
+    MIGRATION_PLATFORM = #{migrationPlatform,jdbcType=VARCHAR},
+    CONTRACT_STATUS = #{contractStatus,jdbcType=DECIMAL},
+    REFUND_AMT_STATUS = #{refundAmtStatus,jdbcType=DECIMAL},
+    REFUND_AMT_DEADLINE = #{refundAmtDeadline,jdbcType=DECIMAL},
+    APPROVE_TIME = #{approveTime,jdbcType=TIMESTAMP},
+    CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    QUIT_BUS_ID = #{quitBusId,jdbcType=VARCHAR},
+    APP_REFUND = #{appRefund,jdbcType=DECIMAL},
+    PLATFORM_STATUS = #{platformStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
