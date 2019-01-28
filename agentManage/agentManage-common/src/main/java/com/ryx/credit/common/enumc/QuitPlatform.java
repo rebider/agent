@@ -1,6 +1,9 @@
 package com.ryx.credit.common.enumc;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 申请推出业务平台
  * Created by liudh on 2018/9/58.
@@ -44,5 +47,14 @@ public enum QuitPlatform {
             }
         }
         return "";
+    }
+
+    public static Map<String,String> getContentMap(){
+        Map<String,String> resultMap = new HashMap<>();
+        QuitPlatform[] busType = QuitPlatform.values();
+        for(QuitPlatform bt : busType){
+            resultMap.put(bt.key,bt.msg);
+        }
+        return resultMap;
     }
 }

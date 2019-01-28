@@ -8,10 +8,16 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
+import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentQuitService;
+import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.OCashReceivablesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +54,16 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private CapitalMapper capitalMapper;
     @Autowired
     private AttachmentRelMapper attachmentRelMapper;
-
+    @Autowired
+    private OCashReceivablesService cashReceivablesService;
+    @Autowired
+    private BusActRelMapper busActRelMapper;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private AgentEnterService agentEnterService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
 
     /**
      * 退出列表
@@ -99,7 +114,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
      */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult saveAgentQuit(AgentQuit agentQuit, String[] agentQuitFiles, String cUser)throws Exception {
+    public AgentResult saveAgentQuit(AgentQuit agentQuit, String[] agentQuitFiles, String cUser,
+                                     String saveFlag,List<OCashReceivablesVo> oCashReceivables)throws Exception {
 
         if(StringUtils.isBlank(agentQuit.getAgentId())){
             throw new MessageException("代理商ID为空！");
@@ -132,13 +148,18 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         BigDecimal capitalSumAmt = getCapitalSumAmt(agent.getId());
         BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
         String suppDeptStr = String.valueOf(suppDept);
-        if(suppDeptStr.contains("-")){
-            agentQuit.setSuppType(SuppType.D.getValue());
-            String substring = suppDeptStr.substring(0, suppDeptStr.length() - 1);
-            agentQuit.setSuppDept(new BigDecimal(substring));
-        }else{
-            agentQuit.setSuppType(SuppType.G.getValue());
+        if(suppDept.compareTo(new BigDecimal(0))==0){
+            agentQuit.setSuppType(SuppType.W.getValue());
             agentQuit.setSuppDept(suppDept);
+        }else{
+            if(suppDeptStr.contains("-")){
+                agentQuit.setSuppType(SuppType.D.getValue());
+                String substring = suppDeptStr.substring(0, suppDeptStr.length() - 1);
+                agentQuit.setSuppDept(new BigDecimal(substring));
+            }else{
+                agentQuit.setSuppType(SuppType.G.getValue());
+                agentQuit.setSuppDept(suppDept);
+            }
         }
         agentQuit.setcTime(new Date());
         agentQuit.setuTime(new Date());
@@ -168,6 +189,15 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     throw new ProcessException("保存附件失败");
                 }
             }
+        }
+        //打款记录
+        AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,agentQuit.getAgentId(),CashPayType.AGENTQUIT,quitId);
+        if(!agentResult.isOK()){
+            logger.info("代理商合并保存打款记录失败1");
+            throw new ProcessException("保存打款记录失败");
+        }
+        if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
+            startAgentMergeActivity(quitId, cUser,true);
         }
         return AgentResult.ok();
     }
@@ -227,6 +257,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
      * @param agentId
      * @return
      */
+    @Override
     public BigDecimal getCapitalSumAmt(String agentId){
         CapitalExample capitalExample = new CapitalExample();
         CapitalExample.Criteria criteria = capitalExample.createCriteria();
@@ -240,4 +271,113 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
         return sumAmt;
     }
+
+    /**
+     * 计算补缴金额
+     * @param agentId
+     */
+    @Override
+    public Map<String,Object> calculateSuppDept(String agentId){
+        Map<String,Object> resultMap = new HashMap<>();
+        BigDecimal capitalSumAmt = getCapitalSumAmt(agentId);
+        BigDecimal profitDebt = profitDebt(agentId);
+        BigDecimal orderDebt = getOrderDebt(agentId);
+        BigDecimal capitalDebt = getCapitalDebt(agentId);
+        BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
+        String suppDeptStr = String.valueOf(suppDept);
+        if(suppDept.compareTo(new BigDecimal(0))==0){
+            resultMap.put("suppType",SuppType.W.getContent());
+        }else{
+            if(suppDeptStr.contains("-")){
+                resultMap.put("suppType",SuppType.D.getContent());
+            }else{
+                resultMap.put("suppType",SuppType.G.getContent());
+            }
+        }
+        resultMap.put("suppDept",suppDept);
+        return resultMap;
+    }
+
+    /**
+     * 提交数据并审批
+     * @param id
+     * @param cUser
+     * @param isSave 是否已保存
+     * @return
+     * @throws Exception
+     */
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception {
+        AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(id);
+        if (agentQuit == null) {
+            throw new MessageException("提交审批信息有误！");
+        }
+        if (!isSave) {
+            agentQuit.setuUser(cUser);
+            agentQuit.setuTime(new Date());
+            agentQuit.setCloReviewStatus(AgStatus.Approving.status);
+            if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
+                throw new MessageException("提交审批处理失败！");
+            }
+        }
+        //提交审批进行锁定
+        String quitBusId = agentQuit.getQuitBusId();
+        String[] quitBusIds = quitBusId.split(",");
+        for(int i=0;i<quitBusIds.length;i++){
+            String mergeBusId = quitBusIds[i];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+            agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+            int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+            if (j!=1) {
+                throw new MessageException("更新业务锁定失败");
+            }
+        }
+
+        AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTMERGE,id,cUser);
+        if(!agentResult.isOK()){
+            logger.info("代理商合并更新打款信息失败");
+            throw new MessageException("代理商合并更新打款信息失败");
+        }
+
+        Map startPar = agentEnterService.startPar(cUser);
+        if (null == startPar) {
+            logger.info("========用户{}{}启动部门参数为空", id, cUser);
+            throw new MessageException("启动部门参数为空!");
+        }
+        Object party = startPar.get("party");
+        //不同的业务类型找到不同的启动流程
+        List<Dict> actlist = dictOptionsService.dictList(DictGroup.ORDER.name(), DictGroup.AGENTQUIT.name());
+        String workId = null;
+        for (Dict dict : actlist) {
+            //根据不同的部门信息启动不同的流程
+            if(party.equals(dict.getdItemvalue())) {
+                workId = dict.getdItemname();
+            }
+        }
+        //启动审批
+        String proce = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        if (proce == null) {
+            logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
+            throw new MessageException("审批流启动失败!");
+        }
+
+        //代理商业务&工作流关系
+        BusActRel record = new BusActRel();
+        record.setBusId(id);
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(cUser);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.QUIT.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(agentQuit.getAgentId());
+        record.setAgentName(agentQuit.getAgentName());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            throw new MessageException("审批流启动失败：添加审批关系失败！");
+        }
+        return AgentResult.ok();
+    }
+
 }

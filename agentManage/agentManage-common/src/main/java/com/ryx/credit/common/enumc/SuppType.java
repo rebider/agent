@@ -11,7 +11,8 @@ package com.ryx.credit.common.enumc;
 public enum SuppType {
 
     D("1","代理商打款"),
-    G("2","公司打款");
+    G("2","公司打款"),
+    W("3","无");
 
     public String code;
 
