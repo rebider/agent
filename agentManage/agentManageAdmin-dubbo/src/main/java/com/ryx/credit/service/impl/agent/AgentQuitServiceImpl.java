@@ -368,24 +368,6 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     @Override
     public Map<String,Object> calculateSuppDept(String agentId){
         Map<String,Object> resultMap = new HashMap<>();
-        BigDecimal capitalSumAmt = getCapitalSumAmt(agentId);
-        BigDecimal profitDebt = profitDebt(agentId);
-        BigDecimal orderDebt = getOrderDebt(agentId);
-        BigDecimal capitalDebt = getCapitalDebt(agentId);
-        BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
-        String suppDeptStr = String.valueOf(suppDept);
-        if(suppDept.compareTo(new BigDecimal(0))==0){
-            resultMap.put("suppType",SuppType.W.getContent());
-            resultMap.put("suppDept",suppDept);
-        }else{
-            if(suppDeptStr.contains("-")){
-                resultMap.put("suppType",SuppType.D.getContent());
-                resultMap.put("suppDept",suppDeptStr.substring(1,suppDeptStr.length()));
-            }else{
-                resultMap.put("suppType",SuppType.G.getContent());
-                resultMap.put("suppDept",suppDept);
-            }
-        }
         AgentQuitExample agentQuitExample = new AgentQuitExample();
         AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -395,6 +377,32 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             AgentQuit agentQuit = agentQuits.get(0);
             resultMap.put("realitySuppDept",agentQuit.getRealitySuppDept());
             resultMap.put("subtractAmt",agentQuit.getSubtractAmt());
+            resultMap.put("suppType",SuppType.getContentByValue(agentQuit.getSuppType()));
+            resultMap.put("suppDept",agentQuit.getSuppDept());
+            resultMap.put("subAgentOweTicket",agentQuit.getAgentOweTicket());
+            resultMap.put("subAgentDebt",agentQuit.getAgentDept());
+            resultMap.put("profitDebt",agentQuit.getProfitDebt());
+            resultMap.put("orderDebt",agentQuit.getOrderDebt());
+            resultMap.put("capitalDebt",agentQuit.getCapitalDebt());
+        }else{
+            BigDecimal capitalSumAmt = getCapitalSumAmt(agentId);
+            BigDecimal profitDebt = profitDebt(agentId);
+            BigDecimal orderDebt = getOrderDebt(agentId);
+            BigDecimal capitalDebt = getCapitalDebt(agentId);
+            BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
+            String suppDeptStr = String.valueOf(suppDept);
+            if(suppDept.compareTo(new BigDecimal(0))==0){
+                resultMap.put("suppType",SuppType.W.getContent());
+                resultMap.put("suppDept",suppDept);
+            }else{
+                if(suppDeptStr.contains("-")){
+                    resultMap.put("suppType",SuppType.D.getContent());
+                    resultMap.put("suppDept",suppDeptStr.substring(1,suppDeptStr.length()));
+                }else{
+                    resultMap.put("suppType",SuppType.G.getContent());
+                    resultMap.put("suppDept",suppDept);
+                }
+            }
         }
         return resultMap;
     }
