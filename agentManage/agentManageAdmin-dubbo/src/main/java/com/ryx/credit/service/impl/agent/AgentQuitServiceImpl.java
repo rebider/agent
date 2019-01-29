@@ -136,7 +136,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         agentQuit.setQuitBusId(quitPlatformIds(agentQuit.getQuitPlatform(),agentQuit.getAgentId()));
         agentQuit.setContractStatus(Status.STATUS_0.status);
         agentQuit.setRefundAmtStatus(Status.STATUS_0.status);
-        agentQuit.setAppRefund(PlatformStatus.NODISPOSE.getValue());
+        agentQuit.setAppRefund(Status.STATUS_0.status);
+        agentQuit.setPlatformStatus(PlatformStatus.NODISPOSE.getValue());
         if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
             agentQuit.setCloReviewStatus(AgStatus.Approving.status);
         } else {
@@ -169,6 +170,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 agentQuit.setSuppDept(suppDept);
             }
         }
+        agentQuit.setRealitySuppDept(agentQuit.getSuppDept());
+        agentQuit.setSubtractAmt(BigDecimal.ZERO);
         agentQuit.setcTime(new Date());
         agentQuit.setuTime(new Date());
         agentQuit.setcUser(cUser);
@@ -414,16 +417,43 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 }
                 Map<String, Object> map = orgCodeRes.get(0);
                 Object orgCode = map.get("ORGANIZATIONCODE");
+                AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(busId);
+                AgentQuit agentQuitVo = agentVo.getAgentQuit();
+                //市场审批
+                if (String.valueOf(orgCode).equals("market")) {
+                    agentQuit.setuTime(new Date());
+                    agentQuit.setRefundAmtDeadline(agentQuitVo.getRefundAmtDeadline());
+                    agentQuit.setMigrationPlatform(agentQuitVo.getMigrationPlatform());
+                    int i = agentQuitMapper.updateByPrimaryKey(agentQuit);
+                    if(i!=1){
+                        throw new ProcessException("更新市场部处理失败");
+                    }
+                }
                 //于华审批
                 if (String.valueOf(orgCode).equals("manage")) {
-                    AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(busId);
-
+                    agentQuit.setuTime(new Date());
+                    if(agentQuitVo.getSubtractAmt().compareTo(BigDecimal.ZERO)==1){
+                        throw new ProcessException("减免金额大于实际金额");
+                    }
+                    agentQuit.setSubtractAmt(agentQuitVo.getSubtractAmt());
+                    BigDecimal subtract = agentQuit.getSuppDept().subtract(agentQuitVo.getSubtractAmt());
+                    agentQuit.setRealitySuppDept(subtract);
+                    int i = agentQuitMapper.updateByPrimaryKey(agentQuit);
+                    if(i!=1){
+                        throw new ProcessException("更新市场部处理失败");
+                    }
                 }
                 //财务审批
                 if (String.valueOf(orgCode).equals("finance")) {
-                    AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.AGENTMERGE,busId,userId,new Date(),agentVo.getoCashReceivablesVoList());
+                    AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(CashPayType.AGENTQUIT,busId,userId,new Date(),agentVo.getoCashReceivablesVoList());
                     if(!cashAgentResult.isOK()){
                         throw new ProcessException("更新收款信息失败");
+                    }
+                    agentQuit.setuTime(new Date());
+                    agentQuit.setAppRefund(agentQuitVo.getAppRefund());
+                    int i = agentQuitMapper.updateByPrimaryKey(agentQuit);
+                    if(i!=1){
+                        throw new ProcessException("更新市场部处理失败");
                     }
                 }
             }
@@ -475,10 +505,10 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
         AgentResult agentResult = AgentResult.fail();
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
-            agentResult = cashReceivablesService.refuseProcing(CashPayType.AGENTMERGE,agentQuit.getId(),agentQuit.getcUser());
+            agentResult = cashReceivablesService.refuseProcing(CashPayType.AGENTQUIT,agentQuit.getId(),agentQuit.getcUser());
         }
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
-            agentResult = cashReceivablesService.finishProcing(CashPayType.AGENTMERGE,agentQuit.getId(),agentQuit.getcUser());
+            agentResult = cashReceivablesService.finishProcing(CashPayType.AGENTQUIT,agentQuit.getId(),agentQuit.getcUser());
         }
         if(!agentResult.isOK()){
             throw new ProcessException("更新打款记录失败");
