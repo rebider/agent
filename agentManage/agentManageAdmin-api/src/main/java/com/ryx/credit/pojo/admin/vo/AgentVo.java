@@ -83,6 +83,24 @@ public class AgentVo implements Serializable {
     private String mainDocDistrict; //主代理商大区
     private String subDocDistrict;  //副代理商大区
     private AgentQuit agentQuit;
+    private BigDecimal realitySuppDept;
+    private List<String> quitRefundFile;
+
+    public List<String> getQuitRefundFile() {
+        return quitRefundFile;
+    }
+
+    public void setQuitRefundFile(List<String> quitRefundFile) {
+        this.quitRefundFile = quitRefundFile;
+    }
+
+    public BigDecimal getRealitySuppDept() {
+        return realitySuppDept;
+    }
+
+    public void setRealitySuppDept(BigDecimal realitySuppDept) {
+        this.realitySuppDept = realitySuppDept;
+    }
 
     public String getMainDocDistrict() {
         return mainDocDistrict;

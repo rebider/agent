@@ -5,12 +5,11 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.dao.agent.AgentQuitMapper;
-import com.ryx.credit.dao.agent.AgentQuitRefundMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.service.ActivityService;
@@ -61,6 +60,10 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
     private AgentQuitMapper agentQuitMapper;
     @Autowired
     private AgentColinfoService agentColinfoService;
+    @Autowired
+    private AttachmentRelMapper attachmentRelMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
 
     /**
@@ -234,6 +237,64 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
      */
     @Override
     public AgentResult approvalQuitRefundTask(AgentVo agentVo, String userId, String busId) throws Exception {
+        try {
+            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+                if (null == orgCodeRes) {
+                    throw new ProcessException("部门参数为空！");
+                }
+                Map<String, Object> map = orgCodeRes.get(0);
+                Object orgCode = map.get("ORGANIZATIONCODE");
+                AgentQuitRefund agentQuitRefund = agentQuitRefundMapper.selectByPrimaryKey(busId);
+                //财务审批
+                if (String.valueOf(orgCode).equals("finance")) {
+                    //实际打款金额
+                    BigDecimal realitySuppDept = agentVo.getRealitySuppDept();
+                    if (realitySuppDept != null || realitySuppDept.compareTo(BigDecimal.ONE) == 0) {
+                        agentQuitRefund.setRealitySuppDept(realitySuppDept);
+                        agentQuitRefund.setuUser(userId);
+                        if (1 != agentQuitRefundMapper.updateByPrimaryKeySelective(agentQuitRefund)) {
+                            throw new MessageException("实际打款金额更新失败！");
+                        }
+                    } else {
+                        logger.info("申请退款添加:{}", "请填写实际打款金额");
+                        throw new MessageException("请填写实际打款金额！");
+                    }
+                    //上传打款凭证
+                    List<String> quitRefundFile = agentVo.getQuitRefundFile();
+                    if (quitRefundFile != null && quitRefundFile.size() != 0) {
+                        for (int i = 0; i < quitRefundFile.size(); i++) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(quitRefundFile.get(i));
+                            record.setSrcId(busId);
+                            record.setcUser(userId);
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.agentQuitRefund.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            if (1 != attachmentRelMapper.insertSelective(record)) {
+                                logger.info("代理商退出申请退款-保存附件关系失败");
+                                throw new ProcessException("保存附件失败！");
+                            }
+                        }
+                    } else {
+                        logger.info("申请退款添加:{}", "请上传打款凭证");
+                        throw new MessageException("请上传打款凭证！");
+                    }
+                }
+            }
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
+            if (!result.isOK()) {
+                logger.error(result.getMsg());
+                throw new MessageException("工作流处理任务异常！");
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("catch工作流处理任务异常！" );
+        }
         return AgentResult.ok();
     }
 
@@ -246,7 +307,56 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
      */
     @Override
     public AgentResult compressQuitRefundActivity(String proIns, BigDecimal agStatus) throws Exception {
+        BusActRelExample example = new BusActRelExample();
+        example.or().andActivIdEqualTo(proIns).andStatusEqualTo(Status.STATUS_1.status).andActivStatusEqualTo(AgStatus.Approving.name());
+        List<BusActRel> list = busActRelMapper.selectByExample(example);
+        if (list.size() != 1) {
+            logger.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
+            throw new MessageException("审批和数据关系有误！");
+        }
+        BusActRel busActRel = list.get(0);
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        if(1 != busActRelMapper.updateByPrimaryKey(busActRel)) {
+            logger.info("审批任务结束{}{}，代理商退出申请退款更新失败-busActRel", proIns, agStatus);
+            throw new MessageException("代理商退出申请退款更新失败！");
+        }
+        AgentQuitRefund agentQuitRefund = agentQuitRefundMapper.selectByPrimaryKey(busActRel.getBusId());
+        agentQuitRefund.setCloReviewStatus(agStatus);
+        agentQuitRefund.setApproveTime(new Date());
+        agentQuitRefund.setuTime(new Date());
+        if (1 != agentQuitRefundMapper.updateByPrimaryKeySelective(agentQuitRefund)) {
+            logger.info("审批任务结束{}{}，代理商退出申请退款更新失败-agentQuitRefund", proIns, agStatus);
+            throw new MessageException("代理商退出申请退款更新失败！");
+        }
+        if (agStatus.compareTo(AgStatus.Approved.getValue()) == 0) {
+            AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(agentQuitRefund.getQuitId());
+            agentQuit.setRefundAmtStatus(Status.STATUS_1.status);
+            if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
+                logger.info("审批任务结束{}{}，代理商退出申请退款更新失败-agentQuit", proIns, agStatus);
+                throw new MessageException("代理商退出申请退款更新失败！");
+            }
+        }
         return AgentResult.ok();
+    }
+
+    /**
+     * 根据ID查询合并数据
+     * @param refundId
+     * @return
+     */
+    @Override
+    public AgentQuitRefund queryQuitRefundById(String refundId) {
+        if (StringUtils.isBlank(refundId)) {
+            return null;
+        }
+        AgentQuitRefund agentQuitRefund = agentQuitRefundMapper.selectByPrimaryKey(refundId);
+        if (null == agentQuitRefund) {
+            return null;
+        }
+        //查询关联附件
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(refundId, AttachmentRelType.agentQuitRefund.name());
+        agentQuitRefund.setAttachments(attachments);
+        return agentQuitRefund;
     }
 
 }

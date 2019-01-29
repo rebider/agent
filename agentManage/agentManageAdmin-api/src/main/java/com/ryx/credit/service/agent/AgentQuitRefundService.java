@@ -51,4 +51,11 @@ public interface AgentQuitRefundService {
      * @throws Exception
      */
     AgentResult compressQuitRefundActivity(String proIns, BigDecimal agStatus) throws Exception;
+
+    /**
+     * 根据ID查询合并数据
+     * @param refundId
+     * @return
+     */
+    AgentQuitRefund queryQuitRefundById(String refundId);
 }
