@@ -371,6 +371,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         AgentQuitExample agentQuitExample = new AgentQuitExample();
         AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCloReviewStatusNotEqualTo(AgStatus.Create.getValue());
         criteria.andAgentIdEqualTo(agentId);
         List<AgentQuit> agentQuits = agentQuitMapper.selectByExample(agentQuitExample);
         if (agentQuits != null && agentQuits.size()!=0) {
@@ -694,9 +695,109 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
         return AgentResult.ok();
     }
+
+
     @Override
     public AgentQuit getAgentQuitById(String quitId) {
         return agentQuitMapper.selectByPrimaryKey(quitId);
     }
 
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult editAgentMerge(AgentQuit agentQuit,String cUser,String[] agentMergeFiles,
+                                      List<OCashReceivablesVo> oCashReceivables) throws Exception {
+        if(StringUtils.isBlank(agentQuit.getId())){
+            throw new MessageException("数据ID为空！");
+        }
+        try {
+            AgentQuit queryAgentQuit = agentQuitMapper.selectByPrimaryKey(agentQuit.getId());
+            String agentId = queryAgentQuit.getAgentId();
+            String platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), queryAgentQuit.getAgentId());
+            if(StringUtils.isBlank(platformIds)){
+                throw new MessageException("请选择有效的平台！");
+            }
+            agentQuit.setAgentOweTicket(getSubAgentOweTicket(agentId));
+            agentQuit.setSuppTicket(getSubAgentOweTicket(agentId));
+            BigDecimal profitDebt = profitDebt(agentId);
+            BigDecimal orderDebt = getOrderDebt(agentId);
+            BigDecimal capitalDebt = getCapitalDebt(agentId);
+            agentQuit.setProfitDebt(profitDebt);
+            agentQuit.setOrderDebt(orderDebt);
+            agentQuit.setCapitalDebt(capitalDebt);
+            agentQuit.setAgentDept(getSubAgentDebt(agentId));
+            BigDecimal capitalSumAmt = getCapitalSumAmt(agentId);
+            BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
+            String suppDeptStr = String.valueOf(suppDept);
+            if(suppDept.compareTo(new BigDecimal(0))==0){
+                agentQuit.setSuppType(SuppType.W.getValue());
+                agentQuit.setSuppDept(suppDept);
+            }else{
+                if(suppDeptStr.contains("-")){
+                    agentQuit.setSuppType(SuppType.D.getValue());
+                    String substring = suppDeptStr.substring(1, suppDeptStr.length());
+                    agentQuit.setSuppDept(new BigDecimal(substring));
+                }else{
+                    agentQuit.setSuppType(SuppType.G.getValue());
+                    agentQuit.setSuppDept(suppDept);
+                }
+            }
+            agentQuit.setuTime(new Date());
+            agentQuit.setuUser(cUser);
+
+            if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
+                logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
+                throw new MessageException("更新合并数据失败！");
+            }
+
+            //打款记录
+            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,queryAgentQuit.getAgentId(),CashPayType.AGENTQUIT,agentQuit.getId());
+            if(!agentResult.isOK()){
+                logger.info("代理商合并保存打款记录失败1");
+                throw new ProcessException("保存打款记录失败");
+            }
+
+            //附件修改
+            if(null!=agentMergeFiles && agentMergeFiles.length!=0){
+                AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+                AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+                criteria.andSrcIdEqualTo(agentQuit.getId());
+                criteria.andBusTypeEqualTo(AttachmentRelType.agentQuit.name());
+                List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+                attachmentRels.forEach(row->{
+                    row.setStatus(Status.STATUS_0.status);
+                    int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                    if (1 != i) {
+                        logger.info("删除代理商合并附件关系失败");
+                        throw new ProcessException("删除附件失败");
+                    }
+                });
+
+                for(int i=0;i<agentMergeFiles.length;i++){
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(agentMergeFiles[i]);
+                    record.setSrcId(agentQuit.getId());
+                    record.setcUser(cUser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.agentQuit.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int f = attachmentRelMapper.insertSelective(record);
+                    if (1 != f) {
+                        logger.info("代理商合并附件关系失败");
+                        throw new ProcessException("附件关系失败");
+                    }
+                }
+            }
+
+
+            return AgentResult.ok();
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("更新数据失败！");
+        }
+    }
 }
