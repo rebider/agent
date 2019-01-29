@@ -7,13 +7,19 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.CUserMapper;
+import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.*;
-import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.dao.order.OPaymentDetailMapper;
+import com.ryx.credit.pojo.admin.CuserAgent;
+import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
+import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentQuitService;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -67,7 +73,14 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private DictOptionsService dictOptionsService;
     @Autowired
     private AttachmentMapper attachmentMapper;
-
+    @Autowired
+    private CuserAgentMapper cUserAgentMapper;
+    @Autowired
+    private CUserMapper cUserMapper;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+    @Autowired
+    private OPaymentDetailMapper oPaymentDetailMapper;
 
     /**
      * 退出列表
@@ -131,9 +144,17 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         if(null==agent){
             throw new MessageException("代理商不存在！");
         }
+        //验证
+        verifypprovaling(agentQuit.getAgentId());
+        verifyChild(agentQuit.getAgentId());
+
         String quitId = idService.genId(TabId.A_AGENT_QUIT);
         agentQuit.setId(quitId);
-        agentQuit.setQuitBusId(quitPlatformIds(agentQuit.getQuitPlatform(),agentQuit.getAgentId()));
+        String platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), agentQuit.getAgentId());
+        if(StringUtils.isBlank(platformIds)){
+            throw new MessageException("请选择有效的平台！");
+        }
+        agentQuit.setQuitBusId(platformIds);
         agentQuit.setContractStatus(Status.STATUS_0.status);
         agentQuit.setRefundAmtStatus(Status.STATUS_0.status);
         agentQuit.setAppRefund(Status.STATUS_0.status);
@@ -163,13 +184,15 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }else{
             if(suppDeptStr.contains("-")){
                 agentQuit.setSuppType(SuppType.D.getValue());
-                String substring = suppDeptStr.substring(0, suppDeptStr.length() - 1);
+                String substring = suppDeptStr.substring(1, suppDeptStr.length());
                 agentQuit.setSuppDept(new BigDecimal(substring));
             }else{
                 agentQuit.setSuppType(SuppType.G.getValue());
                 agentQuit.setSuppDept(suppDept);
             }
         }
+        //验证
+        verifysuppType(agentQuit.getSuppType(),agentQuitFiles,oCashReceivables);
         agentQuit.setRealitySuppDept(agentQuit.getSuppDept());
         agentQuit.setSubtractAmt(BigDecimal.ZERO);
         agentQuit.setcTime(new Date());
@@ -214,6 +237,61 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     }
 
     /**
+     * 不能有下级等验证
+     * @param agentId
+     * @throws Exception
+     */
+    public void verifyChild(String agentId)throws Exception{
+
+        AgentBusInfoExample subAgentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria subCriteria = subAgentBusInfoExample.createCriteria();
+        subCriteria.andAgentIdEqualTo(agentId);
+        subCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
+        if(subAgentBusInfos.size()==0){
+            throw new MessageException("代理商业务信息有误");
+        }
+        for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
+            if(StringUtils.isBlank(subAgentBusInfo.getBusNum())){
+                throw new MessageException("代理商业务平台未入网成功");
+            }
+            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
+            if(childLevelBusInfos.size()!=0){
+                throw new MessageException("代理商不能有下级");
+            }
+        }
+        AgentQuitExample agentQuitExample = new AgentQuitExample();
+        AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andAgentIdEqualTo(agentId);
+        List<AgentQuit> agentQuits = agentQuitMapper.selectByExample(agentQuitExample);
+        if(agentQuits.size()!=0){
+            throw new MessageException("已经提交申请请勿重复提交");
+        }
+    }
+
+    /**
+     * 验证必填
+     * @param suppType
+     * @param agentQuitFiles
+     * @param oCashReceivables
+     * @throws Exception
+     */
+    public void verifysuppType(String suppType,String[] agentQuitFiles,List<OCashReceivablesVo> oCashReceivables)throws Exception{
+        if(SuppType.D.getValue().equals(suppType)){
+            if(null==agentQuitFiles){
+                throw new MessageException("代理商打款时附件必传");
+            }
+            if(agentQuitFiles.length==0){
+                throw new MessageException("代理商打款时附件必传");
+            }
+            if(oCashReceivables.size()==0){
+                throw new MessageException("代理商打款时请填写打款记录");
+            }
+        }
+    }
+
+    /**
      * 查询所有业务id
      * @param quitPlatform
      * @param agentId
@@ -226,7 +304,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         if(quitPlatform.equals(QuitPlatform.POS.getValue())){
             List<String> platformTypeList = new ArrayList<>();
             platformTypeList.add(PlatformType.POS.getValue());
-            platformTypeList.add(PlatformType.MPOS.getValue());
+            platformTypeList.add(PlatformType.ZPOS.getValue());
             criteria.andPlatformTypeIn(platformTypeList);
         }else if(quitPlatform.equals(QuitPlatform.MPOS.getValue())){
             criteria.andPlatformTypeEqualTo(PlatformType.MPOS.getValue());
@@ -298,14 +376,26 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         String suppDeptStr = String.valueOf(suppDept);
         if(suppDept.compareTo(new BigDecimal(0))==0){
             resultMap.put("suppType",SuppType.W.getContent());
+            resultMap.put("suppDept",suppDept);
         }else{
             if(suppDeptStr.contains("-")){
                 resultMap.put("suppType",SuppType.D.getContent());
+                resultMap.put("suppDept",suppDeptStr.substring(1,suppDeptStr.length()));
             }else{
                 resultMap.put("suppType",SuppType.G.getContent());
+                resultMap.put("suppDept",suppDept);
             }
         }
-        resultMap.put("suppDept",suppDept);
+        AgentQuitExample agentQuitExample = new AgentQuitExample();
+        AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andAgentIdEqualTo(agentId);
+        List<AgentQuit> agentQuits = agentQuitMapper.selectByExample(agentQuitExample);
+        if (agentQuits != null && agentQuits.size()!=0) {
+            AgentQuit agentQuit = agentQuits.get(0);
+            resultMap.put("realitySuppDept",agentQuit.getRealitySuppDept());
+            resultMap.put("subtractAmt",agentQuit.getSubtractAmt());
+        }
         return resultMap;
     }
 
@@ -432,7 +522,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 //于华审批
                 if (String.valueOf(orgCode).equals("manage")) {
                     agentQuit.setuTime(new Date());
-                    if(agentQuitVo.getSubtractAmt().compareTo(BigDecimal.ZERO)==1){
+                    if(agentQuitVo.getSubtractAmt().compareTo(agentQuit.getSuppDept())==1){
                         throw new ProcessException("减免金额大于实际金额");
                     }
                     agentQuit.setSubtractAmt(agentQuitVo.getSubtractAmt());
@@ -440,7 +530,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     agentQuit.setRealitySuppDept(subtract);
                     int i = agentQuitMapper.updateByPrimaryKey(agentQuit);
                     if(i!=1){
-                        throw new ProcessException("更新市场部处理失败");
+                        throw new ProcessException("更新处理失败");
                     }
                 }
                 //财务审批
@@ -453,7 +543,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     agentQuit.setAppRefund(agentQuitVo.getAppRefund());
                     int i = agentQuitMapper.updateByPrimaryKey(agentQuit);
                     if(i!=1){
-                        throw new ProcessException("更新市场部处理失败");
+                        throw new ProcessException("更新财务部处理失败");
                     }
                 }
             }
@@ -514,6 +604,85 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new ProcessException("更新打款记录失败");
         }
 
+        //删除退出平台
+        String[] quitBusIds = agentQuit.getQuitBusId().split(",");
+        for(int j=0;j<quitBusIds.length;j++){
+            String quitBusId = quitBusIds[j];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusId);
+            agentBusInfo.setBusStatus(BusinessStatus.pause.status);
+            agentBusInfo.setStatus(Status.STATUS_0.status);
+            int k = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+            if(k!=1){
+                throw new ProcessException("更新业务平台失败");
+            }
+        }
+
+        //代理商退出之后如果一个业务都没了,基本信息等保留,禁止登陆后台
+        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+        AgentBusInfoExample.Criteria agentBusInfocriteria = agentBusInfoExample.createCriteria();
+        agentBusInfocriteria.andAgentIdEqualTo(agentQuit.getAgentId());
+        agentBusInfocriteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+        if(agentBusInfos.size()==0){
+            CuserAgentExample cuserAgentExample = new CuserAgentExample();
+            CuserAgentExample.Criteria userAgentCriteria = cuserAgentExample.createCriteria();
+            userAgentCriteria.andAgentidEqualTo(agentQuit.getAgentId());
+            List<CuserAgent> cuserAgents = cUserAgentMapper.selectByExample(cuserAgentExample);
+            if(cuserAgents.size()!=1){
+                throw new MessageException("代理商信息有误");
+            }
+            CuserAgent cuserAgent = cuserAgents.get(0);
+            int l = cUserMapper.updateStatusByPrimaryKey(Long.valueOf(cuserAgent.getUserid()));
+            if(l!=1){
+                logger.info("审批任务结束{}{}，代理商合并禁止登陆后台失败", proIns, agStatus);
+                throw new MessageException("代理商合并更新失败");
+            }
+        }
+
+        //清除缴纳款欠款
+        if(agentQuit.getCapitalDebt().compareTo(BigDecimal.ZERO)==1){
+            HashMap<String, Object> queryMap = new HashMap<>();
+            queryMap.put("agentId", agentQuit.getAgentId());
+            List<Map<String, Object>> maps = oPaymentDetailMapper.getCapitalDebt(queryMap);
+            if(maps.size()==0){
+                throw new MessageException("代理商退出：查询缴纳款明细失败");
+            }
+            for (Map<String, Object> map : maps) {
+                String id = String.valueOf(map.get("ID"));
+                OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
+                paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
+                paymentDetail.setPayTime(new Date());
+                int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+                if(j!=1){
+                    throw new MessageException("代理商退出：更新付款明细失败");
+                }
+            }
+        }
+        //清除订单欠款
+        if(agentQuit.getOrderDebt().compareTo(BigDecimal.ZERO)==1){
+            HashMap<String, Object> queryMap = new HashMap<>();
+            queryMap.put("agentId", agentQuit.getAgentId());
+            List<Map<String, Object>> maps = oPaymentDetailMapper.getOrderDebt(queryMap);
+            if(maps.size()==0){
+                throw new MessageException("代理商退出：查询订单明细失败");
+            }
+            for (Map<String, Object> map : maps) {
+                String id = String.valueOf(map.get("ID"));
+                OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
+                paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
+                paymentDetail.setPayTime(new Date());
+                int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+                if(j!=1){
+                    throw new MessageException("代理商退出：更新付款明细失败");
+                }
+            }
+        }
+        //清除分润
+        if(agentQuit.getProfitDebt().compareTo(BigDecimal.ZERO)==1){
+
+        }
 
         return AgentResult.ok();
     }

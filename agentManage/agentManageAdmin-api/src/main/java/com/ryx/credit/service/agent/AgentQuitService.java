@@ -46,4 +46,7 @@ public interface AgentQuitService {
 
 
     AgentQuit getAgentQuitById(String quitId);
+
+
+    AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception;
 }
