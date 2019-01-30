@@ -3,6 +3,7 @@ package com.ryx.credit.service.agent;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentQuit;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
@@ -58,4 +59,7 @@ public interface AgentQuitService {
 
 
     AgentResult agentQuitUploadRtc(AgentQuit agentQuit, String cUser, String[] agentMergeFiles) throws Exception;
+
+
+    List<AgentBusInfo> getBusInfosById(String id);
 }

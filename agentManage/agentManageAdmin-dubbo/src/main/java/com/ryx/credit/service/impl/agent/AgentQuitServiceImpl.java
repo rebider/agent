@@ -949,4 +949,28 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         return AgentResult.ok();
     }
 
+    /**
+     * 根据id查询退出的业务
+     * @param id
+     * @return
+     */
+    @Override
+    public List<AgentBusInfo> getBusInfosById(String id){
+        List<AgentBusInfo> resultList = new ArrayList<>();
+        AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(id);
+        if(agentQuit==null){
+            return null;
+        }
+        String quitBusIdsStr = agentQuit.getQuitBusId();
+        if(StringUtils.isBlank(quitBusIdsStr)){
+            return null;
+        }
+        String[] quitBusIds = quitBusIdsStr.split(",");
+        for(int i=0;i<quitBusIds.length;i++){
+            String quitBusId = quitBusIds[i];
+            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusId);
+            resultList.add(agentBusInfo);
+        }
+        return resultList;
+    }
 }
