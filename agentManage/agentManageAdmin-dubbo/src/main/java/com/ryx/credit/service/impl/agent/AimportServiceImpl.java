@@ -36,7 +36,7 @@ import java.util.*;
 @Service("aimportService")
 public class AimportServiceImpl implements AimportService {
 
-    private Logger logger = LoggerFactory.getLogger("AimportServiceImpl");
+    private Logger logger = LoggerFactory.getLogger(AimportServiceImpl.class);
 
     public static List<String> yesorno = Arrays.asList("否","是");
     public static  List<String> gs = Arrays.asList("无","对公","对私");
