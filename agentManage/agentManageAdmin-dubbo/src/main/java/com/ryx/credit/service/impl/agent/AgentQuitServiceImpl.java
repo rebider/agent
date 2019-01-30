@@ -889,7 +889,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         agentQuit.setuTime(new Date());
         agentQuit.setuUser(cUser);
         if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
-            throw new MessageException("合并数据处理失败！");
+            throw new MessageException("退出数据处理失败！");
         }
         return AgentResult.ok();
     }
