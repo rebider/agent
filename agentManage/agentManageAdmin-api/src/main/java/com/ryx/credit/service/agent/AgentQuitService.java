@@ -52,4 +52,7 @@ public interface AgentQuitService {
 
 
     AgentResult editAgentQuit(AgentQuit agentQuit,String cUser,String[] agentMergeFiles, List<OCashReceivablesVo> oCashReceivables) throws Exception;
+
+
+    AgentResult deleteAgentQuit(String quitId, String cUser) throws Exception;
 }

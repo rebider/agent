@@ -234,8 +234,12 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
                 startAgentMergeActivity(quitId, cUser,true);
             }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
         } catch (Exception e) {
-           throw new Exception(e.getMessage());
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
         return AgentResult.ok();
     }
@@ -873,4 +877,21 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new Exception(e.getMessage());
         }
     }
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult deleteAgentQuit(String quitId, String cUser) throws Exception {
+        if (StringUtils.isBlank(quitId)) {
+            throw new MessageException("数据ID为空！");
+        }
+        AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(quitId);
+        agentQuit.setStatus(Status.STATUS_0.status);
+        agentQuit.setuTime(new Date());
+        agentQuit.setuUser(cUser);
+        if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
+            throw new MessageException("合并数据处理失败！");
+        }
+        return AgentResult.ok();
+    }
+
 }
