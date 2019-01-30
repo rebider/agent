@@ -905,21 +905,21 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             }
 
             //附件修改
+            AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+            AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+            criteria.andSrcIdEqualTo(agentMerge.getId());
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andBusTypeEqualTo(AttachmentRelType.agentMerge.name());
+            List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+            attachmentRels.forEach(row->{
+                row.setStatus(Status.STATUS_0.status);
+                int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                if (1 != i) {
+                    logger.info("删除代理商合并附件关系失败");
+                    throw new ProcessException("删除附件失败");
+                }
+            });
             if(null!=agentMergeFiles && agentMergeFiles.length!=0){
-                AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
-                AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
-                criteria.andSrcIdEqualTo(agentMerge.getId());
-                criteria.andBusTypeEqualTo(AttachmentRelType.agentMerge.name());
-                List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
-                attachmentRels.forEach(row->{
-                    row.setStatus(Status.STATUS_0.status);
-                    int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
-                    if (1 != i) {
-                        logger.info("删除代理商合并附件关系失败");
-                        throw new ProcessException("删除附件失败");
-                    }
-                });
-
                 for(int i=0;i<agentMergeFiles.length;i++){
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(agentMergeFiles[i]);
@@ -938,9 +938,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             }
 
             AgentMergeBusInfoExample agentMergeBusInfoExample = new AgentMergeBusInfoExample();
-            AgentMergeBusInfoExample.Criteria criteria = agentMergeBusInfoExample.createCriteria();
-            criteria.andStatusEqualTo(Status.STATUS_1.status);
-            criteria.andAgentMargeIdEqualTo(agentMerge.getId());
+            AgentMergeBusInfoExample.Criteria agentMergeCriteria = agentMergeBusInfoExample.createCriteria();
+            agentMergeCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            agentMergeCriteria.andAgentMargeIdEqualTo(agentMerge.getId());
             List<AgentMergeBusInfo> agentMergeBusInfos = agentMergeBusInfoMapper.selectByExample(agentMergeBusInfoExample);
             for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
                 agentMergeBusInfo.setStatus(Status.STATUS_0.status);
