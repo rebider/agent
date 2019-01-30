@@ -227,7 +227,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //打款记录
         AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,agentQuit.getAgentId(),CashPayType.AGENTQUIT,quitId);
         if(!agentResult.isOK()){
-            logger.info("代理商合并保存打款记录失败1");
+            logger.info("代理商退出保存打款记录失败1");
             throw new ProcessException("保存打款记录失败");
         }
         if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
@@ -446,8 +446,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
         AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTQUIT,id,cUser);
         if(!agentResult.isOK()){
-            logger.info("代理商合并更新打款信息失败");
-            throw new MessageException("代理商合并更新打款信息失败");
+            logger.info("代理商退出更新打款信息失败");
+            throw new MessageException("代理商退出更新打款信息失败");
         }
 
         Map startPar = agentEnterService.startPar(cUser);
@@ -484,7 +484,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         record.setAgentId(agentQuit.getAgentId());
         record.setAgentName(agentQuit.getAgentName());
         if (1 != busActRelMapper.insertSelective(record)) {
-            logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
         }
         return AgentResult.ok();
@@ -599,8 +599,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         agentQuit.setApproveTime(new Date());
         int i = agentQuitMapper.updateByPrimaryKeySelective(agentQuit);
         if(i!=1){
-            logger.info("审批任务结束{}{}，代理商合并更新失败1", proIns, agStatus);
-            throw new MessageException("代理商合并更新失败");
+            logger.info("审批任务结束{}{}，代理商退出更新失败1", proIns, agStatus);
+            throw new MessageException("代理商退出更新失败");
         }
         AgentResult agentResult = AgentResult.fail();
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
@@ -627,6 +627,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
 
         //代理商退出之后如果一个业务都没了,基本信息等保留,禁止登陆后台
+        //代理商状态为退出
         AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
         AgentBusInfoExample.Criteria agentBusInfocriteria = agentBusInfoExample.createCriteria();
         agentBusInfocriteria.andAgentIdEqualTo(agentQuit.getAgentId());
@@ -643,8 +644,15 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             CuserAgent cuserAgent = cuserAgents.get(0);
             int l = cUserMapper.updateStatusByPrimaryKey(Long.valueOf(cuserAgent.getUserid()));
             if(l!=1){
-                logger.info("审批任务结束{}{}，代理商合并禁止登陆后台失败", proIns, agStatus);
-                throw new MessageException("代理商合并更新失败");
+                logger.info("审批任务结束{}{}，代理商退出禁止登陆后台失败", proIns, agStatus);
+                throw new MessageException("代理商退出更新失败");
+            }
+            Agent agent = agentMapper.selectByPrimaryKey(agentQuit.getAgentId());
+            agent.setcIncomStatus(AgentInStatus.QUIT.status);
+            agent.setcUtime(new Date());
+            int j = agentMapper.updateByPrimaryKeySelective(agent);
+            if(j!=1){
+                throw new MessageException("代理商退出更新失败");
             }
         }
 
@@ -750,14 +758,14 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             agentQuit.setuUser(cUser);
 
             if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
-                logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
-                throw new MessageException("更新合并数据失败！");
+                logger.info("代理商退出修改审批，更新数据失败:{}", cUser);
+                throw new MessageException("更新退出数据失败！");
             }
 
             //打款记录
             AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,queryAgentQuit.getAgentId(),CashPayType.AGENTQUIT,agentQuit.getId());
             if(!agentResult.isOK()){
-                logger.info("代理商合并保存打款记录失败1");
+                logger.info("代理商退出保存打款记录失败1");
                 throw new ProcessException("保存打款记录失败");
             }
 
@@ -772,7 +780,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     row.setStatus(Status.STATUS_0.status);
                     int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
                     if (1 != i) {
-                        logger.info("删除代理商合并附件关系失败");
+                        logger.info("删除代理商退出附件关系失败");
                         throw new ProcessException("删除附件失败");
                     }
                 });
@@ -788,7 +796,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     record.setId(idService.genId(TabId.a_attachment_rel));
                     int f = attachmentRelMapper.insertSelective(record);
                     if (1 != f) {
-                        logger.info("代理商合并附件关系失败");
+                        logger.info("代理商退出附件关系失败");
                         throw new ProcessException("附件关系失败");
                     }
                 }
