@@ -159,10 +159,19 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
         }
     }
 
+    /**
+     * 申请退款-审批
+     * @param agentQuitRefund
+     * @param cUser
+     * @return
+     * @throws Exception
+     */
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startQuitRefundActivity(AgentQuitRefund agentQuitRefund, String cUser) throws Exception {
-        whetherSatisfyRefund(agentQuitRefund);//判断申请退款的条件是否满足
+        //判断申请退款的条件是否满足
+        whetherSatisfyRefund(agentQuitRefund);
+
         if (StringUtils.isBlank(cUser)) {
             logger.info("代理商退出-申请退款提交，操作用户为空:{}", cUser);
             return AgentResult.fail("代理商退出-申请退款提交，操作用户为空！");
@@ -253,6 +262,7 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
                     if (realitySuppDept != null || realitySuppDept.compareTo(BigDecimal.ONE) == 0) {
                         agentQuitRefund.setRealitySuppDept(realitySuppDept);
                         agentQuitRefund.setuUser(userId);
+                        agentQuitRefund.setuTime(Calendar.getInstance().getTime());
                         if (1 != agentQuitRefundMapper.updateByPrimaryKeySelective(agentQuitRefund)) {
                             throw new MessageException("实际打款金额更新失败！");
                         }
@@ -322,8 +332,7 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
         }
         AgentQuitRefund agentQuitRefund = agentQuitRefundMapper.selectByPrimaryKey(busActRel.getBusId());
         agentQuitRefund.setCloReviewStatus(agStatus);
-        agentQuitRefund.setApproveTime(new Date());
-        agentQuitRefund.setuTime(new Date());
+        agentQuitRefund.setApproveTime(Calendar.getInstance().getTime());
         if (1 != agentQuitRefundMapper.updateByPrimaryKeySelective(agentQuitRefund)) {
             logger.info("审批任务结束{}{}，代理商退出申请退款更新失败-agentQuitRefund", proIns, agStatus);
             throw new MessageException("代理商退出申请退款更新失败！");
