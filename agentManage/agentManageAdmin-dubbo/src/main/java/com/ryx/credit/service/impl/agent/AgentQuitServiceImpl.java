@@ -705,7 +705,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult editAgentMerge(AgentQuit agentQuit,String cUser,String[] agentMergeFiles,
+    public AgentResult editAgentQuit(AgentQuit agentQuit,String cUser,String[] agentMergeFiles,
                                       List<OCashReceivablesVo> oCashReceivables) throws Exception {
         if(StringUtils.isBlank(agentQuit.getId())){
             throw new MessageException("数据ID为空！");
@@ -713,9 +713,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         try {
             AgentQuit queryAgentQuit = agentQuitMapper.selectByPrimaryKey(agentQuit.getId());
             String agentId = queryAgentQuit.getAgentId();
-            String platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), queryAgentQuit.getAgentId());
-            if(StringUtils.isBlank(platformIds)){
-                throw new MessageException("请选择有效的平台！");
+            String platformIds = "";
+            if(!queryAgentQuit.getQuitPlatform().equals(agentQuit.getQuitPlatform())){
+                platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), queryAgentQuit.getAgentId());
+                if(StringUtils.isBlank(platformIds)){
+                    throw new MessageException("请选择有效的平台！");
+                }
+                agentQuit.setQuitBusId(platformIds);
             }
             agentQuit.setAgentOweTicket(getSubAgentOweTicket(agentId));
             agentQuit.setSuppTicket(getSubAgentOweTicket(agentId));
@@ -789,8 +793,31 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                     }
                 }
             }
-
-
+            if(!queryAgentQuit.getQuitPlatform().equals(agentQuit.getQuitPlatform()) &&
+                queryAgentQuit.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
+                String quitBusIds = queryAgentQuit.getQuitBusId();
+                String[] quitBusIdsSplit = quitBusIds.split(",");
+                for(int i=0;i<quitBusIdsSplit.length;i++){
+                    String quitBusId = quitBusIdsSplit[i];
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusId);
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (1 != j) {
+                        throw new ProcessException("更新业务有效失败");
+                    }
+                }
+                //新修改的业务改成锁定
+                String[] editBusIds = platformIds.split(",");
+                for(int i=0;i<editBusIds.length;i++){
+                    String editBusId = editBusIds[i];
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(editBusId);
+                    agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+                    int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (1 != j) {
+                        throw new ProcessException("更新业务锁定失败");
+                    }
+                }
+            }
             return AgentResult.ok();
         } catch (MessageException e) {
             e.printStackTrace();

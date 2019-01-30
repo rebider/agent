@@ -51,5 +51,5 @@ public interface AgentQuitService {
     AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception;
 
 
-    AgentResult editAgentMerge(AgentQuit agentQuit,String cUser,String[] agentMergeFiles, List<OCashReceivablesVo> oCashReceivables) throws Exception;
+    AgentResult editAgentQuit(AgentQuit agentQuit,String cUser,String[] agentMergeFiles, List<OCashReceivablesVo> oCashReceivables) throws Exception;
 }
