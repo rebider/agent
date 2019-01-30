@@ -133,105 +133,109 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     @Override
     public AgentResult saveAgentQuit(AgentQuit agentQuit, String[] agentQuitFiles, String cUser,
                                      String saveFlag,List<OCashReceivablesVo> oCashReceivables)throws Exception {
-
-        if(StringUtils.isBlank(agentQuit.getAgentId())){
-            throw new MessageException("代理商ID为空！");
-        }
-        if(StringUtils.isBlank(agentQuit.getQuitPlatform())){
-            throw new MessageException("代理商退出平台为空！");
-        }
-        Agent agent = agentMapper.selectByPrimaryKey(agentQuit.getAgentId());
-        if(null==agent){
-            throw new MessageException("代理商不存在！");
-        }
-        //验证
-        verifypprovaling(agentQuit.getAgentId());
-        verifyChild(agentQuit.getAgentId());
-
-        String quitId = idService.genId(TabId.A_AGENT_QUIT);
-        agentQuit.setId(quitId);
-        String platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), agentQuit.getAgentId());
-        if(StringUtils.isBlank(platformIds)){
-            throw new MessageException("请选择有效的平台！");
-        }
-        agentQuit.setQuitBusId(platformIds);
-        agentQuit.setContractStatus(Status.STATUS_0.status);
-        agentQuit.setRefundAmtStatus(Status.STATUS_0.status);
-        agentQuit.setAppRefund(Status.STATUS_0.status);
-        agentQuit.setPlatformStatus(PlatformStatus.NODISPOSE.getValue());
-        if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
-            agentQuit.setCloReviewStatus(AgStatus.Approving.status);
-        } else {
-            agentQuit.setCloReviewStatus(AgStatus.Create.status);
-        }
-        agentQuit.setAgentName(agent.getAgName());
-        agentQuit.setAgentOweTicket(getSubAgentOweTicket(agent.getId()));
-        agentQuit.setSuppTicket(getSubAgentOweTicket(agent.getId()));
-        BigDecimal profitDebt = profitDebt(agent.getId());
-        BigDecimal orderDebt = getOrderDebt(agent.getId());
-        BigDecimal capitalDebt = getCapitalDebt(agent.getId());
-        agentQuit.setProfitDebt(profitDebt);
-        agentQuit.setOrderDebt(orderDebt);
-        agentQuit.setCapitalDebt(capitalDebt);
-        agentQuit.setAgentDept(getSubAgentDebt(agent.getId()));
-
-        BigDecimal capitalSumAmt = getCapitalSumAmt(agent.getId());
-        BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
-        String suppDeptStr = String.valueOf(suppDept);
-        if(suppDept.compareTo(new BigDecimal(0))==0){
-            agentQuit.setSuppType(SuppType.W.getValue());
-            agentQuit.setSuppDept(suppDept);
-        }else{
-            if(suppDeptStr.contains("-")){
-                agentQuit.setSuppType(SuppType.D.getValue());
-                String substring = suppDeptStr.substring(1, suppDeptStr.length());
-                agentQuit.setSuppDept(new BigDecimal(substring));
-            }else{
-                agentQuit.setSuppType(SuppType.G.getValue());
-                agentQuit.setSuppDept(suppDept);
+        try {
+            if(StringUtils.isBlank(agentQuit.getAgentId())){
+                throw new MessageException("代理商ID为空！");
             }
-        }
-        //验证
-        verifysuppType(agentQuit.getSuppType(),agentQuitFiles,oCashReceivables);
-        agentQuit.setRealitySuppDept(agentQuit.getSuppDept());
-        agentQuit.setSubtractAmt(BigDecimal.ZERO);
-        agentQuit.setcTime(new Date());
-        agentQuit.setuTime(new Date());
-        agentQuit.setcUser(cUser);
-        agentQuit.setuUser(cUser);
-        agentQuit.setStatus(Status.STATUS_1.status);
-        agentQuit.setVersion(BigDecimal.ONE);
-        int i = agentQuitMapper.insertSelective(agentQuit);
-        if(i!=1){
-            throw new MessageException("保存退出申请失败！");
-        }
+            if(StringUtils.isBlank(agentQuit.getQuitPlatform())){
+                throw new MessageException("代理商退出平台为空！");
+            }
+            Agent agent = agentMapper.selectByPrimaryKey(agentQuit.getAgentId());
+            if(null==agent){
+                throw new MessageException("代理商不存在！");
+            }
 
-        //添加新的附件
-        if (agentQuitFiles != null && agentQuitFiles.length!=0) {
-            for(int j=0;j<agentQuitFiles.length;j++){
-                AttachmentRel record = new AttachmentRel();
-                record.setAttId(agentQuitFiles[j]);
-                record.setSrcId(quitId);
-                record.setcUser(cUser);
-                record.setcTime(Calendar.getInstance().getTime());
-                record.setStatus(Status.STATUS_1.status);
-                record.setBusType(AttachmentRelType.agentQuit.name());
-                record.setId(idService.genId(TabId.a_attachment_rel));
-                int f = attachmentRelMapper.insertSelective(record);
-                if (1 != f) {
-                    logger.info("代理商退出保存附件关系失败");
-                    throw new ProcessException("保存附件失败");
+            verifypprovaling(agentQuit.getAgentId());
+            verifyProvinceInclude(agent.getId(),cUser);
+            verifyChild(agentQuit.getAgentId());
+
+            String quitId = idService.genId(TabId.A_AGENT_QUIT);
+            agentQuit.setId(quitId);
+            String platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), agentQuit.getAgentId());
+            if(StringUtils.isBlank(platformIds)){
+                throw new MessageException("请选择有效的平台！");
+            }
+            agentQuit.setQuitBusId(platformIds);
+            agentQuit.setContractStatus(Status.STATUS_0.status);
+            agentQuit.setRefundAmtStatus(Status.STATUS_0.status);
+            agentQuit.setAppRefund(Status.STATUS_0.status);
+            agentQuit.setPlatformStatus(PlatformStatus.NODISPOSE.getValue());
+            if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
+                agentQuit.setCloReviewStatus(AgStatus.Approving.status);
+            } else {
+                agentQuit.setCloReviewStatus(AgStatus.Create.status);
+            }
+            agentQuit.setAgentName(agent.getAgName());
+            agentQuit.setAgentOweTicket(getSubAgentOweTicket(agent.getId()));
+            agentQuit.setSuppTicket(getSubAgentOweTicket(agent.getId()));
+            BigDecimal profitDebt = profitDebt(agent.getId());
+            BigDecimal orderDebt = getOrderDebt(agent.getId());
+            BigDecimal capitalDebt = getCapitalDebt(agent.getId());
+            agentQuit.setProfitDebt(profitDebt);
+            agentQuit.setOrderDebt(orderDebt);
+            agentQuit.setCapitalDebt(capitalDebt);
+            agentQuit.setAgentDept(getSubAgentDebt(agent.getId()));
+
+            BigDecimal capitalSumAmt = getCapitalSumAmt(agent.getId());
+            BigDecimal suppDept = capitalSumAmt.subtract(profitDebt).subtract(orderDebt).subtract(capitalDebt);
+            String suppDeptStr = String.valueOf(suppDept);
+            if(suppDept.compareTo(new BigDecimal(0))==0){
+                agentQuit.setSuppType(SuppType.W.getValue());
+                agentQuit.setSuppDept(suppDept);
+            }else{
+                if(suppDeptStr.contains("-")){
+                    agentQuit.setSuppType(SuppType.D.getValue());
+                    String substring = suppDeptStr.substring(1, suppDeptStr.length());
+                    agentQuit.setSuppDept(new BigDecimal(substring));
+                }else{
+                    agentQuit.setSuppType(SuppType.G.getValue());
+                    agentQuit.setSuppDept(suppDept);
                 }
             }
-        }
-        //打款记录
-        AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,agentQuit.getAgentId(),CashPayType.AGENTQUIT,quitId);
-        if(!agentResult.isOK()){
-            logger.info("代理商退出保存打款记录失败1");
-            throw new ProcessException("保存打款记录失败");
-        }
-        if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
-            startAgentMergeActivity(quitId, cUser,true);
+            //验证
+            verifysuppType(agentQuit.getSuppType(),agentQuitFiles,oCashReceivables);
+            agentQuit.setRealitySuppDept(agentQuit.getSuppDept());
+            agentQuit.setSubtractAmt(BigDecimal.ZERO);
+            agentQuit.setcTime(new Date());
+            agentQuit.setuTime(new Date());
+            agentQuit.setcUser(cUser);
+            agentQuit.setuUser(cUser);
+            agentQuit.setStatus(Status.STATUS_1.status);
+            agentQuit.setVersion(BigDecimal.ONE);
+            int i = agentQuitMapper.insertSelective(agentQuit);
+            if(i!=1){
+                throw new MessageException("保存退出申请失败！");
+            }
+
+            //添加新的附件
+            if (agentQuitFiles != null && agentQuitFiles.length!=0) {
+                for(int j=0;j<agentQuitFiles.length;j++){
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(agentQuitFiles[j]);
+                    record.setSrcId(quitId);
+                    record.setcUser(cUser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.agentQuit.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int f = attachmentRelMapper.insertSelective(record);
+                    if (1 != f) {
+                        logger.info("代理商退出保存附件关系失败");
+                        throw new ProcessException("保存附件失败");
+                    }
+                }
+            }
+            //打款记录
+            AgentResult agentResult = cashReceivablesService.addOCashReceivables(oCashReceivables,cUser,agentQuit.getAgentId(),CashPayType.AGENTQUIT,quitId);
+            if(!agentResult.isOK()){
+                logger.info("代理商退出保存打款记录失败1");
+                throw new ProcessException("保存打款记录失败");
+            }
+            if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
+                startAgentMergeActivity(quitId, cUser,true);
+            }
+        } catch (Exception e) {
+           throw new Exception(e.getMessage());
         }
         return AgentResult.ok();
     }
@@ -269,6 +273,35 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new MessageException("已经提交申请请勿重复提交");
         }
     }
+
+    /**
+     * 断是否是自己省区下的
+     * @param cUser
+     * @throws Exception
+     */
+    public void verifyProvinceInclude(String agentId,String cUser)throws Exception{
+        Map startPar = agentEnterService.startPar(cUser);
+        if (null == startPar) {
+            throw new MessageException("启动部门参数为空!");
+        }
+        Object party = startPar.get("party");
+        if(!party.equals("agent")){
+            //判断是否是自己省区下的
+            List<Map<String, Object>>  org = iUserService.orgCode(Long.valueOf(cUser));
+            if(org.size()==0){throw new ProcessException("部门信息未找到");}
+            String orgId = String.valueOf(org.get(0).get("ORGID"));
+            if(StringUtils.isBlank(orgId)){
+                throw new ProcessException("省区部门参数为空");
+            }
+            Agent agent = agentMapper.selectByPrimaryKey(agentId);
+            if(!orgId.equals(agent.getAgDocPro())){
+                logger.info("不能提交其他省区的代理商退出");
+                throw new ProcessException("不能提交其他省区的代理商退出");
+            }
+        }
+    }
+
+
 
     /**
      * 验证必填
@@ -719,8 +752,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new MessageException("数据ID为空！");
         }
         try {
+
             AgentQuit queryAgentQuit = agentQuitMapper.selectByPrimaryKey(agentQuit.getId());
             String agentId = queryAgentQuit.getAgentId();
+
+            verifypprovaling(agentQuit.getAgentId());
+            verifyProvinceInclude(agentId,cUser);
+
             String platformIds = "";
             if(!queryAgentQuit.getQuitPlatform().equals(agentQuit.getQuitPlatform())){
                 platformIds = quitPlatformIds(agentQuit.getQuitPlatform(), queryAgentQuit.getAgentId());
@@ -832,7 +870,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new Exception("更新数据失败！");
+            throw new Exception(e.getMessage());
         }
     }
 }
