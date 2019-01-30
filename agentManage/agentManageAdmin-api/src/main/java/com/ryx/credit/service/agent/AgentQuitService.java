@@ -55,4 +55,7 @@ public interface AgentQuitService {
 
 
     AgentResult deleteAgentQuit(String quitId, String cUser) throws Exception;
+
+
+    AgentResult agentQuitUploadRtc(AgentQuit agentQuit, String cUser, String[] agentMergeFiles) throws Exception;
 }

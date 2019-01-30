@@ -812,21 +812,21 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             }
 
             //附件修改
+            AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+            AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+            criteria.andSrcIdEqualTo(agentQuit.getId());
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andBusTypeEqualTo(AttachmentRelType.agentQuit.name());
+            List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+            attachmentRels.forEach(row->{
+                row.setStatus(Status.STATUS_0.status);
+                int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                if (1 != i) {
+                    logger.info("删除代理商退出附件关系失败");
+                    throw new ProcessException("删除附件失败");
+                }
+            });
             if(null!=agentMergeFiles && agentMergeFiles.length!=0){
-                AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
-                AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
-                criteria.andSrcIdEqualTo(agentQuit.getId());
-                criteria.andBusTypeEqualTo(AttachmentRelType.agentQuit.name());
-                List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
-                attachmentRels.forEach(row->{
-                    row.setStatus(Status.STATUS_0.status);
-                    int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
-                    if (1 != i) {
-                        logger.info("删除代理商退出附件关系失败");
-                        throw new ProcessException("删除附件失败");
-                    }
-                });
-
                 for(int i=0;i<agentMergeFiles.length;i++){
                     AttachmentRel record = new AttachmentRel();
                     record.setAttId(agentMergeFiles[i]);
@@ -890,6 +890,61 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         agentQuit.setuUser(cUser);
         if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
             throw new MessageException("合并数据处理失败！");
+        }
+        return AgentResult.ok();
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    public AgentResult agentQuitUploadRtc(AgentQuit agentQuit, String cUser, String[] agentMergeFiles) throws Exception {
+        AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+        AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+        criteria.andSrcIdEqualTo(agentQuit.getId());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andBusTypeEqualTo(AttachmentRelType.agentQuitUpload.name());
+        List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+        attachmentRels.forEach(row->{
+            row.setStatus(Status.STATUS_0.status);
+            if (1 != attachmentRelMapper.updateByPrimaryKeySelective(row)) {
+                logger.info("删除代理商退出附件关系失败");
+                throw new ProcessException("删除附件失败！");
+            }
+        });
+        if (null != agentMergeFiles && agentMergeFiles.length != 0) {
+            for (int i = 0; i < agentMergeFiles.length; i++) {
+                AttachmentRel record = new AttachmentRel();
+                record.setAttId(agentMergeFiles[i]);
+                record.setSrcId(agentQuit.getId());
+                record.setcUser(cUser);
+                record.setcTime(Calendar.getInstance().getTime());
+                record.setStatus(Status.STATUS_1.status);
+                record.setBusType(AttachmentRelType.agentQuitUpload.name());
+                record.setId(idService.genId(TabId.a_attachment_rel));
+                if (1 != attachmentRelMapper.insertSelective(record)) {
+                    logger.info("代理商退出附件关系失败");
+                    throw new ProcessException("附件关系失败！");
+                }
+            }
+        }
+        AttachmentRelExample attachmentRelExamples = new AttachmentRelExample();
+        AttachmentRelExample.Criteria criterias = attachmentRelExamples.createCriteria();
+        criterias.andSrcIdEqualTo(agentQuit.getId());
+        criterias.andStatusEqualTo(Status.STATUS_1.status);
+        criterias.andBusTypeEqualTo(AttachmentRelType.agentQuitUpload.name());
+        List<AttachmentRel> attachmentRelss = attachmentRelMapper.selectByExample(attachmentRelExamples);
+        if (attachmentRelss.size() > 0) {
+            agentQuit.setContractStatus(Status.STATUS_1.status);
+            if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
+                logger.info("更新上传解除合同状态成功");
+                throw new ProcessException("更新上传解除合同状态成功！");
+            }
+        } else if (attachmentRelss.size() == 0) {
+            agentQuit.setContractStatus(Status.STATUS_0.status);
+            if (1 != agentQuitMapper.updateByPrimaryKeySelective(agentQuit)) {
+                logger.info("更新上传解除合同状态失败");
+                throw new ProcessException("更新上传解除合同状态失败！");
+            }
         }
         return AgentResult.ok();
     }

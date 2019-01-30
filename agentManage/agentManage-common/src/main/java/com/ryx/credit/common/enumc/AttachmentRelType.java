@@ -19,7 +19,8 @@ public enum AttachmentRelType {
     ExitApplyfor("代理商退出申请"),
     agentMerge("代理商合并"),
     agentQuit("代理商退出申请"),
-    agentQuitRefund("代理商退出申请退款");
+    agentQuitRefund("代理商退出申请退款"),
+    agentQuitUpload("代理商退出上传解除合同");
 
     public String  msg;
 
