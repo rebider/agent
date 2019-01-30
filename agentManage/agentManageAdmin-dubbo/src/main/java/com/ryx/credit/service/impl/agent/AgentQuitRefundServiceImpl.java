@@ -137,8 +137,8 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
             if (!agentQuit.getSuppType().equals(SuppType.G.getValue())) {
                 throw new MessageException("代理商补缴类型不是打款公司，不支持此操作！");
             }
-            if (agentQuit.getRealitySuppDept().compareTo(BigDecimal.ONE) == 0) {
-                throw new MessageException("实际补缴欠款小于0，不支持此操作！");
+            if (agentQuit.getRealitySuppDept().compareTo(BigDecimal.ZERO) < 1) {
+                throw new MessageException("实际补缴欠款小于等于0，不支持此操作！");
             }
             if (!agentQuit.getAppRefund().equals(Status.STATUS_1.status)) {
                 throw new MessageException("申请退款为否，不支持此操作！");
@@ -179,8 +179,10 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
         try {
             AgentColinfo agentColinfo = agentColinfoService.selectByAgentId(agentQuitRefund.getAgentId());//获取收款账户信息
             agentQuitRefund.setId(idService.genId(TabId.A_AGENT_QUIT_REFUND));
-            agentQuitRefund.setcTime(new Date());
+            agentQuitRefund.setcTime(Calendar.getInstance().getTime());
+            agentQuitRefund.setuTime(Calendar.getInstance().getTime());
             agentQuitRefund.setcUser(cUser);
+            agentQuitRefund.setuUser(cUser);
             agentQuitRefund.setStatus(Status.STATUS_1.status);
             agentQuitRefund.setVersion(Status.STATUS_1.status);
             agentQuitRefund.setCloType(agentColinfo.getCloType());
