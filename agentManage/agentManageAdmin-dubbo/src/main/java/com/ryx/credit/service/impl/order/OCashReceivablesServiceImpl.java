@@ -7,8 +7,10 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMergeMapper;
+import com.ryx.credit.dao.agent.AgentQuitMapper;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
+import com.ryx.credit.pojo.admin.agent.AgentQuit;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.dict.IdService;
@@ -54,6 +56,8 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
     private OOrderMapper oOrderMapper;
     @Autowired
     private AgentMergeMapper agentMergeMapper;
+    @Autowired
+    private AgentQuitMapper agentQuitMapper;
 
 
     /**
@@ -221,6 +225,17 @@ public class OCashReceivablesServiceImpl implements OCashReceivablesService {
             }else if(cpt.code.equals(CashPayType.AGENTMERGE.code) && StringUtils.isNotBlank(srcId)){
                 AgentMerge agentMerge = agentMergeMapper.selectByPrimaryKey(srcId);
                 if(agentMerge != null && agentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.status)==0){
+                    List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
+                    for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
+                        oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
+                        if(1!=oCashReceivablesMapper.updateByPrimaryKeySelective(oCashReceivables_app)){
+                            throw new MessageException("审批状态调整失败");
+                        }
+                    }
+                }
+            }else if(cpt.code.equals(CashPayType.AGENTQUIT.code) && StringUtils.isNotBlank(srcId)){
+                AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(srcId);
+                if(agentQuit != null && agentQuit.getCloReviewStatus().compareTo(AgStatus.Approving.status)==0){
                     List<OCashReceivables> OCashReceivables_list = query(null,agentId,cpt,srcId,Arrays.asList(AgStatus.Create.status,AgStatus.Approving.status));
                     for (OCashReceivables oCashReceivables_app : OCashReceivables_list) {
                         oCashReceivables_app.setReviewStatus(AgStatus.Approving.status);
