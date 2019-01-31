@@ -203,4 +203,13 @@ public interface ProfitMonthService {
      * @return
      */
     List<Map<String,Object>> exportByF(Map<String, Object> param);
+
+    /**
+     * 冻结代理商分润
+     * @Author chenqiutian
+     * @return
+     */
+    void doFrozenByAgent(String agentId);
+
+
 }

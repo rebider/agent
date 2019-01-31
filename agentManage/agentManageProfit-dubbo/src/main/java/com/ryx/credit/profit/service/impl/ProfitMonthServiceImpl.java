@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -90,6 +91,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     IOwnInvoiceService ownInvoiceService;
     @Resource
     ProfitFactorService profitFactorService;
+
+    @Autowired
+    private IProfitDirectService profitDirectService;
+
+    @Autowired
+    private BusiPlatService busiPlatService;
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -1151,5 +1158,54 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     public ProfitDetailMonth getByAgentId(String agentId) {
         return profitDetailMonthMapper.selectByAgentId(agentId);
     }
+
+    /**
+     * 代理商分润冻结
+     * @param  agentId 代理商唯一码
+     * @return
+     */
+    @Override
+    public void doFrozenByAgent(String agentId) {
+        if(StringUtils.isBlank(agentId)){
+            throw new ProcessException("代理商唯一码为空");
+        }
+        ProfitDetailMonth profitM = new ProfitDetailMonth();
+
+        profitM.setAgentId(agentId);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+
+        profitM.setProfitDate(dateStr);//设置分润月份
+        profitM.setStatus(String.valueOf(Status.STATUS_1.status));//设为冻结状态
+
+        profitDetailMonthMapper.updateStatusByAgent(profitM);//冻结
+
+        //直发分润冻结
+        ProfitDirect profitDirect = new ProfitDirect();
+        profitDirect.setFristAgentPid(profitM.getAgentId());
+
+        List<ProfitDirect> list =profitDirectService.selectByFristAgentPid(profitDirect);
+        if(list.size() > 0){
+            for (ProfitDirect profitD : list) {
+                if(profitD != null){
+                    profitD.setStatus(String.valueOf(Status.STATUS_1.status));
+                    profitDirectService.updateByStatus(profitD);
+                }
+            }
+        }
+
+        //通过接口方式 联动业务平台完成冻结
+        List<String> agentIds = new ArrayList<String>();
+        agentIds.add(profitM.getAgentId());
+        boolean fail =busiPlatService.mPos_Frozen(agentIds);
+        if(fail){
+            throw new ProcessException("通知手刷，冻结失败");
+        }
+
+    }
+
 
 }

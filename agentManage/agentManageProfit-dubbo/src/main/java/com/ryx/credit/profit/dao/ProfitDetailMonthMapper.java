@@ -124,4 +124,10 @@ public interface ProfitDetailMonthMapper {
      * @Date: 12:42 2019/1/24
      */
     void updateAgentInfoBeforeComput(@Param("profitDate") String profitDate);
+
+    /**
+     * 设置数据冻结状态
+     * @param profitDetailMonth
+     */
+     int updateStatusByAgent(ProfitDetailMonth profitDetailMonth);
 }
