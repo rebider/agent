@@ -90,14 +90,14 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
         if (null != agentQuitRefund.getCloReviewStatus()) {
             reqMap.put("cloReviewStatus", agentQuitRefund.getCloReviewStatus());
         }
-//        if(StringUtils.isBlank(dataRole)){
-//            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-//            if(orgCodeRes == null && orgCodeRes.size() != 1){
-//                return null;
-//            }
-//            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-//            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
-//        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes == null && orgCodeRes.size() != 1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String, Object>> agentMergeList = agentQuitRefundMapper.queryQuitRefundList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMergeList);

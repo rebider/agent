@@ -106,14 +106,14 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         if (null != agentQuit.getCloReviewStatus()) {
             reqMap.put("cloReviewStatus", agentQuit.getCloReviewStatus());
         }
-//        if(StringUtils.isBlank(dataRole)){
-//            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-//            if(orgCodeRes == null && orgCodeRes.size() != 1){
-//                return null;
-//            }
-//            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-//            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
-//        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes == null && orgCodeRes.size() != 1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String, Object>> agentMergeList = agentQuitMapper.queryAgentQuitList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(agentMergeList);
