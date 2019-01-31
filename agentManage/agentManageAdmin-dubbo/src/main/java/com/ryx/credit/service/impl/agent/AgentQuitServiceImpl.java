@@ -17,6 +17,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
+import com.ryx.credit.profit.service.ProfitMonthService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
@@ -81,6 +82,9 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private AgentBusinfoService agentBusinfoService;
     @Autowired
     private OPaymentDetailMapper oPaymentDetailMapper;
+    @Autowired
+    private ProfitMonthService profitMonthService;
+
 
     /**
      * 退出列表
@@ -480,6 +484,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 throw new MessageException("更新业务锁定失败");
             }
         }
+        //冻结分润
+//        profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
 
         AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTQUIT,id,cUser);
         if(!agentResult.isOK()){
@@ -707,6 +713,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
                 paymentDetail.setPayTime(new Date());
+                paymentDetail.setSrcType(PamentSrcType.AGENT_QUIT_DIKOU.code);
+                paymentDetail.setSrcId(busActRel.getBusId());
                 int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
                 if(j!=1){
                     throw new MessageException("代理商退出：更新付款明细失败");
@@ -727,6 +735,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                 paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
                 paymentDetail.setPayTime(new Date());
+                paymentDetail.setSrcType(PamentSrcType.AGENT_QUIT_DIKOU.code);
+                paymentDetail.setSrcId(busActRel.getBusId());
                 int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
                 if(j!=1){
                     throw new MessageException("代理商退出：更新付款明细失败");
