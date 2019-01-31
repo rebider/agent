@@ -1,11 +1,14 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.AgentRelateMapper;
 import com.ryx.credit.profit.pojo.AgentRelate;
+import com.ryx.credit.profit.pojo.AgentRelateDetail;
 import com.ryx.credit.profit.pojo.AgentRelateExample;
 import com.ryx.credit.profit.service.IAgentRelateService;
+import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +29,8 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
     Logger logger = LoggerFactory.getLogger(AgentRelateServiceImpl.class);
     @Autowired
     private AgentRelateMapper agentRelateMapper;
+    @Autowired
+    private IdService idService;
 
 
     @Override
@@ -70,5 +75,23 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
     @Override
     public AgentRelate selectById(String id) {
         return agentRelateMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public Map<String, String> queryParentAgentByAgentId(String agentId) {
+        return agentRelateMapper.queryParentAgentByAgentId(agentId);
+    }
+
+    @Override
+    public boolean applyAgentRelate(AgentRelate agentRelate, List<AgentRelateDetail> list, String userId, String workId) {
+        agentRelate.setId(idService.genId(TabId.A_AGENT_RELATE));
+        logger.info("序列ID......"+idService.genId(TabId.A_AGENT_RELATE));
+        for (AgentRelateDetail agentRelateDetail:list){
+            agentRelateDetail.setId(idService.genId(TabId.A_AGENT_RELATE_DETAIL));
+        }
+        agentRelateMapper.insert(agentRelate);
+
+
+        return false;
     }
 }

@@ -29,4 +29,6 @@ public interface AgentRelateMapper {
     int updateByPrimaryKey(AgentRelate record);
 
     List<Map<String, Object>> getList(Map<String, Object> param);
+
+    Map<String,String> queryParentAgentByAgentId(String agentId);
 }

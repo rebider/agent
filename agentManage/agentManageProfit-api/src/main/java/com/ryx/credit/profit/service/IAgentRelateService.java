@@ -2,6 +2,7 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.AgentRelate;
+import com.ryx.credit.profit.pojo.AgentRelateDetail;
 import com.ryx.credit.profit.pojo.AgentRelateExample;
 
 import java.util.List;
@@ -23,4 +24,8 @@ public interface IAgentRelateService {
     List<AgentRelate> selectByExample(AgentRelateExample agentRelateExample);
 
     AgentRelate selectById(String id);
+
+    Map<String,String> queryParentAgentByAgentId(String agentId);
+
+    boolean applyAgentRelate(AgentRelate agentRelate, List<AgentRelateDetail> list, String userId, String workId);
 }
