@@ -119,7 +119,28 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
     }
 
     /**
-     * 判断申请退款的条件是否满足
+     * 判断退出ID是否重复申请
+     * @param agentQuitRefund
+     * @throws Exception
+     */
+    public void whetherRepeatRefund(AgentQuitRefund agentQuitRefund) throws Exception {
+        AgentQuitRefundExample agentQuitRefundExample = new AgentQuitRefundExample();
+        AgentQuitRefundExample.Criteria criteria = agentQuitRefundExample.createCriteria();
+        criteria.andQuitIdEqualTo(agentQuitRefund.getQuitId());
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        List<BigDecimal> cloReviewStatusList = new ArrayList<>();
+        cloReviewStatusList.add(AgStatus.Approving.getValue());
+        cloReviewStatusList.add(AgStatus.Approved.getValue());
+        criteria.andCloReviewStatusIn(cloReviewStatusList);
+        List<AgentQuitRefund> agentQuitRefundList = agentQuitRefundMapper.selectByExample(agentQuitRefundExample);
+        if (agentQuitRefundList.size() != 0) {
+            logger.info("申请退款中或审批通过，不能重复申请");
+            throw new MessageException("申请退款中或审批通过，不能重复申请！");
+        }
+    }
+
+    /**
+     * 判断申请退款条件是否满足
      * @param agentQuitRefund
      * @throws Exception
      */
@@ -135,15 +156,19 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
         }
         for (AgentQuit agentQuit : agentQuitList) {
             if (!agentQuit.getSuppType().equals(SuppType.G.getValue())) {
+                logger.info("代理商补缴类型不是打款公司，不支持此操作:{}", agentQuit.getSuppType());
                 throw new MessageException("代理商补缴类型不是打款公司，不支持此操作！");
             }
             if (agentQuit.getRealitySuppDept().compareTo(BigDecimal.ZERO) < 1) {
+                logger.info("实际补缴欠款小于等于0，不支持此操作:{}", agentQuit.getRealitySuppDept());
                 throw new MessageException("实际补缴欠款小于等于0，不支持此操作！");
             }
             if (!agentQuit.getAppRefund().equals(Status.STATUS_1.status)) {
+                logger.info("申请退款为否，不支持此操作:{}", agentQuit.getAppRefund());
                 throw new MessageException("申请退款为否，不支持此操作！");
             }
             if (!agentQuit.getPlatformStatus().equals(PlatformStatus.FAIL.getValue())) {
+                logger.info("业务平台状态为失败，不支持此操作:{}", agentQuit.getPlatformStatus());
                 throw new MessageException("业务平台状态为失败，不支持此操作！");
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -154,6 +179,7 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
             BigDecimal refundAmtDeadline = agentQuit.getRefundAmtDeadline();//申请退款期限
             long days = (nowDate.getTime() - approveTime.getTime()) / (24 * 60 * 60 * 1000);//天数=当前时间-审批通过时间
             if (new BigDecimal(days).compareTo(refundAmtDeadline) < 0) {
+                logger.info("此代理商申请退款期限不满足180天，不支持此操作:{}", days);
                 throw new MessageException("此代理商申请退款期限不满足180天，不支持此操作！");
             }
         }
@@ -169,7 +195,9 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startQuitRefundActivity(AgentQuitRefund agentQuitRefund, String cUser) throws Exception {
-        //判断申请退款的条件是否满足
+        //判断退出ID是否重复申请
+        whetherRepeatRefund(agentQuitRefund);
+        //判断申请退款条件是否满足
         whetherSatisfyRefund(agentQuitRefund);
 
         if (StringUtils.isBlank(cUser)) {
