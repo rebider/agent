@@ -6,7 +6,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
-import com.ryx.credit.service.agent.AgentQuitService;
+import com.ryx.credit.service.agent.AgentQuitRefundService;
 import com.ryx.credit.service.order.OrderService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
@@ -24,12 +24,12 @@ import java.util.List;
  *
  * @author Wang Qi
  * @version 1.0 2018/7/19 9:37
- * @see QuitTaskExecutionListener
+ * @see QuitRefundTaskExecutionListener
  * To change this template use File | Settings | File Templates.
  */
 
-public class QuitTaskExecutionListener implements TaskListener, ExecutionListener {
-    private static final Logger logger = LoggerFactory.getLogger(QuitTaskExecutionListener.class);
+public class QuitRefundTaskExecutionListener implements TaskListener, ExecutionListener {
+    private static final Logger logger = LoggerFactory.getLogger(QuitRefundTaskExecutionListener.class);
 
 
     @Override
@@ -40,16 +40,16 @@ public class QuitTaskExecutionListener implements TaskListener, ExecutionListene
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            AgentQuitService agentQuitService = (AgentQuitService)MySpringContextHandler.applicationContext.getBean("agentQuitService");
+            AgentQuitRefundService agentQuitRefundService = (AgentQuitRefundService)MySpringContextHandler.applicationContext.getBean("agentQuitRefundService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = agentQuitService.compressAgentQuitActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                AgentResult res = agentQuitRefundService.compressQuitRefundActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-                AgentResult res = agentQuitService.compressAgentQuitActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
+                AgentResult res = agentQuitRefundService.compressQuitRefundActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
