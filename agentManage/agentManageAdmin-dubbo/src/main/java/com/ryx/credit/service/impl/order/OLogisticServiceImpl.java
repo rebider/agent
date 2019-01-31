@@ -36,6 +36,8 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.ryx.credit.common.util.Conver10ToConver33Utils.getBetweenValues;
+
 /**
  * @Author Lihl
  * @Date 2018/07/23
@@ -275,7 +277,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
 
             //IDlist检查
-            List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
+            List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount),null);
             if (Integer.valueOf(sendProNum) != stringList.size()) {
                 logger.info("请仔细核对发货数量");
                 throw new MessageException("请仔细核对发货数量");
@@ -757,7 +759,20 @@ public class OLogisticServiceImpl implements OLogisticsService {
             logger.info("结束截取的位数为空{}:", finish);
             throw new ProcessException("结束截取的位数为空");
         }
-        List<String> idList = idList(startSn, endSn, begins, finish);
+        if (StringUtils.isBlank(logisticsId)){
+            logger.info("物流id为空{}:", logisticsId);
+            throw new ProcessException("物流id为空");
+        }
+        OLogisticsExample oLogisticsExample = new OLogisticsExample();
+        OLogisticsExample.Criteria criteria = oLogisticsExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(logisticsId);
+        List<OLogistics> oLogistics = oLogisticsMapper.selectByExample(oLogisticsExample);
+        if (null==oLogistics || oLogistics.size()==0){
+            logger.info("无此物流信息{}:", logisticsId);
+            throw new ProcessException("无此物流信息");
+        }
+        OLogistics ol = oLogistics.get(0);
+        List<String> idList = idList(startSn, endSn, begins, finish,ol.getProCom());
+
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {
                 OLogisticsDetail detail = new OLogisticsDetail();
@@ -904,29 +919,41 @@ public class OLogisticServiceImpl implements OLogisticsService {
     }
 
 
-    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException {
+    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException {
         //1.startSn  2.endSn  3.开始截取的位数   4.结束截取的位数
-        int begin = begins - 1;
-        ArrayList<String> list = new ArrayList<>();
-        String start = startSn;
-        String end = endSn;
-        if (startSn.length() < begins || endSn.length() <finish) {
-            logger.info("请输入正确的起始和结束SN号位数");
-            throw new MessageException("请输入正确的起始和结束SN号位数");
+        List<String> list = new ArrayList<>();
+        if (StringUtils.isBlank(proCom)){
+            logger.info("厂家为空");
+            throw new MessageException("厂家为空");
         }
-        String sSub = start.substring(begin, finish);
-        String eSub = end.substring(begin, finish);
-        if ("".equals(eSub) || "".equals(sSub)) {
-            logger.info("请输入正确的起始和结束SN号位数");
-            throw new MessageException("请输入正确的起始和结束SN号位数");
+        if (proCom.equals(CardImportType.LD.msg)){
+            proCom=CardImportType.LD.code;
         }
-        int num = Integer.parseInt(sSub);
-        int w = finish - begin;
-        for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
-            int x = num++;
-            String format = String.format("%0" + w + "d", x);
-            String c = start.substring(0, begin) + format + start.substring(finish);
-            list.add(c);
+
+        if (CardImportType.LD.code.equals(proCom)) {
+            list= getBetweenValues(startSn, endSn);
+        }else {
+            int begin = begins - 1;
+            String start = startSn;
+            String end = endSn;
+            if (startSn.length() < begins || endSn.length() <finish) {
+                logger.info("请输入正确的起始和结束SN号位数");
+                throw new MessageException("请输入正确的起始和结束SN号位数");
+            }
+            String sSub = start.substring(begin, finish);
+            String eSub = end.substring(begin, finish);
+            if ("".equals(eSub) || "".equals(sSub)) {
+                logger.info("请输入正确的起始和结束SN号位数");
+                throw new MessageException("请输入正确的起始和结束SN号位数");
+            }
+            int num = Integer.parseInt(sSub);
+            int w = finish - begin;
+            for (int j = Integer.parseInt(eSub) - Integer.parseInt(sSub); j >= 0; j--) {
+                int x = num++;
+                String format = String.format("%0" + w + "d", x);
+                String c = start.substring(0, begin) + format + start.substring(finish);
+                list.add(c);
+            }
         }
         return list;
     }

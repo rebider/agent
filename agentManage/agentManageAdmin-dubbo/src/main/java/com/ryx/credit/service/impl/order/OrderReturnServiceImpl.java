@@ -1204,6 +1204,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             proCode = String.valueOf(objectList.get(col.indexOf("PRO_CODE")));
             proId = String.valueOf(objectList.get(col.indexOf("PRO_ID")));
             proName = String.valueOf(objectList.get(col.indexOf("PRO_NAME")));
+            String proCom = String.valueOf(objectList.get(col.indexOf("PRO_COM_STRING")));
 
             sendDate = String.valueOf(objectList.get(col.indexOf("h")));
             sendProNum = String.valueOf(objectList.get(col.indexOf("g")));
@@ -1282,7 +1283,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
 
             //IDlist检查
-            List<String> stringList = new OLogisticServiceImpl().idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount));
+            List<String> stringList = new OLogisticServiceImpl().idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount),proCom);
             if (Integer.valueOf(sendProNum) != stringList.size()) {
                 log.info("请仔细核对发货数量");
                 throw new MessageException("请仔细核对发货数量");
@@ -1659,7 +1660,19 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             log.info("结束截取的位数为空{}:", finish);
             throw new ProcessException("结束截取的位数为空");
         }
-        List<String> idList = new OLogisticServiceImpl().idList(startSn, endSn, begins, finish);
+        if (com.ryx.credit.commons.utils.StringUtils.isBlank(logisticsId)){
+            log.info("物流id为空{}:", logisticsId);
+            throw new ProcessException("物流id为空");
+        }
+        OLogisticsExample oLogisticsExample = new OLogisticsExample();
+        OLogisticsExample.Criteria criteria = oLogisticsExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status).andIdEqualTo(logisticsId);
+        List<OLogistics> oLogistics = oLogisticsMapper.selectByExample(oLogisticsExample);
+        if (null==oLogistics || oLogistics.size()==0){
+            log.info("无此物流信息{}:", logisticsId);
+            throw new ProcessException("无此物流信息");
+        }
+        OLogistics ol = oLogistics.get(0);
+        List<String> idList = new OLogisticServiceImpl().idList(startSn, endSn, begins, finish,ol.getProCom());
         List<OLogisticsDetail> detailList = new ArrayList<>();
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {
