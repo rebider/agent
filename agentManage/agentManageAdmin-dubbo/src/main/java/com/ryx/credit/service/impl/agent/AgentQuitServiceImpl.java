@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -484,8 +485,14 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 throw new MessageException("更新业务锁定失败");
             }
         }
-        //冻结分润
-//        profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
+
+        try {
+            //冻结分润
+            profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("冻结分润失败");
+        }
 
         AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.AGENTQUIT,id,cUser);
         if(!agentResult.isOK()){
@@ -656,101 +663,112 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             throw new ProcessException("更新打款记录失败");
         }
 
-        //删除退出平台
-        String[] quitBusIds = agentQuit.getQuitBusId().split(",");
-        for(int j=0;j<quitBusIds.length;j++){
-            String quitBusId = quitBusIds[j];
-            AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusId);
-            agentBusInfo.setBusStatus(BusinessStatus.pause.status);
-            agentBusInfo.setStatus(Status.STATUS_0.status);
-            int k = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
-            if(k!=1){
-                throw new ProcessException("更新业务平台失败");
-            }
-        }
-
-        //代理商退出之后如果一个业务都没了,基本信息等保留,禁止登陆后台
-        //代理商状态为退出
-        AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
-        AgentBusInfoExample.Criteria agentBusInfocriteria = agentBusInfoExample.createCriteria();
-        agentBusInfocriteria.andAgentIdEqualTo(agentQuit.getAgentId());
-        agentBusInfocriteria.andStatusEqualTo(Status.STATUS_1.status);
-        List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
-        if(agentBusInfos.size()==0){
-            CuserAgentExample cuserAgentExample = new CuserAgentExample();
-            CuserAgentExample.Criteria userAgentCriteria = cuserAgentExample.createCriteria();
-            userAgentCriteria.andAgentidEqualTo(agentQuit.getAgentId());
-            List<CuserAgent> cuserAgents = cUserAgentMapper.selectByExample(cuserAgentExample);
-            if(cuserAgents.size()!=1){
-                throw new MessageException("代理商信息有误");
-            }
-            CuserAgent cuserAgent = cuserAgents.get(0);
-            int l = cUserMapper.updateStatusByPrimaryKey(Long.valueOf(cuserAgent.getUserid()));
-            if(l!=1){
-                logger.info("审批任务结束{}{}，代理商退出禁止登陆后台失败", proIns, agStatus);
-                throw new MessageException("代理商退出更新失败");
-            }
-            Agent agent = agentMapper.selectByPrimaryKey(agentQuit.getAgentId());
-            agent.setcIncomStatus(AgentInStatus.QUIT.status);
-            agent.setcUtime(new Date());
-            int j = agentMapper.updateByPrimaryKeySelective(agent);
-            if(j!=1){
-                throw new MessageException("代理商退出更新失败");
-            }
-        }
-
-        //清除缴纳款欠款
-        if(agentQuit.getCapitalDebt().compareTo(BigDecimal.ZERO)==1){
-            HashMap<String, Object> queryMap = new HashMap<>();
-            queryMap.put("agentId", agentQuit.getAgentId());
-            List<Map<String, Object>> maps = oPaymentDetailMapper.getCapitalDebt(queryMap);
-            if(maps.size()==0){
-                throw new MessageException("代理商退出：查询缴纳款明细失败");
-            }
-            for (Map<String, Object> map : maps) {
-                String id = String.valueOf(map.get("ID"));
-                OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
-                paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
-                paymentDetail.setPayTime(new Date());
-                paymentDetail.setSrcType(PamentSrcType.AGENT_QUIT_DIKOU.code);
-                paymentDetail.setSrcId(busActRel.getBusId());
-                int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
-                if(j!=1){
-                    throw new MessageException("代理商退出：更新付款明细失败");
+        //通过
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            //删除退出平台
+            String[] quitBusIds = agentQuit.getQuitBusId().split(",");
+            for(int j=0;j<quitBusIds.length;j++){
+                String quitBusId = quitBusIds[j];
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusId);
+                agentBusInfo.setBusStatus(BusinessStatus.pause.status);
+                agentBusInfo.setStatus(Status.STATUS_0.status);
+                int k = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if(k!=1){
+                    throw new ProcessException("更新业务平台失败");
                 }
             }
-        }
-        //清除订单欠款
-        if(agentQuit.getOrderDebt().compareTo(BigDecimal.ZERO)==1){
-            HashMap<String, Object> queryMap = new HashMap<>();
-            queryMap.put("agentId", agentQuit.getAgentId());
-            List<Map<String, Object>> maps = oPaymentDetailMapper.getOrderDebt(queryMap);
-            if(maps.size()==0){
-                throw new MessageException("代理商退出：查询订单明细失败");
-            }
-            for (Map<String, Object> map : maps) {
-                String id = String.valueOf(map.get("ID"));
-                OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
-                paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
-                paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
-                paymentDetail.setPayTime(new Date());
-                paymentDetail.setSrcType(PamentSrcType.AGENT_QUIT_DIKOU.code);
-                paymentDetail.setSrcId(busActRel.getBusId());
-                int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+            //代理商退出之后如果一个业务都没了,基本信息等保留,禁止登陆后台
+            //代理商状态为退出
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria agentBusInfocriteria = agentBusInfoExample.createCriteria();
+            agentBusInfocriteria.andAgentIdEqualTo(agentQuit.getAgentId());
+            agentBusInfocriteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if(agentBusInfos.size()==0){
+                CuserAgentExample cuserAgentExample = new CuserAgentExample();
+                CuserAgentExample.Criteria userAgentCriteria = cuserAgentExample.createCriteria();
+                userAgentCriteria.andAgentidEqualTo(agentQuit.getAgentId());
+                List<CuserAgent> cuserAgents = cUserAgentMapper.selectByExample(cuserAgentExample);
+                if(cuserAgents.size()!=1){
+                    throw new MessageException("代理商信息有误");
+                }
+                CuserAgent cuserAgent = cuserAgents.get(0);
+                int l = cUserMapper.updateStatusByPrimaryKey(Long.valueOf(cuserAgent.getUserid()));
+                if(l!=1){
+                    logger.info("审批任务结束{}{}，代理商退出禁止登陆后台失败", proIns, agStatus);
+                    throw new MessageException("代理商退出更新失败");
+                }
+                Agent agent = agentMapper.selectByPrimaryKey(agentQuit.getAgentId());
+                agent.setcIncomStatus(AgentInStatus.QUIT.status);
+                agent.setcUtime(new Date());
+                int j = agentMapper.updateByPrimaryKeySelective(agent);
                 if(j!=1){
-                    throw new MessageException("代理商退出：更新付款明细失败");
+                    throw new MessageException("代理商退出更新失败");
                 }
             }
-        }
-        //清除分润
-        if(agentQuit.getProfitDebt().compareTo(BigDecimal.ZERO)==1){
 
+            //清除缴纳款欠款
+            if(agentQuit.getCapitalDebt().compareTo(BigDecimal.ZERO)==1){
+                HashMap<String, Object> queryMap = new HashMap<>();
+                queryMap.put("agentId", agentQuit.getAgentId());
+                List<Map<String, Object>> maps = oPaymentDetailMapper.getCapitalDebt(queryMap);
+                if(maps.size()==0){
+                    throw new MessageException("代理商退出：查询缴纳款明细失败");
+                }
+                for (Map<String, Object> map : maps) {
+                    String id = String.valueOf(map.get("ID"));
+                    OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
+                    paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                    paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
+                    paymentDetail.setPayTime(new Date());
+                    paymentDetail.setSrcType(PamentSrcType.AGENT_QUIT_DIKOU.code);
+                    paymentDetail.setSrcId(busActRel.getBusId());
+                    int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+                    if(j!=1){
+                        throw new MessageException("代理商退出：更新付款明细失败");
+                    }
+                }
+            }
+            //清除订单欠款
+            if(agentQuit.getOrderDebt().compareTo(BigDecimal.ZERO)==1){
+                HashMap<String, Object> queryMap = new HashMap<>();
+                queryMap.put("agentId", agentQuit.getAgentId());
+                List<Map<String, Object>> maps = oPaymentDetailMapper.getOrderDebt(queryMap);
+                if(maps.size()==0){
+                    throw new MessageException("代理商退出：查询订单明细失败");
+                }
+                for (Map<String, Object> map : maps) {
+                    String id = String.valueOf(map.get("ID"));
+                    OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
+                    paymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                    paymentDetail.setRealPayAmount(paymentDetail.getPayAmount());
+                    paymentDetail.setPayTime(new Date());
+                    paymentDetail.setSrcType(PamentSrcType.AGENT_QUIT_DIKOU.code);
+                    paymentDetail.setSrcId(busActRel.getBusId());
+                    int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+                    if(j!=1){
+                        throw new MessageException("代理商退出：更新付款明细失败");
+                    }
+                }
+            }
+            //清除分润
+            if(agentQuit.getProfitDebt().compareTo(BigDecimal.ZERO)==1){
+
+            }
+        }
+        //拒绝
+        if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+            try {
+                String profitDate = DateUtil.format(DateUtil.addMonth(agentQuit.getcTime(), -1), "yyyyMM");
+                profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId(),profitDate);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MessageException("代理商退出：分润解冻失败");
+            }
         }
 
         return AgentResult.ok();
     }
-
 
     @Override
     public AgentQuit getAgentQuitById(String quitId) {
