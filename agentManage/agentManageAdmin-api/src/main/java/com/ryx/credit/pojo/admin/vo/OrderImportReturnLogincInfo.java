@@ -55,6 +55,8 @@ public class OrderImportReturnLogincInfo   implements Serializable {
     private String snEndNum;
 
 
+
+
     public String getReturnOrderId() {
         return returnOrderId;
     }

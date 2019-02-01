@@ -7,6 +7,7 @@ import com.ryx.credit.pojo.admin.agent.ImportAgent;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.pojo.admin.vo.OrderImportBaseInfo;
+import com.ryx.credit.pojo.admin.vo.OrderImportReturnInfo;
 
 import java.util.List;
 
@@ -73,7 +74,7 @@ public interface OrderImportService {
      * @return
      * @throws Exception
      */
-    public AgentResult pareseReturn()throws Exception;
+    public AgentResult pareseReturn(ImportAgent importAgent,String User)throws Exception;
 
 
 

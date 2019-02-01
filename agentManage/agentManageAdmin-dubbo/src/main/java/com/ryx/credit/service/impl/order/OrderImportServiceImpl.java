@@ -8,6 +8,8 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
+import com.ryx.credit.common.util.MapUtil;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.common.util.agentUtil.StageUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CuserAgentMapper;
@@ -19,19 +21,13 @@ import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
-import com.ryx.credit.pojo.admin.vo.OrderFormVo;
-import com.ryx.credit.pojo.admin.vo.OrderImportBaseInfo;
-import com.ryx.credit.pojo.admin.vo.OrderImportGoodsInfo;
-import com.ryx.credit.pojo.admin.vo.OrderLogicInfo;
+import com.ryx.credit.pojo.admin.vo.*;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.impl.agent.AimportServiceImpl;
-import com.ryx.credit.service.order.IPaymentDetailService;
-import com.ryx.credit.service.order.OLogisticsService;
-import com.ryx.credit.service.order.OrderImportService;
-import com.ryx.credit.service.order.PlannerService;
+import com.ryx.credit.service.order.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,11 +99,15 @@ public class OrderImportServiceImpl implements OrderImportService {
     private OLogisticsMapper oLogisticsMapper;
     @Autowired
     private OLogisticsService oLogisticsService;
-
+    @Autowired
+    private OrderService orderService;
+    @Autowired
     private OLogisticsDetailMapper  oLogisticsDetailMapper;
-
     @Autowired
     private OSubOrderActivityMapper oSubOrderActivityMapper;
+    @Autowired
+    private AgentBusinfoService agentBusinfoService;
+
 
 
     List<Dict> CAPITAL_TYPE = new ArrayList<>();
@@ -764,10 +764,10 @@ public class OrderImportServiceImpl implements OrderImportService {
                         detail.setuTime(Calendar.getInstance().getTime());
                         detail.setOptType(OLogisticsDetailOptType.ORDER.code);
                         detail.setOptId(oSubOrder.getId());
-                        OOrder oOrder = oOrderMapper.selectByPrimaryKey(oSubOrder.getOrderId());
-                        detail.setBusId(oOrder.getBusId());
+                        detail.setBusId(order.getBusId());
                         detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
                         detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                        detail.setSendStatus(Status.STATUS_1.status);
 
                         detail.setActivityId(oSubOrderActivity.getActivityId());
                         detail.setActivityName(oSubOrderActivity.getActivityName());
@@ -830,8 +830,218 @@ public class OrderImportServiceImpl implements OrderImportService {
         return AgentResult.ok(orderlogiccount);
     }
 
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult pareseReturn() throws Exception {
+    public AgentResult pareseReturn(ImportAgent importAgent,String User) throws Exception {
+
+        //退货单
+        String returnOrderString = importAgent.getDatacontent();
+        JSONArray returnOrderJsnoArray = JSONArray.parseArray(returnOrderString);
+        OrderImportReturnInfo orderImportReturnInfo = new OrderImportReturnInfo();
+        orderImportReturnInfo.loadInfoFromJsonArray(returnOrderJsnoArray);
+        AgentExample agentExample = new AgentExample();
+        agentExample.or()
+                .andAgUniqNumEqualTo(orderImportReturnInfo.getAgentUniqId())
+                .andStatusEqualTo(Status.STATUS_1.status)
+                .andAgStatusEqualTo(AgStatus.Approved.name());
+        List<Agent>  agentList =  agentMapper.selectByExample(agentExample);
+        if(agentList.size()!=1){
+            logger.info("退货单["+orderImportReturnInfo.getReturnOrderId()+"]代理商唯一编号查询代理商未找到["+orderImportReturnInfo.getAgentUniqId()+"]");
+        }
+        Agent agent = agentList.get(0);
+
+        //退货单物流
+        ImportAgentExample example = new ImportAgentExample();
+        example.or().andStatusEqualTo(Status.STATUS_1.status)//有效
+                .andDealstatusEqualTo(Status.STATUS_1.status)//待处理
+                .andDataidEqualTo(orderImportReturnInfo.getReturnOrderId())
+                .andDatatypeEqualTo(AgImportType.ORLOGI.code);
+        List<ImportAgent> importAgentsLogics =  importAgentMapper.selectByExampleWithBLOBs(example);
+        if(importAgentsLogics.size()==0){
+            logger.info("退货单物流为空["+orderImportReturnInfo.getReturnOrderId()+"]");
+            throw new MessageException("退货单物流为空["+orderImportReturnInfo.getReturnOrderId()+"]");
+        }
+
+
+        //每行ID
+        String orderId_productId = "";
+        Map<String, Object> newLine_detail = null;
+        //所有退货商品总价格
+        BigDecimal totalAmt = BigDecimal.ZERO;
+        HashSet<Object> set = new HashSet<>();
+        //根据 "订单编号_商品编号" 作为唯一ID，统计每行退货信息
+        List<Map<String, Object>> retList = new ArrayList<Map<String, Object>>();
+
+        //物流转货对象 sn接卸
+        List<OrderImportReturnLogincInfo> orderImportReturnLogincInfos = new ArrayList<>();
+        for (ImportAgent importAgentsLogic : importAgentsLogics) {
+            OrderImportReturnLogincInfo orderImportReturnLogincInfo = new OrderImportReturnLogincInfo();
+            orderImportReturnLogincInfo.loadInfoFromJsonArray(JSONArray.parseArray(importAgentsLogic.getDatacontent()));
+            orderImportReturnLogincInfos.add(orderImportReturnLogincInfo);
+            importAgentsLogic.setDealstatus(Status.STATUS_1.status);
+            if(importAgentMapper.updateByPrimaryKeySelective(importAgentsLogic)!=1){
+              logger.info("物流信息更新处理中失败["+importAgentsLogic.getId()+"]");
+            }
+            //fixme 根据厂商判断sn生成方式
+            List<String> idlist =  oLogisticsService.idList(
+                    orderImportReturnLogincInfo.getSnStart(),
+                    orderImportReturnLogincInfo.getSnEnd(),
+                    Integer.valueOf(orderImportReturnLogincInfo.getSnStartNum()),
+                    Integer.valueOf(orderImportReturnLogincInfo.getSnEndNum()));
+
+            if(idlist.size()==0){
+                throw new MessageException(
+                        orderImportReturnLogincInfo.getReturnOrderId()
+                                +":"
+                                +orderImportReturnLogincInfo.getSnStart()
+                                +":"
+                                +orderImportReturnLogincInfo.getSnEnd()+"解析后数量未0");
+            }
+
+            //fixme 退货导入是否加入退货数量进行校验
+            for (String s : idlist) {
+                //退货单sn必须是发货有效的存在
+                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andSnNumEqualTo(s)
+                        .andAgentIdNotEqualTo(agent.getId())
+                        .andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code)
+                        .andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                List<OLogisticsDetail>  oLogisticsDetaillist = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                if(oLogisticsDetaillist.size()==0){
+                    logger.info(orderImportReturnLogincInfo.getReturnOrderId()
+                            +":"
+                            +orderImportReturnLogincInfo.getSnStart()
+                            +":"
+                            +orderImportReturnLogincInfo.getSnEnd()+"数据库中未找到sn码");
+                    throw new MessageException(
+                            orderImportReturnLogincInfo.getReturnOrderId()
+                                    +":"
+                                    +orderImportReturnLogincInfo.getSnStart()
+                                    +":"
+                                    +orderImportReturnLogincInfo.getSnEnd()+"数据库中未找到sn码");
+                }
+             }
+
+            logger.info("退货单物流明细放入redis("+idlist.size()+"个)"+orderImportReturnLogincInfo.getSnStart()+":"+orderImportReturnLogincInfo.getSnEnd());
+            for (String s : idlist) {
+                Map<String, Object>  map = oLogisticsMapper.getOrderAndLogisticsBySn(s, agent.getId());
+                if (map==null){
+                    continue;
+                }
+                String norderId = (String) map.get("ORDERID");//订单id
+                OOrder order = orderService.getById(norderId);
+                set.add(order.getOrderPlatform());
+                if (set.size()>1){
+                    throw new MessageException("所发SN码不属于同一个平台");
+                }
+                List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectExistsById(order.getBusId());
+                if(agentBusInfos.size()==0){
+                    throw new MessageException("SN不在平台下");
+                }
+                String ordernum = (String) map.get("ORDERNUM");
+                String proId = (String) map.get("PROID");
+                String proName = (String) map.get("PRONAME");
+                String protype = (String) map.get("PROTYPE");
+                BigDecimal proprice = (BigDecimal) map.get("PROPRICE");
+                String proCom = (String) map.get("PROCOM");
+                String proModel = (String) map.get("PROMODEL");
+                String planId = (String) map.get("PLANID");
+                String receiptId = (String) map.get("RECEIPTID");
+                totalAmt = totalAmt.add(proprice);
+                // 新一个 "订单_商品"
+                if (!orderId_productId.equals(norderId + "_" + proId)) {
+                    orderId_productId = norderId + "_" + proId;
+                    if (newLine_detail != null) {
+                        retList.add(newLine_detail);
+                    }
+                    //生成一个订单中一个商品信息
+                    newLine_detail = new HashMap<>();
+                    newLine_detail.put("id", orderId_productId);
+                    newLine_detail.put("startSn", s);
+                    newLine_detail.put("endSn", s);
+                    newLine_detail.put("orderId", norderId);
+                    newLine_detail.put("proId", proId);
+                    newLine_detail.put("proName", proName);
+                    newLine_detail.put("proPrice", proprice);
+                    newLine_detail.put("proType", protype);
+                    newLine_detail.put("count", 1);
+                    newLine_detail.put("totalPrice", proprice);
+                    newLine_detail.put("proCom", proCom);
+                    newLine_detail.put("proModel", proModel);
+                    newLine_detail.put("planId", planId);
+                    newLine_detail.put("receiptId", receiptId);
+                    newLine_detail.put("ordernum", ordernum);
+                } else {
+                    //还是同一个 "订单_商品",  累加一个订单中一个商品的数量，总价
+                    newLine_detail.put("endSn", s);
+                    newLine_detail.put("count", (int) newLine_detail.get("count") + 1);
+                    newLine_detail.put("totalPrice", ((BigDecimal) newLine_detail.get("totalPrice")).add(proprice));
+                }
+                //sn放入redis中
+                redisService.rpushList("returnorder:snlist:"+orderImportReturnLogincInfo.getReturnOrderId()+"_"+orderImportReturnLogincInfo.getSnStart()+orderImportReturnLogincInfo.getSnEnd(),s);
+            }
+        }
+
+
+        Calendar c = Calendar.getInstance();
+        //生成退货单退货明细，退货单订单关系表
+        OReturnOrder oReturnOrder = new OReturnOrder();
+        oReturnOrder.setId(idService.genId(TabId.o_return_order));
+        oReturnOrder.setAgentId(agent.getId());
+        oReturnOrder.setApplyRemark("(老订单)");
+        oReturnOrder.setRetInvoice(Status.STATUS_0.status);
+        oReturnOrder.setRetReceipt(Status.STATUS_0.status);
+        oReturnOrder.setReturnAmo(new BigDecimal(orderImportReturnInfo.getReturnPayAmt()));
+        oReturnOrder.setGoodsReturnAmo(new BigDecimal(orderImportReturnInfo.getReturnPayAmt()));
+        oReturnOrder.setCutAmo(new BigDecimal(0));
+        oReturnOrder.setRelReturnAmo(new BigDecimal(orderImportReturnInfo.getReturnPayAmt()));
+        oReturnOrder.setTakeOutAmo(new BigDecimal(0));
+        oReturnOrder.setReturnAddress("(老订单)");
+        oReturnOrder.setRetTime(c.getTime());
+        oReturnOrder.setRemark("(老订单)");
+        oReturnOrder.setBatchCode(c.getTime().getTime()+"");
+        oReturnOrder.setcTime(c.getTime());
+        oReturnOrder.setuTime(c.getTime());
+        oReturnOrder.setuUser(User);
+        oReturnOrder.setcUser(User);
+        oReturnOrder.setStatus(Status.STATUS_1.status);
+        oReturnOrder.setVersion(Status.STATUS_0.status);
+        oReturnOrder.setRefundtime(c.getTime());
+        oReturnOrder.setRefundpeople(User);
+
+        //生成退货订单明细
+        for (Map<String, Object> stringObjectMap : retList) {
+
+            OReturnOrderDetail returnOrderDetail = new OReturnOrderDetail();
+            returnOrderDetail.setId(idService.genId(TabId.o_return_order_detail));
+            returnOrderDetail.setReturnId(oReturnOrder.getId());
+            returnOrderDetail.setAgentId(agent.getId());
+            returnOrderDetail.setOrderId(stringObjectMap.get("orderId")+"");
+            returnOrderDetail.setSubOrderId( stringObjectMap.get("receiptId")+"");
+            returnOrderDetail.setProId((String) stringObjectMap.get("proId")+"");
+            returnOrderDetail.setProName((String) stringObjectMap.get("proName")+"");
+            returnOrderDetail.setProType((String) stringObjectMap.get("proType")+"");
+            returnOrderDetail.setProCom((String) stringObjectMap.get("proCom")+"");
+            returnOrderDetail.setProPrice(MapUtil.getBigDecimal(stringObjectMap, "proPrice"));
+            returnOrderDetail.setModel((String) stringObjectMap.get("proModel"));
+            returnOrderDetail.setBeginSn(stringObjectMap.get("startSn")+"");
+            returnOrderDetail.setEndSn(stringObjectMap.get("endSn")+"");
+            returnOrderDetail.setOrderPrice(MapUtil.getBigDecimal(stringObjectMap, "proPrice"));
+            returnOrderDetail.setReturnCount(MapUtil.getBigDecimal(stringObjectMap, "count"));
+            returnOrderDetail.setReturnAmt(MapUtil.getBigDecimal(stringObjectMap, "totalPrice"));
+            returnOrderDetail.setReturnTime(c.getTime());
+            returnOrderDetail.setcTime(c.getTime());
+            returnOrderDetail.setcUser(User);
+
+
+        }
+
+
+        //
+
+        //更新不是当前代理商的排单信息的退货子订单信息未当前代理商的退货单明细编号
+
+
 
         return null;
     }

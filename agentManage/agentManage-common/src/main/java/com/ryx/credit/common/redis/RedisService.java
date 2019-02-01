@@ -87,6 +87,9 @@ public class RedisService {
         return -1;
     }
 
+
+
+
     public String rpopList(String key){
         try {
             redisTemplate.execute(new RedisCallback<Object>() {

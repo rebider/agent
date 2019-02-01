@@ -448,7 +448,7 @@
     </sql>
 
 
-    <select id="getOrderAndLogisticsBySn" resultType="java.util.Map" parameterType="java.lang.String">
+  <select id="getOrderAndLogisticsBySn" resultType="java.util.Map" parameterType="java.lang.String">
     select
         detail.order_id as orderId,
         detail.order_num as orderNum,
