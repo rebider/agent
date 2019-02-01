@@ -1456,4 +1456,13 @@
     where AGENT_ID = #{agentId} and PROFIT_DATE=#{profitDate}
   </update>
 
+  <select id="selectByIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitDetailMonth" >
+    select
+    <include refid="Base_Column_List" />
+    from P_PROFIT_DETAIL_M
+    where
+    PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    AND AGENT_ID = #{agentId,jdbcType=VARCHAR}
+  </select>
+
 </mapper>

@@ -13,6 +13,7 @@ import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import org.activiti.engine.runtime.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1159,10 +1160,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         return profitDetailMonthMapper.selectByAgentId(agentId);
     }
 
+
+
+
     /**
      * 代理商分润冻结
      * @param  agentId 代理商唯一码
-     * @return
      */
     @Override
     public void doFrozenByAgent(String agentId) {
@@ -1170,23 +1173,32 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             throw new ProcessException("代理商唯一码为空");
         }
         ProfitDetailMonth profitM = new ProfitDetailMonth();
-
         profitM.setAgentId(agentId);
-
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, -1);
         Date date = calendar.getTime();
         String dateStr = new SimpleDateFormat("yyyyMM").format(date);
 
-        profitM.setProfitDate(dateStr);//设置分润月份
-        profitM.setStatus(String.valueOf(Status.STATUS_1.status));//设为冻结状态
+        //String dateStr = "201810";
 
-        profitDetailMonthMapper.updateStatusByAgent(profitM);//冻结
+        profitM.setProfitDate(dateStr);//设置分润月份
+        /**根据月份和唯一码获得代理商信息*/
+        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByIdAndMonth(profitM);
+        if(profitDetailMonth == null){
+            throw new ProcessException("该代理商分闰月数据不存在");
+        }
+
+        profitDetailMonth.setStatus(String.valueOf(Status.STATUS_1.status));//设为冻结状态
+        try{
+            profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonth);//冻结
+        }catch (Exception e){
+            LOG.info("代理商分润冻结失败！");
+            throw new ProcessException("代理商分润冻结失败");
+        }
 
         //直发分润冻结
         ProfitDirect profitDirect = new ProfitDirect();
         profitDirect.setFristAgentPid(profitM.getAgentId());
-
         List<ProfitDirect> list =profitDirectService.selectByFristAgentPid(profitDirect);
         if(list.size() > 0){
             for (ProfitDirect profitD : list) {
@@ -1203,6 +1215,61 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         boolean fail =busiPlatService.mPos_Frozen(agentIds);
         if(fail){
             throw new ProcessException("通知手刷，冻结失败");
+        }
+
+
+    }
+
+    /**
+     * 代理商分润解冻流程
+     * @param  agentId 代理商唯一码  profitDate分润月份
+     */
+    @Override
+    public void doUnFrozenAgentProfit(String agentId,String profitDate) {
+        //根据id，分润日期日期 获得代理商分润月数据
+        ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
+        profitDetailMonth.setAgentId(agentId);
+        profitDetailMonth.setProfitDate(profitDate);
+        ProfitDetailMonth profitM = profitDetailMonthMapper.selectByIdAndMonth(profitDetailMonth);
+        if(profitM == null){
+            LOG.info("该代理商分润数据不存在"+agentId);
+            throw new ProcessException("该代理商分润数据不存在");
+        }
+
+        String status = profitM.getStatus();
+        if( !"1".equals(status) && !"2".equals(status) && !"3".equals(status)){
+            LOG.info("该代理商对应月份分润数据未冻结，不能进行解冻"+agentId);
+            throw new ProcessException("该代理商分润数据未冻结，不能进行解冻");
+        }
+
+        //解冻：设置为未分润状态
+        profitM.setStatus(String.valueOf(Status.STATUS_4.status));
+        try{
+            profitDetailMonthMapper.updateByPrimaryKeySelective(profitM);
+        }catch (Exception e){
+            LOG.info("代理商分润解冻失败");
+            throw new ProcessException("代理商分润解冻失败");
+        }
+
+        //直发分润解冻
+        ProfitDirect profitDirect = new ProfitDirect();
+        profitDirect.setFristAgentPid(profitM.getAgentId());
+        List<ProfitDirect> list =profitDirectService.selectByFristAgentPid(profitDirect);
+        if(list.size() > 0){
+            for (ProfitDirect profitD : list) {
+                if(profitD != null){
+                    profitD.setStatus(String.valueOf(Status.STATUS_4.status));
+                    profitDirectService.updateByStatus(profitD);
+                }
+            }
+        }
+
+        //联动业务平台
+        List<String> agentIds = new ArrayList<String>();
+        agentIds.add(profitM.getAgentId());
+        boolean fail =busiPlatService.mPos_unFrozen(agentIds);
+        if(fail){
+            throw new ProcessException("通知手刷，解冻失败！");
         }
 
     }

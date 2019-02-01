@@ -130,4 +130,7 @@ public interface ProfitDetailMonthMapper {
      * @param profitDetailMonth
      */
      int updateStatusByAgent(ProfitDetailMonth profitDetailMonth);
+
+    ProfitDetailMonth selectByIdAndMonth(ProfitDetailMonth record);
+
 }
