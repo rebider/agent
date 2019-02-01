@@ -1,10 +1,10 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
 import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.pojo.admin.agent.PayComp;
 import com.ryx.credit.pojo.admin.agent.PayCompExample;
+import com.ryx.credit.service.agent.ApaycompService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ import java.util.List;
  * Created by cx on 2018/5/29.
  */
 @Service("apaycompService")
-public class ApaycompServiceImpl implements com.ryx.credit.service.agent.ApaycompService {
+public class ApaycompServiceImpl implements ApaycompService {
 
     @Autowired
     private PayCompMapper payCompMapper;

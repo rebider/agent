@@ -6,7 +6,11 @@ package com.ryx.credit.common.enumc;
  * @Description:分润获取的方式
  */
 public enum GetMethod {
-    AGENTORDER("AGENTORDER", "代理商订单分期"), AGENTDATE("AGENTDATE", "所有当月分期");
+    AGENTORDER("AGENTORDER", "代理商订单分期"),
+    AGENTDATE("AGENTDATE", "所有当月分期"),
+    CAPITAL("CAPITAL", "缴纳款分期"),
+    ALLCAPITAL("ALLCAPITAL", "所有缴纳款分期");
+
 
     public String code;
 

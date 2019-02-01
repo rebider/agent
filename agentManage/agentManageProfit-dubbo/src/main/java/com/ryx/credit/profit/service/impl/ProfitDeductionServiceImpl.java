@@ -1,6 +1,5 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.alibaba.dubbo.common.threadpool.support.fixed.FixedThreadPool;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
@@ -8,10 +7,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.BeanUtils;
 import com.ryx.credit.commons.utils.StringUtils;
-import com.ryx.credit.profit.dao.PProfitFactorMapper;
-import com.ryx.credit.profit.dao.ProfitDeductionMapper;
-import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
-import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
+import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.enums.StagingDetailStatus;
@@ -20,22 +16,17 @@ import com.ryx.credit.profit.exceptions.StagingException;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.dict.IdService;
-import javafx.concurrent.ScheduledService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author zhaodw
@@ -72,6 +63,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Autowired
     PProfitFactorMapper pProfitFactorMapper;
 
+    @Autowired
+    private ProfitStagingMapper profitStagingMapper;
+
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
     @Override
@@ -102,6 +96,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 List<String> list = new ArrayList<String>();
                 list.add("04");
                 list.add("05");
+                criteria.andDeductionTypeIn(list);
+            }else if("'03','06'".equals(profitDeduction.getDeductionType())){
+                List<String> list = new ArrayList<String>();
+                list.add("03");
+                list.add("06");
                 criteria.andDeductionTypeIn(list);
             }else{//查询其他扣款
                 criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
@@ -149,11 +148,92 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
 
     @Override
     public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
-        if (deductionist != null && deductionist.size() > 0) {
+        if(deductionist == null || deductionist.size() == 0){
+            throw new RuntimeException("导入数据为空");
+        }
+        for (List<Object> list: deductionist) {
+            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
+                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
+                throw new RuntimeException("数据不能为空");
+            }
+            try{
+                insertDeduction(list, userId);
+            }catch (Exception e){
+                throw  new RuntimeException("数据格式异常！");
+            }
+        }
+        /*if (deductionist != null && deductionist.size() > 0) {
             deductionist.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null && list.get(3) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
                 insertDeduction(list, userId);
             });
+        }*/
+    }
+
+
+    @Override
+    public Map<String,BigDecimal> getNotDeduction(Map<String,String> map){
+        Map<String,BigDecimal> resultMap = new HashMap<String,BigDecimal>();
+        //获取分润月份
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH,-1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        map.put("date",dateStr);
+        //map.put("date","201810");
+        BigDecimal BLNotDeductionAmt = getBLDeduction(map);//保理欠款
+        resultMap.put("BLNotDeductionAmt",BLNotDeductionAmt);
+
+        BigDecimal ToolNotDeductionAmt = getDeductionAmt(map,"02"); //机具扣款
+        resultMap.put("ToolNotDeductionAmt",ToolNotDeductionAmt);
+
+        BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03");//其他扣款  03
+        resultMap.put("otherNotDeductionAmt",otherNotDeductionAmt);
+
+        BigDecimal chargeBackNotDeductionAmt = getDeductionAmt(map,"01"); //退单扣款
+        resultMap.put("chargeBackNotDeductionAmt",chargeBackNotDeductionAmt);
+
+        BigDecimal checkNotDeductionAmt = getDeductionAmt(map,"05").add(getDeductionAmt(map,"04")); //考核扣款 04，05
+        resultMap.put("checkNotDeductionAmt",checkNotDeductionAmt);
+
+        return resultMap;
+    }
+
+   /**获得未扣款**/
+    private BigDecimal getDeductionAmt(Map<String,String> map,String type){
+        map.put("type",type);
+        //获得未扣款
+        BigDecimal notDeductionAmt = profitDeductionMapper.getNotDeductionAmt(map)!=null ?profitDeductionMapper.getNotDeductionAmt(map):BigDecimal.ZERO;
+        //获得分期未扣
+        BigDecimal notStagingAmt = getNotDeductionAmt(map)!= null?getNotDeductionAmt(map) : BigDecimal.ZERO;
+
+        return notDeductionAmt.add(notStagingAmt);
+    }
+
+
+    /**
+     * 获取分期欠款总计
+     * @param param
+     * @return
+     */
+    private BigDecimal getNotDeductionAmt(Map<String, String> param){
+        ProfitStaging profitStaging = profitStagingMapper.getNotDeductionAmtTwo(param);
+        if (profitStaging != null) {
+            return profitStaging.getStagAmt();
         }
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * 得到保理欠款
+     * @param map
+     * @return
+     */
+    private BigDecimal getBLDeduction(Map<String,String> map){
+        BigDecimal result = pProfitFactorMapper.getSurplusAmt(map);
+        if(result != null){
+            return result;
+        }
+        return BigDecimal.ZERO;
     }
 
     /***
@@ -821,11 +901,26 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     @Override
     public void batchInsertCheckDeduction(List<List<Object>> datas, String userId) {
-        if (datas != null && datas.size() > 0) {
+        if(datas == null || datas.size() == 0){
+            throw new RuntimeException("导入数据为空");
+        }
+        for (List<Object> list: datas) {
+            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
+                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
+                throw new RuntimeException("数据不能为空");
+            }
+            try{
+                insertDeduction(list, userId);
+            }catch (Exception e){
+                throw  new RuntimeException("数据格式异常！");
+            }
+        }
+
+       /* if (datas != null && datas.size() > 0) {
             datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
                 insertCheckDeduction(list, userId);
             });
-        }
+        }*/
     }
 
 

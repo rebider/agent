@@ -444,6 +444,11 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         int count = this.getProfitDetailMonthCount(null, profitDetailMonth);
         if (count > 0) {
 
+            //更新代理商税点
+            LOG.info("更新代理商税点开始，{}月",profitDate);
+            profitDetailMonthMapper.updateAgentInfoBeforeComput(profitDate);
+            LOG.info("更新代理商税点结束");
+
             // 其他扣款
             FORK_JOIN_POOL.invoke(new ProfitMonthServiceImpl.ComputStep(0, count, profitDetailMonth, computType));
 

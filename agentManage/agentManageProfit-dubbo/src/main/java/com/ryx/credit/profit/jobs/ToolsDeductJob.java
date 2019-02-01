@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * @author yangmx
- * @desc 机具扣款分期数据导入
+ * @desc 机具扣款分期数据同步
  */
 @Service
 public class ToolsDeductJob {
@@ -32,13 +32,19 @@ public class ToolsDeductJob {
     @Autowired
     private ToolsDeductService toolsDeductService;
 
-    @Scheduled(cron = "0 0 1 1 * ?")
+    /**
+     * @Author: Zhang Lei
+     * @Description: 每月6号凌晨1点执行
+     * @Date: 11:49 2019/1/24
+     */
+    @Scheduled(cron = "0 0 1 6 * ?")
     public void execut(){
-        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
+        String deductDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
         try {
             List<Map<String, Object>> list = iPaymentDetailService.getShareMoney(GetMethod.AGENTDATE.code, null, deductDate);
             LOG.info("从订单系统，获取到需要扣款的机具欠款总计：{} 条", list  != null && !list.isEmpty() ? list.size() : 0);
             if(list!= null && !list.isEmpty()){
+                deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);
                 deductDate = deductDate.replaceAll("-","");
                 toolsDeductService.batchInsertDeduct(list, deductDate);
             }

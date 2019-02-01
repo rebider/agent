@@ -185,8 +185,6 @@
     where PLATFORM_NUM = #{platFormNum}
   </select>
 
-  <!--=====================================================================================-->
-
   <select id="countPlatForm" parameterType="map" resultType="Integer">
     select count(ID)
     from
@@ -221,6 +219,12 @@
       </if>
       <if test="platformType != null and  ''!=platformType">
         and PLATFORM_TYPE=#{platformType}
+      </if>
+      <if test="posanameprefix != null and  ''!=posanameprefix">
+        and POSANAMEPREFIX=#{posanameprefix}
+      </if>
+      <if test="posbusitype != null and  ''!=posbusitype">
+        and POSBUSITYPE=#{posbusitype}
       </if>
     </where>
     order by C_TIME desc
@@ -266,6 +270,12 @@
       </if>
       <if test="platformType != null and  ''!=platformType">
         and PLATFORM_TYPE=#{platformType}
+      </if>
+      <if test="posanameprefix != null and  ''!=posanameprefix">
+        and POSANAMEPREFIX=#{posanameprefix}
+      </if>
+      <if test="posbusitype != null and  ''!=posbusitype">
+        and POSBUSITYPE=#{posbusitype}
       </if>
     </where>
     order by C_TIME desc
@@ -320,23 +330,18 @@
       <if test="platformType != null" >
         PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
       </if>
+      <if test="posanameprefix != null" >
+          POSANAMEPREFIX = #{posanameprefix,jdbcType=VARCHAR},
+      </if>
+      <if test="POSBUSITYPE != null" >
+          POSBUSITYPE = #{posbusitype,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
 
   <!--id自增-->
   <select id="seqId" resultType="long">SELECT A_PLATFORM_SEQ.Nextval FROM dual </select>
-
-  <insert id="insertPlatForm" parameterType="com.ryx.credit.pojo.admin.agent.PlatForm" >
-    insert into A_PLATFORM (
-    ID, PLATFORM_NUM, PLATFORM_NAME, C_TIME, C_UTIME, C_USER,
-    PLATFORM_STATUS, STATUS, VERSION, PLATFORM_TYPE)
-    values (
-    #{id,jdbcType=VARCHAR}, #{platformNum,jdbcType=VARCHAR}, #{platformName,jdbcType=VARCHAR},
-    #{cTime,jdbcType=TIMESTAMP}, #{cUtime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
-    #{platformStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{platformType,jdbcType=VARCHAR})
-  </insert>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from A_PLATFORM where ID = #{id}
@@ -374,6 +379,12 @@
       </if>
       <if test="platformType != null" >
         PLATFORM_TYPE = #{platformType,jdbcType=VARCHAR},
+      </if>
+      <if test="posanameprefix != null" >
+        POSANAMEPREFIX = #{posanameprefix,jdbcType=VARCHAR},
+      </if>
+      <if test="posbusitype != null" >
+        POSBUSITYPE = #{posbusitype,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}

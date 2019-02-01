@@ -111,26 +111,26 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Override
     public void importData(String type) {
+        String month = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
         try {
             if (type.equals("1")) {//交易量重新导入
-                tranDataJob.deal();
+                tranDataJob.deal(month);
             } else if ("2".equals(type)) {//pos分润重新同步
-                newProfitDataJob.deal(null);
+                newProfitDataJob.deal(month);
             } else if ("3".equals(type)) {//手刷月结分润重新同步
-                newProfitMonthMposDataJob.excute(null);
+                newProfitMonthMposDataJob.excute(month);
             } else if ("4".equals(type)) {//手刷日结分润重新同步
                 for (int i = 1; i <= 31; i++) {
-                    String month = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
                     String settleDay = month + (i < 10 ? "0" + i : i);
                     Thread thread = new Thread(new SyncMposDayProfit(settleDay));
                     thread.start();
                 }
             } else if ("5".equals(type)) {//手刷直发平台重新同步
-                profitZhiFaDataJob.excute(null);
+                profitZhiFaDataJob.excute(month);
             } else if ("6".equals(type)) {//手刷补差数据重新同步
-                profitMposDiffDataJob.excute(null);
+                profitMposDiffDataJob.excute(month);
             } else if ("7".equals(type)) {//手刷月汇总重算
-                profitSummaryDataJob.excute(null);
+                profitSummaryDataJob.excute(month);
             }
         } catch (Exception e) {
             e.printStackTrace();

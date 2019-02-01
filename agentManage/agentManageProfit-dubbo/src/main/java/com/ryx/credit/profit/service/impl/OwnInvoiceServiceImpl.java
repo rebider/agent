@@ -246,12 +246,29 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
      * 向欠票导入表中导入数据
      */
     @Override
-    public void exportData(List<List<Object>> datas, String loginName) {
-            if (datas != null && datas.size() > 0) {
+    public void exportData(List<List<Object>> datas, String loginName)throws RuntimeException{
+        if(datas == null || datas.size() == 0){
+            throw new RuntimeException("导入的数据为空");
+        }
+        for (List<Object> list : datas) {
+
+            if(list.size() != 3 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) ||StringUtils.isBlank(list.get(2).toString())){
+                throw new RuntimeException("导入的数据存在空数据");
+            }
+
+            try{
+                insertInvoice(list, loginName);
+            }catch(Exception e){
+                logger.info(e.getMessage());
+                throw new RuntimeException("数据格式异常！请检查文件格式");
+            }
+
+        }
+           /* if (datas != null && datas.size() > 0) {
                 datas.stream().filter(list -> list != null && list.size()== 3 && list.get(0) != null && list.get(1) != null && list.get(2) != null).forEach(list -> {
                     insertInvoice(list, loginName);
                 });
-            }
+            }*/
     }
 
     /**

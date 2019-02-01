@@ -44,7 +44,7 @@ public interface ProfitDirectMapper {
 
 
     //直发分润导出
-    List<ProfitDirect> selectByWhere(ProfitDirect record);
+    List<ProfitDirect> selectByWhere(Map<String,Object> param);
 
     void updateFristAgentStatus(String agentId);
 
@@ -62,4 +62,6 @@ public interface ProfitDirectMapper {
     void deleteByMonth(@Param("transMonth") String transMonth);
 
     BigDecimal selectSumTaxAmt2(ProfitDirect dirct);
+
+    Map<String,Object> profitCount(Map<String, Object> param);
 }

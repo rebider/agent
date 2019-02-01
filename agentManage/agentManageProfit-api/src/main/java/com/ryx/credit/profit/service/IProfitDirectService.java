@@ -7,6 +7,7 @@ import com.ryx.credit.profit.pojo.PosCheck;
 import com.ryx.credit.profit.pojo.PosCheckExample;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
+import com.sun.corba.se.spi.ior.ObjectKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -53,7 +54,7 @@ public interface IProfitDirectService {
     //void updateByAgentId(ProfitDirect ProfitDirect);
 
     //直发分润页面导出
-    public List<ProfitDirect> exportProfitDirect(ProfitDirect record);
+    public List<ProfitDirect> exportProfitDirect(Map<String,Object> param);
 
     //直发分润查询
     List<ProfitDirect> selectByFristAgentPid(ProfitDirect profitDirect);
@@ -64,4 +65,5 @@ public interface IProfitDirectService {
     //直发分润修改状态
     void updateByStatus(ProfitDirect profitDirectSingleList);
 
+    Map<String, Object> profitCount(Map<String,Object> param);
 }

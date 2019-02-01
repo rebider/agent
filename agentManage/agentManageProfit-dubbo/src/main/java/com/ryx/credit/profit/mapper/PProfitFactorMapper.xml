@@ -616,4 +616,21 @@
             </otherwise>
         </choose>
     </select>
+
+    <select id="getSurplusAmt" parameterType="java.util.Map" resultType="java.math.BigDecimal">
+        select sum(MUST_DEDUCTION_AMT) as SURPLUS_AMT
+          from P_PROFIT_FACTOR
+        <where>
+            FACTOR_MONTH=#{date}
+            <if test="agentId!= null and agentId != '' ">
+               and AGENT_ID=#{agentId}
+            </if>
+            <if test="agentName!= null and agentName != '' ">
+                and AGENT_NAME=#{agentName}
+            </if>
+            and DEDUCTION_STATUS = '0'
+        </where>
+    </select>
+
+
 </mapper>

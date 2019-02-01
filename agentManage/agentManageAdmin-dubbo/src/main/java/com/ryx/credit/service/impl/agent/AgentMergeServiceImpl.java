@@ -19,6 +19,8 @@ import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.profit.service.IOwnInvoiceService;
+import com.ryx.credit.profit.service.IProfitMergeDeductionService;
+import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -122,6 +124,12 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private AttachmentMapper attachmentMapper;
     @Autowired
     private IOwnInvoiceService ownInvoiceService;
+    @Autowired
+    private IProfitMergeDeductionService profitMergeDeductionServiceImpl;
+    @Autowired
+    private ProfitDeductionService profitDeductionServiceImpl;
+    @Autowired
+    private OPaymentDetailMapper oPaymentDetailMapper;
 
     /**
      * 合并列表
@@ -575,10 +583,11 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         reqMap.put("agStatus", AgStatus.Approved.name());
         reqMap.put("cIncomStatus", AgentInStatus.NO.status);
         reqMap.put("cloReviewStatus", AgStatus.Approved.status);
+        reqMap.put("receiptProStatus", OReceiptStatus.WAITING_LIST.code);
         reqMap.put("agentId", subAgentId);
         int i = receiptOrderMapper.queryPlannerCount(reqMap);
         if(i!=0){
-            throw new MessageException("有审批中的排单,不能发起合并");
+            throw new MessageException("有未排单,不能发起合并");
         }
 
         //未发货
@@ -587,7 +596,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         if(count!=0){
-            throw new MessageException("有审批中的已排单（未发货）,不能发起合并");
+            throw new MessageException("有未发货,不能发起合并");
         }
 
     }
@@ -678,8 +687,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.MERGE.name());
         record.setActivStatus(AgStatus.Approving.name());
-        record.setAgentId(subAgent.getId());
-        record.setAgentName(subAgent.getAgName());
+        record.setAgentId(mainAgent.getId());
+        record.setAgentName(mainAgent.getAgName());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proceId);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
@@ -747,7 +756,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常！" );
+            throw new MessageException(e.getMessage());
         }
         return AgentResult.ok();
     }
@@ -938,17 +947,37 @@ public class AgentMergeServiceImpl implements AgentMergeService {
                     logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
                     throw new MessageException("更新合并数据失败！");
                 }
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
+                if(agentBusInfo.getBusStatus().compareTo(BusinessStatus.lock.status)==0){
+                    agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                    int j = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (j != 1) {
+                        logger.info("代理商合并修改审批，更新数据失败:{}", cUser);
+                        throw new MessageException("更新合并数据失败！");
+                    }
+                }
             }
             AgentMerge queryAgentMerge = agentMergeMapper.selectByPrimaryKey(agentMerge.getId());
             if(queryAgentMerge.getCloReviewStatus().compareTo(AgStatus.Approving.getValue())==0){
                 BusActRel busActRel = new BusActRel();
                 busActRel.setBusId(agentMerge.getId());
                 busActRel.setActivId(proIns);
-                busActRel.setAgentId(agentMerge.getSubAgentId());
-                busActRel.setAgentName(agentMerge.getSubAgentName());
-                int i = busActRelMapper.updateByPrimaryKey(busActRel);
+                busActRel.setAgentId(agentMerge.getMainAgentId());
+                busActRel.setAgentName(agentMerge.getMainAgentName());
+                int i = busActRelMapper.updateByPrimaryKeySelective(busActRel);
                 if (i != 1) {
                     throw new MessageException("更新合并工作流关系失败！");
+                }
+                String strMergeBusIds = agentMerge.getMergeBusIds();
+                String[] mergeBusIds = strMergeBusIds.split(",");
+                for(int j=0;j<mergeBusIds.length;j++){
+                    String mergeBusId = mergeBusIds[j];
+                    AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+                    agentBusInfo.setBusStatus(BusinessStatus.lock.status);
+                    int p = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                    if (p!=1) {
+                        throw new MessageException("更新业务锁定失败");
+                    }
                 }
             }
             //查看被合并代理商有没有合并过
@@ -1059,7 +1088,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         //如果填写了，合并到那个被合并代理商的分期订单欠款,同步到分润其他扣款
         if(agentMerge.getSuppType().compareTo(mergeSuppType.DLSDK.getValue())==0){
-            Map<String,String> reqMap = new HashMap<>();
+            Map<String,Object> reqMap = new HashMap<>();
             String subAgentName = agentMerge.getSubAgentName();
             String subAgentId = agentMerge.getSubAgentId();
             reqMap.put("AGENT_NAME",subAgentName);
@@ -1071,7 +1100,27 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             reqMap.put("RPLACE_AGENT_NAME",agentMerge.getSuppAgentName());
             reqMap.put("SUPPLY_AMT",String.valueOf(getSubAgentDebt(subAgentId)));
             reqMap.put("REMARK",agentMerge.getRemark());
+            reqMap.put("DEDUCTION_TYPE","06"); //代理商合并
+            HashMap<String, Object> queryMap = new HashMap<>();
+            queryMap.put("agentId", subAgentId);
+            List<Map<String, Object>> maps = oPaymentDetailMapper.getAllDebtDetail(queryMap);
+            for (Map<String, Object> map : maps) {
+                String id = String.valueOf(map.get("ID"));
+                OPaymentDetail paymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
+                paymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                int j = oPaymentDetailMapper.updateByPrimaryKeySelective(paymentDetail);
+                if(j!=1){
+                    throw new MessageException("代理商合并：更新付款明细失败");
+                }
+            }
+            reqMap.put("DETAILS",maps);
             logger.info("代理商合并欠款代理商代扣请求参数：{}",reqMap);
+            Map map = profitMergeDeductionServiceImpl.ProfitMergeDeduction(reqMap);
+            logger.info("代理商合并欠款代理商代扣返回：{}",map);
+            String rusult_code = String.valueOf(map.get("rusult_code"));
+            if(!rusult_code.equals("00")){
+                throw new MessageException("欠款同步分润失败");
+            }
         }
 
         //通知业务系统
@@ -1079,7 +1128,6 @@ public class AgentMergeServiceImpl implements AgentMergeService {
 
         return AgentResult.ok();
     }
-
 
     /**
      * 手动更改手刷、POS代理商名称
@@ -1093,19 +1141,24 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         if(agentMerge==null){
             throw new MessageException("未找到合并信息");
         }
-        String agentName = agentMerge.getMainAgentName() + "-" + agentMerge.getSubAgentName();
 
         List<String> mPosOrgList = new ArrayList<>();
         for (AgentMergeBusInfo agentMergeBusInfo : agentMergeBusInfos) {
-            String platType = platFormMapper.selectPlatType(agentMergeBusInfo.getBusPlatform());
+            PlatForm platForm = platFormMapper.selectByPlatFormNum(agentMergeBusInfo.getBusPlatform());
+            String platType = platForm.getPlatformType();
             if(platType.equals(PlatformType.MPOS.getValue())){
                 mPosOrgList.add(agentMergeBusInfo.getBusNum());
                 continue;
             }
             //调用Pos
             if(platType.equals(PlatformType.POS.getValue()) || platType.equals(PlatformType.ZPOS.getValue())){
+
+                String subAgentName = StringUtils.isNotBlank(platForm.getPosanameprefix()) ? platForm.getPosanameprefix()+agentMerge.getSubAgentName() : agentMerge.getSubAgentName();
+                String agentName = agentMerge.getMainAgentName()+"-"+subAgentName;
+
                 AgentPlatFormSyn record = new AgentPlatFormSyn();
                 AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+
                 agentNotifyVo.setOrgName(agentName);
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentMergeBusInfo.getBusId());
                 Agent agent = agentMapper.selectByPrimaryKey(agentBusInfo.getAgentId());
@@ -1165,6 +1218,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         }
         //调用手刷接口
         if(mPosOrgList.size()!=0){
+            String agentName = agentMerge.getMainAgentName() + "-" + agentMerge.getSubAgentName();
             List<AgentBusInfo> agentBusInfoList = agentBusinfoService.agentBusInfoList(agentMerge.getMainAgentId());
             AgentBusInfo busInfo = agentBusInfoList.get(0);
             PayComp payComp = apaycompService.selectById(busInfo.getCloPayCompany());
@@ -1354,7 +1408,19 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         //订单欠款
         BigDecimal orderDebt = orderService.queryAgentDebt(agentId);
         logger.info("代理商合并查询订单欠款：代理商id:{},欠款：{}",agentId,orderDebt);
-        return orderDebt;
+        Map<String,String> reqMap = new HashMap<>();
+        reqMap.put("agentId",agentId);
+        Map<String, BigDecimal> notDeduction = profitDeductionServiceImpl.getNotDeduction(reqMap);
+        BigDecimal checkNotDeductionAmt = notDeduction.get("checkNotDeductionAmt");
+        BigDecimal bLNotDeductionAmt = notDeduction.get("BLNotDeductionAmt");
+        BigDecimal otherNotDeductionAmt = notDeduction.get("otherNotDeductionAmt");
+        BigDecimal chargeBackNotDeductionAmt = notDeduction.get("chargeBackNotDeductionAmt");
+        BigDecimal toolNotDeductionAmt = notDeduction.get("ToolNotDeductionAmt");
+
+        BigDecimal sum = new BigDecimal(0);
+        sum = sum.add(orderDebt).add(checkNotDeductionAmt).add(bLNotDeductionAmt).add(otherNotDeductionAmt).
+                add(chargeBackNotDeductionAmt).add(toolNotDeductionAmt);
+        return sum;
     }
 
     /**
