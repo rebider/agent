@@ -420,9 +420,7 @@ public class AgentServiceImpl implements AgentService {
         ThreadPool.putThreadPool(() -> {
             try {
                 Agent agent = getAgentById(agentId);
-                UserVo userVo_q = new UserVo();
-                userVo_q.setLoginName(agent.getAgUniqNum());
-                List<CUser>  userVoSelect = iUserService.selectByLoginName(userVo_q);
+                List<CUser>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
                 if (userVoSelect != null || userVoSelect.size()>0) {
                     return;
                 }
@@ -440,9 +438,7 @@ public class AgentServiceImpl implements AgentService {
                 iUserService.insertByVo(userVo);
 
 
-                UserVo query = new UserVo();
-                query.setLoginName(agent.getAgUniqNum());
-                List<CUser>  list_db = iUserService.selectByLoginName(query);
+                List<CUser>  list_db = cUserMapper.selectListByLogin(agent.getAgUniqNum());
                 CUser cUser = new CUser();
                 if(list_db.size()>0){
                     cUser = list_db.get(0);
@@ -453,6 +449,7 @@ public class AgentServiceImpl implements AgentService {
                 cuserAgent.setcTime(new Date());
                 cuserAgent.setStatus(BigDecimal.ONE);
                 cuserAgent.setUserType(BigDecimal.ONE.toString());
+                cuserAgent.setVersion(BigDecimal.ONE);
                 iCuserAgentService.insert(cuserAgent);
                 redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
             } catch (Exception e) {

@@ -6,8 +6,11 @@ import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.commons.utils.DigestUtils;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.CUserMapper;
+import com.ryx.credit.dao.CUserRoleMapper;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.CUser;
+import com.ryx.credit.pojo.admin.CUserRole;
 import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.Agent;
@@ -39,6 +42,10 @@ public class AgentLoginAccountCreateTask {
     private IUserService iUserService;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private CUserMapper userMapper;
+    @Autowired
+    private CUserRoleMapper cUserRoleMapper;
     @Autowired
     private ICuserAgentService iCuserAgentService;
     private static Logger logger = LoggerFactory.getLogger(AgentServiceImpl.class);
@@ -82,6 +89,20 @@ public class AgentLoginAccountCreateTask {
                         iCuserAgentService.insert(cuserAgent);
                         redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
                     }
+                    List<CUserRole> roles = cUserRoleMapper.selectByUserId(cUser.getId());
+                    if(roles.size()==0){
+                        String ro = redisService.hGet("config", "role");
+                        if(StringUtils.isNotBlank(ro)) {
+                            String[] roles_array = ro.split(",");
+                            CUserRole userRole = new CUserRole();
+                            for (String s : roles_array) {
+                                userRole.setUserId(cUser.getId());
+                                userRole.setRoleId(Long.valueOf(s));
+                                cUserRoleMapper.insert(userRole);
+                                logger.info("代理商进行任务开户添加角色{}：{}",agent.getAgUniqNum(),s);
+                            }
+                        }
+                    }
                    continue;
                 }
                 logger.info("代理商进行任务开户{}",agent.getAgUniqNum());
@@ -97,10 +118,7 @@ public class AgentLoginAccountCreateTask {
                 userVo.setUserType(1);
                 userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
-
-                UserVo query = new UserVo();
-                query.setLoginName(agent.getAgUniqNum());
-                List<CUser>  list_db = iUserService.selectByLoginName(query);
+                List<CUser>  list_db = userMapper.selectListByLogin(agent.getAgUniqNum());
                 CUser cUser = new CUser();
                 if(list_db.size()>0){
                     cUser = list_db.get(0);
