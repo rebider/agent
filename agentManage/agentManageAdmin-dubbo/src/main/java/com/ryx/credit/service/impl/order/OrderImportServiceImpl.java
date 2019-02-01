@@ -979,9 +979,24 @@ public class OrderImportServiceImpl implements OrderImportService {
                 }
                 //sn放入redis中
                 redisService.rpushList("returnorder:snlist:"+orderImportReturnLogincInfo.getReturnOrderId()+"_"+orderImportReturnLogincInfo.getSnStart()+orderImportReturnLogincInfo.getSnEnd(),s);
-            }
-        }
 
+                //查询发货有效的自己的sn码更新为退货历史
+                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andSnNumEqualTo(s)
+                        .andAgentIdEqualTo(agent.getId())
+                        .andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code)
+                        .andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                List<OLogisticsDetail>  oLogisticsDetaillist = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                if(oLogisticsDetaillist.size()>0){
+                    for (OLogisticsDetail detail : oLogisticsDetaillist) {
+                        detail.setStatus(OLogisticsDetailStatus.STATUS_TH.code);
+                        detail.setRecordStatus(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+                        oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+                    }
+                }
+            }
+
+        }
 
         Calendar c = Calendar.getInstance();
         //生成退货单退货明细，退货单订单关系表
@@ -1037,9 +1052,14 @@ public class OrderImportServiceImpl implements OrderImportService {
         }
 
 
-        //
+        //生成负数的分期欠款抵扣分润
 
         //更新不是当前代理商的排单信息的退货子订单信息未当前代理商的退货单明细编号
+
+
+
+
+
 
 
 
