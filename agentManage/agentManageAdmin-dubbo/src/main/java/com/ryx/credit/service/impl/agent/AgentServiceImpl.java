@@ -12,6 +12,7 @@ import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.pojo.admin.COrganization;
+import com.ryx.credit.pojo.admin.CUser;
 import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
@@ -419,8 +420,8 @@ public class AgentServiceImpl implements AgentService {
         ThreadPool.putThreadPool(() -> {
             try {
                 Agent agent = getAgentById(agentId);
-                UserVo userVoSelect = iUserService.selectByName(agent.getAgName());
-                if (userVoSelect != null) {
+                List<CUser>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+                if (userVoSelect != null || userVoSelect.size()>0) {
                     return;
                 }
                 UserVo userVo = new UserVo();
@@ -429,29 +430,28 @@ public class AgentServiceImpl implements AgentService {
                 userVo.setSalt(salt);
                 userVo.setPassword(pwd);
                 userVo.setName(agent.getAgName());
-//                if (StringUtils.isNotBlank(agent.getAgLegalMobile())) {
-//                    userVo.setLoginName(agent.getAgLegalMobile());
-//                } else if (StringUtils.isNotBlank(agent.getAgUniqNum())) {
-//                    userVo.setLoginName(agent.getAgUniqNum());
-//                } else {
-//                    userVo.setLoginName(agent.getId());
-//                }
-
-                userVo.setLoginName(agent.getId());
+                userVo.setLoginName(agent.getAgUniqNum());
                 userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
                 userVo.setRoleIds(redisService.hGet("config", "role"));
                 userVo.setUserType(1);
                 userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
-                userVo = iUserService.selectByName(userVo.getName());
+
+
+                List<CUser>  list_db = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+                CUser cUser = new CUser();
+                if(list_db.size()>0){
+                    cUser = list_db.get(0);
+                }
                 CuserAgent cuserAgent = new CuserAgent();
                 cuserAgent.setAgentid(agent.getId());
-                cuserAgent.setUserid(userVo.getId().toString());
+                cuserAgent.setUserid(cUser.getId().toString());
                 cuserAgent.setcTime(new Date());
                 cuserAgent.setStatus(BigDecimal.ONE);
                 cuserAgent.setUserType(BigDecimal.ONE.toString());
+                cuserAgent.setVersion(BigDecimal.ONE);
                 iCuserAgentService.insert(cuserAgent);
-                redisService.hSet("agent", String.valueOf(userVo.getId()), agent.getId());
+                redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
             } catch (Exception e) {
                 logger.error("createBackUserbyAgent error {}", agentId, e);
             }

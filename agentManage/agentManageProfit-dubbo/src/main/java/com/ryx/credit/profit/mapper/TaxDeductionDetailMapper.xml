@@ -519,7 +519,7 @@
           nvl(f.NOT_DEDUCTION_TAX_AMT,0) PRE_NOT_DEDUCTION_TAX_AMT,
           nvl(h.PAY_AMOUNT,0) MACHIN_AMT,
           A.PARENT_AGENT_ID,g.AG_NAME PARENT_AGENT_NAME,
-          nvl(a.TAX,'0') TAX,
+          nvl(a.TAX,'0.06') TAX,
           a.BUS_PLATFORM BUS_PLATFORM
     from P_PROFIT_DETAIL_M a
 

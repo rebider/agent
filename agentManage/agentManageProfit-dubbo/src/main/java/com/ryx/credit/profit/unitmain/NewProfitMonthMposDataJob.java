@@ -18,6 +18,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OrderService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,19 @@ public class NewProfitMonthMposDataJob {
     private int index = 1;
     private static BigDecimal allAmount = BigDecimal.ZERO;
 
+
+    /**
+     * 同步手刷月分润明细数据(TransProfitDetail)
+     * transDate 交易日期（空则为上一月）
+     * 每月3号上午11点
+     */
+    @Scheduled(cron = "0 0 11 3 * ?")
+    public void doCron() {
+        String transDate = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+        excute(transDate);
+    }
+
+    @Transactional
     public void excute(String transDate) {
         logger.info("=============手刷{}月分润明细数据同步执行开始===========", transDate);
         transDate = transDate == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : transDate;
@@ -69,12 +83,6 @@ public class NewProfitMonthMposDataJob {
         logger.info("=============手刷{}月分润明细数据同步执行结束,耗时{}ms===========", transDate, (t2 - t1));
     }
 
-    /**
-     * 同步手刷月分润明细数据(TransProfitDetail)
-     * transDate 交易日期（空则为上一月）
-     * 每月5号上午12点：@Scheduled(cron = "0 0 5 12 * ?")
-     */
-//    @Scheduled(cron = "0 55 10 22 * ?")
 
     public void synchroProfitMonth(String transDate) {
 
@@ -90,7 +98,7 @@ public class NewProfitMonthMposDataJob {
         JSONObject json = JSONObject.parseObject(res);
         if (!json.get("respCode").equals("000000")) {
             logger.error("请求同步失败！");
-            AppConfig.sendEmails("月分润同步失败! respCode="+json.get("respCode")+",respMsg="+json.get("respMsg"), "月分润同步失败");
+            AppConfig.sendEmails("月分润同步失败! respCode=" + json.get("respCode") + ",respMsg=" + json.get("respMsg"), "月分润同步失败");
             throw new RuntimeException("月分润同步失败！");
         }
 
@@ -186,7 +194,7 @@ public class NewProfitMonthMposDataJob {
             detail.setSourceInfo("MPOS");
 
             //手刷只有5000平台有补差
-            if("5000".equals(json.getString("PLATFORMNUM"))){
+            if ("5000".equals(json.getString("PLATFORMNUM"))) {
                 ProfitSupplyDiff where = new ProfitSupplyDiff();
                 where.setDiffDate(transDate);
                 where.setParentAgentid(json.getString("AGENCYID"));

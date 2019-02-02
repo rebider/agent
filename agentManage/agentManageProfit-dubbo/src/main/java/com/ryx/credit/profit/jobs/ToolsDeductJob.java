@@ -21,7 +21,7 @@ import java.util.*;
 
 /**
  * @author yangmx
- * @desc 机具扣款分期数据导入
+ * @desc 机具扣款分期数据同步
  */
 @Service
 public class ToolsDeductJob {
@@ -32,6 +32,11 @@ public class ToolsDeductJob {
     @Autowired
     private ToolsDeductService toolsDeductService;
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 每月6号凌晨1点执行
+     * @Date: 11:49 2019/1/24
+     */
     @Scheduled(cron = "0 0 1 6 * ?")
     public void execut(){
         String deductDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7);

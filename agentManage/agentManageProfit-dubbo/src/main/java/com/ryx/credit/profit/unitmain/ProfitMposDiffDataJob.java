@@ -13,6 +13,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,17 @@ public class ProfitMposDiffDataJob {
         System.out.println(data);
     }
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 手刷补差数据同步，每月3号10:30
+     * @Date: 11:04 2019/1/24
+     */
+    @Scheduled(cron = "0 30 10 3 * ?")
+    public void doCron(){
+        String month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6);
+        excute(month);
+    }
+
     @Transactional
     public void excute(String month) {
         month = month == null ? DateUtil.sdfDays.format(DateUtil.addMonth(new Date(), -1)).substring(0, 6) : month;
@@ -71,12 +83,6 @@ public class ProfitMposDiffDataJob {
 
     }
 
-    /**
-     * 同步手刷月分润明细数据
-     * month 交易日期（空则为上一月）
-     * 每月5号上午8点：@Scheduled(cron = "0 0 5 8 * ?")
-     */
-//    @Scheduled(cron = "0 11 10 22 * ?")
     public void synchroProfitDiff(String month) {
 
         try {
