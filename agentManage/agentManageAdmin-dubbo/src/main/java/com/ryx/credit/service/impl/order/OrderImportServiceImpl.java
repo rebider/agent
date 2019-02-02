@@ -107,7 +107,12 @@ public class OrderImportServiceImpl implements OrderImportService {
     private OSubOrderActivityMapper oSubOrderActivityMapper;
     @Autowired
     private AgentBusinfoService agentBusinfoService;
-
+    @Autowired
+    private OReturnOrderDetailMapper oReturnOrderDetailMapper;
+    @Autowired
+    private OReturnOrderMapper  oReturnOrderMapper;
+    @Autowired
+    private OReturnOrderRelMapper oReturnOrderRelMapper;
 
 
     List<Dict> CAPITAL_TYPE = new ArrayList<>();
@@ -149,8 +154,7 @@ public class OrderImportServiceImpl implements OrderImportService {
 
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
-    public AgentResult pareseOrder(ImportAgent importAgent,String User) throws Exception {
-
+    public AgentResult pareseOrder(ImportAgent importAgent,String User) throws MessageException {
         try {
             //解析订单信息
             String OBASE_dataContent = importAgent.getDatacontent();
@@ -208,7 +212,7 @@ public class OrderImportServiceImpl implements OrderImportService {
      */
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult pareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User) throws Exception {
+    public AgentResult pareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User) throws MessageException {
 
         //查询代理商信息 查询代理商业务平台信息
         AgentBusInfoExample example = new AgentBusInfoExample();
@@ -508,7 +512,7 @@ public class OrderImportServiceImpl implements OrderImportService {
      * @throws Exception
      */
     @Override
-    public AgentResult pareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User) throws Exception {
+    public AgentResult pareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User) throws MessageException {
         List<OrderImportGoodsInfo> OrderImportGoodsInfoList = orderImportBaseInfo.getOrderImportGoodsInfos();
         List<String> listIdes = new ArrayList<>();
         Calendar c = Calendar.getInstance();
@@ -785,14 +789,14 @@ public class OrderImportServiceImpl implements OrderImportService {
 
                         if (1 != oLogisticsDetailMapper.insertSelective(detail)) {
                             logger.info("添加失败");
-                            throw new ProcessException("添加失败");
+                            throw new MessageException("添加失败");
                         }
                     }
                 }
             }
 
         }
-        return null;
+        return AgentResult.ok();
     }
 
     /**
@@ -801,7 +805,7 @@ public class OrderImportServiceImpl implements OrderImportService {
      * @throws Exception
      */
     @Override
-    public AgentResult pareseOrderLogic(String value) throws Exception {
+    public AgentResult pareseOrderLogic(String value) throws MessageException {
         logger.info("======{}物流信存储到reids",value);
         //查询订单信息
         ImportAgentExample example = new ImportAgentExample();
@@ -832,10 +836,10 @@ public class OrderImportServiceImpl implements OrderImportService {
 
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
-    public AgentResult pareseReturn(ImportAgent importAgent,String User) throws Exception {
-
+    public AgentResult pareseReturn(ImportAgent importAgent,String User) throws MessageException {
         //退货单
         String returnOrderString = importAgent.getDatacontent();
+        logger.info("解析退货单[{}]",returnOrderString);
         JSONArray returnOrderJsnoArray = JSONArray.parseArray(returnOrderString);
         OrderImportReturnInfo orderImportReturnInfo = new OrderImportReturnInfo();
         orderImportReturnInfo.loadInfoFromJsonArray(returnOrderJsnoArray);
@@ -846,14 +850,13 @@ public class OrderImportServiceImpl implements OrderImportService {
                 .andAgStatusEqualTo(AgStatus.Approved.name());
         List<Agent>  agentList =  agentMapper.selectByExample(agentExample);
         if(agentList.size()!=1){
-            logger.info("退货单["+orderImportReturnInfo.getReturnOrderId()+"]代理商唯一编号查询代理商未找到["+orderImportReturnInfo.getAgentUniqId()+"]");
+            logger.info("解析退货单["+orderImportReturnInfo.getReturnOrderId()+"]代理商唯一编号查询代理商未找到["+orderImportReturnInfo.getAgentUniqId()+"]");
+            throw new MessageException("代理商信息未找到");
         }
         Agent agent = agentList.get(0);
-
-        //退货单物流
         ImportAgentExample example = new ImportAgentExample();
         example.or().andStatusEqualTo(Status.STATUS_1.status)//有效
-                .andDealstatusEqualTo(Status.STATUS_1.status)//待处理
+                .andDealstatusEqualTo(Status.STATUS_0.status)//待处理
                 .andDataidEqualTo(orderImportReturnInfo.getReturnOrderId())
                 .andDatatypeEqualTo(AgImportType.ORLOGI.code);
         List<ImportAgent> importAgentsLogics =  importAgentMapper.selectByExampleWithBLOBs(example);
@@ -861,26 +864,29 @@ public class OrderImportServiceImpl implements OrderImportService {
             logger.info("退货单物流为空["+orderImportReturnInfo.getReturnOrderId()+"]");
             throw new MessageException("退货单物流为空["+orderImportReturnInfo.getReturnOrderId()+"]");
         }
-
-
+        logger.info("退货单物流信息["+importAgentsLogics.size()+"]条");
         //每行ID
         String orderId_productId = "";
         Map<String, Object> newLine_detail = null;
         //所有退货商品总价格
         BigDecimal totalAmt = BigDecimal.ZERO;
+        //订单退货单关系
+        Set<String> relSet = new HashSet<>();
+        //订单平台滤
         HashSet<Object> set = new HashSet<>();
         //根据 "订单编号_商品编号" 作为唯一ID，统计每行退货信息
         List<Map<String, Object>> retList = new ArrayList<Map<String, Object>>();
-
-        //物流转货对象 sn接卸
+        //=============================================================退货单物流解析
         List<OrderImportReturnLogincInfo> orderImportReturnLogincInfos = new ArrayList<>();
+        logger.info("退货单物流信息开始解析[{}][{}]条",orderImportReturnInfo.getReturnOrderId(),importAgentsLogics.size());
         for (ImportAgent importAgentsLogic : importAgentsLogics) {
             OrderImportReturnLogincInfo orderImportReturnLogincInfo = new OrderImportReturnLogincInfo();
             orderImportReturnLogincInfo.loadInfoFromJsonArray(JSONArray.parseArray(importAgentsLogic.getDatacontent()));
             orderImportReturnLogincInfos.add(orderImportReturnLogincInfo);
             importAgentsLogic.setDealstatus(Status.STATUS_1.status);
             if(importAgentMapper.updateByPrimaryKeySelective(importAgentsLogic)!=1){
-              logger.info("物流信息更新处理中失败["+importAgentsLogic.getId()+"]");
+              logger.info("物流信息更新处理中失败，importAgentsLogic.getId()["+importAgentsLogic.getId()+"]");
+              throw new MessageException("物流信息更新处理中失败，importAgentsLogic.getId()["+importAgentsLogic.getId()+"]");
             }
             //fixme 根据厂商判断sn生成方式
             List<String> idlist =  oLogisticsService.idList(
@@ -888,17 +894,27 @@ public class OrderImportServiceImpl implements OrderImportService {
                     orderImportReturnLogincInfo.getSnEnd(),
                     Integer.valueOf(orderImportReturnLogincInfo.getSnStartNum()),
                     Integer.valueOf(orderImportReturnLogincInfo.getSnEndNum()));
-
+            logger.info("退货单物流信息{}:{}:{}解析后数量{}",
+                    orderImportReturnLogincInfo.getReturnOrderId(),
+                    orderImportReturnLogincInfo.getSnStart(),
+                    orderImportReturnLogincInfo.getSnEnd(),
+                    idlist.size());
             if(idlist.size()==0){
                 throw new MessageException(
                         orderImportReturnLogincInfo.getReturnOrderId()
                                 +":"
                                 +orderImportReturnLogincInfo.getSnStart()
                                 +":"
-                                +orderImportReturnLogincInfo.getSnEnd()+"解析后数量未0");
+                                +orderImportReturnLogincInfo.getSnEnd()+"解析后数量为"+idlist.size());
             }
 
             //fixme 退货导入是否加入退货数量进行校验
+            logger.info("退货单物流信息{}:{}:{}解析后数量{}开始校验",
+                    orderImportReturnLogincInfo.getReturnOrderId(),
+                    orderImportReturnLogincInfo.getSnStart(),
+                    orderImportReturnLogincInfo.getSnEnd(),
+                    idlist.size());
+
             for (String s : idlist) {
                 //退货单sn必须是发货有效的存在
                 OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
@@ -908,21 +924,17 @@ public class OrderImportServiceImpl implements OrderImportService {
                         .andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
                 List<OLogisticsDetail>  oLogisticsDetaillist = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
                 if(oLogisticsDetaillist.size()==0){
-                    logger.info(orderImportReturnLogincInfo.getReturnOrderId()
-                            +":"
-                            +orderImportReturnLogincInfo.getSnStart()
-                            +":"
-                            +orderImportReturnLogincInfo.getSnEnd()+"数据库中未找到sn码");
+                    logger.info("退货单物流信息{}:{}:{}解析后数量{} 数据库中未找到代理商不为{}的sn{}",
+                            orderImportReturnLogincInfo.getReturnOrderId(),
+                            orderImportReturnLogincInfo.getSnStart(),
+                            orderImportReturnLogincInfo.getSnEnd(),
+                            idlist.size(),
+                            agent.getId(),s);
+
                     throw new MessageException(
-                            orderImportReturnLogincInfo.getReturnOrderId()
-                                    +":"
-                                    +orderImportReturnLogincInfo.getSnStart()
-                                    +":"
-                                    +orderImportReturnLogincInfo.getSnEnd()+"数据库中未找到sn码");
+                            orderImportReturnLogincInfo.getReturnOrderId()+":"+orderImportReturnLogincInfo.getSnStart()+":"+orderImportReturnLogincInfo.getSnEnd()+"数据库中未找到代理商不为"+agent.getAgName()+"的sn码："+s);
                 }
              }
-
-            logger.info("退货单物流明细放入redis("+idlist.size()+"个)"+orderImportReturnLogincInfo.getSnStart()+":"+orderImportReturnLogincInfo.getSnEnd());
             for (String s : idlist) {
                 Map<String, Object>  map = oLogisticsMapper.getOrderAndLogisticsBySn(s, agent.getId());
                 if (map==null){
@@ -932,10 +944,20 @@ public class OrderImportServiceImpl implements OrderImportService {
                 OOrder order = orderService.getById(norderId);
                 set.add(order.getOrderPlatform());
                 if (set.size()>1){
+                    logger.info("退货单物流信息{}:{}:{}解析后数量{} 所发SN码不属于同一个平台",
+                            orderImportReturnLogincInfo.getReturnOrderId(),
+                            orderImportReturnLogincInfo.getSnStart(),
+                            orderImportReturnLogincInfo.getSnEnd(),
+                            idlist.size(),set.toString());
                     throw new MessageException("所发SN码不属于同一个平台");
                 }
                 List<AgentBusInfo> agentBusInfos = agentBusinfoService.selectExistsById(order.getBusId());
                 if(agentBusInfos.size()==0){
+                    logger.info("退货单物流信息{}:{}:{}解析后数量{} SN不在平台下",
+                            orderImportReturnLogincInfo.getReturnOrderId(),
+                            orderImportReturnLogincInfo.getSnStart(),
+                            orderImportReturnLogincInfo.getSnEnd(),
+                            idlist.size());
                     throw new MessageException("SN不在平台下");
                 }
                 String ordernum = (String) map.get("ORDERNUM");
@@ -971,16 +993,16 @@ public class OrderImportServiceImpl implements OrderImportService {
                     newLine_detail.put("planId", planId);
                     newLine_detail.put("receiptId", receiptId);
                     newLine_detail.put("ordernum", ordernum);
+                    //sn放入redis中
+                    redisService.rpushList("returnorder:orderprosnlist:"+orderId_productId,s);
                 } else {
                     //还是同一个 "订单_商品",  累加一个订单中一个商品的数量，总价
                     newLine_detail.put("endSn", s);
                     newLine_detail.put("count", (int) newLine_detail.get("count") + 1);
                     newLine_detail.put("totalPrice", ((BigDecimal) newLine_detail.get("totalPrice")).add(proprice));
+                    redisService.rpushList("returnorder:orderprosnlist:"+orderId_productId,s);
                 }
-                //sn放入redis中
-                redisService.rpushList("returnorder:snlist:"+orderImportReturnLogincInfo.getReturnOrderId()+"_"+orderImportReturnLogincInfo.getSnStart()+orderImportReturnLogincInfo.getSnEnd(),s);
-
-                //查询发货有效的自己的sn码更新为退货历史
+                    //查询发货有效的自己的sn码更新为退货历史
                 OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
                 oLogisticsDetailExample.or().andSnNumEqualTo(s)
                         .andAgentIdEqualTo(agent.getId())
@@ -995,11 +1017,12 @@ public class OrderImportServiceImpl implements OrderImportService {
                     }
                 }
             }
-
         }
 
+
+
         Calendar c = Calendar.getInstance();
-        //生成退货单退货明细，退货单订单关系表
+        //=============================================================退货单
         OReturnOrder oReturnOrder = new OReturnOrder();
         oReturnOrder.setId(idService.genId(TabId.o_return_order));
         oReturnOrder.setAgentId(agent.getId());
@@ -1009,7 +1032,7 @@ public class OrderImportServiceImpl implements OrderImportService {
         oReturnOrder.setReturnAmo(new BigDecimal(orderImportReturnInfo.getReturnPayAmt()));
         oReturnOrder.setGoodsReturnAmo(new BigDecimal(orderImportReturnInfo.getReturnPayAmt()));
         oReturnOrder.setCutAmo(new BigDecimal(0));
-        oReturnOrder.setRelReturnAmo(new BigDecimal(orderImportReturnInfo.getReturnPayAmt()));
+        oReturnOrder.setRelReturnAmo(new BigDecimal(orderImportReturnInfo.getHaveReturnPayAmt()));
         oReturnOrder.setTakeOutAmo(new BigDecimal(0));
         oReturnOrder.setReturnAddress("(老订单)");
         oReturnOrder.setRetTime(c.getTime());
@@ -1023,10 +1046,11 @@ public class OrderImportServiceImpl implements OrderImportService {
         oReturnOrder.setVersion(Status.STATUS_0.status);
         oReturnOrder.setRefundtime(c.getTime());
         oReturnOrder.setRefundpeople(User);
-
-        //生成退货订单明细
+        if(oReturnOrderMapper.insertSelective(oReturnOrder)!=1){
+            throw new MessageException("退货处理失败");
+        }
+        //=============================================================生成退货单退货明细，退货单订单关系表
         for (Map<String, Object> stringObjectMap : retList) {
-
             OReturnOrderDetail returnOrderDetail = new OReturnOrderDetail();
             returnOrderDetail.setId(idService.genId(TabId.o_return_order_detail));
             returnOrderDetail.setReturnId(oReturnOrder.getId());
@@ -1047,22 +1071,155 @@ public class OrderImportServiceImpl implements OrderImportService {
             returnOrderDetail.setReturnTime(c.getTime());
             returnOrderDetail.setcTime(c.getTime());
             returnOrderDetail.setcUser(User);
+            if(oReturnOrderDetailMapper.insertSelective(returnOrderDetail)!=1){
+                throw new MessageException("退货明细处理失败");
+            }
 
-
+            //需要更新退货明细的sn
+            List<String> listforupdate_planreturnorderdetail = redisService.lrange("returnorder:orderprosnlist:"+stringObjectMap.get("orderId")+"_"+stringObjectMap.get("proId"),0,-1);
+            for (String s : listforupdate_planreturnorderdetail) {
+                OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                oLogisticsDetailExample.or().andSnNumEqualTo(s)
+                        .andAgentIdNotEqualTo(agent.getId())
+                        .andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code)
+                        .andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                List<OLogisticsDetail>  oLogisticsDetaillist = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+                if(oLogisticsDetaillist.size()!=0){
+                    String logicid = oLogisticsDetaillist.get(0).getLogisticsId();
+                    OLogistics logistics = oLogisticsMapper.selectByPrimaryKey(logicid);
+                    ReceiptPlan receiptPlan = receiptPlanMapper.selectByPrimaryKey(logistics.getReceiptPlanId());
+                    receiptPlan.setReturnOrderDetailId(returnOrderDetail.getId());
+                    if(receiptPlanMapper.updateByPrimaryKeySelective(receiptPlan)!=1){
+                        throw new MessageException("退货更新排单表退货子订单id失败setReturnOrderDetailId");
+                    }
+                }
+            }
+            redisService.delete("returnorder:orderprosnlist:"+stringObjectMap.get("orderId")+"_"+stringObjectMap.get("proId"));
+            //订单退货单关系
+            String setstr = returnOrderDetail.getOrderId() + "_" + returnOrderDetail.getSubOrderId() + "_" + returnOrderDetail.getReturnId();
+            relSet.add(setstr);
+        }
+        //生成退货和订单关系
+        for (String realId : relSet) {
+            try {
+                String[] ids = realId.split("_");
+                OReturnOrderRel returnOrderRel = new OReturnOrderRel();
+                returnOrderRel.setId(idService.genId(TabId.o_return_order_rel));
+                returnOrderRel.setOrderId(ids[0]);
+                returnOrderRel.setSubOrderId(ids[1]);
+                returnOrderRel.setReturnOrderId(ids[2]);
+                returnOrderRel.setcTime(new Date());
+                returnOrderRel.setcUser(User);
+                if(1!=oReturnOrderRelMapper.insertSelective(returnOrderRel)){
+                    throw new MessageException("生成退货关系失败");
+                }
+            } catch (Exception e) {
+                throw new MessageException("生成退货关系失败");
+            }
         }
 
-
         //生成负数的分期欠款抵扣分润
+        if(!orderImportReturnInfo.getReturnPayAmt().equals(orderImportReturnInfo.getHaveReturnPayAmt())){
+            BigDecimal fqreturn = new BigDecimal(orderImportReturnInfo.getReturnPayAmt()).subtract(new BigDecimal(orderImportReturnInfo.getHaveReturnPayAmt()));
+            BigDecimal fqcount = new BigDecimal(orderImportReturnInfo.getReturnFqCount());
+            Date date = DateUtil.format(orderImportReturnInfo.getReturnFqDate(),"yyyy-MM");
+            List<Map> FKFQ_data = null;
+            switch (orderImportReturnInfo.getReturnPayMethod()){
+                case "FRFQ" :
+                   FKFQ_data = StageUtil.stageOrder(fqreturn,fqcount.intValue(),date, 1);
+                    for (Map datum : FKFQ_data) {
+                        OPaymentDetail record = new OPaymentDetail();
+                        record.setId(idService.genId(TabId.o_payment_detail));
+                        record.setBatchCode(oReturnOrder.getBatchCode());
+                        record.setPaymentId(oReturnOrder.getId());//添加退货单ID
+                        record.setPaymentType(PamentIdType.ORDER_IMR.code);//添加退货导入类型
+                        record.setOrderId(oReturnOrder.getId());//添加退货单ID
+                        record.setPayType(PaymentType.DKFQ.code);//分润分日期
+                        record.setPayAmount(((BigDecimal) datum.get("item")).negate());//分润分期金额为负数
+                        record.setRealPayAmount(BigDecimal.ZERO);
+                        record.setPlanPayTime((Date) datum.get("date"));
+                        record.setPlanNum((BigDecimal) datum.get("count"));
+                        record.setAgentId(oReturnOrder.getAgentId());
+                        record.setPaymentStatus(PaymentStatus.DF.code);
+                        record.setcUser(oReturnOrder.getcUser());
+                        record.setcDate(c.getTime());
+                        record.setStatus(Status.STATUS_1.status);
+                        record.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record)) {
+                            throw new MessageException("分期处理失败");
+                        }
+                    }
+                break;
+                case "分润分期" :
+                    FKFQ_data = StageUtil.stageOrder(fqreturn,fqcount.intValue(),date, 1);
+                    for (Map datum : FKFQ_data) {
+                        OPaymentDetail record = new OPaymentDetail();
+                        record.setId(idService.genId(TabId.o_payment_detail));
+                        record.setBatchCode(oReturnOrder.getBatchCode());
+                        record.setPaymentId(oReturnOrder.getId());//添加退货单ID
+                        record.setPaymentType(PamentIdType.ORDER_IMR.code);//添加退货导入类型
+                        record.setOrderId(oReturnOrder.getId());//添加退货单ID
+                        record.setPayType(PaymentType.DKFQ.code);//分润分日期
+                        record.setPayAmount(((BigDecimal) datum.get("item")).negate());//分润分期金额为负数
+                        record.setRealPayAmount(BigDecimal.ZERO);
+                        record.setPlanPayTime((Date) datum.get("date"));
+                        record.setPlanNum((BigDecimal) datum.get("count"));
+                        record.setAgentId(oReturnOrder.getAgentId());
+                        record.setPaymentStatus(PaymentStatus.DF.code);
+                        record.setcUser(oReturnOrder.getcUser());
+                        record.setcDate(c.getTime());
+                        record.setStatus(Status.STATUS_1.status);
+                        record.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record)) {
+                            throw new MessageException("分期处理失败");
+                        }
+                    }
+                    break;
+                default:
+                    FKFQ_data = StageUtil.stageOrder(fqreturn,fqcount.intValue(),date, 1);
+                    for (Map datum : FKFQ_data) {
+                        OPaymentDetail record = new OPaymentDetail();
+                        record.setId(idService.genId(TabId.o_payment_detail));
+                        record.setBatchCode(oReturnOrder.getBatchCode());
+                        record.setPaymentId(oReturnOrder.getId());//添加退货单ID
+                        record.setPaymentType(PamentIdType.ORDER_IMR.code);//添加退货导入类型
+                        record.setOrderId(oReturnOrder.getId());//添加退货单ID
+                        record.setPayType(PaymentType.DKFQ.code);//分润分日期
+                        record.setPayAmount(((BigDecimal) datum.get("item")).negate());//分润分期金额为负数
+                        record.setRealPayAmount(BigDecimal.ZERO);
+                        record.setPlanPayTime((Date) datum.get("date"));
+                        record.setPlanNum((BigDecimal) datum.get("count"));
+                        record.setAgentId(oReturnOrder.getAgentId());
+                        record.setPaymentStatus(PaymentStatus.DF.code);
+                        record.setcUser(oReturnOrder.getcUser());
+                        record.setcDate(c.getTime());
+                        record.setStatus(Status.STATUS_1.status);
+                        record.setVersion(Status.STATUS_1.status);
+                        if (1 != oPaymentDetailMapper.insert(record)) {
+                            throw new MessageException("分期处理失败");
+                        }
+                    }
+                break;
+            }
+        }
+        //更新为处理成功
+        ImportAgentExample importAgentExample = new ImportAgentExample();
+        importAgentExample.or().andStatusEqualTo(Status.STATUS_1.status)//有效
+                .andDealstatusEqualTo(Status.STATUS_1.status)//待处理
+                .andDataidEqualTo(orderImportReturnInfo.getReturnOrderId())
+                .andDatatypeEqualTo(AgImportType.ORLOGI.code);
+        importAgentsLogics =  importAgentMapper.selectByExampleWithBLOBs(example);
+        for (ImportAgent importAgentsLogic : importAgentsLogics) {
+            OrderImportReturnLogincInfo orderImportReturnLogincInfo = new OrderImportReturnLogincInfo();
+            orderImportReturnLogincInfo.loadInfoFromJsonArray(JSONArray.parseArray(importAgentsLogic.getDatacontent()));
+            orderImportReturnLogincInfos.add(orderImportReturnLogincInfo);
+            importAgentsLogic.setDealstatus(Status.STATUS_2.status);
+            if (importAgentMapper.updateByPrimaryKeySelective(importAgentsLogic) != 1) {
+                logger.info("物流信息更新处理中失败，importAgentsLogic.getId()[" + importAgentsLogic.getId() + "]");
+                throw new MessageException("物流信息更新处理中失败，importAgentsLogic.getId()[" + importAgentsLogic.getId() + "]");
+            }
+        }
 
-        //更新不是当前代理商的排单信息的退货子订单信息未当前代理商的退货单明细编号
-
-
-
-
-
-
-
-
-        return null;
+        return AgentResult.ok();
     }
 }

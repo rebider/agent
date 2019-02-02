@@ -2,6 +2,7 @@ package com.ryx.credit.service.order;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.agent.ImportAgent;
 import com.ryx.credit.pojo.admin.order.OOrder;
@@ -40,7 +41,7 @@ public interface OrderImportService {
      * @return
      * @throws Exception
      */
-    public AgentResult pareseOrder(ImportAgent importAgent,String User)throws Exception;
+    public AgentResult pareseOrder(ImportAgent importAgent,String User)throws MessageException;
 
     /**
      * 接卸订单对象
@@ -49,7 +50,7 @@ public interface OrderImportService {
      * @return
      * @throws Exception
      */
-    public AgentResult pareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User)throws Exception;
+    public AgentResult pareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User)throws MessageException;
 
     /**
      * 解析生成订单子订单，子订单活动信息
@@ -58,23 +59,24 @@ public interface OrderImportService {
      * @return
      * @throws Exception
      */
-    public AgentResult pareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User)throws Exception;
+    public AgentResult pareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User)throws MessageException;
 
 
 
     /**
      * 处理订单物流
+     * 处理订单物流
      * @return
      * @throws Exception
      */
-    public AgentResult pareseOrderLogic(String value)throws Exception;
+    public AgentResult pareseOrderLogic(String value)throws MessageException;
 
     /**
      * 处理退货单
      * @return
      * @throws Exception
      */
-    public AgentResult pareseReturn(ImportAgent importAgent,String User)throws Exception;
+    public AgentResult pareseReturn(ImportAgent importAgent,String User)throws MessageException;
 
 
 

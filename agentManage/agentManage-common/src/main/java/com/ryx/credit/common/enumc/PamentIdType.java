@@ -10,6 +10,7 @@ public enum  PamentIdType {
     ORDER_XX("ORDER_XX","线下付款分润抵扣"),
    ORDER_OLD("ORDER_OLD","老数据导入"),
    ORDER_PDT("ORDER_PDT","付款明细拆分"),
+    ORDER_IMR("ORDER_IMR","订单导入退货退款分期"),
    ORDER_BZJ("ORDER_BZJ","订单保证金分期,服务费等分期类型");
     public String code;
 
