@@ -33,12 +33,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.Bidi;
 import java.util.*;
@@ -113,6 +115,8 @@ public class OrderImportServiceImpl implements OrderImportService {
     private OReturnOrderMapper  oReturnOrderMapper;
     @Autowired
     private OReturnOrderRelMapper oReturnOrderRelMapper;
+    @Resource(name = "taskExecutor")
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
 
     List<Dict> CAPITAL_TYPE = new ArrayList<>();
@@ -152,6 +156,96 @@ public class OrderImportServiceImpl implements OrderImportService {
 
 
 
+    @Override
+    public ResultVO pareseOrderEnter(String user) {
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                ImportAgentExample order_exa = new ImportAgentExample();
+                order_exa.or().andDealstatusEqualTo(Status.STATUS_0.status)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andDatatypeEqualTo(AgImportType.OBASE.code);
+                List<ImportAgent> order_exa_list = importAgentMapper.selectByExampleWithBLOBs(order_exa);
+                for (ImportAgent importAgent : order_exa_list) {
+                    try {
+                        logger.info("======处理订单解析{}",importAgent.getDataid());
+                        importAgent.setDealstatus(Status.STATUS_1.status);
+                        importAgent.setDealmsg("处理中");
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        AgentResult agentResult = orderImportService.pareseOrder(importAgent,user);
+                        importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                        importAgent.setDealstatus(Status.STATUS_2.status);
+                        importAgent.setDealmsg(agentResult.getMsg());
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),agentResult.getMsg());
+                    } catch (MessageException e) {
+                        e.printStackTrace();
+                        importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                        importAgent.setDealstatus(Status.STATUS_3.status);
+                        importAgent.setDealmsg(e.getMsg());
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getMsg());
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                        importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                        importAgent.setDealstatus(Status.STATUS_3.status);
+                        importAgent.setDealmsg(e.getLocalizedMessage().substring(0,60));
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
+                    }
+                }
+
+            }
+        });
+
+
+        return ResultVO.success(null);
+    }
+
+    @Override
+    public ResultVO pareseReturnOrderEnter(String user) {
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                ImportAgentExample order_exa = new ImportAgentExample();
+                order_exa.or().andDealstatusEqualTo(Status.STATUS_0.status)
+                        .andStatusEqualTo(Status.STATUS_1.status)
+                        .andDatatypeEqualTo(AgImportType.ORETURN.code);
+                List<ImportAgent> order_exa_list = importAgentMapper.selectByExampleWithBLOBs(order_exa);
+                for (ImportAgent importAgent : order_exa_list) {
+                    try {
+                        logger.info("======处理订单解析{}",importAgent.getDataid());
+                        importAgent.setDealstatus(Status.STATUS_1.status);
+                        importAgent.setDealmsg("处理中");
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        AgentResult agentResult = orderImportService.pareseReturn(importAgent,user);
+                        importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                        importAgent.setDealstatus(Status.STATUS_2.status);
+                        importAgent.setDealmsg(agentResult.getMsg());
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),agentResult.getMsg());
+                    } catch (MessageException e) {
+                        e.printStackTrace();
+                        importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                        importAgent.setDealstatus(Status.STATUS_3.status);
+                        importAgent.setDealmsg(e.getMsg());
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getMsg());
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                        importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
+                        importAgent.setDealstatus(Status.STATUS_3.status);
+                        importAgent.setDealmsg(e.getLocalizedMessage().substring(0,60));
+                        importAgentMapper.updateByPrimaryKeySelective(importAgent);
+                        logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
+                    }
+                }
+
+            }
+        });
+        return ResultVO.success(null);
+    }
+
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
     public AgentResult pareseOrder(ImportAgent importAgent,String User) throws MessageException {
@@ -176,21 +270,26 @@ public class OrderImportServiceImpl implements OrderImportService {
                 JSONArray OGOODS_dataContent_jsonArray = JSONArray.parseArray(OGOODS_dataContent);
                 OrderImportGoodsInfo orderImportGoodsInfo  = new OrderImportGoodsInfo();
                 orderImportGoodsInfo.loadInfoFromJsonArray(OGOODS_dataContent_jsonArray);
-
                 //订单商品发货情况
                 List<OrderLogicInfo> logicInfos = new ArrayList<>();
                 //从redis里那物流信息
-                List<String> listLogic = redisService.lrange(orderImportGoodsInfo.getOrder_id(),0,-1);
+                List<String> listLogic = redisService.lrange(import_order_logic_redis_key+orderImportGoodsInfo.getOrder_id(),0,-1);
                 for (String listLogicItem : listLogic) {
                     JSONArray logic_dataContent_jsonArray = JSONArray.parseArray(listLogicItem);
                     OrderLogicInfo orderLogicInfo = new OrderLogicInfo();
                     orderLogicInfo.loadInfoFromJsonArray(logic_dataContent_jsonArray);
                     logicInfos.add(orderLogicInfo);
                 }
+                if(logicInfos.size()==0){
+                    throw new MessageException("物流信息记录为空["+orderImportBaseInfo.getOrder_id()+"]");
+                }
                 //设置商品物流信息
                 orderImportGoodsInfo.setLogicInfos(logicInfos);
                 //设置商品列表
                 OrderImportGoodsInfos.add(orderImportGoodsInfo);
+            }
+            if(OrderImportGoodsInfos.size()==0){
+                throw new MessageException("商品信息记录为空["+orderImportBaseInfo.getOrder_id()+"]");
             }
             orderImportBaseInfo.setOrderImportGoodsInfos(OrderImportGoodsInfos);
             AgentResult agentImport = orderImportService.pareseOrderImportBaseInfo(orderImportBaseInfo,User);
@@ -198,7 +297,9 @@ public class OrderImportServiceImpl implements OrderImportService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("解析导入订单失败",e);
-            return AgentResult.fail(e.getLocalizedMessage());
+            throw new MessageException(e.getLocalizedMessage());
+        }finally {
+            redisService.delete(import_order_logic_redis_key+importAgent.getDataid());
         }
 
     }
@@ -463,7 +564,9 @@ public class OrderImportServiceImpl implements OrderImportService {
                  FKFQ_data =  FKFQ_data = StageUtil.stageOrder(daifu,1,c.getTime(), c.get(Calendar.DAY_OF_MONTH));
             } else if (oPayment.getPayMethod().equals(SettlementType.FRFQ.code)) {
                 paymentType = PaymentType.FRFQ;
-                FKFQ_data =  FKFQ_data = StageUtil.stageOrder(daifu,oPayment.getDownPaymentCount().intValue(),oPayment.getDownPaymentDate(), c.get(Calendar.DAY_OF_MONTH));
+                FKFQ_data =  FKFQ_data = StageUtil.stageOrder(daifu,
+                        oPayment.getDownPaymentCount().intValue(),
+                        oPayment.getDownPaymentDate(), c.get(Calendar.DAY_OF_MONTH));
             }else{
                 paymentType = PaymentType.FRFQ;
                 FKFQ_data =  FKFQ_data = StageUtil.stageOrder(daifu,oPayment.getDownPaymentCount().intValue(),oPayment.getDownPaymentDate(), c.get(Calendar.DAY_OF_MONTH));
@@ -511,6 +614,7 @@ public class OrderImportServiceImpl implements OrderImportService {
      * @return
      * @throws Exception
      */
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public AgentResult pareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User) throws MessageException {
         List<OrderImportGoodsInfo> OrderImportGoodsInfoList = orderImportBaseInfo.getOrderImportGoodsInfos();
@@ -731,24 +835,9 @@ public class OrderImportServiceImpl implements OrderImportService {
                 if(1!=oLogisticsMapper.insertSelective(logistics)){
                     throw new MessageException("排单信息添加失败");
                 }
-
                 //生成sn明细
                 List<String> idListArr = oLogisticsService.idList(logicInfo.getSnStart(), logicInfo.getSnEnd(), Integer.valueOf(logicInfo.getSnEndNum()),Integer.valueOf( logicInfo.getSnEndNum()));
 
-                for (String snNum : idListArr) {
-                    //检查sn是否存在物流状态和记录状态
-                    OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
-                    OLogisticsDetailExample.Criteria oLogisticsDetailExample_criteria = oLogisticsDetailExample.createCriteria();
-                    oLogisticsDetailExample_criteria.andStatusEqualTo(OLogisticsDetailStatus.STATUS_FH.code);
-                    oLogisticsDetailExample_criteria.andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
-                    oLogisticsDetailExample_criteria.andSnNumEqualTo(snNum);
-                    List<OLogisticsDetail> oLogisticsDetails = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
-                    if (null != oLogisticsDetails && oLogisticsDetails.size() > 0) {
-                        //说明已经存在数据
-                        logger.info(snNum+"此物流已经存在,正在发货中!!!");
-                        throw new MessageException(snNum+"此物流已经存在,正在发货中!!!");
-                    }
-                }
                 if (null != idListArr && idListArr.size() > 0) {
                     for (String idSn : idListArr) {
                         OLogisticsDetail detail = new OLogisticsDetail();
@@ -799,6 +888,8 @@ public class OrderImportServiceImpl implements OrderImportService {
         return AgentResult.ok();
     }
 
+
+    private String import_order_logic_redis_key="imOrderLogic:";
     /**
      * 物流信息存储到redis
      * @return
@@ -822,9 +913,8 @@ public class OrderImportServiceImpl implements OrderImportService {
             orderLogicInfo.loadInfoFromJsonArray(logic_dataContent_jsonArray);
             try {
                 //将发货物流放到redis里
-                redisService.delete(orderLogicInfo.getOrder_id());
                 logger.info("======物流信存储到reids[{}][{}]",orderLogicInfo.getOrder_id(),orderLogicInfo.getGoodsCode());
-                long count = redisService.rpushList(orderLogicInfo.getOrder_id(),logic_dataContent_jsonArray.toJSONString());
+                long count = redisService.rpushList(import_order_logic_redis_key+orderLogicInfo.getOrder_id(),logic_dataContent_jsonArray.toJSONString());
                 logger.info("======物流信存储到reids[{}][{}][{}]条",orderLogicInfo.getOrder_id(),orderLogicInfo.getGoodsCode(),count);
                 orderlogiccount++;
             } catch (Exception e) {

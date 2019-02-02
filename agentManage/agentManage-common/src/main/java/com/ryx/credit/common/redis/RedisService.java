@@ -41,9 +41,9 @@ public class RedisService {
 
     public long lpushList(final String key,final String value){
         try {
-            redisTemplate.execute(new RedisCallback<Object>() {
+            return redisTemplate.execute(new RedisCallback<Long>() {
                 @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                public Long doInRedis(RedisConnection connection) throws DataAccessException {
                     return connection.lPush(redisTemplate.getStringSerializer().serialize(key),redisTemplate.getStringSerializer().serialize(value));
                 }
             });
@@ -56,9 +56,9 @@ public class RedisService {
 
     public String lpopList(String key){
         try {
-            redisTemplate.execute(new RedisCallback<Object>() {
+            return redisTemplate.execute(new RedisCallback<String>() {
                 @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                public String doInRedis(RedisConnection connection) throws DataAccessException {
                     byte[] value = connection.lPop(redisTemplate.getStringSerializer().serialize(key));
                     if(value!=null && value.length>0)
                     return redisTemplate.getStringSerializer().deserialize(value);
@@ -74,9 +74,9 @@ public class RedisService {
 
     public long rpushList(final String key,final String value){
         try {
-            redisTemplate.execute(new RedisCallback<Object>() {
+            return  redisTemplate.execute(new RedisCallback<Long>() {
                 @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                public Long doInRedis(RedisConnection connection) throws DataAccessException {
                     return connection.rPush(redisTemplate.getStringSerializer().serialize(key),redisTemplate.getStringSerializer().serialize(value));
                 }
             });
@@ -92,9 +92,9 @@ public class RedisService {
 
     public String rpopList(String key){
         try {
-            redisTemplate.execute(new RedisCallback<Object>() {
+            return  redisTemplate.execute(new RedisCallback<String>() {
                 @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                public String doInRedis(RedisConnection connection) throws DataAccessException {
                     byte[] value = connection.rPop(redisTemplate.getStringSerializer().serialize(key));
                     if(value!=null && value.length>0)
                         return redisTemplate.getStringSerializer().deserialize(value);
@@ -104,6 +104,7 @@ public class RedisService {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("rpopList error",e);
+
         }
         return null;
     }
@@ -111,9 +112,9 @@ public class RedisService {
 
     public List<String> lrange(String key,long start,long end){
         try {
-            redisTemplate.execute(new RedisCallback<Object>() {
+            return redisTemplate.execute(new RedisCallback<List<String>>() {
                 @Override
-                public Object doInRedis(RedisConnection connection) throws DataAccessException {
+                public List<String> doInRedis(RedisConnection connection) throws DataAccessException {
                    List<String> res = new ArrayList<>();
                    List<byte[]> data =   connection.lRange(redisTemplate.getStringSerializer().serialize(key),start,end);
                    if(data!=null && data.size()>0){

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.ImportAgent;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OPayment;
@@ -20,8 +21,20 @@ import java.util.List;
 public interface OrderImportService {
 
 
+    /**
+     * 解析订单数据
+     * @param user
+     * @return
+     */
+    public ResultVO pareseOrderEnter(String user);
 
 
+    /**
+     * 解析退货订单数据
+     * @param user
+     * @return
+     */
+    public ResultVO pareseReturnOrderEnter(String user);
 
 
     /**
