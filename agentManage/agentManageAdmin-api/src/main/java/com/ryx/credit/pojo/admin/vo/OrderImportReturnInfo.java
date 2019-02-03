@@ -22,7 +22,7 @@ public class OrderImportReturnInfo   implements Serializable {
             "returnFqCount",
             "returnFqDate");
 
-    public void loadInfoFromJsonArray(JSONArray data){
+    public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
            this.setReturnOrderId(data.getString(colum.indexOf("returnOrderId")));
             this.setAgentUniqId(data.getString(colum.indexOf("agentUniqId")));
@@ -33,6 +33,7 @@ public class OrderImportReturnInfo   implements Serializable {
             this.setReturnFqCount(data.getString(colum.indexOf("returnFqCount")));
             this.setReturnFqDate(data.getString(colum.indexOf("returnFqDate")));
         }
+        this.importId = importId;
     }
 
     private String returnOrderId;
@@ -51,6 +52,15 @@ public class OrderImportReturnInfo   implements Serializable {
 
     private String returnFqDate;
 
+    private String importId;
+
+    public String getImportId() {
+        return importId;
+    }
+
+    public void setImportId(String importId) {
+        this.importId = importId;
+    }
 
     public String getReturnOrderId() {
         return returnOrderId;

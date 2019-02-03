@@ -21,7 +21,7 @@ public class OrderImportBaseInfo implements Serializable {
             "order_paymethod","order_shoufu_amt","order_fenqi_count","order_fenqi_date","order_colcomp","order_pay_user","order_is_fp",
             "order_dk_type","order_dk_amt","order_hkr","order_hk_date","order_remark");
 
-    public void loadInfoFromJsonArray(JSONArray data){
+    public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
             this.setOrder_id(data.getString(colum.indexOf("order_id")));
             this.setOrder_orgid(data.getString(colum.indexOf("order_orgid")));
@@ -43,9 +43,11 @@ public class OrderImportBaseInfo implements Serializable {
             this.setOrder_hk_date(data.getString(colum.indexOf("order_hk_date")));
             this.setOrder_remark(data.getString(colum.indexOf("order_remark")));
         }
+        this.importId=importId;
     }
 
 
+    private String importId;
     public  String order_id ;
     public  String order_orgid ;
     public  String order_platform ;
@@ -66,6 +68,16 @@ public class OrderImportBaseInfo implements Serializable {
     public  String order_hk_date ;
     public  String order_remark ;
     public  List<OrderImportGoodsInfo> orderImportGoodsInfos;
+
+
+    public String getImportId() {
+        return importId;
+    }
+
+    public void setImportId(String importId) {
+        this.importId = importId;
+    }
+
     public String getOrder_id() {
         return order_id;
     }

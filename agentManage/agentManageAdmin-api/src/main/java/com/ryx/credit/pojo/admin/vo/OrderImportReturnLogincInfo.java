@@ -25,7 +25,7 @@ public class OrderImportReturnLogincInfo   implements Serializable {
             "snStartNum",
             "snEndNum");
 
-    public void loadInfoFromJsonArray(JSONArray data){
+    public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
             this.setReturnOrderId(data.getString(colum.indexOf("returnOrderId")));
             this.setPlatformOrgNum(data.getString(colum.indexOf("platformOrgNum")));
@@ -37,6 +37,7 @@ public class OrderImportReturnLogincInfo   implements Serializable {
             this.setSnStartNum(data.getString(colum.indexOf("snStartNum")));
             this.setSnEndNum(data.getString(colum.indexOf("snEndNum")));
         }
+        this.importId = importId;
     }
 
     private String returnOrderId;
@@ -54,8 +55,16 @@ public class OrderImportReturnLogincInfo   implements Serializable {
     private String snStartNum;
     private String snEndNum;
 
+    private String importId;
 
 
+    public String getImportId() {
+        return importId;
+    }
+
+    public void setImportId(String importId) {
+        this.importId = importId;
+    }
 
     public String getReturnOrderId() {
         return returnOrderId;

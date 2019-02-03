@@ -20,7 +20,7 @@ public class OrderImportGoodsInfo  implements Serializable {
             "goodsRemark","actId","actCode","actName");
 
 
-    public void loadInfoFromJsonArray(JSONArray data){
+    public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
             this.setOrder_id(data.getString(colum.indexOf("order_id")));
             this.setOrder_orgid(data.getString(colum.indexOf("order_orgid")));
@@ -34,6 +34,7 @@ public class OrderImportGoodsInfo  implements Serializable {
             this.setActCode(data.getString(colum.indexOf("actCode")));
             this.setActName(data.getString(colum.indexOf("actName")));
         }
+        this.importId=importId;
     }
 
     public  String order_id ;
@@ -51,6 +52,16 @@ public class OrderImportGoodsInfo  implements Serializable {
 
     private List<OrderLogicInfo> logicInfos;
 
+    private String importId;
+
+
+    public String getImportId() {
+        return importId;
+    }
+
+    public void setImportId(String importId) {
+        this.importId = importId;
+    }
 
     public String getOrder_id() {
         return order_id;

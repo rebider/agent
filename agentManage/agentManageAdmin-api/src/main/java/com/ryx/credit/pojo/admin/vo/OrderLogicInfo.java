@@ -20,7 +20,7 @@ public class OrderLogicInfo implements Serializable{
             "logicComp","logicCode","sendTime","sendAddress","snStart","snEnd","snStartNum","snEndNum");
 
 
-    public void loadInfoFromJsonArray(JSONArray data){
+    public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
             this.setOrder_id(data.getString(colum.indexOf("order_id")));
             this.setOrder_orgid(data.getString(colum.indexOf("order_orgid")));
@@ -38,6 +38,8 @@ public class OrderLogicInfo implements Serializable{
             this.setSnStartNum(data.getString(colum.indexOf("snStartNum")));
             this.setSnEndNum(data.getString(colum.indexOf("snEndNum")));
         }
+
+        this.importId = importId;
     }
 
     public  String order_id ;
@@ -56,7 +58,15 @@ public class OrderLogicInfo implements Serializable{
     private String snEnd;
     private String snStartNum;
     private String snEndNum;
+    private String importId;
 
+    public String getImportId() {
+        return importId;
+    }
+
+    public void setImportId(String importId) {
+        this.importId = importId;
+    }
 
     public String getOrder_id() {
         return order_id;
