@@ -91,8 +91,8 @@ public interface OrderImportService {
      */
     public AgentResult pareseReturn(ImportAgent importAgent,String User)throws MessageException;
 
-
-
+    public AgentResult deleteFailImportAgentReturn(ImportAgent importAgent,String user)throws Exception;
+    public AgentResult deleteFailImportAgentOrder(ImportAgent importAgent,String user)throws Exception;
 
 
 }
