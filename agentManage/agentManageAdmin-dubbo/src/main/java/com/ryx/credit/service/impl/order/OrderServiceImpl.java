@@ -1539,6 +1539,7 @@ public class OrderServiceImpl implements OrderService {
             order.setOrderStatus(OrderStatus.ENABLE.status);
             order.setReviewStatus(AgStatus.Approved.status);
             order.setoInuretime(d.getTime());
+            Date orderTime = DateUtil.getDateFromStr(DateUtil.format(order.getcTime(), "yyyy-MM-dd"), "yyyy-MM-dd");
             //付款单设置
             switch (order.getPaymentMethod()) {
                 case "FKFQ":
@@ -1550,7 +1551,7 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期数有误");
                     }
-                    if (oPayment.getDownPaymentDate() == null || oPayment.getDownPaymentDate().compareTo(order.getcTime()) < 0) {
+                    if (oPayment.getDownPaymentDate() == null || oPayment.getDownPaymentDate().compareTo(orderTime) < 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期日期错误");
                     }
@@ -1645,7 +1646,7 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期数有误");
                     }
-                    if (oPayment.getDownPaymentDate() == null || oPayment.getDownPaymentDate().compareTo(order.getcTime()) < 0) {
+                    if (oPayment.getDownPaymentDate() == null || oPayment.getDownPaymentDate().compareTo(orderTime) < 0) {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期日期错误");
                     }
@@ -1831,7 +1832,7 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(order.getcTime())<0){
+                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(orderTime)<0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期日期错误");
                     }
@@ -1946,7 +1947,7 @@ public class OrderServiceImpl implements OrderService {
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期数有误");
                     }
-                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(order.getcTime())<0){
+                    if(oPayment.getDownPaymentDate()==null || oPayment.getDownPaymentDate().compareTo(orderTime)<0){
                         logger.info("代理商订单审批完成:分期数据为错误:{},{},{}", order.getId(), oPayment.getId(), oPayment.getPayMethod());
                         throw new MessageException("分期日期错误");
                     }
