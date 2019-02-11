@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * 保证金变更
- * QuitTaskExecutionListener
+ * CapitalChangeExecutionListener
  * Created by IntelliJ IDEA.
  *
  * @author Wang Qi
@@ -43,11 +43,11 @@ public class CapitalChangeExecutionListener implements TaskListener, ExecutionLi
             AgentQuitService agentQuitService = (AgentQuitService)MySpringContextHandler.applicationContext.getBean("agentQuitService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
-                logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========CapitalChangeExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
-                logger.info("=========QuitTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                logger.info("=========CapitalChangeExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
 
             }
         } else if ("take".equals(eventName)) {
