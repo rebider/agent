@@ -450,4 +450,38 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryCapitalChangeList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    ac.*, a.ag_name, cu.name as C_USER_NAME, uu.name as U_USER_NAME
+    from a_capital_change_apply ac
+    left join a_agent a on ac.agent_id = a.id
+    left join c_user cu on ac.c_user = cu.id
+    left join c_user uu on ac.u_user = uu.id
+    <include refid="capitalChangeWhere" />
+    order by ac.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryCapitalChangeCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from a_capital_change_apply ac
+    left join a_agent a on ac.agent_id = a.id
+    left join c_user cu on ac.c_user = cu.id
+    left join c_user uu on ac.u_user = uu.id
+    <include refid="capitalChangeWhere" />
+  </select>
+
+  <sql id="capitalChangeWhere">
+    <where>
+      ac.status = #{map.status} and a.status = #{map.status}
+      <if test="map.id != null"> and ac.id = #{map.id} </if>
+      <if test="map.agentId != null"> and ac.agent_id = #{map.agentId} </if>
+      <if test="map.agentName != null"> and ac.agent_name = #{map.agentName} </if>
+      <if test="map.cloReviewStatus != null"> and ac.clo_review_status = #{map.cloReviewStatus} </if>
+      <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
+    </where>
+  </sql>
 </mapper>
