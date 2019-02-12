@@ -395,4 +395,53 @@
     from A_CAPITAL
     where C_AGENT_ID = #{cAgentId} and STATUS = 1
   </select>
+
+  <select id="getCapitalSummaryList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="PAGING_START" />
+    select
+    a.id as agent_id, a.ag_name, pa.id as parent_agent_id, pa.ag_name as parent_agent_name,
+    c.c_type, sum(c_fq_in_amount) as sum_amount
+    from A_capital c
+    left join a_agent a on a.id = c.c_agent_id and c.status = 1
+    and c.clo_review_status = 3 and a.status = 1 and a.ag_status = 'Approved'
+    left join a_agent_businfo ai on a.id = ai.agent_id and ai.status = 1 and ai.clo_review_status = 3
+    left join a_agent_businfo aib on ai.bus_parent = aib.id and aib.status = 1 and aib.clo_review_status = 3
+    left join a_agent pa on pa.id = aib.agent_id and pa.status = 1 and pa.ag_status = 'Approved'
+    <where>
+      <if test="ID != null and ID !=''">and a.ID = #{ID}</if>
+      <if test="AG_NAME != null and AG_NAME !=''">and a.AG_NAME = #{AG_NAME}</if>
+    </where>
+    group by a.id, a.ag_name, pa.id, pa.ag_name, c.c_type
+    <include refid="PAGING_END" />
+  </select>
+
+  <select id="getCapitalSummaryCount" parameterType="java.util.Map" resultType="java.lang.Long">
+    select count(1) from(
+      select
+      a.id as agent_id, a.ag_name, pa.id as parent_agent_id, pa.ag_name as parent_agent_name,
+      c.c_type, sum(c_fq_in_amount) as sum_amount
+      from A_capital c
+      left join a_agent a on a.id = c.c_agent_id and c.status = 1
+      and c.clo_review_status = 3 and a.status = 1 and a.ag_status = 'Approved'
+      left join a_agent_businfo ai on a.id = ai.agent_id and ai.status = 1 and ai.clo_review_status = 3
+      left join a_agent_businfo aib on ai.bus_parent = aib.id and aib.status = 1 and aib.clo_review_status = 3
+      left join a_agent pa on pa.id = aib.agent_id and pa.status = 1 and pa.ag_status = 'Approved'
+      <where>
+        <if test="ID != null and ID !=''">and a.ID = #{ID}</if>
+        <if test="AG_NAME != null and AG_NAME !=''">and a.AG_NAME = #{AG_NAME}</if>
+      </where>
+      group by a.id, a.ag_name, pa.id, pa.ag_name, c.c_type
+    )
+  </select>
+
+  <sql id="PAGING_START">
+    <if test="begin != null  and end != null and end &gt;0">
+      SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    </if>
+  </sql>
+  <sql id="PAGING_END">
+    <if test="begin != null  and end != null and end &gt;0">
+      ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+    </if>
+  </sql>
 </mapper>
