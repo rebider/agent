@@ -27,7 +27,8 @@ public enum BusActRelBusType {
     QUIT("/BusActRelBusType/QUIT","代理商退出申请"),
     MERGE("/BusActRelBusType/MERGE","代理商合并申请"),
     agentTerminal("/BusActRelBusType/agentTerminal","终端划拨申请"),
-    agentQuitRefund("/BusActRelBusType/agentQuitRefund","代理商退出申请退款");
+    agentQuitRefund("/BusActRelBusType/agentQuitRefund","代理商退出申请退款"),
+    capitalChange("/BusActRelBusType/capitalChange","保证金变更申请");
 
 
     public String key;
