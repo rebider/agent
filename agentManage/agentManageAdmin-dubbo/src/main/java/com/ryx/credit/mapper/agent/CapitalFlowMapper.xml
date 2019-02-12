@@ -283,4 +283,37 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="queryCapitalFlowList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    cf.*, a.ag_name, cu.name as C_USER_NAME, uu.name as U_USER_NAME
+    from a_capital_flow cf
+    left join a_agent a on cf.agent_id = a.id
+    left join c_user cu on cf.c_user = cu.id
+    left join c_user uu on cf.u_user = uu.id
+    <include refid="capitalFlowWhere" />
+    order by cf.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryCapitalFlowCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from a_capital_flow cf
+    left join a_agent a on cf.agent_id = a.id
+    left join c_user cu on cf.c_user = cu.id
+    left join c_user uu on cf.u_user = uu.id
+    <include refid="capitalFlowWhere" />
+  </select>
+
+  <sql id="capitalFlowWhere">
+    <where>
+      cf.status = #{map.status} and a.status = #{map.status}
+      <if test="map.id != null"> and cf.id = #{map.id} </if>
+      <if test="map.agentId != null"> and cf.agent_id = #{map.agentId} </if>
+      <if test="map.agentName != null"> and cf.agent_name = #{map.agentName} </if>
+      <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
+    </where>
+  </sql>
 </mapper>
