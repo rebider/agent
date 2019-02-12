@@ -33,5 +33,14 @@ public enum AgCapitalType {
         return "";
     }
 
+    public static String getContentByValue(String value){
+        AgCapitalType[] agCapitalType = AgCapitalType.values();
+        for(AgCapitalType type : agCapitalType){
+            if(type.name().equals(value)){
+                return type.msg;
+            }
+        }
+        return "";
+    }
 
 }
