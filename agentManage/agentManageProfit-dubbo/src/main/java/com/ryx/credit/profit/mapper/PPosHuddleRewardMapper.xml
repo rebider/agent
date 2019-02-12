@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PPosHuddleRewardMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PPosHuddleReward">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="CREATE_TM" jdbcType="VARCHAR" property="createTm" />
+    <result column="APPLY_STATUS" jdbcType="CHAR" property="applyStatus" />
+    <result column="CREDIT_CONS_MONTH" jdbcType="VARCHAR" property="creditConsMonth" />
+    <result column="GROW_AMT" jdbcType="VARCHAR" property="growAmt" />
+    <result column="MACHINERY_NUM" jdbcType="VARCHAR" property="machineryNum" />
+    <result column="REWARD_SCALE" jdbcType="DECIMAL" property="rewardScale" />
+    <result column="TOTAL_CONS_MONTH" jdbcType="VARCHAR" property="totalConsMonth" />
+    <result column="TOTAL_END_MONTH" jdbcType="VARCHAR" property="totalEndMonth" />
+    <result column="HUDDLE_CODE" jdbcType="VARCHAR" property="huddleCode" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_NAME, CREATE_TM, APPLY_STATUS, CREDIT_CONS_MONTH, GROW_AMT, MACHINERY_NUM, 
+    REWARD_SCALE, TOTAL_CONS_MONTH, TOTAL_END_MONTH, HUDDLE_CODE, REV1
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PPosHuddleRewardExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_POS_HUDDLE_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_POS_HUDDLE_REWARD
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PPosHuddleRewardExample">
+    delete from P_POS_HUDDLE_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PPosHuddleReward">
+    insert into P_POS_HUDDLE_REWARD (ID, AGENT_NAME, CREATE_TM, 
+      APPLY_STATUS, CREDIT_CONS_MONTH, GROW_AMT, 
+      MACHINERY_NUM, REWARD_SCALE, TOTAL_CONS_MONTH, 
+      TOTAL_END_MONTH, HUDDLE_CODE, REV1
+      )
+    values (#{id,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{createTm,jdbcType=VARCHAR}, 
+      #{applyStatus,jdbcType=CHAR}, #{creditConsMonth,jdbcType=VARCHAR}, #{growAmt,jdbcType=VARCHAR}, 
+      #{machineryNum,jdbcType=VARCHAR}, #{rewardScale,jdbcType=DECIMAL}, #{totalConsMonth,jdbcType=VARCHAR},
+      #{totalEndMonth,jdbcType=VARCHAR}, #{huddleCode,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PPosHuddleReward">
+    insert into P_POS_HUDDLE_REWARD
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="createTm != null">
+        CREATE_TM,
+      </if>
+      <if test="applyStatus != null">
+        APPLY_STATUS,
+      </if>
+      <if test="creditConsMonth != null">
+        CREDIT_CONS_MONTH,
+      </if>
+      <if test="growAmt != null">
+        GROW_AMT,
+      </if>
+      <if test="machineryNum != null">
+        MACHINERY_NUM,
+      </if>
+      <if test="rewardScale != null">
+        REWARD_SCALE,
+      </if>
+      <if test="totalConsMonth != null">
+        TOTAL_CONS_MONTH,
+      </if>
+      <if test="totalEndMonth != null">
+        TOTAL_END_MONTH,
+      </if>
+      <if test="huddleCode != null">
+        HUDDLE_CODE,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTm != null">
+        #{createTm,jdbcType=VARCHAR},
+      </if>
+      <if test="applyStatus != null">
+        #{applyStatus,jdbcType=CHAR},
+      </if>
+      <if test="creditConsMonth != null">
+        #{creditConsMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="growAmt != null">
+        #{growAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="machineryNum != null">
+        #{machineryNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardScale != null">
+        #{rewardScale,jdbcType=DECIMAL},
+      </if>
+      <if test="totalConsMonth != null">
+        #{totalConsMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="totalEndMonth != null">
+        #{totalEndMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="huddleCode != null">
+        #{huddleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PPosHuddleRewardExample" resultType="java.lang.Long">
+    select count(*) from P_POS_HUDDLE_REWARD
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update P_POS_HUDDLE_REWARD
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentName != null">
+        AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTm != null">
+        CREATE_TM = #{record.createTm,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applyStatus != null">
+        APPLY_STATUS = #{record.applyStatus,jdbcType=CHAR},
+      </if>
+      <if test="record.creditConsMonth != null">
+        CREDIT_CONS_MONTH = #{record.creditConsMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.growAmt != null">
+        GROW_AMT = #{record.growAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="record.machineryNum != null">
+        MACHINERY_NUM = #{record.machineryNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rewardScale != null">
+        REWARD_SCALE = #{record.rewardScale,jdbcType=DECIMAL},
+      </if>
+      <if test="record.totalConsMonth != null">
+        TOTAL_CONS_MONTH = #{record.totalConsMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.totalEndMonth != null">
+        TOTAL_END_MONTH = #{record.totalEndMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.huddleCode != null">
+        HUDDLE_CODE = #{record.huddleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev1 != null">
+        REV1 = #{record.rev1,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_POS_HUDDLE_REWARD
+    set ID = #{record.id,jdbcType=VARCHAR},
+      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      CREATE_TM = #{record.createTm,jdbcType=VARCHAR},
+      APPLY_STATUS = #{record.applyStatus,jdbcType=CHAR},
+      CREDIT_CONS_MONTH = #{record.creditConsMonth,jdbcType=VARCHAR},
+      GROW_AMT = #{record.growAmt,jdbcType=VARCHAR},
+      MACHINERY_NUM = #{record.machineryNum,jdbcType=VARCHAR},
+      REWARD_SCALE = #{record.rewardScale,jdbcType=DECIMAL},
+      TOTAL_CONS_MONTH = #{record.totalConsMonth,jdbcType=VARCHAR},
+      TOTAL_END_MONTH = #{record.totalEndMonth,jdbcType=VARCHAR},
+      HUDDLE_CODE = #{record.huddleCode,jdbcType=VARCHAR},
+      REV1 = #{record.rev1,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PPosHuddleReward">
+    update P_POS_HUDDLE_REWARD
+    <set>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTm != null">
+        CREATE_TM = #{createTm,jdbcType=VARCHAR},
+      </if>
+      <if test="applyStatus != null">
+        APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
+      </if>
+      <if test="creditConsMonth != null">
+        CREDIT_CONS_MONTH = #{creditConsMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="growAmt != null">
+        GROW_AMT = #{growAmt,jdbcType=VARCHAR},
+      </if>
+      <if test="machineryNum != null">
+        MACHINERY_NUM = #{machineryNum,jdbcType=VARCHAR},
+      </if>
+      <if test="rewardScale != null">
+        REWARD_SCALE = #{rewardScale,jdbcType=DECIMAL},
+      </if>
+      <if test="totalConsMonth != null">
+        TOTAL_CONS_MONTH = #{totalConsMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="totalEndMonth != null">
+        TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="huddleCode != null">
+        HUDDLE_CODE = #{huddleCode,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PPosHuddleReward">
+    update P_POS_HUDDLE_REWARD
+    set AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      CREATE_TM = #{createTm,jdbcType=VARCHAR},
+      APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
+      CREDIT_CONS_MONTH = #{creditConsMonth,jdbcType=VARCHAR},
+      GROW_AMT = #{growAmt,jdbcType=VARCHAR},
+      MACHINERY_NUM = #{machineryNum,jdbcType=VARCHAR},
+      REWARD_SCALE = #{rewardScale,jdbcType=DECIMAL},
+      TOTAL_CONS_MONTH = #{totalConsMonth,jdbcType=VARCHAR},
+      TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
+      HUDDLE_CODE = #{huddleCode,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+
+    <select id="selectByList"  parameterType="java.util.List" resultMap="BaseResultMap">
+
+       select  <include refid="Base_Column_List" />
+        from P_POS_HUDDLE_REWARD
+
+        <if test="listQuvery != null and listQuvery.size()>0">
+          where HUDDLE_CODE in(
+            <foreach item="item" index="index" collection="listQuvery" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+
+
+    <select id="selectByCount" parameterType="java.util.List" resultType="java.lang.Long">
+
+        select  count(*)
+        from P_POS_HUDDLE_REWARD
+
+        <if test="listQuvery != null and listQuvery.size()>0">
+            where HUDDLE_CODE in(
+            <foreach item="item" index="index" collection="listQuvery" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+
+</mapper>
