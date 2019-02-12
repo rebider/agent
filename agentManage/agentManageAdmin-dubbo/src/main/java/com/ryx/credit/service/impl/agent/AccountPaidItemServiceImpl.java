@@ -74,6 +74,7 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         capital.setcUtime(nowDate);
         capital.setCloReviewStatus(AgStatus.Create.status);
         capital.setcInAmount(Status.STATUS_0.status);
+        capital.setFreezeAmt(Status.STATUS_0.status);
         if(PayType.YHHK.code.equals(capital.getcPayType())) {
             capital.setcFqInAmount(capital.getcAmount());
         }else{

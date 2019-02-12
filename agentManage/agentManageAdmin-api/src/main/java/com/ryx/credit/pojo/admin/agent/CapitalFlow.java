@@ -37,6 +37,8 @@ public class CapitalFlow implements Serializable{
 
     private BigDecimal version;
 
+    private String remark;
+
     public String getId() {
         return id;
     }
@@ -163,5 +165,13 @@ public class CapitalFlow implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 }

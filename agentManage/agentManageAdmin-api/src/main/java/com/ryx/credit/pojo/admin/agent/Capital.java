@@ -67,6 +67,9 @@ public class Capital implements Serializable{
     private Date cFqDate;
 
     private BigDecimal cloReviewStatus;
+
+    private BigDecimal freezeAmt;
+
     //新增
     private BigDecimal debt;
 
@@ -104,6 +107,14 @@ public class Capital implements Serializable{
                 ", cloReviewStatus=" + cloReviewStatus +
                 ", debt=" + debt +
                 '}';
+    }
+
+    public BigDecimal getFreezeAmt() {
+        return freezeAmt;
+    }
+
+    public void setFreezeAmt(BigDecimal freezeAmt) {
+        this.freezeAmt = freezeAmt;
     }
 
     public void setDebt(BigDecimal debt) {
