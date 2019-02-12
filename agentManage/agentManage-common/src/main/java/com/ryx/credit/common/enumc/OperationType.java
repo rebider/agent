@@ -2,6 +2,7 @@ package com.ryx.credit.common.enumc;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -58,7 +59,7 @@ public enum OperationType {
      * @return
      */
     public static Map<BigDecimal, Object> getContentMap() {
-        Map<BigDecimal, Object> resultMap = new HashMap<>();
+        Map<BigDecimal, Object> resultMap = new LinkedHashMap<>();
         OperationType[] operationTypes = OperationType.values();
         for (OperationType cc : operationTypes) {
             resultMap.put(cc.code, cc.msg);
