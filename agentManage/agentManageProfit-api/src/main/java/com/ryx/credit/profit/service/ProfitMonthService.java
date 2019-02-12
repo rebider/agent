@@ -205,15 +205,14 @@ public interface ProfitMonthService {
     List<Map<String,Object>> exportByF(Map<String, Object> param);
 
     /**
-     * 冻结代理商分润接口方法
-     * @Author chenqiutian
+     * 代理商日分润冻结
      */
     void doFrozenByAgent(String agentId);
 
     /**
-     * 代理商分润解冻:不走审批流
+     * 代理商日分润解冻
      */
-    void doUnFrozenAgentProfit(String agentId,String profitDate);
+    void doUnFrozenAgentProfit(String agentId);
 
 
 
