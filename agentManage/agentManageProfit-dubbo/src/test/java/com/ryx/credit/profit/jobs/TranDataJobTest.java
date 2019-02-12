@@ -31,8 +31,8 @@ public class TranDataJobTest {
     * @Author: zhaodw 
     * @Date: 2018/7/30 
     */
-//    @Test
-//    public void testDeal() {
-//        tranDataJob.deal();
-//    }
+    @Test
+    public void testDeal() {
+       /* tranDataJob.deal();*/
+    }
 }
