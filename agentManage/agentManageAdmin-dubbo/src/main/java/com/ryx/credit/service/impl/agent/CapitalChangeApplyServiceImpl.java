@@ -96,6 +96,23 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         return pageInfo;
     }
 
+    /**
+     * 查看申请数据
+     * @param capitalId
+     * @return
+     */
+    @Override
+    public CapitalChangeApply queryCapitalChangeById(String capitalId) {
+        if (StringUtils.isBlank(capitalId)) {
+            return null;
+        }
+        CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(capitalId);
+        if (null == capitalChangeApply) {
+            return null;
+        }
+        return capitalChangeApply;
+    }
+
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult saveCapitalChange(CapitalChangeApply capitalChangeApply, String[] capitalChangeFiles, String cUser,

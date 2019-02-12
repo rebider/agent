@@ -45,17 +45,4 @@ public enum AgCapitalType {
         return "";
     }
 
-    /**
-     * 获取下拉列表
-     * @return
-     */
-    public static Map<BigDecimal, Object> getContentMap() {
-        Map<BigDecimal, Object> resultMap = new HashMap<>();
-        RefundType[] refundTypes = RefundType.values();
-        for (RefundType cc : refundTypes) {
-            resultMap.put(cc.code, cc.msg);
-        }
-        return resultMap;
-    }
-
 }

@@ -16,6 +16,8 @@ public interface CapitalChangeApplyService {
 
     PageInfo queryCapitalChangeList(CapitalChangeApply capitalChangeApply, Page page, String dataRole, Long userId);
 
+    CapitalChangeApply queryCapitalChangeById(String capitalId);
+
     AgentResult saveCapitalChange(CapitalChangeApply capitalChangeApply, String[] capitalChangeFiles, String cUser, String saveFlag, List<OCashReceivablesVo> oCashReceivables)throws Exception;
 
     AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception;
