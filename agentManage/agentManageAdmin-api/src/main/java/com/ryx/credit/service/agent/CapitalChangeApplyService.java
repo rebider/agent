@@ -11,4 +11,6 @@ import com.ryx.credit.pojo.admin.agent.CapitalChangeApply;
 public interface CapitalChangeApplyService {
 
     PageInfo queryCapitalChangeList(CapitalChangeApply capitalChangeApply, Page page, String dataRole, Long userId);
+
+    CapitalChangeApply queryCapitalChangeById(String capitalId);
 }
