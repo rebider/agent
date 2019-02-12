@@ -13,6 +13,7 @@ import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import org.activiti.engine.runtime.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -90,6 +92,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     IOwnInvoiceService ownInvoiceService;
     @Resource
     ProfitFactorService profitFactorService;
+
+    @Autowired
+    private IProfitDirectService profitDirectService;
+
+    @Autowired
+    private BusiPlatService busiPlatService;
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -1150,6 +1158,37 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public ProfitDetailMonth getByAgentId(String agentId) {
         return profitDetailMonthMapper.selectByAgentId(agentId);
+    }
+
+
+
+
+    /**
+     * 代理商日分润冻结
+     * @param  agentId 代理商唯一码
+     */
+    @Override
+    public void doFrozenByAgent(String agentId) {
+        List<String> agentIds = new ArrayList<String>();
+        agentIds.add(agentId);
+        boolean fail =busiPlatService.mPos_Frozen(agentIds);
+        if(fail){
+            throw new ProcessException("通知手刷，冻结失败");
+        }
+    }
+
+    /**
+     * 代理商日分润解冻
+     * @param  agentId 代理商唯一码
+     */
+    @Override
+    public void doUnFrozenAgentProfit(String agentId) {
+        List<String> agentIds = new ArrayList<String>();
+        agentIds.add(agentId);
+        boolean fail =busiPlatService.mPos_unFrozen(agentIds);
+        if(fail){
+            throw new ProcessException("通知手刷，解冻失败！");
+        }
     }
 
 }

@@ -9,6 +9,7 @@ import com.ryx.credit.common.util.DateJsonSerializer;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentColinfoRel;
 import com.ryx.credit.pojo.admin.agent.AgentMerge;
+import com.ryx.credit.pojo.admin.agent.AgentQuit;
 import com.ryx.credit.pojo.admin.order.*;
 
 import java.io.Serializable;
@@ -91,6 +92,25 @@ public class AgentVo implements Serializable {
     private BigDecimal mergeType;
     private String mainDocDistrict; //主代理商大区
     private String subDocDistrict;  //副代理商大区
+    private AgentQuit agentQuit;
+    private BigDecimal realitySuppDept;
+    private List<String> quitRefundFile;
+
+    public List<String> getQuitRefundFile() {
+        return quitRefundFile;
+    }
+
+    public void setQuitRefundFile(List<String> quitRefundFile) {
+        this.quitRefundFile = quitRefundFile;
+    }
+
+    public BigDecimal getRealitySuppDept() {
+        return realitySuppDept;
+    }
+
+    public void setRealitySuppDept(BigDecimal realitySuppDept) {
+        this.realitySuppDept = realitySuppDept;
+    }
 
     public String getMainDocDistrict() {
         return mainDocDistrict;
@@ -458,5 +478,13 @@ public class AgentVo implements Serializable {
 
     public void setMergeType(BigDecimal mergeType) {
         this.mergeType = mergeType;
+    }
+
+    public AgentQuit getAgentQuit() {
+        return agentQuit;
+    }
+
+    public void setAgentQuit(AgentQuit agentQuit) {
+        this.agentQuit = agentQuit;
     }
 }
