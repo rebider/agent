@@ -24,6 +24,15 @@ import java.util.Map;
 public class AgentVo implements Serializable {
 
     private Agent agent;
+
+    public String getPretest() {
+        return pretest;
+    }
+
+    public void setPretest(String pretest) {
+        this.pretest = pretest;
+    }
+
     private List<CapitalVo> capitalVoList;
     private List<AgentContractVo> contractVoList;
     private List<AgentColinfoVo> colinfoVoList;
@@ -43,6 +52,7 @@ public class AgentVo implements Serializable {
     private BigDecimal realPayAmount;
     private String supplementId;
     private Date remitTime;
+    private String pretest;
     @JSONField(format="yyyy-MM-dd")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @JsonDeserialize(using = DateJsonDeserializer.class)

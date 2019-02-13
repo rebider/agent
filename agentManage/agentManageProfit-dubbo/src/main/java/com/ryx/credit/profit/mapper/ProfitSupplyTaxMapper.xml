@@ -279,7 +279,9 @@
       <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
       <if test="SUPPLY_TAX_SUB_ID != null and SUPPLY_TAX_SUB_ID !='' "> and SUPPLY_TAX_SUB_ID = #{SUPPLY_TAX_SUB_ID} </if>
       <if test="SUPPLY_TAX_SUB_NAME != null and SUPPLY_TAX_SUB_NAME !='' "> and SUPPLY_TAX_SUB_NAME = #{SUPPLY_TAX_SUB_NAME} </if>
-      <if test="SUPPLY_TAX_AMT != null and SUPPLY_TAX_AMT !='' "> and SUPPLY_TAX_AMT = #{SUPPLY_TAX_AMT} </if>
+
+       and SUPPLY_TAX_AMT  != 0.00
+
       <if test="SUPPLY_TAX_TYPE != null and SUPPLY_TAX_TYPE !='' "> and SUPPLY_TAX_TYPE = #{SUPPLY_TAX_TYPE} </if>
       <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
 
@@ -309,6 +311,7 @@
     <if test="SUPPLY_TAX_AGENT_ID != null and SUPPLY_TAX_AGENT_ID !='' "> and ps.SUPPLY_TAX_AGENT_ID = #{SUPPLY_TAX_AGENT_ID} </if>
     <if test="SUPPLY_TAX_AGENT_NAME != null and SUPPLY_TAX_AGENT_NAME !='' "> and ps.SUPPLY_TAX_AGENT_NAME = #{SUPPLY_TAX_AGENT_NAME} </if>
     <if test="SUPPLY_TAX_PLATFORM != null and SUPPLY_TAX_PLATFORM !='' "> and ps.SUPPLY_TAX_PLATFORM = #{SUPPLY_TAX_PLATFORM} </if>
+    and SUPPLY_TAX_AMT  != 0.00
     ORDER BY ps.SUPPLY_TAX_AMT DESC
     <include refid="PAGING_END" />
   </select>
@@ -323,6 +326,7 @@
     aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where 1=1
     <if test="DATESTART != null and DATESTART !='' "> and ps.SUPPLY_TAX_DATE &gt;= #{DATESTART} </if>
     <if test="DATEEND != null and DATEEND !='' "> and ps.SUPPLY_TAX_DATE &lt;= #{DATEEND} </if>
+    and SUPPLY_TAX_AMT  != 0.00
     ) zzz
     START WITH
     zzz.SUPPLY_TAX_PLATFORM = '01'
@@ -352,6 +356,9 @@
     aa on ps.supply_Tax_agent_id = aa.AGENT_IDA where 1=1
     <if test="DATESTART != null and DATESTART !='' "> and ps.SUPPLY_TAX_DATE &gt;= #{DATESTART} </if>
     <if test="DATEEND != null and DATEEND !='' "> and ps.SUPPLY_TAX_DATE &lt;= #{DATEEND} </if>
+
+     and SUPPLY_TAX_AMT  != 0.00
+
     ) zzz
     START WITH
     zzz.SUPPLY_TAX_PLATFORM = '01'

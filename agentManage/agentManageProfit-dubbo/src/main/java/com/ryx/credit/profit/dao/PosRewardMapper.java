@@ -1,9 +1,11 @@
 package com.ryx.credit.profit.dao;
 
+import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.pojo.PosReward;
 import com.ryx.credit.profit.pojo.PosRewardExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PosRewardMapper {
     long countByExample(PosRewardExample example);
@@ -25,4 +27,11 @@ public interface PosRewardMapper {
     int updateByPrimaryKeySelective(PosReward record);
 
     int updateByPrimaryKey(PosReward record);
+
+    List<Map<String, Object>> huddlePos(Map<String, Object> param);
+
+
+    Map<String, Object> selectById(String id);
+
+    Map<String, Object> selectByActiv(String activId);
 }
