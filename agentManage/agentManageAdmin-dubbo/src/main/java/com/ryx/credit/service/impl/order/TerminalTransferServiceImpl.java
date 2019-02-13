@@ -211,7 +211,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             }
             for (TerminalTransferDetail terminalTransferDetail : terminalTransferDetailList) {
                 Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
-                terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DETAIL));
+                terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DE));
                 terminalTransferDetail.setTerminalTransferId(terminalTransferId);
                 terminalTransferDetail.setcUser(cuser);
                 terminalTransferDetail.setuUser(cuser);
@@ -696,7 +696,7 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
             Map<String, String> resultMap = saveOrEditVerify(terminalTransferDetail, agentId);
             //新增
             if(StringUtils.isBlank(terminalTransferDetail.getId())){
-                terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DETAIL));
+                terminalTransferDetail.setId(idService.genId(TabId.O_TERMINAL_TRANSFER_DE));
                 terminalTransferDetail.setTerminalTransferId(terminalTransfer.getId());
                 terminalTransferDetail.setcUser(cuser);
                 terminalTransferDetail.setuUser(cuser);
