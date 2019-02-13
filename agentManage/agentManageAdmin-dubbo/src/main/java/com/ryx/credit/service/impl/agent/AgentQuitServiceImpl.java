@@ -759,8 +759,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //拒绝
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             try {
-                String profitDate = DateUtil.format(DateUtil.addMonth(agentQuit.getcTime(), -1), "yyyyMM");
-                profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId(),profitDate);
+                profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("代理商退出：分润解冻失败");
