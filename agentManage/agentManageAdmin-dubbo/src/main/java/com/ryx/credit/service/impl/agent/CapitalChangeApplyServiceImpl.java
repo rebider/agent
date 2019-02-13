@@ -129,7 +129,11 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
 
             capitalChangeApply.setRealOperationAmt(capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()));
             capitalChangeApply.setAgentName(agent.getAgName());
-            capitalChangeApply.setCloReviewStatus(AgStatus.Create.status);
+            if (saveFlag.equals(SaveFlag.TJSP.getValue())) {
+                capitalChangeApply.setCloReviewStatus(AgStatus.Approving.status);
+            } else {
+                capitalChangeApply.setCloReviewStatus(AgStatus.Create.status);
+            }
             capitalChangeApply.setcUser(cUser);
             capitalChangeApply.setuUser(cUser);
             capitalChangeApply.setcTime(new Date());
