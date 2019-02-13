@@ -66,7 +66,9 @@ public enum DictGroup {
     AGENTQUIT("代理商退出审批流名称"),
     QUIT_MARKET("代理商退出审批市场部参数"),
     QUIT_MARKET_DEADLINE("代理商退出审批选择期限"),
-    QUIT_MIGR_PLATFORM("代理商退出手刷迁移平台");
+    QUIT_MIGR_PLATFORM("代理商退出手刷迁移平台"),
+    CAPITAL_MIARKET("保证金变更市场部审批参数"),
+    CAPITAL_BUSINESS("保证金变更业务部审批参数");
 
     public String  msg;
 

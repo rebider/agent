@@ -12,6 +12,7 @@ import com.ryx.credit.dao.agent.AttachmentRelMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
 import com.ryx.credit.dao.agent.CapitalChangeApplyMapper;
 import com.ryx.credit.pojo.admin.agent.*;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -32,7 +33,7 @@ import java.util.*;
 
 /**
  * Created by RYX on 2019/2/12.
- * 保证金申请
+ * 保证金变更申请
  */
 @Service("capitalChangeApplyService")
 public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService {
@@ -229,6 +230,54 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult approvalCapitalChangeTask(AgentVo agentVo, String userId, String busId) throws Exception {
+        try {
+            if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+                CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(busId);
+                agentVo.setOperationType(String.valueOf(capitalChangeApply.getOperationType()));
+                agentVo.setAmt(String.valueOf(capitalChangeApply.getRealOperationAmt()));
+            }
+            AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
+            if (!result.isOK()) {
+                logger.error(result.getMsg());
+                throw new MessageException("工作流处理任务异常！");
+            }
+        } catch (MessageException e) {
+            e.printStackTrace();
+            throw new MessageException(e.getMsg());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MessageException("catch工作流处理任务异常！" );
+        }
+        return AgentResult.ok();
+    }
+
+    @Override
+    public AgentResult compressCapitalChangeActivity(String proIns, BigDecimal agStatus) throws Exception {
+        BusActRelExample example = new BusActRelExample();
+        example.or().andActivIdEqualTo(proIns).andStatusEqualTo(Status.STATUS_1.status).andActivStatusEqualTo(AgStatus.Approving.name());
+        List<BusActRel> list = busActRelMapper.selectByExample(example);
+        if (list.size() != 1) {
+            logger.info("审批任务结束{}{}，未找到审批中的审批和数据关系", proIns, agStatus);
+            throw new MessageException("审批和数据关系有误！");
+        }
+        BusActRel busActRel = list.get(0);
+        busActRel.setActivStatus(AgStatus.getAgStatusString(agStatus));
+        if(1 != busActRelMapper.updateByPrimaryKey(busActRel)) {
+            logger.info("审批任务结束{}{}，保证金变更申请更新失败-busActRel", proIns, agStatus);
+            throw new MessageException("保证金变更申请更新失败！");
+        }
+        CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(busActRel.getBusId());
+        capitalChangeApply.setCloReviewStatus(agStatus);
+        capitalChangeApply.setuTime(Calendar.getInstance().getTime());
+        if (1 != capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply)) {
+            logger.info("审批任务结束{}{}，保证金变更申请更新失败-capitalChangeApply", proIns, agStatus);
+            throw new MessageException("保证金变更申请更新失败！");
         }
         return AgentResult.ok();
     }

@@ -86,6 +86,25 @@ public class AgentVo implements Serializable {
     private BigDecimal realitySuppDept;
     private List<String> quitRefundFile;
 
+    private String operationType;
+    private String amt;
+
+    public String getOperationType() {
+        return operationType;
+    }
+
+    public void setOperationType(String operationType) {
+        this.operationType = operationType;
+    }
+
+    public String getAmt() {
+        return amt;
+    }
+
+    public void setAmt(String amt) {
+        this.amt = amt;
+    }
+
     public List<String> getQuitRefundFile() {
         return quitRefundFile;
     }
