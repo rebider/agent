@@ -239,7 +239,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         e.printStackTrace();
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
-                        importAgent.setDealmsg(e.getLocalizedMessage().substring(0,60));
+                        importAgent.setDealmsg(e.getLocalizedMessage());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
                     }
@@ -1406,6 +1406,27 @@ public class OrderImportServiceImpl implements OrderImportService {
         OReturnOrderRelExample oReturnOrderRelExample = new OReturnOrderRelExample();
         oReturnOrderRelExample.or().andReturnOrderIdEqualTo(reutrnorderid);
         oReturnOrderRelMapper.deleteByExample(oReturnOrderRelExample);
+
+        //更新sn信息
+        OReturnOrderDetailExample desn = new OReturnOrderDetailExample();
+        desn.or().andReturnIdEqualTo(reutrnorderid);
+        List<OReturnOrderDetail>  list = oReturnOrderDetailMapper.selectByExample(desn);
+        for (OReturnOrderDetail oReturnOrderDetail : list) {
+            OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+            oLogisticsDetailExample.or()
+                    .andAgentIdEqualTo(oReturnOrderDetail.getAgentId())
+                    .andSnNumLessThanOrEqualTo(oReturnOrderDetail.getBeginSn())
+                    .andSnNumGreaterThanOrEqualTo(oReturnOrderDetail.getEndSn())
+                    .andStatusEqualTo(OLogisticsDetailStatus.STATUS_TH.code)
+                    .andRecordStatusEqualTo(OLogisticsDetailStatus.RECORD_STATUS_HIS.code);
+            List<OLogisticsDetail> details = oLogisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+            for (OLogisticsDetail detail : details) {
+                detail.setStatus(OLogisticsDetailStatus.STATUS_FH.code);
+                detail.setSendStatus(OLogisticsDetailStatus.RECORD_STATUS_VAL.code);
+                oLogisticsDetailMapper.updateByPrimaryKeySelective(detail);
+            }
+        }
+
         //删除退货单明细
         OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
         oReturnOrderDetailExample.or().andReturnIdEqualTo(reutrnorderid);
