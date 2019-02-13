@@ -239,27 +239,27 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             throw new MessageException("启动部门参数为空!");
         }
         //启动审批
-//        String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
-//        if (proce == null) {
-//            logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
-//            throw new MessageException("审批流启动失败!");
-//        }
+        String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
+        if (proce == null) {
+            logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
+            throw new MessageException("审批流启动失败!");
+        }
 
         //代理商业务&工作流关系
-//        BusActRel record = new BusActRel();
-//        record.setBusId(id);
-//        record.setActivId(proce);
-//        record.setcTime(Calendar.getInstance().getTime());
-//        record.setcUser(cUser);
-//        record.setStatus(Status.STATUS_1.status);
-//        record.setBusType(BusActRelBusType.capitalChange.name());
-//        record.setActivStatus(AgStatus.Approving.name());
-//        record.setAgentId(capitalChangeApply.getAgentId());
-//        record.setAgentName(capitalChangeApply.getAgentName());
-//        if (1 != busActRelMapper.insertSelective(record)) {
-//            logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
-//            throw new MessageException("审批流启动失败：添加审批关系失败！");
-//        }
+        BusActRel record = new BusActRel();
+        record.setBusId(id);
+        record.setActivId(proce);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(cUser);
+        record.setStatus(Status.STATUS_1.status);
+        record.setBusType(BusActRelBusType.capitalChange.name());
+        record.setActivStatus(AgStatus.Approving.name());
+        record.setAgentId(capitalChangeApply.getAgentId());
+        record.setAgentName(capitalChangeApply.getAgentName());
+        if (1 != busActRelMapper.insertSelective(record)) {
+            logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+            throw new MessageException("审批流启动失败：添加审批关系失败！");
+        }
         return AgentResult.ok();
     }
 
