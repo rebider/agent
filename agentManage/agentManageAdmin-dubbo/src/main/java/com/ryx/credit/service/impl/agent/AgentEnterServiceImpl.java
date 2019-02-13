@@ -464,8 +464,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
         }
 
-        reqMap.put("operationType", agentVo.getOperationType());
-        reqMap.put("amt", agentVo.getAmt());
+        if(StringUtils.isNotBlank(agentVo.getOperationType())){
+            reqMap.put("operationType", agentVo.getOperationType());
+        }
+
+        if(StringUtils.isNotBlank(agentVo.getAmt())){
+            reqMap.put("amt", agentVo.getAmt());
+        }
 
         //传递部门信息
         Map startPar = startPar(userId);
