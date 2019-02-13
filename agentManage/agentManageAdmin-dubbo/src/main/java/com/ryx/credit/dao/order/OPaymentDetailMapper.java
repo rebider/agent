@@ -50,4 +50,12 @@ public interface OPaymentDetailMapper {
      * @return
      */
     List<Map<String, Object>> getCapitalDebt(@Param("map") Map<String, Object> map);
+
+    /**
+     * 获取订单欠款
+     * @param map
+     * @return
+     */
+    List<Map<String, Object>> getOrderDebt(@Param("map") Map<String, Object> map);
+
 }

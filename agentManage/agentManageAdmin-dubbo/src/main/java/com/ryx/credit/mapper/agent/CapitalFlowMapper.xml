@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.agent.CapitalFlowMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.agent.CapitalFlow">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="C_TYPE" jdbcType="VARCHAR" property="cType" />
+    <result column="CAPITAL_ID" jdbcType="VARCHAR" property="capitalId" />
+    <result column="SRC_TYPE" jdbcType="DECIMAL" property="srcType" />
+    <result column="SRC_ID" jdbcType="VARCHAR" property="srcId" />
+    <result column="BEFORE_AMOUNT" jdbcType="DECIMAL" property="beforeAmount" />
+    <result column="C_AMOUNT" jdbcType="DECIMAL" property="cAmount" />
+    <result column="OPERATION_TYPE" jdbcType="DECIMAL" property="operationType" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, C_TYPE, CAPITAL_ID, SRC_TYPE, SRC_ID, BEFORE_AMOUNT, C_AMOUNT, OPERATION_TYPE,
+    AGENT_ID, AGENT_NAME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, REMARK
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlowExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_CAPITAL_FLOW
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from A_CAPITAL_FLOW
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlowExample">
+    delete from A_CAPITAL_FLOW
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlow">
+    insert into A_CAPITAL_FLOW (ID, C_TYPE, CAPITAL_ID,
+    SRC_TYPE, SRC_ID, BEFORE_AMOUNT,
+    C_AMOUNT, OPERATION_TYPE, AGENT_ID,
+    AGENT_NAME, C_TIME, U_TIME,
+    C_USER, U_USER, STATUS,
+    VERSION, REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{cType,jdbcType=VARCHAR}, #{capitalId,jdbcType=VARCHAR},
+    #{srcType,jdbcType=DECIMAL}, #{srcId,jdbcType=VARCHAR}, #{beforeAmount,jdbcType=DECIMAL},
+    #{cAmount,jdbcType=DECIMAL}, #{operationType,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR},
+    #{agentName,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
+    #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+    #{version,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlow">
+    insert into A_CAPITAL_FLOW
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="cType != null">
+        C_TYPE,
+      </if>
+      <if test="capitalId != null">
+        CAPITAL_ID,
+      </if>
+      <if test="srcType != null">
+        SRC_TYPE,
+      </if>
+      <if test="srcId != null">
+        SRC_ID,
+      </if>
+      <if test="beforeAmount != null">
+        BEFORE_AMOUNT,
+      </if>
+      <if test="cAmount != null">
+        C_AMOUNT,
+      </if>
+      <if test="operationType != null">
+        OPERATION_TYPE,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="uTime != null">
+        U_TIME,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="uUser != null">
+        U_USER,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="cType != null">
+        #{cType,jdbcType=VARCHAR},
+      </if>
+      <if test="capitalId != null">
+        #{capitalId,jdbcType=VARCHAR},
+      </if>
+      <if test="srcType != null">
+        #{srcType,jdbcType=DECIMAL},
+      </if>
+      <if test="srcId != null">
+        #{srcId,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeAmount != null">
+        #{beforeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="cAmount != null">
+        #{cAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="operationType != null">
+        #{operationType,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlowExample" resultType="java.lang.Long">
+    select count(*) from A_CAPITAL_FLOW
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlow">
+    update A_CAPITAL_FLOW
+    <set>
+      <if test="cType != null">
+        C_TYPE = #{cType,jdbcType=VARCHAR},
+      </if>
+      <if test="capitalId != null">
+        CAPITAL_ID = #{capitalId,jdbcType=VARCHAR},
+      </if>
+      <if test="srcType != null">
+        SRC_TYPE = #{srcType,jdbcType=DECIMAL},
+      </if>
+      <if test="srcId != null">
+        SRC_ID = #{srcId,jdbcType=VARCHAR},
+      </if>
+      <if test="beforeAmount != null">
+        BEFORE_AMOUNT = #{beforeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="cAmount != null">
+        C_AMOUNT = #{cAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="operationType != null">
+        OPERATION_TYPE = #{operationType,jdbcType=DECIMAL},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="uUser != null">
+        U_USER = #{uUser,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlow">
+    update A_CAPITAL_FLOW
+    set C_TYPE = #{cType,jdbcType=VARCHAR},
+      CAPITAL_ID = #{capitalId,jdbcType=VARCHAR},
+      SRC_TYPE = #{srcType,jdbcType=DECIMAL},
+      SRC_ID = #{srcId,jdbcType=VARCHAR},
+      BEFORE_AMOUNT = #{beforeAmount,jdbcType=DECIMAL},
+      C_AMOUNT = #{cAmount,jdbcType=DECIMAL},
+      OPERATION_TYPE = #{operationType,jdbcType=DECIMAL},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      U_USER = #{uUser,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from (
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="queryCapitalFlowList" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    select
+    cf.*, a.ag_name, cu.name as C_USER_NAME, uu.name as U_USER_NAME
+    from a_capital_flow cf
+    left join a_agent a on cf.agent_id = a.id
+    left join c_user cu on cf.c_user = cu.id
+    left join c_user uu on cf.u_user = uu.id
+    <include refid="capitalFlowWhere" />
+    order by cf.c_time desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="queryCapitalFlowCount" parameterType="map" resultType="java.lang.Integer">
+    select
+    count(*)
+    from a_capital_flow cf
+    left join a_agent a on cf.agent_id = a.id
+    left join c_user cu on cf.c_user = cu.id
+    left join c_user uu on cf.u_user = uu.id
+    <include refid="capitalFlowWhere" />
+  </select>
+
+  <sql id="capitalFlowWhere">
+    <where>
+      cf.status = #{map.status} and a.status = #{map.status}
+      <if test="map.id != null"> and cf.id = #{map.id} </if>
+      <if test="map.agentId != null"> and cf.agent_id = #{map.agentId} </if>
+      <if test="map.agentName != null"> and cf.agent_name = #{map.agentName} </if>
+      <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
+    </where>
+  </sql>
+</mapper>

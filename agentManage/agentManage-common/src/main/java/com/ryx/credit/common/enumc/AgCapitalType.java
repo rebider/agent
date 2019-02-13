@@ -3,6 +3,8 @@ package com.ryx.credit.common.enumc;
 import org.apache.commons.lang.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 代理商状态
@@ -33,5 +35,14 @@ public enum AgCapitalType {
         return "";
     }
 
+    public static String getContentByValue(String value){
+        AgCapitalType[] agCapitalType = AgCapitalType.values();
+        for(AgCapitalType type : agCapitalType){
+            if(type.name().equals(value)){
+                return type.msg;
+            }
+        }
+        return "";
+    }
 
 }

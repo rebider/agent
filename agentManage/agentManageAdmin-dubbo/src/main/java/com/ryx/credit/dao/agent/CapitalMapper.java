@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.agent.CapitalExample;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CapitalMapper {
     int countByExample(CapitalExample example);
@@ -28,4 +29,8 @@ public interface CapitalMapper {
     public List<Capital> selectAmount(String paymentId);
 
     List<Capital> selectByAgenId(String agentId);
+
+    List<Map<String,Object>> getCapitalSummaryList(Map<String, Object> param);
+
+    Long getCapitalSummaryCount(Map<String, Object> param);
 }

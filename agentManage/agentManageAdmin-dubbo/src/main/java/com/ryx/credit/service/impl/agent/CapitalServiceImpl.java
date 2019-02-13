@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.DictGroup;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.pojo.admin.agent.Capital;
@@ -12,11 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author Lihl
  * @Date 2018/10/11
- * 资金记录：查询保证金信息
+ * 保证金
  */
 @Service("capitalService")
 public class CapitalServiceImpl implements CapitalService{
@@ -41,6 +43,22 @@ public class CapitalServiceImpl implements CapitalService{
             return capitals;
         }
         return null;
+    }
+
+
+    /**
+     * 汇总列表
+     * @param param
+     * @param pageInfo
+     * @return
+     */
+    @Override
+    public PageInfo getCapitalSummaryList(Map<String, Object> param, PageInfo pageInfo) {
+        Long count = capitalMapper.getCapitalSummaryCount(param);
+        List<Map<String, Object>> list = capitalMapper.getCapitalSummaryList(param);
+        pageInfo.setTotal(count.intValue());
+        pageInfo.setRows(list);
+        return pageInfo;
     }
 
 }

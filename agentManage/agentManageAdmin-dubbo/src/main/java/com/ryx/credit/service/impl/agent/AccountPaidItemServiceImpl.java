@@ -74,7 +74,12 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
         capital.setcUtime(nowDate);
         capital.setCloReviewStatus(AgStatus.Create.status);
         capital.setcInAmount(Status.STATUS_0.status);
-        capital.setcFqInAmount(Status.STATUS_0.status);
+        capital.setFreezeAmt(Status.STATUS_0.status);
+        if(PayType.YHHK.code.equals(capital.getcPayType())) {
+            capital.setcFqInAmount(capital.getcAmount());
+        }else{
+            capital.setcFqInAmount(Status.STATUS_0.status);
+        }
         int insertResult = capitalMapper.insertSelective(capital);
         if(1==insertResult){
             if(fileIdList!=null) {
@@ -163,7 +168,11 @@ public class AccountPaidItemServiceImpl implements AccountPaidItemService {
                         db_capital.setcInCom(capitalVo.getcInCom());
                         db_capital.setcPayType(capitalVo.getcPayType());
 
-
+                        if(PayType.YHHK.code.equals(db_capital.getcPayType())) {
+                            db_capital.setcFqInAmount(db_capital.getcAmount());
+                        }else{
+                            db_capital.setcFqInAmount(Status.STATUS_0.status);
+                        }
 
                         if(1!=capitalMapper.updateByPrimaryKeySelective(db_capital)){
                             throw new ProcessException("更新收款信息失败");
