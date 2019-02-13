@@ -54,11 +54,11 @@ public class Conver10ToConver33Utils {
               min = i2;
               max = i1;
           }
-          list.add(par1);
-          list.add(par2);
+          list.add(sn1+par1);
+          list.add(sn1+par2);
           for (int i = min + 1; i < max; i++) {
               String sub = StringSubTo33(i);
-              list.add(sub);
+              list.add(sn1+sub);
           }
       }catch (Exception e){
           e.printStackTrace();
@@ -123,15 +123,11 @@ public class Conver10ToConver33Utils {
     }
 
     public static void main(String[] args) {
-
-        List<String> betweenValues = getBetweenValues("wqeM9998", "wqeP1000");
+      /*  String param1="1922AA8M9998";
+        String sn1= param1.substring(0,param1.length() - 5);
+        System.out.println(sn1);*/
+        List<String> betweenValues = getBetweenValues("1922AA8B9998", "1922AA8C1000");
         System.out.println(betweenValues);
-
-
-       /* String s="12345678910";
-        String par1 = s.substring(s.length() - 5, s.length());
-        String par2= s.substring(0,s.length() - 5);
-        System.out.println(par1+"-------"+par2);*/
 
     }
 }

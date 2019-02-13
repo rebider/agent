@@ -168,6 +168,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String wNumber = "";
             String proType="";
             String planProNum="";
+            String proComString="";
             List col = Arrays.asList(ReceiptPlanExportColum.ReceiptPlanExportColum_column.col);
             planNum = String.valueOf(objectList.get(col.indexOf("PLAN_NUM")));
             orderId = String.valueOf(objectList.get(col.indexOf("ORDER_ID")));
@@ -185,6 +186,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             endSnCount = String.valueOf(objectList.get(col.indexOf("f")));
             proType = String.valueOf(objectList.get(col.indexOf("PRO_TYPE")));
             planProNum = String.valueOf(objectList.get(col.indexOf("PLAN_PRO_NUM")));
+            proComString = String.valueOf(objectList.get(col.indexOf("PRO_COM_STRING")));
 
             if (StringUtils.isBlank(sendDate)) {
                 logger.info("发货日期不能为空");
@@ -277,7 +279,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             }
 
             //IDlist检查
-            List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount),null);
+            List<String> stringList = idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount),proComString);
             if (Integer.valueOf(sendProNum) != stringList.size()) {
                 logger.info("请仔细核对发货数量");
                 throw new MessageException("请仔细核对发货数量");
@@ -926,11 +928,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             logger.info("厂家为空");
             throw new MessageException("厂家为空");
         }
-        if (proCom.equals(CardImportType.LD.msg)){
-            proCom=CardImportType.LD.code;
-        }
-
-        if (CardImportType.LD.code.equals(proCom)) {
+        if (CardImportType.LD.name().equals(proCom) || proCom.equals(CardImportType.LD.msg) || proCom.equals(CardImportType.LD.code)) {
             list= getBetweenValues(startSn, endSn);
         }else {
             int begin = begins - 1;
