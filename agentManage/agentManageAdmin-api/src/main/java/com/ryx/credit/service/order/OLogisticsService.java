@@ -29,7 +29,7 @@ public interface OLogisticsService {
     ResultVO updateLogisticsDetail(List<String> idList,String logisticsId, String cUser, String planId) throws MessageException;
 
     public List<String> addList(List<List<Object>> data, String user)throws Exception;
-    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish) throws MessageException;
+    public List<String> idList(String startSn, String endSn, Integer begins, Integer finish,String proCom) throws MessageException;
     public AgentResult addListItem(List<Object> data, String user) throws Exception;
 
     public int insertImportData(OLogistics oLogistics);

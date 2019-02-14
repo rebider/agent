@@ -892,7 +892,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                     throw new MessageException("排单信息添加失败");
                 }
                 //生成sn明细
-                List<String> idListArr = oLogisticsService.idList(logicInfo.getSnStart(), logicInfo.getSnEnd(), Integer.valueOf(logicInfo.getSnEndNum()),Integer.valueOf( logicInfo.getSnEndNum()));
+                List<String> idListArr = oLogisticsService.idList(logicInfo.getSnStart(), logicInfo.getSnEnd(), Integer.valueOf(logicInfo.getSnEndNum()),Integer.valueOf( logicInfo.getSnEndNum()),logistics.getProCom());
 
                 if (null != idListArr && idListArr.size() > 0) {
                     for (String idSn : idListArr) {
@@ -1061,7 +1061,8 @@ public class OrderImportServiceImpl implements OrderImportService {
                     orderImportReturnLogincInfo.getSnStart(),
                     orderImportReturnLogincInfo.getSnEnd(),
                     Integer.valueOf(orderImportReturnLogincInfo.getSnStartNum()),
-                    Integer.valueOf(orderImportReturnLogincInfo.getSnEndNum()));
+                    Integer.valueOf(orderImportReturnLogincInfo.getSnEndNum()),
+                    orderImportReturnLogincInfo.getReturnCS());
             logger.info("退货单物流信息{}:{}:{}解析后数量{}",
                     orderImportReturnLogincInfo.getReturnOrderId(),
                     orderImportReturnLogincInfo.getSnStart(),
