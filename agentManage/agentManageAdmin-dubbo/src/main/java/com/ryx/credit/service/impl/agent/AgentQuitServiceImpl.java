@@ -264,23 +264,6 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
      */
     public void verifyChild(String agentId)throws Exception{
 
-        AgentBusInfoExample subAgentBusInfoExample = new AgentBusInfoExample();
-        AgentBusInfoExample.Criteria subCriteria = subAgentBusInfoExample.createCriteria();
-        subCriteria.andAgentIdEqualTo(agentId);
-        subCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
-        if(subAgentBusInfos.size()==0){
-            throw new MessageException("代理商业务信息有误");
-        }
-        for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
-            if(StringUtils.isBlank(subAgentBusInfo.getBusNum())){
-                throw new MessageException("代理商业务平台未入网成功");
-            }
-            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
-            if(childLevelBusInfos.size()!=0){
-                throw new MessageException("代理商不能有下级");
-            }
-        }
         AgentQuitExample agentQuitExample = new AgentQuitExample();
         AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -347,7 +330,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
      * @param agentId
      * @return
      */
-    public String quitPlatformIds(String quitPlatform,String agentId){
+    public String quitPlatformIds(String quitPlatform,String agentId)throws Exception{
         PlatFormExample platFormExample = new PlatFormExample();
         PlatFormExample.Criteria criteria = platFormExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -383,6 +366,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         String busIds = "";
         for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            if(StringUtils.isBlank(agentBusInfo.getBusNum())){
+                throw new MessageException("代理商业务平台未入网成功");
+            }
+            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, agentBusInfo.getBusPlatform(), agentBusInfo.getBusNum());
+            if(childLevelBusInfos.size()!=0){
+                throw new MessageException("代理商不能有下级");
+            }
             busIds += agentBusInfo.getId()+",";
         }
         if(StringUtils.isNotBlank(busIds)){
