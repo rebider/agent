@@ -305,6 +305,7 @@ public class AimportServiceImpl implements AimportService {
                         Agent ag_db = agQuery.get(0);
                         ag.setId(ag_db.getId());
                         ag.setVersion(ag_db.getVersion());
+                        ag.setAgRemark(ag.getAgRemark()==null?"(老数据导入)":ag.getAgRemark());
                         if(1!=agentService.updateAgent(ag)){
                             logger.info("更新代理商出错{}",datum.getId());
                             throw new ProcessException("更新代理商出错");
@@ -323,6 +324,7 @@ public class AimportServiceImpl implements AimportService {
                     }else{
                         ag.setcUser(userid);
                         ag.setImport(true);
+                        ag.setAgRemark("(老数据导入)");
                         Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid);
                         //todo 生成后台用户
                         agentService.createBackUserbyAgent(ag_db.getId());
@@ -375,7 +377,7 @@ public class AimportServiceImpl implements AimportService {
                     example.or().andAgUniqNumEqualTo(dataId);
                     List<Agent>  agQuery = agentMapper.selectByExample(example);
                     if(agQuery.size()==0){
-                        throw new ProcessException("代理商交款导入失败");
+                        throw new ProcessException("代理商交款导入失败，代理商信息未找到("+dataId+")");
                     }
 
                     Agent agent =  agQuery.get(0);
@@ -394,11 +396,11 @@ public class AimportServiceImpl implements AimportService {
                                logger.info("用户已交过款项{},{},{}",capital.getcAmount(),capital.getcType(),capital.getcPaytime());
                         }else{
                             AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
-                            if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败");
+                            if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                         }
                     }else{
                         AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
-                        if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败");
+                        if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
                     }
                     ImportAgent payment =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     payment.setDealstatus(Status.STATUS_2.status);//处理成功
@@ -410,11 +412,23 @@ public class AimportServiceImpl implements AimportService {
                     }else{
                         logger.info("导入代理商付款金额插入失败{}",datum.getId());
                     }
-                } catch (Exception e) {
+                } catch (ProcessException e) {
                     e.printStackTrace();
                     ImportAgent con  = importAgentMapper.selectByPrimaryKey(datum.getId());
                     con.setDealstatus(Status.STATUS_3.status);
-                    con.setDealmsg(e.getMessage());
+                    con.setDealmsg(e.getMsg());
+                    con.setDealTime(new Date());
+                    if(1!=importAgentMapper.updateByPrimaryKeySelective(con)) {
+                        logger.info("导入代理商付款金额插入失败{}失败",con.getId());
+                        throw new ProcessException("更新记录失败");
+                    }else{
+                        logger.info("导入代理商付款金额插入失败{}失败",con.getId());
+                    }
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    ImportAgent con  = importAgentMapper.selectByPrimaryKey(datum.getId());
+                    con.setDealstatus(Status.STATUS_3.status);
+                    con.setDealmsg(e.getLocalizedMessage());
                     con.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(con)) {
                         logger.info("导入代理商付款金额插入失败{}失败",con.getId());
@@ -533,7 +547,12 @@ public class AimportServiceImpl implements AimportService {
                     example.or().andAgUniqNumEqualTo(dataId);
                     List<Agent>  agQuery = agentMapper.selectByExample(example);
                     if(agQuery.size()==0){
-                        throw new ProcessException("代理商不存在");
+                        datum = importAgentMapper.selectByPrimaryKey(datum.getId());
+                        datum.setDealstatus(Status.STATUS_3.status);//处理中
+                        datum.setDealTime(new Date());
+                        datum.setDealmsg("代理商信息不存在("+dataId+")");
+                        importAgentMapper.updateByPrimaryKeySelective(datum);
+                        continue;
                     }
 
                     Agent agent =  agQuery.get(0);
@@ -814,7 +833,14 @@ public class AimportServiceImpl implements AimportService {
         try {
             Capital c = new Capital();
             if(obj.size() >2 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(2))){
-                c.setcType(AgCapitalType.getAgNatureMsgString(obj.getString(2)));
+                String ctype = obj.getString(2);
+                Dict dict = dictOptionsService.findDictByName("AGENT","CAPITAL_TYPE",ctype);
+                if(dict!=null){
+                    c.setcType(dict.getdItemvalue());
+                }else{
+                    c.setcType(ctype);
+                }
+
 
             }
             if(obj.size() >3 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(3))){
@@ -835,13 +861,15 @@ public class AimportServiceImpl implements AimportService {
             }
             if(obj.size()>5 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
                 c.setRemark(obj.getString(5)+"(导入)");
+            }else{
+                c.setRemark("(老数据导入)");
             }
 
             return c;
         } catch (Exception e) {
             logger.info("解析json{}:{}",e.getMessage(),obj.toJSONString());
             e.printStackTrace();
-            throw new ProcessException("parsePayMentFromJson错误");
+            throw new ProcessException("parsePayMentFromJson错误"+e.getLocalizedMessage());
         }
     }
 
@@ -1016,6 +1044,9 @@ public class AimportServiceImpl implements AimportService {
 
             if(StringUtils.isNotBlank(p)) {
                 p = p.trim();
+                if(p.contains("MPOS")){
+                    p = p.replace("MPOS","手刷");
+                }
                 for (PlatForm platForm : platForms) {
                     if (platForm.getPlatformName().equals(p)) {
                         ab.setBusPlatform(platForm.getPlatformNum());
