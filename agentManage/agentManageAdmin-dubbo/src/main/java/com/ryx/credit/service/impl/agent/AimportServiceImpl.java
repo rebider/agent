@@ -115,7 +115,7 @@ public class AimportServiceImpl implements AimportService {
                 importAgent.setBatchcode(batch);
                 importAgent.setcUser(user);
                 importAgent.setDatacontent(JSONArray.toJSONString(datum));
-                importAgent.setDataid(datum.get(4) + "");
+                importAgent.setDataid(datum.get(3) + "");
                 importAgent.setDatatype(dataType);
                 if (1 != insertAgentImportData(importAgent)) {
                     throw new ProcessException("插入失败");
@@ -364,6 +364,7 @@ public class AimportServiceImpl implements AimportService {
         try {
             for (ImportAgent datum : data) {
                 try {
+                    datum = importAgentMapper.selectByPrimaryKey(datum.getId());
                     datum.setDealstatus(Status.STATUS_1.status);//处理中
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(datum))throw new ProcessException("更新记录失败");
                     //代理商编号
@@ -389,7 +390,7 @@ public class AimportServiceImpl implements AimportService {
 
                     if(listC.size()>0){
                         Capital c =  listC.get(0);
-                        if(c.getcPaytime()!=null && DateUtil.format(c.getcPaytime(),"yyyy-MM-dd").equals(capital.getcPaytime())){
+                        if(c.getcPaytime()!=null && capital.getcPaytime()!=null && DateUtil.format(c.getcPaytime(),"yyyy-MM-dd").equals(DateUtil.format(capital.getcPaytime(),"yyyy-MM-dd"))){
                                logger.info("用户已交过款项{},{},{}",capital.getcAmount(),capital.getcType(),capital.getcPaytime());
                         }else{
                             AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
@@ -437,6 +438,7 @@ public class AimportServiceImpl implements AimportService {
         try {
             for (ImportAgent datum : data) {
                 try {
+                    datum = importAgentMapper.selectByPrimaryKey(datum.getId());
                     datum.setDealstatus(Status.STATUS_1.status);//处理中
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(datum))throw new ProcessException("更新记录失败");
                     //代理商编号
@@ -518,6 +520,7 @@ public class AimportServiceImpl implements AimportService {
         try {
             for (ImportAgent datum : data) {
                 try {
+                    datum = importAgentMapper.selectByPrimaryKey(datum.getId());
                     datum.setDealstatus(Status.STATUS_1.status);//处理中
                     datum.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(datum))throw new ProcessException("更新记录失败");
@@ -702,18 +705,34 @@ public class AimportServiceImpl implements AimportService {
             }
             if(obj.size()>4 && null!=obj.getString(4)) {
                 //便利查询合同类型
-                a.setContDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
+                try {
+                    a.setContDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy/MM/dd"}));
+                } catch (ParseException e) {
+                    try {
+                        a.setContDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
             if(obj.size()>5 && null!=obj.getString(5)) {
                 //便利查询合同类型
-                a.setContEndDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy-MM-dd"}));
+                try {
+                    a.setContEndDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy/MM/dd"}));
+                } catch (ParseException e) {
+                    try {
+                        a.setContEndDate(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy-MM-dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                }
             }
             if(obj.size()>6 && null!=obj.getString(6)) {
                 //便利查询合同类型
                 a.setRemark(obj.getString(6));
             }
             return a;
-        } catch (ParseException e) {
+        } catch (Exception e) {
             logger.info("解析json{}",obj.toJSONString());
             e.printStackTrace();
             throw e;
@@ -729,13 +748,13 @@ public class AimportServiceImpl implements AimportService {
             a.setAgName(obj.getString(1));
             if(obj.size()>2 && null!=obj.getString(2))
             a.setAgNature(AgNature.getAgNatureMsgString(obj.getString(2)));
-            if(obj.size()>3 && null!=obj.getString(3))
+            if(obj.size()>3 && StringUtils.isNotBlank(obj.getString(3)))
             a.setAgCapital(new BigDecimal(obj.getString(3)));
             if(obj.size()>4 && null!=obj.getString(4))
                 a.setAgBusLic(obj.getString(4));
-            if(obj.size()>5 && null!=obj.getString(5))
+            if(obj.size()>5 && StringUtils.isNotBlank(obj.getString(5)))
                 a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy-MM-dd"}));
-            if(obj.size()>6 && null!=obj.getString(6))
+            if(obj.size()>6 && StringUtils.isNotBlank(obj.getString(6)))
                 a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(6),new String[]{"yyyy-MM-dd"}));
             if(obj.size()>7 && null!=obj.getString(7))
                 a.setAgLegal(obj.getString(7));
@@ -753,7 +772,7 @@ public class AimportServiceImpl implements AimportService {
                 a.setAgRegAdd(obj.getString(13));
             if(obj.size()>14 && null!=obj.getString(14))
                 a.setAgBusScope(obj.getString(14));
-            if(obj.size()>15 && null!=obj.getString(15)) {
+            if(obj.size()>15 && StringUtils.isNotBlank(obj.getString(15))) {
                 COrganization org = departmentService.getByName(obj.getString(15));
                 if(org!=null) {
                     a.setAgDocPro(org == null ? null : org.getId() + "");
@@ -762,12 +781,22 @@ public class AimportServiceImpl implements AimportService {
                         a.setAgDocPro(org_pro == null ? null : org_pro.getId() + "");
                 }
             }
-            if(obj.size()>16 && null!=obj.getString(16)){
-                COrganization org = departmentService.getByName(obj.getString(16));
-                if(org!=null) {
+            if(obj.size()>16 && StringUtils.isNotBlank(obj.getString(16))){
+                String region = obj.getString(16);
+                if("北方".equals(region)) {
+                    region = "北方大区";
+                }
+                if("南方".equals(region)) {
+                    region = "南方大区";
+                }
+                if("北京".equals(region)) {
+                    region = "北京市场部";
+                }
+                COrganization org = departmentService.getByName(region);
+                if (org != null) {
                     a.setAgDocDistrict(org == null ? null : org.getId() + "");
-                }else{
-                    COrganization org_DocDistrict =  departmentService.getByUserNameParent(obj.getString(16));
+                } else {
+                    COrganization org_DocDistrict = departmentService.getByUserNameParent(region);
                     a.setAgDocPro(org_DocDistrict == null ? null : org_DocDistrict.getId() + "");
                 }
             }
@@ -793,14 +822,23 @@ public class AimportServiceImpl implements AimportService {
 
             }
             if(obj.size() >4 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(4))){
-                c.setcPaytime(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
+                try {
+                    c.setcPaytime(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy/MM/dd"}));
+                } catch (ParseException e) {
+                    try {
+                        c.setcPaytime(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(4),new String[]{"yyyy-MM-dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
             }
             if(obj.size()>5 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
                 c.setRemark(obj.getString(5)+"(导入)");
             }
 
             return c;
-        } catch (ParseException e) {
+        } catch (Exception e) {
             logger.info("解析json{}:{}",e.getMessage(),obj.toJSONString());
             e.printStackTrace();
             throw new ProcessException("parsePayMentFromJson错误");
@@ -824,7 +862,7 @@ public class AimportServiceImpl implements AimportService {
                 throw new ProcessException("代理商查询为空");
             }
             JSONObject busitem1 = new JSONObject();
-            if(obj.size()>4 && StringUtils.isNotBlank(obj.getString(3))) {
+            if(obj.size()>=4 && StringUtils.isNotBlank(obj.getString(3))) {
                 busitem1.put("agId", AG.get(0).getId());
                 busitem1.put("uniqNum", uniqNum);
                 busitem1.put("agName", agName);
@@ -995,7 +1033,7 @@ public class AimportServiceImpl implements AimportService {
             }
 
             if(bus_json_array.size()>10 && StringUtils.isNotBlank(bus_json_array.getString(10)))
-            ab.setBusSentDirectly(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(10))));
+            ab.setBusSentDirectly(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(10))));//是否直接返现
             if(bus_json_array.size()>11 && StringUtils.isNotBlank(bus_json_array.getString(11)))
             ab.setBusDirectCashback(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(11))));
             if(bus_json_array.size()>12 && StringUtils.isNotBlank(bus_json_array.getString(12)))
