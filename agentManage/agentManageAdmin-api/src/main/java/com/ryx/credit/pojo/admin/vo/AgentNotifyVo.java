@@ -32,6 +32,8 @@ public class AgentNotifyVo implements Serializable{
     private String hasS0;
     private String busiType;
     private String loginName;
+    private String remark;
+    private String batchIds;
 
     public String getUniqueId() {
         return uniqueId;
@@ -175,5 +177,21 @@ public class AgentNotifyVo implements Serializable{
 
     public void setColinfoMessage(AgentColinfo colinfoMessage) {
         this.colinfoMessage = colinfoMessage;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getBatchIds() {
+        return batchIds;
+    }
+
+    public void setBatchIds(String batchIds) {
+        this.batchIds = batchIds;
     }
 }
