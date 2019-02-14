@@ -6,8 +6,10 @@ import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.result.Tree;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.COrganizationMapper;
+import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.pojo.admin.COrganization;
 import com.ryx.credit.pojo.admin.agent.Region;
+import com.ryx.credit.pojo.admin.vo.UserVo;
 import com.ryx.credit.service.dict.DepartmentService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Autowired
     private COrganizationMapper cOrganizationMapper;
+    @Autowired
+    private CUserMapper cUserMapper;
+
+
+
     @Override
     public List<Tree> selectAllDepartment(String pCode) {
         List<Tree> rootTree = new ArrayList<Tree>();
@@ -112,6 +119,32 @@ public class DepartmentServiceImpl implements DepartmentService {
                 throw e;
             }
 
+        }
+        return null;
+    }
+
+
+    @Override
+    public COrganization getByUserName(String userName) {
+        UserVo userVo = cUserMapper.selectbyName(userName);
+        if(userVo!=null && userVo.getOrganizationId()!=null){
+            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId()+"");
+            if(organization!=null){
+                return organization;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public COrganization getByUserNameParent(String userName) {
+        UserVo userVo = cUserMapper.selectbyName(userName);
+        if(userVo!=null && userVo.getOrganizationId()!=null){
+            COrganization organization = cOrganizationMapper.selectByPrimaryKey(userVo.getOrganizationId()+"");
+            if(organization!=null){
+                COrganization organization_p = cOrganizationMapper.selectByPrimaryKey(organization.getPid()+"");
+                return organization_p;
+            }
         }
         return null;
     }
