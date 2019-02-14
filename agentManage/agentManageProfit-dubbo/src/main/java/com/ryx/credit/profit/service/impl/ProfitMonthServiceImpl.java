@@ -1,9 +1,9 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
@@ -1164,115 +1164,48 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
 
     /**
-     * 代理商分润冻结
+     * 代理商日分润冻结
      * @param  agentId 代理商唯一码
      */
     @Override
-    public void doFrozenByAgent(String agentId) {
-        if(StringUtils.isBlank(agentId)){
-            throw new ProcessException("代理商唯一码为空");
-        }
-        ProfitDetailMonth profitM = new ProfitDetailMonth();
-        profitM.setAgentId(agentId);
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -1);
-        Date date = calendar.getTime();
-        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
-
-        //String dateStr = "201810";
-
-        profitM.setProfitDate(dateStr);//设置分润月份
-        /**根据月份和唯一码获得代理商信息*/
-        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByIdAndMonth(profitM);
-        if(profitDetailMonth == null){
-            throw new ProcessException("该代理商分闰月数据不存在");
-        }
-
-        profitDetailMonth.setStatus(String.valueOf(Status.STATUS_1.status));//设为冻结状态
-        try{
-            profitDetailMonthMapper.updateByPrimaryKeySelective(profitDetailMonth);//冻结
-        }catch (Exception e){
-            LOG.info("代理商分润冻结失败！");
-            throw new ProcessException("代理商分润冻结失败");
-        }
-
-        //直发分润冻结
-        ProfitDirect profitDirect = new ProfitDirect();
-        profitDirect.setFristAgentPid(profitM.getAgentId());
-        List<ProfitDirect> list =profitDirectService.selectByFristAgentPid(profitDirect);
-        if(list.size() > 0){
-            for (ProfitDirect profitD : list) {
-                if(profitD != null){
-                    profitD.setStatus(String.valueOf(Status.STATUS_1.status));
-                    profitDirectService.updateByStatus(profitD);
-                }
-            }
-        }
-
-        //通过接口方式 联动业务平台完成冻结
-        List<String> agentIds = new ArrayList<String>();
-        agentIds.add(profitM.getAgentId());
-        boolean fail =busiPlatService.mPos_Frozen(agentIds);
-        if(fail){
-            throw new ProcessException("通知手刷，冻结失败");
-        }
-
-
+    public Map<String,String> doFrozenByAgent(String agentId) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type", "1");
+        map.put("type", "1");
+        map.put("unfreeze", "0");
+        map.put("flag", "4");
+        map.put("batchIds",agentId);
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"), params);
+        LOG.debug("请求信息：" + res);
+        Map<String,String> map1 = new HashMap<String,String>();
+        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
+                JSONObject.parseObject(res).get("respMsg").toString());
+        return map1;
     }
 
     /**
-     * 代理商分润解冻流程
-     * @param  agentId 代理商唯一码  profitDate分润月份
+     * 代理商日分润解冻
+     * @param  agentId 代理商唯一码
      */
     @Override
-    public void doUnFrozenAgentProfit(String agentId,String profitDate) {
-        //根据id，分润日期日期 获得代理商分润月数据
-        ProfitDetailMonth profitDetailMonth = new ProfitDetailMonth();
-        profitDetailMonth.setAgentId(agentId);
-        profitDetailMonth.setProfitDate(profitDate);
-        ProfitDetailMonth profitM = profitDetailMonthMapper.selectByIdAndMonth(profitDetailMonth);
-        if(profitM == null){
-            LOG.info("该代理商分润数据不存在"+agentId);
-            throw new ProcessException("该代理商分润数据不存在");
-        }
+    public Map<String,String> doUnFrozenAgentProfit(String agentId) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type","0");
+        map.put("type","1");
+        map.put("unfreeze","0");
+        map.put("flag","0");
+        map.put("batchIds",agentId);//AG码list
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"),params);
 
-        String status = profitM.getStatus();
-        if( !"1".equals(status) && !"2".equals(status) && !"3".equals(status)){
-            LOG.info("该代理商对应月份分润数据未冻结，不能进行解冻"+agentId);
-            throw new ProcessException("该代理商分润数据未冻结，不能进行解冻");
-        }
-
-        //解冻：设置为未分润状态
-        profitM.setStatus(String.valueOf(Status.STATUS_4.status));
-        try{
-            profitDetailMonthMapper.updateByPrimaryKeySelective(profitM);
-        }catch (Exception e){
-            LOG.info("代理商分润解冻失败");
-            throw new ProcessException("代理商分润解冻失败");
-        }
-
-        //直发分润解冻
-        ProfitDirect profitDirect = new ProfitDirect();
-        profitDirect.setFristAgentPid(profitM.getAgentId());
-        List<ProfitDirect> list =profitDirectService.selectByFristAgentPid(profitDirect);
-        if(list.size() > 0){
-            for (ProfitDirect profitD : list) {
-                if(profitD != null){
-                    profitD.setStatus(String.valueOf(Status.STATUS_4.status));
-                    profitDirectService.updateByStatus(profitD);
-                }
-            }
-        }
-
-        //联动业务平台
-        List<String> agentIds = new ArrayList<String>();
-        agentIds.add(profitM.getAgentId());
-        boolean fail =busiPlatService.mPos_unFrozen(agentIds);
-        if(fail){
-            throw new ProcessException("通知手刷，解冻失败！");
-        }
+        Map<String,String> map1 = new HashMap<String,String>();
+        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
+                JSONObject.parseObject(res).get("respMsg").toString());
+        return map1;
 
     }
-
 
 }

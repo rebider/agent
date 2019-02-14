@@ -118,8 +118,8 @@ public class AgentLoginAccountCreateTask {
                 userVo.setUserType(1);
                 userVo.setPhone(agent.getId());
                 iUserService.insertByVo(userVo);
-                List<CUser>  list_db = userMapper.selectListByLogin(agent.getAgUniqNum());
-                CUser cUser = new CUser();
+                List<UserVo>  list_db = userMapper.selectListByLogin(agent.getAgUniqNum());
+                UserVo cUser = new UserVo();
                 if(list_db.size()>0){
                     cUser = list_db.get(0);
                 }

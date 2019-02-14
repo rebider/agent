@@ -1,22 +1,26 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.activity.entity.ActRuTask;
+import com.ryx.credit.common.enumc.AgStatus;
+import com.ryx.credit.common.enumc.BusActRelBusType;
+import com.ryx.credit.common.enumc.RewardStatus;
+import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.profit.dao.PPosHuddleRewardMapper;
+import com.ryx.credit.profit.dao.PosHuddleRewardDetailMapper;
 import com.ryx.credit.profit.dao.PosRewardMapper;
 import com.ryx.credit.profit.dao.PosRewardTemplateMapper;
-import com.ryx.credit.profit.pojo.PosReward;
-import com.ryx.credit.profit.pojo.PosRewardExample;
-import com.ryx.credit.profit.pojo.PosRewardTemplate;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IPosRewardService;
+import com.ryx.credit.service.ActRuTaskService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
@@ -28,11 +32,9 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 /**
  * ProfitDServiceImpl
@@ -55,7 +57,12 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Autowired
     private IdService idService;
     @Autowired
-    private PosRewardTemplateMapper templateMapper;
+    private PosRewardTemplateMapper templateMaper;
+    @Autowired
+    private PPosHuddleRewardMapper pPosHuddleRewardMapper;
+    @Autowired
+    private PosHuddleRewardDetailMapper posHuddleRewardDetailMapper;
+
 
     @Override
     public PageInfo posRewardList(PosReward record, Page page) {
@@ -68,6 +75,9 @@ public class PosRewardServiceImpl implements IPosRewardService {
         pageInfo.setTotal((int)rewardMapper.countByExample(example));
         return pageInfo;
     }
+
+
+
 
     private PosRewardExample rewardEqualsTo(PosReward reward) {
         PosRewardExample posRewardExample = new PosRewardExample();
@@ -87,6 +97,31 @@ public class PosRewardServiceImpl implements IPosRewardService {
         return posRewardExample;
     }
 
+
+    @Override
+    public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page) {
+
+        PosHuddleRewardDetailExample posHuddleRewardDetailExample = new PosHuddleRewardDetailExample();
+        PosHuddleRewardDetailExample.Criteria criteria = posHuddleRewardDetailExample.createCriteria();
+        if(StringUtils.isNotBlank(posHuddleRewardDetail.getPosAgentId())){
+            criteria.andPosAgentIdEqualTo(posHuddleRewardDetail.getPosAgentId());
+        }
+        if(StringUtils.isNotBlank(posHuddleRewardDetail.getPosAgentName())){
+            criteria.andPosAgentNameEqualTo(posHuddleRewardDetail.getPosAgentName());
+        }
+        List<PosHuddleRewardDetail> listDetail= posHuddleRewardDetailMapper.selectByExample(posHuddleRewardDetailExample);
+        List<String> listQuvery = new ArrayList<>();
+        for (PosHuddleRewardDetail detail : listDetail) {
+            listQuvery.add(detail.getHuddleCode());
+        }
+
+
+        List<PPosHuddleReward> profitD = pPosHuddleRewardMapper.selectByList(listQuvery);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(profitD);
+        pageInfo.setTotal((int)pPosHuddleRewardMapper.selectByCount(listQuvery));
+        return pageInfo;
+    }
     /**
      * @author: Lihl
      * @desc POS奖励申请调整，进行审批流
@@ -129,8 +164,74 @@ public class PosRewardServiceImpl implements IPosRewardService {
         rewardMapper.updateByPrimaryKeySelective(posReward);
     }
 
+
+    /**
+     * POS抱团奖励进行审批流
+     * @param pPosHuddleReward
+     * @param userId
+     * @param workId
+     * @throws ProcessException
+     */
+    @Override
+    public void applyHuddlePosReward(PPosHuddleReward pPosHuddleReward, String userId, String workId) throws ProcessException {
+        pPosHuddleReward.setId((idService.genId(TabId.p_pos_reward)));
+        logger.info("序列ID......"+idService.genId(TabId.p_pos_reward));
+        pPosHuddleRewardMapper.insertSelective(pPosHuddleReward);
+
+        //启动审批流
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
+        if (proceId == null) {
+            PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
+            pPosHuddleRewardExample.createCriteria().andIdEqualTo(pPosHuddleReward.getId());
+            pPosHuddleRewardMapper.deleteByExample(pPosHuddleRewardExample);
+            logger.error("POS奖励审批流启动失败，代理商ID：{}", pPosHuddleReward.getAgentName());
+            throw new ProcessException("POS抱团奖励审批流启动失败!");
+        }
+        BusActRel record = new BusActRel();
+        record.setBusId(pPosHuddleReward.getId());
+        record.setActivId(proceId);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(userId);
+        record.setBusType(BusActRelBusType.POSHUDDLEREWARD.name());
+        record.setAgentName(pPosHuddleReward.getAgentName());
+        try {
+            taskApprovalService.addABusActRel(record);
+            logger.info("POS奖励审批流启动成功");
+        } catch (Exception e) {
+            e.getStackTrace();
+            logger.error("POS奖励审批流启动失败{}");
+            throw new ProcessException("POS奖励审批流启动失败!:{}",e.getMessage());
+        }
+        pPosHuddleReward.setApplyStatus(RewardStatus.REVIEWING.getStatus());//REVIEWING 0:审核中
+        pPosHuddleRewardMapper.updateByPrimaryKeySelective(pPosHuddleReward);
+    }
+
+    @Override
+    public PPosHuddleReward selectByPrimaryKey(String id) {
+        return  pPosHuddleRewardMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public List<PosHuddleRewardDetail> selectByHuddleCode(String huddleCode) {
+        return posHuddleRewardDetailMapper.selectByHuddleCode(huddleCode);
+    }
+
+
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {
+
+
+        String taskId = agentVo.getTaskId();
+        Map<String, Object> mapactRuTask = rewardMapper.selectById(taskId);
+        String activid = (String) mapactRuTask.get("EXECUTION_ID_");
+        Map<String, Object> mapActRel = rewardMapper.selectByActiv(activid);
+        PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
+        PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
+        criteria.andAgentNameEqualTo((String) mapActRel.get("AGENT_NAME"));
+        criteria.andIdEqualTo((String) mapActRel.get("BUS_ID"));
+        List<PPosHuddleReward> listPos = pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+
+
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
         AgentResult result = new AgentResult(500, "系统异常", "");
         Map<String, Object> reqMap = new HashMap<>();
@@ -151,6 +252,29 @@ public class PosRewardServiceImpl implements IPosRewardService {
         Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
         Boolean rs = (Boolean) resultMap.get("rs");
         String msg = String.valueOf(resultMap.get("msg"));
+
+
+        if(agentVo.getPretest()!=null || "".equals(agentVo.getOrderAprDept())) {
+
+            if (listPos != null) {
+                for (PPosHuddleReward pos : listPos) {
+                    if("".equals(agentVo.getOrderAprDept()) &&(pos.getRev1()!=null)){
+                        if ("pass".equals(agentVo.getApprovalResult())) {
+                            pos.setApplyStatus("1");
+                        }else {
+                            pos.setApplyStatus("2");
+                        }
+                    }else if(pos.getRev1()==null && "pass".equals(agentVo.getApprovalResult())){
+                        pos.setRev1(agentVo.getPretest());
+                    }else {
+                        pos.setApplyStatus("2");
+                    }
+                    pPosHuddleRewardMapper.updateByPrimaryKeySelective(pos);
+                }
+            }
+        }
+
+
         if (resultMap == null) {
             return result;
         }
@@ -285,6 +409,19 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         return rewardMapper.selectByExample(example);
     }
+
+    @Override
+    public int insertHuddleDetail(PosHuddleRewardDetail record) {
+        return posHuddleRewardDetailMapper.insertSelective(record);
+    }
+
+    @Override
+    public List<Map<String, Object>> huddlePos(Map<String, Object> param) {
+        return rewardMapper.huddlePos(param);
+    }
+
+
+
     private static List<String> getMonthBetween(String minDate, String maxDate) {
         try {
             ArrayList<String> result = new ArrayList<String>();

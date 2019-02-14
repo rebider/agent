@@ -19,6 +19,7 @@
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="FLOW_STATUS" jdbcType="DECIMAL" property="flowStatus" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -51,7 +52,7 @@
   </sql>
   <sql id="Base_Column_List">
     ID, C_TYPE, CAPITAL_ID, SRC_TYPE, SRC_ID, BEFORE_AMOUNT, C_AMOUNT, OPERATION_TYPE,
-    AGENT_ID, AGENT_NAME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, REMARK
+    AGENT_ID, AGENT_NAME, C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, REMARK, FLOW_STATUS
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlowExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -87,13 +88,15 @@
     C_AMOUNT, OPERATION_TYPE, AGENT_ID,
     AGENT_NAME, C_TIME, U_TIME,
     C_USER, U_USER, STATUS,
-    VERSION, REMARK)
+    VERSION, REMARK, FLOW_STATUS
+    )
     values (#{id,jdbcType=VARCHAR}, #{cType,jdbcType=VARCHAR}, #{capitalId,jdbcType=VARCHAR},
     #{srcType,jdbcType=DECIMAL}, #{srcId,jdbcType=VARCHAR}, #{beforeAmount,jdbcType=DECIMAL},
     #{cAmount,jdbcType=DECIMAL}, #{operationType,jdbcType=DECIMAL}, #{agentId,jdbcType=VARCHAR},
     #{agentName,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP},
     #{cUser,jdbcType=VARCHAR}, #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
-    #{version,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR})
+    #{version,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, #{flowStatus,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlow">
     insert into A_CAPITAL_FLOW
@@ -149,6 +152,9 @@
       <if test="remark != null">
         REMARK,
       </if>
+      <if test="flowStatus != null">
+        FLOW_STATUS,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -201,6 +207,9 @@
       </if>
       <if test="remark != null">
         #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="flowStatus != null">
+        #{flowStatus,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -261,27 +270,31 @@
       <if test="remark != null">
         REMARK = #{remark,jdbcType=VARCHAR},
       </if>
+      <if test="flowStatus != null">
+        FLOW_STATUS = #{flowStatus,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.CapitalFlow">
     update A_CAPITAL_FLOW
     set C_TYPE = #{cType,jdbcType=VARCHAR},
-      CAPITAL_ID = #{capitalId,jdbcType=VARCHAR},
-      SRC_TYPE = #{srcType,jdbcType=DECIMAL},
-      SRC_ID = #{srcId,jdbcType=VARCHAR},
-      BEFORE_AMOUNT = #{beforeAmount,jdbcType=DECIMAL},
-      C_AMOUNT = #{cAmount,jdbcType=DECIMAL},
-      OPERATION_TYPE = #{operationType,jdbcType=DECIMAL},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL},
-      REMARK = #{remark,jdbcType=VARCHAR}
+    CAPITAL_ID = #{capitalId,jdbcType=VARCHAR},
+    SRC_TYPE = #{srcType,jdbcType=DECIMAL},
+    SRC_ID = #{srcId,jdbcType=VARCHAR},
+    BEFORE_AMOUNT = #{beforeAmount,jdbcType=DECIMAL},
+    C_AMOUNT = #{cAmount,jdbcType=DECIMAL},
+    OPERATION_TYPE = #{operationType,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    FLOW_STATUS = #{flowStatus,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

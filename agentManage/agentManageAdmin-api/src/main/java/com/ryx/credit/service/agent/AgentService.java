@@ -69,4 +69,7 @@ public interface AgentService {
      * @throws Exception
      */
     AgentResult agentUnfreeze(String agentId, String cUser) throws Exception;
+
+
+    void createUser(String agentId)throws Exception;
 }

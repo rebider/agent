@@ -1,12 +1,13 @@
 package com.ryx.credit.service.impl.agent;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.DateUtil;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
+import com.ryx.credit.common.util.agentUtil.AESUtil;
+import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.CUserMapper;
 import com.ryx.credit.dao.CuserAgentMapper;
@@ -16,6 +17,7 @@ import com.ryx.credit.pojo.admin.CuserAgent;
 import com.ryx.credit.pojo.admin.CuserAgentExample;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.OPaymentDetail;
+import com.ryx.credit.pojo.admin.vo.AgentNotifyVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.profit.service.ProfitMonthService;
@@ -27,9 +29,12 @@ import com.ryx.credit.service.agent.AgentQuitService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
+import com.ryx.credit.util.Constants;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -85,7 +90,10 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private OPaymentDetailMapper oPaymentDetailMapper;
     @Autowired
     private ProfitMonthService profitMonthService;
-
+    @Autowired
+    private AgentPlatFormSynMapper agentPlatFormSynMapper;
+    @Autowired
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
     /**
      * 退出列表
@@ -256,23 +264,6 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
      */
     public void verifyChild(String agentId)throws Exception{
 
-        AgentBusInfoExample subAgentBusInfoExample = new AgentBusInfoExample();
-        AgentBusInfoExample.Criteria subCriteria = subAgentBusInfoExample.createCriteria();
-        subCriteria.andAgentIdEqualTo(agentId);
-        subCriteria.andStatusEqualTo(Status.STATUS_1.status);
-        List<AgentBusInfo> subAgentBusInfos = agentBusInfoMapper.selectByExample(subAgentBusInfoExample);
-        if(subAgentBusInfos.size()==0){
-            throw new MessageException("代理商业务信息有误");
-        }
-        for (AgentBusInfo subAgentBusInfo : subAgentBusInfos) {
-            if(StringUtils.isBlank(subAgentBusInfo.getBusNum())){
-                throw new MessageException("代理商业务平台未入网成功");
-            }
-            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, subAgentBusInfo.getBusPlatform(), subAgentBusInfo.getBusNum());
-            if(childLevelBusInfos.size()!=0){
-                throw new MessageException("代理商不能有下级");
-            }
-        }
         AgentQuitExample agentQuitExample = new AgentQuitExample();
         AgentQuitExample.Criteria criteria = agentQuitExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -339,7 +330,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
      * @param agentId
      * @return
      */
-    public String quitPlatformIds(String quitPlatform,String agentId){
+    public String quitPlatformIds(String quitPlatform,String agentId)throws Exception{
         PlatFormExample platFormExample = new PlatFormExample();
         PlatFormExample.Criteria criteria = platFormExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -375,6 +366,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
         String busIds = "";
         for (AgentBusInfo agentBusInfo : agentBusInfos) {
+            if(StringUtils.isBlank(agentBusInfo.getBusNum())){
+                throw new MessageException("代理商业务平台未入网成功");
+            }
+            List<AgentBusInfo> childLevelBusInfos = agentBusinfoService.queryChildLevelByBusNum(null, agentBusInfo.getBusPlatform(), agentBusInfo.getBusNum());
+            if(childLevelBusInfos.size()!=0){
+                throw new MessageException("代理商不能有下级");
+            }
             busIds += agentBusInfo.getId()+",";
         }
         if(StringUtils.isNotBlank(busIds)){
@@ -488,7 +486,11 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
         try {
             //冻结分润
-            profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
+//            Map<String, String> resultMap = profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
+//            String respCode = resultMap.get("key");
+//            if(!respCode.equals("000000")){
+//                throw new MessageException(resultMap.get("value"));
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("冻结分润失败");
@@ -755,15 +757,32 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             if(agentQuit.getProfitDebt().compareTo(BigDecimal.ZERO)==1){
 
             }
+            //通知业务平台
+            notityBusPlatform(agentQuit);
         }
         //拒绝
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             try {
-                String profitDate = DateUtil.format(DateUtil.addMonth(agentQuit.getcTime(), -1), "yyyyMM");
-                profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId(),profitDate);
+//                Map<String,String> resultMap = profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId());
+//                String respCode = resultMap.get("key");
+//                if(!respCode.equals("000000")){
+//                    throw new MessageException(resultMap.get("value"));
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("代理商退出：分润解冻失败");
+            }
+            //还原平台状态
+            String quitBusId = agentQuit.getQuitBusId();
+            String[] quitBusIds = quitBusId.split(",");
+            for(int j=0;j<quitBusIds.length;j++){
+                String mergeBusId = quitBusIds[j];
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+                agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                int k = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (k!=1) {
+                    throw new MessageException("更新业务启用失败");
+                }
             }
         }
 
@@ -1001,4 +1020,218 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
         return resultList;
     }
+
+    /**
+     * 退出通知业务平台
+     * @param agentQuit
+     */
+    public void notityBusPlatform(AgentQuit agentQuit){
+        threadPoolTaskExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+
+                }
+                try {
+                    String[] quitBusIds = agentQuit.getQuitBusId().split(",");
+                    BigDecimal platformStatus = PlatformStatus.FAIL.getValue();
+                    for (int i = 0; i < quitBusIds.length; i++) {
+                        platformStatus = agentPlatFormSyn(agentQuit, platformStatus, quitBusIds[i]);
+                    }
+                    agentQuit.setPlatformStatus(platformStatus);
+                    agentQuitMapper.updateByPrimaryKey(agentQuit);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public BigDecimal agentPlatFormSyn(AgentQuit agentQuit,BigDecimal platformStatus,String busId)throws Exception{
+        AgentPlatFormSyn record = new AgentPlatFormSyn();
+        record.setId(idService.genId(TabId.a_agent_platformsyn));
+        record.setNotifyTime(new Date());
+        record.setBusId(agentQuit.getId());
+        record.setVersion(Status.STATUS_1.status);
+        record.setcTime(new Date());
+        record.setNotifyStatus(Status.STATUS_0.status);
+        record.setNotifyCount(Status.STATUS_1.status);
+        record.setcUser(agentQuit.getcUser());
+        record.setAgentId(agentQuit.getAgentId());
+        record.setNotifyType(NotifyType.AgentQuit.getValue());
+
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        String platType = platForm.getPlatformType();
+        AgentResult agentResult = AgentResult.fail();
+        record.setPlatformCode(agentBusInfo.getBusPlatform());
+        if (platType.equals(PlatformType.POS.getValue())) {
+            AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+            agentNotifyVo.setOrgId(agentBusInfo.getBusNum());
+            agentNotifyVo.setRemark("代理商退出");
+            record.setSendJson("orgId:" + agentNotifyVo.getOrgId());
+            agentResult = httpRequestForPos(agentNotifyVo);
+        } else if (platType.equals(PlatformType.MPOS.getValue())) {
+            AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+            List<String> list = new ArrayList<>();
+            list.add(agentBusInfo.getBusNum());
+            agentNotifyVo.setBatchIds(list);
+            record.setSendJson("batchIds:" + JsonUtil.objectToJson(list));
+            agentResult = httpRequestForMPOS(agentNotifyVo);
+        }
+        //接口请求成功
+        if (null != agentResult && !"".equals(agentResult) && agentResult.isOK()) {
+            //添加请求记录
+            record.setSuccesTime(new Date());
+            record.setNotifyStatus(Status.STATUS_1.status);
+            platformStatus = PlatformStatus.SUCCESS.getValue();
+        }
+        record.setNotifyJson(agentResult.getMsg());
+        try {
+            agentPlatFormSynMapper.insert(record);
+        } catch (Exception e) {
+            logger.info("代理商合并通知pos异常：{}" + e.getMessage());
+            e.printStackTrace();
+        }
+        return platformStatus;
+    }
+
+
+    public static AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
+        try {
+
+            String cooperator = com.ryx.credit.util.Constants.cooperator;
+            String charset = "UTF-8"; // 字符集
+            String tranCode = "ORG007"; // 交易码
+            String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
+            String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
+
+            JSONObject jsonParams = new JSONObject();
+            JSONObject data = new JSONObject();
+            jsonParams.put("version", "1.0.0");
+            jsonParams.put("msgType", "01");
+            jsonParams.put("reqDate", reqDate);
+            data.put("orgId",agentNotifyVo.getOrgId());
+            data.put("remark",agentNotifyVo.getRemark());
+
+            jsonParams.put("data", data);
+            String plainXML = jsonParams.toString();
+            // 请求报文加密开始
+            String keyStr = AESUtil.getAESKey();
+            byte[] plainBytes = plainXML.getBytes(charset);
+            byte[] keyBytes = keyStr.getBytes(charset);
+            String encryptData = new String(org.apache.commons.codec.binary.Base64.encodeBase64((AESUtil.encrypt(plainBytes, keyBytes, "AES", "AES/ECB/PKCS5Padding", null))), charset);
+            String signData = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.digitalSign(plainBytes, Constants.privateKey, "SHA1WithRSA")), charset);
+            String encrtptKey = new String(org.apache.commons.codec.binary.Base64.encodeBase64(RSAUtil.encrypt(keyBytes, Constants.publicKey, 2048, 11, "RSA/ECB/PKCS1Padding")), charset);
+            // 请求报文加密结束
+
+            Map<String, String> map = new HashMap<>();
+            map.put("encryptData", encryptData);
+            map.put("encryptKey", encrtptKey);
+            map.put("cooperator", cooperator);
+            map.put("signData", signData);
+            map.put("tranCode", tranCode);
+            map.put("reqMsgId", reqMsgId);
+
+            logger.info("通知pos请求参数:{}",map);
+            String httpResult = HttpClientUtil.doPost(AppConfig.getProperty("agent_pos_notify_url"), map);
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            if (!jsonObject.containsKey("encryptData") || !jsonObject.containsKey("encryptKey")) {
+                logger.info("请求异常======" + httpResult);
+                AppConfig.sendEmails("http请求异常", "入网通知POS失败报警");
+                throw new Exception("http请求异常");
+            } else {
+                String resEncryptData = jsonObject.getString("encryptData");
+                String resEncryptKey = jsonObject.getString("encryptKey");
+                byte[] decodeBase64KeyBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptKey.getBytes(charset));
+                byte[] merchantAESKeyBytes = RSAUtil.decrypt(decodeBase64KeyBytes, Constants.privateKey, 2048, 11, "RSA/ECB/PKCS1Padding");
+                byte[] decodeBase64DataBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resEncryptData.getBytes(charset));
+                byte[] merchantXmlDataBytes = AESUtil.decrypt(decodeBase64DataBytes, merchantAESKeyBytes, "AES", "AES/ECB/PKCS5Padding", null);
+                String respXML = new String(merchantXmlDataBytes, charset);
+                logger.info("通知pos返回参数：{}",respXML);
+
+                // 报文验签
+                String resSignData = jsonObject.getString("signData");
+                byte[] signBytes = org.apache.commons.codec.binary.Base64.decodeBase64(resSignData);
+                if (!RSAUtil.verifyDigitalSign(respXML.getBytes(charset), signBytes, Constants.publicKey, "SHA1WithRSA")) {
+                    logger.info("签名验证失败");
+                } else {
+                    logger.info("签名验证成功");
+                    JSONObject respXMLObj = JSONObject.parseObject(respXML);
+                    String respCode = String.valueOf(respXMLObj.get("respCode"));
+                    if (respCode.equals("000000")){
+                        return AgentResult.build(200,respXMLObj.toString());
+                    }else{
+                        AppConfig.sendEmails(respXML, "入网通知POS失败报警");
+                        logger.info("http请求超时返回错误:{}",respXML);
+                        return AgentResult.fail(respXMLObj.toString());
+                    }
+                }
+                return new AgentResult(500,"http请求异常",respXML);
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("http请求超时:"+e.getStackTrace(), "入网通知POS失败报警");
+            logger.info("http请求超时:{}",e.getMessage());
+            throw e;
+        }
+    }
+
+    private AgentResult httpRequestForMPOS(AgentNotifyVo agentNotifyVo)throws Exception{
+
+        try {
+            Map<String,Object> jsonParams = new HashMap<>();
+            jsonParams.put("onlinechannel","000158114");
+            jsonParams.put("batchIds",JsonUtil.objectToJson(agentNotifyVo.getBatchIds()));
+
+            String params = JsonUtil .objectToJson(jsonParams);
+            logger.info("通知手刷请求参数：{}",params);
+
+            //发送请求
+            String httpResult = HttpClientUtil.doPostJson(AppConfig.getProperty("agentQuit_mpos_notify_url"),params);
+
+            logger.info("通知手刷返回参数：{}",httpResult);
+            JSONObject respXMLObj = JSONObject.parseObject(httpResult);
+            String respCode = String.valueOf(respXMLObj.get("respCode"));
+            if (respCode.equals("000000")){
+                return AgentResult.build(200,respXMLObj.toString());
+            }else{
+                AppConfig.sendEmails(httpResult, "入网通知手刷失败报警");
+                logger.info("http请求超时返回错误:{}",httpResult);
+                return AgentResult.fail(respXMLObj.toString());
+            }
+        } catch (Exception e) {
+            AppConfig.sendEmails("通知手刷请求超时："+e.getStackTrace(), "入网通知手刷失败报警");
+            logger.info("http请求超时:{}",e.getMessage());
+            throw new Exception("http请求超时");
+        }
+    }
+
+    @Override
+    public AgentResult manualAgentQuitNotify(String busId,String platformCode){
+        try {
+            AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(busId);
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+            criteria.andAgentIdEqualTo(agentQuit.getAgentId());
+            criteria.andBusPlatformEqualTo(platformCode);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if(agentBusInfos==null){
+                return AgentResult.fail();
+            }
+            if(agentBusInfos.size()!=1){
+                return AgentResult.fail();
+            }
+            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+            BigDecimal platformStatus = PlatformStatus.FAIL.getValue();
+            platformStatus = agentPlatFormSyn(agentQuit, platformStatus, agentBusInfo.getId());
+            agentQuit.setPlatformStatus(platformStatus);
+            agentQuitMapper.updateByPrimaryKey(agentQuit);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return AgentResult.ok();
+    }
+
 }

@@ -75,6 +75,8 @@ public class AgentServiceImpl implements AgentService {
     private AgentDataHistoryService agentDataHistoryService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private AgentService agentService;
 
 
     /**
@@ -419,45 +421,52 @@ public class AgentServiceImpl implements AgentService {
     public void createBackUserbyAgent(String agentId) {
         ThreadPool.putThreadPool(() -> {
             try {
-                Agent agent = getAgentById(agentId);
-                List<CUser>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
-                if (userVoSelect != null || userVoSelect.size()>0) {
-                    return;
-                }
-                UserVo userVo = new UserVo();
-                String salt = com.ryx.credit.commons.utils.StringUtils.getUUId();
-                String pwd = DigestUtils.hashByShiro("md5", redisService.hGet("config", "pass"), salt, 1);
-                userVo.setSalt(salt);
-                userVo.setPassword(pwd);
-                userVo.setName(agent.getAgName());
-                userVo.setLoginName(agent.getAgUniqNum());
-                userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
-                userVo.setRoleIds(redisService.hGet("config", "role"));
-                userVo.setUserType(1);
-                userVo.setPhone(agent.getId());
-                iUserService.insertByVo(userVo);
-
-
-                List<CUser>  list_db = cUserMapper.selectListByLogin(agent.getAgUniqNum());
-                CUser cUser = new CUser();
-                if(list_db.size()>0){
-                    cUser = list_db.get(0);
-                }
-                CuserAgent cuserAgent = new CuserAgent();
-                cuserAgent.setAgentid(agent.getId());
-                cuserAgent.setUserid(cUser.getId().toString());
-                cuserAgent.setcTime(new Date());
-                cuserAgent.setStatus(BigDecimal.ONE);
-                cuserAgent.setUserType(BigDecimal.ONE.toString());
-                cuserAgent.setVersion(BigDecimal.ONE);
-                iCuserAgentService.insert(cuserAgent);
-                redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
+                agentService.createUser(agentId);
             } catch (Exception e) {
                 logger.error("createBackUserbyAgent error {}", agentId, e);
             }
 
         });
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    public void createUser(String agentId)throws Exception{
+        Agent agent = getAgentById(agentId);
+        List<UserVo>  userVoSelect = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+        if (userVoSelect.size()>0) {
+            return;
+        }
+        UserVo userVo = new UserVo();
+        String salt = com.ryx.credit.commons.utils.StringUtils.getUUId();
+        String pwd = DigestUtils.hashByShiro("md5", redisService.hGet("config", "pass"), salt, 1);
+        userVo.setSalt(salt);
+        userVo.setPassword(pwd);
+        userVo.setName(agent.getAgName());
+        userVo.setLoginName(agent.getAgUniqNum());
+        userVo.setOrganizationId(Integer.valueOf(redisService.hGet("config", "org")));
+        userVo.setRoleIds(redisService.hGet("config", "role"));
+        userVo.setUserType(1);
+        userVo.setPhone(agent.getId());
+        iUserService.insertByVo(userVo);
+
+
+        List<UserVo>  list_db = cUserMapper.selectListByLogin(agent.getAgUniqNum());
+        UserVo cUser = new UserVo();
+        if(list_db.size()>0){
+            cUser = list_db.get(0);
+        }
+        CuserAgent cuserAgent = new CuserAgent();
+        cuserAgent.setAgentid(agent.getId());
+        cuserAgent.setUserid(cUser.getId().toString());
+        cuserAgent.setcTime(new Date());
+        cuserAgent.setStatus(BigDecimal.ONE);
+        cuserAgent.setUserType(BigDecimal.ONE.toString());
+        cuserAgent.setVersion(BigDecimal.ONE);
+        iCuserAgentService.insert(cuserAgent);
+        redisService.hSet("agent", String.valueOf(cUser.getId()), agent.getId());
+    }
+
 
     /**
      * 生成后台用户

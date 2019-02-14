@@ -5,6 +5,7 @@ import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @version V1.0
@@ -32,6 +33,8 @@ public class AgentNotifyVo implements Serializable{
     private String hasS0;
     private String busiType;
     private String loginName;
+    private String remark;
+    private java.util.List<String> batchIds;
 
     public String getUniqueId() {
         return uniqueId;
@@ -175,5 +178,21 @@ public class AgentNotifyVo implements Serializable{
 
     public void setColinfoMessage(AgentColinfo colinfoMessage) {
         this.colinfoMessage = colinfoMessage;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public List<String> getBatchIds() {
+        return batchIds;
+    }
+
+    public void setBatchIds(List<String> batchIds) {
+        this.batchIds = batchIds;
     }
 }

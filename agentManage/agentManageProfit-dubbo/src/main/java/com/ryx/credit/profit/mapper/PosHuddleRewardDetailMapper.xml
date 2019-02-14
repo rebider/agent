@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PosHuddleRewardDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PosHuddleRewardDetail">
+    <result column="POS_AGENT_ID" jdbcType="VARCHAR" property="posAgentId" />
+    <result column="POS_AGENT_NAME" jdbcType="VARCHAR" property="posAgentName" />
+    <result column="HUDDLE_CODE" jdbcType="VARCHAR" property="huddleCode" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    POS_AGENT_ID, POS_AGENT_NAME, HUDDLE_CODE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PosHuddleRewardDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from POS_HUDDLE_REWARD_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PosHuddleRewardDetailExample">
+    delete from POS_HUDDLE_REWARD_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PosHuddleRewardDetail">
+    insert into POS_HUDDLE_REWARD_DETAIL (POS_AGENT_ID, POS_AGENT_NAME, HUDDLE_CODE
+      )
+    values (#{posAgentId,jdbcType=VARCHAR}, #{posAgentName,jdbcType=VARCHAR}, #{huddleCode,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosHuddleRewardDetail">
+    insert into POS_HUDDLE_REWARD_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="posAgentId != null">
+        POS_AGENT_ID,
+      </if>
+      <if test="posAgentName != null">
+        POS_AGENT_NAME,
+      </if>
+      <if test="huddleCode != null">
+        HUDDLE_CODE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="posAgentId != null">
+        #{posAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="posAgentName != null">
+        #{posAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="huddleCode != null">
+        #{huddleCode,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PosHuddleRewardDetailExample" resultType="java.lang.Long">
+    select count(*) from POS_HUDDLE_REWARD_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update POS_HUDDLE_REWARD_DETAIL
+    <set>
+      <if test="record.posAgentId != null">
+        POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posAgentName != null">
+        POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.huddleCode != null">
+        HUDDLE_CODE = #{record.huddleCode,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update POS_HUDDLE_REWARD_DETAIL
+    set POS_AGENT_ID = #{record.posAgentId,jdbcType=VARCHAR},
+      POS_AGENT_NAME = #{record.posAgentName,jdbcType=VARCHAR},
+      HUDDLE_CODE = #{record.huddleCode,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+
+  <select id="selectByHuddleCode"  parameterType="java.lang.String" resultMap="BaseResultMap">
+    select POS_AGENT_ID,POS_AGENT_NAME,HUDDLE_CODE from POS_HUDDLE_REWARD_DETAIL
+      where 1=1
+      <if test="huddleCode != null and huddleCode != ''">
+       and HUDDLE_CODE = #{huddleCode,jdbcType=VARCHAR}
+      </if>
+
+  </select>
+
+
+</mapper>

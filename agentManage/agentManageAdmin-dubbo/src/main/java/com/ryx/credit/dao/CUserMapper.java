@@ -18,7 +18,7 @@ public interface CUserMapper extends BaseMapper<CUser> {
 
     UserVo selectUserVoById(@Param("id") Long id);
 
-    List<CUser> selectListByLogin(@Param("login_name") String login_name);
+    List<UserVo> selectListByLogin(@Param("login_name") String login_name);
     
     List<Map<String, Object>> selectUserPage(Pagination page, Map<String, Object> params);
 
