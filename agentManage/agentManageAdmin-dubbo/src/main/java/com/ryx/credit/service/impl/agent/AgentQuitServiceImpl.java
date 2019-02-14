@@ -1038,6 +1038,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                         record.setNotifyStatus(Status.STATUS_0.status);
                         record.setNotifyCount(Status.STATUS_1.status);
                         record.setcUser(agentQuit.getcUser());
+                        record.setAgentId(agentQuit.getAgentId());
                         record.setNotifyType(NotifyType.AgentQuit.getValue());
 
                         AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusIds[i]);
@@ -1054,7 +1055,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                             AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
                             List<String> list = new ArrayList<>();
                             list.add(agentBusInfo.getBusNum());
-                            String batchIds = JsonUtil.objectToJson(agentNotifyVo.getBatchIds());
+                            String batchIds = JsonUtil.objectToJson(list);
                             agentNotifyVo.setBatchIds(batchIds);
                             record.setSendJson("batchIds:" + batchIds);
                             agentResult = httpRequestForMPOS(agentNotifyVo);
