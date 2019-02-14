@@ -274,7 +274,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
                 CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(busId);
                 agentVo.setOperationType(String.valueOf(capitalChangeApply.getOperationType()));
-                agentVo.setAmt(String.valueOf(capitalChangeApply.getRealOperationAmt()));
+                agentVo.setAmt(capitalChangeApply.getRealOperationAmt());
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {

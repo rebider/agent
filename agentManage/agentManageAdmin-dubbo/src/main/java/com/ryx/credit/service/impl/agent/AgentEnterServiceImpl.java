@@ -468,7 +468,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             reqMap.put("operationType", agentVo.getOperationType());
         }
 
-        if(StringUtils.isNotBlank(agentVo.getAmt())){
+        if(agentVo.getAmt() != null){
             reqMap.put("amt", agentVo.getAmt());
         }
 
