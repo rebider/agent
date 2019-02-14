@@ -326,8 +326,12 @@ public class AimportServiceImpl implements AimportService {
                         ag.setImport(true);
                         ag.setAgRemark("(老数据导入)");
                         Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid);
-                        //todo 生成后台用户
-                        agentService.createBackUserbyAgent(ag_db.getId());
+                        try {
+                            //todo 生成后台用户
+                            agentService.createBackUserbyAgent(ag_db.getId());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         ImportAgent agent =  importAgentMapper.selectByPrimaryKey(datum.getId());
                         agent.setDealstatus(Status.STATUS_2.status);
                         agent.setDealTime(new Date());
@@ -341,6 +345,8 @@ public class AimportServiceImpl implements AimportService {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    logger.info("导入代理商失败{}:{}",datum.getId(),e.getLocalizedMessage());
+                    logger.error("导入代理商失败",e);
                     ImportAgent agent =  importAgentMapper.selectByPrimaryKey(datum.getId());
                     agent.setDealstatus(Status.STATUS_3.status);
                     agent.setDealTime(new Date());
@@ -356,6 +362,7 @@ public class AimportServiceImpl implements AimportService {
             return ResultVO.success(null);
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("analysisBase err",e);
             throw e;
         }
     }
@@ -464,7 +471,7 @@ public class AimportServiceImpl implements AimportService {
                     example.or().andAgUniqNumEqualTo(dataId);
                     List<Agent>  agQuery = agentMapper.selectByExample(example);
                     if(agQuery.size()==0){
-                        throw new ProcessException("代理商交款导入失败");
+                        throw new ProcessException("代理商合同导入失败 代理商未找到（"+dataId+"）");
                     }
 
                     Agent agent =  agQuery.get(0);
@@ -771,10 +778,31 @@ public class AimportServiceImpl implements AimportService {
             a.setAgCapital(new BigDecimal(obj.getString(3)));
             if(obj.size()>4 && null!=obj.getString(4))
                 a.setAgBusLic(obj.getString(4));
-            if(obj.size()>5 && StringUtils.isNotBlank(obj.getString(5)))
-                a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5),new String[]{"yyyy-MM-dd"}));
-            if(obj.size()>6 && StringUtils.isNotBlank(obj.getString(6)))
-                a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(6),new String[]{"yyyy-MM-dd"}));
+            if(obj.size()>5 && StringUtils.isNotBlank(obj.getString(5))) {
+                try {
+                    a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5), new String[]{"yyyy-MM-dd"}));
+                } catch (ParseException e) {
+                    try {
+                        a.setAgBusLicb(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(5), new String[]{"yyyy/MM/dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+
+                }
+            }
+
+            if(obj.size()>6 && StringUtils.isNotBlank(obj.getString(6))) {
+                try {
+                    a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(6), new String[]{"yyyy-MM-dd"}));
+                } catch (ParseException e) {
+                    try {
+                        a.setAgBusLice(org.apache.commons.lang.time.DateUtils.parseDate(obj.getString(6), new String[]{"yyyy/MM/dd"}));
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+
             if(obj.size()>7 && null!=obj.getString(7))
                 a.setAgLegal(obj.getString(7));
             if(obj.size()>8 && null!=obj.getString(8))
@@ -820,7 +848,7 @@ public class AimportServiceImpl implements AimportService {
                 }
             }
             return a;
-        } catch (ParseException e) {
+        } catch (Exception e) {
             logger.info("解析json{}:{}",e.getMessage(),obj.toJSONString());
             e.printStackTrace();
             throw e;
