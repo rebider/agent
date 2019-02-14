@@ -328,6 +328,16 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             logger.info("审批任务结束{}{}，保证金变更申请更新失败-capitalChangeApply", proIns, agStatus);
             throw new MessageException("保证金变更申请更新失败！");
         }
+        AgentResult agentResult = AgentResult.fail();
+        if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
+            agentResult = cashReceivablesService.refuseProcing(CashPayType.CAPITALCHANGE,capitalChangeApply.getId(),capitalChangeApply.getcUser());
+        }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            agentResult = cashReceivablesService.finishProcing(CashPayType.CAPITALCHANGE,capitalChangeApply.getId(),capitalChangeApply.getcUser());
+        }
+        if(!agentResult.isOK()){
+            throw new ProcessException("更新打款记录失败");
+        }
         if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
             if (capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue()) == 0) {
                 CapitalExample capitalExample = new CapitalExample();
