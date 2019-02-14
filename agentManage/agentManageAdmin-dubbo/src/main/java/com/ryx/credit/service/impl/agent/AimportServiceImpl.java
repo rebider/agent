@@ -654,9 +654,9 @@ public class AimportServiceImpl implements AimportService {
                                         agentColinfoRel.setBusPlatform(busItem.getBusPlatform());
                                         agentColinfoRel.setAgentbusid(busItem.getId());
                                         AgentResult rel = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userid);
-                                        logger.info("代理商导入收款账户业务关系{}",busItem.getId(),rel.getMsg());
+                                        logger.info("代理商导入收款账户业务关系{},{}",busItem.getId(),rel.getMsg());
                                     }else{
-                                        logger.info("代理商导入收款账户业务关系已存在{}",busItem.getId(),listRel_db.get(0).getId());
+                                        logger.info("代理商导入收款账户业务关系已存在{},{}",busItem.getId(),listRel_db.get(0).getId());
                                     }
                             }
 
@@ -668,7 +668,7 @@ public class AimportServiceImpl implements AimportService {
                     payment.setDealTime(new Date());
                     if(1!=importAgentMapper.updateByPrimaryKeySelective(payment)){
                         logger.info("代理商导入业务{}失败",datum.getId());
-                        throw new ProcessException("代理商导入业务");
+                        throw new ProcessException("代理商导入业务更新失败（"+datum.getId()+"）");
                     }else{
                         logger.info("代理商导入业务{}成功",datum.getId());
                     }
@@ -714,13 +714,13 @@ public class AimportServiceImpl implements AimportService {
                 List<Dict>  list = dictOptionsService.dictList(DictGroup.AGENT.name(),DictGroup.CONTRACT_TYPE.name());
                 BigDecimal v = null;
                 for (Dict dict : list) {
-                    if(dict.getdItemname().equals(obj.getString(3))){
+                    if(dict.getdItemname().equals(obj.getString(3).trim())){
                         v= new BigDecimal(dict.getdItemvalue());
                     }
                 }
                 if(null==v)
                     logger.info("合同类型为空{}",obj.toJSONString());
-                a.setContType(v);
+                a.setContType(v==null?new BigDecimal(-1):v);
             }
             if(obj.size()>4 && null!=obj.getString(4)) {
                 //便利查询合同类型
@@ -859,6 +859,9 @@ public class AimportServiceImpl implements AimportService {
                 }
 
             }
+            c.setcPayType("YHHK");
+            c.setCloReviewStatus(AgStatus.Approved.status);
+            c.setcFqInAmount(c.getcAmount());
             if(obj.size()>5 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
                 c.setRemark(obj.getString(5)+"(导入)");
             }else{
