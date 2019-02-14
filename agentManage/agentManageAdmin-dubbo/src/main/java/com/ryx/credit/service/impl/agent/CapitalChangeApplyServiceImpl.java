@@ -58,6 +58,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private CapitalMapper capitalMapper;
     @Autowired
     private CapitalFlowMapper capitalFlowMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
 
     /**
      * 保证金列表
@@ -112,6 +114,9 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         if (null == capitalChangeApply) {
             return null;
         }
+        //查询关联附件
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(capitalChangeApply.getId(), AttachmentRelType.agentQuit.name());
+        capitalChangeApply.setAttachments(attachments);
         return capitalChangeApply;
     }
 

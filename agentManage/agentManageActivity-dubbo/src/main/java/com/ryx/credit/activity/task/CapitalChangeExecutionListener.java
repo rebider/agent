@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.ThreadPool;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.agent.AgentQuitService;
+import com.ryx.credit.service.agent.CapitalChangeApplyService;
 import com.ryx.credit.spring.MySpringContextHandler;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.DelegateTask;
@@ -40,15 +41,16 @@ public class CapitalChangeExecutionListener implements TaskListener, ExecutionLi
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
             //数据变更服务类
-            AgentQuitService agentQuitService = (AgentQuitService)MySpringContextHandler.applicationContext.getBean("agentQuitService");
+            CapitalChangeApplyService capitalChangeApplyService = (CapitalChangeApplyService) MySpringContextHandler.applicationContext.getBean("capitalChangeApplyService");
             //审批拒绝
             if ("reject_end".equals(activityName)) {
                 logger.info("=========CapitalChangeExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
+                AgentResult res = capitalChangeApplyService.compressCapitalChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
             }
             //审批同意更新数据库
             if ("finish_end".equals(activityName)) {
                 logger.info("=========CapitalChangeExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
-
+                AgentResult res = capitalChangeApplyService.compressCapitalChangeActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
             }
         } else if ("take".equals(eventName)) {
             logger.info("take=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
