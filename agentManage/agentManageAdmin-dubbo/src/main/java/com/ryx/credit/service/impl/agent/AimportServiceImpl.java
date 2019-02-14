@@ -115,7 +115,7 @@ public class AimportServiceImpl implements AimportService {
                 importAgent.setBatchcode(batch);
                 importAgent.setcUser(user);
                 importAgent.setDatacontent(JSONArray.toJSONString(datum));
-                importAgent.setDataid(datum.get(3) + "");
+                importAgent.setDataid(datum.get(4) + "");
                 importAgent.setDatatype(dataType);
                 if (1 != insertAgentImportData(importAgent)) {
                     throw new ProcessException("插入失败");
@@ -755,11 +755,21 @@ public class AimportServiceImpl implements AimportService {
                 a.setAgBusScope(obj.getString(14));
             if(obj.size()>15 && null!=obj.getString(15)) {
                 COrganization org = departmentService.getByName(obj.getString(15));
-                a.setAgDocPro(org==null?null:org.getId()+"");
+                if(org!=null) {
+                    a.setAgDocPro(org == null ? null : org.getId() + "");
+                }else{
+                    COrganization org_pro =  departmentService.getByUserName(obj.getString(15));
+                        a.setAgDocPro(org_pro == null ? null : org_pro.getId() + "");
+                }
             }
             if(obj.size()>16 && null!=obj.getString(16)){
                 COrganization org = departmentService.getByName(obj.getString(16));
-                a.setAgDocDistrict(org==null?null:org.getId()+"");
+                if(org!=null) {
+                    a.setAgDocDistrict(org == null ? null : org.getId() + "");
+                }else{
+                    COrganization org_DocDistrict =  departmentService.getByUserNameParent(obj.getString(16));
+                    a.setAgDocPro(org_DocDistrict == null ? null : org_DocDistrict.getId() + "");
+                }
             }
             return a;
         } catch (ParseException e) {
@@ -944,8 +954,8 @@ public class AimportServiceImpl implements AimportService {
             String uniqNum =   obj.getString("uniqNum");
             String agName =    obj.getString("agName");
             String cwzbh =    obj.getString("cwzbh");
-            String p =   obj.getString("p");
-            String pn =    obj.getString("pn");
+            String p =   obj.getString("p");//业务平台
+            String pn =    obj.getString("pn");//业务平台编码
 
             ImportAgentExample importAgentExample = new ImportAgentExample();
             //根据业务平台编号查询业务平台信息
@@ -1066,6 +1076,10 @@ public class AimportServiceImpl implements AimportService {
             }else{
                 ab.setAgentColinfoList(Arrays.asList());
             }
+
+            img_db.setDealstatus(Status.STATUS_2.status);
+            img_db.setDealmsg("获取成功");
+            importAgentMapper.updateByPrimaryKeySelective(img_db);
             return ab;
         } catch (Exception e) {
             logger.info("解析json{}:{}",e.getMessage(),obj.toJSONString());
