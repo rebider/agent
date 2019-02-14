@@ -1206,7 +1206,7 @@ public class AimportServiceImpl implements AimportService {
         if(importAgent!=null && importAgent.getDealstatus()!=null) {
             c.andDealstatusEqualTo(importAgent.getDealstatus());
         }
-        if(importAgent!=null && importAgent.getBatchcode()!=null) {
+        if(importAgent!=null && StringUtils.isNotBlank(importAgent.getBatchcode())) {
             c.andBatchcodeEqualTo(importAgent.getBatchcode());
         }
         c.andStatusEqualTo(Status.STATUS_1.status);
