@@ -1,9 +1,9 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
@@ -1168,13 +1168,21 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @param  agentId 代理商唯一码
      */
     @Override
-    public void doFrozenByAgent(String agentId) {
-        List<String> agentIds = new ArrayList<String>();
-        agentIds.add(agentId);
-        boolean fail =busiPlatService.mPos_Frozen(agentIds);
-        if(fail){
-            throw new ProcessException("通知手刷，冻结失败");
-        }
+    public Map<String,String> doFrozenByAgent(String agentId) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type", "1");
+        map.put("type", "1");
+        map.put("unfreeze", "0");
+        map.put("flag", "4");
+        map.put("batchIds",agentId);
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"), params);
+        LOG.debug("请求信息：" + res);
+        Map<String,String> map1 = new HashMap<String,String>();
+        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
+                JSONObject.parseObject(res).get("respMsg").toString());
+        return map1;
     }
 
     /**
@@ -1182,13 +1190,22 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @param  agentId 代理商唯一码
      */
     @Override
-    public void doUnFrozenAgentProfit(String agentId) {
-        List<String> agentIds = new ArrayList<String>();
-        agentIds.add(agentId);
-        boolean fail =busiPlatService.mPos_unFrozen(agentIds);
-        if(fail){
-            throw new ProcessException("通知手刷，解冻失败！");
-        }
+    public Map<String,String> doUnFrozenAgentProfit(String agentId) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type","0");
+        map.put("type","1");
+        map.put("unfreeze","0");
+        map.put("flag","0");
+        map.put("batchIds",agentId);//AG码list
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"),params);
+
+        Map<String,String> map1 = new HashMap<String,String>();
+        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
+                JSONObject.parseObject(res).get("respMsg").toString());
+        return map1;
+
     }
 
 }

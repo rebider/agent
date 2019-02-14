@@ -486,7 +486,11 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
 
         try {
             //冻结分润
-            profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
+//            Map<String, String> resultMap = profitMonthService.doFrozenByAgent(agentQuit.getAgentId());
+//            String respCode = resultMap.get("key");
+//            if(!respCode.equals("000000")){
+//                throw new MessageException(resultMap.get("value"));
+//            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new MessageException("冻结分润失败");
@@ -759,7 +763,11 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         //拒绝
         if(agStatus.compareTo(AgStatus.Refuse.getValue())==0){
             try {
-                profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId());
+//                Map<String,String> resultMap = profitMonthService.doUnFrozenAgentProfit(agentQuit.getAgentId());
+//                String respCode = resultMap.get("key");
+//                if(!respCode.equals("000000")){
+//                    throw new MessageException(resultMap.get("value"));
+//                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("代理商退出：分润解冻失败");
@@ -1225,4 +1233,5 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
         return AgentResult.ok();
     }
+
 }

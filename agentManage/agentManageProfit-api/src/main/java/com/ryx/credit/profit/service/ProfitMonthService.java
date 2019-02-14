@@ -207,12 +207,12 @@ public interface ProfitMonthService {
     /**
      * 代理商日分润冻结
      */
-    void doFrozenByAgent(String agentId);
+    Map<String,String> doFrozenByAgent(String agentId);
 
     /**
      * 代理商日分润解冻
      */
-    void doUnFrozenAgentProfit(String agentId);
+    Map<String,String> doUnFrozenAgentProfit(String agentId);
 
 
 
