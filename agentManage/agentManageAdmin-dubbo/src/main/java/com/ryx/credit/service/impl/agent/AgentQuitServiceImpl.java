@@ -775,7 +775,17 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 throw new MessageException("代理商退出：分润解冻失败");
             }
             //还原平台状态
-
+            String quitBusId = agentQuit.getQuitBusId();
+            String[] quitBusIds = quitBusId.split(",");
+            for(int j=0;j<quitBusIds.length;j++){
+                String mergeBusId = quitBusIds[j];
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(mergeBusId);
+                agentBusInfo.setBusStatus(BusinessStatus.Enabled.status);
+                int k = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
+                if (k!=1) {
+                    throw new MessageException("更新业务启用失败");
+                }
+            }
         }
 
         return AgentResult.ok();
