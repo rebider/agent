@@ -39,6 +39,8 @@ public class CapitalFlow implements Serializable{
 
     private String remark;
 
+    private BigDecimal flowStatus;
+
     public String getId() {
         return id;
     }
@@ -173,5 +175,13 @@ public class CapitalFlow implements Serializable{
 
     public void setRemark(String remark) {
         this.remark = remark == null ? null : remark.trim();
+    }
+
+    public BigDecimal getFlowStatus() {
+        return flowStatus;
+    }
+
+    public void setFlowStatus(BigDecimal flowStatus) {
+        this.flowStatus = flowStatus;
     }
 }

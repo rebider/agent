@@ -1247,6 +1247,66 @@ public class CapitalFlowExample {
             addCriterion("REMARK not between", value1, value2, "remark");
             return (Criteria) this;
         }
+
+        public Criteria andFlowStatusIsNull() {
+            addCriterion("FLOW_STATUS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusIsNotNull() {
+            addCriterion("FLOW_STATUS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusEqualTo(BigDecimal value) {
+            addCriterion("FLOW_STATUS =", value, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusNotEqualTo(BigDecimal value) {
+            addCriterion("FLOW_STATUS <>", value, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusGreaterThan(BigDecimal value) {
+            addCriterion("FLOW_STATUS >", value, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("FLOW_STATUS >=", value, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusLessThan(BigDecimal value) {
+            addCriterion("FLOW_STATUS <", value, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("FLOW_STATUS <=", value, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusIn(List<BigDecimal> values) {
+            addCriterion("FLOW_STATUS in", values, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusNotIn(List<BigDecimal> values) {
+            addCriterion("FLOW_STATUS not in", values, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FLOW_STATUS between", value1, value2, "flowStatus");
+            return (Criteria) this;
+        }
+
+        public Criteria andFlowStatusNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("FLOW_STATUS not between", value1, value2, "flowStatus");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

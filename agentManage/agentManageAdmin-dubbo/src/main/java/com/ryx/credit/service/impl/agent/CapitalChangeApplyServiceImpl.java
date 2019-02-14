@@ -328,6 +328,59 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             logger.info("审批任务结束{}{}，保证金变更申请更新失败-capitalChangeApply", proIns, agStatus);
             throw new MessageException("保证金变更申请更新失败！");
         }
+        if(agStatus.compareTo(AgStatus.Approved.getValue())==0){
+            if (capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue()) == 0) {
+                CapitalExample capitalExample = new CapitalExample();
+                CapitalExample.Criteria criteria = capitalExample.createCriteria();
+                criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
+                criteria.andCTypeEqualTo(capitalChangeApply.getCapitalType());
+                List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+                for (Capital capital : capitals) {
+                    capital.setFreezeAmt(BigDecimal.ZERO);
+                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
+                    if(i!=1){
+                        throw new MessageException("通过更新冻结金额失败！");
+                    }
+                    CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
+                    CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
+                    criteria1.andStatusEqualTo(Status.STATUS_1.status);
+                    criteria1.andCapitalIdEqualTo(capital.getId());
+                    List<CapitalFlow> capitalFlows = capitalFlowMapper.selectByExample(capitalFlowExample);
+                    for (CapitalFlow capitalFlow : capitalFlows) {
+                        capitalFlow.setFlowStatus(Status.STATUS_1.status);
+                        int j = capitalFlowMapper.updateByPrimaryKey(capitalFlow);
+                        if(j!=1){
+                            throw new MessageException("通过更新资金流水记录失败！");
+                        }
+                    }
+                }
+
+            } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
+
+            } else {
+                throw new MessageException("处理类型错误！");
+            }
+        }else{
+            if (capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue()) == 0) {
+                CapitalExample capitalExample = new CapitalExample();
+                CapitalExample.Criteria criteria = capitalExample.createCriteria();
+                criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
+                criteria.andCTypeEqualTo(capitalChangeApply.getCapitalType());
+                List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+                for (Capital capital : capitals) {
+                    capital.setcFqInAmount(capital.getcFqInAmount().add(capital.getFreezeAmt()));
+                    capital.setFreezeAmt(BigDecimal.ZERO);
+                    int i = capitalMapper.updateByPrimaryKeySelective(capital);
+                    if(i!=1){
+                        throw new MessageException("拒绝更新冻结金额失败！");
+                    }
+                }
+            } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
+
+            } else {
+                throw new MessageException("处理类型错误！");
+            }
+        }
         return AgentResult.ok();
     }
 
@@ -391,6 +444,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 capitalFlow.setuUser(capitalChangeApply.getuUser());
                 capitalFlow.setStatus(Status.STATUS_1.status);
                 capitalFlow.setVersion(BigDecimal.ZERO);
+                capitalFlow.setFlowStatus(Status.STATUS_0.status);
                 capitalFlowMapper.insertSelective(capitalFlow);
                 if (lockAmt.compareTo(BigDecimal.ZERO) >= 0) {
                     break;
