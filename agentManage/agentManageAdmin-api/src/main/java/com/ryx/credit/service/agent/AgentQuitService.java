@@ -62,4 +62,7 @@ public interface AgentQuitService {
 
 
     List<AgentBusInfo> getBusInfosById(String id);
+
+
+    AgentResult manualAgentQuitNotify(String busId,String platformCode);
 }

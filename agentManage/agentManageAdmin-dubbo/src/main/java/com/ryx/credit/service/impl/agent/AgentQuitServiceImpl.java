@@ -1028,58 +1028,68 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 }
                 try {
                     String[] quitBusIds = agentQuit.getQuitBusId().split(",");
+                    BigDecimal platformStatus = PlatformStatus.FAIL.getValue();
                     for (int i = 0; i < quitBusIds.length; i++) {
-                        AgentPlatFormSyn record = new AgentPlatFormSyn();
-                        record.setId(idService.genId(TabId.a_agent_platformsyn));
-                        record.setNotifyTime(new Date());
-                        record.setBusId(agentQuit.getId());
-                        record.setVersion(Status.STATUS_1.status);
-                        record.setcTime(new Date());
-                        record.setNotifyStatus(Status.STATUS_0.status);
-                        record.setNotifyCount(Status.STATUS_1.status);
-                        record.setcUser(agentQuit.getcUser());
-                        record.setAgentId(agentQuit.getAgentId());
-                        record.setNotifyType(NotifyType.AgentQuit.getValue());
-
-                        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(quitBusIds[i]);
-                        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
-                        String platType = platForm.getPlatformType();
-                        AgentResult agentResult = AgentResult.fail();
-                        if (platType.equals(PlatformType.POS.getValue())) {
-                            AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
-                            agentNotifyVo.setOrgId(agentBusInfo.getBusNum());
-                            agentNotifyVo.setRemark("代理商退出");
-                            record.setSendJson("orgId:" + agentNotifyVo.getOrgId());
-                            agentResult = httpRequestForPos(agentNotifyVo);
-                        } else if (platType.equals(PlatformType.MPOS.getValue())) {
-                            AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
-                            List<String> list = new ArrayList<>();
-                            list.add(agentBusInfo.getBusNum());
-                            String batchIds = JsonUtil.objectToJson(list);
-                            agentNotifyVo.setBatchIds(batchIds);
-                            record.setSendJson("batchIds:" + batchIds);
-                            agentResult = httpRequestForMPOS(agentNotifyVo);
-                        }
-                        //接口请求成功
-                        if (null != agentResult && !"".equals(agentResult) && agentResult.isOK()) {
-                            //添加请求记录
-                            record.setSuccesTime(new Date());
-                            record.setNotifyStatus(Status.STATUS_1.status);
-                        }
-                        record.setNotifyJson(agentResult.getMsg());
-                        try {
-                            agentPlatFormSynMapper.insert(record);
-                        } catch (Exception e) {
-                            logger.info("代理商合并通知pos异常：{}" + e.getMessage());
-                            e.printStackTrace();
-                        }
+                        platformStatus = agentPlatFormSyn(agentQuit, platformStatus, quitBusIds[i]);
                     }
+                    agentQuit.setPlatformStatus(platformStatus);
+                    agentQuitMapper.updateByPrimaryKey(agentQuit);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
     }
+
+    public BigDecimal agentPlatFormSyn(AgentQuit agentQuit,BigDecimal platformStatus,String busId)throws Exception{
+        AgentPlatFormSyn record = new AgentPlatFormSyn();
+        record.setId(idService.genId(TabId.a_agent_platformsyn));
+        record.setNotifyTime(new Date());
+        record.setBusId(agentQuit.getId());
+        record.setVersion(Status.STATUS_1.status);
+        record.setcTime(new Date());
+        record.setNotifyStatus(Status.STATUS_0.status);
+        record.setNotifyCount(Status.STATUS_1.status);
+        record.setcUser(agentQuit.getcUser());
+        record.setAgentId(agentQuit.getAgentId());
+        record.setNotifyType(NotifyType.AgentQuit.getValue());
+
+        AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(busId);
+        PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
+        String platType = platForm.getPlatformType();
+        AgentResult agentResult = AgentResult.fail();
+        record.setPlatformCode(agentBusInfo.getBusPlatform());
+        if (platType.equals(PlatformType.POS.getValue())) {
+            AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+            agentNotifyVo.setOrgId(agentBusInfo.getBusNum());
+            agentNotifyVo.setRemark("代理商退出");
+            record.setSendJson("orgId:" + agentNotifyVo.getOrgId());
+            agentResult = httpRequestForPos(agentNotifyVo);
+        } else if (platType.equals(PlatformType.MPOS.getValue())) {
+            AgentNotifyVo agentNotifyVo = new AgentNotifyVo();
+            List<String> list = new ArrayList<>();
+            list.add(agentBusInfo.getBusNum());
+            agentNotifyVo.setBatchIds(list);
+            record.setSendJson("batchIds:" + JsonUtil.objectToJson(list));
+            agentResult = httpRequestForMPOS(agentNotifyVo);
+        }
+        //接口请求成功
+        if (null != agentResult && !"".equals(agentResult) && agentResult.isOK()) {
+            //添加请求记录
+            record.setSuccesTime(new Date());
+            record.setNotifyStatus(Status.STATUS_1.status);
+            platformStatus = PlatformStatus.SUCCESS.getValue();
+        }
+        record.setNotifyJson(agentResult.getMsg());
+        try {
+            agentPlatFormSynMapper.insert(record);
+        } catch (Exception e) {
+            logger.info("代理商合并通知pos异常：{}" + e.getMessage());
+            e.printStackTrace();
+        }
+        return platformStatus;
+    }
+
 
     public static AgentResult httpRequestForPos(AgentNotifyVo agentNotifyVo)throws Exception{
         try {
@@ -1190,4 +1200,29 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
     }
 
+    @Override
+    public AgentResult manualAgentQuitNotify(String busId,String platformCode){
+        try {
+            AgentQuit agentQuit = agentQuitMapper.selectByPrimaryKey(busId);
+            AgentBusInfoExample agentBusInfoExample = new AgentBusInfoExample();
+            AgentBusInfoExample.Criteria criteria = agentBusInfoExample.createCriteria();
+            criteria.andAgentIdEqualTo(agentQuit.getAgentId());
+            criteria.andBusPlatformEqualTo(platformCode);
+            List<AgentBusInfo> agentBusInfos = agentBusInfoMapper.selectByExample(agentBusInfoExample);
+            if(agentBusInfos==null){
+                return AgentResult.fail();
+            }
+            if(agentBusInfos.size()!=1){
+                return AgentResult.fail();
+            }
+            AgentBusInfo agentBusInfo = agentBusInfos.get(0);
+            BigDecimal platformStatus = PlatformStatus.FAIL.getValue();
+            platformStatus = agentPlatFormSyn(agentQuit, platformStatus, agentBusInfo.getId());
+            agentQuit.setPlatformStatus(platformStatus);
+            agentQuitMapper.updateByPrimaryKey(agentQuit);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return AgentResult.ok();
+    }
 }

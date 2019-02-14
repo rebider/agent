@@ -167,7 +167,7 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
                 logger.info("申请退款为否，不支持此操作:{}", agentQuit.getAppRefund());
                 throw new MessageException("申请退款为否，不支持此操作！");
             }
-            if (!agentQuit.getPlatformStatus().equals(PlatformStatus.FAIL.getValue())) {
+            if (!agentQuit.getPlatformStatus().equals(PlatformStatus.SUCCESS.getValue())) {
                 logger.info("业务平台状态为失败，不支持此操作:{}", agentQuit.getPlatformStatus());
                 throw new MessageException("业务平台状态为失败，不支持此操作！");
             }
