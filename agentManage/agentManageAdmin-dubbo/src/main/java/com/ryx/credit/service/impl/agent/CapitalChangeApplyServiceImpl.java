@@ -193,6 +193,16 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         if(capitalChangeApply.getServiceCharge().compareTo(BigDecimal.ZERO)==-1){
             throw new MessageException("手续费必须大于等于0！");
         }
+        CapitalExample capitalExample = new CapitalExample();
+        CapitalExample.Criteria criteria = capitalExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
+        List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+        for (Capital capital : capitals) {
+            if(capital.getFreezeAmt().compareTo(BigDecimal.ZERO)!=0){
+                throw new MessageException("缴纳款冻结中请勿重复提交！");
+            }
+        }
         if(capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue())==0){
             if(capitalChangeApply.getRealOperationAmt().compareTo(capitalChangeApply.getCapitalAmt())==1){
                 throw new MessageException("处理金额不能大于剩余金额！");
