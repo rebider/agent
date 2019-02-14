@@ -1206,6 +1206,9 @@ public class AimportServiceImpl implements AimportService {
         if(importAgent!=null && importAgent.getDealstatus()!=null) {
             c.andDealstatusEqualTo(importAgent.getDealstatus());
         }
+        if(importAgent!=null && importAgent.getBatchcode()!=null) {
+            c.andBatchcodeEqualTo(importAgent.getBatchcode());
+        }
         c.andStatusEqualTo(Status.STATUS_1.status);
         int count = importAgentMapper.countByExample(example);
         example.setOrderByClause(" c_time desc ");
