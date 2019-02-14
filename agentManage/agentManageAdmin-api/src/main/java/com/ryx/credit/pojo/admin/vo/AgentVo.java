@@ -97,7 +97,7 @@ public class AgentVo implements Serializable {
     private List<String> quitRefundFile;
 
     private String operationType;
-    private String amt;
+    private BigDecimal amt;
 
     public String getOperationType() {
         return operationType;
@@ -107,11 +107,11 @@ public class AgentVo implements Serializable {
         this.operationType = operationType;
     }
 
-    public String getAmt() {
+    public BigDecimal getAmt() {
         return amt;
     }
 
-    public void setAmt(String amt) {
+    public void setAmt(BigDecimal amt) {
         this.amt = amt;
     }
 
