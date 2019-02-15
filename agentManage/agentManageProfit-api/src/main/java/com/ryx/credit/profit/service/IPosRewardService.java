@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -82,6 +83,33 @@ public interface IPosRewardService {
      */
     List<PosReward> selectByEndMonth(PosReward posReward);
 
+    /**
+     * 插入抱团明细
+     * @param record
+     * @return
+     */
+    int insertHuddleDetail(PosHuddleRewardDetail record);
+
+    /**
+     * 查询抱团此周期内是否重复
+     * @param param
+     * @return
+     */
+    List<Map<String, Object>> huddlePos(Map<String, Object> param);
+    /**
+     * POS抱团奖励申请，进行审批流
+     * @param pPosHuddleReward
+     * @param userId
+     * @param workId
+     */
+    void applyHuddlePosReward(PPosHuddleReward pPosHuddleReward, String userId, String workId);
 
 
+    PPosHuddleReward selectByPrimaryKey(String id);
+
+    List<PosHuddleRewardDetail> selectByHuddleCode(String huddleCode);
+
+
+
+    public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page);
 }
