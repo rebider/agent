@@ -2,10 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.activity.entity.ActRuTask;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.RewardStatus;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
@@ -222,14 +219,41 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
 
         String taskId = agentVo.getTaskId();
-        Map<String, Object> mapactRuTask = rewardMapper.selectById(taskId);
-        String activid = (String) mapactRuTask.get("EXECUTION_ID_");
-        Map<String, Object> mapActRel = rewardMapper.selectByActiv(activid);
-        PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
-        PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
-        criteria.andAgentNameEqualTo((String) mapActRel.get("AGENT_NAME"));
-        criteria.andIdEqualTo((String) mapActRel.get("BUS_ID"));
-        List<PPosHuddleReward> listPos = pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+        if (taskId!=null){
+            Map<String, Object>  identitylink  = rewardMapper.selectByTaskId(taskId);
+            String groupId = (String) identitylink.get("GROUP_ID_");
+            Map<String, Object> mapactRuTask = rewardMapper.selectById(taskId);
+            String activid = (String) mapactRuTask.get("EXECUTION_ID_");
+            Map<String, Object> mapActRel = rewardMapper.selectByActiv(activid);
+            PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
+            PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
+            criteria.andAgentNameEqualTo((String) mapActRel.get("AGENT_NAME"));
+            criteria.andIdEqualTo((String) mapActRel.get("BUS_ID"));
+            List<PPosHuddleReward> listPos = pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+
+            if(agentVo.getPretest()!=null || "".equals(agentVo.getOrderAprDept())) {
+
+                if (listPos != null) {
+                    for (PPosHuddleReward pos : listPos) {
+                        String Status1 =Status.STATUS_1.status.toString();
+                        if("".equals(agentVo.getOrderAprDept()) &&(pos.getRev1()!=null)){
+
+                            if ("pass".equals(agentVo.getApprovalResult()) && (!"city".equals(groupId))) {
+                                if(!"business".equals(groupId)){
+                                    pos.setApplyStatus(Status.STATUS_1.status.toString());
+                                }
+
+
+                            }
+                        }else if(pos.getRev1()==null){
+                            pos.setRev1(agentVo.getPretest());
+                        }
+                        pPosHuddleRewardMapper.updateByPrimaryKeySelective(pos);
+                    }
+                }
+            }
+        }
+
 
 
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
@@ -254,25 +278,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         String msg = String.valueOf(resultMap.get("msg"));
 
 
-        if(agentVo.getPretest()!=null || "".equals(agentVo.getOrderAprDept())) {
 
-            if (listPos != null) {
-                for (PPosHuddleReward pos : listPos) {
-                    if("".equals(agentVo.getOrderAprDept()) &&(pos.getRev1()!=null)){
-                        if ("pass".equals(agentVo.getApprovalResult())) {
-                            pos.setApplyStatus("1");
-                        }else {
-                            pos.setApplyStatus("2");
-                        }
-                    }else if(pos.getRev1()==null && "pass".equals(agentVo.getApprovalResult())){
-                        pos.setRev1(agentVo.getPretest());
-                    }else {
-                        pos.setApplyStatus("2");
-                    }
-                    pPosHuddleRewardMapper.updateByPrimaryKeySelective(pos);
-                }
-            }
-        }
 
 
         if (resultMap == null) {

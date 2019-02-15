@@ -93,12 +93,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Resource
     ProfitFactorService profitFactorService;
 
-    @Autowired
-    private IProfitDirectService profitDirectService;
-
-    @Autowired
-    private BusiPlatService busiPlatService;
-
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
 
@@ -1165,16 +1159,16 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     /**
      * 代理商日分润冻结
-     * @param  agentId 代理商唯一码
      */
     @Override
-    public Map<String,String> doFrozenByAgent(String agentId) {
+    public Map<String,String> doFrozenByAgent(List<String> list) {
+
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("agencyBlack_type", "1");
         map.put("type", "1");
         map.put("unfreeze", "0");
         map.put("flag", "4");
-        map.put("batchIds",agentId);
+        map.put("batchIds",list.toString());
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.refuse"), params);
@@ -1183,24 +1177,23 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         map1.put(JSONObject.parseObject(res).get("respCode").toString(),
                 JSONObject.parseObject(res).get("respMsg").toString());
         return map1;
+
     }
 
     /**
      * 代理商日分润解冻
-     * @param  agentId 代理商唯一码
      */
     @Override
-    public Map<String,String> doUnFrozenAgentProfit(String agentId) {
+    public Map<String,String> doUnFrozenAgentProfit(List<String> list) {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("agencyBlack_type","0");
         map.put("type","1");
         map.put("unfreeze","0");
         map.put("flag","0");
-        map.put("batchIds",agentId);//AG码list
+        map.put("batchIds",list.toString());//AG码list
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.refuse"),params);
-
         Map<String,String> map1 = new HashMap<String,String>();
         map1.put(JSONObject.parseObject(res).get("respCode").toString(),
                 JSONObject.parseObject(res).get("respMsg").toString());

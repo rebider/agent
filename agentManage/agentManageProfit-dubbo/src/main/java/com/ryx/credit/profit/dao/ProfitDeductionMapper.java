@@ -46,6 +46,6 @@ public interface ProfitDeductionMapper {
     /**获取未扣款**/
     BigDecimal getNotDeductionAmt(Map<String,String> param);
 
-
+    int resetOtherDeduction(@Param("type") String type,@Param("date") String date);
 
 }

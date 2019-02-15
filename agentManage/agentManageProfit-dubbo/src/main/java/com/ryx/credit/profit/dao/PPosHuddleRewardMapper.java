@@ -28,6 +28,6 @@ public interface PPosHuddleRewardMapper {
 
     int updateByPrimaryKey(PPosHuddleReward record);
 
-    List<PPosHuddleReward>  selectByList(@Param("listQuvery")List listQuvery);
-    long   selectByCount(@Param("listQuvery")List listQuvery);
+    List<PPosHuddleReward>  selectByList(@Param("listQuvery") List listQuvery);
+    long   selectByCount(@Param("listQuvery") List listQuvery);
 }

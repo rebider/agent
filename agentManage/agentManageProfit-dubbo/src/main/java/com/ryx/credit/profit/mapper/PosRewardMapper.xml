@@ -287,4 +287,10 @@
     where ID_ = #{id,jdbcType=OTHER}
   </select>
 
+
+  <select id="selectByTaskId" resultType="java.util.Map" parameterType="java.lang.String" >
+    select GROUP_ID_,ID_,PROC_DEF_ID_,PROC_INST_ID_,REV_,TASK_ID_,TYPE_,USER_ID_ from  act_ru_identitylink where TASK_ID_ = #{taskId}
+  </select>
+
+
 </mapper>

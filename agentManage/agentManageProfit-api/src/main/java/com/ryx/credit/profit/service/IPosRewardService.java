@@ -88,7 +88,7 @@ public interface IPosRewardService {
      * @param record
      * @return
      */
-    int insertHuddleDetail (PosHuddleRewardDetail record);
+    int insertHuddleDetail(PosHuddleRewardDetail record);
 
     /**
      * 查询抱团此周期内是否重复

@@ -3,6 +3,7 @@ package com.ryx.credit.service;
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,4 +36,6 @@ public interface ActRuTaskService {
     List<Map<String, Object>> queryMyTask(Map<String,Object> param);
 
     PageInfo queryMyTaskPage(Page page, Map<String,Object> param);
+
+    List<Map<String,Object>> queryHuddleMyTask(Map<String,Object> params);
 }

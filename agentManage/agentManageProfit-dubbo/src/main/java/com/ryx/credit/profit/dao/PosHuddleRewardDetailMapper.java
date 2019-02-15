@@ -21,7 +21,7 @@ public interface PosHuddleRewardDetailMapper {
 
     int updateByExample(@Param("record") PosHuddleRewardDetail record, @Param("example") PosHuddleRewardDetailExample example);
 
-    List<PosHuddleRewardDetail> selectByHuddleCode(@Param("huddleCode")String huddleCode);
+    List<PosHuddleRewardDetail> selectByHuddleCode(@Param("huddleCode") String huddleCode);
 
 
 }

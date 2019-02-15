@@ -106,15 +106,15 @@
   </select>
   <select id="getList" parameterType="java.util.Map" resultType="java.util.Map">
     <include refid="OracleDialectPrefix" />
-    select t.AGENT_NAME,AGENT_ID,
-       max(case t.ORDER_NUM when 1 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY1,
-       max(case t.ORDER_NUM when 2 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY2,
-       max(case t.ORDER_NUM when 3 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY3,
-       max(case t.ORDER_NUM when 4 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY4,
-       t.BUS_PLATFORM,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.remark
-      from
-      (select aar.remark,aar.AGENT_ID,aar.AGENT_NAME,aar.STATUS,aar.BUS_PLATFORM,aar.CREATE_TIME,aar.START_MONTH,aard.ORDER_NUM,aard.AGENT_NAME as RELATE_COMPANY  from A_AGENT_RELATE aar left join A_AGENT_RELATE_DETAIL aard on aar.ID=aard.RELATE_ID) t
-      group by t.AGENT_ID,t.AGENT_NAME,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.BUS_PLATFORM,t.REMARK having 1=1
+    select t.ID, t.AGENT_NAME,AGENT_ID,
+    max(case t.ORDER_NUM when 1 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY1,
+    max(case t.ORDER_NUM when 2 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY2,
+    max(case t.ORDER_NUM when 3 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY3,
+    max(case t.ORDER_NUM when 4 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY4,
+    t.BUS_PLATFORM,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.remark
+    from
+    (select aar.ID, aar.remark,aar.AGENT_ID,aar.AGENT_NAME,aar.STATUS,aar.BUS_PLATFORM,aar.CREATE_TIME,aar.START_MONTH,aard.ORDER_NUM,aard.AGENT_NAME as RELATE_COMPANY  from A_AGENT_RELATE aar left join A_AGENT_RELATE_DETAIL aard on aar.ID=aard.RELATE_ID) t
+    group by t.ID, t.AGENT_ID,t.AGENT_NAME,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.BUS_PLATFORM,t.REMARK having 1=1
       <if test="agentId!=null and agentId!=''">
         and AGENT_ID=#{agentId}
       </if>
@@ -124,17 +124,22 @@
       <if test="status!=null and status!=''">
         and STATUS = #{status}
       </if>
+    order by CREATE_TIME desc
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="queryParentAgentByAgentId" parameterType="java.lang.String" resultType="java.util.Map">
+  <select id="queryParentAgentByAgentId" parameterType="java.util.Map" resultType="java.util.Map">
     select
         b.agent_id as agentId,bb.ag_name as agentName
     from a_agent_businfo a
         left join a_agent_businfo b on b.id = a.bus_parent and b.bus_platform = a.bus_platform and b.status=1
         left join a_agent bb on bb.id = b.agent_id
-    <where>
-      <if test="agentId!=null and agentId!=''"> and a.agent_id = #{agentId}</if>
-    </where>
+    where 1=1
+    <if test="agentId!=null and agentId!=''">
+      and a.AGENT_ID=#{agentId}
+    </if>
+    <if test="busPlatform!=null and busPlatform!=''">
+      and a.bus_platform=#{busPlatform}
+    </if>
   </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.AgentRelateExample">
     delete from A_AGENT_RELATE

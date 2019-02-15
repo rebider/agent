@@ -343,6 +343,23 @@
     </where>
   </select>
 
+
+  <select id="queryHuddleMyTask" parameterType="map" resultType="map">
+    select distinct
+    rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, br.C_TIME, br.C_USER, br.ACTIV_STATUS, br.STATUS,ri.group_id_
+    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri
+      where
+      rt.EXECUTION_ID_ = br.activ_id
+      and ri.task_id_  = rt.id_
+      and br.AGENT_NAME like  concat(concat('%',','), '%')
+      <if test="params.group != null and params.group!='' " >
+        and ri.group_id_ = #{params.group}
+      </if>
+
+  </select>
+
+
+
   <select id="queryMyTaskPage" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     select

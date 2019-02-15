@@ -27,9 +27,11 @@ public enum BusActRelBusType {
     POSHUDDLEREWARD("/BusActRelBusType/POSHUDDLEREWARD","POS抱团奖励申请"),
     QUIT("/BusActRelBusType/QUIT","代理商退出申请"),
     MERGE("/BusActRelBusType/MERGE","代理商合并申请"),
+    agentRelate("/BusActRelBusType/agentRelate","代理商关联申请"),
     agentTerminal("/BusActRelBusType/agentTerminal","终端划拨申请"),
     agentQuitRefund("/BusActRelBusType/agentQuitRefund","代理商退出申请退款"),
-    capitalChange("/BusActRelBusType/capitalChange","保证金变更申请");
+    capitalChange("/BusActRelBusType/capitalChange","保证金变更申请"),
+    CityApplyDeduction("/BusActRelBusType/cityApplyDeduction","省区其他扣款申请");
 
 
     public String key;

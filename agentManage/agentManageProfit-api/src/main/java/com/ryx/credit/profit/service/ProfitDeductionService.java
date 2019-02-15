@@ -161,4 +161,12 @@ public interface ProfitDeductionService {
      */
     Map<String,BigDecimal> getNotDeduction(Map<String,String> map);
 
+
+    /**
+     * 清除上月其他扣款数据，不过包括线上审批数据
+     * @param type
+     * @return
+     */
+    int resetOtherDeduction(String type);
+
 }
