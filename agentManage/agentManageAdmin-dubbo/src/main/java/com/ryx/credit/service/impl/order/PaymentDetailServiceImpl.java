@@ -463,5 +463,24 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
           return Calendar.getInstance().getTime().getTime() + "";
     }
 
-
+    /**
+     *获取机具欠款总和
+     * @param agentId
+     * @return
+     */
+    @Override
+    public BigDecimal getSumDebt(String agentId){
+        HashMap<String, Object> reqMap = new HashMap<>();
+        reqMap.put("agentId", agentId);
+        List<Map<String, Object>> resultList = oPaymentDetailMapper.getOrderDebt(reqMap);
+        if(resultList.size()==0){
+            return BigDecimal.ZERO;
+        }
+        BigDecimal sumDebt = BigDecimal.ZERO;
+        for (Map<String, Object> map : resultList) {
+            String payAmount = String.valueOf(map.get("PAY_AMOUNT"));
+            sumDebt = sumDebt.add(new BigDecimal(payAmount));
+        }
+        return sumDebt;
+    }
 }

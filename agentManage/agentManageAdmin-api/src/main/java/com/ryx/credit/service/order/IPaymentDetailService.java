@@ -61,4 +61,6 @@ public interface IPaymentDetailService {
     AgentResult createPayMentDetail(String batchCode,String srcId, PamentIdType pamentIdType, String orderId, PaymentType paymentType, BigDecimal payAmount, BigDecimal RealPayAmount,Date planPayTime, BigDecimal planNum, PaymentStatus paymentStatus, String agentId, String cuser)throws Exception;
 
     String createBatchCode();
+
+    BigDecimal getSumDebt(String agentId);
 }
