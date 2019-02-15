@@ -84,6 +84,8 @@ public enum TabId {
     P_INVOICE_DETAIL("IDTL_%s%015d"),
     PROFIT_SUPPLU_TAX("PST%s%015d"),
     A_AGENT_MERGE("AM%s%015d"),
+    A_AGENT_RELATE("AR%s%015d"),
+    A_AGENT_RELATE_DETAIL("ARD%s%015d"),
     A_AGENT_MERGE_BUSINFO("AMB%s%015d");
 
 

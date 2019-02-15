@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.AgentRelateMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.AgentRelate">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="BUS_PLATFORM" jdbcType="VARCHAR" property="busPlatform" />
+    <result column="BUS_TYPE" jdbcType="VARCHAR" property="busType" />
+    <result column="START_MONTH" jdbcType="VARCHAR" property="startMonth" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="CREATE_PERSON" jdbcType="VARCHAR" property="createPerson" />
+    <result column="CREATE_NAME" jdbcType="VARCHAR" property="createName" />
+    <result column="UPDATE_TIME" jdbcType="VARCHAR" property="updateTime" />
+    <result column="UPDATE_PERSON" jdbcType="VARCHAR" property="updatePerson" />
+    <result column="UPDATE_NAME" jdbcType="VARCHAR" property="updateName" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENT_ID, AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME, BUS_PLATFORM, BUS_TYPE, 
+    START_MONTH, STATUS, CREATE_TIME, CREATE_PERSON, CREATE_NAME, UPDATE_TIME, UPDATE_PERSON, 
+    UPDATE_NAME, REMARK
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.AgentRelateExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from A_AGENT_RELATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from A_AGENT_RELATE
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="getList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select t.ID, t.AGENT_NAME,AGENT_ID,
+    max(case t.ORDER_NUM when 1 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY1,
+    max(case t.ORDER_NUM when 2 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY2,
+    max(case t.ORDER_NUM when 3 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY3,
+    max(case t.ORDER_NUM when 4 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY4,
+    t.BUS_PLATFORM,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.remark
+    from
+    (select aar.ID, aar.remark,aar.AGENT_ID,aar.AGENT_NAME,aar.STATUS,aar.BUS_PLATFORM,aar.CREATE_TIME,aar.START_MONTH,aard.ORDER_NUM,aard.AGENT_NAME as RELATE_COMPANY  from A_AGENT_RELATE aar left join A_AGENT_RELATE_DETAIL aard on aar.ID=aard.RELATE_ID) t
+    group by t.ID, t.AGENT_ID,t.AGENT_NAME,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.BUS_PLATFORM,t.REMARK having 1=1
+      <if test="agentId!=null and agentId!=''">
+        and AGENT_ID=#{agentId}
+      </if>
+      <if test="agentName!=null and agentName!=''">
+        and AGENT_NAME=#{agentName}
+      </if>
+      <if test="status!=null and status!=''">
+        and STATUS = #{status}
+      </if>
+    order by CREATE_TIME desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryParentAgentByAgentId" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+        b.agent_id as agentId,bb.ag_name as agentName
+    from a_agent_businfo a
+        left join a_agent_businfo b on b.id = a.bus_parent and b.bus_platform = a.bus_platform and b.status=1
+        left join a_agent bb on bb.id = b.agent_id
+    where 1=1
+    <if test="agentId!=null and agentId!=''">
+      and a.AGENT_ID=#{agentId}
+    </if>
+    <if test="busPlatform!=null and busPlatform!=''">
+      and a.bus_platform=#{busPlatform}
+    </if>
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.AgentRelateExample">
+    delete from A_AGENT_RELATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.AgentRelate">
+    insert into A_AGENT_RELATE (ID, AGENT_ID, AGENT_NAME, 
+      PARENT_AGENT_ID, PARENT_AGENT_NAME, BUS_PLATFORM, 
+      BUS_TYPE, START_MONTH, STATUS, 
+      CREATE_TIME, CREATE_PERSON, CREATE_NAME, 
+      UPDATE_TIME, UPDATE_PERSON, UPDATE_NAME, 
+      REMARK)
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
+      #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, 
+      #{busType,jdbcType=VARCHAR}, #{startMonth,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
+      #{createTime,jdbcType=VARCHAR}, #{createPerson,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=VARCHAR}, #{updatePerson,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.AgentRelate">
+    insert into A_AGENT_RELATE
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM,
+      </if>
+      <if test="busType != null">
+        BUS_TYPE,
+      </if>
+      <if test="startMonth != null">
+        START_MONTH,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON,
+      </if>
+      <if test="createName != null">
+        CREATE_NAME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="updatePerson != null">
+        UPDATE_PERSON,
+      </if>
+      <if test="updateName != null">
+        UPDATE_NAME,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null">
+        #{busType,jdbcType=VARCHAR},
+      </if>
+      <if test="startMonth != null">
+        #{startMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createPerson != null">
+        #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="createName != null">
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="updatePerson != null">
+        #{updatePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="updateName != null">
+        #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.AgentRelateExample" resultType="java.lang.Long">
+    select count(*) from A_AGENT_RELATE
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update A_AGENT_RELATE
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentName != null">
+        AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentId != null">
+        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentName != null">
+        PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busPlatform != null">
+        BUS_PLATFORM = #{record.busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busType != null">
+        BUS_TYPE = #{record.busType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.startMonth != null">
+        START_MONTH = #{record.startMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        STATUS = #{record.status,jdbcType=DECIMAL},
+      </if>
+      <if test="record.createTime != null">
+        CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createPerson != null">
+        CREATE_PERSON = #{record.createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createName != null">
+        CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateTime != null">
+        UPDATE_TIME = #{record.updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updatePerson != null">
+        UPDATE_PERSON = #{record.updatePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.updateName != null">
+        UPDATE_NAME = #{record.updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update A_AGENT_RELATE
+    set ID = #{record.id,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{record.busPlatform,jdbcType=VARCHAR},
+      BUS_TYPE = #{record.busType,jdbcType=VARCHAR},
+      START_MONTH = #{record.startMonth,jdbcType=VARCHAR},
+      STATUS = #{record.status,jdbcType=DECIMAL},
+      CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      CREATE_PERSON = #{record.createPerson,jdbcType=VARCHAR},
+      CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
+      UPDATE_TIME = #{record.updateTime,jdbcType=VARCHAR},
+      UPDATE_PERSON = #{record.updatePerson,jdbcType=VARCHAR},
+      UPDATE_NAME = #{record.updateName,jdbcType=VARCHAR},
+      REMARK = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.AgentRelate">
+    update A_AGENT_RELATE
+    <set>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="busPlatform != null">
+        BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      </if>
+      <if test="busType != null">
+        BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      </if>
+      <if test="startMonth != null">
+        START_MONTH = #{startMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="createPerson != null">
+        CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="createName != null">
+        CREATE_NAME = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="updatePerson != null">
+        UPDATE_PERSON = #{updatePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="updateName != null">
+        UPDATE_NAME = #{updateName,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.AgentRelate">
+    update A_AGENT_RELATE
+    set AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      BUS_PLATFORM = #{busPlatform,jdbcType=VARCHAR},
+      BUS_TYPE = #{busType,jdbcType=VARCHAR},
+      START_MONTH = #{startMonth,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      CREATE_PERSON = #{createPerson,jdbcType=VARCHAR},
+      CREATE_NAME = #{createName,jdbcType=VARCHAR},
+      UPDATE_TIME = #{updateTime,jdbcType=VARCHAR},
+      UPDATE_PERSON = #{updatePerson,jdbcType=VARCHAR},
+      UPDATE_NAME = #{updateName,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>
