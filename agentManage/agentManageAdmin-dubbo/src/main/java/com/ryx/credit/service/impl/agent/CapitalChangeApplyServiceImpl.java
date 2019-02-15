@@ -287,9 +287,28 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     public AgentResult approvalCapitalChangeTask(AgentVo agentVo, String userId, String busId) throws Exception {
         try {
             if (agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+                List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+                if (null == orgCodeRes) {
+                    throw new ProcessException("部门参数为空！");
+                }
+                Map<String, Object> map = orgCodeRes.get(0);
+                Object orgCode = map.get("ORGANIZATIONCODE");
                 CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(busId);
                 agentVo.setOperationType(String.valueOf(capitalChangeApply.getOperationType()));
                 agentVo.setAmt(capitalChangeApply.getRealOperationAmt());
+                //财务审批
+                if (String.valueOf(orgCode).equals("finance")) {
+                    AgentResult cashAgentResult = cashReceivablesService.approveTashBusiness(
+                            CashPayType.CAPITALCHANGE, busId, userId, new Date(), agentVo.getoCashReceivablesVoList());
+                    if (!cashAgentResult.isOK()) {
+                        throw new ProcessException("更新收款信息失败！");
+                    }
+                    capitalChangeApply.setuTime(new Date());
+                    int i = capitalChangeApplyMapper.updateByPrimaryKey(capitalChangeApply);
+                    if (i != 1) {
+                        throw new ProcessException("更新财务部处理失败！");
+                    }
+                }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
             if (!result.isOK()) {
