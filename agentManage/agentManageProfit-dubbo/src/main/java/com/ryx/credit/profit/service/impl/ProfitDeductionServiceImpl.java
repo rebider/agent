@@ -972,6 +972,21 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return BigDecimal.ZERO;
     }
 
+    @Override
+    public int resetOtherDeduction(String type) {
+        // 终审后不能清除
+        String finalStatus = redisService.getValue("commitFinal");
+        if (StringUtils.isBlank(finalStatus)) {
+            if ("1".equals(finalStatus)) {
+                logger.info("终审状态不能清除！");
+                throw new ProcessException("终审状态不能清除！");
+            }
+        }
 
-
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.MONTH, -1);
+        Date date = calendar.getTime();
+        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
+        return profitDeductionMapper.resetDataDeduction(type,dateStr);
+    }
 }

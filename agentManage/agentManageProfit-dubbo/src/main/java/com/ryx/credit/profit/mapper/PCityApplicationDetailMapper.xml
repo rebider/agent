@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PCityApplicationDetailMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PCityApplicationDetail">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="APPLICATION_TYPE" jdbcType="VARCHAR" property="applicationType" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="APPLICATION_MONTH" jdbcType="VARCHAR" property="applicationMonth" />
+    <result column="APPLICATION_AMT" jdbcType="DECIMAL" property="applicationAmt" />
+    <result column="DEDUCTION_REMARK" jdbcType="VARCHAR" property="deductionRemark" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="APPLICATION_STATUS" jdbcType="CHAR" property="applicationStatus" />
+    <result column="CREATE_NAME" jdbcType="VARCHAR" property="createName" />
+    <result column="CREATE_DATE" jdbcType="TIMESTAMP" property="createDate" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, APPLICATION_TYPE, AGENT_ID, AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME, APPLICATION_MONTH, 
+    APPLICATION_AMT, DEDUCTION_REMARK, REMARK, APPLICATION_STATUS, CREATE_NAME, CREATE_DATE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetailExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_CITYAPPLICATION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_CITYAPPLICATION_DETAIL
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetailExample">
+    delete from P_CITYAPPLICATION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetail">
+    insert into P_CITYAPPLICATION_DETAIL (ID, APPLICATION_TYPE, AGENT_ID, 
+      AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME, 
+      APPLICATION_MONTH, APPLICATION_AMT, DEDUCTION_REMARK, 
+      REMARK, APPLICATION_STATUS, CREATE_NAME, 
+      CREATE_DATE)
+    values (#{id,jdbcType=VARCHAR}, #{applicationType,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{agentName,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, 
+      #{applicationMonth,jdbcType=VARCHAR}, #{applicationAmt,jdbcType=DECIMAL}, #{deductionRemark,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR}, #{applicationStatus,jdbcType=CHAR}, #{createName,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetail">
+    insert into P_CITYAPPLICATION_DETAIL
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="applicationType != null">
+        APPLICATION_TYPE,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="applicationMonth != null">
+        APPLICATION_MONTH,
+      </if>
+      <if test="applicationAmt != null">
+        APPLICATION_AMT,
+      </if>
+      <if test="deductionRemark != null">
+        DEDUCTION_REMARK,
+      </if>
+      <if test="remark != null">
+        REMARK,
+      </if>
+      <if test="applicationStatus != null">
+        APPLICATION_STATUS,
+      </if>
+      <if test="createName != null">
+        CREATE_NAME,
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationType != null">
+        #{applicationType,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationMonth != null">
+        #{applicationMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationAmt != null">
+        #{applicationAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionRemark != null">
+        #{deductionRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationStatus != null">
+        #{applicationStatus,jdbcType=CHAR},
+      </if>
+      <if test="createName != null">
+        #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetailExample" resultType="java.lang.Long">
+    select count(*) from P_CITYAPPLICATION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update P_CITYAPPLICATION_DETAIL
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applicationType != null">
+        APPLICATION_TYPE = #{record.applicationType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentName != null">
+        AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentId != null">
+        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentName != null">
+        PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applicationMonth != null">
+        APPLICATION_MONTH = #{record.applicationMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applicationAmt != null">
+        APPLICATION_AMT = #{record.applicationAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.deductionRemark != null">
+        DEDUCTION_REMARK = #{record.deductionRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.applicationStatus != null">
+        APPLICATION_STATUS = #{record.applicationStatus,jdbcType=CHAR},
+      </if>
+      <if test="record.createName != null">
+        CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createDate != null">
+        CREATE_DATE = #{record.createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_CITYAPPLICATION_DETAIL
+    set ID = #{record.id,jdbcType=VARCHAR},
+      APPLICATION_TYPE = #{record.applicationType,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      APPLICATION_MONTH = #{record.applicationMonth,jdbcType=VARCHAR},
+      APPLICATION_AMT = #{record.applicationAmt,jdbcType=DECIMAL},
+      DEDUCTION_REMARK = #{record.deductionRemark,jdbcType=VARCHAR},
+      REMARK = #{record.remark,jdbcType=VARCHAR},
+      APPLICATION_STATUS = #{record.applicationStatus,jdbcType=CHAR},
+      CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
+      CREATE_DATE = #{record.createDate,jdbcType=TIMESTAMP}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetail">
+    update P_CITYAPPLICATION_DETAIL
+    <set>
+      <if test="applicationType != null">
+        APPLICATION_TYPE = #{applicationType,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="agentName != null">
+        AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationMonth != null">
+        APPLICATION_MONTH = #{applicationMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationAmt != null">
+        APPLICATION_AMT = #{applicationAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionRemark != null">
+        DEDUCTION_REMARK = #{deductionRemark,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="applicationStatus != null">
+        APPLICATION_STATUS = #{applicationStatus,jdbcType=CHAR},
+      </if>
+      <if test="createName != null">
+        CREATE_NAME = #{createName,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        CREATE_DATE = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PCityApplicationDetail">
+    update P_CITYAPPLICATION_DETAIL
+    set APPLICATION_TYPE = #{applicationType,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      PARENT_AGENT_NAME = #{parentAgentName,jdbcType=VARCHAR},
+      APPLICATION_MONTH = #{applicationMonth,jdbcType=VARCHAR},
+      APPLICATION_AMT = #{applicationAmt,jdbcType=DECIMAL},
+      DEDUCTION_REMARK = #{deductionRemark,jdbcType=VARCHAR},
+      REMARK = #{remark,jdbcType=VARCHAR},
+      APPLICATION_STATUS = #{applicationStatus,jdbcType=CHAR},
+      CREATE_NAME = #{createName,jdbcType=VARCHAR},
+      CREATE_DATE = #{createDate,jdbcType=TIMESTAMP}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+
+  <select id="getDeductionAppList"  resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+      select
+             pcd.ID,pcd.AGENT_ID,pcd.AGENT_NAME,pcd.PARENT_AGENT_ID,pcd.PARENT_AGENT_NAME,
+             pcd.REMARK,pcd.DEDUCTION_REMARK,pcd.APPLICATION_MONTH,pcd.APPLICATION_AMT,pcd.APPLICATION_TYPE,
+             pcd.CREATE_DATE,pcd.CREATE_NAME,pd.DEDUCTION_STATUS,pd.NOT_DEDUCTION_AMT,
+             pcd.APPLICATION_STATUS
+      from P_CITYAPPLICATION_DETAIL pcd
+        left join P_DEDUCTION pd on pcd.ID = pd.ID
+          <where>
+            pcd.APPLICATION_TYPE = #{map.type} and pcd.CREATE_NAME=#{map.userId}
+              <if test="map.agentId != null and map.agentId != '' ">
+                and pcd.AGENT_ID = #{map.agentId}
+              </if>
+              <if test="map.agentName != null and map.agentName != ''  ">
+                and pcd.AGENT_NAME = #{map.agentName}
+              </if>
+          </where>
+        order by pcd.CREATE_DATE desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+
+  <select id="getDeductionAppListCount" parameterType="java.util.Map" resultType="java.lang.Long" >
+    select
+    count(*)
+    from P_CITYAPPLICATION_DETAIL pcd
+    left join P_DEDUCTION pd on pcd.ID = pd.ID
+    <where>
+      pcd.APPLICATION_TYPE = #{type} and pcd.CREATE_NAME=#{userId}
+      <if test="agentId != '' and agentId != null">
+        and pcd.AGENT_ID = #{agentId}
+      </if>
+      <if test="agentName != '' and agentName != null">
+        and pcd.AGENT_NAME = #{agentName}
+      </if>
+    </where>
+  </select>
+
+</mapper>
