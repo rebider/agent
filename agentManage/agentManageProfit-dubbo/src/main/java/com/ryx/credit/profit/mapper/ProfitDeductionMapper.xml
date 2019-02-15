@@ -558,5 +558,11 @@
     </where>
   </select>
 
+    <delete id="resetOtherDeduction">
+        delete from P_DEDUCTION
+        where DEDUCTION_TYPE = #{type} and DEDUCTION_DATE = #{date} and nvl(STAGING_STATUS,'-') !='6'
+            and SOURCE_ID != '88'
+    </delete>
+
 
 </mapper>

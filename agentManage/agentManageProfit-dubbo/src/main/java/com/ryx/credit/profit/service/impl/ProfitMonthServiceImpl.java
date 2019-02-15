@@ -1,9 +1,9 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.profit.dao.*;
@@ -90,6 +90,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     IOwnInvoiceService ownInvoiceService;
     @Resource
     ProfitFactorService profitFactorService;
+
+    @Autowired
+    private IProfitDirectService profitDirectService;
+
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -1150,6 +1154,53 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Override
     public ProfitDetailMonth getByAgentId(String agentId) {
         return profitDetailMonthMapper.selectByAgentId(agentId);
+    }
+
+
+
+
+    /**
+     * 代理商日分润冻结
+     */
+    @Override
+    public Map<String,String> doFrozenByAgent(List<String> list) {
+
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type", "1");
+        map.put("type", "1");
+        map.put("unfreeze", "0");
+        map.put("flag", "4");
+        map.put("batchIds",list.toString());
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"), params);
+        LOG.debug("请求信息：" + res);
+        Map<String,String> map1 = new HashMap<String,String>();
+        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
+                JSONObject.parseObject(res).get("respMsg").toString());
+        return map1;
+
+    }
+
+    /**
+     * 代理商日分润解冻
+     */
+    @Override
+    public Map<String,String> doUnFrozenAgentProfit(List<String> list) {
+        HashMap<String,String> map = new HashMap<String,String>();
+        map.put("agencyBlack_type","0");
+        map.put("type","1");
+        map.put("unfreeze","0");
+        map.put("flag","0");
+        map.put("batchIds",list.toString());//AG码list
+        String params = JsonUtil.objectToJson(map);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("busiPlat.refuse"),params);
+        Map<String,String> map1 = new HashMap<String,String>();
+        map1.put(JSONObject.parseObject(res).get("respCode").toString(),
+                JSONObject.parseObject(res).get("respMsg").toString());
+        return map1;
+
     }
 
 }
