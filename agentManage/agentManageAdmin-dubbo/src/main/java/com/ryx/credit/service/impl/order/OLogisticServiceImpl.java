@@ -220,14 +220,28 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
-            if (StringUtils.isBlank(beginSnCount)) {
+           if (!proComString.equals(CardImportType.LD.msg)) {
+               if (StringUtils.isBlank(beginSnCount)) {
                 logger.info("请填写起始SN位数");
                 throw new MessageException("请填写起始SN位数");
-            }
-            if (StringUtils.isBlank(endSnCount)) {
+              }
+               if (StringUtils.isBlank(endSnCount)) {
                 logger.info("请填写结束SN位数");
                 throw new MessageException("请填写结束SN位数");
-            }
+              }
+               //需要验证截取sn前面的字符是否一致
+               String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
+               String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
+               HashSet<Object> set = new HashSet<>();
+               set.add(startSnString);
+               set.add(endSnString);
+               if (set.size()>1){
+                   logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
+                   throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
+               }
+          }
+
+
             if (StringUtils.isBlank(logCom)) {
                 logger.info("请填写物流公司");
                 throw new MessageException("请填写物流公司");
@@ -244,16 +258,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 logger.info("发货数量不能大于排单数量");
                 throw new MessageException("发货数量不能大于排单数量");
             }
-            //需要验证截取sn前面的字符是否一致
-            String startSnString = beginSn.substring(0,Integer.parseInt(beginSnCount)-1);
-            String endSnString = endSn.substring(0,Integer.parseInt(beginSnCount)-1);
-            HashSet<Object> set = new HashSet<>();
-            set.add(startSnString);
-            set.add(endSnString);
-            if (set.size()>1){
-                logger.info("请检查开始SN码与结束SN码截取之前的是否一致");
-                throw new MessageException("请检查开始SN码与结束SN码截取之前的是否一致");
-            }
+
             OSubOrderExample example = new OSubOrderExample();
             example.or().andStatusEqualTo(Status.STATUS_1.status).andProIdEqualTo(proId).andOrderIdEqualTo(orderId);
             List<OSubOrder>  subOrders = oSubOrderMapper.selectByExample(example);
@@ -276,6 +281,10 @@ public class OLogisticServiceImpl implements OLogisticsService {
                 }
             }else{
                 throw new MessageException("排单信息未找到");
+            }
+            if (beginSnCount.equals("") || endSnCount.equals("")){
+                beginSnCount="0";
+                endSnCount="0";
             }
 
             //IDlist检查
@@ -753,14 +762,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             logger.info("结束SN序列号为空{}:", endSn);
             throw new ProcessException("结束SN序列号为空");
         }
-        if (null == begins) {
-            logger.info("开始截取的位数为空{}:", begins);
-            throw new ProcessException("开始截取的位数为空");
-        }
-        if (null == finish) {
-            logger.info("结束截取的位数为空{}:", finish);
-            throw new ProcessException("结束截取的位数为空");
-        }
+
         if (StringUtils.isBlank(logisticsId)){
             logger.info("物流id为空{}:", logisticsId);
             throw new ProcessException("物流id为空");
@@ -773,6 +775,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
             throw new ProcessException("无此物流信息");
         }
         OLogistics ol = oLogistics.get(0);
+        if (!ol.getProCom().equals(CardImportType.LD.msg)) {
+            if (null == begins) {
+                logger.info("开始截取的位数为空{}:", begins);
+                throw new ProcessException("开始截取的位数为空");
+            }
+            if (null == finish) {
+                logger.info("结束截取的位数为空{}:", finish);
+                throw new ProcessException("结束截取的位数为空");
+            }
+        }
         List<String> idList = idList(startSn, endSn, begins, finish,ol.getProCom());
 
         if (null != idList && idList.size() > 0) {
