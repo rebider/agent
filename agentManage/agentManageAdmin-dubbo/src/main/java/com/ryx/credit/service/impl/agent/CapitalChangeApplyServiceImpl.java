@@ -303,11 +303,6 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     if (!cashAgentResult.isOK()) {
                         throw new ProcessException("更新收款信息失败！");
                     }
-                    capitalChangeApply.setuTime(new Date());
-                    int i = capitalChangeApplyMapper.updateByPrimaryKey(capitalChangeApply);
-                    if (i != 1) {
-                        throw new ProcessException("更新财务部处理失败！");
-                    }
                 }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
