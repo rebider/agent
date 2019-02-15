@@ -112,4 +112,9 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
 
         return pageInfo;
     }
+
+    @Override
+    public List<Map<String, Object>> queryHuddleMyTask(Map<String, Object> params) {
+        return actRuTaskMapper.queryHuddleMyTask(params);
+    }
 }
