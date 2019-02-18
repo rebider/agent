@@ -556,6 +556,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //更新物流明细表SN状态
             try {
+                // fixme 检查sn状态是否有效 添加redissn锁
                 oLogisticsService.updateSnStatus(orderId, startSn, endSn, OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code, returnId);
             } catch (Exception e) {
                 log.error("更新SN状态失败", e);
