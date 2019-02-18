@@ -13,7 +13,6 @@ import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
-import org.activiti.engine.runtime.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -96,8 +94,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Autowired
     private IProfitDirectService profitDirectService;
 
-    @Autowired
-    private BusiPlatService busiPlatService;
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 
@@ -1168,13 +1164,14 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @param  agentId 代理商唯一码
      */
     @Override
-    public Map<String,String> doFrozenByAgent(String agentId) {
+    public Map<String,String> doFrozenByAgent(List<String> list) {
+
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("agencyBlack_type", "1");
         map.put("type", "1");
         map.put("unfreeze", "0");
         map.put("flag", "4");
-        map.put("batchIds",agentId);
+        map.put("batchIds",list.toString());
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.refuse"), params);
@@ -1183,6 +1180,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         map1.put(JSONObject.parseObject(res).get("respCode").toString(),
                 JSONObject.parseObject(res).get("respMsg").toString());
         return map1;
+
     }
 
     /**
@@ -1190,17 +1188,16 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
      * @param  agentId 代理商唯一码
      */
     @Override
-    public Map<String,String> doUnFrozenAgentProfit(String agentId) {
+    public Map<String,String> doUnFrozenAgentProfit(List<String> list) {
         HashMap<String,String> map = new HashMap<String,String>();
         map.put("agencyBlack_type","0");
         map.put("type","1");
         map.put("unfreeze","0");
         map.put("flag","0");
-        map.put("batchIds",agentId);//AG码list
+        map.put("batchIds",list.toString());//AG码list
         String params = JsonUtil.objectToJson(map);
         String res = HttpClientUtil.doPostJson
                 (AppConfig.getProperty("busiPlat.refuse"),params);
-
         Map<String,String> map1 = new HashMap<String,String>();
         map1.put(JSONObject.parseObject(res).get("respCode").toString(),
                 JSONObject.parseObject(res).get("respMsg").toString());
