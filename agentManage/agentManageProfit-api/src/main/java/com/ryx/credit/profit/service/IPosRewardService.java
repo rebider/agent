@@ -109,6 +109,7 @@ public interface IPosRewardService {
 
     List<PosHuddleRewardDetail> selectByHuddleCode(String huddleCode);
 
+    Boolean isRepetition(PosReward posReward);
 
 
     public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page);
