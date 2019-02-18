@@ -124,8 +124,11 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             return null;
         }
         //查询关联附件
-        List<Attachment> attachments = attachmentMapper.accessoryQuery(capitalChangeApply.getId(), AttachmentRelType.agentQuit.name());
+        List<Attachment> attachments = attachmentMapper.accessoryQuery(capitalChangeApply.getId(), AttachmentRelType.capitalManage.name());
         capitalChangeApply.setAttachments(attachments);
+        //查询关联附件
+        List<Attachment> financeAttachments = attachmentMapper.accessoryQuery(capitalChangeApply.getId(), AttachmentRelType.capitalFinance.name());
+        capitalChangeApply.setFinanceAttachments(financeAttachments);
         return capitalChangeApply;
     }
 
@@ -181,7 +184,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     record.setcUser(cUser);
                     record.setcTime(Calendar.getInstance().getTime());
                     record.setStatus(Status.STATUS_1.status);
-                    record.setBusType(AttachmentRelType.agentQuit.name());
+                    record.setBusType(AttachmentRelType.capitalManage.name());
                     record.setId(idService.genId(TabId.a_attachment_rel));
                     int f = attachmentRelMapper.insertSelective(record);
                     if (1 != f) {
