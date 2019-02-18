@@ -1,5 +1,6 @@
 package com.ryx.credit.service.agent;
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.Capital;
 
@@ -16,4 +17,6 @@ public interface CapitalService {
     List<Capital> queryCapital(String agentId);
 
     PageInfo getCapitalSummaryList(Map<String,Object> param, PageInfo pageInfo);
+
+    PageInfo queryCapitalList(Capital capital, Page page, String dataRole, Long userId);
 }
