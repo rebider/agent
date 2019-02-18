@@ -452,16 +452,20 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 for (OPaymentDetail oPaymentDetail : oPaymentDetails) {
                     if(oPaymentDetail.getRealPayAmount().compareTo(BigDecimal.ZERO)==0){
                         oPaymentDetail.setStatus(Status.STATUS_0.status);
+                        int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
+                        if(i!=1){
+                            throw new MessageException("拒绝更新付款明细失败！");
+                        }
                     }else {
                         oPaymentDetail.setRealPayAmount(BigDecimal.ZERO);
                         oPaymentDetail.setPayTime(null);
                         oPaymentDetail.setSrcId("");
                         oPaymentDetail.setSrcType("");
                         oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
-                    }
-                    int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
-                    if(i!=1){
-                        throw new MessageException("拒绝更新付款明细失败！");
+                        int i = oPaymentDetailMapper.updateCapitalById(oPaymentDetail);
+                        if(i!=1){
+                            throw new MessageException("拒绝更新付款明细失败！");
+                        }
                     }
                 }
             }

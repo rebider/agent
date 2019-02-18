@@ -553,4 +553,13 @@
         ORDER BY a.plan_pay_time asc
     </select>
 
+    <update id="updateCapitalById" parameterType="com.ryx.credit.pojo.admin.order.OPaymentDetail">
+        update O_PAYMENT_DETAIL
+        set REAL_PAY_AMOUNT = #{realPayAmount,jdbcType=DECIMAL},
+        PAY_TIME = #{payTime,jdbcType=TIMESTAMP},
+        SRC_ID = #{srcId,jdbcType=VARCHAR},
+        SRC_TYPE = #{srcType,jdbcType=VARCHAR},
+        PAYMENT_STATUS = #{paymentStatus,jdbcType=DECIMAL}
+        where ID = #{id,jdbcType=VARCHAR}
+    </update>
 </mapper>
