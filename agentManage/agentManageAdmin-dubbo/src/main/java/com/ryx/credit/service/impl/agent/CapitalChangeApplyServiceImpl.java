@@ -144,7 +144,10 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 capitalChangeApply.setRealOperationAmt(capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()));
             }else if(capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0){
                 //处理金额 + 手续费-机具抵扣金额 = 最终打款金额
-                BigDecimal subtract = capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()).subtract(capitalChangeApply.getMachinesDeptAmt());
+                BigDecimal subtract = capitalChangeApply.getOperationAmt().subtract(capitalChangeApply.getServiceCharge()).subtract(capitalChangeApply.getMachinesDeptAmt());
+                if(subtract.signum()==-1){
+                    throw new MessageException("实际打款金额必须大于0");
+                }
                 capitalChangeApply.setRealOperationAmt(subtract);
             }else{
                 throw new MessageException("处理类型错误！");
