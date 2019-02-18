@@ -556,6 +556,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //更新物流明细表SN状态
             try {
+                // fixme 检查sn状态是否有效 添加redissn锁
                 oLogisticsService.updateSnStatus(orderId, startSn, endSn, OLogisticsDetailStatus.STATUS_TH.code, OLogisticsDetailStatus.RECORD_STATUS_LOC.code, returnId);
             } catch (Exception e) {
                 log.error("更新SN状态失败", e);
@@ -1248,15 +1249,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 log.info("请填写结束SN序列号");
                 throw new MessageException("请填写结束SN序列号");
             }
+        if (!proCom.equals(CardImportType.LD.msg)) {
             if (com.ryx.credit.commons.utils.StringUtils.isBlank(beginSnCount)) {
-                log.info("请填写起始SN位数");
                 throw new MessageException("请填写起始SN位数");
             }
             if (com.ryx.credit.commons.utils.StringUtils.isBlank(endSnCount)) {
-                log.info("请填写结束SN位数");
                 throw new MessageException("请填写结束SN位数");
             }
-            if (com.ryx.credit.commons.utils.StringUtils.isBlank(logCom)) {
+        }
+
+        if (com.ryx.credit.commons.utils.StringUtils.isBlank(logCom)) {
                 log.info("请填写物流公司");
                 throw new MessageException("请填写物流公司");
             }
@@ -1281,7 +1283,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }else{
                 throw new MessageException("排单信息未找到");
             }
-
+          if (beginSnCount.equals("") || endSnCount.equals("")){
+            beginSnCount="0";
+            endSnCount="0";
+          }
             //IDlist检查
             List<String> stringList = new OLogisticServiceImpl().idList(beginSn, endSn,Integer.parseInt(beginSnCount),Integer.parseInt(endSnCount),proCom);
             if (Integer.valueOf(sendProNum) != stringList.size()) {
@@ -1652,14 +1657,6 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             log.info("结束SN序列号为空{}:", endSn);
             throw new ProcessException("结束SN序列号为空");
         }
-        if (null == begins) {
-            log.info("开始截取的位数为空{}:", begins);
-            throw new ProcessException("开始截取的位数为空");
-        }
-        if (null == finish) {
-            log.info("结束截取的位数为空{}:", finish);
-            throw new ProcessException("结束截取的位数为空");
-        }
         if (com.ryx.credit.commons.utils.StringUtils.isBlank(logisticsId)){
             log.info("物流id为空{}:", logisticsId);
             throw new ProcessException("物流id为空");
@@ -1672,6 +1669,16 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw new ProcessException("无此物流信息");
         }
         OLogistics ol = oLogistics.get(0);
+        if (!ol.getProCom().equals(CardImportType.LD.msg)) {
+            if (null == begins) {
+                throw new ProcessException("开始截取的位数为空");
+            }
+            if (null == finish) {
+                throw new ProcessException("结束截取的位数为空");
+            }
+        }
+
+
         List<String> idList = new OLogisticServiceImpl().idList(startSn, endSn, begins, finish,ol.getProCom());
         List<OLogisticsDetail> detailList = new ArrayList<>();
         if (null != idList && idList.size() > 0) {

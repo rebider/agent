@@ -157,6 +157,9 @@ public class OSupplementServiceImpl implements OSupplementService {
             logger.info("补款添加:{}", "请上传打款截图");
             throw new MessageException("请上传打款截图");
         }
+        if(osupplementVo.getoCashReceivablesVos()==null || osupplementVo.getoCashReceivablesVos().size()==0){
+            throw new MessageException("必须上传打款记录");
+        }
         //去查询是否已经在审批
         String srcId = oSupplement.getSrcId();
         String pkType = oSupplement.getPkType();
@@ -359,15 +362,13 @@ public class OSupplementServiceImpl implements OSupplementService {
     @Override
     public ResultVO updateByActivId(String id, String activityName) throws MessageException {
         BusActRel busActRel = selectByActivId(id);
-        OSupplement oSupplement = new OSupplement();
+        OSupplement oSupplement = oSupplementMapper.selectByPrimaryKey(busActRel.getBusId());
         String srcId = "";
-        if (StringUtils.isNotBlank(busActRel.getBusId())) {
-            srcId = busActRel.getBusId();
+        if (oSupplement==null) {
+            throw new MessageException("补款记录未找到");
         }
-        busActRel.setActivId(id);
-        busActRel.setBusId(srcId);
-        oSupplement.setId(srcId);
         if ("reject_end".equals(activityName)) {//审批拒绝
+            logger.info("补款审批拒绝{}{}:", busActRel.getActivId(),oSupplement.getId());
             busActRel.setActivStatus(AgStatus.Refuse.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}:", busActRel.getActivId());
@@ -393,8 +394,12 @@ public class OSupplementServiceImpl implements OSupplementService {
                     logger.info("订单付款状态修改失败{}:", busActRel.getActivId());
                     throw new MessageException("订单付款状态修改失败");
                 }
+                logger.info("补款审批拒绝更新记录为待付款状态成功{}{}:", busActRel.getActivId(),oSupplement.getId());
+            }else{
+                logger.info("补款审批拒绝pktype不匹配{}{}:", busActRel.getActivId(),oSupplement.getId());
             }
         } else if ("finish_end".equals(activityName)) {//审批同意
+            logger.info("补款审批同意{}{}:", busActRel.getActivId(),oSupplement.getId());
             busActRel.setActivStatus(AgStatus.Approved.name());
             if (1 != busActRelMapper.updateByPrimaryKeySelective(busActRel)) {
                 logger.info("业务流程状态修改失败{}", busActRel.getActivId());

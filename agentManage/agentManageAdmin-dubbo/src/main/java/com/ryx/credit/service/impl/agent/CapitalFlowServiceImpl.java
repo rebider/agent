@@ -51,14 +51,14 @@ public class CapitalFlowServiceImpl implements CapitalFlowService {
         if (StringUtils.isNotBlank(capitalFlow.getAgentName())) {
             reqMap.put("agentName", capitalFlow.getAgentName());
         }
-//        if(StringUtils.isBlank(dataRole)){
-//            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-//            if(orgCodeRes == null && orgCodeRes.size() != 1){
-//                return null;
-//            }
-//            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-//            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
-//        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes == null && orgCodeRes.size() != 1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String, Object>> capitalChangeList = capitalFlowMapper.queryCapitalFlowList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(capitalChangeList);

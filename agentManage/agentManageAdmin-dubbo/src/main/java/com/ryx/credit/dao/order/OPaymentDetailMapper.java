@@ -58,4 +58,7 @@ public interface OPaymentDetailMapper {
      */
     List<Map<String, Object>> getOrderDebt(@Param("map") Map<String, Object> map);
 
+
+    int updateCapitalById(OPaymentDetail record);
+
 }

@@ -19,7 +19,13 @@ public enum AgImportType {
 
     DATACHANGEAPP("DATACHANGEAPP","数据修改审批"),
     NETINAPP("NETINAPP","入网业务审批"),
-    BUSAPP("BUSAPP","业务审批");
+    BUSAPP("BUSAPP","业务审批"),
+
+    OBASE("OBASE","订单基础信息"),
+    OGOODS("OGOODS","订单商品信息"),
+    OLOGISTICS("OLOGISTICS","订单物流信息"),
+    ORETURN("ORETURN","订单退货信息"),
+    ORLOGI("ORLOGI","订单退货物流信息");
 
 
 //    NetInAdd("netInAdd","新增入网"),

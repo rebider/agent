@@ -126,7 +126,7 @@ public class Conver10ToConver33Utils {
       /*  String param1="1922AA8M9998";
         String sn1= param1.substring(0,param1.length() - 5);
         System.out.println(sn1);*/
-        List<String> betweenValues = getBetweenValues("1922AA8B9998", "1922AA8C1000");
+        List<String> betweenValues = getBetweenValues("0000024025311910023776060", "0000024025311910023776159");
         System.out.println(betweenValues);
 
     }

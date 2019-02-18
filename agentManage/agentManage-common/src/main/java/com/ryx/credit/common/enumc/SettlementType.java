@@ -20,4 +20,14 @@ public enum SettlementType {
         this.msg =m;
     }
 
+    public static SettlementType getByType(String msg){
+        SettlementType[] vs = SettlementType.values();
+        for (SettlementType v : vs) {
+            if(v.msg.equals(msg)){
+                return v;
+            }
+        }
+        return null;
+    }
+
 }

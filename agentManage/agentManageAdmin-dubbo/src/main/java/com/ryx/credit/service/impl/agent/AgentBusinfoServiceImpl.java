@@ -77,7 +77,7 @@ public class AgentBusinfoServiceImpl implements AgentBusinfoService {
         			StringUtils.isEmpty(agentBusInfo.getAgentId()) ||
         			StringUtils.isEmpty(agentBusInfo.getBusType())
 				){
-                throw new ProcessException("业务数据不完整");
+                throw new ProcessException(agentBusInfo.getAgentId()+"业务数据不完整");
         	}
         	agentBusInfo.setId(idService.genId(TabId.a_agent_businfo));
         	agentBusInfo.setcTime(new Date());

@@ -38,6 +38,102 @@ public class RedisService {
         return redisTemplate.hasKey(key);
     }
 
+
+    public long lpushList(final String key,final String value){
+        try {
+            return redisTemplate.execute(new RedisCallback<Long>() {
+                @Override
+                public Long doInRedis(RedisConnection connection) throws DataAccessException {
+                    return connection.lPush(redisTemplate.getStringSerializer().serialize(key),redisTemplate.getStringSerializer().serialize(value));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("lpushList error",e);
+        }
+        return -1;
+    }
+
+    public String lpopList(String key){
+        try {
+            return redisTemplate.execute(new RedisCallback<String>() {
+                @Override
+                public String doInRedis(RedisConnection connection) throws DataAccessException {
+                    byte[] value = connection.lPop(redisTemplate.getStringSerializer().serialize(key));
+                    if(value!=null && value.length>0)
+                    return redisTemplate.getStringSerializer().deserialize(value);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("lpopList error",e);
+        }
+        return null;
+    }
+
+    public long rpushList(final String key,final String value){
+        try {
+            return  redisTemplate.execute(new RedisCallback<Long>() {
+                @Override
+                public Long doInRedis(RedisConnection connection) throws DataAccessException {
+                    return connection.rPush(redisTemplate.getStringSerializer().serialize(key),redisTemplate.getStringSerializer().serialize(value));
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("rpushList error",e);
+        }
+        return -1;
+    }
+
+
+
+
+    public String rpopList(String key){
+        try {
+            return  redisTemplate.execute(new RedisCallback<String>() {
+                @Override
+                public String doInRedis(RedisConnection connection) throws DataAccessException {
+                    byte[] value = connection.rPop(redisTemplate.getStringSerializer().serialize(key));
+                    if(value!=null && value.length>0)
+                        return redisTemplate.getStringSerializer().deserialize(value);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("rpopList error",e);
+
+        }
+        return null;
+    }
+
+
+    public List<String> lrange(String key,long start,long end){
+        try {
+            return redisTemplate.execute(new RedisCallback<List<String>>() {
+                @Override
+                public List<String> doInRedis(RedisConnection connection) throws DataAccessException {
+                   List<String> res = new ArrayList<>();
+                   List<byte[]> data =   connection.lRange(redisTemplate.getStringSerializer().serialize(key),start,end);
+                   if(data!=null && data.size()>0){
+                       for (byte[] datum : data) {
+                           if(datum!=null&&datum.length>0) {
+                               res.add(redisTemplate.getStringSerializer().deserialize(datum));
+                           }
+                       }
+                   }
+                   return res;
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("rpopList error",e);
+        }
+        return null;
+    }
+
     /**
 	 * 放置key value 失效时间
 	 * @param key

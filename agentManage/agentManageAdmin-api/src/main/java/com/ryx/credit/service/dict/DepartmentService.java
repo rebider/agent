@@ -17,4 +17,20 @@ public interface DepartmentService {
     public COrganization getById(String id);
 
     public COrganization getByName(String id);
+
+
+    /**
+     * 根据用户名获取所属部门
+     * @param userName
+     * @return
+     */
+    public COrganization getByUserName(String userName);
+
+    /**
+     * 根据用户名获取对应部门的上级部门
+     * @param userName
+     * @return
+     */
+    public COrganization getByUserNameParent(String userName);
+
 }
