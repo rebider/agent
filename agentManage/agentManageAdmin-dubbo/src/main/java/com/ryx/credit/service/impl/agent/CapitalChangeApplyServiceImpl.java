@@ -493,9 +493,17 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         if (capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue()) == 0) {
             disposeCapital(capitals,capitalChangeApply,capitalChangeApply.getRealOperationAmt());
         } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
+            //查询所有机具欠款
+            BigDecimal sumDebt = paymentDetailService.getSumDebt(capitalChangeApply.getAgentId());
             //只要机具欠款大于0就抵扣
+            disposeCapital(capitals,capitalChangeApply,capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()));
+            if(capitalChangeApply.getMachinesDeptAmt().signum()==-1){
+                throw new MessageException("抵扣金额必须是正数！");
+            }
             if(capitalChangeApply.getMachinesDeptAmt().compareTo(BigDecimal.ZERO)==1){
-                disposeCapital(capitals,capitalChangeApply,capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()));
+                if(capitalChangeApply.getMachinesDeptAmt().compareTo(sumDebt)==1){
+                    throw new MessageException("抵扣金额不能大于欠款！");
+                }
                 HashMap<String, Object> reqMap = new HashMap<>();
                 reqMap.put("agentId", capitalChangeApply.getAgentId());
                 List<Map<String, Object>> debtList = oPaymentDetailMapper.getOrderDebt(reqMap);
@@ -549,8 +557,6 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     }
                 }
             }else{
-                //查询所有机具欠款
-                BigDecimal sumDebt = paymentDetailService.getSumDebt(capitalChangeApply.getAgentId());
                 //如果机具欠款大于0必须抵扣
                 if(sumDebt.compareTo(BigDecimal.ZERO)==1){
                     throw new MessageException("机具欠款大于0必须填写抵扣金额！");
