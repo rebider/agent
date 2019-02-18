@@ -233,7 +233,10 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 throw new MessageException("处理金额不能大于剩余金额！");
             }
         }else if(capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue())==0){
-
+            BigDecimal amt = capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge());
+            if(amt.compareTo(capitalChangeApply.getCapitalAmt())==1){
+                throw new MessageException("处理金额不能大于剩余金额！");
+            }
         }else{
             throw new MessageException("处理类型错误！");
         }
@@ -503,6 +506,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                         oPaymentDetail.setPayTime(new Date());
                         oPaymentDetail.setSrcId(capitalChangeApply.getId());
                         oPaymentDetail.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                        oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
                         int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
                         if(i!=1){
                             throw new MessageException("更新付款明细！");
