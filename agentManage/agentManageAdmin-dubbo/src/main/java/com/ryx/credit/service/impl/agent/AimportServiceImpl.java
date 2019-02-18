@@ -1159,13 +1159,20 @@ public class AimportServiceImpl implements AimportService {
                 //收款账户 卡号
                 if (bus_json_array.size()>24 && StringUtils.isNotBlank(bus_json_array.getString(24)))
                     colinfo.setCloBankAccount(bus_json_array.getString(24));
-                //收款账户 开户行
-                if (bus_json_array.size()>25 && StringUtils.isNotBlank(bus_json_array.getString(25)))
-                    colinfo.setCloBank(bus_json_array.getString(25));
                 //收款账户 开户支行
+                if (bus_json_array.size()>25 && StringUtils.isNotBlank(bus_json_array.getString(25)))
+                    colinfo.setCloBankBranch(bus_json_array.getString(25));
+                //收款账户 开户支行联号
                 if (bus_json_array.size()>26 && StringUtils.isNotBlank(bus_json_array.getString(26)))
-                    colinfo.setCloBankBranch(bus_json_array.getString(26));
-
+                    colinfo.setBranchLineNum(bus_json_array.getString(26));
+                //是否开具分润发票
+                if(StringUtils.isNotBlank(bus_json_array.getString(19))) {
+                    colinfo.setCloInvoice(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(19))));
+                }
+                //税点
+                if(StringUtils.isNotBlank(bus_json_array.getString(18))) {
+                    colinfo.setCloTaxPoint(bus_json_array.getBigDecimal(18));
+                }
                 colinfo.setAgentId(ab.getAgentId());
                 colinfo.setRemark("老数据导入");
                 colinfo.setStatus(Status.STATUS_1.status);
