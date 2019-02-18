@@ -233,7 +233,10 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 throw new MessageException("处理金额不能大于剩余金额！");
             }
         }else if(capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue())==0){
-
+            BigDecimal amt = capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge());
+            if(amt.compareTo(capitalChangeApply.getCapitalAmt())==1){
+                throw new MessageException("处理金额不能大于剩余金额！");
+            }
         }else{
             throw new MessageException("处理类型错误！");
         }
@@ -303,6 +306,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         return AgentResult.ok();
     }
 
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult approvalCapitalChangeTask(AgentVo agentVo, String userId, String busId) throws Exception {
         try {
@@ -340,6 +345,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         return AgentResult.ok();
     }
 
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult compressCapitalChangeActivity(String proIns, BigDecimal agStatus) throws Exception {
         BusActRelExample example = new BusActRelExample();
@@ -408,15 +415,16 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                         oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
                         oPaymentDetail.setSrcId("");
                         oPaymentDetail.setSrcType("");
-                    }
-                    //如果不相等更新成部分付款
-                    if(oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
-                        oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
                     }else{
-                        oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+                        //如果不相等更新成部分付款
+                        if(oPaymentDetail.getRealPayAmount().compareTo(oPaymentDetail.getPayAmount())==0){
+                            oPaymentDetail.setPaymentStatus(PaymentStatus.JQ.code);
+                        }else{
+                            oPaymentDetail.setPaymentStatus(PaymentStatus.BF.code);
+                        }
                     }
                     int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
-                    if(i!=0){
+                    if(i!=1){
                         throw new MessageException("通过更新付款明细失败！");
                     }
                 }
@@ -444,16 +452,20 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 for (OPaymentDetail oPaymentDetail : oPaymentDetails) {
                     if(oPaymentDetail.getRealPayAmount().compareTo(BigDecimal.ZERO)==0){
                         oPaymentDetail.setStatus(Status.STATUS_0.status);
+                        int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
+                        if(i!=1){
+                            throw new MessageException("拒绝更新付款明细失败！");
+                        }
                     }else {
                         oPaymentDetail.setRealPayAmount(BigDecimal.ZERO);
                         oPaymentDetail.setPayTime(null);
                         oPaymentDetail.setSrcId("");
                         oPaymentDetail.setSrcType("");
                         oPaymentDetail.setPaymentStatus(PaymentStatus.DF.code);
-                    }
-                    int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
-                    if(i!=0){
-                        throw new MessageException("拒绝更新付款明细失败！");
+                        int i = oPaymentDetailMapper.updateCapitalById(oPaymentDetail);
+                        if(i!=1){
+                            throw new MessageException("拒绝更新付款明细失败！");
+                        }
                     }
                 }
             }
@@ -498,6 +510,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                         oPaymentDetail.setPayTime(new Date());
                         oPaymentDetail.setSrcId(capitalChangeApply.getId());
                         oPaymentDetail.setSrcType(PamentSrcType.CAPITAL_DIKOU.code);
+                        oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
                         int i = oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
                         if(i!=1){
                             throw new MessageException("更新付款明细！");
