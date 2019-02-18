@@ -550,7 +550,7 @@
         <if test="map.time != null and map.time != '' ">
             and to_char(detail.PLAN_PAY_TIME,'YYYY-MM')&lt;= #{map.time}
         </if>)a
-        ORDER BY a.C_DATE DESC
+        ORDER BY a.plan_pay_time asc
     </select>
 
 </mapper>
