@@ -14,11 +14,13 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.PCityApplicationDetailMapper;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
+import com.ryx.credit.profit.dao.ProfitSupplyMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
 import com.ryx.credit.profit.pojo.PCityApplicationDetail;
 import com.ryx.credit.profit.pojo.PCityApplicationDetailExample;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitSupply;
 import com.ryx.credit.profit.service.IProfitCityApplicationService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -58,6 +60,8 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
     private RedisService redisService;
     @Autowired
     private ProfitDeductionMapper profitDeductionMapper;
+    @Autowired
+    private ProfitSupplyMapper pProfitSupplyMapper;
 
     /**
      * 获得其他扣款申请数据
@@ -214,12 +218,9 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
                 pCityApplicationDetailMapper.updateByPrimaryKeySelective(pCityApplicationDetail);
                 //审批通过 ：其他扣款  存入其他扣款表
                 if("1".equals(pCityApplicationDetail.getApplicationType()) && "1".equals(status)){
-
                     this.insertOtherDeduction(pCityApplicationDetail);
-
                 }else if("2".equals(pCityApplicationDetail.getApplicationType()) && "1".equals(status)){
-                    // todo  其他补款，存入其他补款表中
-
+                    this.insertOtherSupply(pCityApplicationDetail);
                 }
 
                 logger.info("2更新审批流与业务对象");
@@ -240,7 +241,88 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
     @Override
     public void editCheckRegect(PCityApplicationDetail pCityApplicationDetail) throws Exception {
         logger.info("审批拒绝，修改信息");
-        pCityApplicationDetailMapper.updateByPrimaryKey(pCityApplicationDetail);
+        pCityApplicationDetailMapper.updateByPrimaryKeySelective(pCityApplicationDetail);
+    }
+
+
+    /**
+     * 省区其他补款申请
+     * @throws Exception
+     */
+    @Override
+    public void applyOtherSupply(PCityApplicationDetail pCityApplicationDetail, String userId, String workId, String cUser) throws Exception {
+        if(StringUtils.isNotBlank(pCityApplicationDetail.getId())){
+            //修改信息
+            pCityApplicationDetail.setApplicationType("2");
+            pCityApplicationDetailMapper.updateByPrimaryKey(pCityApplicationDetail);
+        }else{
+            //将数据插入到记录表中
+            pCityApplicationDetail.setId(idService.genId(TabId.P_CITYAPPLICATION_DETAIL));
+            pCityApplicationDetail.setApplicationType("2"); //代表其他补款申请
+            pCityApplicationDetailMapper.insert(pCityApplicationDetail);
+        }
+        logger.info("序列ID......"+idService.genId(TabId.P_CITYAPPLICATION_DETAIL));
+
+        Map startPar = agentEnterService.startPar(cUser);
+        if (null == startPar) {
+            logger.info("========用户{}{}启动部门参数为空",  cUser);
+            throw new MessageException("启动部门参数为空!");
+        }
+
+        //启动审批流
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        if (proceId == null) {
+            //启动失败，要删除对应数据
+            PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
+            pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
+            pCityApplicationDetailMapper.deleteByExample(pExample);
+            logger.error("其他补款申请审批流启动失败，代理商ID：{}", pCityApplicationDetail.getAgentId());
+            throw new ProcessException("其他补款申请审批流启动失败!");
+        }
+        //启动审批流成功
+        BusActRel record = new BusActRel();
+        record.setBusId(pCityApplicationDetail.getId());
+        record.setActivId(proceId);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(userId);
+        record.setAgentId(pCityApplicationDetail.getAgentId());
+        record.setAgentName(pCityApplicationDetail.getAgentName());
+        record.setBusType(BusActRelBusType.CityApplySupply.name());
+        try{
+            taskApprovalService.addABusActRel(record);
+            logger.info("其他补款申请审批流启动成功");
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.info("其他补款申请审批流启动失败");
+            throw new ProcessException("其他补款申请审批流启动失败!:{}",e.getMessage());
+        }
+
+        pCityApplicationDetail.setApplicationStatus(Status.STATUS_0.status.toString()); //申请中
+        pCityApplicationDetailMapper.updateByPrimaryKeySelective(pCityApplicationDetail);
+    }
+
+    @Override
+    public PageInfo getSupplyAppList(Page page, String userId, PCityApplicationDetail pCityApplicationDetail) {
+        PCityApplicationDetailExample example = new PCityApplicationDetailExample();
+        example.setPage(page);
+        PCityApplicationDetailExample.Criteria criteria = example.createCriteria();
+        criteria.andApplicationTypeEqualTo("2");
+        if(StringUtils.isNotBlank(pCityApplicationDetail.getAgentId())){
+            criteria.andAgentIdEqualTo(pCityApplicationDetail.getAgentId());
+        }
+        if(StringUtils.isNotBlank(pCityApplicationDetail.getAgentName())){
+            criteria.andAgentNameEqualTo(pCityApplicationDetail.getAgentName());
+        }
+        if(StringUtils.isNotBlank(userId)){
+            criteria.andCreateNameEqualTo(userId);
+        }
+        example.setOrderByClause("CREATE_DATE desc");
+        List<PCityApplicationDetail> list = pCityApplicationDetailMapper.selectByExample(example);
+        Long count = pCityApplicationDetailMapper.countByExample(example);
+        PageInfo pageInfo = new PageInfo();
+        pageInfo.setRows(list);
+        pageInfo.setTotal(Integer.parseInt(count.toString()));
+        return pageInfo;
     }
 
     /**
@@ -268,6 +350,30 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         //插入数据表中保存
         profitDeductionMapper.insert(profitDeduction);
     }
+
+    /**
+     * 将省区申请通过的其他补款插入补款表中
+     */
+    private void insertOtherSupply(PCityApplicationDetail pCityApplicationDetail){
+        ProfitSupply profitSupply = new ProfitSupply();
+        profitSupply.setId(idService.genId(TabId.p_profit_supply));
+        profitSupply.setAgentId(pCityApplicationDetail.getAgentId());
+        profitSupply.setAgentName(pCityApplicationDetail.getAgentName());
+        profitSupply.setParentAgentId(pCityApplicationDetail.getParentAgentId());
+        profitSupply.setParentAgentName(pCityApplicationDetail.getParentAgentName());
+        profitSupply.setSupplyDate(pCityApplicationDetail.getApplicationMonth());
+        profitSupply.setSupplyType(pCityApplicationDetail.getDeductionRemark());
+        profitSupply.setSupplyAmt(pCityApplicationDetail.getApplicationAmt());
+        profitSupply.setRemerk(pCityApplicationDetail.getRemark());
+        profitSupply.setBusType(BusActRelBusType.CityApplySupply.name());
+        profitSupply.setBusBigType("99");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        //profitSupply.setSourceId("线上审批通过："+sdf.format(new Date()));
+        pProfitSupplyMapper.insertSelective(profitSupply);
+
+    }
+
+
 
 
 }

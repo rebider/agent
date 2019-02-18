@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Decribute 省区发起代理商其他补扣款申请 接口
+ * @Decribute 省区发起代理商其他补，扣款申请 接口
  * @Author chenqiutian
  * @Create 2019/1/30
  */
@@ -50,4 +50,13 @@ public interface IProfitCityApplicationService {
      */
     void editCheckRegect(PCityApplicationDetail pCityApplicationDetail)throws Exception;
 
+    /**
+     * 省区其他补款申请：进行审批流
+     */
+    void applyOtherSupply(PCityApplicationDetail pCityApplicationDetail,String userId, String workId,String cUser)throws Exception ;
+
+    /**
+     * 获取其他补款申请数据
+     */
+    PageInfo getSupplyAppList(Page page, String userId, PCityApplicationDetail pCityApplicationDetail);
 }
