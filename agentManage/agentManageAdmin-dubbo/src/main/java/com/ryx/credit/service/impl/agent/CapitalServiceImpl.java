@@ -9,6 +9,7 @@ import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.agent.CapitalExample;
 import com.ryx.credit.pojo.admin.agent.Dict;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ public class CapitalServiceImpl implements CapitalService {
     private CapitalMapper capitalMapper;
     @Autowired
     private DictOptionsService dictOptionsService;
+    @Autowired
+    private IUserService iUserService;
 
     @Override
     public List<Capital> queryCapital(String agentId) {
@@ -81,14 +84,14 @@ public class CapitalServiceImpl implements CapitalService {
         if (StringUtils.isNotBlank(capital.getcAgentId())) {
             reqMap.put("agentId", capital.getcAgentId());
         }
-//        if(StringUtils.isBlank(dataRole)){
-//            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-//            if(orgCodeRes == null && orgCodeRes.size() != 1){
-//                return null;
-//            }
-//            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-//            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
-//        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes == null && orgCodeRes.size() != 1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String, Object>> capitalChangeList = capitalMapper.queryCapitalList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(capitalChangeList);
