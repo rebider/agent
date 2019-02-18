@@ -331,6 +331,24 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     if (!cashAgentResult.isOK()) {
                         throw new ProcessException("更新收款信息失败！");
                     }
+                    //添加新的附件
+                    if (agentVo.getCapitalChangeFinaFiles() != null && agentVo.getCapitalChangeFinaFiles().size()!=0) {
+                        for (String capitalFile : agentVo.getCapitalChangeFinaFiles()) {
+                            AttachmentRel record = new AttachmentRel();
+                            record.setAttId(capitalFile);
+                            record.setSrcId(busId);
+                            record.setcUser(userId);
+                            record.setcTime(Calendar.getInstance().getTime());
+                            record.setStatus(Status.STATUS_1.status);
+                            record.setBusType(AttachmentRelType.capitalFinance.name());
+                            record.setId(idService.genId(TabId.a_attachment_rel));
+                            int f = attachmentRelMapper.insertSelective(record);
+                            if (1 != f) {
+                                logger.info("代理商退出保存附件关系失败");
+                                throw new ProcessException("保存附件失败");
+                            }
+                        }
+                    }
                 }
             }
             AgentResult result = agentEnterService.completeTaskEnterActivity(agentVo, userId);
