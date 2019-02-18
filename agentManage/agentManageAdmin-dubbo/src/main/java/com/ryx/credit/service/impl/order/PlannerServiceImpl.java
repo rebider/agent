@@ -147,6 +147,7 @@ public class PlannerServiceImpl implements PlannerService {
                 throw new MessageException("订购商品未找到!");
             }
             OSubOrder  oSubOrderItem = oSubOrders.get(0);
+
             //子订单 根据活动id 找到活动代码，根据活动代码 厂家和型号
             OSubOrderActivityExample oSubOrderActivity = new OSubOrderActivityExample();
             oSubOrderActivity.or().andStatusEqualTo(Status.STATUS_1.status).andSubOrderIdEqualTo(oSubOrderItem.getId());
@@ -154,16 +155,21 @@ public class PlannerServiceImpl implements PlannerService {
             if(oSubOrderActivities.size()==0){
                 throw new MessageException("订购商品活动未找到!");
             }
+            //新订单活动
             OSubOrderActivity OSubOrderActivityItem = oSubOrderActivities.get(0);
-            //查找相关活动
-            OActivity activity =oActivityMapper.selectByPrimaryKey(oSubOrderActivities.get(0).getActivityId());
-            //根据活动代码和厂家和型号更新采购单活动快表信息
-            OActivityExample oActivityQuery = new OActivityExample();
-            oActivityQuery.or().andIdEqualTo(activityId);
-            List<OActivity>  venderModeActivity =  oActivityMapper.selectByExample(oActivityQuery);
-
+            OActivity current_activity = oActivityMapper.selectByPrimaryKey(OSubOrderActivityItem.getActivityId());
+            //排单活动
+            OActivity sure_activity = oActivityMapper.selectByPrimaryKey(activityId);
+            //根据厂商和型号进行活动调整确认
+            OActivityExample new_OActivityExample = new OActivityExample();
+            new_OActivityExample.or()
+                    .andActCodeEqualTo(current_activity.getActCode())
+                    .andStatusEqualTo(Status.STATUS_1.status)
+                    .andVenderEqualTo(sure_activity.getVender())
+                    .andProModelEqualTo(sure_activity.getProModel());
+            List<OActivity> venderModeActivity =oActivityMapper.selectByExample(new_OActivityExample);
             if(venderModeActivity.size()!=1){
-                throw new MessageException(activity.getVender()+"厂商和"+activity.getProModel()+"活动确定不了具体的活动");
+                throw new MessageException(sure_activity.getVender()+"厂商和"+sure_activity.getProModel()+"活动确定不了具体的活动");
             }
             //cxinfo  保存排单 确定具体活动 价格计算采用活动中的价格 xx
             //确定活动
