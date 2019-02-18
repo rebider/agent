@@ -95,7 +95,7 @@ public class AgentVo implements Serializable {
     private AgentQuit agentQuit;
     private BigDecimal realitySuppDept;
     private List<String> quitRefundFile;
-
+    private List<String> capitalChangeFinaFiles;
     private String operationType;
     private BigDecimal amt;
 
@@ -505,5 +505,13 @@ public class AgentVo implements Serializable {
 
     public void setAgentQuit(AgentQuit agentQuit) {
         this.agentQuit = agentQuit;
+    }
+
+    public List<String> getCapitalChangeFinaFiles() {
+        return capitalChangeFinaFiles;
+    }
+
+    public void setCapitalChangeFinaFiles(List<String> capitalChangeFinaFiles) {
+        this.capitalChangeFinaFiles = capitalChangeFinaFiles;
     }
 }

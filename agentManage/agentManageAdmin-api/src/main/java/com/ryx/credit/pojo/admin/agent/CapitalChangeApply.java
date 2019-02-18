@@ -68,6 +68,8 @@ public class CapitalChangeApply implements Serializable {
 
     private List<Attachment> attachments;
 
+    private List<Attachment> financeAttachments;
+
     public List<Attachment> getAttachments() {
         return attachments;
     }
@@ -314,5 +316,13 @@ public class CapitalChangeApply implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public List<Attachment> getFinanceAttachments() {
+        return financeAttachments;
+    }
+
+    public void setFinanceAttachments(List<Attachment> financeAttachments) {
+        this.financeAttachments = financeAttachments;
     }
 }

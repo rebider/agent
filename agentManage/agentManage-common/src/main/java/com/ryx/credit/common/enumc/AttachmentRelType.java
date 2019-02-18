@@ -20,7 +20,9 @@ public enum AttachmentRelType {
     agentMerge("代理商合并"),
     agentQuit("代理商退出申请"),
     agentQuitRefund("代理商退出申请退款"),
-    agentQuitUpload("代理商退出上传解除合同");
+    agentQuitUpload("代理商退出上传解除合同"),
+    capitalFinance("保证金变更申请财务上传附件"),
+    capitalManage("保证金变更申请上传附件");
 
     public String  msg;
 
