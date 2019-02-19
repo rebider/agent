@@ -1134,7 +1134,7 @@ public class AimportServiceImpl implements AimportService {
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
 
             //使用范围
-            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28))) {
+            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28)) && bus_use_organ!=null) {
                 for (Dict dict : bus_use_organ) {
                     if(dict.getdItemname().equals(bus_json_array.getString(28))) {
                         ab.setBusUseOrgan(dict.getdItemvalue());
@@ -1162,8 +1162,6 @@ public class AimportServiceImpl implements AimportService {
                 ab.setBusRegion(sb.toString());
             }
 
-
-
             //打款公司
             if(bus_json_array.size()>21 && StringUtils.isNotBlank(bus_json_array.getString(21)))
             for (PayComp payComp : payCompList) {
@@ -1174,7 +1172,6 @@ public class AimportServiceImpl implements AimportService {
             }
 
             //设置打款账户
-
             if(bus_json_array.size()>22 && StringUtils.isNotBlank(bus_json_array.getString(22))) {
                 AgentColinfo colinfo = new AgentColinfo();
                 //收款账户 对公对私
