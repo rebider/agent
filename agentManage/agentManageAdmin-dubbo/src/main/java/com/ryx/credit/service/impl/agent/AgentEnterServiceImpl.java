@@ -76,6 +76,9 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     private PlatFormMapper platFormMapper;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private CapitalFlowService capitalFlowService;
+
 
     /**
      * 商户入网
@@ -577,6 +580,13 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 logger.info("代理商审批通过，合同状态更新失败{}:{}", processingId, bus.getId());
                 throw new ProcessException("合同状态更新失败");
             }
+            //插入资金流水
+            try {
+                capitalFlowService.insertCapitalFlow(capital,busId,"代理商新增业务");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ProcessException("新增资金流水失败");
+            }
         }
         //入网程序调用
         try {
@@ -729,6 +739,12 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                     e.printStackTrace();
                     throw new ProcessException(e.getMessage());
                 }
+            }
+            try {
+                capitalFlowService.insertCapitalFlow(capital,busId,"代理商入网");
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new ProcessException("新增资金流水失败");
             }
         }
         //入网程序调用

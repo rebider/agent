@@ -1,18 +1,24 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.dao.agent.CapitalFlowMapper;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.agent.CapitalFlow;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.CapitalFlowService;
+import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +35,11 @@ public class CapitalFlowServiceImpl implements CapitalFlowService {
     private CapitalFlowMapper capitalFlowMapper;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private IdService idService;
+    @Autowired
+    private AgentMapper agentMapper;
+
 
     /**
      * 资金流水列表
@@ -64,6 +75,40 @@ public class CapitalFlowServiceImpl implements CapitalFlowService {
         pageInfo.setRows(capitalChangeList);
         pageInfo.setTotal(capitalFlowMapper.queryCapitalFlowCount(reqMap));
         return pageInfo;
+    }
+
+    /**
+     * 插入资金流水记录
+     * @param capital
+     * @param srcId
+     * @param remark
+     * @throws Exception
+     */
+    @Override
+    public void insertCapitalFlow(Capital capital, String srcId, String remark)throws Exception{
+        if(capital.getcType().equals(PayType.YHHK.getValue())){
+            CapitalFlow capitalFlow = new CapitalFlow();
+            capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
+            capitalFlow.setcType(capital.getcType());
+            capitalFlow.setCapitalId(capital.getId());
+            capitalFlow.setSrcType(SrcType.RW.getValue());
+            capitalFlow.setSrcId(srcId);
+            capitalFlow.setBeforeAmount(BigDecimal.ZERO);
+            capitalFlow.setcAmount(capital.getcAmount());
+            capitalFlow.setOperationType(OperateTypes.RZ.getValue());
+            capitalFlow.setAgentId(capital.getcAgentId());
+            Agent agent = agentMapper.selectByPrimaryKey(capital.getcAgentId());
+            capitalFlow.setAgentName(agent.getAgName());
+            capitalFlow.setRemark(remark);
+            capitalFlow.setcTime(new Date());
+            capitalFlow.setuTime(new Date());
+            capitalFlow.setcUser(capital.getcUser());
+            capitalFlow.setuUser(capital.getcUser());
+            capitalFlow.setStatus(Status.STATUS_1.status);
+            capitalFlow.setVersion(BigDecimal.ZERO);
+            capitalFlow.setFlowStatus(Status.STATUS_1.status);
+            capitalFlowMapper.insertSelective(capitalFlow);
+        }
     }
 
 }

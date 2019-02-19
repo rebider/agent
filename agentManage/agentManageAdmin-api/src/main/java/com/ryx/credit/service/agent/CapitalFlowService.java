@@ -2,6 +2,7 @@ package com.ryx.credit.service.agent;
 
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.agent.CapitalFlow;
 
 /**
@@ -11,4 +12,6 @@ import com.ryx.credit.pojo.admin.agent.CapitalFlow;
 public interface CapitalFlowService {
 
     PageInfo queryCapitalFlowList(CapitalFlow capitalFlow, Page page, String dataRole, Long userId);
+
+    void insertCapitalFlow(Capital capital, String srcId, String remark)throws Exception;
 }
