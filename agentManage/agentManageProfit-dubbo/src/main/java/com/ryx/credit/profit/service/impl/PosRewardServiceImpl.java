@@ -213,6 +213,31 @@ public class PosRewardServiceImpl implements IPosRewardService {
         return posHuddleRewardDetailMapper.selectByHuddleCode(huddleCode);
     }
 
+    @Override
+    public Boolean isRepetition(PosReward posReward) {
+        PosRewardExample example = new PosRewardExample();
+        PosRewardExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(posReward.getAgentPid())){
+            criteria.andAgentPidEqualTo(posReward.getAgentPid());
+        }
+        if(StringUtils.isNotBlank(posReward.getAgentId())){
+            criteria.andAgentIdEqualTo(posReward.getAgentId());
+        }
+        if(StringUtils.isNotBlank(posReward.getApplyStatus())){
+            criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
+        }
+        List<PosReward> list=rewardMapper.selectByExample(example);
+        List<String> month=getMonthBetween(posReward.getTotalConsMonth(),posReward.getCreditConsMonth());
+        for (PosReward p :list) {
+            for (String mon:month) {
+                if(mon.compareTo(p.getTotalConsMonth())>=0&&mon.compareTo(p.getCreditConsMonth())<=0){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 
     @Override
     public AgentResult approvalTask(AgentVo agentVo, String userId) throws ProcessException {

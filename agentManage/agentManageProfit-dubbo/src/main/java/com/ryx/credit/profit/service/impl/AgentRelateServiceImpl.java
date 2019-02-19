@@ -1,10 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.ApprovalType;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -210,12 +207,12 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
             if (rel != null) {
                 AgentRelate agentRelate = agentRelateMapper.selectByPrimaryKey(rel.getBusId());
                 if("1".equals(status)){
-                    agentRelate.setStatus(new BigDecimal(1)); // PASS 1:生效
+                    agentRelate.setStatus(Status.STATUS_1.status); // PASS 1:生效
                 }else if ("2".equals(status)){
-                    agentRelate.setStatus(new BigDecimal(2)); // PASS 1:驳回
+                    agentRelate.setStatus(Status.STATUS_2.status); // PASS 1:驳回
                 }
                 agentRelateMapper.updateByPrimaryKeySelective(agentRelate);//将此审批通过的申请更新到数据
-                logger.info("2更新审批流与业务对象");
+                logger.info("更新审批流与业务对象");
                 rel.setActivStatus(AgStatus.Approved.name());
                 taskApprovalService.updateABusActRel(rel);
             }
