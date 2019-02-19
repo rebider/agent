@@ -18,4 +18,11 @@ public interface BusinessCAService {
      * @return
      */
     AgentResult agentBusinessCaToAgentDb(String agentId);
+
+
+    /**
+     * 批量进行工商认证
+     * @return
+     */
+    public AgentResult caAgentList();
 }
