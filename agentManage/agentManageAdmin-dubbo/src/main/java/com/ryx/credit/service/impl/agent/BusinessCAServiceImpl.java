@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -155,6 +156,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		if(agentResult.isOK()){
 			//补全代理商信息
 			JSONObject dataObj = (JSONObject)agentResult.getData();
+
 			if(StringUtils.isNotBlank(dataObj.getString("regCap")))
 			agent.setAgCapital(new BigDecimal(dataObj.getString("regCap")));
 
@@ -174,6 +176,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			if(StringUtils.isBlank(agent.getAgHead())){
 				agent.setAgHead(agent.getAgLegal());
 			}
+			agent.setCaStatus(Status.STATUS_1.status);
 			if(1==agentMapper.updateByPrimaryKeySelective(agent)){
 				logger.info("工商认证成功，提取信息成功"+agent.getId());
 			}
