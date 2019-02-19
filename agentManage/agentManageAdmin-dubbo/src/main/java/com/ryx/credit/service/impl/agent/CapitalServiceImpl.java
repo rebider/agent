@@ -7,6 +7,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.CapitalFlowMapper;
 import com.ryx.credit.dao.agent.CapitalMapper;
+import com.ryx.credit.dao.agent.PayCompMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.CapitalService;
@@ -39,6 +40,8 @@ public class CapitalServiceImpl implements CapitalService {
     private CapitalFlowMapper capitalFlowMapper;
     @Autowired
     private IdService idService;
+    @Autowired
+    private PayCompMapper payCompMapper;
 
 
     @Override
@@ -115,6 +118,13 @@ public class CapitalServiceImpl implements CapitalService {
         }
         reqMap.put("cloReviewStatus", AgStatus.Approved.getValue());
         List<Map<String, Object>> capitalChangeList = capitalMapper.queryCapitalList(reqMap, page);
+        for (Map<String, Object> stringMap : capitalChangeList) {
+            String cInCom = String.valueOf(stringMap.get("C_IN_COM"));
+            PayComp payComp = payCompMapper.selectByPrimaryKey(cInCom);
+            if(null!=payComp){
+                stringMap.put("C_IN_COM",payComp.getComName());
+            }
+        }
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(capitalChangeList);
         pageInfo.setTotal(capitalMapper.queryCapitalCount(reqMap));
