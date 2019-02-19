@@ -262,11 +262,15 @@
   <select id="huddlePos" parameterType="java.util.Map"  resultType="java.util.Map" >
    select pphr.ID,pphr.APPLY_STATUS,pphr.CREDIT_CONS_MONTH,pphr.TOTAL_CONS_MONTH, pphr.TOTAL_END_MONTH,phrd.POS_AGENT_ID,phrd.POS_AGENT_NAME   from P_POS_HUDDLE_REWARD pphr join POS_HUDDLE_REWARD_DETAIL phrd on pphr.HUDDLE_CODE = phrd.HUDDLE_CODE
     where 1=1
-   <if test="TOTAL_CONS_MONTH != null and TOTAL_CONS_MONTH !='' ">and  pphr.TOTAL_END_MONTH like   concat(concat('%', #{TOTAL_CONS_MONTH}), '%')</if>
-    <if test="CREDIT_CONS_MONTH != null and CREDIT_CONS_MONTH !='' ">and pphr.TOTAL_END_MONTH like  concat(concat('%', #{CREDIT_CONS_MONTH}), '%') </if>
-    <if test="APPLY_STATUS != null and APPLY_STATUS !='' ">and pphr.APPLY_STATUS = #{APPLY_STATUS} </if>
+   <!--<if test="TOTAL_CONS_MONTH != null and TOTAL_CONS_MONTH !='' ">and  pphr.TOTAL_END_MONTH like   concat(concat('%', #{TOTAL_CONS_MONTH}), '%')</if>
+    <if test="CREDIT_CONS_MONTH != null and CREDIT_CONS_MONTH !='' ">and pphr.TOTAL_END_MONTH like  concat(concat('%', #{CREDIT_CONS_MONTH}), '%') </if>-->
     <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' ">and phrd.POS_AGENT_ID = #{POS_AGENT_ID} </if>
     <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' ">and phrd.POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+<!--<choose>
+    <when test="TOTAL_CONS_MONTH != null and TOTAL_CONS_MONTH !='' ">and  pphr.TOTAL_CONS_MONTH  &gt; #{CREDIT_CONS_MONTH}</when>
+      <when test="CREDIT_CONS_MONTH != null and CREDIT_CONS_MONTH !='' ">and pphr.CREDIT_CONS_MONTH &lt; #{TOTAL_CONS_MONTH}</when>
+</choose>-->
+
   </select>
 
 

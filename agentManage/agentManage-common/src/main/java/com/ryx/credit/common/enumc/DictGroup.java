@@ -62,7 +62,11 @@ public enum DictGroup {
     MERGE("代理商合并"),
     MERGE_MARKET("代理商合并审批市场部参数"),
     MERGE_YUHUA("代理商合并审批于华参数"),
-    NETIN_MARKET("代理商入网审批市场部参数");
+    NETIN_MARKET("代理商入网审批市场部参数"),
+
+    POS("POS审批"),
+    POS_APR_BUSNISS("POS审批参数");
+
     public String  msg;
 
     DictGroup(String s){
