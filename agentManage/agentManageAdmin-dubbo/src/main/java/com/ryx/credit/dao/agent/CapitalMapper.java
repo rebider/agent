@@ -1,8 +1,10 @@
 package com.ryx.credit.dao.agent;
 
 
+import com.ryx.credit.common.util.Page;
 import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.agent.CapitalExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -33,4 +35,8 @@ public interface CapitalMapper {
     List<Map<String,Object>> getCapitalSummaryList(Map<String, Object> param);
 
     Long getCapitalSummaryCount(Map<String, Object> param);
+
+    List<Map<String, Object>> queryCapitalList(@Param("map") Map<String, Object> map, @Param("page") Page page);
+
+    int queryCapitalCount(@Param("map") Map<String, Object> map);
 }

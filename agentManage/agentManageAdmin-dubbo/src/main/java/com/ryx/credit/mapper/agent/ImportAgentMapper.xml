@@ -273,8 +273,8 @@
       DEALSTATUS = #{dealstatus,jdbcType=DECIMAL},
       DEALMSG = #{dealmsg,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+      VERSION =VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR}  and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix" >
     <if test="page != null" >

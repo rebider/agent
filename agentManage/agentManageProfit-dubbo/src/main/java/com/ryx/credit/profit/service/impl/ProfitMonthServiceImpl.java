@@ -13,7 +13,6 @@ import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
-import org.activiti.engine.runtime.Execution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -92,6 +90,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     IOwnInvoiceService ownInvoiceService;
     @Resource
     ProfitFactorService profitFactorService;
+
+    @Autowired
+    private IProfitDirectService profitDirectService;
+
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
 

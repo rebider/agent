@@ -1,6 +1,7 @@
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.order.IPaymentDetailService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,6 +16,8 @@ public class ActivityServiceTest extends BaseSpringTest {
 
     @Autowired
     private ActivityService activityService;
+    @Autowired
+    private IPaymentDetailService paymentDetailService;
 
     @Test
     public void testInstance(){
@@ -36,7 +39,11 @@ public class ActivityServiceTest extends BaseSpringTest {
     }
 
 
+    @Test
+    public void test(){
 
+        paymentDetailService.getSumDebt("AG20190129000000000016401");
+    }
 
 
 }

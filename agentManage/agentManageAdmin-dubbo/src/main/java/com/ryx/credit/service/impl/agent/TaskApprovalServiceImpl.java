@@ -106,10 +106,34 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("保存收款关系异常");
                 }
             }
+            Set<String> dkgs = new HashSet<String>();
+            for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
+                //上级不为空判断是否与上级打款公司一致 fixme 一个代理商下的业务平台的打款公司必须是一样
+//                if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
+//                    AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
+//                    if(!agentBusInfoVo.getCloPayCompany().equals(parentBusInfo.getCloPayCompany())){
+//                        throw new ProcessException(Platform.getContentByValue(agentBusInfo.getBusPlatform())+"上级打款公司不一致");
+//                    }
+//                }
+                if(StringUtils.isNotBlank(agentBusInfo.getCloPayCompany())) {
+                    dkgs.add(agentBusInfo.getCloPayCompany());
+                }
+                if(dkgs.size()>1){
+                    throw new ProcessException("代理商的业务平台的打款公司必须是一样");
+                }
+                agentBusInfoVo.setId(agentBusInfoVo.getId());
+                agentBusInfoVo.setVersion(agentBusInfo.getVersion());
+                agentBusInfoVo.setcUtime(new Date());
+                int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
+                if(i!=1){
+                    throw new ProcessException("更新打款公司或业务所属上级异常");
+                }
+            }
             //处理业务修改
             for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
                 AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                //上级不为空判断是否与上级打款公司一致
+                //上级不为空判断是否与上级打款公司一致 fixme 一个代理商下的业务平台的打款公司必须是一样
 //                if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
 //                    AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
 //                    if(!agentBusInfoVo.getCloPayCompany().equals(parentBusInfo.getCloPayCompany())){
