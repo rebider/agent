@@ -18,6 +18,7 @@ import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.CapitalChangeApplyService;
+import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -68,6 +69,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private IPaymentDetailService paymentDetailService;
     @Autowired
     private OPaymentDetailMapper oPaymentDetailMapper;
+    @Autowired
+    private CapitalService capitalService;
 
 
     /**
@@ -512,12 +515,14 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         capitalExample.setOrderByClause(" c_fq_in_amount asc");
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         if (capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue()) == 0) {
-            disposeCapital(capitals,capitalChangeApply,capitalChangeApply.getRealOperationAmt());
+            capitalService.disposeCapital(capitals,capitalChangeApply.getRealOperationAmt(),capitalChangeApply.getId(),
+                    capitalChangeApply.getcUser(),capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName());
         } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
             //查询所有机具欠款
             BigDecimal sumDebt = paymentDetailService.getSumDebt(capitalChangeApply.getAgentId());
             //只要机具欠款大于0就抵扣
-            disposeCapital(capitals,capitalChangeApply,capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()));
+            capitalService.disposeCapital(capitals,capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()),
+                    capitalChangeApply.getId(),capitalChangeApply.getcUser(),capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName());
             if(capitalChangeApply.getMachinesDeptAmt().signum()==-1){
                 throw new MessageException("抵扣金额必须是正数！");
             }
@@ -588,64 +593,5 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         }
     }
 
-    /**
-     * 扣除资金记录表
-     * @param capitals
-     * @param capitalChangeApply
-     * @param amt
-     * @throws Exception
-     */
-    public void disposeCapital(List<Capital> capitals,CapitalChangeApply capitalChangeApply,BigDecimal amt)throws Exception{
-        BigDecimal residueAmt = amt;
-        for (Capital capital : capitals) {
-            BigDecimal fqInAmount = capital.getcFqInAmount();
-            BigDecimal freezeAmt = capital.getFreezeAmt();
-            BigDecimal lockAmt = capital.getcFqInAmount().subtract(residueAmt);
-            BigDecimal operationAmt = BigDecimal.ZERO;
-            //如果等于已扣足
-            if (lockAmt.compareTo(BigDecimal.ZERO) == 0) {
-                operationAmt = capital.getcFqInAmount();
-                capital.setFreezeAmt(capital.getFreezeAmt().add(capital.getcFqInAmount()));
-            } else if (lockAmt.compareTo(BigDecimal.ZERO) == 1) {
-                operationAmt = residueAmt;
-                capital.setFreezeAmt(capital.getFreezeAmt().add(residueAmt));
-            } else {
-                operationAmt = capital.getcFqInAmount();
-                capital.setFreezeAmt(capital.getFreezeAmt().add(capital.getcFqInAmount()));
-                String lockAmtStr = String.valueOf(lockAmt);
-                String substring = lockAmtStr.substring(1, lockAmtStr.length());
-                residueAmt = new BigDecimal(substring);
-            }
-            capital.setcFqInAmount(capital.getcFqInAmount().subtract(capital.getFreezeAmt()).add(freezeAmt));
-            capital.setcUtime(new Date());
-            int i = capitalMapper.updateByPrimaryKey(capital);
-            if (i != 1) {
-                throw new MessageException("更新资金记录失败！");
-            }
-            CapitalFlow capitalFlow = new CapitalFlow();
-            capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
-            capitalFlow.setcType(capital.getcType());
-            capitalFlow.setCapitalId(capital.getId());
-            capitalFlow.setSrcType(SrcType.BZJ.getValue());
-            capitalFlow.setSrcId(capitalChangeApply.getId());
-            capitalFlow.setBeforeAmount(fqInAmount);
-            capitalFlow.setcAmount(operationAmt);
-            capitalFlow.setOperationType(OperateTypes.CZ.getValue());
-            capitalFlow.setAgentId(capitalChangeApply.getAgentId());
-            capitalFlow.setAgentName(capitalChangeApply.getAgentName());
-            capitalFlow.setRemark("保证金扣款");
-            capitalFlow.setcTime(new Date());
-            capitalFlow.setuTime(new Date());
-            capitalFlow.setcUser(capitalChangeApply.getcUser());
-            capitalFlow.setuUser(capitalChangeApply.getuUser());
-            capitalFlow.setStatus(Status.STATUS_1.status);
-            capitalFlow.setVersion(BigDecimal.ZERO);
-            capitalFlow.setFlowStatus(Status.STATUS_0.status);
-            capitalFlowMapper.insertSelective(capitalFlow);
-            if (lockAmt.compareTo(BigDecimal.ZERO) >= 0) {
-                break;
-            }
-        }
-    }
 
 }
