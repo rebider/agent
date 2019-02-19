@@ -380,6 +380,18 @@ public class PosRewardServiceImpl implements IPosRewardService {
     }
 
     @Override
+    public List<PPosHuddleReward> getHuddlePosRewardByDataId(String id) {
+        if(StringUtils.isNotBlank(id)){
+            PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
+            PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
+            criteria.andIdEqualTo(id);
+            return pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+        }
+        return null;
+    }
+
+
+    @Override
     public void editRewardRegect(PosReward posReward) throws Exception {
         try {
             rewardMapper.updateByPrimaryKeySelective(posReward);
