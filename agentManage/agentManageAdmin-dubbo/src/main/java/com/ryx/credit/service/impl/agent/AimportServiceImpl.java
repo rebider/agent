@@ -21,11 +21,13 @@ import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
@@ -79,6 +81,7 @@ public class AimportServiceImpl implements AimportService {
     private CapitalMapper capitalMapper;
     @Autowired
     private DPosRegionMapper dPosRegionMapper;
+
 
 
 
@@ -325,6 +328,7 @@ public class AimportServiceImpl implements AimportService {
                         ag.setcUser(userid);
                         ag.setImport(true);
                         ag.setAgRemark("(老数据导入)");
+                        ag.setCaStatus(Status.STATUS_0.status);
                         Agent ag_db = agentService.insertAgent(ag, Arrays.asList(),userid);
                         try {
                             //todo 生成后台用户
@@ -604,6 +608,7 @@ public class AimportServiceImpl implements AimportService {
                             db_agentBusInfo.setAgZbh(busItem.getAgZbh());
                             db_agentBusInfo.setBusRegion(busItem.getBusRegion());
                             db_agentBusInfo.setBusScope(busItem.getBusScope());
+                            db_agentBusInfo.setBusUseOrgan(busItem.getBusUseOrgan());
                             agentBusinfoService.updateAgentBusInfo(db_agentBusInfo);
                             busItem.setId(db_agentBusInfo.getId());
                         }else{
@@ -1038,6 +1043,8 @@ public class AimportServiceImpl implements AimportService {
     }
 
 
+    private static List<Dict> bus_use_organ = null;
+
     /**
      * 解析业务
      * @param obj
@@ -1046,6 +1053,9 @@ public class AimportServiceImpl implements AimportService {
      */
     private AgentBusInfo parseBusFromJson(JSONObject obj, List<PlatForm>  platForms,List<Dict>  bustype, List<PayComp>  payCompList)throws Exception{
         logger.info("解析json{}",obj.toJSONString());
+        if(bus_use_organ==null){
+            bus_use_organ = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.USE_SCOPE.name());
+        }
         try {
             String agid =   obj.getString("agId");
             String uniqNum =   obj.getString("uniqNum");
@@ -1110,12 +1120,32 @@ public class AimportServiceImpl implements AimportService {
             ab.setBusContactPerson(bus_json_array.getString(16));
             if(bus_json_array.size()>17 && StringUtils.isNotBlank(bus_json_array.getString(17)))
             ab.setBusRiskEmail(bus_json_array.getString(17));
+
+            //税点
             if(bus_json_array.size()>18 && StringUtils.isNotBlank(bus_json_array.getString(18)))
             ab.setCloTaxPoint(bus_json_array.getBigDecimal(18));
+
+            //是否开具分润发票
             if(bus_json_array.size()>19 && StringUtils.isNotBlank(bus_json_array.getString(19)))
             ab.setCloInvoice(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(19))));
+
+            //是否开收据
             if(bus_json_array.size()>20 && StringUtils.isNotBlank(bus_json_array.getString(20)))
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
+
+            //使用范围
+            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28))) {
+                for (Dict dict : bus_use_organ) {
+                    if(dict.getdItemname().equals(bus_json_array.getString(28))) {
+                        ab.setBusUseOrgan(dict.getdItemvalue());
+                    }
+                }
+            }
+            //业务范围
+            if(bus_json_array.size()>29 && StringUtils.isNotBlank(bus_json_array.getString(29))) {
+                ab.setBusScope(BUS_SCOP.get(bus_json_array.getString(29)));
+            }
+
 
 
             //业务区域
@@ -1132,10 +1162,7 @@ public class AimportServiceImpl implements AimportService {
                 ab.setBusRegion(sb.toString());
             }
 
-            //业务范围
-            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28))){
-                ab.setBusScope(BUS_SCOP.get(bus_json_array.getString(28)));
-            }
+
 
             //打款公司
             if(bus_json_array.size()>21 && StringUtils.isNotBlank(bus_json_array.getString(21)))
@@ -1166,11 +1193,11 @@ public class AimportServiceImpl implements AimportService {
                 if (bus_json_array.size()>26 && StringUtils.isNotBlank(bus_json_array.getString(26)))
                     colinfo.setBranchLineNum(bus_json_array.getString(26));
                 //是否开具分润发票
-                if(StringUtils.isNotBlank(bus_json_array.getString(19))) {
+                if(bus_json_array.size()>19 && StringUtils.isNotBlank(bus_json_array.getString(19))) {
                     colinfo.setCloInvoice(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(19))));
                 }
                 //税点
-                if(StringUtils.isNotBlank(bus_json_array.getString(18))) {
+                if(bus_json_array.size()>18  && StringUtils.isNotBlank(bus_json_array.getString(18))) {
                     colinfo.setCloTaxPoint(bus_json_array.getBigDecimal(18));
                 }
                 colinfo.setAgentId(ab.getAgentId());

@@ -19,11 +19,13 @@ import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -38,6 +40,8 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 	private BusinessCAService businessCAService;
 	@Autowired
 	private AgentMapper agentMapper;
+	@Resource(name = "taskExecutor")
+	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
 	@Override
 	public AgentResult agentBusinessCA(String agentBusinfoName) {
@@ -149,12 +153,12 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		Agent agent = agentMapper.selectByPrimaryKey(agentId);
 		if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agentId);
 		//查询代理商信息检查是否需要提取数据
-		if(StringUtils.isBlank(agent.getAgLegal())){return AgentResult.fail("工商认证代理商法人信息不为空不进行工商认证"+agentId);}
+		if(StringUtils.isNotBlank(agent.getAgLegal())){return AgentResult.fail("工商认证代理商法人信息不为空不进行工商认证"+agentId);}
 		//处理代理名称去掉前缀和括号后的信息
 		String agname = agent.getAgName();
-		logger.info("后台任务进行工商认证{},{}",agent.getId(),agname);
+		logger.info("后台任务进行工商认证|{}|{}",agent.getId(),agname);
 		agname = agname.replaceAll("[A-Z]|\\(*\\)","");
-		logger.info("后台任务进行工商认证{},替换后名称{}",agent.getId(),agname);
+		logger.info("后台任务进行工商认证|{}|替换后名称|{}",agent.getId(),agname);
 		//工商认证
 		AgentResult agentResult = agentBusinessCA(agname);
 		if(agentResult.isOK()){
@@ -199,20 +203,31 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 
 	@Override
 	public AgentResult caAgentList(){
-		AgentExample example = new AgentExample();
-		example.or().andCaStatusEqualTo(Status.STATUS_0.status).andAgLegalIsNull();
-		example.or().andCaStatusIsNull().andAgLegalIsNull();
-		List<Agent> agents = agentMapper.selectByExample(example);
-		for (Agent agent : agents) {
-			try {
-				logger.info("后台任务进行工商认证{},{}",agent.getId(),agent.getAgName());
-				AgentResult res = businessCAService.agentBusinessCaToAgentDb(agent.getId());
-				logger.info("后台任务进行工商认证{},{},结果{}",agent.getId(),agent.getAgName(),res.getMsg());
-			} catch (Exception e) {
-				e.printStackTrace();
-				logger.error("后台任务进行工商认证"+agent.getId(),e);
+
+		threadPoolTaskExecutor.execute(new Runnable() {
+
+			@Override
+			public void run() {
+
+				logger.info("后台任务进行批量工商认证");
+				AgentExample example = new AgentExample();
+				example.or().andCaStatusEqualTo(Status.STATUS_0.status).andAgLegalIsNull();
+				example.or().andCaStatusIsNull().andAgLegalIsNull();
+				List<Agent> agents = agentMapper.selectByExample(example);
+				for (Agent agent : agents) {
+					try {
+						logger.info("后台任务进行工商认证{}|{}",agent.getId(),agent.getAgName());
+						AgentResult res = businessCAService.agentBusinessCaToAgentDb(agent.getId());
+						logger.info("后台任务进行工商认证{}|{}|结果|{}",agent.getId(),agent.getAgName(),res.getMsg());
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("后台任务进行工商认证"+agent.getId(),e);
+					}
+				}
+
 			}
-		}
+		});
+
 		return AgentResult.ok();
 	}
 
