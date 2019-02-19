@@ -218,6 +218,16 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
 
     public void verify(CapitalChangeApply capitalChangeApply)throws MessageException {
 
+        if(null==capitalChangeApply.getOperationAmt()){
+            throw new MessageException("操作金额必填！");
+        }
+        if(null==capitalChangeApply.getServiceCharge()){
+            throw new MessageException("手续费必填！");
+        }
+        if(null==capitalChangeApply.getMachinesDeptAmt()){
+            throw new MessageException("机具欠款金额必填！");
+        }
+
         if(capitalChangeApply.getOperationAmt().compareTo(BigDecimal.ZERO)==-1){
             throw new MessageException("处理金额必须大于0！");
         }
