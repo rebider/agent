@@ -113,4 +113,5 @@ public interface IPosRewardService {
 
 
     public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page);
+    List<PPosHuddleReward> getHuddlePosRewardByDataId(String id);
 }
