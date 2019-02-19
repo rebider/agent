@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
@@ -9,6 +10,7 @@ import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentMapper;
 import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.util.Constants;
@@ -18,12 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 @Service("businessCAService")
@@ -141,6 +143,7 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 	 * @param agentId
 	 * @return
 	 */
+	@Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
 	@Override
 	public AgentResult agentBusinessCaToAgentDb(String agentId) {
 		Agent agent = agentMapper.selectByPrimaryKey(agentId);
@@ -149,12 +152,15 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		if(StringUtils.isBlank(agent.getAgLegal())){return AgentResult.fail("工商认证代理商法人信息不为空不进行工商认证"+agentId);}
 		//处理代理名称去掉前缀和括号后的信息
 		String agname = agent.getAgName();
+		logger.info("后台任务进行工商认证{},{}",agent.getId(),agname);
 		agname = agname.replaceAll("[A-Z]|\\(*\\)","");
+		logger.info("后台任务进行工商认证{},替换后名称{}",agent.getId(),agname);
 		//工商认证
 		AgentResult agentResult = agentBusinessCA(agname);
 		if(agentResult.isOK()){
 			//补全代理商信息
 			JSONObject dataObj = (JSONObject)agentResult.getData();
+
 			if(StringUtils.isNotBlank(dataObj.getString("regCap")))
 			agent.setAgCapital(new BigDecimal(dataObj.getString("regCap")));
 
@@ -174,12 +180,14 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 			if(StringUtils.isBlank(agent.getAgHead())){
 				agent.setAgHead(agent.getAgLegal());
 			}
+			agent.setCaStatus(Status.STATUS_1.status);
 			if(1==agentMapper.updateByPrimaryKeySelective(agent)){
 				logger.info("工商认证成功，提取信息成功"+agent.getId());
 			}
 			return AgentResult.ok();
 		}else{
-			agent.setAgLegal("工商认证失败");
+			//工商认证失败
+			agent.setCaStatus(Status.STATUS_2.status);
 			if(1==agentMapper.updateByPrimaryKeySelective(agent)){
 				logger.info("工商认证失败"+agent.getId());
 			}
@@ -187,4 +195,27 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		}
 
 	}
+
+
+	@Override
+	public AgentResult caAgentList(){
+		AgentExample example = new AgentExample();
+		example.or().andCaStatusEqualTo(Status.STATUS_0.status).andAgLegalIsNull();
+		example.or().andCaStatusIsNull().andAgLegalIsNull();
+		List<Agent> agents = agentMapper.selectByExample(example);
+		for (Agent agent : agents) {
+			try {
+				logger.info("后台任务进行工商认证{},{}",agent.getId(),agent.getAgName());
+				AgentResult res = businessCAService.agentBusinessCaToAgentDb(agent.getId());
+				logger.info("后台任务进行工商认证{},{},结果{}",agent.getId(),agent.getAgName(),res.getMsg());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("后台任务进行工商认证"+agent.getId(),e);
+			}
+		}
+		return AgentResult.ok();
+	}
+
+
+
 }
