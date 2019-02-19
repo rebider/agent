@@ -47,6 +47,7 @@ public class CapitalServiceImpl implements CapitalService {
             CapitalExample capitalExample = new CapitalExample();
             CapitalExample.Criteria criteria = capitalExample.createCriteria();
             criteria.andCAgentIdEqualTo(agentId);
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
             List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
             for (Capital capital : capitals) {
                 Dict dictByValue = dictOptionsService.findDictByValue(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name(), capital.getcType());
@@ -58,6 +59,19 @@ public class CapitalServiceImpl implements CapitalService {
         return null;
     }
 
+    @Override
+    public List<Capital> queryCapital(String agentId,String cPayType) {
+        if(StringUtils.isNotBlank(agentId)){
+            CapitalExample capitalExample = new CapitalExample();
+            CapitalExample.Criteria criteria = capitalExample.createCriteria();
+            criteria.andCAgentIdEqualTo(agentId);
+            criteria.andCPayTypeEqualTo(cPayType);
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+            return capitals;
+        }
+        return null;
+    }
 
     /**
      * 汇总列表
@@ -115,7 +129,7 @@ public class CapitalServiceImpl implements CapitalService {
      */
     @Override
     public void disposeCapital(List<Capital> capitals, BigDecimal amt,String srcId,String cUser,
-                               String agentId,String agentName)throws Exception{
+                               String agentId,String agentName,String remark)throws Exception{
         BigDecimal residueAmt = amt;
         for (Capital capital : capitals) {
             BigDecimal fqInAmount = capital.getcFqInAmount();
@@ -153,14 +167,14 @@ public class CapitalServiceImpl implements CapitalService {
             capitalFlow.setOperationType(OperateTypes.CZ.getValue());
             capitalFlow.setAgentId(agentId);
             capitalFlow.setAgentName(agentName);
-            capitalFlow.setRemark("保证金扣款");
+            capitalFlow.setRemark(remark);
             capitalFlow.setcTime(new Date());
             capitalFlow.setuTime(new Date());
             capitalFlow.setcUser(cUser);
             capitalFlow.setuUser(cUser);
             capitalFlow.setStatus(Status.STATUS_1.status);
             capitalFlow.setVersion(BigDecimal.ZERO);
-            capitalFlow.setFlowStatus(Status.STATUS_0.status);
+            capitalFlow.setFlowStatus(Status.STATUS_0.status);//未生效
             capitalFlowMapper.insertSelective(capitalFlow);
             if (lockAmt.compareTo(BigDecimal.ZERO) >= 0) {
                 break;

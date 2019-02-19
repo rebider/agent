@@ -17,10 +17,12 @@ public interface CapitalService {
 
     List<Capital> queryCapital(String agentId);
 
+    List<Capital> queryCapital(String agentId,String cPayType);
+
     PageInfo getCapitalSummaryList(Map<String,Object> param, PageInfo pageInfo);
 
     PageInfo queryCapitalList(Capital capital, Page page, String dataRole, Long userId);
 
     void disposeCapital(List<Capital> capitals, BigDecimal amt, String srcId, String cUser,
-                        String agentId, String agentName)throws Exception;
+                        String agentId, String agentName,String remark)throws Exception;
 }
