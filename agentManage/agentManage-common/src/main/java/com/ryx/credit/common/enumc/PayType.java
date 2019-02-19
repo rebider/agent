@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * @Auther: RYX
  * @Date: 2018/9/20 10:54
- * @Description:订单线下打款方式
+ * @Description:（订单线下/缴纳款项）打款方式
  */
 public enum  PayType {
     YHHK("YHHK", "银行汇款"),

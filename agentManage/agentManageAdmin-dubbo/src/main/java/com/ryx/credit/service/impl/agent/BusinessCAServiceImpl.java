@@ -1,11 +1,16 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.Status;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.HttpUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.dao.agent.AgentMapper;
+import com.ryx.credit.pojo.admin.agent.Agent;
+import com.ryx.credit.pojo.admin.agent.AgentExample;
 import com.ryx.credit.service.agent.AgentNotifyService;
 import com.ryx.credit.service.agent.BusinessCAService;
 import com.ryx.credit.util.Constants;
@@ -15,11 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 @Service("businessCAService")
@@ -28,6 +34,10 @@ public class BusinessCAServiceImpl implements BusinessCAService{
     private static Logger logger = LoggerFactory.getLogger(BusinessCAServiceImpl.class);
 	@Autowired
 	private AgentNotifyService agentNotifyService;
+	@Autowired
+	private BusinessCAService businessCAService;
+	@Autowired
+	private AgentMapper agentMapper;
 
 	@Override
 	public AgentResult agentBusinessCA(String agentBusinfoName) {
@@ -126,4 +136,86 @@ public class BusinessCAServiceImpl implements BusinessCAService{
 		}
 		return "";
 	}
+
+
+	/**
+	 * 对没有用户信息的代理商进行工商认证提取数据
+	 * @param agentId
+	 * @return
+	 */
+	@Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
+	@Override
+	public AgentResult agentBusinessCaToAgentDb(String agentId) {
+		Agent agent = agentMapper.selectByPrimaryKey(agentId);
+		if(agent==null)return AgentResult.fail("工商认证代理商未找到"+agentId);
+		//查询代理商信息检查是否需要提取数据
+		if(StringUtils.isBlank(agent.getAgLegal())){return AgentResult.fail("工商认证代理商法人信息不为空不进行工商认证"+agentId);}
+		//处理代理名称去掉前缀和括号后的信息
+		String agname = agent.getAgName();
+		logger.info("后台任务进行工商认证{},{}",agent.getId(),agname);
+		agname = agname.replaceAll("[A-Z]|\\(*\\)","");
+		logger.info("后台任务进行工商认证{},替换后名称{}",agent.getId(),agname);
+		//工商认证
+		AgentResult agentResult = agentBusinessCA(agname);
+		if(agentResult.isOK()){
+			//补全代理商信息
+			JSONObject dataObj = (JSONObject)agentResult.getData();
+
+			if(StringUtils.isNotBlank(dataObj.getString("regCap")))
+			agent.setAgCapital(new BigDecimal(dataObj.getString("regCap")));
+
+			if(StringUtils.isNotBlank(dataObj.getString("openFrom")))
+			agent.setAgBusLicb(DateUtil.format(dataObj.getString("openFrom"),"yyyy-MM-dd"));
+
+			if(StringUtils.isNotBlank(dataObj.getString("openTo")) && dataObj.getString("openTo").equals("长期")){
+				agent.setAgBusLice(DateUtil.format("2099-12-31","yyyy-MM-dd"));
+			}else if(StringUtils.isNotBlank(dataObj.getString("openTo"))){
+				agent.setAgBusLice(DateUtil.format(dataObj.getString("openTo"),"yyyy-MM-dd"));
+			}
+			agent.setAgLegal(dataObj.getString("frName"));//法人姓名
+			agent.setAgRegAdd(dataObj.getString("address"));//注册地址
+			agent.setAgBusScope(dataObj.getString("operateScope"));
+			agent.setAgBusLic(dataObj.getString("creditCode"));//营业执照
+			//如果负责人没有，采用工商认证后的法人
+			if(StringUtils.isBlank(agent.getAgHead())){
+				agent.setAgHead(agent.getAgLegal());
+			}
+			agent.setCaStatus(Status.STATUS_1.status);
+			if(1==agentMapper.updateByPrimaryKeySelective(agent)){
+				logger.info("工商认证成功，提取信息成功"+agent.getId());
+			}
+			return AgentResult.ok();
+		}else{
+			//工商认证失败
+			agent.setCaStatus(Status.STATUS_2.status);
+			if(1==agentMapper.updateByPrimaryKeySelective(agent)){
+				logger.info("工商认证失败"+agent.getId());
+			}
+			return AgentResult.fail();
+		}
+
+	}
+
+
+	@Override
+	public AgentResult caAgentList(){
+		AgentExample example = new AgentExample();
+		example.or().andCaStatusEqualTo(Status.STATUS_0.status).andAgLegalIsNull();
+		example.or().andCaStatusIsNull().andAgLegalIsNull();
+		List<Agent> agents = agentMapper.selectByExample(example);
+		for (Agent agent : agents) {
+			try {
+				logger.info("后台任务进行工商认证{},{}",agent.getId(),agent.getAgName());
+				AgentResult res = businessCAService.agentBusinessCaToAgentDb(agent.getId());
+				logger.info("后台任务进行工商认证{},{},结果{}",agent.getId(),agent.getAgName(),res.getMsg());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("后台任务进行工商认证"+agent.getId(),e);
+			}
+		}
+		return AgentResult.ok();
+	}
+
+
+
 }

@@ -26,6 +26,7 @@ import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.AgentQuitService;
+import com.ryx.credit.service.agent.CapitalService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.OCashReceivablesService;
@@ -94,6 +95,10 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
     private AgentPlatFormSynMapper agentPlatFormSynMapper;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private CapitalService capitalService;
+    @Autowired
+    private CapitalFlowMapper capitalFlowMapper;
 
     /**
      * 退出列表
@@ -483,6 +488,13 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 throw new MessageException("更新业务锁定失败");
             }
         }
+        List<Capital> capitals = capitalService.queryCapital(agentQuit.getAgentId(),PayType.YHHK.getValue());
+        BigDecimal sumAmt = BigDecimal.ZERO;
+        for (Capital capital : capitals) {
+            sumAmt = capital.getcFqInAmount().add(sumAmt);
+        }
+        capitalService.disposeCapital(capitals, sumAmt, agentQuit.getId(), cUser, agentQuit.getAgentId(),
+                                      agentQuit.getAgentName(),"代理商退出扣除");
 
         try {
             //冻结分润
@@ -757,6 +769,32 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
             if(agentQuit.getProfitDebt().compareTo(BigDecimal.ZERO)==1){
 
             }
+
+            List<Capital> capitals = capitalService.queryCapital(agentQuit.getAgentId(),PayType.YHHK.getValue());
+            BigDecimal sumAmt = BigDecimal.ZERO;
+            for (Capital capital : capitals) {
+                sumAmt = capital.getcFqInAmount().add(sumAmt);
+            }
+            for (Capital capital : capitals) {
+                capital.setFreezeAmt(BigDecimal.ZERO);
+                int k = capitalMapper.updateByPrimaryKeySelective(capital);
+                if(k!=1){
+                    throw new MessageException("通过更新冻结金额失败！");
+                }
+                CapitalFlowExample capitalFlowExample = new CapitalFlowExample();
+                CapitalFlowExample.Criteria criteria1 = capitalFlowExample.createCriteria();
+                criteria1.andStatusEqualTo(Status.STATUS_1.status);
+                criteria1.andCapitalIdEqualTo(capital.getId());
+                List<CapitalFlow> capitalFlows = capitalFlowMapper.selectByExample(capitalFlowExample);
+                for (CapitalFlow capitalFlow : capitalFlows) {
+                    capitalFlow.setFlowStatus(Status.STATUS_1.status);
+                    int j = capitalFlowMapper.updateByPrimaryKey(capitalFlow);
+                    if(j!=1){
+                        throw new MessageException("通过更新资金流水记录失败！");
+                    }
+                }
+            }
+
             //通知业务平台
             notityBusPlatform(agentQuit);
         }
@@ -782,6 +820,16 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
                 int k = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfo);
                 if (k!=1) {
                     throw new MessageException("更新业务启用失败");
+                }
+            }
+
+            List<Capital> capitals = capitalService.queryCapital(agentQuit.getAgentId(),PayType.YHHK.getValue());
+            for (Capital capital : capitals) {
+                capital.setcFqInAmount(capital.getcFqInAmount().add(capital.getFreezeAmt()));
+                capital.setFreezeAmt(BigDecimal.ZERO);
+                int j = capitalMapper.updateByPrimaryKeySelective(capital);
+                if(j!=1){
+                    throw new MessageException("拒绝更新冻结金额失败！");
                 }
             }
         }
