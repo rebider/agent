@@ -72,7 +72,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private OPaymentDetailMapper oPaymentDetailMapper;
     @Autowired
     private CapitalService capitalService;
-
+    @Autowired
+    private CapitalChangeApplyService capitalChangeApplyService;
 
     /**
      * 保证金列表
@@ -364,7 +365,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     Date format = DateUtil.format(agentVo.getRemitTimeStr());
                     capitalChangeApply.setRemitTime(format);
                     capitalChangeApply.setRemitPerson(agentVo.getRemitPerson());
-                    int i = capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply);
+                    int i = capitalChangeApplyService.updateByPrimaryKeySelective(capitalChangeApply);
                     if(i!=1){
                         throw new ProcessException("更新打款信息失败");
                     }
@@ -622,5 +623,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         }
     }
 
-
+    @Override
+    public int updateByPrimaryKeySelective(CapitalChangeApply capitalChangeApply){
+        return capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply);
+    }
 }
