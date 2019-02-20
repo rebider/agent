@@ -536,8 +536,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
             //查询所有机具欠款
             BigDecimal sumDebt = paymentDetailService.getSumDebt(capitalChangeApply.getAgentId());
-            BigDecimal tkAmt = capitalChangeApply.getOperationAmt().subtract(capitalChangeApply.getServiceCharge());
-            capitalService.disposeCapital(capitals,tkAmt, capitalChangeApply.getId(),capitalChangeApply.getcUser(),
+            capitalService.disposeCapital(capitals,capitalChangeApply.getOperationAmt(), capitalChangeApply.getId(),capitalChangeApply.getcUser(),
                                           capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName(),"保证金扣款");
             if(capitalChangeApply.getMachinesDeptAmt().signum()==-1){
                 throw new MessageException("抵扣金额必须是正数！");
