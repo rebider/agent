@@ -62,6 +62,10 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentQueryService agentQueryService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private CapitalService capitalService;
+    @Autowired
+    private CapitalMapper capitalMapper;
 
 
 
@@ -262,6 +266,16 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
+                            }
+                            Agent agent = vo.getAgent();
+                            String agentId = agent.getId();
+                            List<Capital> capitals = capitalService.queryCapital(agentId);
+                            for (Capital capital : capitals) {
+                                capital.setCloReviewStatus(AgStatus.Approved.getValue());
+                                int i = capitalMapper.updateByPrimaryKeySelective(capital);
+                                if(1!=i){
+                                    throw new ProcessException("更新缴纳款审批通过失败");
+                                }
                             }
                         }
 
