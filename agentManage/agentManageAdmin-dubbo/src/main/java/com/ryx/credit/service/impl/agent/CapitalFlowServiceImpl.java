@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.agent;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -16,6 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -84,16 +88,17 @@ public class CapitalFlowServiceImpl implements CapitalFlowService {
      * @param remark
      * @throws Exception
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
     @Override
-    public void insertCapitalFlow(Capital capital, String srcId, String remark)throws Exception{
-        if(capital.getcType().equals(PayType.YHHK.getValue())){
+    public void insertCapitalFlow(Capital capital,BigDecimal beforeAmount,String srcId,String remark)throws Exception{
+        if(capital.getcPayType().equals(PayType.YHHK.getValue())){
             CapitalFlow capitalFlow = new CapitalFlow();
             capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
             capitalFlow.setcType(capital.getcType());
             capitalFlow.setCapitalId(capital.getId());
             capitalFlow.setSrcType(SrcType.RW.getValue());
             capitalFlow.setSrcId(srcId);
-            capitalFlow.setBeforeAmount(BigDecimal.ZERO);
+            capitalFlow.setBeforeAmount(beforeAmount);
             capitalFlow.setcAmount(capital.getcAmount());
             capitalFlow.setOperationType(OperateTypes.RZ.getValue());
             capitalFlow.setAgentId(capital.getcAgentId());
@@ -107,7 +112,10 @@ public class CapitalFlowServiceImpl implements CapitalFlowService {
             capitalFlow.setStatus(Status.STATUS_1.status);
             capitalFlow.setVersion(BigDecimal.ZERO);
             capitalFlow.setFlowStatus(Status.STATUS_1.status);
-            capitalFlowMapper.insertSelective(capitalFlow);
+            int i = capitalFlowMapper.insertSelective(capitalFlow);
+            if(i!=1){
+                throw new ProcessException("插入资金流水失败");
+            }
         }
     }
 

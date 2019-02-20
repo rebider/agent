@@ -582,7 +582,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             }
             //插入资金流水
             try {
-                capitalFlowService.insertCapitalFlow(capital,busId,"代理商新增业务");
+                capitalFlowService.insertCapitalFlow(capital,BigDecimal.ZERO,busId,"代理商新增业务");
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new ProcessException("新增资金流水失败");
@@ -741,7 +741,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
                 }
             }
             try {
-                capitalFlowService.insertCapitalFlow(capital,busId,"代理商入网");
+                capitalFlowService.insertCapitalFlow(capital,BigDecimal.ZERO,busId,"代理商入网");
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new ProcessException("新增资金流水失败");
