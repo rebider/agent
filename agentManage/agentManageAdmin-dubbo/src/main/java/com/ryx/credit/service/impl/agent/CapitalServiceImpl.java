@@ -76,6 +76,19 @@ public class CapitalServiceImpl implements CapitalService {
         return null;
     }
 
+    @Override
+    public List<Capital> queryByAgentId(String agentId) {
+        if(StringUtils.isNotBlank(agentId)){
+            CapitalExample capitalExample = new CapitalExample();
+            CapitalExample.Criteria criteria = capitalExample.createCriteria();
+            criteria.andCAgentIdEqualTo(agentId);
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+            return capitals;
+        }
+        return null;
+    }
+
     /**
      * 汇总列表
      * @param param
