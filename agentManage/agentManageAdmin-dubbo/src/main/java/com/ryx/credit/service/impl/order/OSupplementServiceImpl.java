@@ -539,7 +539,7 @@ public class OSupplementServiceImpl implements OSupplementService {
     public BigDecimal selectPayAmout(String srcid, String pkType) {
          BigDecimal payAmout= oSupplementMapper.selectPayAmout(srcid, pkType);
          OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectMoney(srcid);
-         BigDecimal amount=(oPaymentDetail.getPayAmount().subtract(oPaymentDetail.getRealPayAmount()).subtract(payAmout));
+         BigDecimal amount=(oPaymentDetail.getPayAmount().subtract((oPaymentDetail.getRealPayAmount()==null?new BigDecimal(0):oPaymentDetail.getRealPayAmount())).subtract(payAmout));
         return amount;
     }
 }

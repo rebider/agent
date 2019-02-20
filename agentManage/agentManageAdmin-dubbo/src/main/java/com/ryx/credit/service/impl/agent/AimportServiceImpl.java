@@ -405,6 +405,11 @@ public class AimportServiceImpl implements AimportService {
                         Capital c =  listC.get(0);
                         if(c.getcPaytime()!=null && capital.getcPaytime()!=null && DateUtil.format(c.getcPaytime(),"yyyy-MM-dd").equals(DateUtil.format(capital.getcPaytime(),"yyyy-MM-dd"))){
                                logger.info("用户已交过款项{},{},{}",capital.getcAmount(),capital.getcType(),capital.getcPaytime());
+                            c.setcInCom(capital.getcInCom());
+                            c.setcPayType(capital.getcPayType());
+                            c.setCloReviewStatus(capital.getCloReviewStatus());
+                            c.setVersion(capital.getVersion());
+                            capitalMapper.updateByPrimaryKeySelective(c);
                         }else{
                             AgentResult result = accountPaidItemService.insertAccountPaid(capital,Arrays.asList(),userid);
                             if(null==result || !result.isOK())throw new ProcessException("代理商交款导入失败"+result.getMsg());
@@ -632,24 +637,32 @@ public class AimportServiceImpl implements AimportService {
 
                         List<AgentColinfo> colinfos = busItem.getAgentColinfoList();
                         if(colinfos.size()>0){
+                            AgentColinfo colinfo = colinfos.get(0);
                             AgentColinfoExample agentColinfoExample_uniq  = new AgentColinfoExample();
-                            agentColinfoExample_uniq.or().andAgentIdEqualTo(busItem.getAgentId()).andStatusEqualTo(Status.STATUS_1.status);
+                            agentColinfoExample_uniq.or()
+                                    .andAgentIdEqualTo(busItem.getAgentId())
+                                    .andStatusEqualTo(Status.STATUS_1.status);
                             if(agentColinfoMapper.countByExample(agentColinfoExample_uniq)==0){
-                                    AgentColinfo colinfo = colinfos.get(0);
                                     colinfo.setcUser(userid);
                                     AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
-                                    agentColinfoExample.or().andAgentIdEqualTo(busItem.getAgentId()).andCloRealnameEqualTo(colinfo.getCloRealname())
-                                            .andCloBankAccountEqualTo(colinfo.getCloBankAccount()).andCloBankEqualTo(colinfo.getCloBank());
+                                    agentColinfoExample.or()
+                                            .andAgentIdEqualTo(busItem.getAgentId())
+                                            .andCloRealnameEqualTo(colinfo.getCloRealname())
+                                            .andCloBankAccountEqualTo(colinfo.getCloBankAccount());
                                     //添加收款账户
                                     AgentColinfo ac = null;
                                     List<AgentColinfo>  colinfodb = agentColinfoMapper.selectByExample(agentColinfoExample);
                                     if(colinfodb.size()==0){
                                         //添加收款账户
                                         colinfo.setImport(true);
-                                        colinfo.setCloTaxPoint(busItem.getCloTaxPoint());
                                         ac =  agentColinfoService.agentColinfoInsert(colinfo,Arrays.asList());
                                     }else{
                                         ac = colinfodb.get(0);
+                                        ac.setCloTaxPoint(colinfo.getCloTaxPoint());
+                                        ac.setCloInvoice(colinfo.getCloInvoice());
+                                        ac.setBranchLineNum(colinfo.getBranchLineNum());
+                                        ac.setCloBankBranch(colinfo.getCloBankBranch());
+                                        agentColinfoService.updateAgentColinfo(ac);
                                     }
                                     AgentColinfoRelExample agentColinfoRelExample = new AgentColinfoRelExample();
                                     agentColinfoRelExample.or().andAgentbusidEqualTo(busItem.getId()).andAgentidEqualTo(busItem.getAgentId())
@@ -670,6 +683,24 @@ public class AimportServiceImpl implements AimportService {
                                     }else{
                                         logger.info("代理商导入收款账户业务关系已存在{},{}",busItem.getId(),listRel_db.get(0).getId());
                                     }
+                            }else{
+                                AgentColinfoExample agentColinfoExample = new AgentColinfoExample();
+                                agentColinfoExample.or()
+                                        .andAgentIdEqualTo(busItem.getAgentId())
+                                        .andCloRealnameEqualTo(colinfo.getCloRealname())
+                                        .andCloBankAccountEqualTo(colinfo.getCloBankAccount())
+                                        .andStatusEqualTo(Status.STATUS_1.status);
+                                //添加收款账户
+                                List<AgentColinfo>  colinfodb = agentColinfoMapper.selectByExample(agentColinfoExample);
+                                if(colinfodb.size()>0){
+                                    AgentColinfo agentColinfo = colinfodb.get(0);
+                                    agentColinfo.setCloInvoice(colinfo.getCloInvoice());
+                                    agentColinfo.setCloTaxPoint(colinfo.getCloTaxPoint());
+                                    agentColinfo.setBranchLineNum(colinfo.getBranchLineNum());
+                                    agentColinfo.setCloBankBranch(colinfo.getCloBankBranch());
+                                    agentColinfoMapper.updateByPrimaryKeySelective(agentColinfo);
+                                }
+
                             }
 
                         }
@@ -889,6 +920,18 @@ public class AimportServiceImpl implements AimportService {
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
+                }
+            }
+            if(obj.size() >5 && org.apache.commons.lang3.StringUtils.isNotEmpty(obj.getString(5))){
+                try {
+                    List<PayComp> list =  apaycompService.recCompList();
+                    for (PayComp payComp : list) {
+                        if(payComp.getComName().equals(obj.getString(5))) {
+                            c.setcInCom(payComp.getId());
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
             }
@@ -1134,7 +1177,7 @@ public class AimportServiceImpl implements AimportService {
             ab.setCloReceipt(BigDecimal.valueOf(yesorno.indexOf(bus_json_array.getString(20))));
 
             //使用范围
-            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28))) {
+            if(bus_json_array.size()>28 && StringUtils.isNotBlank(bus_json_array.getString(28)) && bus_use_organ!=null) {
                 for (Dict dict : bus_use_organ) {
                     if(dict.getdItemname().equals(bus_json_array.getString(28))) {
                         ab.setBusUseOrgan(dict.getdItemvalue());
@@ -1162,8 +1205,6 @@ public class AimportServiceImpl implements AimportService {
                 ab.setBusRegion(sb.toString());
             }
 
-
-
             //打款公司
             if(bus_json_array.size()>21 && StringUtils.isNotBlank(bus_json_array.getString(21)))
             for (PayComp payComp : payCompList) {
@@ -1174,7 +1215,6 @@ public class AimportServiceImpl implements AimportService {
             }
 
             //设置打款账户
-
             if(bus_json_array.size()>22 && StringUtils.isNotBlank(bus_json_array.getString(22))) {
                 AgentColinfo colinfo = new AgentColinfo();
                 //收款账户 对公对私
