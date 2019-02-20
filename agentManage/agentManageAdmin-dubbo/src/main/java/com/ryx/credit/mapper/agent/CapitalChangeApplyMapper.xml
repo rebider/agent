@@ -32,6 +32,8 @@
     <result column="U_USER" jdbcType="VARCHAR" property="uUser" />
     <result column="STATUS" jdbcType="DECIMAL" property="status" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="REMIT_TIME" jdbcType="TIMESTAMP" property="remitTime" />
+    <result column="REMIT_PERSON" jdbcType="VARCHAR" property="remitPerson" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,11 +65,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, CAPITAL_TYPE, CAPITAL_AMT, REFUND_TYPE, MACHINES_DEPT_AMT, OPERATION_TYPE, OPERATION_AMT, 
-    REAL_OPERATION_AMT, SERVICE_CHARGE, AGENT_ID, AGENT_NAME, CLO_REVIEW_STATUS, CLO_TYPE, 
-    CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, ALL_LINE_NUM, BRANCH_LINE_NUM, 
-    CLO_TAX_POINT, CLO_INVOICE, BANK_REGION, CLO_BANK_CODE, REMARK, C_TIME, U_TIME, C_USER, 
-    U_USER, STATUS, VERSION
+    ID, CAPITAL_TYPE, CAPITAL_AMT, REFUND_TYPE, MACHINES_DEPT_AMT, OPERATION_TYPE, OPERATION_AMT,
+    REAL_OPERATION_AMT, SERVICE_CHARGE, AGENT_ID, AGENT_NAME, CLO_REVIEW_STATUS, CLO_TYPE,
+    CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, ALL_LINE_NUM, BRANCH_LINE_NUM,
+    CLO_TAX_POINT, CLO_INVOICE, BANK_REGION, CLO_BANK_CODE, REMARK, C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION, REMIT_TIME, REMIT_PERSON
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalChangeApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -86,7 +88,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from A_CAPITAL_CHANGE_APPLY
     where ID = #{id,jdbcType=VARCHAR}
@@ -98,28 +100,28 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.pojo.admin.agent.CapitalChangeApply">
-    insert into A_CAPITAL_CHANGE_APPLY (ID, CAPITAL_TYPE, CAPITAL_AMT, 
-      REFUND_TYPE, MACHINES_DEPT_AMT, OPERATION_TYPE, 
-      OPERATION_AMT, REAL_OPERATION_AMT, SERVICE_CHARGE, 
-      AGENT_ID, AGENT_NAME, CLO_REVIEW_STATUS, 
-      CLO_TYPE, CLO_REALNAME, CLO_BANK, 
-      CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, ALL_LINE_NUM, 
-      BRANCH_LINE_NUM, CLO_TAX_POINT, CLO_INVOICE, 
-      BANK_REGION, CLO_BANK_CODE, REMARK, 
-      C_TIME, U_TIME, C_USER, 
-      U_USER, STATUS, VERSION
-      )
-    values (#{id,jdbcType=VARCHAR}, #{capitalType,jdbcType=VARCHAR}, #{capitalAmt,jdbcType=DECIMAL}, 
-      #{refundType,jdbcType=DECIMAL}, #{machinesDeptAmt,jdbcType=DECIMAL}, #{operationType,jdbcType=DECIMAL}, 
-      #{operationAmt,jdbcType=DECIMAL}, #{realOperationAmt,jdbcType=DECIMAL}, #{serviceCharge,jdbcType=DECIMAL}, 
-      #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL}, 
-      #{cloType,jdbcType=DECIMAL}, #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR}, 
-      #{cloBankBranch,jdbcType=VARCHAR}, #{cloBankAccount,jdbcType=VARCHAR}, #{allLineNum,jdbcType=VARCHAR}, 
-      #{branchLineNum,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, #{cloInvoice,jdbcType=DECIMAL}, 
-      #{bankRegion,jdbcType=VARCHAR}, #{cloBankCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
-      #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR}, 
-      #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}
-      )
+    insert into A_CAPITAL_CHANGE_APPLY (ID, CAPITAL_TYPE, CAPITAL_AMT,
+    REFUND_TYPE, MACHINES_DEPT_AMT, OPERATION_TYPE,
+    OPERATION_AMT, REAL_OPERATION_AMT, SERVICE_CHARGE,
+    AGENT_ID, AGENT_NAME, CLO_REVIEW_STATUS,
+    CLO_TYPE, CLO_REALNAME, CLO_BANK,
+    CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, ALL_LINE_NUM,
+    BRANCH_LINE_NUM, CLO_TAX_POINT, CLO_INVOICE,
+    BANK_REGION, CLO_BANK_CODE, REMARK,
+    C_TIME, U_TIME, C_USER,
+    U_USER, STATUS, VERSION,
+    REMIT_TIME, REMIT_PERSON)
+    values (#{id,jdbcType=VARCHAR}, #{capitalType,jdbcType=VARCHAR}, #{capitalAmt,jdbcType=DECIMAL},
+    #{refundType,jdbcType=DECIMAL}, #{machinesDeptAmt,jdbcType=DECIMAL}, #{operationType,jdbcType=DECIMAL},
+    #{operationAmt,jdbcType=DECIMAL}, #{realOperationAmt,jdbcType=DECIMAL}, #{serviceCharge,jdbcType=DECIMAL},
+    #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{cloReviewStatus,jdbcType=DECIMAL},
+    #{cloType,jdbcType=DECIMAL}, #{cloRealname,jdbcType=VARCHAR}, #{cloBank,jdbcType=VARCHAR},
+    #{cloBankBranch,jdbcType=VARCHAR}, #{cloBankAccount,jdbcType=VARCHAR}, #{allLineNum,jdbcType=VARCHAR},
+    #{branchLineNum,jdbcType=VARCHAR}, #{cloTaxPoint,jdbcType=DECIMAL}, #{cloInvoice,jdbcType=DECIMAL},
+    #{bankRegion,jdbcType=VARCHAR}, #{cloBankCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+    #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
+    #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
+    #{remitTime,jdbcType=TIMESTAMP}, #{remitPerson,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.CapitalChangeApply">
     insert into A_CAPITAL_CHANGE_APPLY
@@ -214,6 +216,12 @@
       <if test="version != null">
         VERSION,
       </if>
+      <if test="remitTime != null">
+        REMIT_TIME,
+      </if>
+      <if test="remitPerson != null">
+        REMIT_PERSON,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -305,6 +313,12 @@
       </if>
       <if test="version != null">
         #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="remitTime != null">
+        #{remitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remitPerson != null">
+        #{remitPerson,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -404,45 +418,53 @@
       <if test="version != null">
         VERSION = #{version,jdbcType=DECIMAL},
       </if>
+      <if test="remitTime != null">
+        REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remitPerson != null">
+        REMIT_PERSON = #{remitPerson,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.agent.CapitalChangeApply">
     update A_CAPITAL_CHANGE_APPLY
     set CAPITAL_TYPE = #{capitalType,jdbcType=VARCHAR},
-      CAPITAL_AMT = #{capitalAmt,jdbcType=DECIMAL},
-      REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
-      MACHINES_DEPT_AMT = #{machinesDeptAmt,jdbcType=DECIMAL},
-      OPERATION_TYPE = #{operationType,jdbcType=DECIMAL},
-      OPERATION_AMT = #{operationAmt,jdbcType=DECIMAL},
-      REAL_OPERATION_AMT = #{realOperationAmt,jdbcType=DECIMAL},
-      SERVICE_CHARGE = #{serviceCharge,jdbcType=DECIMAL},
-      AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
-      CLO_TYPE = #{cloType,jdbcType=DECIMAL},
-      CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
-      CLO_BANK = #{cloBank,jdbcType=VARCHAR},
-      CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
-      CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
-      ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
-      BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
-      CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
-      CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
-      BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
-      CLO_BANK_CODE = #{cloBankCode,jdbcType=VARCHAR},
-      REMARK = #{remark,jdbcType=VARCHAR},
-      C_TIME = #{cTime,jdbcType=TIMESTAMP},
-      U_TIME = #{uTime,jdbcType=TIMESTAMP},
-      C_USER = #{cUser,jdbcType=VARCHAR},
-      U_USER = #{uUser,jdbcType=VARCHAR},
-      STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
+    CAPITAL_AMT = #{capitalAmt,jdbcType=DECIMAL},
+    REFUND_TYPE = #{refundType,jdbcType=DECIMAL},
+    MACHINES_DEPT_AMT = #{machinesDeptAmt,jdbcType=DECIMAL},
+    OPERATION_TYPE = #{operationType,jdbcType=DECIMAL},
+    OPERATION_AMT = #{operationAmt,jdbcType=DECIMAL},
+    REAL_OPERATION_AMT = #{realOperationAmt,jdbcType=DECIMAL},
+    SERVICE_CHARGE = #{serviceCharge,jdbcType=DECIMAL},
+    AGENT_ID = #{agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+    CLO_REVIEW_STATUS = #{cloReviewStatus,jdbcType=DECIMAL},
+    CLO_TYPE = #{cloType,jdbcType=DECIMAL},
+    CLO_REALNAME = #{cloRealname,jdbcType=VARCHAR},
+    CLO_BANK = #{cloBank,jdbcType=VARCHAR},
+    CLO_BANK_BRANCH = #{cloBankBranch,jdbcType=VARCHAR},
+    CLO_BANK_ACCOUNT = #{cloBankAccount,jdbcType=VARCHAR},
+    ALL_LINE_NUM = #{allLineNum,jdbcType=VARCHAR},
+    BRANCH_LINE_NUM = #{branchLineNum,jdbcType=VARCHAR},
+    CLO_TAX_POINT = #{cloTaxPoint,jdbcType=DECIMAL},
+    CLO_INVOICE = #{cloInvoice,jdbcType=DECIMAL},
+    BANK_REGION = #{bankRegion,jdbcType=VARCHAR},
+    CLO_BANK_CODE = #{cloBankCode,jdbcType=VARCHAR},
+    REMARK = #{remark,jdbcType=VARCHAR},
+    C_TIME = #{cTime,jdbcType=TIMESTAMP},
+    U_TIME = #{uTime,jdbcType=TIMESTAMP},
+    C_USER = #{cUser,jdbcType=VARCHAR},
+    U_USER = #{uUser,jdbcType=VARCHAR},
+    STATUS = #{status,jdbcType=DECIMAL},
+    VERSION = #{version,jdbcType=DECIMAL},
+    REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
+    REMIT_PERSON = #{remitPerson,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

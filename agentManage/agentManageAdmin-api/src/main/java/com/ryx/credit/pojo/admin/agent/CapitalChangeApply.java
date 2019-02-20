@@ -66,6 +66,10 @@ public class CapitalChangeApply implements Serializable {
 
     private BigDecimal version;
 
+    private Date remitTime;
+
+    private String remitPerson;
+
     private List<Attachment> attachments;
 
     private List<Attachment> financeAttachments;
@@ -324,5 +328,21 @@ public class CapitalChangeApply implements Serializable {
 
     public void setFinanceAttachments(List<Attachment> financeAttachments) {
         this.financeAttachments = financeAttachments;
+    }
+
+    public Date getRemitTime() {
+        return remitTime;
+    }
+
+    public void setRemitTime(Date remitTime) {
+        this.remitTime = remitTime;
+    }
+
+    public String getRemitPerson() {
+        return remitPerson;
+    }
+
+    public void setRemitPerson(String remitPerson) {
+        this.remitPerson = remitPerson;
     }
 }
