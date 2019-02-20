@@ -241,6 +241,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         CapitalExample.Criteria criteria = capitalExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
         criteria.andCAgentIdEqualTo(capitalChangeApply.getAgentId());
+        criteria.andCTypeEqualTo(capitalChangeApply.getCapitalType());
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         for (Capital capital : capitals) {
             if(capital.getFreezeAmt().compareTo(BigDecimal.ZERO)!=0){
@@ -252,7 +253,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 throw new MessageException("处理金额不能大于剩余金额！");
             }
         }else if(capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue())==0){
-            BigDecimal amt = capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge());
+            BigDecimal amt = capitalChangeApply.getOperationAmt().subtract(capitalChangeApply.getServiceCharge());
             if(amt.compareTo(capitalChangeApply.getCapitalAmt())==1){
                 throw new MessageException("处理金额不能大于剩余金额！");
             }
@@ -347,22 +348,27 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     if (!cashAgentResult.isOK()) {
                         throw new ProcessException("更新收款信息失败！");
                     }
+
+                    if (agentVo.getCapitalChangeFinaFiles() == null) {
+                        throw new ProcessException("请上传打款截图");
+                    }
+                    if (agentVo.getCapitalChangeFinaFiles().size()==0) {
+                        throw new ProcessException("请上传打款截图");
+                    }
                     //添加新的附件
-                    if (agentVo.getCapitalChangeFinaFiles() != null && agentVo.getCapitalChangeFinaFiles().size()!=0) {
-                        for (String capitalFile : agentVo.getCapitalChangeFinaFiles()) {
-                            AttachmentRel record = new AttachmentRel();
-                            record.setAttId(capitalFile);
-                            record.setSrcId(busId);
-                            record.setcUser(userId);
-                            record.setcTime(Calendar.getInstance().getTime());
-                            record.setStatus(Status.STATUS_1.status);
-                            record.setBusType(AttachmentRelType.capitalFinance.name());
-                            record.setId(idService.genId(TabId.a_attachment_rel));
-                            int f = attachmentRelMapper.insertSelective(record);
-                            if (1 != f) {
-                                logger.info("代理商退出保存附件关系失败");
-                                throw new ProcessException("保存附件失败");
-                            }
+                    for (String capitalFile : agentVo.getCapitalChangeFinaFiles()) {
+                        AttachmentRel record = new AttachmentRel();
+                        record.setAttId(capitalFile);
+                        record.setSrcId(busId);
+                        record.setcUser(userId);
+                        record.setcTime(Calendar.getInstance().getTime());
+                        record.setStatus(Status.STATUS_1.status);
+                        record.setBusType(AttachmentRelType.capitalFinance.name());
+                        record.setId(idService.genId(TabId.a_attachment_rel));
+                        int f = attachmentRelMapper.insertSelective(record);
+                        if (1 != f) {
+                            logger.info("代理商退出保存附件关系失败");
+                            throw new ProcessException("保存附件失败");
                         }
                     }
                 }
