@@ -27,4 +27,6 @@ public interface CapitalChangeApplyService {
     AgentResult approvalCapitalChangeTask(AgentVo agentVo, String userId, String busId) throws Exception;
 
     AgentResult compressCapitalChangeActivity(String proIns, BigDecimal agStatus) throws Exception;
+
+    int updateByPrimaryKeySelective(CapitalChangeApply capitalChangeApply);
 }
