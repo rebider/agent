@@ -303,6 +303,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             logger.info("========用户{}{}启动部门参数为空", id, cUser);
             throw new MessageException("启动部门参数为空!");
         }
+        startPar.put("rs","pass");
         //启动审批
         String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
         if (proce == null) {
