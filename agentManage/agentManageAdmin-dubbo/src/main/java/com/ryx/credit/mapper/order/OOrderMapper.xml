@@ -686,7 +686,7 @@
     c.platform_name,
     (
     select LISTAGG(dict.d_itemname,',') WITHIN GROUP( ORDER BY o_sub_order.order_id)  from o_sub_order
-    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.d_status=1 and dict.D_ITEMVALUE=o_sub_order.pro_type
+    left join d_dict dict on dict.d_group='ORDER' and dict.d_artifact='MODEL_TYPE' and dict.D_ITEMVALUE=o_sub_order.pro_type and dict.d_status=1
     where o_sub_order.order_id = o.id and o_sub_order.status=1
     ) as pro_type,
     (select LISTAGG(o_sub_order_activity.activity_name,',') WITHIN GROUP( ORDER BY o_sub_order.order_id) from o_sub_order_activity
@@ -712,8 +712,8 @@
       <if test="beginTime!=null and endTime!=''"> and (to_char(o.c_time,'YYYY-MM-DD') between #{beginTime} and #{endTime}) </if>
       <if test="platformNum!=null and platformNum!=''"> and c.PLATFORM_NUM=#{platformNum} </if>
       <if test="busNum!=null and busNum!=''"> and e.bus_num like CONCAT(CONCAT('%',#{busNum}),'%') </if>
-      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and PRO_TYPE=#{proType} and o.id=ORDER_ID) </if>
-      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where status=1 and model=#{model} and o.id=ORDER_ID) </if>
+      <if test="proType!=null and proType!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and PRO_TYPE=#{proType} ) </if>
+      <if test="model!=null and model!=''"> and EXISTS(select * from O_SUB_ORDER where  o.id=ORDER_ID and status=1 and model=#{model} ) </if>
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})</if>
       <if test="activityName!=null and activityName !=''">
