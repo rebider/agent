@@ -356,4 +356,11 @@
     </if>
   </sql>
 
+  <select id="getProfitSuppList" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM P_PROFIT_SUPPLY
+    where BUS_BIG_TYPE=#{busBigType} and AGENT_ID=#{agentId} and SUPPLY_DATE=#{supplyDate} and SUPPLY_TYPE=#{supplyType}
+  </select>
+
 </mapper>

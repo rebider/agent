@@ -17,10 +17,7 @@ import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.dao.ProfitSupplyMapper;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
-import com.ryx.credit.profit.pojo.PCityApplicationDetail;
-import com.ryx.credit.profit.pojo.PCityApplicationDetailExample;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitSupply;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IProfitCityApplicationService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -35,6 +32,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -163,11 +161,24 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         if(Objects.equals("pass",agentVo.getApprovalResult())
                 && StringUtils.isBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", "finish");
+            String id = agentVo.getSid();
+            PCityApplicationDetail pCityApplicationDetail = pCityApplicationDetailMapper.selectByPrimaryKey(id);
+            pCityApplicationDetail.setApplicationStatus("0");
+            pCityApplicationDetailMapper.updateByPrimaryKeySelective(pCityApplicationDetail);
         }
         if("reject".equals(agentVo.getApprovalResult())
                 && StringUtils.isBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", "finish");
         }
+        //设置为退回状态
+        if("back".equals(agentVo.getApprovalResult())){
+            //根据id过的对应数据，设置状态为退回 3
+            String id = agentVo.getSid();
+            PCityApplicationDetail pCityApplicationDetail = pCityApplicationDetailMapper.selectByPrimaryKey(id);
+            pCityApplicationDetail.setApplicationStatus("3");
+            pCityApplicationDetailMapper.updateByPrimaryKeySelective(pCityApplicationDetail);
+        }
+
 
         reqMap.put("rs", agentVo.getApprovalResult());
         reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
@@ -356,21 +367,30 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
      */
     private void insertOtherSupply(PCityApplicationDetail pCityApplicationDetail){
         ProfitSupply profitSupply = new ProfitSupply();
-        profitSupply.setId(idService.genId(TabId.p_profit_supply));
         profitSupply.setAgentId(pCityApplicationDetail.getAgentId());
         profitSupply.setAgentName(pCityApplicationDetail.getAgentName());
-        profitSupply.setParentAgentId(pCityApplicationDetail.getParentAgentId());
-        profitSupply.setParentAgentName(pCityApplicationDetail.getParentAgentName());
         profitSupply.setSupplyDate(pCityApplicationDetail.getApplicationMonth());
         profitSupply.setSupplyType(pCityApplicationDetail.getDeductionRemark());
-        profitSupply.setSupplyAmt(pCityApplicationDetail.getApplicationAmt());
-        profitSupply.setRemerk(pCityApplicationDetail.getRemark());
-        profitSupply.setBusType(BusActRelBusType.CityApplySupply.name());
         profitSupply.setBusBigType("99");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        //profitSupply.setSourceId("线上审批通过："+sdf.format(new Date()));
-        pProfitSupplyMapper.insertSelective(profitSupply);
-
+        List<ProfitSupply> ps = pProfitSupplyMapper.getProfitSuppList(profitSupply);
+        if(ps.size()>0){
+            //如果存在，补款金额相加
+            ProfitSupply profitSupply1 = ps.get(0);
+            BigDecimal amt = profitSupply1.getSupplyAmt().add(pCityApplicationDetail.getApplicationAmt());
+            profitSupply1.setSupplyAmt(amt);
+            pProfitSupplyMapper.updateByPrimaryKeySelective(profitSupply1);
+        }else{
+            //如果为空 插入新的数据
+            profitSupply.setId(idService.genId(TabId.p_profit_supply));
+            profitSupply.setParentAgentId(pCityApplicationDetail.getParentAgentId());
+            profitSupply.setParentAgentName(pCityApplicationDetail.getParentAgentName());
+            profitSupply.setSupplyAmt(pCityApplicationDetail.getApplicationAmt());
+            profitSupply.setRemerk(pCityApplicationDetail.getRemark());
+            profitSupply.setBusType(BusActRelBusType.CityApplySupply.name());
+            profitSupply.setBusBigType("99");
+            //如果不为空 在原来的基础上金额相加
+            pProfitSupplyMapper.insertSelective(profitSupply);
+        }
     }
 
 

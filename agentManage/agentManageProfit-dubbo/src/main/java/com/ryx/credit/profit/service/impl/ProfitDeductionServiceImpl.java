@@ -151,22 +151,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(deductionist == null || deductionist.size() == 0){
             throw new RuntimeException("导入数据为空");
         }
-        for (List<Object> list: deductionist) {
-            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
-                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                throw new RuntimeException("数据不能为空");
-            }
-            try{
-                insertDeduction(list, userId);
-            }catch (Exception e){
-                throw  new RuntimeException("数据格式异常！");
-            }
-        }
-        /*if (deductionist != null && deductionist.size() > 0) {
-            deductionist.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null && list.get(3) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
+
+        if (deductionist != null && deductionist.size() > 0) {
+            deductionist.stream().filter(list -> list != null && list.size() > 0 && StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
+                    StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) && StringUtils.isNotBlank(list.get(6).toString())  ).forEach(list -> {
                 insertDeduction(list, userId);
             });
-        }*/
+        }
     }
 
 
@@ -904,26 +895,19 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(datas == null || datas.size() == 0){
             throw new RuntimeException("导入数据为空");
         }
-        for (List<Object> list: datas) {
-            if(list.size()== 7){
-                if(StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString())|| StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                    throw new RuntimeException("数据不能为空");
+        if (datas != null && datas.size() > 0) {
+            for (List<Object> list:datas) {
+                if(list != null && list.size() > 0 &&
+                        StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
+                        StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) &&
+                        StringUtils.isNotBlank(list.get(6).toString())){
+                    insertCheckDeduction(list, userId);
+                }else{
+                    throw new RuntimeException(list.get(0).toString()+":存在不合理数据格式");
                 }
 
-
-            try{
-                insertDeduction(list, userId);
-            }catch (Exception e){
-                throw  new RuntimeException("数据格式异常！");
-            }
             }
         }
-
-       /* if (datas != null && datas.size() > 0) {
-            datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
-                insertCheckDeduction(list, userId);
-            });
-        }*/
     }
 
 

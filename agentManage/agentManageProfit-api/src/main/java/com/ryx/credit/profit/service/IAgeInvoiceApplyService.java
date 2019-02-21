@@ -61,10 +61,7 @@ public interface IAgeInvoiceApplyService {
      */
     InvoiceApply getInvoiceApplyByInvoiceNumber(String invoiceNumber);
 
-    /**
-     * 批量上传附件  todo
-     */
-   //void volumeImportFile();
 
+    void insertInvoiceApply(InvoiceApply invoiceApply);
 
 }

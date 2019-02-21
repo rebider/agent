@@ -82,10 +82,16 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         if(StringUtils.isNotBlank(invoiceApply.getExpressDate())){
             criteria.andExpressDateEqualTo(invoiceApply.getExpressDate());
         }
-        if(StringUtils.isNotBlank(invoiceApply.getCreateName())){
-            criteria.andCreateNameEqualTo(invoiceApply.getCreateName());
+        if(StringUtils.isNotBlank(invoiceApply.getAgentId())){
+            criteria.andAgentIdEqualTo(invoiceApply.getAgentId());
         }
-        example.setOrderByClause("EXPRESS_DATE  desc");
+        if(StringUtils.isNotBlank(invoiceApply.getAgentName())){
+            criteria.andAgentNameEqualTo(invoiceApply.getAgentName());
+        }
+        if(StringUtils.isNotBlank(invoiceApply.getShResult())){
+            criteria.andShResultNotEqualTo(invoiceApply.getShResult());
+        }
+        example.setOrderByClause("CREATE_DATE  desc");
         PageInfo pageInfo = new PageInfo();
         List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
         Long count = invoiceApplyMapper.countByExample(example);
@@ -109,7 +115,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }else{
             //表示申请信息
             invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
-            invoiceApply.setCreateDate(new Date().toString());
+            invoiceApply.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:ss:mm").format(new Date()));
             invoiceApplyMapper.insert(invoiceApply);
         }
 
@@ -248,27 +254,35 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
 
     @Override
     public void volumeImportData(Map<String, String> map, List<List<Object>> list) {
-        for (List<Object> lists:list) {
-            insertInvoiceApply(map,lists);
+        if(list.size()<=0){
+            throw new ProcessException("导入数据为空");
+        }
+        try{
+            for (List<Object> lists:list) {
+                insertInvoiceApply(map,lists);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            throw new ProcessException("导入数据格式不正确");
         }
     }
 
     private void insertInvoiceApply(Map<String, String> map, List<Object> list){
         InvoiceApply invoiceApply = new InvoiceApply();
-        invoiceApply.setId(idService.genId(TabId.P_INVOICE_APPLY));
         invoiceApply.setInvoiceCompany(list.get(0).toString());
-        invoiceApply.setInvoiceCode(list.get(1).toString());
-        invoiceApply.setInvoiceNumber(list.get(2).toString());
-        invoiceApply.setInvoiceCode(list.get(3).toString());
+        invoiceApply.setInvoiceDate(list.get(1).toString());
+        invoiceApply.setInvoiceNumber(list.get(2).toString().substring(0,list.get(2).toString().indexOf(".")));
+        invoiceApply.setInvoiceCode(list.get(3).toString().substring(0,list.get(3).toString().indexOf(".")));
         invoiceApply.setInvoiceItem(list.get(4).toString());
-        invoiceApply.setUnitPrice(new BigDecimal(list.get(5).toString()));
-        invoiceApply.setNumberSl(Long.valueOf(list.get(6).toString()));
-        invoiceApply.setSumAmt(new BigDecimal(list.get(7).toString()));
-        invoiceApply.setTax(new BigDecimal(list.get(8).toString()));
+        invoiceApply.setUnitPrice(new BigDecimal(list.get(5).toString().trim()));
+        String str = list.get(6).toString().trim();
+        invoiceApply.setNumberSl(Long.valueOf(str.substring(0,str.indexOf("."))));
+        invoiceApply.setSumAmt(new BigDecimal(list.get(7).toString().trim()));
+        invoiceApply.setTax(new BigDecimal(list.get(8).toString().trim()));
         invoiceApply.setExpressCompany(list.get(9).toString());
-        invoiceApply.setExpressNumber(list.get(10).toString());
+        invoiceApply.setExpressNumber(list.get(10).toString().trim());
         invoiceApply.setShResult("1");
-        invoiceApply.setCreateDate( new SimpleDateFormat("yyyy-MM-dd HH:SS:mm").format(new Date()));
+        invoiceApply.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:SS:mm").format(new Date()));
         invoiceApply.setCreateName(map.get("userId"));
         invoiceApply.setAgentName(map.get("agentName"));
         invoiceApply.setAgentId(map.get("agentId"));
@@ -289,7 +303,8 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         return null;
     }
 
-
-
-
+    @Override
+    public void insertInvoiceApply(InvoiceApply invoiceApply) {
+        invoiceApplyMapper.updateByPrimaryKeySelective(invoiceApply);
+    }
 }
