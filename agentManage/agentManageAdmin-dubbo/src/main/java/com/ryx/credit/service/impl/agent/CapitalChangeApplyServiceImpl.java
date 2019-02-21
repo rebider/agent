@@ -623,6 +623,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public int updateByPrimaryKeySelective(CapitalChangeApply capitalChangeApply){
         return capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply);
