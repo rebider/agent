@@ -12,6 +12,7 @@ import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentColinfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.*;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -62,6 +64,12 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
     private AgentQueryService agentQueryService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private CapitalService capitalService;
+    @Autowired
+    private CapitalMapper capitalMapper;
+    @Autowired
+    private CapitalFlowService capitalFlowService;
 
 
 
@@ -253,6 +261,26 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
 
                         //更新入库
                         AgentVo vo = JSONObject.parseObject(dr.getDataContent(), AgentVo.class);
+                        AgentVo preVo = JSONObject.parseObject(dr.getDataPreContent(), AgentVo.class);
+                        List<CapitalVo> capitalVoList = vo.getCapitalVoList();
+                        for (CapitalVo capitalVo : capitalVoList) {
+                            capitalVo.setcAgentId(vo.getAgent().getId());
+                            capitalVo.setcUser(rel.getcUser());
+                            if(StringUtils.isBlank(capitalVo.getId())){
+                                capitalFlowService.insertCapitalFlow(capitalVo, BigDecimal.ZERO,dr.getId(),"代理商信息修改");
+                            }
+                            List<CapitalVo> preCapitalVoList = preVo.getCapitalVoList();
+                            for (CapitalVo preCapitalVo : preCapitalVoList) {
+                                preCapitalVo.setcAgentId(vo.getAgent().getId());
+                                preCapitalVo.setcUser(rel.getcUser());
+                                if(capitalVo.getId().equals(preCapitalVo.getId())){
+                                    if(preCapitalVo.getcAmount().compareTo(capitalVo.getcAmount())!=0){
+                                        capitalFlowService.insertCapitalFlow(capitalVo, preCapitalVo.getcAmount(),dr.getId(),"代理商信息修改");
+                                    }
+                                }
+                            }
+                        }
+
                         ResultVO res = agentEnterService.updateAgentVo(vo,rel.getcUser());
                         logger.info("========审批流完成{}业务{}状态{},结果{}", proIns, rel.getBusType(), agStatus, res.getResInfo());
                         //更新数据状态为审批成功
@@ -262,6 +290,13 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                             logger.info("========审批流完成{}业务{}状态{},结果{}",proIns,rel.getBusType(),agStatus,"更新数据申请成功");
                             if(1!=dateChangeRequestMapper.updateByPrimaryKeySelective(dr)){
                                 throw new ProcessException("更新数据申请失败");
+                            }
+                            for (Capital capital : vo.getCapitalVoList()) {
+                                capital.setCloReviewStatus(AgStatus.Approved.getValue());
+                                int i = capitalMapper.updateByPrimaryKeySelective(capital);
+                                if(1!=i){
+                                    throw new ProcessException("更新缴纳款审批通过失败");
+                                }
                             }
                         }
 

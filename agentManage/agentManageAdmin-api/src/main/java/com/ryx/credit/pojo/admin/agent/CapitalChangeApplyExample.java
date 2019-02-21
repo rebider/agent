@@ -2087,6 +2087,136 @@ public class CapitalChangeApplyExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andRemitTimeIsNull() {
+            addCriterion("REMIT_TIME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeIsNotNull() {
+            addCriterion("REMIT_TIME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeEqualTo(Date value) {
+            addCriterion("REMIT_TIME =", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeNotEqualTo(Date value) {
+            addCriterion("REMIT_TIME <>", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeGreaterThan(Date value) {
+            addCriterion("REMIT_TIME >", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeGreaterThanOrEqualTo(Date value) {
+            addCriterion("REMIT_TIME >=", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeLessThan(Date value) {
+            addCriterion("REMIT_TIME <", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeLessThanOrEqualTo(Date value) {
+            addCriterion("REMIT_TIME <=", value, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeIn(List<Date> values) {
+            addCriterion("REMIT_TIME in", values, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeNotIn(List<Date> values) {
+            addCriterion("REMIT_TIME not in", values, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeBetween(Date value1, Date value2) {
+            addCriterion("REMIT_TIME between", value1, value2, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitTimeNotBetween(Date value1, Date value2) {
+            addCriterion("REMIT_TIME not between", value1, value2, "remitTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonIsNull() {
+            addCriterion("REMIT_PERSON is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonIsNotNull() {
+            addCriterion("REMIT_PERSON is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonEqualTo(String value) {
+            addCriterion("REMIT_PERSON =", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonNotEqualTo(String value) {
+            addCriterion("REMIT_PERSON <>", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonGreaterThan(String value) {
+            addCriterion("REMIT_PERSON >", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonGreaterThanOrEqualTo(String value) {
+            addCriterion("REMIT_PERSON >=", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonLessThan(String value) {
+            addCriterion("REMIT_PERSON <", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonLessThanOrEqualTo(String value) {
+            addCriterion("REMIT_PERSON <=", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonLike(String value) {
+            addCriterion("REMIT_PERSON like", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonNotLike(String value) {
+            addCriterion("REMIT_PERSON not like", value, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonIn(List<String> values) {
+            addCriterion("REMIT_PERSON in", values, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonNotIn(List<String> values) {
+            addCriterion("REMIT_PERSON not in", values, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonBetween(String value1, String value2) {
+            addCriterion("REMIT_PERSON between", value1, value2, "remitPerson");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitPersonNotBetween(String value1, String value2) {
+            addCriterion("REMIT_PERSON not between", value1, value2, "remitPerson");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

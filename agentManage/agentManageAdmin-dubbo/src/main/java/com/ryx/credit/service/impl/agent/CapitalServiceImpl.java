@@ -76,6 +76,19 @@ public class CapitalServiceImpl implements CapitalService {
         return null;
     }
 
+    @Override
+    public List<Capital> queryByAgentId(String agentId) {
+        if(StringUtils.isNotBlank(agentId)){
+            CapitalExample capitalExample = new CapitalExample();
+            CapitalExample.Criteria criteria = capitalExample.createCriteria();
+            criteria.andCAgentIdEqualTo(agentId);
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
+            return capitals;
+        }
+        return null;
+    }
+
     /**
      * 汇总列表
      * @param param
@@ -166,26 +179,28 @@ public class CapitalServiceImpl implements CapitalService {
             if (i != 1) {
                 throw new MessageException("更新资金记录失败！");
             }
-            CapitalFlow capitalFlow = new CapitalFlow();
-            capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
-            capitalFlow.setcType(capital.getcType());
-            capitalFlow.setCapitalId(capital.getId());
-            capitalFlow.setSrcType(SrcType.BZJ.getValue());
-            capitalFlow.setSrcId(srcId);
-            capitalFlow.setBeforeAmount(fqInAmount);
-            capitalFlow.setcAmount(operationAmt);
-            capitalFlow.setOperationType(OperateTypes.CZ.getValue());
-            capitalFlow.setAgentId(agentId);
-            capitalFlow.setAgentName(agentName);
-            capitalFlow.setRemark(remark);
-            capitalFlow.setcTime(new Date());
-            capitalFlow.setuTime(new Date());
-            capitalFlow.setcUser(cUser);
-            capitalFlow.setuUser(cUser);
-            capitalFlow.setStatus(Status.STATUS_1.status);
-            capitalFlow.setVersion(BigDecimal.ZERO);
-            capitalFlow.setFlowStatus(Status.STATUS_0.status);//未生效
-            capitalFlowMapper.insertSelective(capitalFlow);
+            if(fqInAmount.compareTo(BigDecimal.ZERO)==1 && operationAmt.compareTo(BigDecimal.ZERO)==1){
+                CapitalFlow capitalFlow = new CapitalFlow();
+                capitalFlow.setId(idService.genId(TabId.A_CAPITAL_FLOW));
+                capitalFlow.setcType(capital.getcType());
+                capitalFlow.setCapitalId(capital.getId());
+                capitalFlow.setSrcType(SrcType.BZJ.getValue());
+                capitalFlow.setSrcId(srcId);
+                capitalFlow.setBeforeAmount(fqInAmount);
+                capitalFlow.setcAmount(operationAmt);
+                capitalFlow.setOperationType(OperateTypes.CZ.getValue());
+                capitalFlow.setAgentId(agentId);
+                capitalFlow.setAgentName(agentName);
+                capitalFlow.setRemark(remark);
+                capitalFlow.setcTime(new Date());
+                capitalFlow.setuTime(new Date());
+                capitalFlow.setcUser(cUser);
+                capitalFlow.setuUser(cUser);
+                capitalFlow.setStatus(Status.STATUS_1.status);
+                capitalFlow.setVersion(BigDecimal.ZERO);
+                capitalFlow.setFlowStatus(Status.STATUS_0.status);//未生效
+                capitalFlowMapper.insertSelective(capitalFlow);
+            }
             if (lockAmt.compareTo(BigDecimal.ZERO) >= 0) {
                 break;
             }

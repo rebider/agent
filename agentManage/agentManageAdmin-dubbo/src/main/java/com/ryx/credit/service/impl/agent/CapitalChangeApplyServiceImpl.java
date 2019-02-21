@@ -4,6 +4,7 @@ import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
@@ -71,7 +72,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private OPaymentDetailMapper oPaymentDetailMapper;
     @Autowired
     private CapitalService capitalService;
-
+    @Autowired
+    private CapitalChangeApplyService capitalChangeApplyService;
 
     /**
      * 保证金列表
@@ -348,13 +350,26 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     if (!cashAgentResult.isOK()) {
                         throw new ProcessException("更新收款信息失败！");
                     }
-
                     if (agentVo.getCapitalChangeFinaFiles() == null) {
                         throw new ProcessException("请上传打款截图");
                     }
                     if (agentVo.getCapitalChangeFinaFiles().size()==0) {
                         throw new ProcessException("请上传打款截图");
                     }
+                    if (StringUtils.isBlank(agentVo.getRemitTimeStr())) {
+                        throw new ProcessException("请填写打款时间");
+                    }
+                    if (StringUtils.isBlank(agentVo.getRemitPerson())) {
+                        throw new ProcessException("请填写打款人");
+                    }
+                    Date format = DateUtil.format(agentVo.getRemitTimeStr());
+                    capitalChangeApply.setRemitTime(format);
+                    capitalChangeApply.setRemitPerson(agentVo.getRemitPerson());
+                    int i = capitalChangeApplyService.updateByPrimaryKeySelective(capitalChangeApply);
+                    if(i!=1){
+                        throw new ProcessException("更新打款信息失败");
+                    }
+
                     //添加新的附件
                     for (String capitalFile : agentVo.getCapitalChangeFinaFiles()) {
                         AttachmentRel record = new AttachmentRel();
@@ -383,7 +398,7 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             throw new MessageException(e.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new MessageException("catch工作流处理任务异常！" );
+            throw new MessageException(e.getMessage());
         }
         return AgentResult.ok();
     }
@@ -536,9 +551,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         } else if (capitalChangeApply.getOperationType().compareTo(OperationType.TK.getValue()) == 0) {
             //查询所有机具欠款
             BigDecimal sumDebt = paymentDetailService.getSumDebt(capitalChangeApply.getAgentId());
-            //只要机具欠款大于0就抵扣
-            capitalService.disposeCapital(capitals,capitalChangeApply.getOperationAmt().add(capitalChangeApply.getServiceCharge()),
-                    capitalChangeApply.getId(),capitalChangeApply.getcUser(),capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName(),"保证金扣款");
+            capitalService.disposeCapital(capitals,capitalChangeApply.getOperationAmt(), capitalChangeApply.getId(),capitalChangeApply.getcUser(),
+                                          capitalChangeApply.getAgentId(),capitalChangeApply.getAgentName(),"保证金扣款");
             if(capitalChangeApply.getMachinesDeptAmt().signum()==-1){
                 throw new MessageException("抵扣金额必须是正数！");
             }
@@ -609,5 +623,9 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         }
     }
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public int updateByPrimaryKeySelective(CapitalChangeApply capitalChangeApply){
+        return capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply);
+    }
 }

@@ -98,6 +98,9 @@ public class AgentVo implements Serializable {
     private List<String> capitalChangeFinaFiles;
     private String operationType;
     private BigDecimal amt;
+    private String remitTimeStr;
+    private String remitPerson;
+
 
     public String getOperationType() {
         return operationType;
@@ -513,5 +516,21 @@ public class AgentVo implements Serializable {
 
     public void setCapitalChangeFinaFiles(List<String> capitalChangeFinaFiles) {
         this.capitalChangeFinaFiles = capitalChangeFinaFiles;
+    }
+
+    public String getRemitTimeStr() {
+        return remitTimeStr;
+    }
+
+    public void setRemitTimeStr(String remitTimeStr) {
+        this.remitTimeStr = remitTimeStr;
+    }
+
+    public String getRemitPerson() {
+        return remitPerson;
+    }
+
+    public void setRemitPerson(String remitPerson) {
+        this.remitPerson = remitPerson;
     }
 }
