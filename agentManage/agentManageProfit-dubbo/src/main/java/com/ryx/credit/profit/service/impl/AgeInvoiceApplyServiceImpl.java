@@ -122,7 +122,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
 
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, null);
         if (proceId == null) {
             //启动失败，要删除对应数据
             InvoiceApplyExample example = new InvoiceApplyExample();
