@@ -905,14 +905,17 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             throw new RuntimeException("导入数据为空");
         }
         for (List<Object> list: datas) {
-            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
-                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                throw new RuntimeException("数据不能为空");
-            }
+            if(list.size()== 7){
+                if(StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString())|| StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
+                    throw new RuntimeException("数据不能为空");
+                }
+
+
             try{
                 insertDeduction(list, userId);
             }catch (Exception e){
                 throw  new RuntimeException("数据格式异常！");
+            }
             }
         }
 

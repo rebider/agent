@@ -60,6 +60,8 @@ public enum DictGroup {
     SETTLEMENT_PRICESTR("结算价类型"),
     PAY_TYPE("打款方式"),
     MERGE("代理商合并"),
+    OTHER_DEDUCT("其他扣款/补款审批参数"),
+    INVOICEAPPLY("发票审核审批参数"),
     MERGE_MARKET("代理商合并审批市场部参数"),
     MERGE_YUHUA("代理商合并审批于华参数"),
     NETIN_MARKET("代理商入网审批市场部参数"),

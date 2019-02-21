@@ -73,4 +73,7 @@
 		<!--<table tableName="P_POS_HUDDLE_REWARD" domainObjectName="PPosHuddleReward" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
 		<table tableName="POS_HUDDLE_REWARD_DETAIL" domainObjectName="PosHuddleRewardDetail" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>
 	</context>
+<!--		<table tableName="P_PROFIT_FACTOR" domainObjectName="PProfitFactor" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="P_INVOICE_APPLY" domainObjectName="InvoiceApply" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>
+</context>
 </generatorConfiguration>

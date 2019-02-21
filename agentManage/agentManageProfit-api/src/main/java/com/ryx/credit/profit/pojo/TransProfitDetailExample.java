@@ -1617,8 +1617,633 @@ public class TransProfitDetailExample {
             return (Criteria) this;
         }
 
+        public Criteria andSourceInfoIsNull() {
+            addCriterion("SOURCE_INFO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoIsNotNull() {
+            addCriterion("SOURCE_INFO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoEqualTo(String value) {
+            addCriterion("SOURCE_INFO =", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoNotEqualTo(String value) {
+            addCriterion("SOURCE_INFO <>", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoGreaterThan(String value) {
+            addCriterion("SOURCE_INFO >", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoGreaterThanOrEqualTo(String value) {
+            addCriterion("SOURCE_INFO >=", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoLessThan(String value) {
+            addCriterion("SOURCE_INFO <", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoLessThanOrEqualTo(String value) {
+            addCriterion("SOURCE_INFO <=", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoLike(String value) {
+            addCriterion("SOURCE_INFO like", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoNotLike(String value) {
+            addCriterion("SOURCE_INFO not like", value, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoIn(List<String> values) {
+            addCriterion("SOURCE_INFO in", values, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoNotIn(List<String> values) {
+            addCriterion("SOURCE_INFO not in", values, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoBetween(String value1, String value2) {
+            addCriterion("SOURCE_INFO between", value1, value2, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andSourceInfoNotBetween(String value1, String value2) {
+            addCriterion("SOURCE_INFO not between", value1, value2, "sourceInfo");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIsNull() {
+            addCriterion("AGENT_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIsNotNull() {
+            addCriterion("AGENT_TYPE is not null");
+            return (Criteria) this;
+        }
+
         public Criteria andAgentTypeEqualTo(String value) {
             addCriterion("AGENT_TYPE =", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotEqualTo(String value) {
+            addCriterion("AGENT_TYPE <>", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeGreaterThan(String value) {
+            addCriterion("AGENT_TYPE >", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeGreaterThanOrEqualTo(String value) {
+            addCriterion("AGENT_TYPE >=", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLessThan(String value) {
+            addCriterion("AGENT_TYPE <", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLessThanOrEqualTo(String value) {
+            addCriterion("AGENT_TYPE <=", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeLike(String value) {
+            addCriterion("AGENT_TYPE like", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotLike(String value) {
+            addCriterion("AGENT_TYPE not like", value, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeIn(List<String> values) {
+            addCriterion("AGENT_TYPE in", values, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotIn(List<String> values) {
+            addCriterion("AGENT_TYPE not in", values, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeBetween(String value1, String value2) {
+            addCriterion("AGENT_TYPE between", value1, value2, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andAgentTypeNotBetween(String value1, String value2) {
+            addCriterion("AGENT_TYPE not between", value1, value2, "agentType");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtIsNull() {
+            addCriterion("UNLINE_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtIsNotNull() {
+            addCriterion("UNLINE_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtEqualTo(BigDecimal value) {
+            addCriterion("UNLINE_AMT =", value, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtNotEqualTo(BigDecimal value) {
+            addCriterion("UNLINE_AMT <>", value, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtGreaterThan(BigDecimal value) {
+            addCriterion("UNLINE_AMT >", value, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("UNLINE_AMT >=", value, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtLessThan(BigDecimal value) {
+            addCriterion("UNLINE_AMT <", value, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("UNLINE_AMT <=", value, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtIn(List<BigDecimal> values) {
+            addCriterion("UNLINE_AMT in", values, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtNotIn(List<BigDecimal> values) {
+            addCriterion("UNLINE_AMT not in", values, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("UNLINE_AMT between", value1, value2, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andUnlineAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("UNLINE_AMT not between", value1, value2, "unlineAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNull() {
+            addCriterion("PARENT_AGENT_NAME is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIsNotNull() {
+            addCriterion("PARENT_AGENT_NAME is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME =", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <>", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThan(String value) {
+            addCriterion("PARENT_AGENT_NAME >", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameGreaterThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME >=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThan(String value) {
+            addCriterion("PARENT_AGENT_NAME <", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLessThanOrEqualTo(String value) {
+            addCriterion("PARENT_AGENT_NAME <=", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameLike(String value) {
+            addCriterion("PARENT_AGENT_NAME like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotLike(String value) {
+            addCriterion("PARENT_AGENT_NAME not like", value, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotIn(List<String> values) {
+            addCriterion("PARENT_AGENT_NAME not in", values, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentAgentNameNotBetween(String value1, String value2) {
+            addCriterion("PARENT_AGENT_NAME not between", value1, value2, "parentAgentName");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtIsNull() {
+            addCriterion("POS_TRAN_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtIsNotNull() {
+            addCriterion("POS_TRAN_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_AMT =", value, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtNotEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_AMT <>", value, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtGreaterThan(BigDecimal value) {
+            addCriterion("POS_TRAN_AMT >", value, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_AMT >=", value, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtLessThan(BigDecimal value) {
+            addCriterion("POS_TRAN_AMT <", value, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_AMT <=", value, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtIn(List<BigDecimal> values) {
+            addCriterion("POS_TRAN_AMT in", values, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtNotIn(List<BigDecimal> values) {
+            addCriterion("POS_TRAN_AMT not in", values, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_TRAN_AMT between", value1, value2, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_TRAN_AMT not between", value1, value2, "posTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeIsNull() {
+            addCriterion("POS_TRAN_FEE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeIsNotNull() {
+            addCriterion("POS_TRAN_FEE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_FEE =", value, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeNotEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_FEE <>", value, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeGreaterThan(BigDecimal value) {
+            addCriterion("POS_TRAN_FEE >", value, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_FEE >=", value, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeLessThan(BigDecimal value) {
+            addCriterion("POS_TRAN_FEE <", value, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_TRAN_FEE <=", value, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeIn(List<BigDecimal> values) {
+            addCriterion("POS_TRAN_FEE in", values, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeNotIn(List<BigDecimal> values) {
+            addCriterion("POS_TRAN_FEE not in", values, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_TRAN_FEE between", value1, value2, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosTranFeeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_TRAN_FEE not between", value1, value2, "posTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtIsNull() {
+            addCriterion("POS_PFT_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtIsNotNull() {
+            addCriterion("POS_PFT_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtEqualTo(BigDecimal value) {
+            addCriterion("POS_PFT_AMT =", value, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtNotEqualTo(BigDecimal value) {
+            addCriterion("POS_PFT_AMT <>", value, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtGreaterThan(BigDecimal value) {
+            addCriterion("POS_PFT_AMT >", value, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_PFT_AMT >=", value, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtLessThan(BigDecimal value) {
+            addCriterion("POS_PFT_AMT <", value, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("POS_PFT_AMT <=", value, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtIn(List<BigDecimal> values) {
+            addCriterion("POS_PFT_AMT in", values, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtNotIn(List<BigDecimal> values) {
+            addCriterion("POS_PFT_AMT not in", values, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_PFT_AMT between", value1, value2, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andPosPftAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("POS_PFT_AMT not between", value1, value2, "posPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtIsNull() {
+            addCriterion("QR_TRAN_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtIsNotNull() {
+            addCriterion("QR_TRAN_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_AMT =", value, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtNotEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_AMT <>", value, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtGreaterThan(BigDecimal value) {
+            addCriterion("QR_TRAN_AMT >", value, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_AMT >=", value, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtLessThan(BigDecimal value) {
+            addCriterion("QR_TRAN_AMT <", value, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_AMT <=", value, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtIn(List<BigDecimal> values) {
+            addCriterion("QR_TRAN_AMT in", values, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtNotIn(List<BigDecimal> values) {
+            addCriterion("QR_TRAN_AMT not in", values, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("QR_TRAN_AMT between", value1, value2, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("QR_TRAN_AMT not between", value1, value2, "qrTranAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeIsNull() {
+            addCriterion("QR_TRAN_FEE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeIsNotNull() {
+            addCriterion("QR_TRAN_FEE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_FEE =", value, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeNotEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_FEE <>", value, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeGreaterThan(BigDecimal value) {
+            addCriterion("QR_TRAN_FEE >", value, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_FEE >=", value, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeLessThan(BigDecimal value) {
+            addCriterion("QR_TRAN_FEE <", value, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("QR_TRAN_FEE <=", value, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeIn(List<BigDecimal> values) {
+            addCriterion("QR_TRAN_FEE in", values, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeNotIn(List<BigDecimal> values) {
+            addCriterion("QR_TRAN_FEE not in", values, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("QR_TRAN_FEE between", value1, value2, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrTranFeeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("QR_TRAN_FEE not between", value1, value2, "qrTranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtIsNull() {
+            addCriterion("QR_PFT_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtIsNotNull() {
+            addCriterion("QR_PFT_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtEqualTo(BigDecimal value) {
+            addCriterion("QR_PFT_AMT =", value, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtNotEqualTo(BigDecimal value) {
+            addCriterion("QR_PFT_AMT <>", value, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtGreaterThan(BigDecimal value) {
+            addCriterion("QR_PFT_AMT >", value, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("QR_PFT_AMT >=", value, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtLessThan(BigDecimal value) {
+            addCriterion("QR_PFT_AMT <", value, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("QR_PFT_AMT <=", value, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtIn(List<BigDecimal> values) {
+            addCriterion("QR_PFT_AMT in", values, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtNotIn(List<BigDecimal> values) {
+            addCriterion("QR_PFT_AMT not in", values, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("QR_PFT_AMT between", value1, value2, "qrPftAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andQrPftAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("QR_PFT_AMT not between", value1, value2, "qrPftAmt");
             return (Criteria) this;
         }
     }

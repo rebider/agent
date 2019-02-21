@@ -32,6 +32,7 @@ public enum BusActRelBusType {
     agentQuitRefund("/BusActRelBusType/agentQuitRefund","代理商退出申请退款"),
     capitalChange("/BusActRelBusType/capitalChange","保证金变更申请"),
     CityApplyDeduction("/BusActRelBusType/cityApplyDeduction","省区其他扣款申请"),
+    INVOICEAPPLY("/BusActRelBusType/invoiceApply","代理商发票审批"),
     CityApplySupply("/BusActRelBusType/CityApplySupply","省区其他补款申请");
 
 
