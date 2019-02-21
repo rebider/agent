@@ -92,6 +92,53 @@ public class AgentVo implements Serializable {
     private String mainDocDistrict; //主代理商大区
     private String subDocDistrict;  //副代理商大区
 
+    //发票信息
+   private String invoiceId;
+   private  String invoiceReturnReason;
+    private  String invoiceReturnExpressNumber;
+    private  String invoiceReturnExpressCompany;
+    private  String invoiceReturnDate;
+
+    public String getInvoiceId() {
+        return invoiceId;
+    }
+
+    public void setInvoiceId(String invoiceId) {
+        this.invoiceId = invoiceId;
+    }
+
+    public String getInvoiceReturnReason() {
+        return invoiceReturnReason;
+    }
+
+    public void setInvoiceReturnReason(String invoiceReturnReason) {
+        this.invoiceReturnReason = invoiceReturnReason;
+    }
+
+    public String getInvoiceReturnExpressNumber() {
+        return invoiceReturnExpressNumber;
+    }
+
+    public void setInvoiceReturnExpressNumber(String invoiceReturnExpressNumber) {
+        this.invoiceReturnExpressNumber = invoiceReturnExpressNumber;
+    }
+
+    public String getInvoiceReturnExpressCompany() {
+        return invoiceReturnExpressCompany;
+    }
+
+    public void setInvoiceReturnExpressCompany(String invoiceReturnExpressCompany) {
+        this.invoiceReturnExpressCompany = invoiceReturnExpressCompany;
+    }
+
+    public String getInvoiceReturnDate() {
+        return invoiceReturnDate;
+    }
+
+    public void setInvoiceReturnDate(String invoiceReturnDate) {
+        this.invoiceReturnDate = invoiceReturnDate;
+    }
+
     public String getMainDocDistrict() {
         return mainDocDistrict;
     }

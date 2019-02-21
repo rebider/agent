@@ -87,6 +87,7 @@ public enum TabId {
     P_CITYAPPLICATION_DETAIL("PCD%s%015d"),
     A_AGENT_RELATE("AR%s%015d"),
     A_AGENT_RELATE_DETAIL("ARD%s%015d"),
+    P_INVOICE_APPLY("PIA%s%015d"),
     A_AGENT_MERGE_BUSINFO("AMB%s%015d");
 
 
