@@ -2,12 +2,11 @@ package com.ryx.credit.profit.pojo;
 
 import com.ryx.credit.common.util.Page;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProfitOrganTranMonthExample implements Serializable {
+public class ProfitOrganTranMonthExample {
     protected String orderByClause;
 
     protected boolean distinct;
@@ -805,6 +804,126 @@ public class ProfitOrganTranMonthExample implements Serializable {
 
         public Criteria andRemarkNotBetween(String value1, String value2) {
             addCriterion("REMARK not between", value1, value2, "remark");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeIsNull() {
+            addCriterion("TRAN_FEE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeIsNotNull() {
+            addCriterion("TRAN_FEE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeEqualTo(BigDecimal value) {
+            addCriterion("TRAN_FEE =", value, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeNotEqualTo(BigDecimal value) {
+            addCriterion("TRAN_FEE <>", value, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeGreaterThan(BigDecimal value) {
+            addCriterion("TRAN_FEE >", value, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("TRAN_FEE >=", value, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeLessThan(BigDecimal value) {
+            addCriterion("TRAN_FEE <", value, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("TRAN_FEE <=", value, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeIn(List<BigDecimal> values) {
+            addCriterion("TRAN_FEE in", values, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeNotIn(List<BigDecimal> values) {
+            addCriterion("TRAN_FEE not in", values, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TRAN_FEE between", value1, value2, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andTranFeeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("TRAN_FEE not between", value1, value2, "tranFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeIsNull() {
+            addCriterion("SETTLE_FEE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeIsNotNull() {
+            addCriterion("SETTLE_FEE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_FEE =", value, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeNotEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_FEE <>", value, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeGreaterThan(BigDecimal value) {
+            addCriterion("SETTLE_FEE >", value, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_FEE >=", value, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeLessThan(BigDecimal value) {
+            addCriterion("SETTLE_FEE <", value, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SETTLE_FEE <=", value, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeIn(List<BigDecimal> values) {
+            addCriterion("SETTLE_FEE in", values, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeNotIn(List<BigDecimal> values) {
+            addCriterion("SETTLE_FEE not in", values, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLE_FEE between", value1, value2, "settleFee");
+            return (Criteria) this;
+        }
+
+        public Criteria andSettleFeeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SETTLE_FEE not between", value1, value2, "settleFee");
             return (Criteria) this;
         }
     }

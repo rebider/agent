@@ -2,6 +2,7 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample;
+
 import java.util.List;
 
 public interface ProfitOrganTranMonthMapper {
