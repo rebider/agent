@@ -1,37 +1,39 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper" >
-  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitOrganTranMonth" >
-    <id column="ID" property="id" jdbcType="VARCHAR" />
-    <result column="PRODUCT_TYPE" property="productType" jdbcType="CHAR" />
-    <result column="PRODUCT_NAME" property="productName" jdbcType="VARCHAR" />
-    <result column="TRAN_AMT" property="tranAmt" jdbcType="DECIMAL" />
-    <result column="SETTLE_AMT" property="settleAmt" jdbcType="DECIMAL" />
-    <result column="CHECK_DATE" property="checkDate" jdbcType="VARCHAR" />
-    <result column="PROFIT_DATE" property="profitDate" jdbcType="VARCHAR" />
-    <result column="DIFFERENCE_AMT" property="differenceAmt" jdbcType="DECIMAL" />
-    <result column="STATUS" property="status" jdbcType="CHAR" />
-    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.ProfitOrganTranMonth">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PRODUCT_TYPE" jdbcType="CHAR" property="productType" />
+    <result column="PRODUCT_NAME" jdbcType="VARCHAR" property="productName" />
+    <result column="TRAN_AMT" jdbcType="DECIMAL" property="tranAmt" />
+    <result column="SETTLE_AMT" jdbcType="DECIMAL" property="settleAmt" />
+    <result column="CHECK_DATE" jdbcType="VARCHAR" property="checkDate" />
+    <result column="PROFIT_DATE" jdbcType="VARCHAR" property="profitDate" />
+    <result column="DIFFERENCE_AMT" jdbcType="DECIMAL" property="differenceAmt" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="REMARK" jdbcType="VARCHAR" property="remark" />
+    <result column="TRAN_FEE" jdbcType="DECIMAL" property="tranFee" />
+    <result column="SETTLE_FEE" jdbcType="DECIMAL" property="settleFee" />
   </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
                   and ${criterion.condition}
                 </when>
-                <when test="criterion.singleValue" >
+                <when test="criterion.singleValue">
                   and ${criterion.condition} #{criterion.value}
                 </when>
-                <when test="criterion.betweenValue" >
+                <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                 </when>
-                <when test="criterion.listValue" >
+                <when test="criterion.listValue">
                   and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                     #{listItem}
                   </foreach>
                 </when>
@@ -42,156 +44,266 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
-    ID, PRODUCT_TYPE, PRODUCT_NAME, TRAN_AMT, SETTLE_AMT, CHECK_DATE, PROFIT_DATE, DIFFERENCE_AMT, 
-    STATUS, REMARK
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
   </sql>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" >
+  <sql id="Base_Column_List">
+    ID, PRODUCT_TYPE, PRODUCT_NAME, TRAN_AMT, SETTLE_AMT, CHECK_DATE, PROFIT_DATE, DIFFERENCE_AMT, 
+    STATUS, REMARK, TRAN_FEE, SETTLE_FEE
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
     <include refid="Base_Column_List" />
     from P_ORGAN_TRAN_MONTH
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from P_ORGAN_TRAN_MONTH
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByExample"  parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" >
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample">
     delete from P_ORGAN_TRAN_MONTH
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
-
-  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth" >
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth">
     insert into P_ORGAN_TRAN_MONTH (ID, PRODUCT_TYPE, PRODUCT_NAME, 
       TRAN_AMT, SETTLE_AMT, CHECK_DATE, 
       PROFIT_DATE, DIFFERENCE_AMT, STATUS, 
-      REMARK)
+      REMARK, TRAN_FEE, SETTLE_FEE
+      )
     values (#{id,jdbcType=VARCHAR}, #{productType,jdbcType=CHAR}, #{productName,jdbcType=VARCHAR}, 
       #{tranAmt,jdbcType=DECIMAL}, #{settleAmt,jdbcType=DECIMAL}, #{checkDate,jdbcType=VARCHAR}, 
       #{profitDate,jdbcType=VARCHAR}, #{differenceAmt,jdbcType=DECIMAL}, #{status,jdbcType=CHAR}, 
-      #{remark,jdbcType=VARCHAR})
+      #{remark,jdbcType=VARCHAR}, #{tranFee,jdbcType=DECIMAL}, #{settleFee,jdbcType=DECIMAL}
+      )
   </insert>
-  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth" >
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth">
     insert into P_ORGAN_TRAN_MONTH
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         ID,
       </if>
-      <if test="productType != null" >
+      <if test="productType != null">
         PRODUCT_TYPE,
       </if>
-      <if test="productName != null" >
+      <if test="productName != null">
         PRODUCT_NAME,
       </if>
-      <if test="tranAmt != null" >
+      <if test="tranAmt != null">
         TRAN_AMT,
       </if>
-      <if test="settleAmt != null" >
+      <if test="settleAmt != null">
         SETTLE_AMT,
       </if>
-      <if test="checkDate != null" >
+      <if test="checkDate != null">
         CHECK_DATE,
       </if>
-      <if test="profitDate != null" >
+      <if test="profitDate != null">
         PROFIT_DATE,
       </if>
-      <if test="differenceAmt != null" >
+      <if test="differenceAmt != null">
         DIFFERENCE_AMT,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS,
       </if>
-      <if test="remark != null" >
+      <if test="remark != null">
         REMARK,
       </if>
+      <if test="tranFee != null">
+        TRAN_FEE,
+      </if>
+      <if test="settleFee != null">
+        SETTLE_FEE,
+      </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=VARCHAR},
       </if>
-      <if test="productType != null" >
+      <if test="productType != null">
         #{productType,jdbcType=CHAR},
       </if>
-      <if test="productName != null" >
+      <if test="productName != null">
         #{productName,jdbcType=VARCHAR},
       </if>
-      <if test="tranAmt != null" >
+      <if test="tranAmt != null">
         #{tranAmt,jdbcType=DECIMAL},
       </if>
-      <if test="settleAmt != null" >
+      <if test="settleAmt != null">
         #{settleAmt,jdbcType=DECIMAL},
       </if>
-      <if test="checkDate != null" >
+      <if test="checkDate != null">
         #{checkDate,jdbcType=VARCHAR},
       </if>
-      <if test="profitDate != null" >
+      <if test="profitDate != null">
         #{profitDate,jdbcType=VARCHAR},
       </if>
-      <if test="differenceAmt != null" >
+      <if test="differenceAmt != null">
         #{differenceAmt,jdbcType=DECIMAL},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=CHAR},
       </if>
-      <if test="remark != null" >
+      <if test="remark != null">
         #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="tranFee != null">
+        #{tranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="settleFee != null">
+        #{settleFee,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonthExample" resultType="java.lang.Long">
     select count(*) from P_ORGAN_TRAN_MONTH
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth" >
+  <update id="updateByExampleSelective" parameterType="map">
     update P_ORGAN_TRAN_MONTH
-    <set >
-      <if test="productType != null" >
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.productType != null">
+        PRODUCT_TYPE = #{record.productType,jdbcType=CHAR},
+      </if>
+      <if test="record.productName != null">
+        PRODUCT_NAME = #{record.productName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tranAmt != null">
+        TRAN_AMT = #{record.tranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settleAmt != null">
+        SETTLE_AMT = #{record.settleAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.checkDate != null">
+        CHECK_DATE = #{record.checkDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitDate != null">
+        PROFIT_DATE = #{record.profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.differenceAmt != null">
+        DIFFERENCE_AMT = #{record.differenceAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.status != null">
+        STATUS = #{record.status,jdbcType=CHAR},
+      </if>
+      <if test="record.remark != null">
+        REMARK = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.tranFee != null">
+        TRAN_FEE = #{record.tranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settleFee != null">
+        SETTLE_FEE = #{record.settleFee,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_ORGAN_TRAN_MONTH
+    set ID = #{record.id,jdbcType=VARCHAR},
+      PRODUCT_TYPE = #{record.productType,jdbcType=CHAR},
+      PRODUCT_NAME = #{record.productName,jdbcType=VARCHAR},
+      TRAN_AMT = #{record.tranAmt,jdbcType=DECIMAL},
+      SETTLE_AMT = #{record.settleAmt,jdbcType=DECIMAL},
+      CHECK_DATE = #{record.checkDate,jdbcType=VARCHAR},
+      PROFIT_DATE = #{record.profitDate,jdbcType=VARCHAR},
+      DIFFERENCE_AMT = #{record.differenceAmt,jdbcType=DECIMAL},
+      STATUS = #{record.status,jdbcType=CHAR},
+      REMARK = #{record.remark,jdbcType=VARCHAR},
+      TRAN_FEE = #{record.tranFee,jdbcType=DECIMAL},
+      SETTLE_FEE = #{record.settleFee,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth">
+    update P_ORGAN_TRAN_MONTH
+    <set>
+      <if test="productType != null">
         PRODUCT_TYPE = #{productType,jdbcType=CHAR},
       </if>
-      <if test="productName != null" >
+      <if test="productName != null">
         PRODUCT_NAME = #{productName,jdbcType=VARCHAR},
       </if>
-      <if test="tranAmt != null" >
+      <if test="tranAmt != null">
         TRAN_AMT = #{tranAmt,jdbcType=DECIMAL},
       </if>
-      <if test="settleAmt != null" >
+      <if test="settleAmt != null">
         SETTLE_AMT = #{settleAmt,jdbcType=DECIMAL},
       </if>
-      <if test="checkDate != null" >
+      <if test="checkDate != null">
         CHECK_DATE = #{checkDate,jdbcType=VARCHAR},
       </if>
-      <if test="profitDate != null" >
+      <if test="profitDate != null">
         PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
       </if>
-      <if test="differenceAmt != null" >
+      <if test="differenceAmt != null">
         DIFFERENCE_AMT = #{differenceAmt,jdbcType=DECIMAL},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         STATUS = #{status,jdbcType=CHAR},
       </if>
-      <if test="remark != null" >
+      <if test="remark != null">
         REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="tranFee != null">
+        TRAN_FEE = #{tranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="settleFee != null">
+        SETTLE_FEE = #{settleFee,jdbcType=DECIMAL},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth" >
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.ProfitOrganTranMonth">
     update P_ORGAN_TRAN_MONTH
     set PRODUCT_TYPE = #{productType,jdbcType=CHAR},
       PRODUCT_NAME = #{productName,jdbcType=VARCHAR},
@@ -201,16 +313,18 @@
       PROFIT_DATE = #{profitDate,jdbcType=VARCHAR},
       DIFFERENCE_AMT = #{differenceAmt,jdbcType=DECIMAL},
       STATUS = #{status,jdbcType=CHAR},
-      REMARK = #{remark,jdbcType=VARCHAR}
+      REMARK = #{remark,jdbcType=VARCHAR},
+      TRAN_FEE = #{tranFee,jdbcType=DECIMAL},
+      SETTLE_FEE = #{settleFee,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
-  <sql id="OracleDialectPrefix" >
-    <if test="page != null" >
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
       select * from ( select row_.*, rownum rownum_ from ( 
     </if>
   </sql>
-  <sql id="OracleDialectSuffix" >
-    <if test="page != null" >
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>

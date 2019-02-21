@@ -4,7 +4,25 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public class ProfitOrganTranMonth implements Serializable {
-    private static final long serialVersionUID = -194242998163037835L;
+    private String profitDateStart;
+    private String profitDateEnd;
+
+    public String getProfitDateStart() {
+        return profitDateStart;
+    }
+
+    public void setProfitDateStart(String profitDateStart) {
+        this.profitDateStart = profitDateStart;
+    }
+
+    public String getProfitDateEnd() {
+        return profitDateEnd;
+    }
+
+    public void setProfitDateEnd(String profitDateEnd) {
+        this.profitDateEnd = profitDateEnd;
+    }
+
     private String id;
 
     private String productType;
@@ -19,15 +37,15 @@ public class ProfitOrganTranMonth implements Serializable {
 
     private String profitDate;
 
-    private String profitDateStart;
-
-    private String profitDateEnd;
-
     private BigDecimal differenceAmt;
 
     private String status;
 
     private String remark;
+
+    private BigDecimal tranFee;
+
+    private BigDecimal settleFee;
 
     public String getId() {
         return id;
@@ -109,19 +127,19 @@ public class ProfitOrganTranMonth implements Serializable {
         this.remark = remark == null ? null : remark.trim();
     }
 
-    public String getProfitDateStart() {
-        return profitDateStart;
+    public BigDecimal getTranFee() {
+        return tranFee;
     }
 
-    public void setProfitDateStart(String profitDateStart) {
-        this.profitDateStart = profitDateStart;
+    public void setTranFee(BigDecimal tranFee) {
+        this.tranFee = tranFee;
     }
 
-    public String getProfitDateEnd() {
-        return profitDateEnd;
+    public BigDecimal getSettleFee() {
+        return settleFee;
     }
 
-    public void setProfitDateEnd(String profitDateEnd) {
-        this.profitDateEnd = profitDateEnd;
+    public void setSettleFee(BigDecimal settleFee) {
+        this.settleFee = settleFee;
     }
 }
