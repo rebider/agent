@@ -439,8 +439,23 @@
   </select>
 
   <select id="getCapitalSummaryCount" parameterType="java.util.Map" resultType="java.lang.Long">
-      select
-      count(*)
+    select count(1) from(
+      select a.id as agent_id,
+      a.ag_name,
+      c.c_type,
+      sum(c.c_amount) as sum_amt,
+      sum(c.c_fq_in_amount) as ky_amt,
+      sum(c.freeze_amt) as sum_freeze_amt,
+      (select a.id from a_agent_businfo ab,a_agent a
+      where ab.agent_id = a.id
+      and ab.id=(select bus_parent from a_agent_businfo where agent_id='AG20181121000000000010251' and status=1 and clo_review_status = 3 and rownum = 1)
+      and ab.status=1 and a.status =1 and ab.clo_review_status = 3 and a.ag_status = 'Approved'
+      and rownum = 1)as parent_agent_id,
+      (select a.id from a_agent_businfo ab,a_agent a
+      where ab.agent_id = a.id
+      and ab.id=(select bus_parent from a_agent_businfo where agent_id='AG20181121000000000010251' and status=1 and clo_review_status = 3 and rownum = 1)
+      and ab.status=1 and a.status =1 and ab.clo_review_status = 3 and a.ag_status = 'Approved'
+      and rownum = 1)as parent_agent_name
       from A_capital c
       left join a_agent a on a.id = c.c_agent_id
       and a.status = 1
@@ -450,6 +465,8 @@
         <if test="ID != null and ID !=''">and a.ID = #{ID}</if>
         <if test="AG_NAME != null and AG_NAME !=''">and a.AG_NAME = #{AG_NAME}</if>
       </where>
+      group by a.id, a.ag_name, c.c_type
+    )
   </select>
 
   <sql id="PAGING_START">
