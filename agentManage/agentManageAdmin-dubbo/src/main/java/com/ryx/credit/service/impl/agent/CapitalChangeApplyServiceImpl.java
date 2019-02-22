@@ -173,6 +173,19 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             capitalChangeApply.setuTime(new Date());
             capitalChangeApply.setStatus(Status.STATUS_1.status);
             capitalChangeApply.setVersion(BigDecimal.ONE);
+            if(capitalChangeApply.getOperationType().compareTo(OperationType.KQ.getValue())==0){
+                capitalChangeApply.setCloType(null);
+                capitalChangeApply.setCloRealname("");
+                capitalChangeApply.setCloBank("");
+                capitalChangeApply.setCloBankBranch("");
+                capitalChangeApply.setCloBankAccount("");
+                capitalChangeApply.setAllLineNum("");
+                capitalChangeApply.setBranchLineNum("");
+                capitalChangeApply.setCloTaxPoint(null);
+                capitalChangeApply.setCloInvoice(null);
+                capitalChangeApply.setBankRegion("");
+                capitalChangeApply.setCloBankCode(null);
+            }
             //校验
             verify(capitalChangeApply);
             int i = capitalChangeApplyMapper.insertSelective(capitalChangeApply);
