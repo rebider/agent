@@ -1936,6 +1936,66 @@ public class ProfitDirectExample {
             addCriterion("DAILY_AMT not between", value1, value2, "dailyAmt");
             return (Criteria) this;
         }
+
+        public Criteria andParentSupplyIsNull() {
+            addCriterion("PARENT_SUPPLY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyIsNotNull() {
+            addCriterion("PARENT_SUPPLY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyEqualTo(BigDecimal value) {
+            addCriterion("PARENT_SUPPLY =", value, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyNotEqualTo(BigDecimal value) {
+            addCriterion("PARENT_SUPPLY <>", value, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyGreaterThan(BigDecimal value) {
+            addCriterion("PARENT_SUPPLY >", value, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("PARENT_SUPPLY >=", value, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyLessThan(BigDecimal value) {
+            addCriterion("PARENT_SUPPLY <", value, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("PARENT_SUPPLY <=", value, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyIn(List<BigDecimal> values) {
+            addCriterion("PARENT_SUPPLY in", values, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyNotIn(List<BigDecimal> values) {
+            addCriterion("PARENT_SUPPLY not in", values, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PARENT_SUPPLY between", value1, value2, "parentSupply");
+            return (Criteria) this;
+        }
+
+        public Criteria andParentSupplyNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("PARENT_SUPPLY not between", value1, value2, "parentSupply");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
