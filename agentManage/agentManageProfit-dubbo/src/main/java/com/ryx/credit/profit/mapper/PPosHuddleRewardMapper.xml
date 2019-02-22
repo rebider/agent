@@ -336,13 +336,16 @@
        select  <include refid="Base_Column_List" />
         from P_POS_HUDDLE_REWARD
 
-        <if test="listQuvery != null and listQuvery.size()>0">
+      <if test="listQuvery != null and listQuvery.size()>0">
           where HUDDLE_CODE in(
             <foreach item="item" index="index" collection="listQuvery" separator=",">
                 #{item}
             </foreach>
             )
         </if>
+      <if test="listQuvery == null or listQuvery.size()==0">
+        where  HUDDLE_CODE = '////'
+      </if>
     </select>
 
 
@@ -358,6 +361,12 @@
             </foreach>
             )
         </if>
+
+      <if test="listQuvery == null or listQuvery.size()==0">
+        where  HUDDLE_CODE = '////'
+      </if>
+
+
     </select>
 
 </mapper>
