@@ -288,6 +288,14 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
                 }
             }
             for (CapitalVo item : agentVo.getCapitalVoList()) {
+                if(item.getcPayType().equals(PayType.YHHK.getValue())){
+                    if(item.getCapitalTableFile()==null){
+                        throw new ProcessException("银行汇款方式必须上传打款凭据");
+                    }
+                    if(item.getCapitalTableFile().size()==0){
+                        throw new ProcessException("银行汇款方式必须上传打款凭据");
+                    }
+                }
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {
                     item.setcAgentId(agent.getId());
                     item.setcUser(agent.getcUser());
