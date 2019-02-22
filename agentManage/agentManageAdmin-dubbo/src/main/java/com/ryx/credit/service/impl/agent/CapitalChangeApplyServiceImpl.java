@@ -7,6 +7,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.RegExpression;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.OPaymentDetailMapper;
@@ -188,6 +189,19 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             }
             //校验
             verify(capitalChangeApply);
+            Boolean regOperationAmt = RegExpression.regAmount(capitalChangeApply.getOperationAmt());
+            if(!regOperationAmt){
+                throw new MessageException("操作金额不正确,保留小数点后两位");
+            }
+            Boolean regServiceCharge = RegExpression.regAmount(capitalChangeApply.getServiceCharge());
+            if(!regServiceCharge){
+                throw new MessageException("手续费金额不正确,保留小数点后两位！");
+            }
+            Boolean regMachinesDeptAmt = RegExpression.regAmount(capitalChangeApply.getMachinesDeptAmt());
+            if(!regMachinesDeptAmt){
+                throw new MessageException("抵扣金额不正确,保留小数点后两位！");
+            }
+
             int i = capitalChangeApplyMapper.insertSelective(capitalChangeApply);
             if(i!=1){
                 throw new MessageException("保存退出申请失败！");

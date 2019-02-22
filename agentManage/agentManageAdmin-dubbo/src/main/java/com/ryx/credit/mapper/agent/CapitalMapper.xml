@@ -488,7 +488,7 @@
     <where>
       ac.status = #{map.status} and a.status = #{map.status} and ac.clo_review_status=#{map.cloReviewStatus}
       <if test="map.id != null"> and ac.id = #{map.id} </if>
-      <if test="map.cAgentId != null"> and ac.c_agent_id = #{map.cAgentId} </if>
+      <if test="map.agentId != null"> and ac.c_agent_id = #{map.agentId} </if>
       <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
     </where>
   </sql>
