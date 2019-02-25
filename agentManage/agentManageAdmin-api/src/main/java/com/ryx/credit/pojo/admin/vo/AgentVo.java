@@ -100,6 +100,7 @@ public class AgentVo implements Serializable {
     private BigDecimal amt;
     private String remitTimeStr;
     private String remitPerson;
+    private BigDecimal remitAmt;
 
 
     public String getOperationType() {
@@ -579,5 +580,13 @@ public class AgentVo implements Serializable {
 
     public void setRemitPerson(String remitPerson) {
         this.remitPerson = remitPerson;
+    }
+
+    public BigDecimal getRemitAmt() {
+        return remitAmt;
+    }
+
+    public void setRemitAmt(BigDecimal remitAmt) {
+        this.remitAmt = remitAmt;
     }
 }

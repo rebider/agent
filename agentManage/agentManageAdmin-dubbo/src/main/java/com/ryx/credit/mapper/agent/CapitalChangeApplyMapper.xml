@@ -34,6 +34,7 @@
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="REMIT_TIME" jdbcType="TIMESTAMP" property="remitTime" />
     <result column="REMIT_PERSON" jdbcType="VARCHAR" property="remitPerson" />
+    <result column="REMIT_AMT" jdbcType="DECIMAL" property="remitAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -69,7 +70,7 @@
     REAL_OPERATION_AMT, SERVICE_CHARGE, AGENT_ID, AGENT_NAME, CLO_REVIEW_STATUS, CLO_TYPE,
     CLO_REALNAME, CLO_BANK, CLO_BANK_BRANCH, CLO_BANK_ACCOUNT, ALL_LINE_NUM, BRANCH_LINE_NUM,
     CLO_TAX_POINT, CLO_INVOICE, BANK_REGION, CLO_BANK_CODE, REMARK, C_TIME, U_TIME, C_USER,
-    U_USER, STATUS, VERSION, REMIT_TIME, REMIT_PERSON
+    U_USER, STATUS, VERSION, REMIT_TIME, REMIT_PERSON, REMIT_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.agent.CapitalChangeApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -110,7 +111,8 @@
     BANK_REGION, CLO_BANK_CODE, REMARK,
     C_TIME, U_TIME, C_USER,
     U_USER, STATUS, VERSION,
-    REMIT_TIME, REMIT_PERSON)
+    REMIT_TIME, REMIT_PERSON, REMIT_AMT
+    )
     values (#{id,jdbcType=VARCHAR}, #{capitalType,jdbcType=VARCHAR}, #{capitalAmt,jdbcType=DECIMAL},
     #{refundType,jdbcType=DECIMAL}, #{machinesDeptAmt,jdbcType=DECIMAL}, #{operationType,jdbcType=DECIMAL},
     #{operationAmt,jdbcType=DECIMAL}, #{realOperationAmt,jdbcType=DECIMAL}, #{serviceCharge,jdbcType=DECIMAL},
@@ -121,7 +123,8 @@
     #{bankRegion,jdbcType=VARCHAR}, #{cloBankCode,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
     #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, #{cUser,jdbcType=VARCHAR},
     #{uUser,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL},
-    #{remitTime,jdbcType=TIMESTAMP}, #{remitPerson,jdbcType=VARCHAR})
+    #{remitTime,jdbcType=TIMESTAMP}, #{remitPerson,jdbcType=VARCHAR}, #{remitAmt,jdbcType=DECIMAL}
+    )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.agent.CapitalChangeApply">
     insert into A_CAPITAL_CHANGE_APPLY
@@ -222,6 +225,9 @@
       <if test="remitPerson != null">
         REMIT_PERSON,
       </if>
+      <if test="remitAmt != null">
+        REMIT_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -319,6 +325,9 @@
       </if>
       <if test="remitPerson != null">
         #{remitPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="remitAmt != null">
+        #{remitAmt,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -424,6 +433,9 @@
       <if test="remitPerson != null">
         REMIT_PERSON = #{remitPerson,jdbcType=VARCHAR},
       </if>
+      <if test="remitAmt != null">
+        REMIT_AMT = #{remitAmt,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -459,7 +471,8 @@
     STATUS = #{status,jdbcType=DECIMAL},
     VERSION = #{version,jdbcType=DECIMAL},
     REMIT_TIME = #{remitTime,jdbcType=TIMESTAMP},
-    REMIT_PERSON = #{remitPerson,jdbcType=VARCHAR}
+    REMIT_PERSON = #{remitPerson,jdbcType=VARCHAR},
+    REMIT_AMT = #{remitAmt,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

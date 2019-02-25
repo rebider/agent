@@ -70,6 +70,8 @@ public class CapitalChangeApply implements Serializable {
 
     private String remitPerson;
 
+    private BigDecimal remitAmt;
+
     private List<Attachment> attachments;
 
     private List<Attachment> financeAttachments;
@@ -344,5 +346,13 @@ public class CapitalChangeApply implements Serializable {
 
     public void setRemitPerson(String remitPerson) {
         this.remitPerson = remitPerson;
+    }
+
+    public BigDecimal getRemitAmt() {
+        return remitAmt;
+    }
+
+    public void setRemitAmt(BigDecimal remitAmt) {
+        this.remitAmt = remitAmt;
     }
 }
