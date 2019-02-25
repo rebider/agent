@@ -21,7 +21,7 @@ public interface CapitalService {
 
     List<Capital> queryByAgentId(String agentId);
 
-    PageInfo getCapitalSummaryList(Map<String,Object> param, PageInfo pageInfo);
+    PageInfo getCapitalSummaryList(Map<String,Object> param, PageInfo pageInfo,String dataRole,Long userId);
 
     PageInfo queryCapitalList(Capital capital, Page page, String dataRole, Long userId);
 

@@ -433,6 +433,7 @@
       c.status = 1  and c.clo_review_status =3
       <if test="ID != null and ID !=''">and a.ID = #{ID}</if>
       <if test="AG_NAME != null and AG_NAME !=''">and a.AG_NAME = #{AG_NAME}</if>
+      <if test="orgId != null and orgId != ''"> and (a.AG_DOC_PRO = #{orgId} or a.AG_DOC_DISTRICT = #{orgId}) </if>
     </where>
     group by a.id, a.ag_name, c.c_type
     <include refid="PAGING_END" />
@@ -464,6 +465,7 @@
         c.status = 1  and c.clo_review_status =3
         <if test="ID != null and ID !=''">and a.ID = #{ID}</if>
         <if test="AG_NAME != null and AG_NAME !=''">and a.AG_NAME = #{AG_NAME}</if>
+        <if test="orgId != null and orgId != ''"> and (a.AG_DOC_PRO = #{orgId} or a.AG_DOC_DISTRICT = #{orgId}) </if>
       </where>
       group by a.id, a.ag_name, c.c_type
     )

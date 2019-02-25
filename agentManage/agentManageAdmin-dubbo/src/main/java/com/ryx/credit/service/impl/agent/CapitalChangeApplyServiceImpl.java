@@ -100,14 +100,14 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         if (null != capitalChangeApply.getCloReviewStatus()) {
             reqMap.put("cloReviewStatus", capitalChangeApply.getCloReviewStatus());
         }
-//        if(StringUtils.isBlank(dataRole)){
-//            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
-//            if(orgCodeRes == null && orgCodeRes.size() != 1){
-//                return null;
-//            }
-//            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-//            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
-//        }
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes == null && orgCodeRes.size() != 1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            reqMap.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+        }
         List<Map<String, Object>> capitalChangeList = capitalChangeApplyMapper.queryCapitalChangeList(reqMap, page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(capitalChangeList);

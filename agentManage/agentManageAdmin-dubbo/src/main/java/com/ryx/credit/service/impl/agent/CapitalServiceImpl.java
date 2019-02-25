@@ -96,7 +96,16 @@ public class CapitalServiceImpl implements CapitalService {
      * @return
      */
     @Override
-    public PageInfo getCapitalSummaryList(Map<String, Object> param, PageInfo pageInfo) {
+    public PageInfo getCapitalSummaryList(Map<String, Object> param, PageInfo pageInfo,String dataRole,Long userId) {
+
+        if(StringUtils.isBlank(dataRole)){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
+            if(orgCodeRes == null && orgCodeRes.size() != 1){
+                return null;
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            param.put("orgId", String.valueOf(stringObjectMap.get("ORGID")));
+        }
         Long count = capitalMapper.getCapitalSummaryCount(param);
         List<Map<String, Object>> list = capitalMapper.getCapitalSummaryList(param);
         pageInfo.setTotal(count.intValue());
