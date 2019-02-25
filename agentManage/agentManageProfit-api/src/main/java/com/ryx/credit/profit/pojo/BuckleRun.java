@@ -22,6 +22,16 @@ public class BuckleRun implements Serializable{
 
     private String runStatus;
 
+    private String createTime;
+
+    private String supplyDate;
+
+    private Short supplyTimes;
+
+    private String souceId;
+
+    private BigDecimal runType;
+
     public String getId() {
         return id;
     }
@@ -92,5 +102,45 @@ public class BuckleRun implements Serializable{
 
     public void setRunStatus(String runStatus) {
         this.runStatus = runStatus == null ? null : runStatus.trim();
+    }
+
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime == null ? null : createTime.trim();
+    }
+
+    public String getSupplyDate() {
+        return supplyDate;
+    }
+
+    public void setSupplyDate(String supplyDate) {
+        this.supplyDate = supplyDate == null ? null : supplyDate.trim();
+    }
+
+    public Short getSupplyTimes() {
+        return supplyTimes;
+    }
+
+    public void setSupplyTimes(Short supplyTimes) {
+        this.supplyTimes = supplyTimes;
+    }
+
+    public String getSouceId() {
+        return souceId;
+    }
+
+    public void setSouceId(String souceId) {
+        this.souceId = souceId == null ? null : souceId.trim();
+    }
+
+    public BigDecimal getRunType() {
+        return runType;
+    }
+
+    public void setRunType(BigDecimal runType) {
+        this.runType = runType;
     }
 }

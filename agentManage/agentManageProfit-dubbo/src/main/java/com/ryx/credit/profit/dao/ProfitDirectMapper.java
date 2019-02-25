@@ -1,6 +1,5 @@
 package com.ryx.credit.profit.dao;
 
-import com.ryx.credit.pojo.admin.vo.AgentoutVo;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
 import org.apache.ibatis.annotations.Param;
