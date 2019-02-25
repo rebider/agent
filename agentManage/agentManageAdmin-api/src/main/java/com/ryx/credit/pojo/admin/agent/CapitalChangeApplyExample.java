@@ -2217,6 +2217,66 @@ public class CapitalChangeApplyExample {
             addCriterion("REMIT_PERSON not between", value1, value2, "remitPerson");
             return (Criteria) this;
         }
+
+        public Criteria andRemitAmtIsNull() {
+            addCriterion("REMIT_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtIsNotNull() {
+            addCriterion("REMIT_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtEqualTo(BigDecimal value) {
+            addCriterion("REMIT_AMT =", value, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtNotEqualTo(BigDecimal value) {
+            addCriterion("REMIT_AMT <>", value, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtGreaterThan(BigDecimal value) {
+            addCriterion("REMIT_AMT >", value, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("REMIT_AMT >=", value, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtLessThan(BigDecimal value) {
+            addCriterion("REMIT_AMT <", value, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("REMIT_AMT <=", value, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtIn(List<BigDecimal> values) {
+            addCriterion("REMIT_AMT in", values, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtNotIn(List<BigDecimal> values) {
+            addCriterion("REMIT_AMT not in", values, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REMIT_AMT between", value1, value2, "remitAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andRemitAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("REMIT_AMT not between", value1, value2, "remitAmt");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

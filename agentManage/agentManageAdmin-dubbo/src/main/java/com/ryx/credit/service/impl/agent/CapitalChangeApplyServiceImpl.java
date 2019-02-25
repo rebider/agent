@@ -193,15 +193,18 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
             if(!regOperationAmt){
                 throw new MessageException("操作金额不正确,保留小数点后两位");
             }
-            Boolean regServiceCharge = RegExpression.regAmount(capitalChangeApply.getServiceCharge());
-            if(!regServiceCharge){
-                throw new MessageException("手续费金额不正确,保留小数点后两位！");
+            if(capitalChangeApply.getServiceCharge().compareTo(BigDecimal.ZERO)==1){
+                Boolean regServiceCharge = RegExpression.regAmount(capitalChangeApply.getServiceCharge());
+                if(!regServiceCharge){
+                    throw new MessageException("手续费金额不正确,保留小数点后两位！");
+                }
             }
-            Boolean regMachinesDeptAmt = RegExpression.regAmount(capitalChangeApply.getMachinesDeptAmt());
-            if(!regMachinesDeptAmt){
-                throw new MessageException("抵扣金额不正确,保留小数点后两位！");
+            if(capitalChangeApply.getMachinesDeptAmt().compareTo(BigDecimal.ZERO)==1){
+                Boolean regMachinesDeptAmt = RegExpression.regAmount(capitalChangeApply.getMachinesDeptAmt());
+                if(!regMachinesDeptAmt){
+                    throw new MessageException("抵扣金额不正确,保留小数点后两位！");
+                }
             }
-
             int i = capitalChangeApplyMapper.insertSelective(capitalChangeApply);
             if(i!=1){
                 throw new MessageException("保存退出申请失败！");
@@ -390,9 +393,16 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                     if (StringUtils.isBlank(agentVo.getRemitPerson())) {
                         throw new ProcessException("请填写打款人");
                     }
+                    if (null==agentVo.getRemitAmt()) {
+                        throw new ProcessException("请填写打款金额");
+                    }
+                    if(agentVo.getRemitAmt().compareTo(capitalChangeApply.getRealOperationAmt())==1){
+                        throw new ProcessException("打款金额不能大于实际操作金额");
+                    }
                     Date format = DateUtil.format(agentVo.getRemitTimeStr());
                     capitalChangeApply.setRemitTime(format);
                     capitalChangeApply.setRemitPerson(agentVo.getRemitPerson());
+                    capitalChangeApply.setRemitAmt(agentVo.getRemitAmt());
                     int i = capitalChangeApplyService.updateByPrimaryKeySelective(capitalChangeApply);
                     if(i!=1){
                         throw new ProcessException("更新打款信息失败");
