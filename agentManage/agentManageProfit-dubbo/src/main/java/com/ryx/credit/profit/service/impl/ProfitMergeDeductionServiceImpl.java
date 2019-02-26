@@ -37,7 +37,6 @@ public class ProfitMergeDeductionServiceImpl implements IProfitMergeDeductionSer
 
                 List<Map<String, Object>> list = (List<Map<String, Object>>) params.get("DETAILS");
 
-
                 for (Map<String, Object> detailIdMap : list) {
                     ProfitDeduction deduction = new ProfitDeduction();
                     deduction.setAgentName(agentName);
