@@ -415,16 +415,36 @@
     sum(c.c_amount) as sum_amt,
     sum(c.c_fq_in_amount) as ky_amt,
     sum(c.freeze_amt) as sum_freeze_amt,
-    (select a.id from a_agent_businfo ab,a_agent a
-    where ab.agent_id = a.id
-    and ab.id=(select bus_parent from a_agent_businfo where agent_id='AG20181121000000000010251' and status=1 and clo_review_status = 3 and rownum = 1)
-    and ab.status=1 and a.status =1 and ab.clo_review_status = 3 and a.ag_status = 'Approved'
-    and rownum = 1)as parent_agent_id,
-    (select a.id from a_agent_businfo ab,a_agent a
-    where ab.agent_id = a.id
-    and ab.id=(select bus_parent from a_agent_businfo where agent_id='AG20181121000000000010251' and status=1 and clo_review_status = 3 and rownum = 1)
-    and ab.status=1 and a.status =1 and ab.clo_review_status = 3 and a.ag_status = 'Approved'
-    and rownum = 1)as parent_agent_name
+    (select aa.id
+    from a_agent_businfo ab, a_agent aa
+    where ab.agent_id = aa.id
+    and ab.id = (select bus_parent
+    from a_agent_businfo
+    where
+    agent_id=a.id
+    and status = 1
+    and clo_review_status = 3
+    and rownum = 1)
+    and ab.status = 1
+    and aa.status = 1
+    and ab.clo_review_status = 3
+    and aa.ag_status = 'Approved'
+    and rownum = 1) as parent_agent_id,
+    (select aa.ag_name
+    from a_agent_businfo ab, a_agent aa
+    where ab.agent_id = aa.id
+    and ab.id = (select bus_parent
+    from a_agent_businfo
+    where
+    agent_id=a.id
+    and status = 1
+    and clo_review_status = 3
+    and rownum = 1)
+    and ab.status = 1
+    and aa.status = 1
+    and ab.clo_review_status = 3
+    and aa.ag_status = 'Approved'
+    and rownum = 1) as parent_agent_name
     from A_capital c
     left join a_agent a on a.id = c.c_agent_id
     and a.status = 1
@@ -447,16 +467,36 @@
       sum(c.c_amount) as sum_amt,
       sum(c.c_fq_in_amount) as ky_amt,
       sum(c.freeze_amt) as sum_freeze_amt,
-      (select a.id from a_agent_businfo ab,a_agent a
-      where ab.agent_id = a.id
-      and ab.id=(select bus_parent from a_agent_businfo where agent_id='AG20181121000000000010251' and status=1 and clo_review_status = 3 and rownum = 1)
-      and ab.status=1 and a.status =1 and ab.clo_review_status = 3 and a.ag_status = 'Approved'
-      and rownum = 1)as parent_agent_id,
-      (select a.id from a_agent_businfo ab,a_agent a
-      where ab.agent_id = a.id
-      and ab.id=(select bus_parent from a_agent_businfo where agent_id='AG20181121000000000010251' and status=1 and clo_review_status = 3 and rownum = 1)
-      and ab.status=1 and a.status =1 and ab.clo_review_status = 3 and a.ag_status = 'Approved'
-      and rownum = 1)as parent_agent_name
+      (select aa.id
+      from a_agent_businfo ab, a_agent aa
+      where ab.agent_id = aa.id
+      and ab.id = (select bus_parent
+      from a_agent_businfo
+      where
+      agent_id=a.id
+      and status = 1
+      and clo_review_status = 3
+      and rownum = 1)
+      and ab.status = 1
+      and aa.status = 1
+      and ab.clo_review_status = 3
+      and aa.ag_status = 'Approved'
+      and rownum = 1) as parent_agent_id,
+      (select aa.ag_name
+      from a_agent_businfo ab, a_agent aa
+      where ab.agent_id = aa.id
+      and ab.id = (select bus_parent
+      from a_agent_businfo
+      where
+      agent_id=a.id
+      and status = 1
+      and clo_review_status = 3
+      and rownum = 1)
+      and ab.status = 1
+      and aa.status = 1
+      and ab.clo_review_status = 3
+      and aa.ag_status = 'Approved'
+      and rownum = 1) as parent_agent_name
       from A_capital c
       left join a_agent a on a.id = c.c_agent_id
       and a.status = 1
