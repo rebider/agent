@@ -176,6 +176,13 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
         }
     }
 
+    @Override
+    public PageInfo adjustDetailList(Map<String, Object> param, String adjustType,PageInfo pageInfo) {
+        param.put("adjustType",adjustType);
+        pageInfo.setRows(pDataAdjustMapper.selectAdjustDetail(param));
+        return pageInfo;
+    }
+
     /**
      * 封装查询条件
      * @param taxDeductionDetail

@@ -22,4 +22,6 @@ public interface ITaxDeductionDetailService {
     PageInfo queryAndSubordinate(TaxDeductionDetail taxDeductionDetail,Page page);
 
     Map<String,Object> profitCount(Map<String,Object> param,boolean isQuerySubordinate);
+
+    PageInfo adjustDetailList(Map<String,Object> param,String adjustType,PageInfo pageInfo);
 }

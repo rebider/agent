@@ -5,6 +5,7 @@ import com.ryx.credit.profit.pojo.PDataAdjustExample;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PDataAdjustMapper {
     long countByExample(PDataAdjustExample example);
@@ -26,4 +27,6 @@ public interface PDataAdjustMapper {
     int updateByPrimaryKeySelective(PDataAdjust record);
 
     int updateByPrimaryKey(PDataAdjust record);
+
+    List<Map<String,Object>> selectAdjustDetail(Map<String,Object> param);
 }

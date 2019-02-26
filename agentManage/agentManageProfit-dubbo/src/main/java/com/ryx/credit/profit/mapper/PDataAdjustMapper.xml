@@ -373,4 +373,24 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+  <select id="selectAdjustDetail" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+    <include refid="Base_Column_List" />
+    from P_DATA_ADJUST
+    where 1=1
+    <if test="adjustType!=null and adjustType!=''">
+      and ADJUST_TYPE=#{adjustType}
+    </if>
+    <if test="agentId!=null and agentId!=''">
+      and AGENT_ID=#{agentId}
+    </if>
+    <if test="parentAgentId!=null and parentAgentId!=''">
+      and PARENT_AGENT_ID=#{parentAgentId}
+    </if>
+    <if test="profitMonth!=null and profitMonth!=''">
+      and PROFIT_MONTH=#{profitMonth}
+    </if>
+    order by ADJUST_TIME desc
+  </select>
 </mapper>
