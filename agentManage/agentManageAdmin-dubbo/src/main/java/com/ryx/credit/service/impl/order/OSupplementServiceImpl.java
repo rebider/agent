@@ -17,6 +17,7 @@ import com.ryx.credit.dao.order.OSupplementMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 import com.ryx.credit.pojo.admin.vo.OsupplementVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.IUserService;
@@ -159,6 +160,14 @@ public class OSupplementServiceImpl implements OSupplementService {
         }
         if(osupplementVo.getoCashReceivablesVos()==null || osupplementVo.getoCashReceivablesVos().size()==0){
             throw new MessageException("必须上传打款记录");
+        }
+        List<OCashReceivablesVo> oCashReceivablesVos = osupplementVo.getoCashReceivablesVos();
+        BigDecimal sumAmount = BigDecimal.ZERO;
+        for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVos) {
+            sumAmount = sumAmount.add(oCashReceivablesVo.getAmount());
+        }
+        if(sumAmount.compareTo(oSupplement.getPayAmount())!=0){
+            throw new MessageException("打款金额必须与付款金额相同");
         }
         //去查询是否已经在审批
         String srcId = oSupplement.getSrcId();
