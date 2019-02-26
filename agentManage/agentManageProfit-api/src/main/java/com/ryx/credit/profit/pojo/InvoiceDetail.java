@@ -58,25 +58,9 @@ public class InvoiceDetail implements Serializable {
 
     private String updateTime;
 
-    private BigDecimal drAddInvoiceAmt; //线下导入
+    private BigDecimal drAddInvoiceAmt;
 
-    private  BigDecimal shAddInvoiceAmt;//线上维护
-
-    public BigDecimal getDrAddInvoiceAmt() {
-        return drAddInvoiceAmt;
-    }
-
-    public void setDrAddInvoiceAmt(BigDecimal drAddInvoiceAmt) {
-        this.drAddInvoiceAmt = drAddInvoiceAmt;
-    }
-
-    public BigDecimal getShAddInvoiceAmt() {
-        return shAddInvoiceAmt;
-    }
-
-    public void setShAddInvoiceAmt(BigDecimal shAddInvoiceAmt) {
-        this.shAddInvoiceAmt = shAddInvoiceAmt;
-    }
+    private BigDecimal shAddInvoceAmt;
 
     public String getId() {
         return id;
@@ -292,5 +276,21 @@ public class InvoiceDetail implements Serializable {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime == null ? null : updateTime.trim();
+    }
+
+    public BigDecimal getDrAddInvoiceAmt() {
+        return drAddInvoiceAmt;
+    }
+
+    public void setDrAddInvoiceAmt(BigDecimal drAddInvoiceAmt) {
+        this.drAddInvoiceAmt = drAddInvoiceAmt;
+    }
+
+    public BigDecimal getShAddInvoceAmt() {
+        return shAddInvoceAmt;
+    }
+
+    public void setShAddInvoceAmt(BigDecimal shAddInvoceAmt) {
+        this.shAddInvoceAmt = shAddInvoceAmt;
     }
 }
