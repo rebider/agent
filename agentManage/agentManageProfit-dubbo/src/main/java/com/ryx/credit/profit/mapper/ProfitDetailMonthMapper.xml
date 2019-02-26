@@ -883,6 +883,11 @@
     </if>
   </sql>
 
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+
+
+
+
 
 
 
@@ -1016,10 +1021,12 @@
     <include refid="paging_start" />
     select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
     ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
-    ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,ppd.REAL_PROFIT_AMT,
-    ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
-    ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
-    ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
+    ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,
+    nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
+    nvl(ppd.ryx_profit_amt,0)+ nvl(ppd.ryx_hd_profit_amt,0)
+    +nvl(ppd.tp_profit_amt,0)+ nvl(ppd.rs_profit_amt,0)+nvl(ppd.rs_hd_profit_amt,0)
+    +nvl(ppd.rhb_profit_amt,0)+nvl(ppd.zf_profit_amt,0) as SUM_ZF,
+    ppd.BU_DEDUCTION_AMT,ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
     nvl(ppd.pos_td_supply_amt,'0')+nvl(ppd.mpos_td_supply_amt,'0')+nvl(ppd.tools_return_amt,'0')+nvl(ppd.other_supply_amt,'0') as profitSupplySum,
     ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,
     nvl(ppd.pos_td_real_deduction_amt,0)
@@ -1043,16 +1050,18 @@
 
     from P_PROFIT_DETAIL_M ppd
     <include refid="queryWhere"/>
-    order by ppd.profit_date desc) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
+    order by ppd.profit_date desc ) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
     <include refid="paging_end" />
   </select>
     <!--导出数据 查询：不包含下级-->
   <select id="exportByFNoChild" parameterType="java.util.Map" resultType="java.util.Map">
     select bb.* ,aa.ag_name as parentAgentName from(select
     ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
-    ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,ppd.REAL_PROFIT_AMT,
-    ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
-    ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
+    ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,ppd.BU_DEDUCTION_AMT,
+    nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
+    nvl(ppd.ryx_profit_amt,0)+ nvl(ppd.ryx_hd_profit_amt,0)
+    +nvl(ppd.tp_profit_amt,0)+ nvl(ppd.rs_profit_amt,0)+nvl(ppd.rs_hd_profit_amt,0)
+    +nvl(ppd.rhb_profit_amt,0)+nvl(ppd.zf_profit_amt,0) as SUM_ZF,
     ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
     nvl(ppd.pos_td_supply_amt,'0')+nvl(ppd.mpos_td_supply_amt,'0')+nvl(ppd.tools_return_amt,'0')+nvl(ppd.other_supply_amt,'0') as profitSupplySum,
     ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,
@@ -1094,9 +1103,11 @@
   <include refid="paging_start" />
  select zzz.* from (select bb.* ,aa.ag_name as PARENT_AGENT_NAME from(select
   ppd.id, ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
-  ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,ppd.REAL_PROFIT_AMT,
-  ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
-  ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
+  ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,ppd.BU_DEDUCTION_AMT,
+  nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
+  nvl(ppd.ryx_profit_amt,0)+ nvl(ppd.ryx_hd_profit_amt,0)
+  +nvl(ppd.tp_profit_amt,0)+ nvl(ppd.rs_profit_amt,0)+nvl(ppd.rs_hd_profit_amt,0)
+  +nvl(ppd.rhb_profit_amt,0)+nvl(ppd.zf_profit_amt,0) as SUM_ZF,
   ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
   nvl((ppd.pos_td_supply_amt+ppd.mpos_td_supply_amt+ppd.tools_return_amt+ppd.other_supply_amt),0) as profitSupplySum,
   ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,
@@ -1135,9 +1146,11 @@
   <select id="exportByFHaveChild" parameterType="java.util.Map" resultType="java.util.Map">
     select cc.*  from (select bb.* ,aa.ag_name as parentAgentName from(select
     ppd.profit_date, ppd.agent_id, ppd.agent_name,ppd.PARENT_AGENT_ID,
-    ppd.profit_sum_amt+nvl(ppd.pos_reward_amt,0) profit_sum_amt,ppd.REAL_PROFIT_AMT,
-    ppd.tran_profit_amt, ppd.pay_profit_amt, ppd.ryx_profit_amt, ppd.ryx_hd_profit_amt,ppd.BU_DEDUCTION_AMT,
-    ppd.tp_profit_amt, ppd.rs_profit_amt, ppd.rs_hd_profit_amt, ppd.rhb_profit_amt, ppd.zf_profit_amt,
+    ppd.profit_sum_amt,ppd.REAL_PROFIT_AMT,ppd.BU_DEDUCTION_AMT,
+    nvl(ppd.tran_profit_amt,0)+nvl(ppd.pay_profit_amt,0) as SUM_POS,
+    nvl(ppd.ryx_profit_amt,0)+ nvl(ppd.ryx_hd_profit_amt,0)
+    +nvl(ppd.tp_profit_amt,0)+ nvl(ppd.rs_profit_amt,0)+nvl(ppd.rs_hd_profit_amt,0)
+    +nvl(ppd.rhb_profit_amt,0)+nvl(ppd.zf_profit_amt,0) as SUM_ZF,
     ppd.pos_zq_supply_profit_amt, ppd.mpos_zq_supply_profit_amt, ppd.pos_reward_amt,
     nvl((ppd.pos_td_supply_amt+ppd.mpos_td_supply_amt+ppd.tools_return_amt+ppd.other_supply_amt),0) as profitSupplySum,
     ppd.pos_td_supply_amt, ppd.mpos_td_supply_amt, ppd.tools_return_amt, ppd.other_supply_amt,

@@ -58,6 +58,10 @@ public class InvoiceDetail implements Serializable {
 
     private String updateTime;
 
+    private BigDecimal drAddInvoiceAmt;
+
+    private BigDecimal shAddInvoceAmt;
+
     public String getId() {
         return id;
     }
@@ -272,5 +276,21 @@ public class InvoiceDetail implements Serializable {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime == null ? null : updateTime.trim();
+    }
+
+    public BigDecimal getDrAddInvoiceAmt() {
+        return drAddInvoiceAmt;
+    }
+
+    public void setDrAddInvoiceAmt(BigDecimal drAddInvoiceAmt) {
+        this.drAddInvoiceAmt = drAddInvoiceAmt;
+    }
+
+    public BigDecimal getShAddInvoceAmt() {
+        return shAddInvoceAmt;
+    }
+
+    public void setShAddInvoceAmt(BigDecimal shAddInvoceAmt) {
+        this.shAddInvoceAmt = shAddInvoceAmt;
     }
 }

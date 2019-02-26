@@ -286,35 +286,6 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-
-  <select id="getSumRunAmt" parameterType="java.lang.String" resultType="java.math.BigDecimal">
-    select SUM(RUN_AMT-SUPPLY_AMT) from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR}
-  </select>
-
-  <select id="selectListByAgentIdAndRunDate" parameterType="java.util.Map" resultType="map">
-    select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.RUN_AMT
-    from (select * from P_BUCKLE_RUN where AGENT_ID = #{agentId} AND RUN_TYPE=1 AND RUN_STATUS='0' AND SUBSTR(RUN_DATE,0,6) = #{runDate}) pbr
-left join (select distinct PARENT_AGENT_NAME,PARENT_AGENT_ID,TRANS_MONTH from P_PROFIT_DIRECT) ppd
-on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.RUN_DATE,0,6)=ppd.TRANS_MONTH ORDER BY RUN_LEVEL desc
-  </select>
-  <select id="selectListByAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultType="map">
-    select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.SUPPLY_AMT
-    from (select * from P_BUCKLE_RUN where AGENT_ID = #{agentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND SUBSTR(SUPPLY_DATE,0,6) = #{runDate}) pbr
-left join (select distinct PARENT_AGENT_NAME,PARENT_AGENT_ID,TRANS_MONTH from P_PROFIT_DIRECT) ppd
-on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.SUPPLY_DATE,0,6)=ppd.TRANS_MONTH ORDER BY RUN_LEVEL desc
-  </select>
-
-  <select id="selectListByBearAgentIdAndRunDate" parameterType="java.util.Map" resultMap="BaseResultMap">
-    select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=1 AND RUN_STATUS='0' AND SUBSTR(RUN_DATE,0,6) = #{runDate}
-  </select>
-  <select id="selectListByBearAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultMap="BaseResultMap">
-    select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND substr(SUPPLY_DATE,0,6)=#{runDate}
-  </select>
-
-  <select id="selectListByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select * from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} AND RUN_STATUS='0' ORDER BY RUN_LEVEL DESC
-  </select>
-
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.BuckleRun">
     update P_BUCKLE_RUN
     <set>
@@ -379,7 +350,7 @@ on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.SUPPLY_DATE,0,6)=ppd.TRA
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -387,5 +358,29 @@ on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.SUPPLY_DATE,0,6)=ppd.TRA
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+  <select id="getSumRunAmt" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+    select SUM(RUN_AMT-SUPPLY_AMT) from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectListByAgentIdAndRunDate" parameterType="java.util.Map" resultType="map">
+    select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.RUN_AMT
+    from (select * from P_BUCKLE_RUN where AGENT_ID = #{agentId} AND RUN_TYPE=1 AND RUN_STATUS='0' AND SUBSTR(RUN_DATE,0,6) = #{runDate}) pbr
+left join (select distinct PARENT_AGENT_NAME,PARENT_AGENT_ID,TRANS_MONTH from P_PROFIT_DIRECT) ppd
+on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.RUN_DATE,0,6)=ppd.TRANS_MONTH ORDER BY RUN_LEVEL desc
+  </select>
+  <select id="selectListByAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultType="map">
+    select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.SUPPLY_AMT
+    from (select * from P_BUCKLE_RUN where AGENT_ID = #{agentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND SUBSTR(SUPPLY_DATE,0,6) = #{runDate}) pbr
+left join (select distinct PARENT_AGENT_NAME,PARENT_AGENT_ID,TRANS_MONTH from P_PROFIT_DIRECT) ppd
+on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.SUPPLY_DATE,0,6)=ppd.TRANS_MONTH ORDER BY RUN_LEVEL desc
+  </select>
+  <select id="selectListByBearAgentIdAndRunDate" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=1 AND RUN_STATUS='0' AND SUBSTR(RUN_DATE,0,6) = #{runDate}
+  </select>
+  <select id="selectListByBearAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND substr(SUPPLY_DATE,0,6)=#{runDate}
+  </select>
+  <select id="selectListByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} AND RUN_STATUS='0' ORDER BY RUN_LEVEL DESC
+  </select>
 </mapper>

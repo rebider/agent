@@ -33,6 +33,6 @@ public class TranDataJobTest {
     */
     @Test
     public void testDeal() {
-       /* tranDataJob.deal();*/
+        tranDataJob.deal("201901");
     }
 }
