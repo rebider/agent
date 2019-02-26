@@ -85,61 +85,6 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-  <select id="queryAndSubordinate" resultMap="BaseResultMap">
-    <include refid="OracleDialectPrefix" />
-    select
-    <include refid="Base_Column_List" />
-    from P_TAX_DEDUCTION_DETAIL
-    START WITH PROFIT_MONTH=#{detail.profitMonth}
-    <if test="detail.agentId!=null and detail.agentId!=''">
-      AND AGENT_ID=#{detail.agentId}
-    </if>
-    <if test="detail.agentName!=null and detail.agentName!=''">
-      AND AGENT_NAME=#{detail.agentName}
-    </if>
-    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{detail.profitMonth}
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="queryCountAndSubordinate" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail" resultType="java.lang.Long">
-    select  count(1) from (
-      select
-      distinct
-      <include refid="Base_Column_List" />
-      from P_TAX_DEDUCTION_DETAIL
-      START WITH PROFIT_MONTH=#{profitMonth}
-      <if test="agentId!=null and agentId!=''">
-        AND AGENT_ID=#{agentId}
-      </if>
-      <if test="agentName!=null and agentName!=''">
-        AND AGENT_NAME=#{agentName}
-      </if>
-      CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
-    )
-  </select>
-  <select id="profitCount" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultType="java.util.Map">
-    select count(1) as totalNum,sum(REAL_TAX_AMT) as totalMoney
-    from P_TAX_DEDUCTION_DETAIL
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-  </select>
-  <!--连带下级统计-->
-  <select id="profitCountWithSubordinate" parameterType="java.util.Map" resultType="java.util.Map">
-    select  count(1) as totalNum,sum(REAL_TAX_AMT) as totalMoney from (
-    select
-    distinct
-    <include refid="Base_Column_List" />
-    from P_TAX_DEDUCTION_DETAIL
-    START WITH PROFIT_MONTH=#{profitMonth}
-    <if test="agentId!=null and agentId!=''">
-      AND AGENT_ID=#{agentId}
-    </if>
-    <if test="agentName!=null and agentName!=''">
-      AND AGENT_NAME=#{agentName}
-    </if>
-    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
-    )
-  </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
@@ -505,7 +450,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <!--直签扣税代理商查询-->
   <select id="queryTaxDeductionAgentList" parameterType="map" resultType="map">
     select a.AGENT_ID, a.PARENT_AGENT_ID,A.AGENT_NAME,
@@ -558,7 +503,6 @@
 
     where a.PROFIT_DATE = '${profitMonth}' and  a.PAY_COMPANY != 'Q000029564'
   </select>
-
   <!--直发扣税代理商查询-->
   <select id="queryTaxDeductionZFAgentList" parameterType="map" resultType="map">
     select a.AGENT_ID,A.AGENT_NAME,
@@ -594,11 +538,63 @@
     and a.PAYCOMPANY_NUM != 'Q000029564'
 
   </select>
-
-
   <delete id="deleteByMonth" parameterType="java.lang.String">
     delete from P_TAX_DEDUCTION_DETAIL
     where PROFIT_MONTH = '${profitMonth}'
   </delete>
-
+  <select id="queryAndSubordinate" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    START WITH PROFIT_MONTH=#{detail.profitMonth}
+    <if test="detail.agentId!=null and detail.agentId!=''">
+      AND AGENT_ID=#{detail.agentId}
+    </if>
+    <if test="detail.agentName!=null and detail.agentName!=''">
+      AND AGENT_NAME=#{detail.agentName}
+    </if>
+    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{detail.profitMonth}
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryCountAndSubordinate" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetail" resultType="java.lang.Long">
+    select  count(1) from (
+    select
+    distinct
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    START WITH PROFIT_MONTH=#{profitMonth}
+    <if test="agentId!=null and agentId!=''">
+      AND AGENT_ID=#{agentId}
+    </if>
+    <if test="agentName!=null and agentName!=''">
+      AND AGENT_NAME=#{agentName}
+    </if>
+    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
+    )
+  </select>
+  <select id="profitCount" parameterType="com.ryx.credit.profit.pojo.TaxDeductionDetailExample" resultType="java.util.Map">
+    select count(1) as totalNum,sum(REAL_TAX_AMT) as totalMoney
+    from P_TAX_DEDUCTION_DETAIL
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <!--连带下级统计-->
+  <select id="profitCountWithSubordinate" parameterType="java.util.Map" resultType="java.util.Map">
+    select  count(1) as totalNum,sum(REAL_TAX_AMT) as totalMoney from (
+    select
+    distinct
+    <include refid="Base_Column_List" />
+    from P_TAX_DEDUCTION_DETAIL
+    START WITH PROFIT_MONTH=#{profitMonth}
+    <if test="agentId!=null and agentId!=''">
+      AND AGENT_ID=#{agentId}
+    </if>
+    <if test="agentName!=null and agentName!=''">
+      AND AGENT_NAME=#{agentName}
+    </if>
+    CONNECT BY  PRIOR  AGENT_ID=PARENT_AGENT_ID AND PROFIT_MONTH=#{profitMonth}
+    )
+  </select>
 </mapper>

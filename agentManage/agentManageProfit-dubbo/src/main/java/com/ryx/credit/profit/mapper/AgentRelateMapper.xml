@@ -104,43 +104,6 @@
     from A_AGENT_RELATE
     where ID = #{id,jdbcType=VARCHAR}
   </select>
-  <select id="getList" parameterType="java.util.Map" resultType="java.util.Map">
-    <include refid="OracleDialectPrefix" />
-    select t.ID, t.AGENT_NAME,AGENT_ID,
-    max(case t.ORDER_NUM when 1 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY1,
-    max(case t.ORDER_NUM when 2 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY2,
-    max(case t.ORDER_NUM when 3 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY3,
-    max(case t.ORDER_NUM when 4 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY4,
-    t.BUS_PLATFORM,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.remark
-    from
-    (select aar.ID, aar.remark,aar.AGENT_ID,aar.AGENT_NAME,aar.STATUS,aar.BUS_PLATFORM,aar.CREATE_TIME,aar.START_MONTH,aard.ORDER_NUM,aard.AGENT_NAME as RELATE_COMPANY  from A_AGENT_RELATE aar left join A_AGENT_RELATE_DETAIL aard on aar.ID=aard.RELATE_ID) t
-    group by t.ID, t.AGENT_ID,t.AGENT_NAME,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.BUS_PLATFORM,t.REMARK having 1=1
-      <if test="agentId!=null and agentId!=''">
-        and AGENT_ID=#{agentId}
-      </if>
-      <if test="agentName!=null and agentName!=''">
-        and AGENT_NAME=#{agentName}
-      </if>
-      <if test="status!=null and status!=''">
-        and STATUS = #{status}
-      </if>
-    order by CREATE_TIME desc
-    <include refid="OracleDialectSuffix" />
-  </select>
-  <select id="queryParentAgentByAgentId" parameterType="java.util.Map" resultType="java.util.Map">
-    select
-        b.agent_id as agentId,bb.ag_name as agentName
-    from a_agent_businfo a
-        left join a_agent_businfo b on b.id = a.bus_parent and b.bus_platform = a.bus_platform and b.status=1
-        left join a_agent bb on bb.id = b.agent_id
-    where 1=1
-    <if test="agentId!=null and agentId!=''">
-      and a.AGENT_ID=#{agentId}
-    </if>
-    <if test="busPlatform!=null and busPlatform!=''">
-      and a.bus_platform=#{busPlatform}
-    </if>
-  </select>
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.AgentRelateExample">
     delete from A_AGENT_RELATE
     <if test="_parameter != null">
@@ -148,17 +111,17 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.AgentRelate">
-    insert into A_AGENT_RELATE (ID, AGENT_ID, AGENT_NAME, 
-      PARENT_AGENT_ID, PARENT_AGENT_NAME, BUS_PLATFORM, 
-      BUS_TYPE, START_MONTH, STATUS, 
-      CREATE_TIME, CREATE_PERSON, CREATE_NAME, 
-      UPDATE_TIME, UPDATE_PERSON, UPDATE_NAME, 
+    insert into A_AGENT_RELATE (ID, AGENT_ID, AGENT_NAME,
+      PARENT_AGENT_ID, PARENT_AGENT_NAME, BUS_PLATFORM,
+      BUS_TYPE, START_MONTH, STATUS,
+      CREATE_TIME, CREATE_PERSON, CREATE_NAME,
+      UPDATE_TIME, UPDATE_PERSON, UPDATE_NAME,
       REMARK)
-    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
-      #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR}, 
-      #{busType,jdbcType=VARCHAR}, #{startMonth,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, 
-      #{createTime,jdbcType=VARCHAR}, #{createPerson,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR}, 
-      #{updateTime,jdbcType=VARCHAR}, #{updatePerson,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+      #{parentAgentId,jdbcType=VARCHAR}, #{parentAgentName,jdbcType=VARCHAR}, #{busPlatform,jdbcType=VARCHAR},
+      #{busType,jdbcType=VARCHAR}, #{startMonth,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL},
+      #{createTime,jdbcType=VARCHAR}, #{createPerson,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR},
+      #{updateTime,jdbcType=VARCHAR}, #{updatePerson,jdbcType=VARCHAR}, #{updateName,jdbcType=VARCHAR},
       #{remark,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.AgentRelate">
@@ -420,7 +383,7 @@
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -428,4 +391,42 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+  <select id="getList" parameterType="java.util.Map" resultType="java.util.Map">
+    <include refid="OracleDialectPrefix" />
+    select t.ID, t.AGENT_NAME,AGENT_ID,
+    max(case t.ORDER_NUM when 1 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY1,
+    max(case t.ORDER_NUM when 2 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY2,
+    max(case t.ORDER_NUM when 3 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY3,
+    max(case t.ORDER_NUM when 4 then t.RELATE_COMPANY else '' end ) RELATE_COMPANY4,
+    t.BUS_PLATFORM,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.remark
+    from
+    (select aar.ID, aar.remark,aar.AGENT_ID,aar.AGENT_NAME,aar.STATUS,aar.BUS_PLATFORM,aar.CREATE_TIME,aar.START_MONTH,aard.ORDER_NUM,aard.AGENT_NAME as RELATE_COMPANY  from A_AGENT_RELATE aar left join A_AGENT_RELATE_DETAIL aard on aar.ID=aard.RELATE_ID) t
+    group by t.ID, t.AGENT_ID,t.AGENT_NAME,t.STATUS,t.CREATE_TIME,t.START_MONTH,t.BUS_PLATFORM,t.REMARK having 1=1
+      <if test="agentId!=null and agentId!=''">
+        and AGENT_ID=#{agentId}
+      </if>
+      <if test="agentName!=null and agentName!=''">
+        and AGENT_NAME=#{agentName}
+      </if>
+      <if test="status!=null and status!=''">
+        and STATUS = #{status}
+      </if>
+    order by CREATE_TIME desc
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="queryParentAgentByAgentId" parameterType="java.util.Map" resultType="java.util.Map">
+    select
+        b.agent_id as agentId,bb.ag_name as agentName
+    from a_agent_businfo a
+        left join a_agent_businfo b on b.id = a.bus_parent and b.bus_platform = a.bus_platform and b.status=1
+        left join a_agent bb on bb.id = b.agent_id
+    where 1=1
+    <if test="agentId!=null and agentId!=''">
+      and a.AGENT_ID=#{agentId}
+    </if>
+    <if test="busPlatform!=null and busPlatform!=''">
+      and a.bus_platform=#{busPlatform}
+    </if>
+  </select>
 </mapper>

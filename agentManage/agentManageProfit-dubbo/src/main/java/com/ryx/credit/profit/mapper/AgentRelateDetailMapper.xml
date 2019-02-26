@@ -281,9 +281,7 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
-
-
-
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <select id="selectMyRelateAgents" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
