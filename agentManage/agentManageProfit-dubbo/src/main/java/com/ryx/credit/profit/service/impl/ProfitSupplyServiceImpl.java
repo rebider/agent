@@ -49,6 +49,9 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      */
     @Override
     public PageInfo getProfitSupplyList(Map<String, Object> param, PageInfo pageInfo) {
+        if("99".equals(param.get("BUS_BIG_TYPE"))){
+            param.put("sign","90");
+        }
         Long count = pProfitSupplyMapper.getProfitSupplyCount(param);
         List<Map<String, Object>> list = pProfitSupplyMapper.getProfitSupplyList(param);
         for (int i = 0; i <list.size() ; i++) {
@@ -57,7 +60,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             } else if (list.get(i).get("BUS_BIG_TYPE").equals("01" ) && list.get(i).get("BUS_TYPE").equals("02" )) {
                 list.get(i).put("SUPPLY_TYPE","POS退单补款");
             }
-            }
+        }
 
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);

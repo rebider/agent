@@ -41,4 +41,7 @@ public interface InvoiceDetailMapper {
     /**根据agentId或者agentName获得本月欠票**/
     Map<String,Object> getOwnInvoice(Map<String,String> map);
 
+    /**线上审批获取数据*/
+    List<Map<String,Object>> queryInvoiceSH(Map<String,Object> params);
+
 }

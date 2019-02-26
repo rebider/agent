@@ -14,8 +14,6 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.InvoiceMapper;
 import com.ryx.credit.profit.pojo.Invoice;
-import com.ryx.credit.profit.pojo.InvoiceDetail;
-import com.ryx.credit.profit.pojo.InvoiceDetailExample;
 import com.ryx.credit.profit.service.IOwnInvoiceService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
@@ -456,24 +454,32 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         return false;
     }
 
+
     @Override
-    public List<InvoiceDetail> getAgentInvoiceDetailList(Page page, String loginName) {
+    public List<InvoiceDetail> getAgentInvoiceDetailList(Page page, String loginName, InvoiceDetail invoiceDetail) {
         InvoiceDetailExample example = new InvoiceDetailExample();
         example.setOrderByClause("PROFIT_MONTH desc");
         example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
         criteria.andAgentIdEqualTo(loginName);
+        if(StringUtils.isNotBlank(invoiceDetail.getAgentName())){
+            criteria.andAgentNameEqualTo(invoiceDetail.getAgentName());
+        }
+        if(StringUtils.isNotBlank(invoiceDetail.getProfitMonth())){
+            criteria.andProfitMonthEqualTo(invoiceDetail.getProfitMonth());
+        }
         return invoiceDetailMapper.selectByExample(example);
     }
 
+    /**
+     * 线上维护，计算欠票
+     */
     @Override
     public void invoiceApplyComputer(InvoiceApply invoiceApply) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
-        String profitMonth = sdf.format(new Date());
+        String profitMonth = invoiceApply.getProfitMonth();
         String agentId = invoiceApply.getAgentId();
 
-        //根据agentId 和分润月 得到
-        InvoiceDetailExample example = new InvoiceDetailExample();
+        InvoiceDetailExample example = new InvoiceDetailExample();//根据agentId 和月份判断本月数据信息是否存在
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
         criteria.andAgentIdEqualTo(agentId);
         criteria.andProfitMonthEqualTo(profitMonth);
@@ -481,11 +487,16 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         if (list != null && list.size() > 0) {
             //若存在数据则更新数据
             InvoiceDetail invoiceDetail = list.get(0);
-            //计算本月到票总计
-            BigDecimal addInvoiceAmt = invoiceDetail.getAddInvoiceAmt().add(invoiceApply.getSumAmt());
-            invoiceDetail.setAddInvoiceAmt(addInvoiceAmt);
+            //线上本月到票总计
+            BigDecimal sum = invoiceDetail.getShAddInvoceAmt() == null ? BigDecimal.ZERO : invoiceDetail.getShAddInvoceAmt();
+            BigDecimal shAmt = invoiceApply.getSumAmt().add(sum);//线上实际到票
+            invoiceDetail.setShAddInvoceAmt(shAmt);
+            //本月到票合计
+            BigDecimal dr = invoiceDetail.getDrAddInvoiceAmt() == null ?BigDecimal.ZERO : invoiceDetail.getDrAddInvoiceAmt();
+            BigDecimal addAmt = dr.add(shAmt);
+            invoiceDetail.setAddInvoiceAmt(addAmt);
             //计算本月欠票
-            BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()
+            BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()//计算本月欠票
                     .add(invoiceDetail.getDayProfitAmt())
                     .add(invoiceDetail.getDayBackAmt())
                     .add(invoiceDetail.getPreProfitMonthAmt())
@@ -495,19 +506,69 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             invoiceDetail.setOwnInvoice(ownInvoice);
             invoiceDetail.setUpdateTime(DateUtils.dateToStringss(new Date()));
             invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
-        }else{
-            //插入新数据
-            //插入
-            Map<String, Object> params = new HashMap<>();
-            params.put("profitMonth", profitMonth);
-            params.put("preMonth", new SimpleDateFormat("yyyyMM").format(DateUtil.addMonth(new Date(), -2)));
-            params.put("agentId", agentId);
-            List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceAgents(params);
-            if (agentList != null && agentList.size() > 0) {
-                Map<String, Object> map = agentList.get(0);
-                insertInvoiceOwnDetail(map, profitMonth);
+        }else{//插入新数据
+            try{
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+                Date date = sdf.parse(invoiceApply.getProfitMonth());
+                Calendar curr = Calendar.getInstance();
+                curr.setTime(date);
+                curr.add(Calendar.MONTH, -1);
+                String preMonth = sdf.format(curr.getTime());
+                Map<String, Object> params = new HashMap<>();
+                params.put("profitMonth", invoiceApply.getProfitMonth());
+                params.put("preMonth",preMonth);
+                params.put("agentId", agentId);
+                List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceSH(params);
+                if(agentList != null && agentList.size()>0){
+                    Map<String, Object> map = agentList.get(0);
+                    insertInvoicesh(map,profitMonth);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
             }
-
         }
+    }
+
+    private void insertInvoicesh(Map<String, Object> map, String profitMonth){
+        InvoiceDetail invoiceDetail = new InvoiceDetail();
+        invoiceDetail.setId(idService.genId(TabId.P_INVOICE_DETAIL));
+        invoiceDetail.setAgentName((String) map.get("AGENT_NAME"));
+        invoiceDetail.setAgentId((String) map.get("AGENT_ID"));
+        invoiceDetail.setProfitMonth(profitMonth);
+        invoiceDetail.setPreLeftAmt((BigDecimal) map.get("PRE_LEFT_AMT"));
+        invoiceDetail.setDayProfitAmt((BigDecimal) map.get("DAYS_PROFIT_AMT"));
+        invoiceDetail.setDayBackAmt((BigDecimal) map.get("RETURN_MONEY"));
+        invoiceDetail.setPreProfitMonthAmt((BigDecimal) map.get("PRE_PROFIT_AMT"));
+        invoiceDetail.setPreProfitMonthBlAmt((BigDecimal) map.get("BL_AMT"));
+        invoiceDetail.setAddInvoiceAmt((BigDecimal) map.get("ADD_INVOICE_AMT"));
+        invoiceDetail.setShAddInvoceAmt((BigDecimal) map.get("ADD_INVOICE_AMT"));
+        BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()//计算本月欠票
+                .add(invoiceDetail.getDayProfitAmt())
+                .add(invoiceDetail.getDayBackAmt())
+                .add(invoiceDetail.getPreProfitMonthAmt())
+                .add(invoiceDetail.getPreProfitMonthBlAmt())
+                .add(invoiceDetail.getAdjustAmt() == null ? BigDecimal.ZERO : invoiceDetail.getAdjustAmt())
+                .subtract(invoiceDetail.getAddInvoiceAmt());
+        invoiceDetail.setOwnInvoice(ownInvoice);
+        invoiceDetail.setCreateTime(DateUtils.dateToStringss(new Date()));
+        invoiceDetailMapper.insertSelective(invoiceDetail);
+
+    }
+
+    @Override
+    public InvoiceDetail getInvoice(String agentId) {
+        Calendar curr = Calendar.getInstance();
+        curr.setTime(new Date());
+        curr.add(Calendar.MONTH, -1);
+        String profitMonth = new SimpleDateFormat("yyyyMM").format(curr.getTime());
+        InvoiceDetailExample example = new InvoiceDetailExample();//根据agentId 和月份判断本月数据信息是否存在
+        InvoiceDetailExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(agentId);
+        criteria.andProfitMonthEqualTo(profitMonth);
+        List<InvoiceDetail> list = invoiceDetailMapper.selectByExample(example);
+        if(list.size()!= 0){
+            return list.get(0);
+        }
+            return null;
     }
 }

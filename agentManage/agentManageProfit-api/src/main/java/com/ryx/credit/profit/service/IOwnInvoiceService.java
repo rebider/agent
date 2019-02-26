@@ -2,12 +2,12 @@ package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.InvoiceApply;
-import com.ryx.credit.profit.pojo.InvoiceDetail;
 
 import java.util.List;
 import java.util.Map;
 
 import com.ryx.credit.common.util.Page;
+import com.ryx.credit.profit.pojo.InvoiceDetail;
 
 /**
  * @Author: Zhang Lei
@@ -80,12 +80,14 @@ public interface IOwnInvoiceService {
      * @param loginName
      * @return
      */
-    List<InvoiceDetail> getAgentInvoiceDetailList(Page page,String loginName);
+    List<InvoiceDetail> getAgentInvoiceDetailList(Page page,String loginName,InvoiceDetail invoiceDetail);
 
     /**
      * 线上审批后计算欠票
      */
     void invoiceApplyComputer(InvoiceApply invoiceApply);
 
+
+    InvoiceDetail getInvoice(String agentId);
 
 }
