@@ -337,6 +337,7 @@
       <if test="map.id != null"> and cf.id = #{map.id} </if>
       <if test="map.agentId != null"> and cf.agent_id = #{map.agentId} </if>
       <if test="map.agentName != null"> and cf.agent_name = #{map.agentName} </if>
+      <if test="map.flowStatus != null"> and cf.flow_status = #{map.flowStatus} </if>
       <if test="map.orgId != null and map.orgId != ''"> and (a.AG_DOC_PRO = #{map.orgId} or a.AG_DOC_DISTRICT = #{map.orgId}) </if>
     </where>
   </sql>
