@@ -88,7 +88,8 @@ public enum TabId {
     A_AGENT_RELATE("AR%s%015d"),
     A_AGENT_RELATE_DETAIL("ARD%s%015d"),
     P_INVOICE_APPLY("PIA%s%015d"),
-    A_AGENT_MERGE_BUSINFO("AMB%s%015d");
+    A_AGENT_MERGE_BUSINFO("AMB%s%015d"),
+    P_DATA_ADJUST("PDA%s%015d");
 
 
     TabId(String thePatt){

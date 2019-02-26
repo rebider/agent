@@ -1,17 +1,26 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.PDataAdjustType;
+import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.profit.dao.PDataAdjustMapper;
 import com.ryx.credit.profit.dao.TaxDeductionDetailMapper;
+import com.ryx.credit.profit.pojo.PDataAdjust;
 import com.ryx.credit.profit.pojo.TaxDeductionDetail;
 import com.ryx.credit.profit.pojo.TaxDeductionDetailExample;
 import com.ryx.credit.profit.service.ITaxDeductionDetailService;
+import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +30,10 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
 
     @Autowired
     private TaxDeductionDetailMapper taxDeductionDetailMapper;
+    @Resource
+    IdService idService;
+    @Autowired
+    private PDataAdjustMapper pDataAdjustMapper;
 
     @Override
     public PageInfo posDeductTaxList(TaxDeductionDetail taxDeductionDetail, Page page,String dateStart,String dateEnd) {
@@ -87,7 +100,21 @@ public class TaxDeductionDetailServiceImpl implements ITaxDeductionDetailService
     }
 
     @Override
-    public int updateAdjust(TaxDeductionDetail taxDeductionDetail) {
+    @Transactional
+    public int updateAdjust(TaxDeductionDetail taxDeductionDetail,TaxDeductionDetail adjustDetail) {
+        //记录调整
+        PDataAdjust pDataAdjust = new PDataAdjust();
+        pDataAdjust.setId(idService.genId(TabId.P_DATA_ADJUST));
+        pDataAdjust.setProfitMonth(taxDeductionDetail.getProfitMonth());
+        pDataAdjust.setAgentId(taxDeductionDetail.getAgentId());
+        pDataAdjust.setParentAgentId(taxDeductionDetail.getParentAgentId());
+        pDataAdjust.setAdjustType(PDataAdjustType.KS.adjustType);
+        pDataAdjust.setAdjustAmt(adjustDetail.getAdjustAmt());
+        pDataAdjust.setAdjustAccount(adjustDetail.getAdjustAccount());
+        pDataAdjust.setAdjustReson(adjustDetail.getAdjustReson());
+        pDataAdjust.setAdjustTime(DateUtils.dateToStringss(new Date()));
+        pDataAdjustMapper.insertSelective(pDataAdjust);
+        //更新当前扣税明细
         return taxDeductionDetailMapper.updateByPrimaryKeySelective(taxDeductionDetail);
     }
 

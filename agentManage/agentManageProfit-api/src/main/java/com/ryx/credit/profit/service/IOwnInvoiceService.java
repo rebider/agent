@@ -49,7 +49,7 @@ public interface IOwnInvoiceService {
      * @param invoiceDetail
      * @return
      */
-    void setAdjustAMT(InvoiceDetail invoiceDetail);
+    void setAdjustAMT(InvoiceDetail invoiceDetail,InvoiceDetail adjustDetail);
 
     /**
      * 导出数据

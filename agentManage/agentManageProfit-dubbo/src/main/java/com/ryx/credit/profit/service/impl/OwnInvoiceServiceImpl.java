@@ -1,10 +1,12 @@
 package com.ryx.credit.profit.service.impl;
 
+import com.ryx.credit.common.enumc.PDataAdjustType;
 import com.ryx.credit.common.enumc.ProfitStatus;
 import com.ryx.credit.common.enumc.TabId;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.profit.dao.InvoiceDetailMapper;
+import com.ryx.credit.profit.dao.PDataAdjustMapper;
 import com.ryx.credit.profit.dao.ProfitDetailMonthMapper;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.common.util.Page;
@@ -20,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,6 +52,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
 
     @Autowired
     protected InvoiceMapper invoiceMapper;
+    @Autowired
+    private PDataAdjustMapper pDataAdjustMapper;
 
     /**
      * @Author: Zhang Lei
@@ -193,6 +199,8 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
         invoiceDetail.setPreProfitMonthAmt((BigDecimal) map.get("PRE_PROFIT_AMT"));
         invoiceDetail.setPreProfitMonthBlAmt((BigDecimal) map.get("BL_AMT"));
         invoiceDetail.setAddInvoiceAmt((BigDecimal) map.get("ADD_INVOICE_AMT"));
+        invoiceDetail.setDrAddInvoiceAmt((BigDecimal) map.get("DR_ADD_INVOICE_AMT"));
+        invoiceDetail.setShAddInvoceAmt((BigDecimal) map.get("SH_ADD_INVOCE_AMT"));
         invoiceDetail.setAdjustAmt((BigDecimal) map.get("ADJUST_AMT"));
         invoiceDetail.setOwnInvoice((BigDecimal) map.get("ownInvoice"));
         invoiceDetail.setCreateTime(DateUtils.dateToStringss(new Date()));
@@ -289,8 +297,22 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
      * 设置调整金额
      */
     @Override
-    public void setAdjustAMT(InvoiceDetail invoiceDetail) {
+    @Transactional
+    public void setAdjustAMT(InvoiceDetail invoiceDetail,InvoiceDetail adjustDetail) {
         ownInvoiceAdjust(invoiceDetail.getId(), new BigDecimal(invoiceDetail.getAdjustAmt().toString()), invoiceDetail.getAdjustAccount(), invoiceDetail.getAdjustReson());
+
+        //记录调整
+        PDataAdjust pDataAdjust = new PDataAdjust();
+        pDataAdjust.setId(idService.genId(TabId.P_DATA_ADJUST));
+        pDataAdjust.setProfitMonth(invoiceDetail.getProfitMonth());
+        pDataAdjust.setAgentId(invoiceDetail.getAgentId());
+        pDataAdjust.setParentAgentId(invoiceDetail.getParentAgentId());
+        pDataAdjust.setAdjustType(PDataAdjustType.QP.adjustType);
+        pDataAdjust.setAdjustAmt(adjustDetail.getAdjustAmt());
+        pDataAdjust.setAdjustAccount(invoiceDetail.getAdjustAccount());
+        pDataAdjust.setAdjustReson(invoiceDetail.getAdjustReson());
+        pDataAdjust.setAdjustTime(DateUtils.dateToStringss(new Date()));
+        pDataAdjustMapper.insertSelective(pDataAdjust);
     }
 
     /**

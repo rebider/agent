@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.profit.dao.PDataAdjustMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.profit.pojo.PDataAdjust">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
+    <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
+    <result column="PARENT_AGENT_ID" jdbcType="VARCHAR" property="parentAgentId" />
+    <result column="ADJUST_TYPE" jdbcType="VARCHAR" property="adjustType" />
+    <result column="ADJUST_AMT" jdbcType="DECIMAL" property="adjustAmt" />
+    <result column="SOURCE_ID" jdbcType="VARCHAR" property="sourceId" />
+    <result column="ADJUST_ACCOUNT" jdbcType="VARCHAR" property="adjustAccount" />
+    <result column="ADJUST_RESON" jdbcType="VARCHAR" property="adjustReson" />
+    <result column="ADJUST_TIME" jdbcType="VARCHAR" property="adjustTime" />
+    <result column="REV1" jdbcType="VARCHAR" property="rev1" />
+    <result column="REV2" jdbcType="VARCHAR" property="rev2" />
+    <result column="REV3" jdbcType="VARCHAR" property="rev3" />
+    <result column="REV4" jdbcType="VARCHAR" property="rev4" />
+    <result column="REV5" jdbcType="VARCHAR" property="rev5" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, PROFIT_MONTH, AGENT_ID, PARENT_AGENT_ID, ADJUST_TYPE, ADJUST_AMT, SOURCE_ID, 
+    ADJUST_ACCOUNT, ADJUST_RESON, ADJUST_TIME, REV1, REV2, REV3, REV4, REV5
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.PDataAdjustExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from P_DATA_ADJUST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from P_DATA_ADJUST
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.PDataAdjustExample">
+    delete from P_DATA_ADJUST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.profit.pojo.PDataAdjust">
+    insert into P_DATA_ADJUST (ID, PROFIT_MONTH, AGENT_ID, 
+      PARENT_AGENT_ID, ADJUST_TYPE, ADJUST_AMT, 
+      SOURCE_ID, ADJUST_ACCOUNT, ADJUST_RESON, 
+      ADJUST_TIME, REV1, REV2, 
+      REV3, REV4, REV5)
+    values (#{id,jdbcType=VARCHAR}, #{profitMonth,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
+      #{parentAgentId,jdbcType=VARCHAR}, #{adjustType,jdbcType=VARCHAR}, #{adjustAmt,jdbcType=DECIMAL}, 
+      #{sourceId,jdbcType=VARCHAR}, #{adjustAccount,jdbcType=VARCHAR}, #{adjustReson,jdbcType=VARCHAR}, 
+      #{adjustTime,jdbcType=VARCHAR}, #{rev1,jdbcType=VARCHAR}, #{rev2,jdbcType=VARCHAR}, 
+      #{rev3,jdbcType=VARCHAR}, #{rev4,jdbcType=VARCHAR}, #{rev5,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PDataAdjust">
+    insert into P_DATA_ADJUST
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH,
+      </if>
+      <if test="agentId != null">
+        AGENT_ID,
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID,
+      </if>
+      <if test="adjustType != null">
+        ADJUST_TYPE,
+      </if>
+      <if test="adjustAmt != null">
+        ADJUST_AMT,
+      </if>
+      <if test="sourceId != null">
+        SOURCE_ID,
+      </if>
+      <if test="adjustAccount != null">
+        ADJUST_ACCOUNT,
+      </if>
+      <if test="adjustReson != null">
+        ADJUST_RESON,
+      </if>
+      <if test="adjustTime != null">
+        ADJUST_TIME,
+      </if>
+      <if test="rev1 != null">
+        REV1,
+      </if>
+      <if test="rev2 != null">
+        REV2,
+      </if>
+      <if test="rev3 != null">
+        REV3,
+      </if>
+      <if test="rev4 != null">
+        REV4,
+      </if>
+      <if test="rev5 != null">
+        REV5,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMonth != null">
+        #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustType != null">
+        #{adjustType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustAmt != null">
+        #{adjustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="sourceId != null">
+        #{sourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustAccount != null">
+        #{adjustAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustReson != null">
+        #{adjustReson,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustTime != null">
+        #{adjustTime,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="rev5 != null">
+        #{rev5,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.PDataAdjustExample" resultType="java.lang.Long">
+    select count(*) from P_DATA_ADJUST
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update P_DATA_ADJUST
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitMonth != null">
+        PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentId != null">
+        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adjustType != null">
+        ADJUST_TYPE = #{record.adjustType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adjustAmt != null">
+        ADJUST_AMT = #{record.adjustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.sourceId != null">
+        SOURCE_ID = #{record.sourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adjustAccount != null">
+        ADJUST_ACCOUNT = #{record.adjustAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adjustReson != null">
+        ADJUST_RESON = #{record.adjustReson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.adjustTime != null">
+        ADJUST_TIME = #{record.adjustTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev1 != null">
+        REV1 = #{record.rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev2 != null">
+        REV2 = #{record.rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev3 != null">
+        REV3 = #{record.rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev4 != null">
+        REV4 = #{record.rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rev5 != null">
+        REV5 = #{record.rev5,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_DATA_ADJUST
+    set ID = #{record.id,jdbcType=VARCHAR},
+      PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      ADJUST_TYPE = #{record.adjustType,jdbcType=VARCHAR},
+      ADJUST_AMT = #{record.adjustAmt,jdbcType=DECIMAL},
+      SOURCE_ID = #{record.sourceId,jdbcType=VARCHAR},
+      ADJUST_ACCOUNT = #{record.adjustAccount,jdbcType=VARCHAR},
+      ADJUST_RESON = #{record.adjustReson,jdbcType=VARCHAR},
+      ADJUST_TIME = #{record.adjustTime,jdbcType=VARCHAR},
+      REV1 = #{record.rev1,jdbcType=VARCHAR},
+      REV2 = #{record.rev2,jdbcType=VARCHAR},
+      REV3 = #{record.rev3,jdbcType=VARCHAR},
+      REV4 = #{record.rev4,jdbcType=VARCHAR},
+      REV5 = #{record.rev5,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.PDataAdjust">
+    update P_DATA_ADJUST
+    <set>
+      <if test="profitMonth != null">
+        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="agentId != null">
+        AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="parentAgentId != null">
+        PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustType != null">
+        ADJUST_TYPE = #{adjustType,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustAmt != null">
+        ADJUST_AMT = #{adjustAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="sourceId != null">
+        SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustAccount != null">
+        ADJUST_ACCOUNT = #{adjustAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustReson != null">
+        ADJUST_RESON = #{adjustReson,jdbcType=VARCHAR},
+      </if>
+      <if test="adjustTime != null">
+        ADJUST_TIME = #{adjustTime,jdbcType=VARCHAR},
+      </if>
+      <if test="rev1 != null">
+        REV1 = #{rev1,jdbcType=VARCHAR},
+      </if>
+      <if test="rev2 != null">
+        REV2 = #{rev2,jdbcType=VARCHAR},
+      </if>
+      <if test="rev3 != null">
+        REV3 = #{rev3,jdbcType=VARCHAR},
+      </if>
+      <if test="rev4 != null">
+        REV4 = #{rev4,jdbcType=VARCHAR},
+      </if>
+      <if test="rev5 != null">
+        REV5 = #{rev5,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.profit.pojo.PDataAdjust">
+    update P_DATA_ADJUST
+    set PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      AGENT_ID = #{agentId,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{parentAgentId,jdbcType=VARCHAR},
+      ADJUST_TYPE = #{adjustType,jdbcType=VARCHAR},
+      ADJUST_AMT = #{adjustAmt,jdbcType=DECIMAL},
+      SOURCE_ID = #{sourceId,jdbcType=VARCHAR},
+      ADJUST_ACCOUNT = #{adjustAccount,jdbcType=VARCHAR},
+      ADJUST_RESON = #{adjustReson,jdbcType=VARCHAR},
+      ADJUST_TIME = #{adjustTime,jdbcType=VARCHAR},
+      REV1 = #{rev1,jdbcType=VARCHAR},
+      REV2 = #{rev2,jdbcType=VARCHAR},
+      REV3 = #{rev3,jdbcType=VARCHAR},
+      REV4 = #{rev4,jdbcType=VARCHAR},
+      REV5 = #{rev5,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

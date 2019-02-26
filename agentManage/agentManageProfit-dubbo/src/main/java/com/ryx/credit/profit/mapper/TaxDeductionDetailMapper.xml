@@ -544,7 +544,8 @@
     ) d on a.AGENT_ID=d.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(d.PARENT_AGENT_ID,'-')
 
     <!--调整金额-->
-    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(e.PARENT_AGENT_ID,'-')
+    left join (select AGENT_ID,PARENT_AGENT_ID,sum(ADJUST_AMT) ADJUST_AMT from P_DATA_ADJUST  where ADJUST_TYPE = 'KS' and PROFIT_MONTH = '${profitMonth}' group by AGENT_ID,PARENT_AGENT_ID)
+    e on a.AGENT_ID=e.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(e.PARENT_AGENT_ID,'-')
 
     left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(f.PARENT_AGENT_ID,'-')
 
@@ -585,7 +586,8 @@
     ) c on a.AGENT_ID = c.AGENT_ID and nvl(a.PARENT_AGENT_ID,'-') = nvl(c.PARENT_AGENT_ID,'-')
 
     <!--调整金额-->
-    left join P_TAX_DEDUCTION_DETAIL e on e.PROFIT_MONTH = '${profitMonth}' and a.AGENT_ID=e.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-')=nvl(e.PARENT_AGENT_ID,'-')
+    left join (select AGENT_ID,PARENT_AGENT_ID,sum(ADJUST_AMT) ADJUST_AMT from P_DATA_ADJUST  where ADJUST_TYPE = 'KS' and PROFIT_MONTH = '${profitMonth}' group by AGENT_ID,PARENT_AGENT_ID)
+    e on a.AGENT_ID=e.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-')=nvl(e.PARENT_AGENT_ID,'-')
     left join P_TAX_DEDUCTION_DETAIL f on f.PROFIT_MONTH = '${preMonth}' and a.AGENT_ID=f.AGENT_ID  and nvl(a.PARENT_AGENT_ID,'-') = nvl(f.PARENT_AGENT_ID,'-')
 
     where a.TRANS_MONTH = '${profitMonth}'

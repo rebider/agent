@@ -296,5 +296,19 @@
     select GROUP_ID_,ID_,PROC_DEF_ID_,PROC_INST_ID_,REV_,TASK_ID_,TYPE_,USER_ID_ from  act_ru_identitylink where TASK_ID_ = #{taskId}
   </select>
 
+  <select id="selectPosRewardByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    from  P_POS_REWARD
+    where AGENT_ID = '${agentId}'
+    <if test="applyStatus != null and applyStatus !='' ">
+      and APPLY_STATUS = '${applyStatus}'
+    </if>
+    <if test="profitMonth != null and profitMonth !='' ">
+      and TOTAL_CONS_MONTH $lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
+    </if>
+  </select>
+
+
 
 </mapper>

@@ -13,7 +13,7 @@ public interface ITaxDeductionDetailService {
 
     PageInfo posDirectlyDeductTaxList (TaxDeductionDetail taxDeductionDetail,Page page,String dateStart,String dateEnd);
 
-    int updateAdjust(TaxDeductionDetail taxDeductionDetail);
+    int updateAdjust(TaxDeductionDetail taxDeductionDetail,TaxDeductionDetail adjustDetail);
 
     TaxDeductionDetail selectById(String id);
 

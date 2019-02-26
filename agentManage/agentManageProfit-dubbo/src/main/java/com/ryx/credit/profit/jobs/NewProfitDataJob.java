@@ -159,6 +159,7 @@ public class NewProfitDataJob {
         transProfitDetail.setParentBusNum((String) agentMap.get("parentBusNum"));
         transProfitDetail.setParentAgentName((String) agentMap.get("parentAgentName"));
         transProfitDetail.setProfitDate(settleMonth);
+        transProfitDetail.setProfitAmt(profitData.getBigDecimal("PFT_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("PFT_AMT"));
         transProfitDetail.setInTransAmt(profitData.getBigDecimal("TRAN_01_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("TRAN_01_AMT"));
         transProfitDetail.setOutTransAmt(profitData.getBigDecimal("TRAN_02_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("TRAN_02_AMT"));
         transProfitDetail.setInProfitScale(profitData.getBigDecimal("PFT_01_RATE"));

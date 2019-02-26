@@ -633,7 +633,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                     break;
                 }
             }
-            ;
         }
     }
 

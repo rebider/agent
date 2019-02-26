@@ -27,7 +27,6 @@ public interface IPosRewardService {
 
     /**
      * POS奖励申请，进行审批流
-     *
      * @param posReward
      * @param userId
      * @param workId
@@ -36,7 +35,6 @@ public interface IPosRewardService {
 
     /**
      * 处理审批任务
-     *
      * @param agentVo
      * @param userId
      * @throws ProcessException
@@ -45,7 +43,6 @@ public interface IPosRewardService {
 
     /**
      * 审批流回调方法
-     *
      * @param insid
      * @param status
      */
@@ -53,7 +50,6 @@ public interface IPosRewardService {
 
     /**
      * 获取POS奖励信息
-     *
      * @param id 不能为空
      * @return POS奖励信息
      */
@@ -61,7 +57,6 @@ public interface IPosRewardService {
 
     /**
      * 根据ID 查询数据信息
-     *
      * @param id
      * @return
      */
@@ -69,15 +64,13 @@ public interface IPosRewardService {
 
     /**
      * 审批退回，修改申请信息
-     *
      * @param posReward
      * @throws Exception
      */
-    public void editRewardRegect(PosReward posReward) throws Exception;
+    public void editRewardRegect(PosReward posReward)throws Exception;
 
     /**
      * 查询此交易月份是否已申请
-     *
      * @param posReward
      * @return
      */
@@ -85,7 +78,6 @@ public interface IPosRewardService {
 
     /**
      * 按照考核月查询pos奖励申请
-     *
      * @param posReward
      * @return
      */
@@ -93,7 +85,6 @@ public interface IPosRewardService {
 
     /**
      * 插入抱团明细
-     *
      * @param record
      * @return
      */
@@ -101,15 +92,12 @@ public interface IPosRewardService {
 
     /**
      * 查询抱团此周期内是否重复
-     *
      * @param param
      * @return
      */
     List<Map<String, Object>> huddlePos(Map<String, Object> param);
-
     /**
      * POS抱团奖励申请，进行审批流
-     *
      * @param pPosHuddleReward
      * @param userId
      * @param workId
@@ -127,6 +115,13 @@ public interface IPosRewardService {
     public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page);
 
     List<PPosHuddleReward> getHuddlePosRewardByDataId(String id);
+
+    List<PosReward> selectPosRewardByParams(Map<String,Object> posRewardPrams);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByParams(Map<String,Object> posRewardPrams);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByEndMonth(Map<String,Object> map);
+}
 
     int editHuddleRewardRegect(PPosHuddleReward pPosHuddleReward);
 }
