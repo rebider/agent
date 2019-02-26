@@ -600,14 +600,16 @@ public class OLogisticServiceImpl implements OLogisticsService {
         String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
         String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
         for (int i=0;i<18;i++){
-            if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
-               continue;
-            }
-            if(excel.get(i)==null || StringUtils.isBlank(excel.get(i).toString())){
-                return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
-            }
-            if(!(excel.get(i)+"").equals((db.get(col[i])+""))){
-                return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+            if(!col[i].equals("SEND_PRO_NUM")){
+                if(null==db.get(col[i]) || db.get(col[i]).toString().length()==0){
+                   continue;
+                }
+                if(excel.get(i)==null || StringUtils.isBlank(excel.get(i).toString())){
+                    return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+                }
+                if(!(excel.get(i)+"").equals((db.get(col[i])+""))){
+                    return AgentResult.fail(PLAN_NUM+title[i]+"有改动");
+                }
             }
         }
         return AgentResult.ok();
