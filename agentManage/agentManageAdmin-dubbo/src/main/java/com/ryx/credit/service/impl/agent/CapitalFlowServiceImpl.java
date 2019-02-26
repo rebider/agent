@@ -66,6 +66,9 @@ public class CapitalFlowServiceImpl implements CapitalFlowService {
         if (StringUtils.isNotBlank(capitalFlow.getAgentName())) {
             reqMap.put("agentName", capitalFlow.getAgentName());
         }
+        if (null!=capitalFlow.getFlowStatus()) {
+            reqMap.put("flowStatus", capitalFlow.getFlowStatus());
+        }
         if(StringUtils.isBlank(dataRole)){
             List<Map<String, Object>> orgCodeRes = iUserService.orgCode(userId);
             if(orgCodeRes == null && orgCodeRes.size() != 1){

@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.agent;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
@@ -75,6 +76,13 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     private CapitalService capitalService;
     @Autowired
     private CapitalChangeApplyService capitalChangeApplyService;
+    @Autowired
+    private RedisService redisService;
+
+    private static final String CAPITAL_LOCK = "capital_lock_";
+    private static final String CAPITAL_APP_LOCK = "capital_app_lock_";
+    private static final long TIME_OUT = 60000*5;       //锁的超时时间
+    private static final long ACQUIRE_TIME_OUT = 5000;  //超时时间
 
     /**
      * 保证金列表
@@ -142,7 +150,13 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     @Override
     public AgentResult saveCapitalChange(CapitalChangeApply capitalChangeApply, String[] capitalChangeFiles, String cUser,
                                      String saveFlag, List<OCashReceivablesVo> oCashReceivables)throws Exception {
+
+        String indentifier = "";
         try {
+            indentifier = redisService.lockWithTimeout(CAPITAL_LOCK+cUser,ACQUIRE_TIME_OUT,TIME_OUT);
+            if(StringUtils.isBlank(indentifier)){
+                throw new MessageException("系统处理中,请勿重复提交！");
+            }
             if(StringUtils.isBlank(capitalChangeApply.getAgentId())){
                 throw new MessageException("代理商ID为空！");
             }
@@ -243,6 +257,10 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception(e.getMessage());
+        }finally {
+            if(StringUtils.isNotBlank(indentifier)){
+                redisService.releaseLock(CAPITAL_LOCK+cUser, indentifier);
+            }
         }
         return AgentResult.ok();
     }
@@ -307,54 +325,69 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
     public AgentResult startAgentMergeActivity(String id, String cUser, Boolean isSave) throws Exception {
-        CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(id);
-        if (capitalChangeApply == null) {
-            throw new MessageException("提交审批信息有误！");
-        }
-        if (!isSave) {
-            capitalChangeApply.setuUser(cUser);
-            capitalChangeApply.setuTime(new Date());
-            capitalChangeApply.setCloReviewStatus(AgStatus.Approving.status);
-            if (1 != capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply)) {
-                throw new MessageException("提交审批处理失败！");
+
+        String indentifier = "";
+        try {
+            indentifier = redisService.lockWithTimeout(CAPITAL_APP_LOCK+cUser,ACQUIRE_TIME_OUT,TIME_OUT);
+            if(StringUtils.isBlank(indentifier)){
+                throw new MessageException("系统处理中,请勿重复提交！");
             }
-        }
-        //锁定金额
-        disposeAmt(capitalChangeApply);
 
-        AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.CAPITALCHANGE,id,cUser);
-        if(!agentResult.isOK()){
-            logger.info("代理商退出更新打款信息失败");
-            throw new MessageException("代理商退出更新打款信息失败");
-        }
+            CapitalChangeApply capitalChangeApply = capitalChangeApplyMapper.selectByPrimaryKey(id);
+            if (capitalChangeApply == null) {
+                throw new MessageException("提交审批信息有误！");
+            }
+            if (!isSave) {
+                capitalChangeApply.setuUser(cUser);
+                capitalChangeApply.setuTime(new Date());
+                capitalChangeApply.setCloReviewStatus(AgStatus.Approving.status);
+                if (1 != capitalChangeApplyMapper.updateByPrimaryKeySelective(capitalChangeApply)) {
+                    throw new MessageException("提交审批处理失败！");
+                }
+            }
+            //锁定金额
+            disposeAmt(capitalChangeApply);
 
-        Map startPar = agentEnterService.startPar(cUser);
-        if (null == startPar) {
-            logger.info("========用户{}{}启动部门参数为空", id, cUser);
-            throw new MessageException("启动部门参数为空!");
-        }
-        startPar.put("rs","pass");
-        //启动审批
-        String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
-        if (proce == null) {
-            logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
-            throw new MessageException("审批流启动失败!");
-        }
+            AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.CAPITALCHANGE,id,cUser);
+            if(!agentResult.isOK()){
+                logger.info("代理商退出更新打款信息失败");
+                throw new MessageException("代理商退出更新打款信息失败");
+            }
 
-        //代理商业务&工作流关系
-        BusActRel record = new BusActRel();
-        record.setBusId(id);
-        record.setActivId(proce);
-        record.setcTime(Calendar.getInstance().getTime());
-        record.setcUser(cUser);
-        record.setStatus(Status.STATUS_1.status);
-        record.setBusType(BusActRelBusType.capitalChange.name());
-        record.setActivStatus(AgStatus.Approving.name());
-        record.setAgentId(capitalChangeApply.getAgentId());
-        record.setAgentName(capitalChangeApply.getAgentName());
-        if (1 != busActRelMapper.insertSelective(record)) {
-            logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
-            throw new MessageException("审批流启动失败：添加审批关系失败！");
+            Map startPar = agentEnterService.startPar(cUser);
+            if (null == startPar) {
+                logger.info("========用户{}{}启动部门参数为空", id, cUser);
+                throw new MessageException("启动部门参数为空!");
+            }
+            startPar.put("rs","pass");
+            //启动审批
+            String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
+            if (proce == null) {
+                logger.info("退补差价提交审批，审批流启动失败{}:{}", id, cUser);
+                throw new MessageException("审批流启动失败!");
+            }
+
+            //代理商业务&工作流关系
+            BusActRel record = new BusActRel();
+            record.setBusId(id);
+            record.setActivId(proce);
+            record.setcTime(Calendar.getInstance().getTime());
+            record.setcUser(cUser);
+            record.setStatus(Status.STATUS_1.status);
+            record.setBusType(BusActRelBusType.capitalChange.name());
+            record.setActivStatus(AgStatus.Approving.name());
+            record.setAgentId(capitalChangeApply.getAgentId());
+            record.setAgentName(capitalChangeApply.getAgentName());
+            if (1 != busActRelMapper.insertSelective(record)) {
+                logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
+                throw new MessageException("审批流启动失败：添加审批关系失败！");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(StringUtils.isNotBlank(indentifier)){
+                redisService.releaseLock(CAPITAL_APP_LOCK+cUser, indentifier);
+            }
         }
         return AgentResult.ok();
     }
