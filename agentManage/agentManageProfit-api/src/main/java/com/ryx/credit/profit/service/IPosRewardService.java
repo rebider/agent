@@ -121,7 +121,6 @@ public interface IPosRewardService {
     List<PPosHuddleReward> selectPosHuddleRewardByParams(Map<String,Object> posRewardPrams);
 
     List<PPosHuddleReward> selectPosHuddleRewardByEndMonth(Map<String,Object> map);
-}
 
     int editHuddleRewardRegect(PPosHuddleReward pPosHuddleReward);
 }
