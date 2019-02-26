@@ -517,6 +517,11 @@
     </if>
   </sql>
 
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+
+
+
+
 
   <select id="selectAmtBySummary" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
   select
@@ -547,4 +552,22 @@
     </if>
   </select>
 
-</mapper>
+<select id="posBaseProfitList" parameterType="java.util.Map" resultType="java.util.Map">
+select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID,PROFIT_DATE,AGENT_ID,AGENT_NAME,PARENT_AGENT_ID,BUS_CODE,POS_TRAN_AMT,POS_TRAN_FEE,POS_PFT_AMT,
+                QR_TRAN_AMT,QR_TRAN_FEE,QR_PFT_AMT,SUPPLY_AMT,SOURCE_INFO from TRANS_PROFIT_DETAIL) aa
+left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
+where (aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')
+<if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+  <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+  <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+</select>
+
+  <select id="posBaseProfitCount" parameterType="java.util.Map" resultType="java.util.Integer">
+   select count(*) from TRANS_PROFIT_DETAIL
+    where (aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')
+    <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+    <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+    <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+
+  </select>
+  </mapper>
