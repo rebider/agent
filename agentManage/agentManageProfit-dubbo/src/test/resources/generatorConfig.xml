@@ -70,6 +70,11 @@
 		<!--<table tableName="P_PROFIT_DETAIL_M" domainObjectName="ProfitDetailMonth" enableUpdateByExample="false" enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="PROFIT_SUPPLY_TAX" domainObjectName="ProfitSupplyTax" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
 <!--		<table tableName="P_PROFIT_FACTOR" domainObjectName="PProfitFactor" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="P_INVOICE_APPLY" domainObjectName="InvoiceApply" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
+		<!--<table tableName="TRANS_PROFIT_DETAIL" domainObjectName="TransProfitDetail" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
+		<table tableName="P_ORGAN_TRAN_MONTH" domainObjectName="ProfitOrganTranMonth" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>
+	</context>
+<!--		<table tableName="P_PROFIT_FACTOR" domainObjectName="PProfitFactor" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>-->
 		<table tableName="P_INVOICE_APPLY" domainObjectName="InvoiceApply" enableUpdateByExample="true" enableDeleteByPrimaryKey="false"/>
 </context>
 </generatorConfiguration>

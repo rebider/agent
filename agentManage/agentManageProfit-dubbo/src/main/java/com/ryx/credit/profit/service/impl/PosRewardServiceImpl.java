@@ -260,18 +260,15 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
                 if (listPos != null) {
                     for (PPosHuddleReward pos : listPos) {
-                        String Status1 =Status.STATUS_1.status.toString();
+                        if (agentVo.getPretest()!=null ){
+                            pos.setRev1(agentVo.getPretest());
+                        }
                         if("".equals(agentVo.getOrderAprDept()) &&(pos.getRev1()!=null)){
-
                             if ("pass".equals(agentVo.getApprovalResult()) && (!"city".equals(groupId))) {
                                 if(!"business".equals(groupId)){
                                     pos.setApplyStatus(Status.STATUS_1.status.toString());
                                 }
-
-
                             }
-                        }else if(pos.getRev1()==null){
-                            pos.setRev1(agentVo.getPretest());
                         }
                         pPosHuddleRewardMapper.updateByPrimaryKeySelective(pos);
                     }
@@ -388,6 +385,11 @@ public class PosRewardServiceImpl implements IPosRewardService {
             return pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
         }
         return null;
+    }
+
+    @Override
+    public int editHuddleRewardRegect(PPosHuddleReward pPosHuddleReward) {
+        return pPosHuddleRewardMapper.updateByPrimaryKeySelective(pPosHuddleReward);
     }
 
 
