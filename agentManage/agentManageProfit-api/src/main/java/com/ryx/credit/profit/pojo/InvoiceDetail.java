@@ -58,6 +58,26 @@ public class InvoiceDetail implements Serializable {
 
     private String updateTime;
 
+    private BigDecimal drAddInvoiceAmt; //线下导入
+
+    private  BigDecimal shAddInvoiceAmt;//线上维护
+
+    public BigDecimal getDrAddInvoiceAmt() {
+        return drAddInvoiceAmt;
+    }
+
+    public void setDrAddInvoiceAmt(BigDecimal drAddInvoiceAmt) {
+        this.drAddInvoiceAmt = drAddInvoiceAmt;
+    }
+
+    public BigDecimal getShAddInvoiceAmt() {
+        return shAddInvoiceAmt;
+    }
+
+    public void setShAddInvoiceAmt(BigDecimal shAddInvoiceAmt) {
+        this.shAddInvoiceAmt = shAddInvoiceAmt;
+    }
+
     public String getId() {
         return id;
     }
