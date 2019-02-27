@@ -1047,4 +1047,32 @@ public class CompensateServiceImpl implements CompensateService {
         }
         return AgentResult.ok();
     }
+
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public AgentResult compensateAmtDel(String busId, String cUser) throws Exception {
+        if (StringUtils.isBlank(busId)) {
+            throw new MessageException("数据ID为空！");
+        }
+        ORefundPriceDiff oRefundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(busId);
+        oRefundPriceDiff.setStatus(Status.STATUS_0.status);
+        int i = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+        if(i!=1){
+            throw new MessageException("删除失败！");
+        }
+        ORefundPriceDiffDetailExample oRefundPriceDiffDetailExample = new ORefundPriceDiffDetailExample();
+        ORefundPriceDiffDetailExample.Criteria criteria = oRefundPriceDiffDetailExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
+        List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
+        for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
+            oRefundPriceDiffDetail.setStatus(Status.STATUS_0.status);
+            int j = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
+            if(j!=1){
+                throw new MessageException("删除明细失败！");
+            }
+        }
+        return AgentResult.ok();
+    }
 }
