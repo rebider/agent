@@ -194,9 +194,7 @@ public class CompensateServiceImpl implements CompensateService {
         }
         String logisticsId = String.valueOf(compensateLList.get(0).get("LOGISTICS_ID"));
         OLogistics oLogistics = logisticsMapper.selectByPrimaryKey(logisticsId);
-        Set<String> agentIdSet = new HashSet<>();
         for (Map<String, Object> stringObjectMap : compensateLList) {
-            agentIdSet.add(String.valueOf(stringObjectMap.get("AGENT_ID")));
             Agent agent = agentService.getAgentById(String.valueOf(stringObjectMap.get("AGENT_ID")));
             if(null==agent){
                 log.info("代理商信息不存在");
@@ -229,10 +227,6 @@ public class CompensateServiceImpl implements CompensateService {
                     throw new ProcessException("商品活动超出保价时间");
                 }
             }
-        }
-        if(agentIdSet.size()>1){
-            log.info("退补差价代理商不唯一");
-            throw new ProcessException("代理商不唯一");
         }
         return compensateLList;
     }
