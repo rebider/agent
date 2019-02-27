@@ -552,22 +552,69 @@
     </if>
   </select>
 
-<select id="posBaseProfitList" parameterType="java.util.Map" resultType="java.util.Map">
-select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID,PROFIT_DATE,AGENT_ID,AGENT_NAME,PARENT_AGENT_ID,BUS_CODE,POS_TRAN_AMT,POS_TRAN_FEE,POS_PFT_AMT,
-                QR_TRAN_AMT,QR_TRAN_FEE,QR_PFT_AMT,SUPPLY_AMT,SOURCE_INFO from TRANS_PROFIT_DETAIL) aa
+<select id="baseProfitList" parameterType="java.util.Map" resultType="java.util.Map">
+  SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+  select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+  IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
+  IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
+  NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
+  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT from TRANS_PROFIT_DETAIL) aa
 left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
-where (aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')
-<if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+where
+  <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
+  <if test="SOURCE_INFO=='MPOS'">aa.SOURCE_INFO='MPOS'</if>
+ <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
   <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
   <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+  <if test="DATE_START!=null and DATE_START!=''"> and aa.PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+  <if test="DATE_END!=null and DATE_END!=''"> and aa.PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+  ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
 </select>
 
-  <select id="posBaseProfitCount" parameterType="java.util.Map" resultType="java.util.Integer">
+  <select id="baseProfitCount" parameterType="java.util.Map" resultType="java.lang.Integer">
    select count(*) from TRANS_PROFIT_DETAIL
-    where (aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')
+    where
+    <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
+    <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
+    <if test="AGENT_ID!=null and AGENT_ID!=''"> and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+    <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+    <if test="BUS_CODE!=null and BUS_CODE!=''"> and BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+    <if test="DATE_START!=null and DATE_START!=''"> and PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+    <if test="DATE_END!=null and DATE_END!=''"> and PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+  </select>
+
+
+  <select id="baseProfitLowerList" parameterType="java.util.Map" resultType="java.util.Map">
+ SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+    IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
+    IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
+    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT from TRANS_PROFIT_DETAIL) aa
+    left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
+    start with
+    <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
+    <if test="SOURCE_INFO=='MPOS'">aa.SOURCE_INFO='MPOS'</if>
     <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
     <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
     <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+    <if test="DATE_START!=null and DATE_START!=''"> and aa.PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+    <if test="DATE_END!=null and DATE_END!=''"> and aa.PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+    connect by prior aa.AGENT_ID =aa.PARENT_AGENT_ID
+   ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+  </select>
 
+  <select id="baseProfitLowerCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(*) from TRANS_PROFIT_DETAIL
+
+    start with
+    <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
+    <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
+    <if test="AGENT_ID!=null and AGENT_ID!=''"> and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+    <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+    <if test="BUS_CODE!=null and BUS_CODE!=''"> and BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+    <if test="DATE_START!=null and DATE_START!=''"> and PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+    <if test="DATE_END!=null and DATE_END!=''"> and PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+    connect by prior AGENT_ID = PARENT_AGENT_ID
   </select>
   </mapper>
