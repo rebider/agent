@@ -44,5 +44,7 @@ public interface CompensateService {
     AgentResult updateTask(AgentVo agentVo,BigDecimal deductAmt,String userId,List<OCashReceivablesVo> cashReceivablesVoList)throws Exception;
 
     AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList);
+
+    AgentResult compensateAmtDel(String busId, String cUser) throws Exception;
 }
 
