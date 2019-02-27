@@ -562,7 +562,7 @@ where (aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')
   <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
 </select>
 
-  <select id="posBaseProfitCount" parameterType="java.util.Map" resultType="java.util.Integer">
+  <select id="posBaseProfitCount" parameterType="java.util.Map" resultType="java.lang.Integer">
    select count(*) from TRANS_PROFIT_DETAIL
     where (aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')
     <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
