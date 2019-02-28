@@ -346,6 +346,7 @@
       <if test="listQuvery == null or listQuvery.size()==0">
         where  HUDDLE_CODE = '////'
       </if>
+      order by CREATE_TM desc
     </select>
 
 
