@@ -92,7 +92,9 @@ public enum TabId {
     P_INVOICE_APPLY("PIA%s%015d"),
     A_AGENT_RELATE_DETAIL("ARD%s%014d"),
     A_CAPITAL_CHANGE_APPLY("ACCA%s%014d"),
-    A_CAPITAL_FLOW("ACF%s%014d");
+    A_CAPITAL_FLOW("ACF%s%014d"),
+  P_DATA_ADJUST("PDA%s%015d");
+
 
     TabId(String thePatt){
            this.patt = thePatt;

@@ -29,6 +29,7 @@
     <result column="FILENAME" jdbcType="VARCHAR" property="filename" />
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
+    <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -92,7 +93,8 @@
     ID, INVOICE_COMPANY, INVOICE_DATE, INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM, UNIT_PRICE, 
     NUMBER_SL, SUM_AMT, TAX, EXPRESS_COMPANY, EXPRESS_NUMBER, EXPRESS_DATE, ATTACHMENT, 
     SH_DATE, SH_NAME, CURRENT_INVOICE, SH_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, 
-    RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, FILENAME, AGENT_ID, AGENT_NAME
+    RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, FILENAME, AGENT_ID, AGENT_NAME, 
+    PROFIT_MONTH
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -131,8 +133,8 @@
       SH_NAME, CURRENT_INVOICE, SH_RESULT, 
       RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, 
       RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, 
-      FILENAME, AGENT_ID, AGENT_NAME
-      )
+      FILENAME, AGENT_ID, AGENT_NAME, 
+      PROFIT_MONTH)
     values (#{id,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{invoiceDate,jdbcType=VARCHAR}, 
       #{invoiceNumber,jdbcType=VARCHAR}, #{invoiceCode,jdbcType=VARCHAR}, #{invoiceItem,jdbcType=VARCHAR}, 
       #{unitPrice,jdbcType=DECIMAL}, #{numberSl,jdbcType=DECIMAL}, #{sumAmt,jdbcType=DECIMAL}, 
@@ -141,8 +143,8 @@
       #{shName,jdbcType=VARCHAR}, #{currentInvoice,jdbcType=DECIMAL}, #{shResult,jdbcType=CHAR}, 
       #{returnReason,jdbcType=VARCHAR}, #{returnDate,jdbcType=VARCHAR}, #{returnExpressNumber,jdbcType=VARCHAR}, 
       #{returnExpressCompany,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR}, 
-      #{filename,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}
-      )
+      #{filename,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
+      #{profitMonth,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
     insert into P_INVOICE_APPLY
@@ -228,6 +230,9 @@
       <if test="agentName != null">
         AGENT_NAME,
       </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -310,6 +315,9 @@
       </if>
       <if test="agentName != null">
         #{agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="profitMonth != null">
+        #{profitMonth,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -403,6 +411,9 @@
       <if test="record.agentName != null">
         AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
       </if>
+      <if test="record.profitMonth != null">
+        PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -436,7 +447,8 @@
       CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
       FILENAME = #{record.filename,jdbcType=VARCHAR},
       AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR}
+      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -522,6 +534,9 @@
       <if test="agentName != null">
         AGENT_NAME = #{agentName,jdbcType=VARCHAR},
       </if>
+      <if test="profitMonth != null">
+        PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -552,7 +567,8 @@
       CREATE_NAME = #{createName,jdbcType=VARCHAR},
       FILENAME = #{filename,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{agentName,jdbcType=VARCHAR}
+      AGENT_NAME = #{agentName,jdbcType=VARCHAR},
+      PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

@@ -113,5 +113,14 @@ public interface IPosRewardService {
 
 
     public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page);
+
     List<PPosHuddleReward> getHuddlePosRewardByDataId(String id);
+
+    List<PosReward> selectPosRewardByParams(Map<String,Object> posRewardPrams);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByParams(Map<String,Object> posRewardPrams);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByEndMonth(Map<String,Object> map);
+
+    int editHuddleRewardRegect(PPosHuddleReward pPosHuddleReward);
 }

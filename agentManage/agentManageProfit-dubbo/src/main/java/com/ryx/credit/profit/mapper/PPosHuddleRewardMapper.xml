@@ -346,6 +346,7 @@
       <if test="listQuvery == null or listQuvery.size()==0">
         where  HUDDLE_CODE = '////'
       </if>
+      order by CREATE_TM desc
     </select>
 
 
@@ -368,5 +369,19 @@
 
 
     </select>
+
+  <select id="selectPosHuddleRewardByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    from  P_POS_HUDDLE_REWARD
+    where huddle_code in(select huddle_code from POS_HUDDLE_REWARD_DETAIL where pos_agent_id = '${agentId}')
+    <if test="applyStatus != null and applyStatus !='' ">
+      and APPLY_STATUS = '${applyStatus}'
+    </if>
+    <if test="profitMonth != null and profitMonth !='' ">
+      and TOTAL_CONS_MONTH $lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
+    </if>
+    and REV1 = '00' <!--按照特殊抱团申请预发分润-->
+  </select>
 
 </mapper>

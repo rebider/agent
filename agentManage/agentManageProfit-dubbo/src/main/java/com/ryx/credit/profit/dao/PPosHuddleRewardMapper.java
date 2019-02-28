@@ -6,6 +6,7 @@ import com.ryx.credit.profit.pojo.PosHuddleRewardDetail;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface PPosHuddleRewardMapper {
     long countByExample(PPosHuddleRewardExample example);
@@ -30,4 +31,6 @@ public interface PPosHuddleRewardMapper {
 
     List<PPosHuddleReward>  selectByList(@Param("listQuvery") List listQuvery);
     long   selectByCount(@Param("listQuvery") List listQuvery);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByParams(Map<String,Object> posRewardPrams);
 }

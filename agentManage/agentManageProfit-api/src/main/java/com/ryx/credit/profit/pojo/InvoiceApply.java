@@ -1,7 +1,5 @@
 package com.ryx.credit.profit.pojo;
 
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -59,6 +57,8 @@ public class InvoiceApply implements Serializable {
     private String agentId;
 
     private String agentName;
+
+    private String profitMonth;
 
     public String getId() {
         return id;
@@ -274,5 +274,13 @@ public class InvoiceApply implements Serializable {
 
     public void setAgentName(String agentName) {
         this.agentName = agentName == null ? null : agentName.trim();
+    }
+
+    public String getProfitMonth() {
+        return profitMonth;
+    }
+
+    public void setProfitMonth(String profitMonth) {
+        this.profitMonth = profitMonth == null ? null : profitMonth.trim();
     }
 }

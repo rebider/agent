@@ -97,10 +97,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 list.add("04");
                 list.add("05");
                 criteria.andDeductionTypeIn(list);
-            }else if("'03','06'".equals(profitDeduction.getDeductionType())){
+            }else if("'03','06','07'".equals(profitDeduction.getDeductionType())){
                 List<String> list = new ArrayList<String>();
                 list.add("03");
                 list.add("06");
+                list.add("07");
                 criteria.andDeductionTypeIn(list);
             }else{//查询其他扣款
                 criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
@@ -633,7 +634,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                     break;
                 }
             }
-            ;
         }
     }
 
@@ -959,21 +959,4 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return BigDecimal.ZERO;
     }
 
-    @Override
-    public int resetOtherDeduction(String type) {
-        // 终审后不能清除
-        String finalStatus = redisService.getValue("commitFinal");
-        if (StringUtils.isBlank(finalStatus)) {
-            if ("1".equals(finalStatus)) {
-                logger.info("终审状态不能清除！");
-                throw new ProcessException("终审状态不能清除！");
-            }
-        }
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MONTH, -1);
-        Date date = calendar.getTime();
-        String dateStr = new SimpleDateFormat("yyyyMM").format(date);
-        return profitDeductionMapper.resetDataDeduction(type,dateStr);
-    }
 }

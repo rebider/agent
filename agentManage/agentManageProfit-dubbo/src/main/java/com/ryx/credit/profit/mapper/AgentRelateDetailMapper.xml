@@ -281,4 +281,26 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+  <select id="selectMyRelateAgents" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from A_AGENT_RELATE_DETAIL
+    where RELATE_ID in (
+        select id from A_AGENT_RELATE where START_MONTH in(
+            select max(START_MONTH) from A_AGENT_RELATE
+            where STATUS = '1'
+                and START_MONTH &gt;='${profitMonth}'
+                and AGENT_ID = '${agentId}'
+                <choose >
+                  <when test="parentAgentId != null and parentAgentId !=''" >
+                    and PARENT_AGENT_ID = '${parentAgentId}'
+                  </when>
+                  <otherwise>
+                    and PARENT_AGENT_ID is null
+                  </otherwise>
+                </choose>
+        )
+    ) order by ORDER_NUM asc
+  </select>
 </mapper>

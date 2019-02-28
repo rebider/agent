@@ -1975,6 +1975,76 @@ public class InvoiceApplyExample {
             addCriterion("AGENT_NAME not between", value1, value2, "agentName");
             return (Criteria) this;
         }
+
+        public Criteria andProfitMonthIsNull() {
+            addCriterion("PROFIT_MONTH is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthIsNotNull() {
+            addCriterion("PROFIT_MONTH is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthEqualTo(String value) {
+            addCriterion("PROFIT_MONTH =", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthNotEqualTo(String value) {
+            addCriterion("PROFIT_MONTH <>", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthGreaterThan(String value) {
+            addCriterion("PROFIT_MONTH >", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthGreaterThanOrEqualTo(String value) {
+            addCriterion("PROFIT_MONTH >=", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthLessThan(String value) {
+            addCriterion("PROFIT_MONTH <", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthLessThanOrEqualTo(String value) {
+            addCriterion("PROFIT_MONTH <=", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthLike(String value) {
+            addCriterion("PROFIT_MONTH like", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthNotLike(String value) {
+            addCriterion("PROFIT_MONTH not like", value, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthIn(List<String> values) {
+            addCriterion("PROFIT_MONTH in", values, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthNotIn(List<String> values) {
+            addCriterion("PROFIT_MONTH not in", values, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthBetween(String value1, String value2) {
+            addCriterion("PROFIT_MONTH between", value1, value2, "profitMonth");
+            return (Criteria) this;
+        }
+
+        public Criteria andProfitMonthNotBetween(String value1, String value2) {
+            addCriterion("PROFIT_MONTH not between", value1, value2, "profitMonth");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

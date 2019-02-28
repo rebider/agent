@@ -4,9 +4,12 @@ package com.ryx.credit.profit.service;/**
  * @Description:
  */
 
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分润交易明细接口
@@ -42,5 +45,13 @@ public interface TransProfitDetailService {
      * @Date: 2018/8/27 
      */ 
      List<TransProfitDetail> getPosTransProfitDetailSumList(String prfitDate);
+
+    /**
+     * POS基础分润
+     * @param params
+     * @return
+     * @AUTHOR chenliang
+     */
+    PageInfo posBaseProfitList(Map<String,Object> params, PageInfo  page);
 
 }

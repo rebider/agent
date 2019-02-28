@@ -2,8 +2,9 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.pojo.admin.vo.AgentoutVo;
+import com.ryx.credit.profit.dao.BuckleRunMapper;
 import com.ryx.credit.profit.dao.ProfitDirectMapper;
+import com.ryx.credit.profit.pojo.BuckleRun;
 import com.ryx.credit.profit.pojo.ProfitDirect;
 import com.ryx.credit.profit.pojo.ProfitDirectExample;
 import com.ryx.credit.profit.service.IProfitDirectService;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +31,8 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
 
     @Autowired
     private ProfitDirectMapper directMapper;
+    @Autowired
+    private BuckleRunMapper buckleRunMapper;
     @Autowired
     private IdService idService;
 
@@ -121,6 +125,30 @@ public class ProfitDirectServiceImpl implements IProfitDirectService {
     @Override
     public Map<String, Object> profitCount(Map<String, Object> param) {
         return directMapper.profitCount(param);
+    }
+
+    @Override
+    public List<List<Map<String,Object>>> getBuckleRunByAgentIdAndRunDate(Map<String, Object> param) {
+        List<BuckleRun> list=buckleRunMapper.selectListByBearAgentIdAndRunDate(param);
+        List<List<Map<String,Object>>> result=new ArrayList<>();
+        for (BuckleRun b : list) {
+            param.put("agentId",b.getAgentId());
+            List<Map<String,Object>> buckleRuns=buckleRunMapper.selectListByAgentIdAndRunDate(param);
+            result.add(buckleRuns);
+        }
+        return result;
+    }
+
+    @Override
+    public List<List<Map<String, Object>>> getSupplyByAgentIdAndRunDate(Map<String, Object> param) {
+        List<BuckleRun> list=buckleRunMapper.selectListByBearAgentIdAndRunDateWithSupply(param);
+        List<List<Map<String,Object>>> result=new ArrayList<>();
+        for (BuckleRun b : list) {
+            param.put("agentId",b.getAgentId());
+            List<Map<String,Object>> buckleRuns=buckleRunMapper.selectListByAgentIdAndRunDateWithSupply(param);
+            result.add(buckleRuns);
+        }
+        return result;
     }
 
     //直发分润导出

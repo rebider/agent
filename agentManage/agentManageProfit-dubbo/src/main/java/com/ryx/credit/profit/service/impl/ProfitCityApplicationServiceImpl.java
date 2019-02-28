@@ -97,15 +97,12 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
             pCityApplicationDetailMapper.insert(pCityApplicationDetail);
         }
 
-
         logger.info("序列ID......"+idService.genId(TabId.P_CITYAPPLICATION_DETAIL));
-
         Map startPar = agentEnterService.startPar(cUser);
         if (null == startPar) {
             logger.info("========用户{}{}启动部门参数为空",  cUser);
             throw new MessageException("启动部门参数为空!");
         }
-
         //启动审批流
         String proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
         if (proceId == null) {
@@ -345,7 +342,7 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         profitDeduction.setId(idService.genId(TabId.P_DEDUCTION));
         profitDeduction.setAgentId(pCityApplicationDetail.getAgentId());
         profitDeduction.setAgentName(pCityApplicationDetail.getAgentName());
-        profitDeduction.setDeductionType(DeductionType.OTHER.getType());
+        profitDeduction.setDeductionType(DeductionType.OTHER_DEDUCT_UNCEL.getType());
         profitDeduction.setParentAgentId(pCityApplicationDetail.getParentAgentId());
         profitDeduction.setParentAgentName(pCityApplicationDetail.getParentAgentName());
         profitDeduction.setDeductionDate(pCityApplicationDetail.getApplicationMonth());
@@ -353,11 +350,10 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         profitDeduction.setMustDeductionAmt(pCityApplicationDetail.getApplicationAmt());
         profitDeduction.setSumDeductionAmt(pCityApplicationDetail.getApplicationAmt());
         profitDeduction.setRemark(pCityApplicationDetail.getDeductionRemark());
-        profitDeduction.setDeductionStatus("0");//未扣款
+        profitDeduction.setDeductionStatus(DeductionStatus.NOT_APPLIED.getStatus());//未扣款
         profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());//未分期
         profitDeduction.setCreateDateTime(new Date());
         profitDeduction.setUserId(pCityApplicationDetail.getCreateName());
-        profitDeduction.setSourceId("88");  //表示线上申请通过的其他扣款
         //插入数据表中保存
         profitDeductionMapper.insert(profitDeduction);
     }
@@ -371,7 +367,7 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         profitSupply.setAgentName(pCityApplicationDetail.getAgentName());
         profitSupply.setSupplyDate(pCityApplicationDetail.getApplicationMonth());
         profitSupply.setSupplyType(pCityApplicationDetail.getDeductionRemark());
-        profitSupply.setBusBigType("99");
+        profitSupply.setBusBigType("90");
         List<ProfitSupply> ps = pProfitSupplyMapper.getProfitSuppList(profitSupply);
         if(ps.size()>0){
             //如果存在，补款金额相加
@@ -386,14 +382,10 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
             profitSupply.setParentAgentName(pCityApplicationDetail.getParentAgentName());
             profitSupply.setSupplyAmt(pCityApplicationDetail.getApplicationAmt());
             profitSupply.setRemerk(pCityApplicationDetail.getRemark());
-            profitSupply.setBusType(BusActRelBusType.CityApplySupply.name());
-            profitSupply.setBusBigType("99");
+           //profitSupply.setBusType(BusActRelBusType.CityApplySupply.name());
+            profitSupply.setBusBigType("90");
             //如果不为空 在原来的基础上金额相加
             pProfitSupplyMapper.insertSelective(profitSupply);
         }
     }
-
-
-
-
 }

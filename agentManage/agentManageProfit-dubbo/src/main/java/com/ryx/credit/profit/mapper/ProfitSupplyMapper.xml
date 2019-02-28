@@ -334,7 +334,8 @@
         <if test="SUPPLY_DATE_END != null and SUPPLY_DATE_END != ''">AND SUPPLY_DATE &lt;= #{SUPPLY_DATE_END,jdbcType=VARCHAR}</if>
 
         <if test="BUS_TYPE != null and BUS_TYPE != ''">AND BUS_TYPE = #{BUS_TYPE,jdbcType=VARCHAR}</if>
-        <if test="BUS_BIG_TYPE != null and BUS_BIG_TYPE != ''">AND BUS_BIG_TYPE = #{BUS_BIG_TYPE,jdbcType=VARCHAR}</if>
+        <if test="BUS_BIG_TYPE != null and BUS_BIG_TYPE != '' and sign != null and sign != '' ">AND BUS_BIG_TYPE in (#{BUS_BIG_TYPE},#{sign})</if>
+        <if test="BUS_BIG_TYPE != null and BUS_BIG_TYPE != '' and sign == null or sign == '' ">AND BUS_BIG_TYPE = #{BUS_BIG_TYPE}</if>
         <!--<if test="BUS_TYPE != null and BUS_TYPE != ''">AND BUS_TYPE = #{BUS_TYPE,jdbcType=VARCHAR}</if>-->
       </trim>
     </where>
