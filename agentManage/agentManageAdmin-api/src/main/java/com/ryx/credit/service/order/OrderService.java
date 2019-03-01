@@ -36,7 +36,7 @@ public interface OrderService {
      * @param page
      * @return
      */
-    PageInfo orderList(OOrder product, Page page);
+//    PageInfo orderList(OOrder product, Page page);
 
     PageInfo orderList(Map par, Page page);
 

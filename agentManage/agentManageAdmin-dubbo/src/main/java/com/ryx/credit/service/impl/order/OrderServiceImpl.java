@@ -1,6 +1,5 @@
 package com.ryx.credit.service.impl.order;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
@@ -116,20 +115,20 @@ public class OrderServiceImpl implements OrderService {
      * @param page
      * @return
      */
-    @Override
-    public PageInfo orderList(OOrder product, Page page) {
-
-        OOrderExample example = new OOrderExample();
-        OOrderExample.Criteria criteria = example.createCriteria();
-
-        example.setPage(page);
-        example.setOrderByClause(" c_time desc ");
-        List<OOrder> oOrders = orderMapper.selectByExample(example);
-        PageInfo pageInfo = new PageInfo();
-        pageInfo.setRows(oOrders);
-        pageInfo.setTotal(orderMapper.countByExample(example));
-        return pageInfo;
-    }
+//    @Override
+//    public PageInfo orderList(OOrder product, Page page) {
+//
+//        OOrderExample example = new OOrderExample();
+//        OOrderExample.Criteria criteria = example.createCriteria();
+//
+//        example.setPage(page);
+//        example.setOrderByClause(" c_time desc ");
+//        List<OOrder> oOrders = orderMapper.selectByExample(example);
+//        PageInfo pageInfo = new PageInfo();
+//        pageInfo.setRows(oOrders);
+//        pageInfo.setTotal(orderMapper.countByExample(example));
+//        return pageInfo;
+//    }
 
     /**
      * 分页查询订单列表

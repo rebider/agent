@@ -717,9 +717,10 @@
       <if test="payMethod!=null and payMethod!=''"> and d.PAY_METHOD=#{payMethod} </if>
       <if test="vender!=null and vender!=''"> and  EXISTS(select * FROM o_sub_order os left join o_sub_order_activity soa on soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.VENDER=#{vender})</if>
       <if test="activityName!=null and activityName !=''">
-        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%') and soa.status=1 and os.order_id = o.id)
       </if>
       <if test="reviewStatus!=null and reviewStatus!=''"> and o.review_status = #{reviewStatus}</if>
+      <if test="notLookTem=='true'"> and o.review_status != 1</if>
     </where>
     order by c_time desc
     <include refid="OracleDialectSuffix" />
@@ -758,8 +759,9 @@
         and os.order_id=o.id where soa.VENDER=#{vender})</if>
       <if test="activityName!=null and activityName !=''">
         and EXISTS (select * from o_sub_order_activity soa left join o_sub_order os on  soa.SUB_ORDER_ID=os.id
-        and os.order_id=o.id where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%'))
+        where soa.ACTIVITY_NAME LIKE CONCAT(CONCAT('%',#{activityName}),'%') and soa.status=1 and os.order_id = o.id)
       </if>
+      <if test="notLookTem=='true'"> and o.review_status != 1</if>
     </where>
     )
   </select>
