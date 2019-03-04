@@ -557,14 +557,10 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
 
     @Override
     public InvoiceDetail getInvoice(String agentId) {
-        Calendar curr = Calendar.getInstance();
-        curr.setTime(new Date());
-        curr.add(Calendar.MONTH, -1);
-        String profitMonth = new SimpleDateFormat("yyyyMM").format(curr.getTime());
         InvoiceDetailExample example = new InvoiceDetailExample();//根据agentId 和月份判断本月数据信息是否存在
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
         criteria.andAgentIdEqualTo(agentId);
-        criteria.andProfitMonthEqualTo(profitMonth);
+        example.setOrderByClause("PROFIT_MONTH desc");
         List<InvoiceDetail> list = invoiceDetailMapper.selectByExample(example);
         if(list.size()!= 0){
             return list.get(0);
