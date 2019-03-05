@@ -617,4 +617,66 @@ where
     <if test="DATE_END!=null and DATE_END!=''"> and PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
     connect by prior AGENT_ID = PARENT_AGENT_ID
   </select>
+
+  <select id="selectByIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM TRANS_PROFIT_DETAIL
+    WHERE
+    BUS_NUM = #{busNum,jdbcType=VARCHAR}
+    AND PARENT_BUS_NUM = #{parentBusNum,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectListByDate" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE SOURCE_INFO='MPOS' and PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    ORDER BY AGENT_ID
+  </select>
+
+  <select id="getPosTransProfitDetailSumList" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT AGENT_ID,PARENT_AGENT_ID, PROFIT_DATE,
+      SUM(case when IN_TRANS_AMT is null then 0 else IN_TRANS_AMT end )IN_TRANS_AMT,
+      SUM(case when OUT_TRANS_AMT is null then 0 else OUT_TRANS_AMT end  )OUT_TRANS_AMT,
+      SUM(case when  IN_PROFIT_SCALE is null then 0 else IN_PROFIT_SCALE end )IN_PROFIT_SCALE,
+      SUM(case when  OUT_PROFIT_SCALE is null then 0 else OUT_PROFIT_SCALE end)OUT_PROFIT_SCALE,
+      SUM(case when  IN_PROFIT_AMT  is null then 0 else IN_PROFIT_AMT end)IN_PROFIT_AMT,
+      SUM(case when  OUT_PROFIT_AMT  is null then 0 else OUT_PROFIT_AMT end)OUT_PROFIT_AMT,
+      SUM(case when  SUPPLY_AMT  is null then 0 else SUPPLY_AMT end)SUPPLY_AMT,
+      MAX(PAY_COMPANY) PAY_COMPANY,
+      MAX(AGENT_NAME) AGENT_NAME
+    FROM TRANS_PROFIT_DETAIL WHERE SOURCE_INFO ='POS' AND PROFIT_DATE = #{profitDate}
+    GROUP BY AGENT_ID, PARENT_AGENT_ID,PROFIT_DATE
+  </select>
+
+  <select id="selectCompanyByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND PAY_COMPANY='Q000029564'
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <select id="selectListByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <select id="selectSumTotalDay" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
+    select
+    SUM(NOTAX_AMT-UNLINE_AMT)
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
   </mapper>
