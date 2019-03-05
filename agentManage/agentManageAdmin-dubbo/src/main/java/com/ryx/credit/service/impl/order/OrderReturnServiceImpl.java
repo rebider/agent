@@ -472,7 +472,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      */
     @Override
     @Transactional
-    public Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson, String userid) throws ProcessException {
+    public Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson, String userid,String invoiceList) throws ProcessException {
 
         List<Map> list = null;
         try {
