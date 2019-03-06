@@ -127,7 +127,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OActivityMapper oActivityMapper;
     @Autowired
     private IUserService iUserService;
-
+    @Autowired
+    private OPaymentMapper paymentMapper;
+    @Autowired
+    private OCashReceivablesMapper cashReceivablesMapper;
+    @Autowired
+    private OInvoiceMapper invoiceMapper;
 
     /**
      * @Author: Zhang Lei
@@ -489,6 +494,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             throw e;
         }
 
+        List<OInvoice> oInvoices = null;
+        try {
+            oInvoices = JSONObject.parseArray(invoiceList,OInvoice.class);
+        } catch (Exception e) {
+            log.error("解析发票信息失败", e);
+            throw new ProcessException("解析发票信息失败");
+        }
+
         String returnId = null;
 
         try {
@@ -512,7 +525,12 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
         //退货单和订单关系
         Set<String> relSet = new HashSet<>();
-
+        BigDecimal orderTotalAmt = BigDecimal.ZERO;        //订单总金额
+        BigDecimal totalAmt = BigDecimal.ZERO;             //退货总金额
+        BigDecimal bjTotalAmt = BigDecimal.ZERO;             //北京收款总金额
+        BigDecimal invoiceTotalAmt = BigDecimal.ZERO;      //发票总金额
+        BigDecimal isCloInvoice = Status.STATUS_0.status;  //是否开具发票
+        String collectCompany = "7";  //北京财务
         for (Map<String, Object> map : list) {
 
             String orderId = (String) map.get("orderId");
@@ -566,6 +584,88 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             String setstr = returnOrderDetail.getOrderId() + "_" + returnOrderDetail.getSubOrderId() + "_" + returnOrderDetail.getReturnId();
             relSet.add(setstr);
+            totalAmt = totalAmt.add(MapUtil.getBigDecimal(map, "proPrice"));
+
+            OPaymentExample oPaymentExample = new OPaymentExample();
+            OPaymentExample.Criteria criteria = oPaymentExample.createCriteria();
+            criteria.andStatusEqualTo(Status.STATUS_1.status);
+            criteria.andOrderIdEqualTo(orderId);
+            List<OPayment>  paymentList = paymentMapper.selectByExample(oPaymentExample);
+            OPayment oPayment = paymentList.get(0);
+            BigDecimal cloInvoice = oPayment.getIsCloInvoice();
+            if(cloInvoice.compareTo(Status.STATUS_1.status)==0){
+                invoiceTotalAmt = invoiceTotalAmt.add(oPayment.getPayAmount());
+                isCloInvoice = cloInvoice;
+            }
+            OCashReceivablesExample oCashReceivablesExample = new OCashReceivablesExample();
+            OCashReceivablesExample.Criteria oCashCriteria = oCashReceivablesExample.createCriteria();
+            oCashCriteria.andStatusEqualTo(Status.STATUS_1.status);
+            oCashCriteria.andCashpayTypeEqualTo(CashPayType.PAYMENT.code);
+            oCashCriteria.andReviewStatusEqualTo(AgStatus.Approved.getValue());
+            oCashCriteria.andSrcIdEqualTo(oPayment.getId());
+            List<OCashReceivables> oCashReceivables = cashReceivablesMapper.selectByExample(oCashReceivablesExample);
+            for (OCashReceivables oCashReceivable : oCashReceivables) {
+                String company = oCashReceivable.getCollectCompany();
+                if(company.equals("8")){
+                    collectCompany = company;
+                }else{
+                    bjTotalAmt = bjTotalAmt.add(oCashReceivable.getAmount());
+                }
+            }
+            orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount());
+        }
+        //订单下单时的发票开具状态为是 且 收款账号为深圳财务的
+        if(isCloInvoice.compareTo(Status.STATUS_1.status)==0 && collectCompany.equals("8")){
+//          1.订单总金额-退货金额小于等于发票金额 发票信息为必填
+//          2.订单总金额-退货金额大于发票金额 发票信息可选择否
+            if(orderTotalAmt.subtract(bjTotalAmt).subtract(totalAmt).compareTo(invoiceTotalAmt)<=0){
+                if(returnOrder.getRetInvoice().compareTo(Status.STATUS_0.status)==0){
+                    throw new ProcessException("是否退发票必须选择是");
+                }
+                if(oInvoices==null){
+                    throw new ProcessException("发票信息为必填");
+                }
+                if(oInvoices.size()==0){
+                    throw new ProcessException("发票信息为必填");
+                }
+            }
+        }
+        for (OInvoice oInvoice : oInvoices) {
+            if(StringUtils.isBlank(oInvoice.getInvoiceCompany())){
+                throw new ProcessException("开票公司不能为空");
+            }
+            if(StringUtils.isBlank(oInvoice.getInvoiceProject())){
+                throw new ProcessException("开票项目不能为空");
+            }
+            if(null==oInvoice.getInvoiceAmt()){
+                throw new ProcessException("金额不能为空");
+            }
+            if(StringUtils.isBlank(oInvoice.getInvoiceNum())){
+                throw new ProcessException("发票号不能为空");
+            }
+            if(StringUtils.isBlank(oInvoice.getInvoiceCode())){
+                throw new ProcessException("发票代码不能为空");
+            }
+            if(StringUtils.isBlank(oInvoice.getExpressNum())){
+                throw new ProcessException("快递单号不能为空");
+            }
+            if(StringUtils.isBlank(oInvoice.getExpressComp())){
+                throw new ProcessException("快递公司不能为空");
+            }
+            if(null==oInvoice.getSendTime()){
+                throw new ProcessException("寄出时间不能为空");
+            }
+            oInvoice.setId(idService.genId(TabId.O_INVOICE));
+            oInvoice.setSrcType(OInvoiceSrcType.RETURNORDER.code);
+            oInvoice.setSrcId(returnId);
+            oInvoice.setAgentId(returnOrder.getAgentId());
+            oInvoice.setcTime(new Date());
+            oInvoice.setuTime(new Date());
+            oInvoice.setcUser(userid);
+            oInvoice.setuUser(userid);
+            oInvoice.setStatus(Status.STATUS_1.status);
+            oInvoice.setVersion(Status.STATUS_1.status);
+            invoiceMapper.insert(oInvoice);
         }
 
         //生成退货和订单关系
@@ -1929,4 +2029,5 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
         }
     }
+
 }
