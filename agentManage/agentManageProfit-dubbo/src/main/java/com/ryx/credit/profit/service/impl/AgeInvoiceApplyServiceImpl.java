@@ -115,7 +115,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
         try{
             for (List<Object> list:lists) {
-                if(list.size()>0 && list!= null && StringUtils.isNotBlank(list.get(7).toString())){
+                if(list.size()>0 && list!= null){
                     insertInvoiceApply(list,agentId,agentName);
                 }
             }
@@ -141,12 +141,14 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
         invoiceApply.setInvoiceCode(str1);
         invoiceApply.setInvoiceItem(list.get(4).toString());
-        invoiceApply.setUnitPrice(new BigDecimal(list.get(5).toString().trim()));
+        invoiceApply.setUnitPrice(new BigDecimal(list.get(5).toString()));
         String str2 = list.get(6).toString().trim();
         invoiceApply.setNumberSl(Long.valueOf(str2.substring(0,str2.indexOf("."))));
-        invoiceApply.setSumAmt(new BigDecimal(list.get(7).toString().trim()));
-        invoiceApply.setTax(new BigDecimal(list.get(8).toString().trim()));
-        invoiceApply.setExpressCompany(list.get(9).toString().trim());
+        BigDecimal sum = invoiceApply.getUnitPrice().multiply(new BigDecimal(invoiceApply.getNumberSl()));
+        invoiceApply.setSumAmt(sum.setScale(2));
+        invoiceApply.setExpressDate(list.get(7).toString());
+        invoiceApply.setTax(new BigDecimal(list.get(8).toString()));
+        invoiceApply.setExpressCompany(list.get(9).toString());
         String str3 = list.get(10).toString();
         if(str3.indexOf(".") != -1){
             str3 = str3.substring(0,str3.indexOf("."));
