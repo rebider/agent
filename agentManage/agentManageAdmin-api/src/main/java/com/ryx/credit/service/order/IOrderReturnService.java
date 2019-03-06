@@ -4,6 +4,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
+import com.ryx.credit.pojo.admin.order.OInvoice;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -68,4 +69,7 @@ public interface IOrderReturnService {
      * @throws Exception
      */
     public AgentResult sendReturnLgcInfoToBusSystem(String lgcId,String userId)throws Exception ;
+
+
+    public List<OInvoice> findInvoiceById(String id);
 }

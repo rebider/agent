@@ -1,8 +1,11 @@
 package com.ryx.credit.pojo.admin.order;
 
+import com.ryx.credit.pojo.admin.agent.Attachment;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class OInvoice implements Serializable{
 
@@ -41,6 +44,10 @@ public class OInvoice implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private List<String> invoiceTableFile;
+
+    private List<Attachment> attachments;
 
     public String getId() {
         return id;
@@ -184,5 +191,21 @@ public class OInvoice implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public List<String> getInvoiceTableFile() {
+        return invoiceTableFile;
+    }
+
+    public void setInvoiceTableFile(List<String> invoiceTableFile) {
+        this.invoiceTableFile = invoiceTableFile;
+    }
+
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<Attachment> attachments) {
+        this.attachments = attachments;
     }
 }

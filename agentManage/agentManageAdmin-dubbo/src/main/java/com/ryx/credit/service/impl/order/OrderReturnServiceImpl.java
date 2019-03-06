@@ -7,10 +7,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
-import com.ryx.credit.dao.agent.AgentBusInfoMapper;
-import com.ryx.credit.dao.agent.AgentMapper;
-import com.ryx.credit.dao.agent.AttachmentRelMapper;
-import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.*;
 import com.ryx.credit.dao.order.*;
 import com.ryx.credit.machine.entity.ImsTermAdjustDetail;
 import com.ryx.credit.machine.service.ImsTermAdjustDetailService;
@@ -133,6 +130,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
     private OCashReceivablesMapper cashReceivablesMapper;
     @Autowired
     private OInvoiceMapper invoiceMapper;
+    @Autowired
+    private AttachmentMapper attachmentMapper;
+
+
 
     /**
      * @Author: Zhang Lei
@@ -655,7 +656,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             if(null==oInvoice.getSendTime()){
                 throw new ProcessException("寄出时间不能为空");
             }
-            oInvoice.setId(idService.genId(TabId.O_INVOICE));
+            String oInvoiceId = idService.genId(TabId.O_INVOICE);
+            oInvoice.setId(oInvoiceId);
             oInvoice.setSrcType(OInvoiceSrcType.RETURNORDER.code);
             oInvoice.setSrcId(returnId);
             oInvoice.setAgentId(returnOrder.getAgentId());
@@ -666,6 +668,26 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oInvoice.setStatus(Status.STATUS_1.status);
             oInvoice.setVersion(Status.STATUS_1.status);
             invoiceMapper.insert(oInvoice);
+
+            List<String> invoiceTableFiles = oInvoice.getInvoiceTableFile();
+            //添加新的附件
+            if (invoiceTableFiles != null && invoiceTableFiles.size()!=0) {
+                for (String invoiceTableFile : invoiceTableFiles) {
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(invoiceTableFile);
+                    record.setSrcId(oInvoiceId);
+                    record.setcUser(userid);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.returnOrderInvoice.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int f = attachmentRelMapper.insertSelective(record);
+                    if (1 != f) {
+                        log.info("退货上传发票信息保存附件关系失败");
+                        throw new ProcessException("保存附件失败");
+                    }
+                }
+            }
         }
 
         //生成退货和订单关系
@@ -2030,4 +2052,23 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
     }
 
+    /**
+     * 根据退货单id查询发票信息
+     * @param id
+     * @return
+     */
+    @Override
+    public List<OInvoice> findInvoiceById(String id){
+        OInvoiceExample oInvoiceExample = new OInvoiceExample();
+        OInvoiceExample.Criteria criteria = oInvoiceExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andSrcIdEqualTo(id);
+        criteria.andSrcTypeEqualTo(OInvoiceSrcType.RETURNORDER.code);
+        List<OInvoice> oInvoices = invoiceMapper.selectByExample(oInvoiceExample);
+        for (OInvoice oInvoice : oInvoices) {
+            List<Attachment> attachments = attachmentMapper.accessoryQuery(oInvoice.getId(), AttachmentRelType.returnOrderInvoice.name());
+            oInvoice.setAttachments(attachments);
+        }
+        return oInvoices;
+    }
 }
