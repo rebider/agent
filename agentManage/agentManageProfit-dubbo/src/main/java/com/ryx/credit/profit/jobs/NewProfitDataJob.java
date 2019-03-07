@@ -211,14 +211,14 @@ public class NewProfitDataJob {
                 } else {
                     //profitDetailMonthTemp.setTranAmt((profitDetailMonthTemp.getTranAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getTranAmt()).add(transProfitDetail.getInTransAmt()));
                     //profitDetailMonthTemp.setPayAmt((profitDetailMonthTemp.getPayAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPayAmt()).add(transProfitDetail.getOutTransAmt()));
-                    profitDetailMonthTemp.setTranAmt((profitDetailMonthTemp.getTranAmt() == null ? BigDecimal.ZERO : transProfitDetail.getInTransAmt()));
-                    profitDetailMonthTemp.setPayAmt((profitDetailMonthTemp.getPayAmt() == null ? BigDecimal.ZERO : transProfitDetail.getOutTransAmt()));
+                    profitDetailMonthTemp.setTranAmt( transProfitDetail.getInTransAmt());
+                    profitDetailMonthTemp.setPayAmt(transProfitDetail.getOutTransAmt());
                     profitDetailMonthTemp.setTranProfitScale(transProfitDetail.getInProfitScale().toString());
                     profitDetailMonthTemp.setPayProfitScale(transProfitDetail.getOutProfitScale().toString());
                     //profitDetailMonthTemp.setTranProfitAmt((profitDetailMonthTemp.getTranProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getTranProfitAmt()).add(transProfitDetail.getInProfitAmt()));
                     //profitDetailMonthTemp.setPayProfitAmt((profitDetailMonthTemp.getPayProfitAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPayProfitAmt()).add(transProfitDetail.getOutProfitAmt()));
-                    profitDetailMonthTemp.setTranProfitAmt((profitDetailMonthTemp.getTranProfitAmt() == null ? BigDecimal.ZERO : transProfitDetail.getInProfitAmt()));
-                    profitDetailMonthTemp.setPayProfitAmt((profitDetailMonthTemp.getPayProfitAmt() == null ? BigDecimal.ZERO : transProfitDetail.getOutProfitAmt()));
+                    profitDetailMonthTemp.setTranProfitAmt(transProfitDetail.getInProfitAmt());
+                    profitDetailMonthTemp.setPayProfitAmt( transProfitDetail.getOutProfitAmt());
                     profitDetailMonthTemp.setPosZqSupplyProfitAmt(transProfitDetail.getSupplyAmt());
                     profitDetailMonthServiceImpl.update(profitDetailMonthTemp);
                 }
