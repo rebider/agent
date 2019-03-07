@@ -480,7 +480,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 List<Map<String, Object>> glList = getGlAgentIdProfitAmt(profitDetailMonthTemp, profitAmtMap, profitDate);
                 if (glList != null && glList.size() > 0) {
-                    doHbToolDeduction(profitDetailMonthTemp, computType, glList, "2");
+                    doHbToolDeduction(profitDetailMonthTemp, computType, glList, "3");
                 }
             });
 
