@@ -205,4 +205,10 @@
   <select id="getNextStagAmt" resultMap="BaseResultMap">
      select sum(MUST_AMT) from  P_STAGING_DETAIL where STATUS='N' and DEDUCTION_DATE = #{deductionDate} and SOURCE_ID=#{sourceId}
   </select>
+
+  <select id="byTaskId" resultType="java.util.Map" parameterType="java.lang.String">
+    select GROUP_ID_,NAME_ from  act_ru_identitylink aa,ACT_RU_TASK bb  where aa.TASK_ID_ =bb.ID_ and aa.TASK_ID_= #{taskId}
+  </select>
+
+
 </mapper>
