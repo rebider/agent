@@ -48,9 +48,12 @@
 		<!--<table tableName="a_platform" domainObjectName="PlatForm" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
 
-		<table tableName="a_agent_quit" domainObjectName="AgentQuit" enableUpdateByExample="false"
-			   enableDeleteByPrimaryKey="false"/>
+		<!--<table tableName="a_agent_quit" domainObjectName="AgentQuit" enableUpdateByExample="false"-->
+			   <!--enableDeleteByPrimaryKey="false"/>-->
 		<!--<table tableName="a_agent_quit_refund" domainObjectName="AgentQuitRefund" enableUpdateByExample="false"-->
 			   <!--enableDeleteByPrimaryKey="false"/>-->
+
+		<table tableName="o_return_order" domainObjectName="OReturnOrder" enableUpdateByExample="false"
+			   enableDeleteByPrimaryKey="false"/>
 	</context>
 </generatorConfiguration>
