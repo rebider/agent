@@ -381,7 +381,7 @@
     <if test="profitMonth != null and profitMonth !='' ">
       and TOTAL_CONS_MONTH &lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
     </if>
-    and REV1 = '00' <!--按照特殊抱团申请预发分润-->
+    and REV1 = '00' <!--00:预发分润-->
   </select>
 
 </mapper>
