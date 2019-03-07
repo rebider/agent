@@ -373,6 +373,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 returnOrderDetail.setReturnTime(new Date());
                 returnOrderDetail.setcTime(new Date());
                 returnOrderDetail.setcUser(agentId);
+                returnOrderDetail.setStatus(Status.STATUS_1.status);
+                returnOrderDetail.setVersion(Status.STATUS_1.status);
                 returnOrderDetailMapper.insertSelective(returnOrderDetail);
             } catch (Exception e) {
                 log.error("生成退货明细失败", e);
