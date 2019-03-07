@@ -24,7 +24,7 @@ public interface IOrderReturnService {
 
     Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson,String userid,String invoiceList) throws ProcessException;
 
-    Map<String, Object> applyEdit(String agentId, OReturnOrder returnOrder, String productsJson,String userid) throws ProcessException;
+    Map<String, Object> applyEdit(String agentId, OReturnOrder returnOrder, String productsJson,String userid,String invoiceList) throws ProcessException;
 
     Map<String, Object> view(String returnId) throws ProcessException;
 
