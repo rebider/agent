@@ -162,6 +162,15 @@ public class NewProfitDataJob {
         transProfitDetail.setProfitAmt(profitData.getBigDecimal("PFT_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("PFT_AMT"));
         transProfitDetail.setInTransAmt(profitData.getBigDecimal("TRAN_01_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("TRAN_01_AMT"));
         transProfitDetail.setOutTransAmt(profitData.getBigDecimal("TRAN_02_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("TRAN_02_AMT"));
+
+        transProfitDetail.setQrTranAmt(profitData.getBigDecimal("QR_TRAN_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("QR_TRAN_AMT"));
+        transProfitDetail.setQrTranFee(profitData.getBigDecimal("QR_TRAN_FEE") == null ? BigDecimal.ZERO : profitData.getBigDecimal("QR_TRAN_FEE"));
+        transProfitDetail.setQrPftAmt(profitData.getBigDecimal("QR_PFT_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("QR_PFT_AMT"));
+        transProfitDetail.setPosTranAmt(profitData.getBigDecimal("POS_TRAN_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("POS_TRAN_AMT"));
+        transProfitDetail.setPosTranFee(profitData.getBigDecimal("POS_TRAN_FEE") == null ? BigDecimal.ZERO : profitData.getBigDecimal("POS_TRAN_FEE"));
+        transProfitDetail.setPosPftAmt(profitData.getBigDecimal("POS_PFT_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("POS_PFT_AMT"));
+
+
         transProfitDetail.setInProfitScale(profitData.getBigDecimal("PFT_01_RATE"));
         transProfitDetail.setOutProfitScale(profitData.getBigDecimal("PFT_02_RATE"));
         transProfitDetail.setInProfitAmt(profitData.getBigDecimal("PFT_01_AMT") == null ? BigDecimal.ZERO : profitData.getBigDecimal("PFT_01_AMT"));
