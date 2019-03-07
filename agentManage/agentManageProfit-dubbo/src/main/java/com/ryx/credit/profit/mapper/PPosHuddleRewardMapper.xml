@@ -379,7 +379,7 @@
       and APPLY_STATUS = '${applyStatus}'
     </if>
     <if test="profitMonth != null and profitMonth !='' ">
-      and TOTAL_CONS_MONTH $lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
+      and TOTAL_CONS_MONTH &lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
     </if>
     and REV1 = '00' <!--按照特殊抱团申请预发分润-->
   </select>
