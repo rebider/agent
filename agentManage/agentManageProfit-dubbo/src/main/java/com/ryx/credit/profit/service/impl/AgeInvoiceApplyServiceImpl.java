@@ -230,7 +230,12 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         if("1".equals(invoiceApply.getShResult())){
             //根据id获得数据
             InvoiceApply invoiceApply1 = invoiceApplyMapper.selectByPrimaryKey(invoiceApply.getId());
-            ownInvoiceService.invoiceApplyComputer(invoiceApply1);
+            try{
+                ownInvoiceService.invoiceApplyComputer(invoiceApply1);
+            }catch (Exception e){
+                throw new ProcessException("欠票汇总失败");
+
+            }
         }
     }
 }
