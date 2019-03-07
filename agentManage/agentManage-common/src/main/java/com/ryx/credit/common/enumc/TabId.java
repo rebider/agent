@@ -90,7 +90,8 @@ public enum TabId {
     A_AGENT_RELATE("AR%s%015d"),
     A_AGENT_RELATE_DETAIL("ARD%s%014d"),
     A_CAPITAL_CHANGE_APPLY("ACCA%s%014d"),
-    A_CAPITAL_FLOW("ACF%s%014d");
+    A_CAPITAL_FLOW("ACF%s%014d"),
+    O_INVOICE("OI%s%014d");
 
     TabId(String thePatt){
            this.patt = thePatt;
