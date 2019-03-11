@@ -29,6 +29,7 @@ import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.ognl.enhance.OrderedReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2070,5 +2071,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oInvoice.setAttachments(attachments);
         }
         return oInvoices;
+    }
+
+    @Override
+    public OReturnOrder selectById(String id) {
+        return returnOrderMapper.selectByPrimaryKey(id);
     }
 }

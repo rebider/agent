@@ -63,7 +63,7 @@
     C_TIME, U_TIME, C_USER, U_USER, STATUS, VERSION, REFUNDTIME, REFUNDPEOPLE, AUDITOR, 
     ORETURNTYPE
   </sql>
-  <select id="selectByExample" parameterType="com.ryx.credit.activity.entity.OReturnOrderExample" resultMap="BaseResultMap">
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
     select
     <if test="distinct">
@@ -268,13 +268,13 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.ryx.credit.activity.entity.OReturnOrderExample" resultType="java.lang.Long">
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderExample" resultType="java.lang.Long">
     select count(*) from O_RETURN_ORDER
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.activity.entity.OReturnOrder">
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrder">
     update O_RETURN_ORDER
     <set>
       <if test="agentId != null">

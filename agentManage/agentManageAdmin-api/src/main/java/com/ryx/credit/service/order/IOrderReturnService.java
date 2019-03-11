@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.order.OInvoice;
 import com.ryx.credit.pojo.admin.order.OLogisticsDetail;
 import com.ryx.credit.pojo.admin.order.OReturnOrder;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import org.apache.ibatis.ognl.enhance.OrderedReturn;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,6 +22,8 @@ import java.util.Map;
 public interface IOrderReturnService {
 
     PageInfo orderList(OReturnOrder returnOrder, PageInfo page);
+
+    OReturnOrder selectById(String id);
 
     Map<String, Object> apply(String agentId, OReturnOrder returnOrder, String productsJson,String userid,String invoiceList) throws ProcessException;
 
