@@ -70,15 +70,16 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
             if (list != null && list.size() > 0) {
                 // 更新
                 InvoiceDetail invoiceDetail = list.get(0);
-                BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()
+                invoiceDetail.setDrAddInvoiceAmt(invoice.getInvoiceAmt());  //线下
+                invoiceDetail.setAddInvoiceAmt(invoiceDetail.getDrAddInvoiceAmt().add(invoiceDetail.getShAddInvoceAmt())); //总到票
+                BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()  //欠票
                         .add(invoiceDetail.getDayProfitAmt())
                         .add(invoiceDetail.getDayBackAmt())
                         .add(invoiceDetail.getPreProfitMonthAmt())
                         .add(invoiceDetail.getPreProfitMonthBlAmt())
                         .add(invoiceDetail.getAdjustAmt())
-                        .subtract(invoice.getInvoiceAmt());
+                        .subtract(invoiceDetail.getAddInvoiceAmt());
                 invoiceDetail.setOwnInvoice(ownInvoice);
-                invoiceDetail.setAddInvoiceAmt(invoice.getInvoiceAmt());
                 invoiceDetail.setUpdateTime(DateUtils.dateToStringss(new Date()));
                 invoiceDetailMapper.updateByPrimaryKeySelective(invoiceDetail);
             } else {
