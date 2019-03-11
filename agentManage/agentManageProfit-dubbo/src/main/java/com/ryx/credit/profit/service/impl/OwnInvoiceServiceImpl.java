@@ -518,41 +518,15 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
                 params.put("profitMonth", invoiceApply.getProfitMonth());
                 params.put("preMonth",preMonth);
                 params.put("agentId", agentId);
-                List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceSH(params);
+                List<Map<String, Object>> agentList = invoiceDetailMapper.queryInvoiceAgents(params);
                 if(agentList != null && agentList.size()>0){
                     Map<String, Object> map = agentList.get(0);
-                    insertInvoicesh(map,profitMonth);
+                    insertInvoiceOwnDetail(map,profitMonth);
                 }
             }catch (Exception e){
                 e.printStackTrace();
             }
         }
-    }
-
-    private void insertInvoicesh(Map<String, Object> map, String profitMonth){
-        InvoiceDetail invoiceDetail = new InvoiceDetail();
-        invoiceDetail.setId(idService.genId(TabId.P_INVOICE_DETAIL));
-        invoiceDetail.setAgentName((String) map.get("AGENT_NAME"));
-        invoiceDetail.setAgentId((String) map.get("AGENT_ID"));
-        invoiceDetail.setProfitMonth(profitMonth);
-        invoiceDetail.setPreLeftAmt((BigDecimal) map.get("PRE_LEFT_AMT"));
-        invoiceDetail.setDayProfitAmt((BigDecimal) map.get("DAYS_PROFIT_AMT"));
-        invoiceDetail.setDayBackAmt((BigDecimal) map.get("RETURN_MONEY"));
-        invoiceDetail.setPreProfitMonthAmt((BigDecimal) map.get("PRE_PROFIT_AMT"));
-        invoiceDetail.setPreProfitMonthBlAmt((BigDecimal) map.get("BL_AMT"));
-        invoiceDetail.setAddInvoiceAmt((BigDecimal) map.get("ADD_INVOICE_AMT"));
-        invoiceDetail.setShAddInvoceAmt((BigDecimal) map.get("ADD_INVOICE_AMT"));
-        BigDecimal ownInvoice = invoiceDetail.getPreLeftAmt()//计算本月欠票
-                .add(invoiceDetail.getDayProfitAmt())
-                .add(invoiceDetail.getDayBackAmt())
-                .add(invoiceDetail.getPreProfitMonthAmt())
-                .add(invoiceDetail.getPreProfitMonthBlAmt())
-                .add(invoiceDetail.getAdjustAmt() == null ? BigDecimal.ZERO : invoiceDetail.getAdjustAmt())
-                .subtract(invoiceDetail.getAddInvoiceAmt());
-        invoiceDetail.setOwnInvoice(ownInvoice);
-        invoiceDetail.setCreateTime(DateUtils.dateToStringss(new Date()));
-        invoiceDetailMapper.insertSelective(invoiceDetail);
-
     }
 
     @Override

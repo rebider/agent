@@ -66,6 +66,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Autowired
     private ProfitStagingMapper profitStagingMapper;
 
+    @Autowired
+    private ProfitDeducttionDetailMapper profitDeducttionDetailMapper;
+
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
     @Override
@@ -957,6 +960,42 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
             return getDeductionAmt(deductionList, param);
         }
         return BigDecimal.ZERO;
+    }
+
+    /**
+     * 获取机具--关联代理商扣款
+     * @param id
+     * @return
+     */
+   @Override
+    public List<ProfitDeducttionDetail> getRev1DetailById(String id){
+        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+        //根据 月份 类型  id  remark 查出关联代理商扣款记录
+       ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
+       ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
+       criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
+       criteria.andDeductionIdEqualTo(profitDeduction.getId());
+       criteria.andDeductionTypeEqualTo(DeductionType.MACHINE.getType());
+       criteria.andRemarkEqualTo("3"+"代理商代扣机具款，扣款明细："+profitDeduction.getSourceId());
+       List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+        return list;
+    }
+
+    /**
+     * 获取代理商担保扣款
+     */
+    @Override
+    public List<ProfitDeducttionDetail> getRev2DetailById(String id){
+        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+        //根据agentId  月份 类型(02)    remark 查出关联代理商扣款记录
+        ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
+        ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
+        criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
+        criteria.andDeductionTypeEqualTo(DeductionType.MACHINE.getType());
+        criteria.andRemarkLike("3" + "代理商代扣机具款，扣款明细：" + "%");
+        List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+        return list;
     }
 
 }

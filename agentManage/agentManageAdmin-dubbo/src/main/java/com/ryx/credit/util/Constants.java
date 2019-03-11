@@ -11,6 +11,7 @@ public class Constants {
 	public static PublicKey publicKey;
 	public static PrivateKey privateKey;
 	public static String serverUrl = AppConfig.getProperty("industryAuth_url");
+	public static String posPmsPlusUrl = AppConfig.getProperty("pos_pms_plus_url");//pos分润查询
 	
 	// --机构号
 	public static String cooperator = AppConfig.getProperty("industryAuth_cooperator");

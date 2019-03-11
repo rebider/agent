@@ -68,7 +68,7 @@ public class PosOrganDataServiceImpl implements PosOrganDataService {
         map.put("tranCode", tranCode);
         map.put("reqMsgId", reqMsgId);
 
-        String respStr = HttpUtil.doPost(Constants.serverUrl, map);
+        String respStr = HttpUtil.doPost(Constants.posPmsPlusUrl, map);
         System.out.println("返回密文======" + respStr);
 
         //返回报文解密开始
