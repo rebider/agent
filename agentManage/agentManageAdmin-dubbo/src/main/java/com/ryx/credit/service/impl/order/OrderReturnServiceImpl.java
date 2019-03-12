@@ -454,6 +454,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
         });
 
+        BigDecimal invoiceAmt = BigDecimal.ZERO;
         if(oInvoices!=null)
         for (OInvoice oInvoice : oInvoices) {
             if(StringUtils.isBlank(oInvoice.getInvoiceCompany())){
@@ -464,6 +465,13 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             }
             if(null==oInvoice.getInvoiceAmt()){
                 throw new ProcessException("金额不能为空");
+            }
+            if(oInvoice.getInvoiceAmt().compareTo(BigDecimal.ZERO)==-1){
+                throw new ProcessException("金额必须大于0！");
+            }
+            Boolean regMachinesDeptAmt = RegExpression.regAmount(oInvoice.getInvoiceAmt());
+            if(!regMachinesDeptAmt){
+                throw new ProcessException("金额不正确,保留小数点后两位！");
             }
             if(StringUtils.isBlank(oInvoice.getInvoiceNum())){
                 throw new ProcessException("发票号不能为空");
@@ -528,7 +536,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     }
                 }
             }
+            invoiceAmt = invoiceAmt.add(oInvoice.getInvoiceAmt());
         }
+
+
 
         //生成退货和订单关系
         for (String realId : relSet) {
@@ -784,6 +795,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                 }
             }
         }
+
+        BigDecimal invoiceAmt = BigDecimal.ZERO;
         if(oInvoices!=null)
         for (OInvoice oInvoice : oInvoices) {
             if(StringUtils.isBlank(oInvoice.getInvoiceCompany())){
@@ -842,6 +855,11 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     }
                 }
             }
+            invoiceAmt = invoiceAmt.add(oInvoice.getInvoiceAmt());
+        }
+
+        if(invoiceAmt.compareTo(totalAmt)==-1){
+            throw new ProcessException("发票金额必须大于退货金额");
         }
 
         //生成退货和订单关系
