@@ -766,7 +766,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount());
         }
         //订单下单时的发票开具状态为是 且 收款账号为深圳财务的
-        if(isCloInvoice.compareTo(Status.STATUS_1.status)==0 && collectCompany.equals("8")){
+        if(isCloInvoice.compareTo(Status.STATUS_1.status)==0 && collectCompany.equals("7")){
 //          1.订单总金额-退货金额小于等于发票金额 发票信息为必填
 //          2.订单总金额-退货金额大于发票金额 发票信息可选择否
             if(orderTotalAmt.subtract(bjTotalAmt).subtract(totalAmt).compareTo(invoiceTotalAmt)<=0){
