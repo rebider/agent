@@ -419,13 +419,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     bjTotalAmt = bjTotalAmt.add(oCashReceivable.getRealAmount());
                 }
             }
-            orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount());
+            BigDecimal amt = iOrderReturnService.selectOrderDetails(orderId);
+            orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount()).subtract(amt);
         }
         //订单下单时的发票开具状态为是 且 收款账号为深圳财务的
         if(isCloInvoice.compareTo(Status.STATUS_1.status)==0 && collectCompany.equals("7")){
 //          1.订单总金额-退货金额小于等于发票金额 发票信息为必填
 //          2.订单总金额-退货金额大于发票金额 发票信息可选择否
-            if(orderTotalAmt.subtract(bjTotalAmt).subtract(totalAmt).compareTo(invoiceTotalAmt)<=0){
+            if(orderTotalAmt.subtract(bjTotalAmt).subtract(totalAmt).compareTo(invoiceTotalAmt)<0){
                 if(returnOrder.getRetInvoice().compareTo(Status.STATUS_0.status)==0){
                     throw new ProcessException("是否退发票必须选择是");
                 }
@@ -764,13 +765,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                     bjTotalAmt = bjTotalAmt.add(oCashReceivable.getRealAmount());
                 }
             }
-            orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount());
+            BigDecimal amt = iOrderReturnService.selectOrderDetails(orderId);
+            orderTotalAmt = orderTotalAmt.add(oPayment.getPayAmount()).subtract(amt);
         }
         //订单下单时的发票开具状态为是 且 收款账号为深圳财务的
         if(isCloInvoice.compareTo(Status.STATUS_1.status)==0 && collectCompany.equals("7")){
 //          1.订单总金额-退货金额小于等于发票金额 发票信息为必填
 //          2.订单总金额-退货金额大于发票金额 发票信息可选择否
-            if(orderTotalAmt.subtract(bjTotalAmt).subtract(totalAmt).compareTo(invoiceTotalAmt)<=0){
+            if(orderTotalAmt.subtract(bjTotalAmt).subtract(totalAmt).compareTo(invoiceTotalAmt)<0){
                 if(returnOrder.getRetInvoice().compareTo(Status.STATUS_0.status)==0){
                     throw new ProcessException("是否退发票必须选择是");
                 }
@@ -920,6 +922,21 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
         return null;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    public BigDecimal selectOrderDetails(String orderId){
+        BigDecimal amt = BigDecimal.ZERO;
+        OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
+        OReturnOrderDetailExample.Criteria criteria1 = oReturnOrderDetailExample.createCriteria();
+        criteria1.andStatusEqualTo(Status.STATUS_1.status);
+        criteria1.andOrderIdEqualTo(orderId);
+        List<OReturnOrderDetail> oReturnOrderDetails = returnOrderDetailMapper.selectByExample(oReturnOrderDetailExample);
+        for (OReturnOrderDetail oReturnOrderDetail : oReturnOrderDetails) {
+            amt = amt.add(oReturnOrderDetail.getReturnAmt());
+        }
+        return amt;
     }
 
 

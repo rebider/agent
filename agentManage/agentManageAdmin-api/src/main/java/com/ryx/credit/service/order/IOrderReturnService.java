@@ -72,4 +72,7 @@ public interface IOrderReturnService {
 
 
     public List<OInvoice> findInvoiceById(String id);
+
+
+    BigDecimal selectOrderDetails(String orderId);
 }
