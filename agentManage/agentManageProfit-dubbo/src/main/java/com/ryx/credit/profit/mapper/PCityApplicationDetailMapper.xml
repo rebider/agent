@@ -384,4 +384,13 @@
     </where>
   </select>
 
+ <select id="getAgentNameByAgentId" parameterType="java.lang.String" resultType="java.lang.String">
+    select AG_NAME from A_AGENT where ID=#{id} and AG_STATUS = 'Approved' and STATUS='1'
+  </select>
+
+  <select id="getParentIdByAgentId" parameterType="java.lang.String" resultType="java.lang.String">
+    select a.AGENT_ID from A_AGENT_BUSINFO  a
+      left join A_AGENT_BUSINFO b on a.ID = b.BUS_PARENT where b.AGENT_ID = #{agentId} and b.STATUS = '1'
+  </select>
+
 </mapper>

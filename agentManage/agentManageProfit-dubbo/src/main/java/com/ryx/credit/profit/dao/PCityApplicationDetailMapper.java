@@ -33,4 +33,10 @@ public interface PCityApplicationDetailMapper {
     List<Map<String,String>> getDeductionAppList(@Param("map") Map<String,String> map,@Param("page") Page page);
     long getDeductionAppListCount(Map<String,String> map);
 
+    /**根据代理商AG，获得代理商姓名*/
+    String getAgentNameByAgentId(String id);
+
+    /**根据AG获取上级代理商信息*/
+    List<String> getParentIdByAgentId(String agentId);
+
 }

@@ -9,6 +9,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
@@ -104,13 +105,23 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
             throw new MessageException("启动部门参数为空!");
         }
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
-        if (proceId == null) {
-            //启动失败，要删除对应数据
+        String proceId = null;
+        try{
+            proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
+            if (proceId == null) {
+                //启动失败，要删除对应数据
+                PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
+                pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
+                pCityApplicationDetailMapper.deleteByExample(pExample);
+                logger.error("其他扣款申请审批流启动失败，代理商ID：{}", pCityApplicationDetail.getAgentId());
+                throw new ProcessException("其他扣款申请审批流启动失败!");
+            }
+        }catch (Exception e){
             PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
             pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
             pCityApplicationDetailMapper.deleteByExample(pExample);
-            logger.error("其他扣款申请审批流启动失败，代理商ID：{}", pCityApplicationDetail.getAgentId());
+            e.printStackTrace();
+            logger.info("其他扣款申请审批流启动失败");
             throw new ProcessException("其他扣款申请审批流启动失败!");
         }
         //启动审批流成功
@@ -128,6 +139,9 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         }catch (Exception e){
             e.printStackTrace();
             logger.info("其他扣款申请审批流启动失败");
+            PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
+            pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
+            pCityApplicationDetailMapper.deleteByExample(pExample);
             throw new ProcessException("其他扣款申请审批流启动失败!:{}",e.getMessage());
         }
 
@@ -278,15 +292,25 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         }
 
         //启动审批流
-        String proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
-        if (proceId == null) {
-            //启动失败，要删除对应数据
-            PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
-            pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
-            pCityApplicationDetailMapper.deleteByExample(pExample);
-            logger.error("其他补款申请审批流启动失败，代理商ID：{}", pCityApplicationDetail.getAgentId());
-            throw new ProcessException("其他补款申请审批流启动失败!");
-        }
+        String proceId = null;
+       try{
+           proceId = activityService.createDeloyFlow(null, workId, null, null, startPar);
+           if (proceId == null) {
+               //启动失败，要删除对应数据
+               PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
+               pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
+               pCityApplicationDetailMapper.deleteByExample(pExample);
+               logger.error("其他补款申请审批流启动失败，代理商ID：{}", pCityApplicationDetail.getAgentId());
+               throw new ProcessException("其他补款申请审批流启动失败!");
+           }
+       }catch (Exception e){
+           e.printStackTrace();
+           logger.info("其他补款申请审批流启动失败");
+           PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
+           pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
+           pCityApplicationDetailMapper.deleteByExample(pExample);
+           throw new ProcessException("其他补款申请审批流启动失败!:{}",e.getMessage());
+       }
         //启动审批流成功
         BusActRel record = new BusActRel();
         record.setBusId(pCityApplicationDetail.getId());
@@ -302,6 +326,9 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         }catch (Exception e){
             e.printStackTrace();
             logger.info("其他补款申请审批流启动失败");
+            PCityApplicationDetailExample pExample = new PCityApplicationDetailExample();
+            pExample.createCriteria().andIdEqualTo(pCityApplicationDetail.getId());
+            pCityApplicationDetailMapper.deleteByExample(pExample);
             throw new ProcessException("其他补款申请审批流启动失败!:{}",e.getMessage());
         }
 
@@ -388,4 +415,39 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
             pProfitSupplyMapper.insertSelective(profitSupply);
         }
     }
+
+    /**
+     * 获取代理商名称
+     */
+    @Override
+    public ResultVO getAgentNameById(String id) {
+        ResultVO result = new ResultVO();
+        String agentName = pCityApplicationDetailMapper.getAgentNameByAgentId(id);
+        if(agentName != null){
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put("agentName",agentName);
+            List<String> list = pCityApplicationDetailMapper.getParentIdByAgentId(id);
+            map.put("parentInfo",list);
+            return result.success(map);
+        }
+        return result.fail("请输入正确的唯一码");
+    }
+
+    @Override
+    public ResultVO getParentNameByID(String agentId, String parentAgentId) {
+        ResultVO resultVO = new ResultVO();
+        List<String> list = pCityApplicationDetailMapper.getParentIdByAgentId(agentId);
+        if(list.size()<=0){
+            return resultVO.fail("该代理商无上级代理商");
+        }
+        for (String id: list) {
+            if(id.equals(parentAgentId)){
+                String name = pCityApplicationDetailMapper.getAgentNameByAgentId(parentAgentId);
+                return resultVO.success(name);
+            }
+        }
+        return resultVO.fail("请输入正确的唯一码");
+    }
+
+
 }
