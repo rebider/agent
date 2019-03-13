@@ -360,6 +360,8 @@ public class CapitalChangeApplyServiceImpl implements CapitalChangeApplyService 
                 throw new MessageException("启动部门参数为空!");
             }
             startPar.put("rs","pass");
+            startPar.put("operationType", capitalChangeApply.getOperationType());
+
             //启动审批
             String proce = activityService.createDeloyFlow(null, "capitalChange1.0", null, null, startPar);
             if (proce == null) {
