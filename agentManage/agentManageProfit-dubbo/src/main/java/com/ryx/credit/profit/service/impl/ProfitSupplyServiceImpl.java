@@ -163,9 +163,31 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         }
         for (List<Object> supply : data) {
             if (supply.size() == 6){
-                if (null!=supply.get(0) && !"".equals(supply.get(0))&& null!=supply.get(1) && !"".equals(supply.get(1))&& null!=supply.get(4) && !"".equals(supply.get(4))
-                        && null!=supply.get(5) && !"".equals(supply.get(5))) {
+                if(null==supply.get(0) || "".equals(supply.get(0))){
+                    throw new MessageException("代理商唯一码导入有误，请检查");
+                }
+                if( null==supply.get(1) || "".equals(supply.get(1))){
+                    throw new MessageException("代理商名称导入有误，请检查");
+                }
+                if( null==supply.get(4) || "".equals(supply.get(4))){
+                    throw new MessageException("补款类型导入有误，请检查");
+                }
+                if( null==supply.get(5) || "".equals(supply.get(5))){
+                    throw new MessageException("补款金额导入有误，请检查");
+                }else{
+                    try {
+                        new BigDecimal(String.valueOf(supply.get(5)));
+                    }catch (Exception e){
+                        throw new MessageException("补款金额不是小数，请检查");
+                    }
+                }
+            }
 
+        }
+
+
+        for (List<Object> supply : data) {
+            if (supply.size() == 6){
              ProfitSupply profitSupply = new ProfitSupply();
             profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
             profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
@@ -197,7 +219,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 throw new MessageException(supply.toString() + "导入格式错误！");
             }
 
-        }
+
             }
         }
         return list;
