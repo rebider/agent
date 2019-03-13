@@ -222,7 +222,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
             agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
-            agentEnterService.verifyOther(agentBusInfoVos);
+//            agentEnterService.verifyOther(agentBusInfoVos);
 
             for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
                 AgentBusInfo agbus = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
@@ -278,7 +278,7 @@ public class BusinessPlatformServiceImpl implements BusinessPlatformService {
             String json = JsonUtil.objectToJson(agentBusInfos);
             List<AgentBusInfoVo> agentBusInfoVos = JsonUtil.jsonToList(json, AgentBusInfoVo.class);
             agentEnterService.verifyOrgAndBZYD(agentBusInfoVos);
-            agentEnterService.verifyOther(agentBusInfoVos);
+//            agentEnterService.verifyOther(agentBusInfoVos);
 
             for (AgentContractVo item : agentVo.getContractVoList()) {
                 if (StringUtils.isNotBlank(agent.getcUser()) && StringUtils.isNotBlank(agent.getId())) {

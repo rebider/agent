@@ -91,7 +91,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO agentEnterIn(AgentVo agentVo) throws ProcessException {
         try {
             verifyOrgAndBZYD(agentVo.getBusInfoVoList());
-            verifyOther(agentVo.getBusInfoVoList());
+//            verifyOther(agentVo.getBusInfoVoList());
             Agent agent = agentService.insertAgent(agentVo.getAgent(), agentVo.getAgentTableFile(),agentVo.getAgent().getcUser());
             agentVo.setAgent(agent);
             for (AgentContractVo item : agentVo.getContractVoList()) {
@@ -204,32 +204,33 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     }
 
     /**
+     * （业务市场财务去掉必须是同一个上级限制，此方法废弃 20190313）
      * 代理商新签入网业务平台类型为机构一代、二代直签直发、直签不直发、一代X时，所有业务平台上级必须为同一个。
      * @param busInfoVoList
      * @throws Exception
      */
-    @Override
-    public void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception {
-        Set<String> busParentSet = new HashSet<>();
-        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-            String busParent = "";
-            if(StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
-                busParent = agentBusInfo.getAgentId();
-            }else{
-                busParent = "";
-            }
-            busParentSet.add(busParent);
-        }
-        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
-            if(agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.JGYD.key)
-            || agentBusInfoVo.getBusType().equals(BusType.YDX.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key)){
-                if(busParentSet.size()!=1){
-                    throw new ProcessException("上级不是同一个");
-                }
-            }
-        }
-    }
+//    @Override
+//    public void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception {
+//        Set<String> busParentSet = new HashSet<>();
+//        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+//            String busParent = "";
+//            if(StringUtils.isNotBlank(agentBusInfoVo.getBusParent())){
+//                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getBusParent());
+//                busParent = agentBusInfo.getAgentId();
+//            }else{
+//                busParent = "";
+//            }
+//            busParentSet.add(busParent);
+//        }
+//        for (AgentBusInfoVo agentBusInfoVo : busInfoVoList) {
+//            if(agentBusInfoVo.getBusType().equals(BusType.ZQ.key) || agentBusInfoVo.getBusType().equals(BusType.JGYD.key)
+//            || agentBusInfoVo.getBusType().equals(BusType.YDX.key) || agentBusInfoVo.getBusType().equals(BusType.ZQBZF.key)){
+//                if(busParentSet.size()!=1){
+//                    throw new ProcessException("上级不是同一个");
+//                }
+//            }
+//        }
+//    }
 
     /**
      * 启动代理商审批
@@ -846,7 +847,7 @@ public class AgentEnterServiceImpl implements AgentEnterService {
     public ResultVO updateAgentVo(AgentVo agent, String userId) throws Exception {
         try {
             verifyOrgAndBZYD(agent.getBusInfoVoList());
-            verifyOther(agent.getBusInfoVoList());
+//            verifyOther(agent.getBusInfoVoList());
             logger.info("用户{}{}修改代理商信息{}", userId, agent.getAgent().getId(), JSONObject.toJSONString(agent));
             Agent ag = null;
             if (StringUtils.isNotBlank(agent.getAgent().getAgName())) {
