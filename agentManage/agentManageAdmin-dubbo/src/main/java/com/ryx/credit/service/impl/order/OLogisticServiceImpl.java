@@ -595,7 +595,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * @param db
      * @return
      */
-    private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
+    @Override
+    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
         String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
         String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");

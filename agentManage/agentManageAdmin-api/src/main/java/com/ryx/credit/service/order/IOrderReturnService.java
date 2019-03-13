@@ -35,6 +35,7 @@ public interface IOrderReturnService {
 
     Map<String, Object> delCut(String returnId,String cutId,String userid)throws ProcessException;
 
+    public AgentResult savePlans(AgentVo agentVo, String userid)throws Exception;
 
 
     AgentResult approvalTaskAjustPeople(OReturnOrder oReturnOrder) throws ProcessException;

@@ -865,9 +865,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //业务审批时添加排单
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
-                AgentResult agentResult = savePlans(agentVo, userId);
-                if (!agentResult.isOK()) {
-                    return AgentResult.fail(agentResult.getMsg());
+                try {
+                    AgentResult agentResult = savePlans(agentVo, userId);
+                    if (!agentResult.isOK()) {
+                        return AgentResult.fail(agentResult.getMsg());
+                    }
+                } catch (MessageException me){
+                   throw new ProcessException(me.getMsg());
+                }catch (Exception e){
+                    throw new ProcessException(e.getLocalizedMessage());
                 }
             }
 
@@ -1071,7 +1077,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 保存排单
      * @Date: 21:31 2018/8/2
      */
-    public AgentResult savePlans(AgentVo agentVo, String userid) {
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public AgentResult savePlans(AgentVo agentVo, String userid)throws Exception {
         try {
 
             JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());

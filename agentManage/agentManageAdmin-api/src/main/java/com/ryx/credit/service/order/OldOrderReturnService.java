@@ -3,6 +3,7 @@ package com.ryx.credit.service.order;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.OldOrderReturnBusEditVo;
 import com.ryx.credit.pojo.admin.vo.OldOrderReturnSubmitProVo;
 import com.ryx.credit.pojo.admin.vo.OldOrderReturnVo;
 import org.springframework.transaction.annotation.Isolation;
@@ -44,4 +45,31 @@ public interface OldOrderReturnService {
      * @return
      */
     public AgentResult loadOldOrderReturnDetailInfo(String orderId,String proId);
+
+    /**
+     * 业务部门完善信息
+     * @param oldOrderReturnBusEditVos
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    public AgentResult completOldOrderReturnInfo(List<OldOrderReturnBusEditVo> oldOrderReturnBusEditVos, String user)throws Exception;
+
+    /**
+     * 物流上传处理
+     * @param data
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    List<String> uploadSnFileList(List<List<Object>> data, String user) throws Exception;
+
+    /**
+     * 物流上传处理单个号码段
+     * @param objectList
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    AgentResult uploadSnFileListItem(List<Object> objectList, String user) throws Exception;
 }
