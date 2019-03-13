@@ -4,6 +4,7 @@ import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.PCityApplicationDetail;
 import com.ryx.credit.profit.pojo.PosCheck;
@@ -59,4 +60,13 @@ public interface IProfitCityApplicationService {
      * 获取其他补款申请数据
      */
     PageInfo getSupplyAppList(Page page, String userId, PCityApplicationDetail pCityApplicationDetail);
+
+    /**
+     * 获取代理商名称
+     */
+    ResultVO getAgentNameById(String id);
+    /**
+     *获取上级代理商名称 且判断上下级关系
+     */
+   ResultVO getParentNameByID(String agentId,String parentAgentId);
 }

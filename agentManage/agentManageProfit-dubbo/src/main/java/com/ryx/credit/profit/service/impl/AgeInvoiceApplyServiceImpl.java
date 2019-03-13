@@ -200,6 +200,7 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         }
         if("0".equals(invoiceApply.getShResult())){
             criteria.andShResultEqualTo(invoiceApply.getShResult());
+            criteria.andFilenameIsNotNull();
         }
 
         List<InvoiceApply> list = invoiceApplyMapper.selectByExample(example);
