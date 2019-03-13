@@ -164,20 +164,25 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
         for (List<Object> supply : data) {
             if (supply.size() == 6){
                 if(null==supply.get(0) || "".equals(supply.get(0))){
+                    logger.info("代理商唯一码导入有误，请检查");
                     throw new MessageException("代理商唯一码导入有误，请检查");
                 }
                 if( null==supply.get(1) || "".equals(supply.get(1))){
+                    logger.info("代理商名称导入有误，请检查");
                     throw new MessageException("代理商名称导入有误，请检查");
                 }
                 if( null==supply.get(4) || "".equals(supply.get(4))){
+                    logger.info("补款类型导入有误，请检查");
                     throw new MessageException("补款类型导入有误，请检查");
                 }
                 if( null==supply.get(5) || "".equals(supply.get(5))){
+                    logger.info("补款金额导入有误，请检查");
                     throw new MessageException("补款金额导入有误，请检查");
                 }else{
                     try {
                         new BigDecimal(String.valueOf(supply.get(5)));
                     }catch (Exception e){
+                        logger.info("补款金额不是小数，请检查");
                         throw new MessageException("补款金额不是小数，请检查");
                     }
                 }
