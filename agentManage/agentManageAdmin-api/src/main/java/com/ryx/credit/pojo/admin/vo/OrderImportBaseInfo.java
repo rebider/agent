@@ -21,7 +21,7 @@ public class OrderImportBaseInfo implements Serializable {
             "order_agname",
             "order_date","order_amt","order_have_amt",
             "order_paymethod","order_shoufu_amt","order_fenqi_count","order_fenqi_date","order_colcomp","order_pay_user","order_is_fp",
-            "order_dk_type","order_dk_amt","order_hkr","order_hk_date","order_remark","ox_order");
+            "order_dk_type","order_dk_amt","order_hkr","order_hk_date","order_remark");
 
     public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
@@ -44,7 +44,6 @@ public class OrderImportBaseInfo implements Serializable {
             this.setOrder_hkr(data.getString(colum.indexOf("order_hkr")));
             this.setOrder_hk_date(data.getString(colum.indexOf("order_hk_date")));
             this.setOrder_remark(data.getString(colum.indexOf("order_remark")));
-            this.setOx_order(data.getString(colum.indexOf("ox_order")));
         }
         this.importId=importId;
     }

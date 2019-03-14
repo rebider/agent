@@ -254,10 +254,8 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             orderImportBaseInfo.loadInfoFromJsonArray(OBASE_dataContent_jsonArray, importAgent.getId());
             //查询商品信息
             ImportAgentExample goods_exa = new ImportAgentExample();
-            goods_exa.or().andDealstatusEqualTo(Status.STATUS_0.status)
-                    .andStatusEqualTo(Status.STATUS_1.status)
-                    .andDataidEqualTo(orderImportBaseInfo.getOrder_id())
-                    .andDatatypeEqualTo(AgImportType.OGOODS.code);
+            goods_exa.or().andDealstatusEqualTo(Status.STATUS_0.status).andStatusEqualTo(Status.STATUS_1.status)
+                    .andDataidEqualTo(orderImportBaseInfo.getOrder_id()).andDatatypeEqualTo(AgImportType.OGOODS.code);
             List<ImportAgent> goods_list = importAgentMapper.selectByExampleWithBLOBs(goods_exa);
             List<OrderImportGoodsInfo> OrderImportGoodsInfos = new ArrayList<>();
             for (ImportAgent goodss : goods_list) {
@@ -345,7 +343,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         //busid
         orderFormVo.setBusId(agentBusInfo.getId());
         //新老订单
-        orderFormVo.setOxOrder(orderImportBaseInfo.getOx_order());
+        orderFormVo.setOxOrder(Oreturntype.OLD.code);
         orderFormVo.setReviewStatus(AgStatus.Approved.status);
         orderFormVo.setOrderStatus(OrderStatus.ENABLE.status);
         if(orderImportBaseInfo.getOrder_amt().equals(orderImportBaseInfo.getOrder_have_amt())) {
@@ -402,30 +400,26 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             }
         }
         //抵扣金额
-        oPayment.setDeductionAmount(orderImportBaseInfo.getOrder_dk_amt()!=null?new BigDecimal(orderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
+        oPayment.setDeductionAmount(orderImportBaseInfo.getOrder_dk_amt()==null?new BigDecimal(orderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
         //首付金额
         if(StringUtils.isNotBlank(orderImportBaseInfo.getOrder_shoufu_amt())) {
             oPayment.setDownPayment(
-                    StringUtils.isNotBlank(orderImportBaseInfo.getOrder_shoufu_amt())?
-                            new BigDecimal(orderImportBaseInfo.getOrder_shoufu_amt())
-                            :BigDecimal.ZERO);
+                    StringUtils.isNotBlank(
+                            orderImportBaseInfo.getOrder_shoufu_amt())?new BigDecimal(orderImportBaseInfo.getOrder_shoufu_amt()):BigDecimal.ZERO);
         }
         //分期期数
         oPayment.setDownPaymentCount(
-                StringUtils.isNotBlank(orderImportBaseInfo.getOrder_fenqi_count())
-                        ?new BigDecimal(orderImportBaseInfo.getOrder_fenqi_count())
-                        :BigDecimal.ZERO);
+                StringUtils.isNotBlank(
+                        orderImportBaseInfo.getOrder_fenqi_count())?new BigDecimal(orderImportBaseInfo.getOrder_fenqi_count()):BigDecimal.ZERO);
         //分期日期
         oPayment.setDownPaymentDate(
-                StringUtils.isNotBlank(orderImportBaseInfo.getOrder_fenqi_date())?
-                        DateUtil.format(orderImportBaseInfo.getOrder_fenqi_date(),"yyyy-MM")
-                        :null
+                StringUtils.isNotBlank(
+                        orderImportBaseInfo.getOrder_fenqi_date())?DateUtil.format(orderImportBaseInfo.getOrder_fenqi_date(),"yyyy-MM"):null
         );
         //打款用户
         oPayment.setDownPaymentUser(
-                StringUtils.isNotBlank(orderImportBaseInfo.getOrder_pay_user())
-                        ?orderImportBaseInfo.getOrder_pay_user()
-                        :"");
+                StringUtils.isNotBlank(
+                        orderImportBaseInfo.getOrder_pay_user())?orderImportBaseInfo.getOrder_pay_user():"");
 
         //收款公司
         for (PayComp payComp : payComps) {
@@ -453,6 +447,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         BigDecimal yifu = oPayment.getRealAmount();
         //待付生成分期 或者生成欠款
         BigDecimal daifu = oPayment.getOutstandingAmount();
+
         //首付金额 首付生成首付明细
         BigDecimal shoufu = oPayment.getDownPayment();
         if(shoufu.compareTo(BigDecimal.ZERO)>0){
@@ -480,6 +475,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 throw new MessageException("分期处理");
             }
         }
+
         //抵扣 抵扣生成抵扣明细
         String dikou_type = oPayment.getDeductionType();
         BigDecimal dikou = oPayment.getDeductionAmount();
@@ -508,6 +504,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 throw new MessageException("分期处理");
             }
         }
+
         //已付款余处
         BigDecimal yifu_mingxi = yifu.subtract(shoufu).subtract(dikou);
         if(yifu_mingxi.compareTo(BigDecimal.ZERO)>0){
@@ -536,6 +533,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 throw new MessageException("分期处理");
             }
         }
+
         //如果有待付款 生成待付款明细
         if(daifu.compareTo(BigDecimal.ZERO)>0) {
             List<Map> FKFQ_data = null;
@@ -589,11 +587,28 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 }
             }
         }
-        //解析商品物流信息
-        AgentResult suborder = newOrderImportService.newPareseOrderImportSubOrderInfo(orderImportBaseInfo,orderFormVo,oPayment,User);
-        if(!suborder.isOK()){
+
+        //解析订单商品信息
+        AgentResult suborder = newOrderImportService.newPareseOrderImportSubOrderInfo(orderImportBaseInfo, orderFormVo, oPayment, User);
+        if (!suborder.isOK()) {
+            List<OrderImportGoodsInfo> orderImportGoodsInfos = orderImportBaseInfo.getOrderImportGoodsInfos();
+            for (OrderImportGoodsInfo orderImportGoodsInfo : orderImportGoodsInfos) {
+                String importId = orderImportGoodsInfo.getImportId();
+                ImportAgent orderImportGoodsInfo_importAgent = importAgentMapper.selectByPrimaryKey(importId);
+                orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_3.status);
+                orderImportGoodsInfo_importAgent.setDealmsg(suborder.getMsg());
+                orderImportGoodsInfo_importAgent.setDealTime(new Date());
+                if(importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent) != 1){
+                    redisService.rpushList(import_order_imOrderMsg_key + orderImportBaseInfo.getOrder_id(),
+                            "更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                    logger.info("更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                    throw new MessageException("更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                }
+            }
+            logger.info("======处理订单商品解析{}失败{}", orderImportBaseInfo.getOrder_id(), suborder.getMsg());
             throw new MessageException(suborder.getMsg());
         }
+
         return AgentResult.ok();
     }
 
@@ -636,12 +651,13 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             }
             OProduct product = oProductList.get(0);
             OActivity activity = oActivityMapper.selectByPrimaryKey(orderImportGoodsInfo.getActId());
+
             //查询采购单是否存在此商品
             OSubOrderExample oSubOrderExample = new OSubOrderExample();
             oSubOrderExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
                     .andProIdEqualTo(product.getId()).andOrderIdEqualTo(order.getId());
             List<OSubOrder> oSubOrderList = oSubOrderMapper.selectByExample(oSubOrderExample);
-            if (oSubOrderList.size() != 0) {
+            if (oSubOrderList.size() != 0 && !oSubOrderList.isEmpty()) {
                 for (OSubOrder oSubOrder : oSubOrderList) {
                     oSubOrder.setProId(product.getId());
                     oSubOrder.setOrderId(order.getId());
@@ -671,6 +687,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                         logger.info("采购单更新失败" + orderImportBaseInfo.getOrder_id() + ":" + orderImportGoodsInfo.getGoodsCode());
                         throw new MessageException("采购单更新失败" + orderImportBaseInfo.getOrder_id() + ":" + orderImportGoodsInfo.getGoodsCode());
                     }
+
                     //查询采购活动
                     OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
                     oSubOrderActivityExample.createCriteria().andStatusEqualTo(Status.STATUS_1.status)
@@ -716,80 +733,80 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                         }
                     }
                 }
+            } else {
+                //采购单表
+                OSubOrder oSubOrder = new OSubOrder();
+                oSubOrder.setId(idService.genId(TabId.o_sub_order));
+                oSubOrder.setProId(product.getId());
+                oSubOrder.setOrderId(order.getId());
+                oSubOrder.setProCode(product.getProCode());
+                oSubOrder.setProName(product.getProName());
+                oSubOrder.setProType(activity.getProType());
+                oSubOrder.setProPrice(activity.getPrice());
+                oSubOrder.setSendNum(new BigDecimal(orderImportGoodsInfo.getSendOutNum()));
+                oSubOrder.setIsDeposit(product.getIsDeposit());
+                oSubOrder.setDeposit(product.getDeposit());
+                oSubOrder.setModel(activity.getProModel());
+                oSubOrder.setProNum(new BigDecimal(orderImportGoodsInfo.getGoodsNum()));
+                oSubOrder.setProRelPrice(activity.getPrice());
+                oSubOrder.setRemark("(老订单)");
+                oSubOrder.setcTime(c.getTime());
+                oSubOrder.setuUser(User);
+                oSubOrder.setcUser(User);
+                oSubOrder.setuTime(c.getTime());
+                oSubOrder.setStatus(Status.STATUS_1.status);
+                oSubOrder.setVersion(Status.STATUS_0.status);
+                oSubOrder.setAgentId(order.getAgentId());
+                oSubOrder.setSendOutNum(new BigDecimal(orderImportGoodsInfo.getSendOutNum()));
+                oSubOrder.setReturnsNum(new BigDecimal(orderImportGoodsInfo.getReturnsNum()));
+                if(1!=oSubOrderMapper.insertSelective(oSubOrder)){
+                    redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"采购单添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                    logger.info("采购单添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                    throw new MessageException("采购单添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                }
+
+                //商品采购单活动
+                OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
+                oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
+                oSubOrderActivity.setActivityId(activity.getId());
+                oSubOrderActivity.setSubOrderId(oSubOrder.getId());
+                oSubOrderActivity.setActivityName(activity.getActivityName());
+                oSubOrderActivity.setRuleId(activity.getRuleId());
+                oSubOrderActivity.setProId(oSubOrder.getProId());
+                oSubOrderActivity.setProName(oSubOrder.getProName());
+                oSubOrderActivity.setActivityRule(activity.getActivityRule());
+                oSubOrderActivity.setActivityWay(activity.getActivityWay());
+                oSubOrderActivity.setPrice(activity.getPrice());
+                oSubOrderActivity.setOriginalPrice(activity.getOriginalPrice());
+                oSubOrderActivity.setProModel(activity.getProModel());
+                oSubOrderActivity.setVender(activity.getVender());
+                oSubOrderActivity.setPlatform(activity.getPlatform());
+                oSubOrderActivity.setgTime(activity.getgTime());
+                oSubOrderActivity.setcTime(c.getTime());
+                oSubOrderActivity.setuTime(c.getTime());
+                oSubOrderActivity.setcUser(User);
+                oSubOrderActivity.setuUser(User);
+                oSubOrderActivity.setStatus(Status.STATUS_1.status);
+                oSubOrderActivity.setVersion(Status.STATUS_0.status);
+                oSubOrderActivity.setBusProCode(activity.getBusProCode());
+                oSubOrderActivity.setBusProName(activity.getBusProName());
+                oSubOrderActivity.setTermBatchcode(activity.getTermBatchcode());
+                oSubOrderActivity.setTermBatchname(activity.getTermBatchname());
+                oSubOrderActivity.setTermtype(activity.getTermtype());
+                oSubOrderActivity.setTermtypename(activity.getTermtypename());
+                oSubOrderActivity.setPosType(activity.getPosType());
+                oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
+                oSubOrderActivity.setStandTime(activity.getStandTime());
+                oSubOrderActivity.setStandAmt(activity.getStandAmt());
+                oSubOrderActivity.setBackType(activity.getBackType());
+                if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
+                    redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"采购单活动添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                    logger.info("采购单活动添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
+                    throw new MessageException("采购单活动添加失败");
+                }
             }
 
-            //采购单表
-            OSubOrder oSubOrder = new OSubOrder();
-            oSubOrder.setId(idService.genId(TabId.o_sub_order));
-            oSubOrder.setProId(product.getId());
-            oSubOrder.setOrderId(order.getId());
-            oSubOrder.setProCode(product.getProCode());
-            oSubOrder.setProName(product.getProName());
-            oSubOrder.setProType(activity.getProType());
-            oSubOrder.setProPrice(activity.getPrice());
-            oSubOrder.setSendNum(new BigDecimal(orderImportGoodsInfo.getSendOutNum()));
-            oSubOrder.setIsDeposit(product.getIsDeposit());
-            oSubOrder.setDeposit(product.getDeposit());
-            oSubOrder.setModel(activity.getProModel());
-            oSubOrder.setProNum(new BigDecimal(orderImportGoodsInfo.getGoodsNum()));
-            oSubOrder.setProRelPrice(activity.getPrice());
-            oSubOrder.setRemark("(老订单)");
-            oSubOrder.setcTime(c.getTime());
-            oSubOrder.setuUser(User);
-            oSubOrder.setcUser(User);
-            oSubOrder.setuTime(c.getTime());
-            oSubOrder.setStatus(Status.STATUS_1.status);
-            oSubOrder.setVersion(Status.STATUS_0.status);
-            oSubOrder.setAgentId(order.getAgentId());
-            oSubOrder.setSendOutNum(new BigDecimal(orderImportGoodsInfo.getSendOutNum()));
-            oSubOrder.setReturnsNum(new BigDecimal(orderImportGoodsInfo.getReturnsNum()));
-            if(1!=oSubOrderMapper.insertSelective(oSubOrder)){
-                redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"采购单添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                logger.info("采购单添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                throw new MessageException("采购单添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-            }
-
-            //商品采购单活动
-            OSubOrderActivity oSubOrderActivity = new OSubOrderActivity();
-            oSubOrderActivity.setId(idService.genId(TabId.o_sub_order_activity));
-            oSubOrderActivity.setActivityId(activity.getId());
-            oSubOrderActivity.setSubOrderId(oSubOrder.getId());
-            oSubOrderActivity.setActivityName(activity.getActivityName());
-            oSubOrderActivity.setRuleId(activity.getRuleId());
-            oSubOrderActivity.setProId(oSubOrder.getProId());
-            oSubOrderActivity.setProName(oSubOrder.getProName());
-            oSubOrderActivity.setActivityRule(activity.getActivityRule());
-            oSubOrderActivity.setActivityWay(activity.getActivityWay());
-            oSubOrderActivity.setPrice(activity.getPrice());
-            oSubOrderActivity.setOriginalPrice(activity.getOriginalPrice());
-            oSubOrderActivity.setProModel(activity.getProModel());
-            oSubOrderActivity.setVender(activity.getVender());
-            oSubOrderActivity.setPlatform(activity.getPlatform());
-            oSubOrderActivity.setgTime(activity.getgTime());
-            oSubOrderActivity.setcTime(c.getTime());
-            oSubOrderActivity.setuTime(c.getTime());
-            oSubOrderActivity.setcUser(User);
-            oSubOrderActivity.setuUser(User);
-            oSubOrderActivity.setStatus(Status.STATUS_1.status);
-            oSubOrderActivity.setVersion(Status.STATUS_0.status);
-            oSubOrderActivity.setBusProCode(activity.getBusProCode());
-            oSubOrderActivity.setBusProName(activity.getBusProName());
-            oSubOrderActivity.setTermBatchcode(activity.getTermBatchcode());
-            oSubOrderActivity.setTermBatchname(activity.getTermBatchname());
-            oSubOrderActivity.setTermtype(activity.getTermtype());
-            oSubOrderActivity.setTermtypename(activity.getTermtypename());
-            oSubOrderActivity.setPosType(activity.getPosType());
-            oSubOrderActivity.setPosSpePrice(activity.getPosSpePrice());
-            oSubOrderActivity.setStandTime(activity.getStandTime());
-            oSubOrderActivity.setStandAmt(activity.getStandAmt());
-            oSubOrderActivity.setBackType(activity.getBackType());
-            if(1!=oSubOrderActivityMapper.insertSelective(oSubOrderActivity)){
-                redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"采购单活动添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                logger.info("采购单活动添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                throw new MessageException("采购单活动添加失败");
-            }
-
-            String importid =  orderImportGoodsInfo.getImportId();
+            String importid = orderImportGoodsInfo.getImportId();
             ImportAgent orderImportGoodsInfo_importAgent = importAgentMapper.selectByPrimaryKey(importid);
             orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_2.status);
             orderImportGoodsInfo_importAgent.setDealmsg("成功");
