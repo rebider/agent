@@ -27,4 +27,6 @@ public interface OProductMapper {
     List<Map> queryGroupByProCodeList(Map par);
 
     int queryGroupByProCodeListCount(Map par);
+
+    List<Map> queryGroupByProCode(Map par);
 }
