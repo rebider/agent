@@ -663,4 +663,28 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
         return AgentResult.ok();
     }
+
+
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public void approvalFinish(String processInstanceId, String activityName) throws Exception{
+        try {
+            logger.info("历史退货审批完成回调:{},{}", processInstanceId, activityName);
+            //审批流关系
+            BusActRel rel = busActRelService.findById(processInstanceId);
+            //退货编号
+            String returnId = rel.getBusId();
+            //更新退货单
+            OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            returnOrder.setRetSchedule(new BigDecimal(RetSchedule.WC.code));
+            returnOrder.setuTime(new Date());
+            if( returnOrderMapper.updateByPrimaryKeySelective(returnOrder)!=1){
+                logger.info("退货审批完成回调:{},{},更新退货单失败", processInstanceId, activityName);
+                throw new MessageException("更新退货单失败");
+            }
+        } catch (Exception e) {
+            logger.error("退货审批完成回调异常", e);
+            throw e;
+        }
+    }
 }

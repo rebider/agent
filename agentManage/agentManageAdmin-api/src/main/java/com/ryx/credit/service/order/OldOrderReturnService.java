@@ -72,4 +72,13 @@ public interface OldOrderReturnService {
      * @throws Exception
      */
     AgentResult uploadSnFileListItem(List<Object> objectList, String user) throws Exception;
+
+
+    /**
+     * 审批通过
+     * @param processInstanceId
+     * @param activityName
+     * @throws Exception
+     */
+     void approvalFinish(String processInstanceId, String activityName) throws Exception;
 }
