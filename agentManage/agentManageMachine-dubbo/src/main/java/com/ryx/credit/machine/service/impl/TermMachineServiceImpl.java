@@ -113,4 +113,17 @@ public class TermMachineServiceImpl  implements TermMachineService {
     public JSONObject request(Map data, String url) throws Exception {
         return null;
     }
+
+    @Override
+    public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
+        switch (platformType.name()){
+            case "POS":
+                return posTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+            case "MPOS":
+                return mposTermMachineServiceImpl.querySnMsg(platformType,snBegin,snEnd);
+            default:
+                return AgentResult.fail();
+        }
+
+    }
 }

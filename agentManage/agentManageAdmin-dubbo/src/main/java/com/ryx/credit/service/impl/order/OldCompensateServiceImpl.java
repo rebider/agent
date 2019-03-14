@@ -1,7 +1,12 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.DictGroup;
+import com.ryx.credit.common.enumc.PlatformType;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.machine.service.TermMachineService;
 import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.OProduct;
 import com.ryx.credit.service.dict.DictOptionsService;
@@ -30,6 +35,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private ProductService productService;
+    @Autowired
+    private TermMachineService termMachineService;
 
     @Override
     public List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList){
@@ -53,9 +60,31 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 throw new ProcessException("导入类型错误");
             }
             if(proModel.equals("MPOS")){
-                httpForMPos(snBegin,snEnd);
+                try {
+                    AgentResult agentResult = termMachineService.querySnMsg(PlatformType.MPOS,snBegin, snEnd);
+                    if(!agentResult.isOK()){
+                        throw new ProcessException("查询手刷失败");
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }else {
-                httpForPos(snBegin, snEnd);
+                try {
+                    AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS,"001", "012");
+                    if(!agentResult.isOK()){
+                        throw new ProcessException("查询pos失败");
+                    }
+                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                    JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                    System.out.println(String.valueOf(data.get("termMachineList")));
+                    List<Map<String,Object>> termMachineListMap = (List<Map<String,Object>>)JSONArray.parse(String.valueOf(data.get("termMachineList")));
+                    System.out.println(termMachineListMap);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             OProduct product = new OProduct();
@@ -79,14 +108,15 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     }
 
 
-    private void httpForPos(String snBegin,String snEnd){
 
+
+    public static void main(String[] args){
+        try {
+//            AgentResult agentResult = querySnMsgService.httpForPos("001", "002");
+//            System.out.println(agentResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
-
-    private void httpForMPos(String snBegin,String snEnd){
-
-
-    }
-
 }

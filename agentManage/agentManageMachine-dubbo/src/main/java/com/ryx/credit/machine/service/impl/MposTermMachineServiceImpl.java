@@ -187,4 +187,11 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         }
 
     }
+
+
+    @Override
+    public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
+
+        return AgentResult.fail();
+    }
 }
