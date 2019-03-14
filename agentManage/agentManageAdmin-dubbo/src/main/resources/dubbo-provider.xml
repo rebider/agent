@@ -121,4 +121,6 @@
     <dubbo:service interface="com.ryx.credit.service.order.InternetCardService" ref="internetCardService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.TerminalTransferService" ref="terminalTransferService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.OrderImportService" ref="orderImportService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.order.OldOrderReturnService" ref="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />
 </beans>

@@ -19,6 +19,7 @@ public enum BusActRelBusType {
     THAW("/BusActRelBusType/THAW","分润解冻申请"),
     PkType("/BusActRelBusType/PkType","订单补款"),
     refund("/BusActRelBusType/refund","退货审批"),
+    hisrefund("/BusActRelBusType/hisrefund","历史退货审批"),
     TOOLS("/BusActRelBusType/TOOLS","机具扣款调整申请"),
     COMPENSATE("/BusActRelBusType/COMPENSATE","退补差价审批"),
     POSTAX("/BusActRelBusType/POSTAX","税点调整申请"),

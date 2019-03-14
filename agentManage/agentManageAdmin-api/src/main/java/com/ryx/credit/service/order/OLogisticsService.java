@@ -42,7 +42,7 @@ public interface OLogisticsService {
     public List<String> addSn(List<List<String>>  data, String user)throws Exception;
 
     PageInfo getOLogisticsDetailList(Map<String, Object> param, PageInfo pageInfo);
-
+    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db);
 
     /**
      * 发送物流到业务系统

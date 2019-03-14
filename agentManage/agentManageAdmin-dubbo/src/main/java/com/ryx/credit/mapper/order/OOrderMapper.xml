@@ -24,6 +24,7 @@
     <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
     <result column="VERSION" jdbcType="DECIMAL" property="version" />
     <result column="BUS_ID" jdbcType="VARCHAR" property="busId" />
+    <result column="OX_ORDER" jdbcType="VARCHAR" property="oxOrder" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -57,7 +58,7 @@
   <sql id="Base_Column_List">
     ID, O_NUM, O_APYTIME, O_INURETIME, USER_ID, PAYMENT_METHOD, O_AMO, INCENTIVE_AMO,
     PAY_AMO, REMARK, RULEID, AGENT_ID, ORDER_PLATFORM, REVIEW_STATUS, ORDER_STATUS, CLEAR_STATUS,
-    STATUS, C_TIME, U_USER, U_TIME, VERSION, BUS_ID
+    STATUS, C_TIME, U_USER, U_TIME, VERSION, BUS_ID, OX_ORDER
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OOrderExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -95,7 +96,7 @@
     ORDER_PLATFORM, REVIEW_STATUS, ORDER_STATUS,
     CLEAR_STATUS, STATUS, C_TIME,
     U_USER, U_TIME, VERSION,
-    BUS_ID)
+    BUS_ID, OX_ORDER)
     values (#{id,jdbcType=VARCHAR}, #{oNum,jdbcType=VARCHAR}, #{oApytime,jdbcType=TIMESTAMP},
     #{oInuretime,jdbcType=TIMESTAMP}, #{userId,jdbcType=VARCHAR}, #{paymentMethod,jdbcType=VARCHAR},
     #{oAmo,jdbcType=DECIMAL}, #{incentiveAmo,jdbcType=DECIMAL}, #{payAmo,jdbcType=DECIMAL},
@@ -103,7 +104,7 @@
     #{orderPlatform,jdbcType=VARCHAR}, #{reviewStatus,jdbcType=DECIMAL}, #{orderStatus,jdbcType=DECIMAL},
     #{clearStatus,jdbcType=DECIMAL}, #{status,jdbcType=DECIMAL}, #{cTime,jdbcType=TIMESTAMP},
     #{uUser,jdbcType=VARCHAR}, #{uTime,jdbcType=TIMESTAMP}, #{version,jdbcType=DECIMAL},
-    #{busId,jdbcType=VARCHAR})
+    #{busId,jdbcType=VARCHAR}, #{oxOrder,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OOrder">
     insert into O_ORDER
@@ -174,6 +175,9 @@
       <if test="busId != null">
         BUS_ID,
       </if>
+      <if test="oxOrder != null">
+        OX_ORDER,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -241,6 +245,9 @@
       </if>
       <if test="busId != null">
         #{busId,jdbcType=VARCHAR},
+      </if>
+      <if test="oxOrder != null">
+        #{oxOrder,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -316,6 +323,9 @@
       <if test="busId != null">
         BUS_ID = #{busId,jdbcType=VARCHAR},
       </if>
+      <if test="oxOrder != null">
+        OX_ORDER = #{oxOrder,jdbcType=VARCHAR},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -341,7 +351,8 @@
     U_USER = #{uUser,jdbcType=VARCHAR},
     U_TIME = #{uTime,jdbcType=TIMESTAMP},
     VERSION = #{version,jdbcType=DECIMAL},
-    BUS_ID = #{busId,jdbcType=VARCHAR}
+    BUS_ID = #{busId,jdbcType=VARCHAR},
+    OX_ORDER = #{oxOrder,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">

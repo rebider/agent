@@ -49,6 +49,16 @@ public class OOrder implements Serializable {
 
     private String busId;
 
+    private String oxOrder;
+
+    public String getOxOrder() {
+        return oxOrder;
+    }
+
+    public void setOxOrder(String oxOrder) {
+        this.oxOrder = oxOrder;
+    }
+
     public String getId() {
         return id;
     }

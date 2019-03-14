@@ -29,6 +29,7 @@ import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.ognl.enhance.OrderedReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1051,9 +1052,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //业务审批时添加排单
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
-                AgentResult agentResult = savePlans(agentVo, userId);
-                if (!agentResult.isOK()) {
-                    return AgentResult.fail(agentResult.getMsg());
+                try {
+                    AgentResult agentResult = savePlans(agentVo, userId);
+                    if (!agentResult.isOK()) {
+                        return AgentResult.fail(agentResult.getMsg());
+                    }
+                } catch (MessageException me){
+                   throw new ProcessException(me.getMsg());
+                }catch (Exception e){
+                    throw new ProcessException(e.getLocalizedMessage());
                 }
             }
 
@@ -1257,7 +1264,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 保存排单
      * @Date: 21:31 2018/8/2
      */
-    public AgentResult savePlans(AgentVo agentVo, String userid) {
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public AgentResult savePlans(AgentVo agentVo, String userid)throws Exception {
         try {
 
             JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
@@ -2257,5 +2266,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oInvoice.setAttachments(attachments);
         }
         return oInvoices;
+    }
+
+    @Override
+    public OReturnOrder selectById(String id) {
+        return returnOrderMapper.selectByPrimaryKey(id);
     }
 }

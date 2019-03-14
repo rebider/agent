@@ -1677,6 +1677,76 @@ public class OReturnOrderExample {
             addCriterion("AUDITOR not between", value1, value2, "auditor");
             return (Criteria) this;
         }
+
+        public Criteria andOreturntypeIsNull() {
+            addCriterion("ORETURNTYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeIsNotNull() {
+            addCriterion("ORETURNTYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeEqualTo(String value) {
+            addCriterion("ORETURNTYPE =", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeNotEqualTo(String value) {
+            addCriterion("ORETURNTYPE <>", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeGreaterThan(String value) {
+            addCriterion("ORETURNTYPE >", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeGreaterThanOrEqualTo(String value) {
+            addCriterion("ORETURNTYPE >=", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeLessThan(String value) {
+            addCriterion("ORETURNTYPE <", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeLessThanOrEqualTo(String value) {
+            addCriterion("ORETURNTYPE <=", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeLike(String value) {
+            addCriterion("ORETURNTYPE like", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeNotLike(String value) {
+            addCriterion("ORETURNTYPE not like", value, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeIn(List<String> values) {
+            addCriterion("ORETURNTYPE in", values, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeNotIn(List<String> values) {
+            addCriterion("ORETURNTYPE not in", values, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeBetween(String value1, String value2) {
+            addCriterion("ORETURNTYPE between", value1, value2, "oreturntype");
+            return (Criteria) this;
+        }
+
+        public Criteria andOreturntypeNotBetween(String value1, String value2) {
+            addCriterion("ORETURNTYPE not between", value1, value2, "oreturntype");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

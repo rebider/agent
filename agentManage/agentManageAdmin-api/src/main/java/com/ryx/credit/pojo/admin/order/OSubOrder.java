@@ -57,6 +57,26 @@ public class OSubOrder extends OSubOrderExtends implements Serializable {
 
     private String snEnd;
 
+    private BigDecimal sendOutNum;
+
+    private BigDecimal returnsNum;
+
+    public BigDecimal getSendOutNum() {
+        return sendOutNum;
+    }
+
+    public void setSendOutNum(BigDecimal sendOutNum) {
+        this.sendOutNum = sendOutNum;
+    }
+
+    public BigDecimal getReturnsNum() {
+        return returnsNum;
+    }
+
+    public void setReturnsNum(BigDecimal returnsNum) {
+        this.returnsNum = returnsNum;
+    }
+
     public String getId() {
         return id;
     }
