@@ -241,17 +241,23 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     public AgentResult taskApprove(AgentVo agentVo, String userId)throws MessageException {
 
         //业务部审批提交排单信息，fixme 业务部如果没有排单信息提示必须进行排单
-        if(StringUtils.isNotBlank(agentVo.getPlans())){
-
-            try {
-                //保存排单信息
-                AgentResult savePlans_agentResult =  iOrderReturnService.savePlans(agentVo,userId);
-            } catch (MessageException e) {
-                e.printStackTrace();
-                throw new MessageException(e.getMsg());
-            }catch (Exception e) {
-                e.printStackTrace();
-                throw new MessageException(e.getLocalizedMessage());
+        OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business1_id",""))) {
+            if(StringUtils.isBlank(agentVo.getPlans())){
+                throw new MessageException("排单信息不能为空");
+            }
+            if (StringUtils.isNotBlank(agentVo.getPlans())) {
+                try {
+                    //保存排单信息
+                    AgentResult savePlans_agentResult = iOrderReturnService.savePlans(agentVo, userId);
+                    logger.info("历史订单退货保存排单结果:" + savePlans_agentResult.getMsg());
+                } catch (MessageException e) {
+                    e.printStackTrace();
+                    throw new MessageException(e.getMsg());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new MessageException(e.getLocalizedMessage());
+                }
             }
         }
         //保存抵扣信息
@@ -259,6 +265,26 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
                 if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO)>0) {
                     iOrderReturnService.saveCut(agentVo.getReturnId(), oDeductCapital.getcAmount().toString(), oDeductCapital.getcType());
+                }
+            }
+        }
+        //财务二级审批
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_finc2_id",""))) {
+            //财务最后审批时上传打款凭证,并且是已经执行退款方案
+            if (agentVo.getApprovalResult()!=null && ApprovalType.PASS.getValue().equals(agentVo.getApprovalResult())) {
+                OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
+                oAccountAdjustExample.or().andSrcIdEqualTo(agentVo.getReturnId()).andAdjustTypeEqualTo(AdjustType.TKTH.adjustType);
+                List<OAccountAdjust> oAccountAdjusts = accountAdjustMapper.selectByExample(oAccountAdjustExample);
+                if (oAccountAdjusts == null || oAccountAdjusts.size() <= 0) {
+                    throw new MessageException("您还未执行退款方案");
+                }
+
+                if (oReturnOrder.getRelReturnAmo().compareTo(BigDecimal.ZERO) > 0 && agentVo.getAttachments().length <= 0) {
+                    throw new MessageException("有线下退款金额时，必须上传打款凭证");
+                }
+                AgentResult agentResult = iOrderReturnService.saveAttachments(agentVo, userId);
+                if (!agentResult.isOK()) {
+                    throw new MessageException(agentResult.getMsg());
                 }
             }
         }

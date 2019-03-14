@@ -1175,7 +1175,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
         } catch (Exception e) {
             log.error("保存退货排单失败", e);
-            return AgentResult.fail("保存退货排单失败");
+          throw new MessageException("保存退货排单失败:"+e.getLocalizedMessage());
         }
 
         return AgentResult.ok();
@@ -1187,6 +1187,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 保存打款截图
      * @Date: 21:31 2018/8/2
      */
+    @Override
     public AgentResult saveAttachments(AgentVo agentVo, String userid) {
         try {
             String[] attachments = agentVo.getAttachments();
