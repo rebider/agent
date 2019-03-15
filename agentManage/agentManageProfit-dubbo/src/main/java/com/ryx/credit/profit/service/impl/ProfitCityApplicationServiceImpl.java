@@ -97,13 +97,8 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
             pCityApplicationDetail.setApplicationType("1"); //代表其他扣款申请
             pCityApplicationDetailMapper.insert(pCityApplicationDetail);
         }
-
         logger.info("序列ID......"+idService.genId(TabId.P_CITYAPPLICATION_DETAIL));
         Map startPar = agentEnterService.startPar(cUser);
-        if (null == startPar) {
-            logger.info("========用户{}{}启动部门参数为空",  cUser);
-            throw new MessageException("启动部门参数为空!");
-        }
         //启动审批流
         String proceId = null;
         try{
@@ -172,10 +167,6 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         if(Objects.equals("pass",agentVo.getApprovalResult())
                 && StringUtils.isBlank(agentVo.getOrderAprDept())){
             reqMap.put("dept", "finish");
-            String id = agentVo.getSid();
-            PCityApplicationDetail pCityApplicationDetail = pCityApplicationDetailMapper.selectByPrimaryKey(id);
-            pCityApplicationDetail.setApplicationStatus("0");
-            pCityApplicationDetailMapper.updateByPrimaryKeySelective(pCityApplicationDetail);
         }
         if("reject".equals(agentVo.getApprovalResult())
                 && StringUtils.isBlank(agentVo.getOrderAprDept())){
