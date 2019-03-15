@@ -83,6 +83,6 @@ public interface AgentEnterService {
 
     void verifyOrgAndBZYD(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
-    void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception;
+//    void verifyOther(List<AgentBusInfoVo> busInfoVoList)throws Exception;
 
 }
