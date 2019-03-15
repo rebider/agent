@@ -2,7 +2,10 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitStagingDetail;
 import com.ryx.credit.profit.pojo.ProfitStagingDetailExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
+import java.util.Map;
 
 public interface ProfitStagingDetailMapper {
     int countByExample(ProfitStagingDetailExample example);
@@ -22,4 +25,11 @@ public interface ProfitStagingDetailMapper {
     int updateByPrimaryKey(ProfitStagingDetail record);
 
     ProfitStagingDetail getNextStagAmt(ProfitStagingDetail profitStagingDetail);
+    /**
+     * 根据任务id查询名称
+     * @param taskId
+     * @return
+     */
+   Map<String,Object> byTaskId(@Param("taskId") String taskId);
+
 }

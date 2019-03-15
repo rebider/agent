@@ -49,6 +49,9 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
      */
     @Override
     public PageInfo getProfitSupplyList(Map<String, Object> param, PageInfo pageInfo) {
+        if("99".equals(param.get("BUS_BIG_TYPE"))){
+            param.put("sign","90");
+        }
         Long count = pProfitSupplyMapper.getProfitSupplyCount(param);
         List<Map<String, Object>> list = pProfitSupplyMapper.getProfitSupplyList(param);
         for (int i = 0; i <list.size() ; i++) {
@@ -57,7 +60,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             } else if (list.get(i).get("BUS_BIG_TYPE").equals("01" ) && list.get(i).get("BUS_TYPE").equals("02" )) {
                 list.get(i).put("SUPPLY_TYPE","POS退单补款");
             }
-            }
+        }
 
         pageInfo.setTotal(count.intValue());
         pageInfo.setRows(list);
@@ -159,10 +162,41 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             throw new MessageException("导入数据为空");
         }
         for (List<Object> supply : data) {
+            if(supply.size() != 6){
+                logger.info("代理商唯一码导入有误，请检查");
+                throw new MessageException("代理商唯一码导入有误，请检查");
+            }
             if (supply.size() == 6){
-                if (null!=supply.get(0) && !"".equals(supply.get(0))&& null!=supply.get(1) && !"".equals(supply.get(1))&& null!=supply.get(4) && !"".equals(supply.get(4))
-                        && null!=supply.get(5) && !"".equals(supply.get(5))) {
+                if(null==supply.get(0) || "".equals(supply.get(0))){
+                    logger.info("代理商唯一码导入有误，请检查");
+                    throw new MessageException("代理商唯一码导入有误，请检查");
+                }
+                if( null==supply.get(1) || "".equals(supply.get(1))){
+                    logger.info("代理商名称导入有误，请检查");
+                    throw new MessageException("代理商名称导入有误，请检查");
+                }
+                if( null==supply.get(4) || "".equals(supply.get(4))){
+                    logger.info("补款类型导入有误，请检查");
+                    throw new MessageException("补款类型导入有误，请检查");
+                }
+                if( null==supply.get(5) || "".equals(supply.get(5))){
+                    logger.info("补款金额导入有误，请检查");
+                    throw new MessageException("补款金额导入有误，请检查");
+                }else{
+                    try {
+                        new BigDecimal(String.valueOf(supply.get(5)));
+                    }catch (Exception e){
+                        logger.info("补款金额不是小数，请检查");
+                        throw new MessageException("补款金额不是小数，请检查");
+                    }
+                }
+            }
 
+        }
+
+
+        for (List<Object> supply : data) {
+            if (supply.size() == 6){
              ProfitSupply profitSupply = new ProfitSupply();
             profitSupply.setId(idService.genId(TabId.p_profit_supply));//ID序列号
             profitSupply.setSourceId(DateUtils.dateToStrings(new Date()));//录入日期
@@ -194,7 +228,7 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
                 throw new MessageException(supply.toString() + "导入格式错误！");
             }
 
-        }
+
             }
         }
         return list;

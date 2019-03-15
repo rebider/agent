@@ -3,10 +3,7 @@ package com.ryx.credit.profit.service;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.vo.AgentoutVo;
-import com.ryx.credit.profit.pojo.PosCheck;
-import com.ryx.credit.profit.pojo.PosCheckExample;
-import com.ryx.credit.profit.pojo.ProfitDirect;
-import com.ryx.credit.profit.pojo.ProfitDirectExample;
+import com.ryx.credit.profit.pojo.*;
 import com.sun.corba.se.spi.ior.ObjectKey;
 import org.apache.ibatis.annotations.Param;
 
@@ -64,6 +61,10 @@ public interface IProfitDirectService {
 
     //直发分润修改状态
     void updateByStatus(ProfitDirect profitDirectSingleList);
-
+    //统计
     Map<String, Object> profitCount(Map<String,Object> param);
+    //直发分润查询代扣明细
+    List<List<Map<String,Object>>> getBuckleRunByAgentIdAndRunDate(Map<String,Object> param);
+    //直发分润查退单补款明细
+    List<List<Map<String,Object>>> getSupplyByAgentIdAndRunDate(Map<String,Object> param);
 }

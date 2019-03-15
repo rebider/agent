@@ -1,22 +1,40 @@
 package com.ryx.credit.profit.service.impl;
 
-import com.ryx.credit.common.enumc.TabId;
+import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
+import com.ryx.credit.pojo.admin.agent.AgentBusInfoExample;
+import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.order.TerminalTransferDetail;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.profit.dao.AgentRelateDetailMapper;
 import com.ryx.credit.profit.dao.AgentRelateMapper;
-import com.ryx.credit.profit.pojo.AgentRelate;
-import com.ryx.credit.profit.pojo.AgentRelateDetail;
-import com.ryx.credit.profit.pojo.AgentRelateExample;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.IAgentRelateService;
+import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.agent.AgentEnterService;
+import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /***
  * @author renshenghao
@@ -30,7 +48,17 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
     @Autowired
     private AgentRelateMapper agentRelateMapper;
     @Autowired
+    private AgentRelateDetailMapper agentRelateDetailMapper;
+    @Autowired
+    private ActivityService activityService;
+    @Autowired
+    private TaskApprovalService taskApprovalService;
+    @Autowired
     private IdService idService;
+    @Autowired
+    private AgentEnterService agentEnterService;
+    @Autowired
+    protected RedisTemplate<String, String> redisTemplate;
 
 
     @Override
@@ -78,8 +106,8 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
     }
 
     @Override
-    public Map<String, String> queryParentAgentByAgentId(String agentId) {
-        return agentRelateMapper.queryParentAgentByAgentId(agentId);
+    public Map<String, String> queryParentAgentByAgentId(Map<String,String> param) {
+        return agentRelateMapper.queryParentAgentByAgentId(param);
     }
 
     @Override
@@ -88,10 +116,109 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
         logger.info("序列ID......"+idService.genId(TabId.A_AGENT_RELATE));
         for (AgentRelateDetail agentRelateDetail:list){
             agentRelateDetail.setId(idService.genId(TabId.A_AGENT_RELATE_DETAIL));
+            agentRelateDetail.setRelateId(agentRelate.getId());
+            agentRelateDetailMapper.insert(agentRelateDetail);
         }
         agentRelateMapper.insert(agentRelate);
+        Map<String,Object> map=agentEnterService.startPar(userId);
+        Map<String,Object> param=new HashMap<String,Object>();
+        if(map!=null&&map.get("party")!=null){
+            param.put("part",map.get("party"));
+        }
+        String proceId = activityService.createDeloyFlow(null, workId, null, null, param);
+        if (proceId == null) {
+            AgentRelateExample agentRelateExample=new AgentRelateExample();
+            AgentRelateExample.Criteria criteria = agentRelateExample.createCriteria();
+            criteria.andIdEqualTo(agentRelate.getId());
+            agentRelateMapper.deleteByExample(agentRelateExample);
+            logger.error("代理商关联审批流启动失败，代理商ID：{}", agentRelate.getAgentId());
+            throw new ProcessException("代理商关联审批流启动失败!");
+        }
 
+        BusActRel record = new BusActRel();
+        record.setBusId(agentRelate.getId());
+        record.setActivId(proceId);
+        record.setcTime(Calendar.getInstance().getTime());
+        record.setcUser(userId);
+        record.setBusType(BusActRelBusType.agentRelate.name());
+        record.setAgentId(agentRelate.getAgentId());
+        record.setAgentName(agentRelate.getAgentName());
+        try {
+            taskApprovalService.addABusActRel(record);
+            logger.info("POS奖励审批流启动成功");
+        } catch (Exception e) {
+            e.getStackTrace();
+            logger.error("POS奖励审批流启动失败{}");
+            throw new ProcessException("POS奖励审批流启动失败!:{}",e.getMessage());
+        }
+        return true;
+    }
+    @Override
+    public List<AgentRelateDetail> queryDetailByBusId(String busId){
+        AgentRelateDetailExample agentRelateDetailExam=new AgentRelateDetailExample();
+        AgentRelateDetailExample.Criteria criteria=agentRelateDetailExam.createCriteria();
+        if (StringUtils.isNotBlank(busId)){
+            criteria.andRelateIdEqualTo(busId);
+        }
+        return agentRelateDetailMapper.selectByExample(agentRelateDetailExam);
+    }
 
-        return false;
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult approvalAgentRelateTask(AgentVo agentVo, String userId) throws Exception {
+        logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
+        AgentResult result = new AgentResult(500, "系统异常", "");
+        Map<String, Object> reqMap = new HashMap<>();
+        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", agentVo.getOrderAprDept());
+        }
+        if(Objects.equals("pass",agentVo.getApprovalResult())
+                && StringUtils.isBlank(agentVo.getOrderAprDept())){
+            reqMap.put("dept", "finish");
+        }
+        reqMap.put("rs", agentVo.getApprovalResult());
+        reqMap.put("approvalOpinion", agentVo.getApprovalOpinion());
+        reqMap.put("approvalPerson", userId);
+        reqMap.put("createTime", DateUtils.dateToStringss(new Date()));
+        reqMap.put("taskId", agentVo.getTaskId());
+
+        logger.info("创建下一审批流对象：{}", reqMap.toString());
+        Map resultMap = activityService.completeTask(agentVo.getTaskId(), reqMap);
+        Boolean rs = (Boolean) resultMap.get("rs");
+        String msg = String.valueOf(resultMap.get("msg"));
+        if (resultMap == null) {
+            return result;
+        }
+        if (!rs) {
+            result.setMsg(msg);
+            return result;
+        }
+        return AgentResult.ok(resultMap);
+    }
+
+    @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
+    @Override
+    public void completeTaskEnterActivity(String insid, String status) {
+
+        BusActRel busActRel = new BusActRel();
+        busActRel.setActivId(insid);
+        try {
+            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            if (rel != null) {
+                AgentRelate agentRelate = agentRelateMapper.selectByPrimaryKey(rel.getBusId());
+                if("1".equals(status)){
+                    agentRelate.setStatus(Status.STATUS_1.status); // PASS 1:生效
+                }else if ("2".equals(status)){
+                    agentRelate.setStatus(Status.STATUS_2.status); // PASS 1:驳回
+                }
+                agentRelateMapper.updateByPrimaryKeySelective(agentRelate);//将此审批通过的申请更新到数据
+                logger.info("更新审批流与业务对象");
+                rel.setActivStatus(AgStatus.Approved.name());
+                taskApprovalService.updateABusActRel(rel);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("代理商关联审批流回调异常，activId：{}" + insid);
+        }
     }
 }

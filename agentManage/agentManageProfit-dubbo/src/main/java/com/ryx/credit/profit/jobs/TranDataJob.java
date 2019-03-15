@@ -67,7 +67,7 @@ public class TranDataJob {
         try {
             AgentResult agentResult = posProfitDataService.getPosProfitDate(settleMonth);
             if (agentResult != null && agentResult.getData() != null) {
-                JSONObject json = JSONObject.parseObject(agentResult.getData().toString());
+                JSONObject json = JSONObject.parseObject(agentResult.getData().toString());//pos平台数据
                 if (json != null) {
                     //LOG.info(JSONObject.toJSONString(json));
                     BigDecimal tranAmt = BigDecimal.ZERO;
@@ -85,7 +85,7 @@ public class TranDataJob {
                         BigDecimal zyPosAmt = tranData.getBigDecimal("zyPosAmt") == null ? BigDecimal.ZERO : tranData.getBigDecimal("zyPosAmt");//自营pos金额
                         BigDecimal hyxPosJwAmt = tranData.getBigDecimal("hyxPosJwAmt") == null ? BigDecimal.ZERO : tranData.getBigDecimal("hyxPosJwAmt");//汇银讯境外金额
                         BigDecimal dlPosJwAmt = tranData.getBigDecimal("dlPosJwAmt") == null ? BigDecimal.ZERO : tranData.getBigDecimal("dlPosJwAmt");//代理商境外
-                        tranAmt = zydlPosDjAmt.add(zydlPosJjAmt).add(jgPosAmt);
+                        tranAmt = zydlPosDjAmt.add(zydlPosJjAmt).add(jgPosAmt);//清算pos交易总量
                         //t.hyxpos_jw_amt+t.dlpos_jw_amt
                         posAmt = zyPosAmt.add(hyxPosJwAmt).add(dlPosJwAmt);
                     }
@@ -105,7 +105,7 @@ public class TranDataJob {
 
     /***
      * @Description:新增或修改数据
-     * @Param:json 分润数据
+     * @Param:json pos分润数据
      * @Param:settleMonth 分润月份
      * @Param:tranAmt pos交易金额
      * @Param:zyssAmt 手刷交易金额

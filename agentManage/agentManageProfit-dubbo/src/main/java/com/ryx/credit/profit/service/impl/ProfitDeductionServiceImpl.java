@@ -66,6 +66,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Autowired
     private ProfitStagingMapper profitStagingMapper;
 
+    @Autowired
+    private ProfitDeducttionDetailMapper profitDeducttionDetailMapper;
+
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
     @Override
@@ -97,10 +100,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 list.add("04");
                 list.add("05");
                 criteria.andDeductionTypeIn(list);
-            }else if("'03','06'".equals(profitDeduction.getDeductionType())){
+            }else if("'03','06','07'".equals(profitDeduction.getDeductionType())){
                 List<String> list = new ArrayList<String>();
                 list.add("03");
                 list.add("06");
+                list.add("07");
                 criteria.andDeductionTypeIn(list);
             }else{//查询其他扣款
                 criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
@@ -151,22 +155,13 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(deductionist == null || deductionist.size() == 0){
             throw new RuntimeException("导入数据为空");
         }
-        for (List<Object> list: deductionist) {
-            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
-                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                throw new RuntimeException("数据不能为空");
-            }
-            try{
-                insertDeduction(list, userId);
-            }catch (Exception e){
-                throw  new RuntimeException("数据格式异常！");
-            }
-        }
-        /*if (deductionist != null && deductionist.size() > 0) {
-            deductionist.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null && list.get(3) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
+
+        if (deductionist != null && deductionist.size() > 0) {
+            deductionist.stream().filter(list -> list != null && list.size() > 0 && StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
+                    StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) && StringUtils.isNotBlank(list.get(6).toString())  ).forEach(list -> {
                 insertDeduction(list, userId);
             });
-        }*/
+        }
     }
 
 
@@ -642,7 +637,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                     break;
                 }
             }
-            ;
         }
     }
 
@@ -904,23 +898,19 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(datas == null || datas.size() == 0){
             throw new RuntimeException("导入数据为空");
         }
-        for (List<Object> list: datas) {
-            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
-                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                throw new RuntimeException("数据不能为空");
-            }
-            try{
-                insertDeduction(list, userId);
-            }catch (Exception e){
-                throw  new RuntimeException("数据格式异常！");
+        if (datas != null && datas.size() > 0) {
+            for (List<Object> list:datas) {
+                if(list != null && list.size() > 0 &&
+                        StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
+                        StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) &&
+                        StringUtils.isNotBlank(list.get(6).toString())){
+                    insertCheckDeduction(list, userId);
+                }else{
+                    throw new RuntimeException(list.get(0).toString()+":存在不合理数据格式");
+                }
+
             }
         }
-
-       /* if (datas != null && datas.size() > 0) {
-            datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
-                insertCheckDeduction(list, userId);
-            });
-        }*/
     }
 
 
@@ -972,6 +962,40 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * 获取机具--关联代理商扣款
+     * @param id
+     * @return
+     */
+   @Override
+    public List<ProfitDeducttionDetail> getRev1DetailById(String id){
+        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+        //根据 月份 类型  id  remark 查出关联代理商扣款记录
+       ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
+       ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
+       criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
+       criteria.andDeductionIdEqualTo(profitDeduction.getId());
+       criteria.andDeductionTypeEqualTo(DeductionType.MACHINE.getType());
+       criteria.andRemarkEqualTo("3"+"代理商代扣机具款，扣款明细："+profitDeduction.getSourceId());
+       List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+        return list;
+    }
 
+    /**
+     * 获取代理商担保扣款
+     */
+    @Override
+    public List<ProfitDeducttionDetail> getRev2DetailById(String id){
+        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+        //根据agentId  月份 类型(02)    remark 查出关联代理商扣款记录
+        ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
+        ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
+        criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
+        criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
+        criteria.andDeductionTypeEqualTo(DeductionType.MACHINE.getType());
+        criteria.andRemarkLike("3" + "代理商代扣机具款，扣款明细：" + "%");
+        List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+        return list;
+    }
 
 }

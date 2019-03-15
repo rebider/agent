@@ -28,6 +28,13 @@
     <result column="SOURCE_INFO" jdbcType="VARCHAR" property="sourceInfo" />
     <result column="AGENT_TYPE" jdbcType="VARCHAR" property="agentType" />
     <result column="UNLINE_AMT" jdbcType="DECIMAL" property="unlineAmt" />
+    <result column="PARENT_AGENT_NAME" jdbcType="VARCHAR" property="parentAgentName" />
+    <result column="POS_TRAN_AMT" jdbcType="DECIMAL" property="posTranAmt" />
+    <result column="POS_TRAN_FEE" jdbcType="DECIMAL" property="posTranFee" />
+    <result column="POS_PFT_AMT" jdbcType="DECIMAL" property="posPftAmt" />
+    <result column="QR_TRAN_AMT" jdbcType="DECIMAL" property="qrTranAmt" />
+    <result column="QR_TRAN_FEE" jdbcType="DECIMAL" property="qrTranFee" />
+    <result column="QR_PFT_AMT" jdbcType="DECIMAL" property="qrPftAmt" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -58,11 +65,41 @@
       </foreach>
     </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
   <sql id="Base_Column_List">
     ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE, 
     IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, OUT_PROFIT_SCALE, 
     IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY, 
-    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT
+    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME, 
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -80,69 +117,6 @@
     </if>
     <include refid="OracleDialectSuffix" />
   </select>
-
-  <select id="selectByIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" >
-    SELECT
-    <include refid="Base_Column_List" />
-    FROM TRANS_PROFIT_DETAIL
-    WHERE
-    BUS_NUM = #{busNum,jdbcType=VARCHAR}
-    AND PARENT_BUS_NUM = #{parentBusNum,jdbcType=VARCHAR}
-  </select>
-
-  <select id="selectListByDate" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from TRANS_PROFIT_DETAIL
-    WHERE SOURCE_INFO='MPOS' and PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
-    ORDER BY AGENT_ID
-  </select>
-
-  <select id="getPosTransProfitDetailSumList" parameterType="java.lang.String" resultMap="BaseResultMap">
- SELECT AGENT_ID,PARENT_AGENT_ID, PROFIT_DATE,
-  SUM(case when IN_TRANS_AMT is null then 0 else IN_TRANS_AMT end )IN_TRANS_AMT,
-  SUM(case when OUT_TRANS_AMT is null then 0 else OUT_TRANS_AMT end  )OUT_TRANS_AMT,
-  SUM(case when  IN_PROFIT_SCALE is null then 0 else IN_PROFIT_SCALE end )IN_PROFIT_SCALE,
-   SUM(case when  OUT_PROFIT_SCALE is null then 0 else OUT_PROFIT_SCALE end)OUT_PROFIT_SCALE,
-   SUM(case when  IN_PROFIT_AMT  is null then 0 else IN_PROFIT_AMT end)IN_PROFIT_AMT,
-   SUM(case when  OUT_PROFIT_AMT  is null then 0 else OUT_PROFIT_AMT end)OUT_PROFIT_AMT,
-   SUM(case when  SUPPLY_AMT  is null then 0 else SUPPLY_AMT end)SUPPLY_AMT,
-  MAX(PAY_COMPANY) PAY_COMPANY,
-  MAX(AGENT_NAME) AGENT_NAME
-  FROM TRANS_PROFIT_DETAIL WHERE SOURCE_INFO ='POS' AND PROFIT_DATE = #{profitDate}
-  GROUP BY AGENT_ID, PARENT_AGENT_ID,PROFIT_DATE
-  </select>
-
-  <select id="selectCompanyByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from TRANS_PROFIT_DETAIL
-    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND PAY_COMPANY='Q000029564'
-    <if test="parentAgentId != null">
-      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
-    </if>
-  </select>
-
-  <select id="selectListByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from TRANS_PROFIT_DETAIL
-    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
-    <if test="parentAgentId != null">
-      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
-    </if>
-  </select>
-
-  <select id="selectSumTotalDay" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
-    select
-    SUM(NOTAX_AMT-UNLINE_AMT)
-    from TRANS_PROFIT_DETAIL
-    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
-    <if test="parentAgentId != null">
-      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
-    </if>
-  </select>
-
   <delete id="deleteByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample">
     delete from TRANS_PROFIT_DETAIL
     <if test="_parameter != null">
@@ -156,8 +130,12 @@
       PROFIT_AMT, BUS_CODE, IN_PROFIT_SCALE, 
       OUT_PROFIT_SCALE, IN_PROFIT_AMT, OUT_PROFIT_AMT, 
       POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, 
-      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT, TRANS_FEE,
-      UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT)
+      PAY_COMPANY, NOTAX_AMT, SUPPLY_AMT, 
+      TRANS_FEE, UNICODE, SOURCE_INFO, 
+      AGENT_TYPE, UNLINE_AMT, PARENT_AGENT_NAME, 
+      POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, 
+      QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT
+      )
     values (#{id,jdbcType=VARCHAR}, #{busNum,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{parentBusNum,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR}, 
       #{profitDate,jdbcType=VARCHAR}, #{inTransAmt,jdbcType=DECIMAL}, #{outTransAmt,jdbcType=DECIMAL}, 
@@ -165,8 +143,11 @@
       #{outProfitScale,jdbcType=DECIMAL}, #{inProfitAmt,jdbcType=DECIMAL}, #{outProfitAmt,jdbcType=DECIMAL}, 
       #{posCreditAmt,jdbcType=DECIMAL}, #{iposCreditAmt,jdbcType=DECIMAL}, #{posRewardAmt,jdbcType=DECIMAL}, 
       #{payCompany,jdbcType=VARCHAR}, #{notaxAmt,jdbcType=DECIMAL}, #{supplyAmt,jdbcType=DECIMAL}, 
-      #{transFee,jdbcType=DECIMAL}, #{unicode,jdbcType=VARCHAR}, #{sourceInfo,jdbcType=VARCHAR},
-      #{agentType,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL})
+      #{transFee,jdbcType=DECIMAL}, #{unicode,jdbcType=VARCHAR}, #{sourceInfo,jdbcType=VARCHAR}, 
+      #{agentType,jdbcType=VARCHAR}, #{unlineAmt,jdbcType=DECIMAL}, #{parentAgentName,jdbcType=VARCHAR}, 
+      #{posTranAmt,jdbcType=DECIMAL}, #{posTranFee,jdbcType=DECIMAL}, #{posPftAmt,jdbcType=DECIMAL}, 
+      #{qrTranAmt,jdbcType=DECIMAL}, #{qrTranFee,jdbcType=DECIMAL}, #{qrPftAmt,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail">
     insert into TRANS_PROFIT_DETAIL
@@ -249,6 +230,27 @@
       <if test="unlineAmt != null">
         UNLINE_AMT,
       </if>
+      <if test="parentAgentName != null">
+        PARENT_AGENT_NAME,
+      </if>
+      <if test="posTranAmt != null">
+        POS_TRAN_AMT,
+      </if>
+      <if test="posTranFee != null">
+        POS_TRAN_FEE,
+      </if>
+      <if test="posPftAmt != null">
+        POS_PFT_AMT,
+      </if>
+      <if test="qrTranAmt != null">
+        QR_TRAN_AMT,
+      </if>
+      <if test="qrTranFee != null">
+        QR_TRAN_FEE,
+      </if>
+      <if test="qrPftAmt != null">
+        QR_PFT_AMT,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -329,6 +331,27 @@
       <if test="unlineAmt != null">
         #{unlineAmt,jdbcType=DECIMAL},
       </if>
+      <if test="parentAgentName != null">
+        #{parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="posTranAmt != null">
+        #{posTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="posTranFee != null">
+        #{posTranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="posPftAmt != null">
+        #{posPftAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="qrTranAmt != null">
+        #{qrTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="qrTranFee != null">
+        #{qrTranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="qrPftAmt != null">
+        #{qrPftAmt,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.TransProfitDetailExample" resultType="java.lang.Long">
@@ -337,6 +360,152 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update TRANS_PROFIT_DETAIL
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.busNum != null">
+        BUS_NUM = #{record.busNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentName != null">
+        AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentBusNum != null">
+        PARENT_BUS_NUM = #{record.parentBusNum,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentAgentId != null">
+        PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.profitDate != null">
+        PROFIT_DATE = #{record.profitDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.inTransAmt != null">
+        IN_TRANS_AMT = #{record.inTransAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.outTransAmt != null">
+        OUT_TRANS_AMT = #{record.outTransAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.profitAmt != null">
+        PROFIT_AMT = #{record.profitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.busCode != null">
+        BUS_CODE = #{record.busCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.inProfitScale != null">
+        IN_PROFIT_SCALE = #{record.inProfitScale,jdbcType=DECIMAL},
+      </if>
+      <if test="record.outProfitScale != null">
+        OUT_PROFIT_SCALE = #{record.outProfitScale,jdbcType=DECIMAL},
+      </if>
+      <if test="record.inProfitAmt != null">
+        IN_PROFIT_AMT = #{record.inProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.outProfitAmt != null">
+        OUT_PROFIT_AMT = #{record.outProfitAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.posCreditAmt != null">
+        POS_CREDIT_AMT = #{record.posCreditAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.iposCreditAmt != null">
+        IPOS_CREDIT_AMT = #{record.iposCreditAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.posRewardAmt != null">
+        POS_REWARD_AMT = #{record.posRewardAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.payCompany != null">
+        PAY_COMPANY = #{record.payCompany,jdbcType=VARCHAR},
+      </if>
+      <if test="record.notaxAmt != null">
+        NOTAX_AMT = #{record.notaxAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.supplyAmt != null">
+        SUPPLY_AMT = #{record.supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.transFee != null">
+        TRANS_FEE = #{record.transFee,jdbcType=DECIMAL},
+      </if>
+      <if test="record.unicode != null">
+        UNICODE = #{record.unicode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sourceInfo != null">
+        SOURCE_INFO = #{record.sourceInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentType != null">
+        AGENT_TYPE = #{record.agentType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.unlineAmt != null">
+        UNLINE_AMT = #{record.unlineAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.parentAgentName != null">
+        PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.posTranAmt != null">
+        POS_TRAN_AMT = #{record.posTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.posTranFee != null">
+        POS_TRAN_FEE = #{record.posTranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="record.posPftAmt != null">
+        POS_PFT_AMT = #{record.posPftAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.qrTranAmt != null">
+        QR_TRAN_AMT = #{record.qrTranAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.qrTranFee != null">
+        QR_TRAN_FEE = #{record.qrTranFee,jdbcType=DECIMAL},
+      </if>
+      <if test="record.qrPftAmt != null">
+        QR_PFT_AMT = #{record.qrPftAmt,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update TRANS_PROFIT_DETAIL
+    set ID = #{record.id,jdbcType=VARCHAR},
+      BUS_NUM = #{record.busNum,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+      PARENT_BUS_NUM = #{record.parentBusNum,jdbcType=VARCHAR},
+      PARENT_AGENT_ID = #{record.parentAgentId,jdbcType=VARCHAR},
+      PROFIT_DATE = #{record.profitDate,jdbcType=VARCHAR},
+      IN_TRANS_AMT = #{record.inTransAmt,jdbcType=DECIMAL},
+      OUT_TRANS_AMT = #{record.outTransAmt,jdbcType=DECIMAL},
+      PROFIT_AMT = #{record.profitAmt,jdbcType=DECIMAL},
+      BUS_CODE = #{record.busCode,jdbcType=VARCHAR},
+      IN_PROFIT_SCALE = #{record.inProfitScale,jdbcType=DECIMAL},
+      OUT_PROFIT_SCALE = #{record.outProfitScale,jdbcType=DECIMAL},
+      IN_PROFIT_AMT = #{record.inProfitAmt,jdbcType=DECIMAL},
+      OUT_PROFIT_AMT = #{record.outProfitAmt,jdbcType=DECIMAL},
+      POS_CREDIT_AMT = #{record.posCreditAmt,jdbcType=DECIMAL},
+      IPOS_CREDIT_AMT = #{record.iposCreditAmt,jdbcType=DECIMAL},
+      POS_REWARD_AMT = #{record.posRewardAmt,jdbcType=DECIMAL},
+      PAY_COMPANY = #{record.payCompany,jdbcType=VARCHAR},
+      NOTAX_AMT = #{record.notaxAmt,jdbcType=DECIMAL},
+      SUPPLY_AMT = #{record.supplyAmt,jdbcType=DECIMAL},
+      TRANS_FEE = #{record.transFee,jdbcType=DECIMAL},
+      UNICODE = #{record.unicode,jdbcType=VARCHAR},
+      SOURCE_INFO = #{record.sourceInfo,jdbcType=VARCHAR},
+      AGENT_TYPE = #{record.agentType,jdbcType=VARCHAR},
+      UNLINE_AMT = #{record.unlineAmt,jdbcType=DECIMAL},
+      PARENT_AGENT_NAME = #{record.parentAgentName,jdbcType=VARCHAR},
+      POS_TRAN_AMT = #{record.posTranAmt,jdbcType=DECIMAL},
+      POS_TRAN_FEE = #{record.posTranFee,jdbcType=DECIMAL},
+      POS_PFT_AMT = #{record.posPftAmt,jdbcType=DECIMAL},
+      QR_TRAN_AMT = #{record.qrTranAmt,jdbcType=DECIMAL},
+      QR_TRAN_FEE = #{record.qrTranFee,jdbcType=DECIMAL},
+      QR_PFT_AMT = #{record.qrPftAmt,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
       select * from ( select row_.*, rownum rownum_ from ( 
@@ -347,6 +516,12 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+
+
+
+
 
   <select id="selectAmtBySummary" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
   select
@@ -366,15 +541,142 @@
   <select id="selectListByParams" parameterType="map" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List"/>
-    from TRANS_PROFIT_DETAIL
+    from TRANS_PROFIT_DETAIL a
     where
-    PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+      a.PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
     <if test="busCode!=null and busCode!=''">
-      and BUS_CODE = #{busCode,jdbcType=VARCHAR}
+      and a.BUS_CODE = #{busCode,jdbcType=VARCHAR}
     </if>
     <if test="agentTypeList!=null and agentTypeList!=''">
-      and AGENT_TYPE in (${agentTypeList})
+      and a.AGENT_TYPE in (${agentTypeList})
     </if>
   </select>
 
-</mapper>
+<select id="baseProfitList" parameterType="java.util.Map" resultType="java.util.Map">
+  SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+  select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+  IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
+  IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
+  NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
+  POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT from TRANS_PROFIT_DETAIL) aa
+left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
+where
+  <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
+  <if test="SOURCE_INFO=='MPOS'">aa.SOURCE_INFO='MPOS'</if>
+ <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+  <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+  <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+  <if test="DATE_START!=null and DATE_START!=''"> and aa.PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+  <if test="DATE_END!=null and DATE_END!=''"> and aa.PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+  ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+</select>
+
+  <select id="baseProfitCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+   select count(*) from TRANS_PROFIT_DETAIL
+    where
+    <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
+    <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
+    <if test="AGENT_ID!=null and AGENT_ID!=''"> and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+    <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+    <if test="BUS_CODE!=null and BUS_CODE!=''"> and BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+    <if test="DATE_START!=null and DATE_START!=''"> and PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+    <if test="DATE_END!=null and DATE_END!=''"> and PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+  </select>
+
+
+  <select id="baseProfitLowerList" parameterType="java.util.Map" resultType="java.util.Map">
+ SELECT * FROM ( SELECT A.*, ROWNUM RN FROM (
+    select aa.*,bb.AG_NAME as PARENT_AGENT_NAME  from(select ID, BUS_NUM, AGENT_ID, AGENT_NAME, PARENT_BUS_NUM, PARENT_AGENT_ID, PROFIT_DATE,
+    IN_TRANS_AMT, OUT_TRANS_AMT, PROFIT_AMT, BUS_CODE,BUS_CODE as BUS_NAME, IN_PROFIT_SCALE, OUT_PROFIT_SCALE,
+    IN_PROFIT_AMT, OUT_PROFIT_AMT, POS_CREDIT_AMT, IPOS_CREDIT_AMT, POS_REWARD_AMT, PAY_COMPANY,
+    NOTAX_AMT, SUPPLY_AMT, TRANS_FEE, UNICODE, SOURCE_INFO, AGENT_TYPE, UNLINE_AMT,
+    POS_TRAN_AMT, POS_TRAN_FEE, POS_PFT_AMT, QR_TRAN_AMT, QR_TRAN_FEE, QR_PFT_AMT from TRANS_PROFIT_DETAIL) aa
+    left join  A_AGENT  bb on aa.PARENT_AGENT_ID = bb.ID
+    start with
+    <if test="SOURCE_INFO=='POS'">(aa.SOURCE_INFO='POS'or aa.SOURCE_INFO='ZPOS')</if>
+    <if test="SOURCE_INFO=='MPOS'">aa.SOURCE_INFO='MPOS'</if>
+    <if test="AGENT_ID!=null and AGENT_ID!=''"> and aa.AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+    <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and aa.AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+    <if test="BUS_CODE!=null and BUS_CODE!=''"> and aa.BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+    <if test="DATE_START!=null and DATE_START!=''"> and aa.PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+    <if test="DATE_END!=null and DATE_END!=''"> and aa.PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+    connect by prior aa.AGENT_ID =aa.PARENT_AGENT_ID
+   ) A WHERE ROWNUM &lt;= #{end} ) WHERE RN &gt; #{begin}
+  </select>
+
+  <select id="baseProfitLowerCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(*) from TRANS_PROFIT_DETAIL
+
+    start with
+    <if test="SOURCE_INFO=='POS'">(SOURCE_INFO='POS'or SOURCE_INFO='ZPOS')</if>
+    <if test="SOURCE_INFO=='MPOS'">SOURCE_INFO='MPOS'</if>
+    <if test="AGENT_ID!=null and AGENT_ID!=''"> and AGENT_ID=#{AGENT_ID,jdbcType=VARCHAR}</if>
+    <if test="AGENT_NAME!=null and AGENT_NAME!=''"> and AGENT_NAME=#{AGENT_NAME,jdbcType=VARCHAR}</if>
+    <if test="BUS_CODE!=null and BUS_CODE!=''"> and BUS_CODE=#{BUS_CODE,jdbcType=VARCHAR}</if>
+    <if test="DATE_START!=null and DATE_START!=''"> and PROFIT_DATE &gt;= #{DATE_START,jdbcType=VARCHAR}</if>
+    <if test="DATE_END!=null and DATE_END!=''"> and PROFIT_DATE &lt;= #{DATE_END,jdbcType=VARCHAR}</if>
+    connect by prior AGENT_ID = PARENT_AGENT_ID
+  </select>
+
+  <select id="selectByIdAndMonth" resultMap="BaseResultMap" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM TRANS_PROFIT_DETAIL
+    WHERE
+    BUS_NUM = #{busNum,jdbcType=VARCHAR}
+    AND PARENT_BUS_NUM = #{parentBusNum,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectListByDate" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE SOURCE_INFO='MPOS' and PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    ORDER BY AGENT_ID
+  </select>
+
+  <select id="getPosTransProfitDetailSumList" parameterType="java.lang.String" resultMap="BaseResultMap">
+    SELECT AGENT_ID,PARENT_AGENT_ID, PROFIT_DATE,
+      SUM(case when IN_TRANS_AMT is null then 0 else IN_TRANS_AMT end )IN_TRANS_AMT,
+      SUM(case when OUT_TRANS_AMT is null then 0 else OUT_TRANS_AMT end  )OUT_TRANS_AMT,
+      SUM(case when  IN_PROFIT_SCALE is null then 0 else IN_PROFIT_SCALE end )IN_PROFIT_SCALE,
+      SUM(case when  OUT_PROFIT_SCALE is null then 0 else OUT_PROFIT_SCALE end)OUT_PROFIT_SCALE,
+      SUM(case when  IN_PROFIT_AMT  is null then 0 else IN_PROFIT_AMT end)IN_PROFIT_AMT,
+      SUM(case when  OUT_PROFIT_AMT  is null then 0 else OUT_PROFIT_AMT end)OUT_PROFIT_AMT,
+      SUM(case when  SUPPLY_AMT  is null then 0 else SUPPLY_AMT end)SUPPLY_AMT,
+      MAX(PAY_COMPANY) PAY_COMPANY,
+      MAX(AGENT_NAME) AGENT_NAME
+    FROM TRANS_PROFIT_DETAIL WHERE SOURCE_INFO ='POS' AND PROFIT_DATE = #{profitDate}
+    GROUP BY AGENT_ID, PARENT_AGENT_ID,PROFIT_DATE
+  </select>
+
+  <select id="selectCompanyByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR} AND PAY_COMPANY='Q000029564'
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <select id="selectListByDoubleId" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+
+  <select id="selectSumTotalDay" parameterType="com.ryx.credit.profit.pojo.TransProfitDetail" resultType="java.math.BigDecimal">
+    select
+    SUM(NOTAX_AMT-UNLINE_AMT)
+    from TRANS_PROFIT_DETAIL
+    WHERE AGENT_ID=#{agentId,jdbcType=VARCHAR} AND PROFIT_DATE = #{profitDate,jdbcType=VARCHAR}
+    <if test="parentAgentId != null">
+      AND PARENT_AGENT_ID=#{parentAgentId,jdbcType=VARCHAR}
+    </if>
+  </select>
+  </mapper>

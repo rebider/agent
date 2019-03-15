@@ -30,5 +30,5 @@ public interface AgentRelateMapper {
 
     List<Map<String, Object>> getList(Map<String, Object> param);
 
-    Map<String,String> queryParentAgentByAgentId(String agentId);
+    Map<String,String> queryParentAgentByAgentId(Map<String, String> param);
 }

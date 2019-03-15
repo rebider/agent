@@ -3,12 +3,7 @@ package com.ryx.credit.profit.pojo;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-/**
- * @author RYX
- */
-public class TransProfitDetail implements Serializable{
-
-    private static final long serialVersionUID = -7093600723570940396L;
+public class TransProfitDetail implements Serializable {
     private String id;
 
     private String busNum;
@@ -54,38 +49,26 @@ public class TransProfitDetail implements Serializable{
     private BigDecimal transFee;
 
     private String unicode;
-    //新增 20180821
+
     private String sourceInfo;
-    //新增 20180822
+
     private String agentType;
 
     private BigDecimal unlineAmt;
 
     private String parentAgentName;
 
-    public String getParentAgentName() {
-        return parentAgentName;
-    }
+    private BigDecimal posTranAmt;
 
-    public void setParentAgentName(String parentAgentName) {
-        this.parentAgentName = parentAgentName;
-    }
+    private BigDecimal posTranFee;
 
-    public BigDecimal getUnlineAmt() {
-        return unlineAmt;
-    }
+    private BigDecimal posPftAmt;
 
-    public void setUnlineAmt(BigDecimal unlineAmt) {
-        this.unlineAmt = unlineAmt;
-    }
+    private BigDecimal qrTranAmt;
 
-    public String getSourceInfo() {
-        return sourceInfo;
-    }
+    private BigDecimal qrTranFee;
 
-    public void setSourceInfo(String sourceInfo) {
-        this.sourceInfo = sourceInfo;
-    }
+    private BigDecimal qrPftAmt;
 
     public String getId() {
         return id;
@@ -271,11 +254,83 @@ public class TransProfitDetail implements Serializable{
         this.unicode = unicode == null ? null : unicode.trim();
     }
 
+    public String getSourceInfo() {
+        return sourceInfo;
+    }
+
+    public void setSourceInfo(String sourceInfo) {
+        this.sourceInfo = sourceInfo == null ? null : sourceInfo.trim();
+    }
+
     public String getAgentType() {
         return agentType;
     }
 
     public void setAgentType(String agentType) {
-        this.agentType = agentType;
+        this.agentType = agentType == null ? null : agentType.trim();
+    }
+
+    public BigDecimal getUnlineAmt() {
+        return unlineAmt;
+    }
+
+    public void setUnlineAmt(BigDecimal unlineAmt) {
+        this.unlineAmt = unlineAmt;
+    }
+
+    public String getParentAgentName() {
+        return parentAgentName;
+    }
+
+    public void setParentAgentName(String parentAgentName) {
+        this.parentAgentName = parentAgentName == null ? null : parentAgentName.trim();
+    }
+
+    public BigDecimal getPosTranAmt() {
+        return posTranAmt;
+    }
+
+    public void setPosTranAmt(BigDecimal posTranAmt) {
+        this.posTranAmt = posTranAmt;
+    }
+
+    public BigDecimal getPosTranFee() {
+        return posTranFee;
+    }
+
+    public void setPosTranFee(BigDecimal posTranFee) {
+        this.posTranFee = posTranFee;
+    }
+
+    public BigDecimal getPosPftAmt() {
+        return posPftAmt;
+    }
+
+    public void setPosPftAmt(BigDecimal posPftAmt) {
+        this.posPftAmt = posPftAmt;
+    }
+
+    public BigDecimal getQrTranAmt() {
+        return qrTranAmt;
+    }
+
+    public void setQrTranAmt(BigDecimal qrTranAmt) {
+        this.qrTranAmt = qrTranAmt;
+    }
+
+    public BigDecimal getQrTranFee() {
+        return qrTranFee;
+    }
+
+    public void setQrTranFee(BigDecimal qrTranFee) {
+        this.qrTranFee = qrTranFee;
+    }
+
+    public BigDecimal getQrPftAmt() {
+        return qrPftAmt;
+    }
+
+    public void setQrPftAmt(BigDecimal qrPftAmt) {
+        this.qrPftAmt = qrPftAmt;
     }
 }

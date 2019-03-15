@@ -39,9 +39,12 @@
     <dubbo:reference interface="com.ryx.credit.profit.service.IProfitAgentMergerService" id="profitAgentMergerService"  timeout="1200000" registry="${zk.group}"/>
     <dubbo:reference interface="com.ryx.credit.service.order.TerminalTransferService" id="terminalTransferService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentMergeService" id="agentMergeService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.profit.service.IAgentRelateService" id="agentRelateService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.profit.service.IProfitCityApplicationService" id="profitCityApplicationService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentQuitService" id="agentQuitService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentQuitRefundService" id="agentQuitRefundService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.CapitalChangeApplyService" id="capitalChangeApplyService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OldOrderReturnService" id="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
 
+    <dubbo:reference interface="com.ryx.credit.profit.service.IAgeInvoiceApplyService" id="ageInvoiceApplyService"  timeout="1200000" registry="${zk.group}" check="false"/>
 </beans>

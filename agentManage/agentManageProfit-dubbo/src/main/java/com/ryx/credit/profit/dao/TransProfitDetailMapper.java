@@ -45,4 +45,15 @@ public interface TransProfitDetailMapper {
     void deleteBySourceIdAndMonth(@Param("sourceInfo") String sourceInfo, @Param("transDate") String transDate);
 
     List<TransProfitDetail> selectListByParams(Map<String,Object> params);
+
+    List<Map<String,Object>> baseProfitList(Map<String,Object> params);
+    Integer baseProfitCount (Map<String,Object> params);
+
+
+    List<Map<String,Object>> baseProfitLowerList(Map<String,Object> params);
+
+    Integer  baseProfitLowerCount (Map<String,Object> params);
+
+
+
 }

@@ -107,6 +107,9 @@ public class ProfitFactorServiceImpl implements ProfitFactorService {
             PProfitFactor profitFactor = new PProfitFactor();
             profitFactor.setFactorDate(Calendar.getInstance().getTime());//导入时间
             profitFactor.setId(idService.genId(TabId.p_profit_factor));//ID序列号
+            if(null == factor.get(1) || "".equals(factor.get(1))){
+                throw new MessageException(factor.get(2)+":代理商唯一码为空!");
+            }
             try {
                 profitFactor.setFactorMonth(null != factor.get(0) ? String.valueOf(factor.get(0)).substring(0, 6) : "");//月份
                 profitFactor.setAgentPid(null != factor.get(1) ? String.valueOf(factor.get(1)) : "");//代理商唯一码(因业务中无pid，现将pid取值更改为AG码)

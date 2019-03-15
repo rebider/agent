@@ -84,14 +84,18 @@ public enum TabId {
     P_INVOICE_DETAIL("IDTL_%s%015d"),
     PROFIT_SUPPLU_TAX("PST%s%015d"),
     A_AGENT_MERGE("AM%s%015d"),
+    P_CITYAPPLICATION_DETAIL("PCD%s%015d"),
     A_AGENT_MERGE_BUSINFO("AMB%s%015d"),
     A_AGENT_QUIT("AQ%s%015d"),
     A_AGENT_QUIT_REFUND("AQR%s%015d"),
     A_AGENT_RELATE("AR%s%015d"),
+    P_INVOICE_APPLY("PIA%s%015d"),
     A_AGENT_RELATE_DETAIL("ARD%s%014d"),
     A_CAPITAL_CHANGE_APPLY("ACCA%s%014d"),
     A_CAPITAL_FLOW("ACF%s%014d"),
-    O_INVOICE("OI%s%014d");
+    O_INVOICE("OI%s%014d"),
+    P_DATA_ADJUST("PDA%s%015d");
+
 
     TabId(String thePatt){
            this.patt = thePatt;

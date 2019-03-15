@@ -29,6 +29,7 @@
     <result column="PAYCOMPANY_NAME" jdbcType="VARCHAR" property="paycompanyName" />
     <result column="PAYCOMPANY_NUM" jdbcType="VARCHAR" property="paycompanyNum" />
     <result column="DAILY_AMT" jdbcType="DECIMAL" property="dailyAmt" />
+    <result column="PARENT_SUPPLY" jdbcType="DECIMAL" property="parentSupply" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -63,7 +64,8 @@
     ID, AGENT_NAME, AGENT_ID, FRIST_AGENT_PID, FRIST_AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME,
     TRANS_AMT, TRANS_FEE, PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT, SHOULD_PROFIT, ACTUAL_PROFIT,
     TRANS_MONTH, AGENT_EMAIL, ACCOUNT_CODE, ACCOUNT_NAME, BANK_OPEN, BANK_CODE, BOSS_CODE,
-    PARENT_BUCKLE, FRIST_AGENT_ID, STATUS, PAYCOMPANY_NAME, PAYCOMPANY_NUM, DAILY_AMT
+    PARENT_BUCKLE, FRIST_AGENT_ID, STATUS, PAYCOMPANY_NAME, PAYCOMPANY_NUM, DAILY_AMT,
+    PARENT_SUPPLY
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.ProfitDirectExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -102,8 +104,8 @@
       AGENT_EMAIL, ACCOUNT_CODE, ACCOUNT_NAME,
       BANK_OPEN, BANK_CODE, BOSS_CODE,
       PARENT_BUCKLE, FRIST_AGENT_ID, STATUS,
-      PAYCOMPANY_NAME, PAYCOMPANY_NUM, DAILY_AMT
-      )
+      PAYCOMPANY_NAME, PAYCOMPANY_NUM, DAILY_AMT,
+      PARENT_SUPPLY)
     values (#{id,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR},
       #{fristAgentPid,jdbcType=VARCHAR}, #{fristAgentName,jdbcType=VARCHAR}, #{parentAgentId,jdbcType=VARCHAR},
       #{parentAgentName,jdbcType=VARCHAR}, #{transAmt,jdbcType=DECIMAL}, #{transFee,jdbcType=DECIMAL},
@@ -112,8 +114,8 @@
       #{agentEmail,jdbcType=VARCHAR}, #{accountCode,jdbcType=VARCHAR}, #{accountName,jdbcType=VARCHAR},
       #{bankOpen,jdbcType=VARCHAR}, #{bankCode,jdbcType=VARCHAR}, #{bossCode,jdbcType=VARCHAR},
       #{parentBuckle,jdbcType=DECIMAL}, #{fristAgentId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
-      #{paycompanyName,jdbcType=VARCHAR}, #{paycompanyNum,jdbcType=VARCHAR}, #{dailyAmt,jdbcType=DECIMAL}
-      )
+      #{paycompanyName,jdbcType=VARCHAR}, #{paycompanyNum,jdbcType=VARCHAR}, #{dailyAmt,jdbcType=DECIMAL},
+      #{parentSupply,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.ProfitDirect">
     insert into P_PROFIT_DIRECT
@@ -199,6 +201,9 @@
       <if test="dailyAmt != null">
         DAILY_AMT,
       </if>
+      <if test="parentSupply != null">
+        PARENT_SUPPLY,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -281,6 +286,9 @@
       </if>
       <if test="dailyAmt != null">
         #{dailyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="parentSupply != null">
+        #{parentSupply,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -371,6 +379,9 @@
       <if test="dailyAmt != null">
         DAILY_AMT = #{dailyAmt,jdbcType=DECIMAL},
       </if>
+      <if test="parentSupply != null">
+        PARENT_SUPPLY = #{parentSupply,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -401,7 +412,8 @@
       STATUS = #{status,jdbcType=VARCHAR},
       PAYCOMPANY_NAME = #{paycompanyName,jdbcType=VARCHAR},
       PAYCOMPANY_NUM = #{paycompanyNum,jdbcType=VARCHAR},
-      DAILY_AMT = #{dailyAmt,jdbcType=DECIMAL}
+      DAILY_AMT = #{dailyAmt,jdbcType=DECIMAL},
+      PARENT_SUPPLY = #{parentSupply,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -467,7 +479,7 @@
     select AGENT_ID, AGENT_NAME,TRANS_MONTH, FRIST_AGENT_PID,
     FRIST_AGENT_NAME, PARENT_AGENT_ID, PARENT_AGENT_NAME,
     PROFIT_AMT, SUPPLY_AMT, BUCKLE_AMT, BASIC_PROFIT_AMT as SHOULD_PROFIT,
-    REAL_TAX_AMT ,(BASIC_PROFIT_AMT-REAL_TAX_AMT) as ACTUAL_PROFIT,PARENT_BUCKLE,STATUS
+    REAL_TAX_AMT ,(BASIC_PROFIT_AMT-REAL_TAX_AMT) as ACTUAL_PROFIT,PARENT_BUCKLE,PARENT_SUPPLY,STATUS
     FROM (select ppd.*,ptdd.BASIC_PROFIT_AMT,ptdd.REAL_TAX_AMT from
     P_PROFIT_DIRECT ppd left join P_TAX_DEDUCTION_DETAIL ptdd on ppd.AGENT_ID=ptdd.AGENT_ID and ppd.TRANS_MONTH=ptdd.PROFIT_MONTH)
     <include refid="BASE_WHERE_SQL" />

@@ -37,4 +37,9 @@ public interface ProfitSupplyMapper {
     List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
 
     Map<String,Object> profitCount(Map <String, Object> param);
+
+    /**获取其他补款*/
+    List<ProfitSupply> getProfitSuppList(ProfitSupply record);
+
+
 }

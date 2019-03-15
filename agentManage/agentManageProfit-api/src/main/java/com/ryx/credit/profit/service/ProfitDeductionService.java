@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -160,5 +161,16 @@ public interface ProfitDeductionService {
      * @return
      */
     Map<String,BigDecimal> getNotDeduction(Map<String,String> map);
+
+    /**
+     * 获取机具扣款关联代理商扣款
+     */
+    List<ProfitDeducttionDetail> getRev1DetailById(String id);
+
+    /**
+     * 获取机具扣款---代理商担保扣款
+     */
+    List<ProfitDeducttionDetail> getRev2DetailById(String id);
+
 
 }

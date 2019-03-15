@@ -1895,6 +1895,126 @@ public class InvoiceDetailExample {
             addCriterion("UPDATE_TIME not between", value1, value2, "updateTime");
             return (Criteria) this;
         }
+
+        public Criteria andDrAddInvoiceAmtIsNull() {
+            addCriterion("DR_ADD_INVOICE_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtIsNotNull() {
+            addCriterion("DR_ADD_INVOICE_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtEqualTo(BigDecimal value) {
+            addCriterion("DR_ADD_INVOICE_AMT =", value, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtNotEqualTo(BigDecimal value) {
+            addCriterion("DR_ADD_INVOICE_AMT <>", value, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtGreaterThan(BigDecimal value) {
+            addCriterion("DR_ADD_INVOICE_AMT >", value, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("DR_ADD_INVOICE_AMT >=", value, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtLessThan(BigDecimal value) {
+            addCriterion("DR_ADD_INVOICE_AMT <", value, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("DR_ADD_INVOICE_AMT <=", value, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtIn(List<BigDecimal> values) {
+            addCriterion("DR_ADD_INVOICE_AMT in", values, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtNotIn(List<BigDecimal> values) {
+            addCriterion("DR_ADD_INVOICE_AMT not in", values, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DR_ADD_INVOICE_AMT between", value1, value2, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andDrAddInvoiceAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("DR_ADD_INVOICE_AMT not between", value1, value2, "drAddInvoiceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtIsNull() {
+            addCriterion("SH_ADD_INVOCE_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtIsNotNull() {
+            addCriterion("SH_ADD_INVOCE_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtEqualTo(BigDecimal value) {
+            addCriterion("SH_ADD_INVOCE_AMT =", value, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtNotEqualTo(BigDecimal value) {
+            addCriterion("SH_ADD_INVOCE_AMT <>", value, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtGreaterThan(BigDecimal value) {
+            addCriterion("SH_ADD_INVOCE_AMT >", value, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("SH_ADD_INVOCE_AMT >=", value, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtLessThan(BigDecimal value) {
+            addCriterion("SH_ADD_INVOCE_AMT <", value, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("SH_ADD_INVOCE_AMT <=", value, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtIn(List<BigDecimal> values) {
+            addCriterion("SH_ADD_INVOCE_AMT in", values, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtNotIn(List<BigDecimal> values) {
+            addCriterion("SH_ADD_INVOCE_AMT not in", values, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SH_ADD_INVOCE_AMT between", value1, value2, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andShAddInvoceAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("SH_ADD_INVOCE_AMT not between", value1, value2, "shAddInvoceAmt");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
