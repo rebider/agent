@@ -162,6 +162,10 @@ public class ProfitSupplyServiceImpl implements ProfitSupplyService {
             throw new MessageException("导入数据为空");
         }
         for (List<Object> supply : data) {
+            if(supply.size() != 6){
+                logger.info("代理商唯一码导入有误，请检查");
+                throw new MessageException("代理商唯一码导入有误，请检查");
+            }
             if (supply.size() == 6){
                 if(null==supply.get(0) || "".equals(supply.get(0))){
                     logger.info("代理商唯一码导入有误，请检查");
