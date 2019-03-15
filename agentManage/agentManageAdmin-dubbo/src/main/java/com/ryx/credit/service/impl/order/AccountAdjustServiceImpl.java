@@ -354,7 +354,8 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
                     refundAgent.setCloInvoice(agentColinfo.getCloInvoice());
                 }else{
                     if(leftAmt.compareTo(BigDecimal.ZERO)>0) {
-                        throw new MessageException("用户收款账户信息不完整,代理商编号{}", agentId);
+                        refundAgent.setRemark("未找到收款账户信息");
+//                        throw new MessageException("用户收款账户信息不完整,代理商编号"+agentId);
                     }
                 }
 
@@ -368,6 +369,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             BigDecimal takeAmt = BigDecimal.ZERO;
             takeAmt = adjustAmt.subtract(leftAmt);
             result.put("takeAmt", takeAmt);
+            result.put("realreturnAmt", leftAmt);
             //更新退货表
             if (isRealAdjust && adjustType.equals(AdjustType.TKTH.adjustType)) {
                 orderReturnService.doPlan(srcId, takeAmt, userid);
@@ -389,7 +391,7 @@ public class AccountAdjustServiceImpl implements IAccountAdjustService {
             }
 
         }  catch (MessageException e) {
-            log.error("调账计算出现错误,{}", e.getMessage(), e);
+            log.error("调账计算出现错误,{}", e.getMessage());
             throw new ProcessException("调账计算出现错误," + e.getMsg());
         } catch (ProcessException e) {
             log.error("调账计算出现错误,{}", e.getLocalizedMessage(), e);

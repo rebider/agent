@@ -1175,7 +1175,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
         } catch (Exception e) {
             log.error("保存退货排单失败", e);
-            return AgentResult.fail("保存退货排单失败");
+          throw new MessageException("保存退货排单失败:"+e.getLocalizedMessage());
         }
 
         return AgentResult.ok();
@@ -1187,6 +1187,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 保存打款截图
      * @Date: 21:31 2018/8/2
      */
+    @Override
     public AgentResult saveAttachments(AgentVo agentVo, String userid) {
         try {
             String[] attachments = agentVo.getAttachments();
@@ -1716,7 +1717,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @param db
      * @return
      */
-    private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
+    @Override
+    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
         String [] col= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.code.split(",");
         String [] title= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_title.code.split(",");

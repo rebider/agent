@@ -30,6 +30,9 @@ public class DateUtil {
     public final static SimpleDateFormat sdf_Days = new SimpleDateFormat(
             "yyyy-MM-dd");
 
+    public final static SimpleDateFormat sdf_g_Days = new SimpleDateFormat(
+            "yyyy/MM/dd");
+
     /**
 	 * 将Date类型转换为字符串
 	 * 

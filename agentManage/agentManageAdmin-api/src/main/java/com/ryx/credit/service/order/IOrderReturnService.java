@@ -64,7 +64,10 @@ public interface IOrderReturnService {
     AgentBusInfo queryBusInfoByLogDetail(OLogisticsDetail oLogisticsDetail);
 
     Map selectByReturnDeId(String returnDetailsId);
+    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db);
 
+
+    public AgentResult saveAttachments(AgentVo agentVo, String userid);
     /**
      * 退货发货
      * @param lgcId
