@@ -328,7 +328,7 @@ public class CompensateServiceImpl implements CompensateService {
             oRefundPriceDiff.setReviewStatus(AgStatus.Create.status);
             oRefundPriceDiff.setStatus(Status.STATUS_1.status);
             oRefundPriceDiff.setVersion(Status.STATUS_0.status);
-            oRefundPriceDiff.setOrderType(Status.STATUS_1.status);
+            oRefundPriceDiff.setOrderType(OrderType.NEW.getValue());
             BigDecimal belowPayAmt = new BigDecimal(0);
             BigDecimal shareDeductAmt = new BigDecimal(0);
             for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
@@ -415,7 +415,7 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setuUser(cUser);
                 refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
-                refundPriceDiffDetail.setOrderType(Status.STATUS_1.status);
+                refundPriceDiffDetail.setOrderType(OrderType.NEW.getValue());
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");
@@ -579,8 +579,8 @@ public class CompensateServiceImpl implements CompensateService {
                     });
                 }
                 //1表示机具欠款已抵扣
+                ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
                 if(agentVo.getFlag().equals("1")){
-                    ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
                     BigDecimal subtract = oRefundPriceDiff.getRelCompAmt().subtract(agentVo.getoRefundPriceDiffVo().getMachOweAmt());
                     String subtractStr = String.valueOf(subtract);
                     if(subtractStr.contains("-")){
@@ -919,6 +919,7 @@ public class CompensateServiceImpl implements CompensateService {
         criteria.andRefundPriceDiffIdEqualTo(oRefundPriceDiff.getId());
         List<ORefundPriceDiffDetail> oRefundPriceDiffDetails = refundPriceDiffDetailMapper.selectByExample(oRefundPriceDiffDetailExample);
         oRefundPriceDiff.setRefundPriceDiffDetailList(oRefundPriceDiffDetails);
+        if(oRefundPriceDiff.getOrderType().compareTo(OrderType.NEW.getValue())==0)
         for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
             Dict dict = dictOptionsService.findDictByValue(DictGroup.ORDER.name(), DictGroup.ACTIVITY_DIS_TYPE.name(),oRefundPriceDiffDetail.getActivityWay());
             oRefundPriceDiffDetail.setActivityWay(dict.getdItemname());
