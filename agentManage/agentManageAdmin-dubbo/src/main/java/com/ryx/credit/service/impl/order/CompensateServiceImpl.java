@@ -328,6 +328,7 @@ public class CompensateServiceImpl implements CompensateService {
             oRefundPriceDiff.setReviewStatus(AgStatus.Create.status);
             oRefundPriceDiff.setStatus(Status.STATUS_1.status);
             oRefundPriceDiff.setVersion(Status.STATUS_0.status);
+            oRefundPriceDiff.setOrderType(Status.STATUS_1.status);
             BigDecimal belowPayAmt = new BigDecimal(0);
             BigDecimal shareDeductAmt = new BigDecimal(0);
             for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
@@ -414,6 +415,7 @@ public class CompensateServiceImpl implements CompensateService {
                 refundPriceDiffDetail.setuUser(cUser);
                 refundPriceDiffDetail.setStatus(Status.STATUS_1.status);
                 refundPriceDiffDetail.setVersion(Status.STATUS_0.status);
+                refundPriceDiffDetail.setOrderType(Status.STATUS_1.status);
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");

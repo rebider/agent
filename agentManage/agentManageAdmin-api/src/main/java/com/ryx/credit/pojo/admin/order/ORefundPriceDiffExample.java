@@ -1467,6 +1467,66 @@ public class ORefundPriceDiffExample {
             addCriterion("SHARE_DEDUCT_AMT not between", value1, value2, "shareDeductAmt");
             return (Criteria) this;
         }
+
+        public Criteria andOrderTypeIsNull() {
+            addCriterion("ORDER_TYPE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeIsNotNull() {
+            addCriterion("ORDER_TYPE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeEqualTo(BigDecimal value) {
+            addCriterion("ORDER_TYPE =", value, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeNotEqualTo(BigDecimal value) {
+            addCriterion("ORDER_TYPE <>", value, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeGreaterThan(BigDecimal value) {
+            addCriterion("ORDER_TYPE >", value, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORDER_TYPE >=", value, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeLessThan(BigDecimal value) {
+            addCriterion("ORDER_TYPE <", value, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("ORDER_TYPE <=", value, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeIn(List<BigDecimal> values) {
+            addCriterion("ORDER_TYPE in", values, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeNotIn(List<BigDecimal> values) {
+            addCriterion("ORDER_TYPE not in", values, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORDER_TYPE between", value1, value2, "orderType");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderTypeNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("ORDER_TYPE not between", value1, value2, "orderType");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

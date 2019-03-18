@@ -64,6 +64,16 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private String sendMsg;
 
+    private BigDecimal orderType;
+
+
+    public BigDecimal getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(BigDecimal orderType) {
+        this.orderType = orderType;
+    }
 
     public String getId() {
         return id;
