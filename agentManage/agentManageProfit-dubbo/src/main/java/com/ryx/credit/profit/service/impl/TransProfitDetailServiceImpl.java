@@ -55,6 +55,19 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(example);
         return transProfitDetails==null?Collections.EMPTY_LIST:transProfitDetails;
     }
+    @Override
+    public List<TransProfitDetail> getTransProfitDetailByBusNum(TransProfitDetail transProfitDetail) {
+        TransProfitDetailExample example = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(transProfitDetail.getBusNum())) {
+            criteria.andBusNumEqualTo(transProfitDetail.getBusNum());
+        }
+        if (StringUtils.isNotBlank(transProfitDetail.getProfitDate())) {
+            criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
+        }
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(example);
+        return transProfitDetails==null?Collections.EMPTY_LIST:transProfitDetails;
+    }
 
     @Override
     public List<TransProfitDetail> getPosTransProfitDetailSumList(String prfitDate) {

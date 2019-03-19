@@ -4,10 +4,10 @@ package com.ryx.credit.profit.service.impl;/**
  * @Description:
  */
 
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.ProfitOrganTranMonthMapper;
+import com.ryx.credit.profit.dao.TranPlatformMapper;
 import com.ryx.credit.profit.jobs.NewProfitDataJob;
 import com.ryx.credit.profit.jobs.TranDataJob;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
@@ -21,7 +21,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 月交易实现
@@ -37,6 +40,8 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
 
     @Autowired
     private ProfitOrganTranMonthMapper profitOrganTranMonthMapper;
+    @Autowired
+    private TranPlatformMapper tranPlatformMapper;
 
     @Autowired
     private TranDataJob tranDataJob;
@@ -149,5 +154,43 @@ public class ProfitOrganTranMonthServiceImpl implements ProfitOrganTranMonthServ
         public void run() {
             dailyProfitMposDataJob.excute(settleDay);
         }
+    }
+    @Override
+    public String doSettleTranAmount(Map<String,String> param){
+        String params = JsonUtil.objectToJson(param);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("settle.tranAmount"), params);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getAllTranPlatform() {
+        Map<String,Object> result=new HashMap<String, Object>();
+        List<String> allPlatformType = tranPlatformMapper.selectAllPlatformType();
+        List<Map<String, String>> allTranPlatform = tranPlatformMapper.selectAllTranPlatform();
+        for (String platformType:allPlatformType) {
+            ArrayList<String> list = new ArrayList<>();
+            for (int i = 0; i < allTranPlatform.size(); i++) {
+                Map<String, String> map=allTranPlatform.get(i);
+                if(map.get("PLATFORM_TYPE").equals(platformType)){
+                    list.add(map.get("PLATFORM_NAME"));
+                }
+            }
+            result.put(platformType,list);
+        }
+        return result;
+    }
+
+    @Override
+    public String doProfitNewMonth(Map<String,String> param){
+        String params = JsonUtil.objectToJson(param);
+        String res = HttpClientUtil.doPostJson
+                (AppConfig.getProperty("profit.newmonth"), params);
+        return res;
+    }
+
+    @Override
+    public Map<String, Object> getTranAmtByMonth(String tranMonth) {
+        return tranPlatformMapper.getTranAmtByMonth(tranMonth);
     }
 }
