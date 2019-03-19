@@ -54,4 +54,11 @@ public interface TransProfitDetailService {
      */
     PageInfo posBaseProfitList(Map<String,Object> params, PageInfo  page);
 
+    /**
+     * 根据BusNum查询基础分润
+     * @param transProfitDetail
+     * @return
+     */
+    List<TransProfitDetail> getTransProfitDetailByBusNum(TransProfitDetail transProfitDetail);
+
 }
