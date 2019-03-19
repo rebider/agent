@@ -66,6 +66,15 @@ public class ORefundPriceDiffDetail  implements Serializable {
 
     private BigDecimal orderType;
 
+    private OActivity activityFront;
+
+    public OActivity getActivityFront() {
+        return activityFront;
+    }
+
+    public void setActivityFront(OActivity activityFront) {
+        this.activityFront = activityFront;
+    }
 
     public BigDecimal getOrderType() {
         return orderType;

@@ -447,13 +447,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
 
     /**
      * 查询当前活动和可变更的活动
-     * @param orderId
      * @param subOrderId
      * @return
      * @throws MessageException
      */
     @Override
-    public OSubOrderActivity queryActivity(String orderId,String subOrderId)throws MessageException{
+    public OSubOrderActivity queryActivity(String subOrderId)throws MessageException{
 
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();

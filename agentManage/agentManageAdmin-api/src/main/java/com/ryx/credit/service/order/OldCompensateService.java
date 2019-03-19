@@ -24,7 +24,7 @@ public interface OldCompensateService {
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 
-    OSubOrderActivity queryActivity(String orderId, String subOrderId)throws MessageException;
+    OSubOrderActivity queryActivity(String subOrderId)throws MessageException;
 
     List<OSubOrder> queryOrder(String orderId)throws MessageException;
 
