@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class OPaymentDetail implements Serializable{
+public class OPaymentDetail implements Serializable {
     private String id;
 
     private String paymentId;
@@ -44,6 +44,8 @@ public class OPaymentDetail implements Serializable{
     private BigDecimal status;
 
     private BigDecimal version;
+
+    private String oPdSumId;
 
     public String getId() {
         return id;
@@ -203,5 +205,13 @@ public class OPaymentDetail implements Serializable{
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+    public String getoPdSumId() {
+        return oPdSumId;
+    }
+
+    public void setoPdSumId(String oPdSumId) {
+        this.oPdSumId = oPdSumId == null ? null : oPdSumId.trim();
     }
 }

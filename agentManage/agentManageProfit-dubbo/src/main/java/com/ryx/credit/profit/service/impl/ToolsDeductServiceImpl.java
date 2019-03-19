@@ -7,6 +7,7 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.order.OPdSum;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.dao.ProfitDeductionMapper;
 import com.ryx.credit.profit.dao.ProfitStagingDetailMapper;
@@ -21,6 +22,7 @@ import com.ryx.credit.profit.service.ToolsDeductService;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.TaskApprovalService;
 import com.ryx.credit.service.dict.IdService;
+import com.ryx.credit.service.order.IOPdSumService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +55,9 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     private TaskApprovalService taskApprovalService;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+
+    @Autowired
+    IOPdSumService ioPdSumService;
 
     /**
      * 扣款总额=本月新增+上月未口足，
@@ -223,7 +228,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
     public List<Map<String, Object>> batchInsertDeduct(List<Map<String, Object>> list, String deductionDate) throws ProcessException{
         if(list != null && !list.isEmpty()){
             List<Map<String, Object>> successList=  new ArrayList<Map<String, Object>>(list.size());
-            list.forEach((Map<String, Object> map) -> {
+            for ( Map map: list) {
                 if(map.get("ID") != null ){
                     try {
                         ProfitDeductionExample profitDeductionExample = new ProfitDeductionExample();
@@ -241,6 +246,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             profitDeduction.setAgentId(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
                             profitDeduction.setAgentPid(map.get("AGENT_ID") == null ? "" : map.get("AGENT_ID").toString());
                             profitDeduction.setAgentName(map.get("AG_NAME") == null ? "" : map.get("AG_NAME").toString());
+                            profitDeduction.setParentAgentName(map.get("PARENT_AG_NAME") == null ? "" : map.get("PARENT_AG_NAME").toString());
                             profitDeduction.setDeductionDesc(map.get("ORDER_PLATFORM") == null ? "" : map.get("ORDER_PLATFORM").toString());
                             profitDeduction.setDeductionDate(deductionDate);
                             profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
@@ -254,9 +260,12 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());
                             profitDeduction.setCreateDateTime(new Date());
                             profitDeductionMapper.insertSelective(profitDeduction);
+
+
                             Map<String, Object> successMap = new HashMap<String, Object>(2);
                             successMap.put("detailId", map.get("ID"));
                             successMap.put("srcId", profitDeduction.getId());
+                            successMap.put("tools", "tools");
                             successList.add(successMap);
                         }
                     } catch (Exception e) {
@@ -265,12 +274,27 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                         throw new ProcessException("机具扣款数据初始化失败");
                     }
                 }
-            });
+            }
 
             LOG.info("通知订单系统，付款中订单信息：{} ", JSONObject.toJSON(successList));
             try {
                 if(successList.size() > 0){
-                    //通知订单系统，订单付款中
+                    for (Map map  :successList) {
+                            OPdSum oPdSum = new OPdSum();
+                            oPdSum.setId(map.get("detailId").toString());
+                            oPdSum.setSumStatus("Deduction_lok");
+                            oPdSum.setPaySrc(map.get("srcId").toString());
+
+                            try{
+                                ioPdSumService.updateByPrimaryKeySelective(oPdSum);
+                            }catch (Exception e){
+                                e.getMessage();
+                                throw new ProcessException("机具付款汇总更新数据失败");
+                            }
+
+
+                    }
+                 //通知订单系统，订单付款中
                     iPaymentDetailService.uploadStatus(successList, PaySign.FKING.code);
                 }
             } catch (Exception e) {
