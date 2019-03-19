@@ -41,5 +41,8 @@ public interface ProfitSupplyMapper {
     /**获取其他补款*/
     List<ProfitSupply> getProfitSuppList(ProfitSupply record);
 
+    /**根据agentId,月份，parentAgentId,获取其他补款总计*/
+    BigDecimal getTotalByPidMonthAndAndAG(Map<String,String> param);
+
 
 }

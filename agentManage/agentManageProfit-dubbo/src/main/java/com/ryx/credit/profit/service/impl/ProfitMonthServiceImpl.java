@@ -569,6 +569,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         param.put("deductionDate", profitDetailMonthTemp.getProfitDate());
         param.put("profitAmt", sumAmt);
         param.put("sourceId", "4");// 罚款
+        param.put("computeType",computType);
         BigDecimal fk = profitDeductionServiceImpl.otherDeductionByType(param);
 //        otherAmt = otherAmt.add(fk);
         sumAmt = sumAmt.subtract(fk);

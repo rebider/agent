@@ -285,6 +285,13 @@
       /*AND SUPPLY_CODE != '0'*/
   </select>
 
+  <select id="getTotalByPidMonthAndAndAG" parameterType="java.util.Map" resultType="java.math.BigDecimal">
+    SELECT SUM(supply_amt)
+    FROM P_PROFIT_SUPPLY
+    where SUPPLY_DATE = #{date} AND AGENT_ID = #{agentId} AND BUS_BIG_TYPE in ( #{type1},#{type2} )
+    <if test="parentAgentId != null and parentAgentId != ''">AND PARENT_AGENT_ID = #{parentAgentId}</if>
+  </select>
+
   <select id="getBuckleByMonthAndPid" parameterType="com.ryx.credit.profit.pojo.ProfitSupply" resultType="java.math.BigDecimal">
     SELECT SUM(supply_amt)
     FROM P_PROFIT_SUPPLY
