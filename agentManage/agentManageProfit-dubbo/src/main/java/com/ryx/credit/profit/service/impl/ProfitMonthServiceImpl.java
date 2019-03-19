@@ -468,6 +468,9 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 }
             });*/
 
+            //600直发非一代退单扣款
+
+
             // 机具扣款未扣足，扣合并代理商
             toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 List<Map<String, Object>> hbList = getAgentIdProfitAmt(profitDetailMonthTemp.getAgentId(), profitAmtMap);
@@ -555,9 +558,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 //        profitDetailMonthTemp.setOtherSupplyAmt(profitComputerService.new_total_supply(profitDetailMonthTemp.getAgentId(), profitDetailMonthTemp.getParentAgentId(), null));
         sumAmt = sumAmt.add(profitDetailMonthTemp.getToolsReturnAmt());
 
-        // 考核奖励
-        sumAmt = sumAmt.add(profitDetailMonthTemp.getPosRewardAmt() == null ? BigDecimal.ZERO : profitDetailMonthTemp.getPosRewardAmt());
-        //.subtract(profitDetailMonthTemp.getPosRewardDeductionAmt())
         //退单扣款-
         if (!profitDetailMonthTemp.getAgentId().startsWith("6000")) {
             sumAmt = doTdDeductionAmt(profitDetailMonthTemp, sumAmt, computType);
