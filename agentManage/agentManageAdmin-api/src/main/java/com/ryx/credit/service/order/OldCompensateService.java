@@ -8,6 +8,7 @@ import com.ryx.credit.pojo.admin.order.OSubOrder;
 import com.ryx.credit.pojo.admin.order.OSubOrderActivity;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -26,4 +27,6 @@ public interface OldCompensateService {
     OSubOrderActivity queryActivity(String orderId, String subOrderId)throws MessageException;
 
     List<OSubOrder> queryOrder(String orderId)throws MessageException;
+
+    BigDecimal calculatePriceDiff(String oldActivityId, String activityId, BigDecimal proNum)throws Exception;
 }

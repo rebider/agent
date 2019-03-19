@@ -223,14 +223,16 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                                          List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList){
 
         try {
-//            if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
-//                if(refundPriceDiffFile.size()==0){
-//                    return AgentResult.fail("代理商打款必须上传打款凭证");
-//                }
-//            }
+            if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
+                if(refundPriceDiffFile.size()==0){
+                    return AgentResult.fail("代理商打款必须上传打款凭证");
+                }
+            }
             String priceDiffId = idService.genId(TabId.o_Refund_price_diff);
             oRefundPriceDiff.setId(priceDiffId);
             Date nowDate = new Date();
+            oRefundPriceDiff.setRelCompType(oRefundPriceDiff.getApplyCompType());
+            oRefundPriceDiff.setRelCompAmt(oRefundPriceDiff.getApplyCompAmt());
             oRefundPriceDiff.setMachOweAmt(new BigDecimal(0));
             oRefundPriceDiff.setDeductAmt(new BigDecimal(0));
             oRefundPriceDiff.setGatherAmt(new BigDecimal(0));
@@ -287,16 +289,30 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             }
 
             refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
+                if(StringUtils.isBlank(refundPriceDiffDetail.getProId())){
+                    throw new ProcessException("请选择商品");
+                }
+                if(StringUtils.isBlank(refundPriceDiffDetail.getActivityRealId())){
+                    throw new ProcessException("请选择要变更的活动");
+                }
+                OActivity oldActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
+                if(oldActivity==null){
+                    throw new ProcessException("旧活动不存在");
+                }
+                OActivity newActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
+                if(newActivity==null){
+                    throw new ProcessException("新活动不存在");
+                }
                 refundPriceDiffDetail.setAgentId(oRefundPriceDiff.getAgentId());
                 refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
                 refundPriceDiffDetail.setRefundPriceDiffId(priceDiffId);
-//                refundPriceDiffDetail.setFrontPrice(logisticsDetail!=null?new BigDecimal(logisticsDetail.get("SETTLEMENT_PRICE").toString()):new BigDecimal(0));
-//                refundPriceDiffDetail.setActivityName(oActivity.getActivityName());
-//                refundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
-//                refundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
-//                refundPriceDiffDetail.setPrice(oActivity.getPrice());
-//                refundPriceDiffDetail.setVender(oActivity.getVender());
-//                refundPriceDiffDetail.setProModel(oActivity.getProModel());
+                refundPriceDiffDetail.setFrontPrice(oldActivity.getPrice());
+                refundPriceDiffDetail.setActivityName(newActivity.getActivityName());
+                refundPriceDiffDetail.setActivityWay(newActivity.getActivityWay());
+                refundPriceDiffDetail.setActivityRule(newActivity.getActivityRule());
+                refundPriceDiffDetail.setPrice(newActivity.getPrice());
+                refundPriceDiffDetail.setVender(newActivity.getVender());
+                refundPriceDiffDetail.setProModel(newActivity.getProModel());
                 refundPriceDiffDetail.setcTime(nowDate);
                 refundPriceDiffDetail.setuTime(nowDate);
                 refundPriceDiffDetail.setsTime(nowDate);
@@ -394,7 +410,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             throw new MessageException("审批流启动失败:添加审批关系失败");
         }
 
-
         AgentResult agentResult = cashReceivablesService.startProcing(CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId(),cuser);
         if(!agentResult.isOK()){
             log.info("插入补退差价更新打款信息失败");
@@ -440,7 +455,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     @Override
     public OSubOrderActivity queryActivity(String orderId,String subOrderId)throws MessageException{
 
-        Map<String,Object> resultMap = new HashMap<>();
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         OSubOrderActivityExample.Criteria criteria = oSubOrderActivityExample.createCriteria();
         criteria.andStatusEqualTo(Status.STATUS_1.status);
@@ -458,6 +472,31 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
         return oSubOrderActivity;
 
+    }
+
+    /**
+     * 计算变更差价
+     * @param oldActivityId
+     * @param activityId
+     * @param proNum
+     * @return
+     */
+    @Override
+    public BigDecimal calculatePriceDiff(String oldActivityId,String activityId,BigDecimal proNum)throws Exception{
+        BigDecimal calculatePrice = BigDecimal.ZERO;
+        OActivity oldActivity = activityMapper.selectByPrimaryKey(oldActivityId);
+        if(null==oldActivity){
+            throw new MessageException("旧活动信息不存在");
+        }
+        OActivity newActivity = activityMapper.selectByPrimaryKey(activityId);
+        if(null==newActivity){
+            throw new MessageException("新活动信息不存在");
+        }
+        BigDecimal oldActivityPrice = oldActivity.getPrice().multiply(proNum);
+        BigDecimal newActivityPrice = newActivity.getPrice().multiply(proNum);
+        calculatePrice = oldActivityPrice.subtract(newActivityPrice);
+
+        return calculatePrice;
     }
 
 
