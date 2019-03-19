@@ -27,7 +27,7 @@ public interface IOwnInvoiceService {
      * 获取数据列表
      * @Author chenqiutian
      */
-    PageInfo getInvoiceDetailList(Page page, String agentId, String agentName, String concludeChild, String dateStart, String dateEnd);
+    PageInfo getInvoiceDetailList(Page page,Map<String,String> map);
 
     /**
      * 向欠票导入表中导入数据

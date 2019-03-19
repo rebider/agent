@@ -46,4 +46,10 @@ public interface ProfitDeductionMapper {
     /**获取未扣款**/
     BigDecimal getNotDeductionAmt(Map<String,String> param);
 
+    /**查看代理商关联扣款*/
+    List<Map<String,Object>> getRev1List(Map<String,String> param);
+
+    /**查看代理商担保扣款*/
+    List<Map<String,Object>> getRev2List(Map<String,String> param);
+
 }

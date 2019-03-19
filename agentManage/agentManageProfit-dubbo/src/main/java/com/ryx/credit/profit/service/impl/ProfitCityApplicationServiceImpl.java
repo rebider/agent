@@ -368,6 +368,13 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         profitDeduction.setMustDeductionAmt(pCityApplicationDetail.getApplicationAmt());
         profitDeduction.setSumDeductionAmt(pCityApplicationDetail.getApplicationAmt());
         profitDeduction.setRemark(pCityApplicationDetail.getDeductionRemark());
+        if ("罚款".equals(pCityApplicationDetail.getRemark())) {
+            profitDeduction.setSourceId("4");
+        } else if ("预发分润扣款".equals(pCityApplicationDetail.getRemark())) {
+            profitDeduction.setSourceId("5");
+        } else {
+            profitDeduction.setSourceId("3");
+        }
         profitDeduction.setDeductionStatus(DeductionStatus.NOT_APPLIED.getStatus());//未扣款
         profitDeduction.setStagingStatus(DeductionStatus.NOT_APPLIED.getStatus());//未分期
         profitDeduction.setCreateDateTime(new Date());

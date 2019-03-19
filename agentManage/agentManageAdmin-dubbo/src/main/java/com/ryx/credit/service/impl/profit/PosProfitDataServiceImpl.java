@@ -45,7 +45,8 @@ public class PosProfitDataServiceImpl implements IPosProfitDataService {
         }
         try {
             result.setMsg("服务器异常");
-            String httpResult = posRequest(settleMonth);
+            String tranCode = "PFT001"; // 交易码
+            String httpResult = posRequest(settleMonth,tranCode);
             if(StringUtils.isBlank(httpResult)){
                 return result;
             }
@@ -66,11 +67,10 @@ public class PosProfitDataServiceImpl implements IPosProfitDataService {
     }
 
 
-    private String posRequest(String settleMonth)throws Exception{
+    private String posRequest(String settleMonth,String tranCode)throws Exception{
 
         String cooperator = Constants.cooperator;
         String charset = "UTF-8"; // 字符集
-        String tranCode = "PFT001"; // 交易码
         String reqMsgId = UUID.randomUUID().toString().replace("-", ""); // 请求流水
         String reqDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"); // 请求时间
 
@@ -131,5 +131,34 @@ public class PosProfitDataServiceImpl implements IPosProfitDataService {
             return respXML;
         }
         return "";
+    }
+
+    @Override
+    public AgentResult getTradingVolume(String settleMonth,String tranCode) throws ProcessException {
+        AgentResult result = new AgentResult(500,"参数错误","");
+        if (StringUtils.isBlank(settleMonth)) {
+            logger.info("分润月交易量查询:{}","请求月份为空");
+            return result;
+        }
+        try {
+            result.setMsg("服务器异常");
+            String httpResult = posRequest(settleMonth,tranCode);
+            if(StringUtils.isBlank(httpResult)){
+                return result;
+            }
+            JSONObject jsonObject = JSONObject.parseObject(httpResult);
+            JSONObject dataMap = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+            String respType = (String)jsonObject.get("respType");
+            String respCode = (String)jsonObject.get("respCode");
+            if(respType.equals("E") || !respCode.equals("000000")){
+                return new AgentResult(404,String.valueOf(jsonObject.get("respMsg")),"");
+            }else{
+                return AgentResult.ok(dataMap);
+            }
+        } catch (Exception e) {
+            logger.info("分润月交易量查询:{}",e.getMessage());
+            e.printStackTrace();
+        }
+        return result;
     }
 }

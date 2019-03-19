@@ -165,12 +165,12 @@ public interface ProfitDeductionService {
     /**
      * 获取机具扣款关联代理商扣款
      */
-    List<ProfitDeducttionDetail> getRev1DetailById(String id);
+    List<Map<String,Object>> getRev1DetailById(String id);
 
     /**
      * 获取机具扣款---代理商担保扣款
      */
-    List<ProfitDeducttionDetail> getRev2DetailById(String id);
+    List<Map<String,Object>> getRev2DetailById(String id);
 
 
 }

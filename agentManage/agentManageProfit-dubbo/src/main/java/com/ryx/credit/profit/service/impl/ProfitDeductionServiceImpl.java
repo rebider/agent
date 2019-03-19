@@ -90,6 +90,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())) {
             criteria.andAgentIdEqualTo(profitDeduction.getParentAgentId());
         }
+        if(StringUtils.isNotBlank(profitDeduction.getDeductionDesc())){
+            criteria.andDeductionDescEqualTo(profitDeduction.getDeductionDesc());
+        }
         if (department != null) {
             example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
         }
@@ -294,7 +297,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentId())) {
             criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
         }
-        if (StringUtils.isNotBlank(profitDeduction.getDeductionType())) {
+        if("03,07".equals(profitDeduction.getDeductionType())){
+            List<String> list = new ArrayList<String>();
+            list.add("03");
+            list.add("07");
+            criteria.andDeductionTypeIn(list);
+        }else if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
         }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionDate())) {
@@ -494,8 +502,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     private BigDecimal otherDeduction(Map<String, Object> param) {
         // 获取代理商所有其它扣款信息
-        param.put("type", DeductionType.OTHER.getType());
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
+        param.put("type","03,07");
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);  // todo
         return getDeductionAmt(deductionList, param);
     }
 
@@ -968,33 +976,32 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @return
      */
    @Override
-    public List<ProfitDeducttionDetail> getRev1DetailById(String id){
-        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
-        //根据 月份 类型  id  remark 查出关联代理商扣款记录
-       ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
-       ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
-       criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
-       criteria.andDeductionIdEqualTo(profitDeduction.getId());
-       criteria.andDeductionTypeEqualTo(DeductionType.MACHINE.getType());
-       criteria.andRemarkEqualTo("3"+"代理商代扣机具款，扣款明细："+profitDeduction.getSourceId());
-       List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+    public List<Map<String,Object>> getRev1DetailById(String id){
+       ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+       Map<String,String> map = new HashMap<String,String>();
+       map.put("id",profitDeduction.getId());
+       map.put("date",profitDeduction.getDeductionDate());
+       map.put("desc",profitDeduction.getDeductionDesc());
+       map.put("type",DeductionType.MACHINE.getType());
+       map.put("remark","%"+"代理商代扣机具款，扣款明细："+"%");
+       List<Map<String,Object>> list = profitDeductionMapper.getRev1List(map);
         return list;
     }
 
     /**
-     * 获取代理商担保扣款
+     * 获取代理商担保扣款:
      */
     @Override
-    public List<ProfitDeducttionDetail> getRev2DetailById(String id){
+    public List<Map<String,Object>> getRev2DetailById(String id){
         ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
-        //根据agentId  月份 类型(02)    remark 查出关联代理商扣款记录
-        ProfitDeducttionDetailExample example = new ProfitDeducttionDetailExample();
-        ProfitDeducttionDetailExample.Criteria criteria = example.createCriteria();
-        criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
-        criteria.andDeductionDateEqualTo(profitDeduction.getDeductionDate());
-        criteria.andDeductionTypeEqualTo(DeductionType.MACHINE.getType());
-        criteria.andRemarkLike("3" + "代理商代扣机具款，扣款明细：" + "%");
-        List<ProfitDeducttionDetail> list = profitDeducttionDetailMapper.selectByExample(example);
+        Map<String,String> map = new HashMap<String,String>();
+        map.put("agentId",profitDeduction.getAgentId());
+        map.put("parentAgentId",profitDeduction.getParentAgentId());
+        map.put("date",profitDeduction.getDeductionDate());
+        map.put("desc",profitDeduction.getDeductionDate());
+        map.put("type",DeductionType.MACHINE.getType());
+        map.put("remark","%" + "代理商代扣机具款，扣款明细：" + "%");
+        List<Map<String,Object>> list = profitDeductionMapper.getRev2List(map);
         return list;
     }
 

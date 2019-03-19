@@ -34,10 +34,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * 分润计算(财务自编码) cxinfo 分润计算 汪勇
@@ -223,12 +220,19 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             month = DateUtil.sdfDays.format(DateUtil.addMonth(new Date(),-1));
             month = month.substring(0,6);
         }
-        ProfitSupply supply = new ProfitSupply();
+        /*ProfitSupply supply = new ProfitSupply();
         supply.setAgentId(agentId);
         supply.setParentAgentId(parentId);
         supply.setSupplyDate(month);
-        supply.setBusBigType("99");//其它补款
-        BigDecimal totalSupply = profitSupplyMapper.getTotalByMonthAndPid(supply);
+        supply.setBusBigType("99");//其它补款*/
+        //其他补款分为线下导入和线上审批
+        Map<String,String> map = new HashMap<String,String>();
+        map.put("agentId",agentId);
+        map.put("parentAgentId",parentId);
+        map.put("date",month);
+        map.put("type1","99");
+        map.put("type2","90");
+        BigDecimal totalSupply = profitSupplyMapper.getTotalByPidMonthAndAndAG(map);
         if(null == totalSupply){
             totalSupply = BigDecimal.ZERO;
         }

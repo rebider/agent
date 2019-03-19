@@ -213,31 +213,34 @@ public class OwnInvoiceServiceImpl implements IOwnInvoiceService {
      * @return
      */
     @Override
-    public PageInfo getInvoiceDetailList(Page page, String agentId, String agentName, String concludeChild, String dateStart, String dateEnd) {
+    public PageInfo getInvoiceDetailList(Page page, Map<String,String> map) {
         InvoiceDetailExample example = new InvoiceDetailExample();
         example.setPage(page);
         InvoiceDetailExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(dateStart) && StringUtils.isNotBlank(dateEnd)){
-            criteria.andProfitMonthBetween(dateStart,dateEnd);
-        }else if(StringUtils.isNotBlank(dateStart)){
-            criteria.andProfitMonthGreaterThanOrEqualTo(dateStart);
-        }else if(StringUtils.isNotBlank(dateEnd)){
-            criteria.andProfitMonthLessThanOrEqualTo(dateEnd);
+        if(StringUtils.isNotBlank(map.get("dateStart")) && StringUtils.isNotBlank(map.get("dateEnd"))){
+            criteria.andProfitMonthBetween(map.get("dateStart"),map.get("dateEnd"));
+        }else if(StringUtils.isNotBlank(map.get("dateStart"))){
+            criteria.andProfitMonthGreaterThanOrEqualTo(map.get("dateStart"));
+        }else if(StringUtils.isNotBlank(map.get("dateEnd"))){
+            criteria.andProfitMonthLessThanOrEqualTo(map.get("dateEnd"));
         }
-        if ("1".equals(concludeChild) && StringUtils.isNotBlank(agentId)) {
-            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(agentId);
-            lists.add(agentId);
+        if (!"1".equals(map.get("concludeChild")) && StringUtils.isNotBlank(map.get("agentId"))) {
+            criteria.andAgentIdEqualTo(map.get("agentId"));
+        }
+        if(!"1".equals(map.get("concludeChild")) && StringUtils.isNotBlank(map.get("agentName"))){
+            criteria.andAgentNameEqualTo(map.get("agentName"));
+        }
+        if ("1".equals(map.get("concludeChild")) && StringUtils.isNotBlank(map.get("agentId"))) {
+            List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(map.get("agentId"));
+            lists.add(map.get("agentId"));
             criteria.andAgentIdIn(lists);
-        } else if ("1".equals(concludeChild) && StringUtils.isBlank(agentId) && StringUtils.isNotBlank(agentName)) {
-           String aId = invoiceDetailMapper.getAgentIdbyAgentName(agentName);
+        } else if ("1".equals(map.get("concludeChild")) && StringUtils.isBlank(map.get("agentId")) && StringUtils.isNotBlank(map.get("agentName"))) {
+           String aId = invoiceDetailMapper.getAgentIdbyAgentName(map.get("agentName"));
             List<String> lists = invoiceDetailMapper.getAgentIdByBusParent(aId);
             lists.add(aId);
             criteria.andAgentIdIn(lists);
-        } else if (StringUtils.isNotBlank(agentId)) {
-            criteria.andAgentIdEqualTo(agentId);
-        }else if(StringUtils.isNotBlank(agentName)){
-            criteria.andAgentNameEqualTo(agentName);
         }
+
         List<InvoiceDetail> lists = invoiceDetailMapper.selectByExample(example);
         Long count = invoiceDetailMapper.countByExample(example);
         PageInfo pageInfo = new PageInfo();

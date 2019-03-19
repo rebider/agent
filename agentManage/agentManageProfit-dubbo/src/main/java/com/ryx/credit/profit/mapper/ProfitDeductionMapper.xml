@@ -459,6 +459,8 @@
     </if>
   </sql>
 
+    <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+
   <select id="getDeductDetail" parameterType="java.lang.String" resultType="java.util.Map">
      SELECT S.STAG_ID,S.SOURCE_ID, S.DEDUCTION_DATE, S.MUST_AMT,
      D.NOT_DEDUCTION_AMT,D.AGENT_ID,D.AGENT_PID,D.AGENT_NAME,D.PARENT_AGENT_ID,D.DEDUCTION_DESC
@@ -554,8 +556,38 @@
       <if test="agentName != null and agentName != ''">
         and AGENT_NAME = #{agentName}
       </if>
-
     </where>
   </select>
+
+    <select id="getRev1List" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+            pdd.DEDUCTION_DATE,pdd.DEDUCTION_AMT,pdd.PARENT_AGENT_ID parentAgentIdRev1,pdd.PARENT_AGENT_NAME parentAgentNameRev1,
+            pdd.AGENT_ID agentIdRev1,pdd.AGENT_NAME agentNameRev1,
+            pd.AGENT_ID,pd.AGENT_NAME,pd.PARENT_AGENT_NAME,pd.PARENT_AGENT_ID
+        from P_DEDUCTION_DETAIL pdd left join P_DEDUCTION pd on pdd.DEDUCTION_ID = pd.ID
+        where
+            pdd.DEDUCTION_DATE = #{date} and pdd.DEDUCTION_TYPE = #{type}
+            and pdd.DEDUCTION_DESC = #{desc} and pdd.REMARK like #{remark}
+            and pd.ID = #{id}
+    </select>
+
+    <select id="getRev2List" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        pdd.DEDUCTION_DATE,pdd.DEDUCTION_AMT,pdd.PARENT_AGENT_ID parentAgentIdRev2,pdd.PARENT_AGENT_NAME parentAgentNameRev2,
+        pdd.AGENT_ID agentIdRev2,pdd.AGENT_NAME agentNameRev2,
+        pd.AGENT_ID,pd.AGENT_NAME,pd.PARENT_AGENT_NAME,pd.PARENT_AGENT_ID
+        from P_DEDUCTION_DETAIL pdd left join P_DEDUCTION pd on pdd.DEDUCTION_ID = pd.ID
+        where pdd.AGENT_ID = #{agentId}  and pdd.DEDUCTION_DATE = #{date}
+        and pdd.DEDUCTION_TYPE = #{type} and pdd.DEDUCTION_DESC = #{desc}
+        and pdd.REMARK like #{remark}
+        <choose>
+            <when test="parentAgentId != null and parentAgentId != '' ">
+                and pdd.PARENT_AGENT_ID  = #{parentAgentId}
+            </when>
+            <otherwise>
+                and pdd.PARENT_AGENT_ID is null
+            </otherwise>
+        </choose>
+    </select>
 
 </mapper>
