@@ -11,9 +11,11 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.util.*;
 
@@ -53,6 +56,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private BusActRelMapper busActRelMapper;
      @Autowired
      private TaskApprovalService taskApprovalService;
+     @Autowired
+     private CapitalMapper capitalMapper;
 
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
@@ -147,6 +152,21 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if(i!=1){
                     throw new ProcessException("更新打款公司或业务所属上级异常");
+                }
+            }
+
+            //财务填写实际到账时间
+            for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
+                Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
+                capitalVo.setcUtime(new Date());
+                capitalVo.setVersion(capital.getVersion());
+                capitalVo.setcInAmount(capitalVo.getcInAmount());
+                capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                capitalVo.setId(capitalVo.getId());
+                int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
+                if(i!=1){
+                    logger.info("实际到账金额填写失败");
+                    throw new ProcessException("实际到账金额填写失败");
                 }
             }
         }
