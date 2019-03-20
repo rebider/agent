@@ -23,6 +23,7 @@ import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.agent.Agent;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.BusActRel;
+import com.ryx.credit.pojo.admin.agent.Dict;
 import com.ryx.credit.pojo.admin.order.*;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OldOrderReturnBusEditVo;
@@ -131,6 +132,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     private OProductMapper oProductMapper;
     @Autowired
     private RedisService  redisService;
+    @Autowired
+    private DictOptionsService dictOptionsService;
+    @Autowired
+    private OrderActivityService orderActivityService;
 
 
 
@@ -851,5 +856,47 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             logger.error("退货审批完成回调异常", e);
             throw e;
         }
+    }
+
+
+    /**
+     * 解析历史订单退货上传
+     * @param excelList
+     * @return
+     * @throws MessageException
+     */
+    public AgentResult parseExcel(List<List<Object>> excelList)throws MessageException{
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        for (List<Object> excel : excelList) {
+            Map<String, Object> resultMap = new HashMap();
+            String snBegin = "";
+            String snEnd = "";
+            String count = "";
+            String proModel = "";
+            try {
+                snBegin = String.valueOf(excel.get(0));
+                snEnd = String.valueOf(excel.get(1));
+                count = String.valueOf(excel.get(2));
+                proModel = String.valueOf(excel.get(3));
+            } catch (Exception e) {
+                throw new MessageException("导入解析文件失败");
+            }
+            try {
+                Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
+                if(modelType==null){
+                    throw new MessageException("导入类型错误");
+                }
+                AgentResult agentResult = orderActivityService.querySnInfoFromBusSystem(snBegin,snEnd,count,proModel);
+                if(agentResult.isOK()) {
+                    resultList.add(agentResult.getMapData());
+                }else{
+                    return AgentResult.fail(agentResult.getMsg());
+                }
+            } catch (MessageException e) {
+                e.printStackTrace();
+                return AgentResult.fail(e.getMsg());
+            }
+        }
+        return AgentResult.ok(resultList);
     }
 }
