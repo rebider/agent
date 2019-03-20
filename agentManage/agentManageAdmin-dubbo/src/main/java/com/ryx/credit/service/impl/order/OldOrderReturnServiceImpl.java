@@ -143,6 +143,20 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     public AgentResult saveOldReturnOrder(OldOrderReturnVo oldOrderReturnVo)throws Exception{
+        List<OldOrderReturnSubmitProVo> oldOrderReturnSubmitProVos = oldOrderReturnVo.getOldOrderReturnSubmitProVoList();
+        if(oldOrderReturnSubmitProVos==null || oldOrderReturnSubmitProVos.size()==0){
+            return AgentResult.fail("请填写退货sn号码段");
+        }
+        for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
+            if(StringUtils.isBlank(oldOrderReturnSubmitProVo.getSnStart())||
+               StringUtils.isBlank(oldOrderReturnSubmitProVo.getSnEnd())){
+                return AgentResult.fail("SN号码不能为空");
+            }
+            if(oldOrderReturnSubmitProVo.getReturnCount()==null||
+                    oldOrderReturnSubmitProVo.getReturnCount().compareTo(BigDecimal.ZERO)<=0){
+                return AgentResult.fail("数量必须大于0");
+            }
+        }
 
         Agent agent = agentMapper.selectByPrimaryKey(oldOrderReturnVo.getAgentId());
         //保存审批中的退货申请单
@@ -536,7 +550,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         }
         OSubOrder subOrderItem = subOrders.get(0);
 
-        //商品活动
+        //退货商品活动
         OSubOrderActivityExample oSubOrderActivityExample = new OSubOrderActivityExample();
         oSubOrderActivityExample.or().andSubOrderIdEqualTo(subOrderItem.getId()).andStatusEqualTo(Status.STATUS_1.status);
         List<OSubOrderActivity> oSubOrderActivities = subOrderActivityMapper.selectByExample(oSubOrderActivityExample);
@@ -548,7 +562,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             logger.info("查询活动数据错误2");
             throw new MessageException("订单活动查询失败");
         }
-        //商品活动临时表
+        //退货商品活动临时表
         OSubOrderActivity oSubOrderActivity = oSubOrderActivities.get(0);
         OActivity oActivity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
         //物流检查
@@ -658,7 +672,158 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             //流量卡不进行下发操作
             if(oActivity!=null && StringUtils.isNotBlank(oActivity.getActCode()) && "2204".equals(oActivity.getActCode())){
                 logger.info("导入物流数据,流量卡不进行下发操作，活动代码{}={}==========================================={}" ,oActivity.getActCode(),oLogistics.getId(), JSONObject.toJSON(oLogistics));
+                return AgentResult.ok("流量卡不进行下发操作");
             }
+
+            //进行机具调整操作
+            if (!proType.equals(PlatformType.MPOS.msg) && !proType.equals(PlatformType.MPOS.code)){
+                logger.info("======pos发货 更新库存记录:{}:{}",proType,stringList);
+                List<OLogisticsDetail> snList = null; //fixme 使用缓存中的数据进行添加
+                OOrder oOrder = oOrderMapper.selectByPrimaryKey(orderId);
+                if(null==oOrder){
+                    throw new MessageException("查询订单数据失败！");
+                }
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(oOrder.getBusId());
+                if(null==agentBusInfo){
+                    throw new MessageException("查询订单业务数据失败！");
+                }
+                ImsTermAdjustDetail imsTermAdjustDetail = new ImsTermAdjustDetail();
+                imsTermAdjustDetail.setnOrgId(agentBusInfo.getBusNum());
+                imsTermAdjustDetail.setMachineId(oSubOrderActivity.getBusProCode());
+                OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                logger.info("退货上传物流下发到POS系统:{}:{}:{}",user,logistics.getId(),snList.toString());
+                try {
+                    AgentResult ar =  imsTermAdjustDetailService.insertImsTermAdjustDetail(snList,imsTermAdjustDetail);
+                    if(ar.isOK()){
+                        logistics.setSendStatus(Status.STATUS_1.status);
+                        logistics.setSendMsg(ar.getMsg());
+                        oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                    }else{
+                        logistics.setSendStatus(Status.STATUS_2.status);
+                        logistics.setSendMsg(ar.getMsg());
+                        oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                    }
+                } catch (MessageException e) {
+                    e.printStackTrace();
+                    logger.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
+                    logistics.setSendStatus(Status.STATUS_2.status);
+                    logistics.setSendMsg(e.getMsg());
+                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                }catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("机具退货调整POS接口调用异常"+logistics.getId(),e);
+                    logistics.setSendStatus(Status.STATUS_2.status);
+                    logistics.setSendMsg(e.getLocalizedMessage());
+                    oLogisticsMapper.updateByPrimaryKeySelective(logistics);
+                }
+            //cxinfo 机具退货调整首刷接口调用
+            }else{
+
+                logger.info("======首刷发货 更新库存记录:{}:{}",proType,stringList);
+                //起始sn fixme 首刷历史订单退货，无sn需要从缓存中拿明细数据
+                OLogisticsDetailExample exampleOLogisticsDetailExamplestart = new OLogisticsDetailExample();
+                exampleOLogisticsDetailExamplestart.or()
+                        .andSnNumEqualTo(oLogistics.getSnBeginNum())
+                        .andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                List<OLogisticsDetail> logisticsDetailsstart = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExamplestart);
+                OLogisticsDetail detailstart = logisticsDetailsstart.get(0);
+
+                //结束sn
+                OLogisticsDetailExample exampleOLogisticsDetailExampleend = new OLogisticsDetailExample();
+                exampleOLogisticsDetailExampleend.or().andSnNumEqualTo(oLogistics.getSnEndNum()).andTerminalidTypeEqualTo(PlatformType.MPOS.code);
+                List<OLogisticsDetail> logisticsDetailsend = logisticsDetailMapper.selectByExample(exampleOLogisticsDetailExampleend);
+                OLogisticsDetail detailend = logisticsDetailsend.get(0);
+
+                AdjustmentMachineVo vo = new AdjustmentMachineVo();
+                vo.setOptUser(user);
+                vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
+                vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
+                vo.setSnNum(oLogistics.getSendNum().toString());
+
+                //发货订单的业务编号
+                OOrder order =  oOrderMapper.selectByPrimaryKey(oLogistics.getOrderId());
+                AgentBusInfo busInfo = agentBusInfoMapper.selectByPrimaryKey(order.getBusId());
+                vo.setNewBusNum(busInfo.getBusNum());
+
+
+                //退货订单的业务编号
+                OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(receiptPlan.getReturnOrderDetailId());
+                OOrder orderreturn =  oOrderMapper.selectByPrimaryKey(oReturnOrderDetail.getOrderId());
+                AgentBusInfo returnbusInfo = agentBusInfoMapper.selectByPrimaryKey(orderreturn.getBusId());
+                vo.setOldBusNum(returnbusInfo.getBusNum());
+                vo.setPlatformNum(returnbusInfo.getBusPlatform());
+
+                //新活动
+                vo.setNewAct(oSubOrderActivity.getBusProCode());
+
+                //老活动查询
+                OSubOrderExample old_OSubOrder = new OSubOrderExample();
+                old_OSubOrder.or()
+                        .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
+                        .andProIdEqualTo(oReturnOrderDetail.getProId())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrder> list_osub_old = oSubOrderMapper.selectByExample(old_OSubOrder);
+
+                if(list_osub_old.size()==0){
+                    throw new MessageException("退货机具活动信息未找到");
+                }
+                OSubOrder old_suborder  = list_osub_old.get(0);
+                OSubOrderActivityExample example_old_activity = new OSubOrderActivityExample();
+                example_old_activity.or().andSubOrderIdEqualTo(old_suborder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrderActivity>  list_old_act = subOrderActivityMapper.selectByExample(example_old_activity);
+                if(list_old_act.size()==0){
+                    throw new MessageException("退货机具活动信息未找到");
+                }
+                OSubOrderActivity old_act = list_old_act.get(0);
+                vo.setOldAct(old_act.getBusProCode());
+
+                //cxinfo 机具退货调整首刷接口调用
+                OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
+                //同平台下发，不同平台不下发
+                if(busInfo.getBusPlatform().equals(returnbusInfo.getBusPlatform())) {
+                    try {
+                        logger.info("退货上传物流下发到首刷系统:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd());
+                        AgentResult mposXF = termMachineService.adjustmentMachine(vo);
+                        logger.info("机具退货调整首刷接口调用:{}:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd(),mposXF.getMsg());
+                        if (!mposXF.isOK()) {
+                            logistics.setSendStatus(Status.STATUS_2.status);
+                            logistics.setSendMsg(mposXF.getMsg());
+                            if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                                logger.info("机具退货调整首刷接口调用STATUS_2更新数据库失败:{}:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd(),mposXF.getMsg());
+                            }
+                        }else{
+                            logistics.setSendStatus(Status.STATUS_1.status);
+                            logistics.setSendMsg(mposXF.getMsg());
+                            if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                                logger.info("机具退货调整首刷接口调用STATUS_1更新数据库失败:{}:{}:{}:{}:{}",user,logistics.getId(),vo.getSnStart(),vo.getSnEnd(),mposXF.getMsg());
+                            }
+                        }
+                    }catch (MessageException e) {
+                        e.printStackTrace();
+                        logistics.setSendStatus(Status.STATUS_2.status);
+                        logistics.setSendMsg(e.getMsg());
+                        if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                            logger.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        logistics.setSendStatus(Status.STATUS_2.status);
+                        logistics.setSendMsg(e.getLocalizedMessage());
+                        if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                            logger.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
+                        }
+                    }
+                }else{
+                    logistics.setSendStatus(Status.STATUS_0.status);
+                    logistics.setSendMsg("不同平台不下发，手动调整");
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                        logger.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
+                    }
+                }
+            }
+
+
+
         }
 
         return AgentResult.ok();
