@@ -896,20 +896,16 @@ public class CompensateServiceImpl implements CompensateService {
                         row.setSendStatus(Status.STATUS_2.status);
                     }
                     refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
-                } catch (MessageException e) {
+                }catch (ProcessException e) {
                     e.printStackTrace();
-                    row.setSendMsg(e.getMsg());
-                    row.setSendStatus(Status.STATUS_2.status);
-                    refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
-                } catch (Exception e) {
+                    throw new ProcessException(e.getMessage());
+                }catch (Exception e) {
                     e.printStackTrace();
-                    row.setSendMsg("下发异常");
-                    row.setSendStatus(Status.STATUS_2.status);
-                    refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                    throw new ProcessException("处理失败");
                 }
             }catch (ProcessException e) {
                 e.printStackTrace();
-                throw new ProcessException("处理失败");
+                throw new ProcessException(e.getMessage());
             }catch (Exception e) {
                 e.printStackTrace();
                 throw new ProcessException("处理失败");
