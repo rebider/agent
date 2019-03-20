@@ -639,6 +639,12 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                     ORefundPriceDiffDetail upPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getId());
                     upPriceDiffDetail.setSubOrderId(oRefundPriceDiffDetail.getSubOrderId());
+                    OSubOrder oSubOrder = subOrderMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getSubOrderId());
+                    if(null==oSubOrder){
+                        throw new ProcessException("商品不存在");
+                    }
+                    upPriceDiffDetail.setProId(oSubOrder.getProId());
+                    upPriceDiffDetail.setProName(oSubOrder.getProName());
                     upPriceDiffDetail.setOrderId(oRefundPriceDiffDetail.getOrderId());
                     int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(upPriceDiffDetail);
                     if(i!=1){
@@ -901,16 +907,12 @@ public class CompensateServiceImpl implements CompensateService {
                     row.setSendStatus(Status.STATUS_2.status);
                     refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
                 }
-            } catch (ProcessException e) {
+            }catch (ProcessException e) {
                 e.printStackTrace();
-                row.setSendMsg(e.getMsg());
-                row.setSendStatus(Status.STATUS_2.status);
-                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                throw new ProcessException("处理失败");
             }catch (Exception e) {
                 e.printStackTrace();
-                row.setSendMsg("下发异常");
-                row.setSendStatus(Status.STATUS_2.status);
-                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                throw new ProcessException("处理失败");
             }
         });
         return AgentResult.ok();

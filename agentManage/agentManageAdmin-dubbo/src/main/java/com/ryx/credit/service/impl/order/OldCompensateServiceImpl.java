@@ -601,7 +601,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 }
             }catch (ProcessException e) {
                 e.printStackTrace();
-                throw new ProcessException("处理失败");
+                throw new ProcessException(e.getMessage());
             }catch (Exception e) {
                 e.printStackTrace();
                 throw new ProcessException("处理失败");
