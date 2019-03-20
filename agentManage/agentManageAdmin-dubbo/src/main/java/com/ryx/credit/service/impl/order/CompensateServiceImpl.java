@@ -3,6 +3,7 @@ package com.ryx.credit.service.impl.order;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtil;
 import com.ryx.credit.common.util.Page;
@@ -101,6 +102,9 @@ public class CompensateServiceImpl implements CompensateService {
     private AgentMapper agentMapper;
     @Autowired
     private OCashReceivablesService cashReceivablesService;
+    @Autowired
+    private RedisService redisService;
+    
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -617,13 +621,13 @@ public class CompensateServiceImpl implements CompensateService {
         ORefundPriceDiff oRefundPriceDiff= refundPriceDiffMapper.selectByPrimaryKey(agentVo.getAgentBusId());
         ORefundPriceDiffVo updatePriceDiff = new ORefundPriceDiffVo();
         updatePriceDiff.setId(oRefundPriceDiff.getId());
-        //业务审批
-        if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0) {
-            updatePriceDiff.setDeductAmt(deductAmt);
-            BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
-            String relCompAmtStr = String.valueOf(relCompAmt);
-            updatePriceDiff.setRelCompType(relCompAmtStr.contains("-") ? PriceDiffType.DETAIN_AMT.getValue() : PriceDiffType.REPAIR_AMT.getValue());
-            updatePriceDiff.setRelCompAmt(relCompAmtStr.contains("-") ? new BigDecimal(relCompAmtStr.substring(1)) : new BigDecimal(relCompAmtStr));
+        List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+        if (null == orgCodeRes) {
+            throw new ProcessException("部门参数为空！");
+        }
+        Map<String, Object> map = orgCodeRes.get(0);
+        String orgCode = String.valueOf(map.get("ORGANIZATIONCODE"));
+        if(orgCode.equals("business")){
             if(oRefundPriceDiff.getOrderType().compareTo(OrderType.OLD.getValue())==0){
                 List<ORefundPriceDiffDetail> refundPriceDiffDetailList = agentVo.getRefundPriceDiffDetailList();
                 for (ORefundPriceDiffDetail oRefundPriceDiffDetail : refundPriceDiffDetailList) {
@@ -642,6 +646,14 @@ public class CompensateServiceImpl implements CompensateService {
                     }
                 }
             }
+        }
+        //业务审批
+        if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()!=0) {
+            updatePriceDiff.setDeductAmt(deductAmt);
+            BigDecimal relCompAmt = oRefundPriceDiff.getApplyCompAmt().subtract(deductAmt);
+            String relCompAmtStr = String.valueOf(relCompAmt);
+            updatePriceDiff.setRelCompType(relCompAmtStr.contains("-") ? PriceDiffType.DETAIN_AMT.getValue() : PriceDiffType.REPAIR_AMT.getValue());
+            updatePriceDiff.setRelCompAmt(relCompAmtStr.contains("-") ? new BigDecimal(relCompAmtStr.substring(1)) : new BigDecimal(relCompAmtStr));
         }
         if(null!=agentVo.getoRefundPriceDiffVo())
         //财务审批

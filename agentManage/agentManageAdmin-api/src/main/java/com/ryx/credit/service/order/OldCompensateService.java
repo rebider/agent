@@ -29,4 +29,6 @@ public interface OldCompensateService {
     List<OSubOrder> queryOrder(String orderId)throws MessageException;
 
     BigDecimal calculatePriceDiff(String oldActivityId, String activityId, BigDecimal proNum)throws Exception;
+
+    AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
 }

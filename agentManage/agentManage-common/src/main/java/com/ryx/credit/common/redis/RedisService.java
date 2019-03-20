@@ -467,7 +467,8 @@ public class RedisService {
 
 
 
-
-
+    public Set<String> hGet(String key) {
+        return (Set) redisTemplate.opsForHash().keys(key);
+    }
 
 }
