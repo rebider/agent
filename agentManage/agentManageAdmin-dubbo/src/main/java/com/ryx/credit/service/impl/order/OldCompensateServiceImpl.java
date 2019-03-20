@@ -7,6 +7,7 @@ import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
+import com.ryx.credit.common.util.FastMap;
 import com.ryx.credit.common.util.JsonUtil;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
@@ -89,7 +90,6 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     @Autowired
     private RedisService redisService;
 
-
     @Override
     public List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList)throws MessageException{
 
@@ -108,149 +108,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             } catch (Exception e) {
                 throw new MessageException("导入解析文件失败");
             }
-            Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
-            if(modelType==null){
-                throw new MessageException("导入类型错误");
-            }
-            Set<String> actSet = new HashSet<>();
-            if(modelType.getdItemvalue().equals(PlatformType.MPOS.code)){
-                try {
-                    AgentResult agentResult = termMachineService.querySnMsg(PlatformType.MPOS,snBegin, snEnd);
-                    if(!agentResult.isOK()){
-                        throw new MessageException("查询手刷失败");
-                    }
-                    List<Map<String,Object>> data = (List<Map<String,Object>>)agentResult.getData();
-                    if(data.size()!=Integer.parseInt(count)){
-                        log.info("查询手刷根据SN号段查询机具信息数量：{},count:{}",data.size(),count);
-                        throw new MessageException("请检查sn有效性");
-                    }
-                    for (Map<String, Object> map : data) {
-                        String termActiveId = String.valueOf(map.get("termActiveId"));
-                        String termActiveName = String.valueOf(map.get("termActiveName"));
-                        String termBatchId = String.valueOf(map.get("termBatchId"));
-                        String termTypeId = String.valueOf(map.get("termTypeId"));
-                        String sn = String.valueOf(map.get("termId"));
 
-                        OActivityExample oActivityExample = new OActivityExample();
-                        OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
-                        activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                        activityCriteria.andBusProCodeEqualTo(termActiveId);
-                        activityCriteria.andBusProNameEqualTo(termActiveName);
-                        activityCriteria.andTermBatchcodeEqualTo(termBatchId);
-                        activityCriteria.andTermtypeEqualTo(termTypeId);
-                        List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
-                        if(oActivities==null){
-                            throw new MessageException(sn+"活动未找到");
-                        }
-                        if(oActivities.size()==0){
-                            throw new MessageException(sn+"活动未找到");
-                        }
-                        Set<BigDecimal> priceSet = new HashSet<>();
-                        for (OActivity oActivity : oActivities) {
-                            priceSet.add(oActivity.getPrice());
-                        }
-                        if(priceSet.size()!=1){
-                            throw new MessageException(sn+"价格配置错误");
-                        }
-                        actSet.add(oActivities.get(0).getId());
-                    }
-                    if(actSet.size()!=1){
-                        throw new MessageException(snBegin+"到"+snEnd+":活动不一致,请分开上传");
-                    }
-                    for (Map<String, Object> map : data) {
-                        String sn = String.valueOf(map.get("termId"));
-                        Map<String,String> redisMap = new HashMap<>();
-                        redisMap.put("sn",sn);
-                        redisMap.put("termActiveId",String.valueOf(map.get("termActiveId")));
-                        redisMap.put("termActiveName",String.valueOf(map.get("termActiveName")));
-                        redisMap.put("termBatchId",String.valueOf(map.get("termBatchId")));
-                        redisMap.put("termTypeId",String.valueOf(map.get("termTypeId")));
-                        redisMap.put("termCheck",String.valueOf(map.get("termCheck")));
-                        redisMap.put("agencyId",String.valueOf(map.get("agencyId")));
-                        redisMap.put("agencyName",String.valueOf(map.get("agencyName")));
-                        redisService.hSet(snBegin+","+snEnd,sn, JsonUtil.objectToJson(redisMap));
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }else {
-                try {
-                    AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS,snBegin, snEnd);
-                    if(!agentResult.isOK()){
-                        throw new MessageException("查询pos失败");
-                    }
-                    JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
-                    JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                    System.out.println(String.valueOf(data.get("termMachineList")));
-                    List<Map<String,Object>> termMachineListMap = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(data.get("termMachineList")));
-                    if(termMachineListMap.size()!=Integer.parseInt(count)){
-                        log.info("查询pos根据SN号段查询机具信息数量：{},count:{}",termMachineListMap.size(),count);
-                        throw new MessageException("请检查sn有效性");
-                    }
-                    for (Map<String, Object> map : termMachineListMap) {
-                        String posSn = String.valueOf(map.get("posSn"));
-                        String tmsModel = String.valueOf(map.get("tmsModel"));
-                        String machineManufName = String.valueOf(map.get("machineManufName"));
-                        String machineId = String.valueOf(map.get("machineId"));
-                        String posType = String.valueOf(map.get("posType"));
-                        Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
-                        if (manufaName == null) {
-                            throw new MessageException(machineManufName+"厂商不存在");
-                        }
-                        String manufaValue = manufaName.getdItemvalue();//厂商
-                        OActivityExample oActivityExample = new OActivityExample();
-                        OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
-                        activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                        activityCriteria.andVenderEqualTo(manufaValue);
-                        activityCriteria.andProModelEqualTo(tmsModel);
-                        activityCriteria.andPosTypeEqualTo(posType);
-                        activityCriteria.andBusProCodeEqualTo(machineId);
-                        List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
-                        if(oActivities==null){
-                            throw new MessageException(posSn+"活动未找到");
-                        }
-                        if(oActivities.size()==0){
-                            throw new MessageException(posSn+"活动未找到");
-                        }
-                        Set<BigDecimal> priceSet = new HashSet<>();
-                        for (OActivity oActivity : oActivities) {
-                            priceSet.add(oActivity.getPrice());
-                        }
-                        if(priceSet.size()!=1){
-                            throw new MessageException(posSn+"价格配置错误");
-                        }
-                        actSet.add(oActivities.get(0).getId());
-                    }
-                    if(actSet.size()!=1){
-                        throw new MessageException(snBegin+"到"+snEnd+":活动不一致,请分开上传");
-                    }
-                    for (Map<String, Object> map : termMachineListMap) {
-                        Map<String,String> redisMap = new HashMap<>();
-                        String posSn = String.valueOf(map.get("posSn"));
-                        redisMap.put("posSn",posSn);
-                        redisMap.put("tmsModel",String.valueOf(map.get("tmsModel")));
-                        String machineManufName = String.valueOf(map.get("machineManufName"));
-                        redisMap.put("machineManufName",machineManufName);
-                        redisMap.put("machineId",String.valueOf(map.get("machineId")));
-                        redisMap.put("posType",String.valueOf(map.get("posType")));
-                        Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
-                        if (manufaName == null) {
-                            throw new MessageException(machineManufName + "厂商不存在");
-                        }
-                        String manufaValue = manufaName.getdItemvalue();//厂商
-                        redisMap.put("manufaValue",manufaValue);
-                        redisService.hSet(snBegin+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new MessageException(e.getMessage());
-                }
-            }
+            AgentResult agentResult = orderActivityService.querySnInfoFromBusSystem(snBegin, snEnd, count, proModel);
+            FastMap fastMap = (FastMap)agentResult.getMapData();
 
             OProduct product = new OProduct();
-            product.setProType(modelType.getdItemvalue());
+            product.setProType(String.valueOf(fastMap.get("modelType")));
             List<Map> proMaps = productService.queryGroupByProCode(product);
             for (Map proMap : proMaps) {
                 if(String.valueOf(proMap.get("proName")).equals("流量卡")){
@@ -262,9 +125,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
             resultMap.put("snEnd",snEnd);
             resultMap.put("count",count);
             resultMap.put("proMaps",proMaps);
-            List list = new ArrayList(actSet);
-            String activityId = (String)list.get(0);
-            OActivity oActivity = activityMapper.selectByPrimaryKey(activityId);
+            List list = new ArrayList((Set)fastMap.get("activity"));
+            OActivity oActivity = (OActivity)list.get(0);
             resultMap.put("activity",oActivity);
             OActivityExample oActivityExample = new OActivityExample();
             OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
@@ -299,7 +161,7 @@ public class OldCompensateServiceImpl implements OldCompensateService {
     @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
     @Override
     public AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                         List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList){
+                                         List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList)throws Exception{
 
         try {
             if(PriceDiffType.DETAIN_AMT.code.equals(oRefundPriceDiff.getApplyCompType())){
@@ -366,21 +228,20 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 log.info("退补差价保存打款记录失败1");
                 throw new MessageException("保存打款记录失败");
             }
-
-            refundPriceDiffDetailList.forEach(refundPriceDiffDetail->{
+            for (ORefundPriceDiffDetail refundPriceDiffDetail : refundPriceDiffDetailList) {
                 if(StringUtils.isBlank(refundPriceDiffDetail.getProId())){
-                    throw new ProcessException("请选择商品");
+                    throw new MessageException("请选择商品");
                 }
                 if(StringUtils.isBlank(refundPriceDiffDetail.getActivityRealId())){
-                    throw new ProcessException("请选择要变更的活动");
+                    throw new MessageException("请选择要变更的活动");
                 }
                 OActivity oldActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityFrontId());
                 if(oldActivity==null){
-                    throw new ProcessException("旧活动不存在");
+                    throw new MessageException("旧活动不存在");
                 }
                 OActivity newActivity = activityMapper.selectByPrimaryKey(refundPriceDiffDetail.getActivityRealId());
                 if(newActivity==null){
-                    throw new ProcessException("新活动不存在");
+                    throw new MessageException("新活动不存在");
                 }
                 refundPriceDiffDetail.setAgentId(oRefundPriceDiff.getAgentId());
                 refundPriceDiffDetail.setId(idService.genId(TabId.o_Refund_price_diff_d));
@@ -403,14 +264,17 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 int priceDiffDetailInsert = refundPriceDiffDetailMapper.insert(refundPriceDiffDetail);
                 if(priceDiffDetailInsert!=1){
                     log.info("插入补退差价详情表异常");
-                    throw new ProcessException("保存失败");
+                    throw new MessageException("保存失败");
                 }
-            });
+            }
 
             return AgentResult.ok(priceDiffId);
+        } catch (MessageException e) {
+            log.info("退补差价保存失败");
+            throw new MessageException(e.getMessage());
         } catch (Exception e) {
             log.info("退补差价保存失败");
-            throw new ProcessException("退补差价保存失败");
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -735,16 +599,12 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     row.setSendStatus(Status.STATUS_2.status);
                     refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
                 }
-            } catch (ProcessException e) {
+            }catch (ProcessException e) {
                 e.printStackTrace();
-                row.setSendMsg(e.getMsg());
-                row.setSendStatus(Status.STATUS_2.status);
-                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                throw new ProcessException("处理失败");
             }catch (Exception e) {
                 e.printStackTrace();
-                row.setSendMsg("下发异常");
-                row.setSendStatus(Status.STATUS_2.status);
-                refundPriceDiffDetailMapper.updateByPrimaryKeySelective(row);
+                throw new ProcessException("处理失败");
             }
         });
         return AgentResult.ok();
