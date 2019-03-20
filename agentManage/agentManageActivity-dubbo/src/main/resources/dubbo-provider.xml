@@ -43,5 +43,6 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentQuitRefundService" id="agentQuitRefundService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.CapitalChangeApplyService" id="capitalChangeApplyService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.order.OldOrderReturnService" id="oldOrderReturnService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:reference interface="com.ryx.credit.service.order.OldCompensateService" id="oldCompensateService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
 </beans>

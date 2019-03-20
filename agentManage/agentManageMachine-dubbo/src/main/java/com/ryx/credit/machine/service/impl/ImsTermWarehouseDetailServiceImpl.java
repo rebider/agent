@@ -76,6 +76,10 @@ public class ImsTermWarehouseDetailServiceImpl implements ImsTermWarehouseDetail
             if(imsTermWarehouseDetail.getStandTime()==null || StringUtils.isBlank(imsTermWarehouseDetail.getPosType()) || imsTermWarehouseDetail.getPosSpePrice()==null ){
                 throw new MessageException("缺少参数");
             }
+            ImsTermWarehouseDetail updateTermWarehouseDetail = imsTermWarehouseDetailMapper.selectByPrimaryKey(sn);
+            if(updateTermWarehouseDetail!=null){
+                throw new MessageException("SN已存在,请检查sn");
+            }
             String createTime = DateUtil.format(new Date());
             imsTermWarehouseDetail.setWdId(IDUtils.genImsTermId());
             imsTermWarehouseDetail.setPosSn(sn);

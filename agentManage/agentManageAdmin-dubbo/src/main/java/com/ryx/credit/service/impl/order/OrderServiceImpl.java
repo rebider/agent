@@ -1443,9 +1443,17 @@ public class OrderServiceImpl implements OrderService {
                         Date nuclearTime = DateUtil.format(agentVo.getoPayment().get("nuclearTime") + "", "yyyy-MM-dd");
                         oPayment.setNuclearTime(nuclearTime);
                         oPayment.setNuclearUser(userId);
+                        for (OCashReceivablesVo oCashReceivablesVo : oCashReceivablesVoList) {
+                            if(null==oCashReceivablesVo.getRealRecTime()){
+                                throw new MessageException("请填写实际到账时间");
+                            }
+                        }
                         //审核人审核时间
                         AgentResult ocash  = oCashReceivablesService.approveTashBusiness(CashPayType.PAYMENT,oPayment.getId(),userId,nuclearTime,oCashReceivablesVoList);
                         logger.info("核款时间核款人更新成功order{}user{}date{}",oPayment.getOrderId(),userId,nuclearTime.getTime());
+                    }catch (MessageException e){
+                        e.printStackTrace();
+                        throw new MessageException(e.getMsg());
                     }catch (Exception e){
                         e.printStackTrace();
                         throw new MessageException("核款日期错误");

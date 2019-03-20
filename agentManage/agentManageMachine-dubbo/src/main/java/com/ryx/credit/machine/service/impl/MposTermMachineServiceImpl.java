@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -187,4 +188,24 @@ public class MposTermMachineServiceImpl implements TermMachineService {
         }
 
     }
+
+
+    @Override
+    public AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception{
+
+        Map<String,String> resultMap = new HashMap<>();
+        resultMap.put("beginTermNum",snBegin);
+        resultMap.put("endTermNum",snEnd);
+
+        logger.info("老订单Mpos请求参数：{}",resultMap.toString());
+        JSONObject res = request(resultMap, AppConfig.getProperty("mpos.oldChangeActMachine"));
+        if(null!=res && MPOS_SUCESS_respCode.equals(res.getString("respCode")) && MPOS_SUCESS_respType.equals(res.getString("respType"))){
+            logger.info("老订单Mpos机具查询:{}{}{}",AppConfig.getProperty("mpos.oldChangeActMachine"),res.getString("respMsg"),res.toJSONString());
+            List<Map<String,Object>> termMachineListMap = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(res.get("data")));
+            return AgentResult.ok(termMachineListMap);
+        }else{
+            throw new MessageException(res.getString("respMsg"));
+        }
+    }
+
 }
