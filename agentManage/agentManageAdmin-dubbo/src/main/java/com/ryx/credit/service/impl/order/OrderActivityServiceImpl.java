@@ -1,12 +1,12 @@
 package com.ryx.credit.service.impl.order;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.redis.RedisService;
 import com.ryx.credit.common.result.AgentResult;
-import com.ryx.credit.common.util.FastMap;
-import com.ryx.credit.common.util.Page;
-import com.ryx.credit.common.util.PageInfo;
-import com.ryx.credit.common.util.ResultVO;
+import com.ryx.credit.common.util.*;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.PlatFormMapper;
@@ -55,6 +55,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
     private DictOptionsService dictOptionsService;
     @Autowired
     private AgentBusInfoMapper agentBusInfoMapper;
+    @Autowired
+    private RedisService redisService;
+
 
     @Override
     public PageInfo activityList(OActivity activity, Page page) {
@@ -375,5 +378,156 @@ public class OrderActivityServiceImpl implements OrderActivityService {
             resList.add(item);
         }
         return resList;
+    }
+
+
+    @Override
+    public AgentResult querySnInfoFromBusSystem(String snStart, String snEnd, String count, String proModel)throws MessageException {
+
+        Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
+        if(modelType==null){
+            throw new MessageException("导入类型错误");
+        }
+        FastMap res = FastMap.fastSuccessMap();
+        Set<OActivity> actSet = new HashSet<>();
+        if(modelType.getdItemvalue().equals(PlatformType.MPOS.code)){
+            try {
+                AgentResult agentResult = termMachineService.querySnMsg(PlatformType.MPOS,snStart, snEnd);
+                if(!agentResult.isOK()){
+                    throw new MessageException("查询手刷失败");
+                }
+                List<Map<String,Object>> data = (List<Map<String,Object>>)agentResult.getData();
+                if(data.size()!=Integer.parseInt(count)){
+                    logger.info("查询手刷根据SN号段查询机具信息数量：{},count:{}",data.size(),count);
+                    throw new MessageException("请检查sn有效性");
+                }
+                for (Map<String, Object> map : data) {
+                    String termActiveId = String.valueOf(map.get("termActiveId"));
+                    String termActiveName = String.valueOf(map.get("termActiveName"));
+                    String termBatchId = String.valueOf(map.get("termBatchId"));
+                    String termTypeId = String.valueOf(map.get("termTypeId"));
+                    String sn = String.valueOf(map.get("termId"));
+
+                    OActivityExample oActivityExample = new OActivityExample();
+                    OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
+                    activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                    activityCriteria.andBusProCodeEqualTo(termActiveId);
+                    activityCriteria.andBusProNameEqualTo(termActiveName);
+                    activityCriteria.andTermBatchcodeEqualTo(termBatchId);
+                    activityCriteria.andTermtypeEqualTo(termTypeId);
+                    List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
+                    if(oActivities==null){
+                        throw new MessageException(sn+"活动未找到");
+                    }
+                    if(oActivities.size()==0){
+                        throw new MessageException(sn+"活动未找到");
+                    }
+                    Set<BigDecimal> priceSet = new HashSet<>();
+                    for (OActivity oActivity : oActivities) {
+                        priceSet.add(oActivity.getPrice());
+                    }
+                    if(priceSet.size()!=1){
+                        throw new MessageException(sn+"价格配置错误");
+                    }
+                    actSet.add(oActivities.get(0));
+                }
+                if(actSet.size()!=1){
+                    throw new MessageException(snStart+"到"+snEnd+":活动不一致,请分开上传");
+                }
+                for (Map<String, Object> map : data) {
+                    String sn = String.valueOf(map.get("termId"));
+                    Map<String,String> redisMap = new HashMap<>();
+                    redisMap.put("sn",sn);
+                    redisMap.put("termActiveId",String.valueOf(map.get("termActiveId")));
+                    redisMap.put("termActiveName",String.valueOf(map.get("termActiveName")));
+                    redisMap.put("termBatchId",String.valueOf(map.get("termBatchId")));
+                    redisMap.put("termTypeId",String.valueOf(map.get("termTypeId")));
+                    redisMap.put("termCheck",String.valueOf(map.get("termCheck")));
+                    redisMap.put("agencyId",String.valueOf(map.get("agencyId")));
+                    redisMap.put("agencyName",String.valueOf(map.get("agencyName")));
+                    redisService.hSet(snStart+","+snEnd,sn, JsonUtil.objectToJson(redisMap));
+                }
+                res.putKeyV("snStart",snStart).putKeyV("snEnd",snEnd).putKeyV("activity",actSet);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MessageException("查询机具sn异常:"+e.getLocalizedMessage());
+            }
+        }else {
+            try {
+                AgentResult agentResult = termMachineService.querySnMsg(PlatformType.POS,snStart, snEnd);
+                if(!agentResult.isOK()){
+                    throw new MessageException("查询pos失败");
+                }
+                JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
+                JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
+                System.out.println(String.valueOf(data.get("termMachineList")));
+                List<Map<String,Object>> termMachineListMap = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(data.get("termMachineList")));
+                if(termMachineListMap.size()!=Integer.parseInt(count)){
+                    logger.info("查询pos根据SN号段查询机具信息数量：{},count:{}",termMachineListMap.size(),count);
+                    throw new MessageException("请检查sn有效性");
+                }
+                for (Map<String, Object> map : termMachineListMap) {
+                    String posSn = String.valueOf(map.get("posSn"));
+                    String tmsModel = String.valueOf(map.get("tmsModel"));
+                    String machineManufName = String.valueOf(map.get("machineManufName"));
+                    String machineId = String.valueOf(map.get("machineId"));
+                    String posType = String.valueOf(map.get("posType"));
+                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
+                    if (manufaName == null) {
+                        throw new MessageException(machineManufName+"厂商不存在");
+                    }
+                    String manufaValue = manufaName.getdItemvalue();//厂商
+                    OActivityExample oActivityExample = new OActivityExample();
+                    OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
+                    activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                    activityCriteria.andVenderEqualTo(manufaValue);
+                    activityCriteria.andProModelEqualTo(tmsModel);
+                    activityCriteria.andPosTypeEqualTo(posType);
+                    activityCriteria.andBusProCodeEqualTo(machineId);
+                    List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
+                    if(oActivities==null){
+                        throw new MessageException(posSn+"活动未找到");
+                    }
+                    if(oActivities.size()==0){
+                        throw new MessageException(posSn+"活动未找到");
+                    }
+                    Set<BigDecimal> priceSet = new HashSet<>();
+                    for (OActivity oActivity : oActivities) {
+                        priceSet.add(oActivity.getPrice());
+                    }
+                    if(priceSet.size()!=1){
+                        throw new MessageException(posSn+"价格配置错误");
+                    }
+                    actSet.add(oActivities.get(0));
+                }
+                if(actSet.size()!=1){
+                    throw new MessageException(snStart+"到"+snEnd+":活动不一致,请分开上传");
+                }
+                for (Map<String, Object> map : termMachineListMap) {
+                    Map<String,String> redisMap = new HashMap<>();
+                    String posSn = String.valueOf(map.get("posSn"));
+                    redisMap.put("posSn",posSn);
+                    redisMap.put("tmsModel",String.valueOf(map.get("tmsModel")));
+                    String machineManufName = String.valueOf(map.get("machineManufName"));
+                    redisMap.put("machineManufName",machineManufName);
+                    redisMap.put("machineId",String.valueOf(map.get("machineId")));
+                    redisMap.put("posType",String.valueOf(map.get("posType")));
+                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
+                    if (manufaName == null) {
+                        throw new MessageException(machineManufName + "厂商不存在");
+                    }
+                    String manufaValue = manufaName.getdItemvalue();//厂商
+                    redisMap.put("manufaValue",manufaValue);
+                    redisService.hSet(snStart+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
+                }
+                res.putKeyV("snStart",snStart).putKeyV("snEnd",snEnd).putKeyV("activity",actSet);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new MessageException(e.getMessage());
+            }
+        }
+        AgentResult agentResult = AgentResult.ok();
+        agentResult.setMapData(res);
+        return agentResult;
     }
 }

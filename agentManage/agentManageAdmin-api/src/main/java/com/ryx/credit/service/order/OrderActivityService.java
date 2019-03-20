@@ -33,4 +33,14 @@ public interface OrderActivityService {
     Map selectTermMachine(String platformNum) throws MessageException;
 
     List<Map<String,String>> planChoiseProComAndModel(String productId,String orderId);
+
+    /**
+     * 从业务平台获取sn信息并匹配本地相关活动
+     * @param snStart
+     * @param snEnd
+     * @param count
+     * @param proModel POS 手刷
+     * @return
+     */
+    AgentResult querySnInfoFromBusSystem(String snStart,String snEnd,String count,String proModel)throws MessageException;
 }
