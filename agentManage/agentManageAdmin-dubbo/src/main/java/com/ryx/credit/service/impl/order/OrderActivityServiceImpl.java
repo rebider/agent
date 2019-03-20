@@ -450,7 +450,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
-                res.putKeyV("snStart",snStart).putKeyV("snEnd",snEnd).putKeyV("activity",actSet).putKeyV("modelType",modelType.getdItemvalue());
+                res.putKeyV("snStart",snStart)
+                        .putKeyV("snEnd",snEnd)
+                        .putKeyV("count",count)
+                        .putKeyV("activity",actSet)
+                        .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:"+e.getLocalizedMessage());
@@ -527,7 +531,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
-                res.putKeyV("snStart",snStart).putKeyV("snEnd",snEnd).putKeyV("activity",actSet).putKeyV("modelType",modelType.getdItemvalue());
+                res.putKeyV("snStart",snStart)
+                        .putKeyV("snEnd",snEnd)
+                        .putKeyV("count",count)
+                        .putKeyV("activity",actSet)
+                        .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException(e.getMessage());
