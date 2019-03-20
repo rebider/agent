@@ -447,6 +447,9 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisMap.put("agencyName",String.valueOf(map.get("agencyName")));
                     redisService.hSet(snStart+","+snEnd,sn, JsonUtil.objectToJson(redisMap));
                 }
+                for (OActivity activity : actSet) {
+                    redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
+                }
                 res.putKeyV("snStart",snStart).putKeyV("snEnd",snEnd).putKeyV("activity",actSet);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -519,6 +522,10 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     String manufaValue = manufaName.getdItemvalue();//厂商
                     redisMap.put("manufaValue",manufaValue);
                     redisService.hSet(snStart+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
+                }
+                //号段活动存储在redis中
+                for (OActivity activity : actSet) {
+                    redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
                 res.putKeyV("snStart",snStart).putKeyV("snEnd",snEnd).putKeyV("activity",actSet);
             } catch (Exception e) {
