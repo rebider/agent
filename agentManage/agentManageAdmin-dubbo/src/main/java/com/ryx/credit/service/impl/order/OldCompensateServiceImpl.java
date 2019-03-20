@@ -119,6 +119,57 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                     if(!agentResult.isOK()){
                         throw new MessageException("查询手刷失败");
                     }
+                    List<Map<String,Object>> data = (List<Map<String,Object>>)agentResult.getData();
+                    if(data.size()!=Integer.parseInt(count)){
+                        log.info("查询手刷根据SN号段查询机具信息数量：{},count:{}",data.size(),count);
+                        throw new MessageException("请检查sn有效性");
+                    }
+                    for (Map<String, Object> map : data) {
+                        String termActiveId = String.valueOf(map.get("termActiveId"));
+                        String termActiveName = String.valueOf(map.get("termActiveName"));
+                        String termBatchId = String.valueOf(map.get("termBatchId"));
+                        String termTypeId = String.valueOf(map.get("termTypeId"));
+                        String sn = String.valueOf(map.get("termId"));
+
+                        OActivityExample oActivityExample = new OActivityExample();
+                        OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
+                        activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                        activityCriteria.andBusProCodeEqualTo(termActiveId);
+                        activityCriteria.andBusProNameEqualTo(termActiveName);
+                        activityCriteria.andTermBatchcodeEqualTo(termBatchId);
+                        activityCriteria.andTermtypeEqualTo(termTypeId);
+                        List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
+                        if(oActivities==null){
+                            throw new MessageException(sn+"活动未找到");
+                        }
+                        if(oActivities.size()==0){
+                            throw new MessageException(sn+"活动未找到");
+                        }
+                        Set<BigDecimal> priceSet = new HashSet<>();
+                        for (OActivity oActivity : oActivities) {
+                            priceSet.add(oActivity.getPrice());
+                        }
+                        if(priceSet.size()!=1){
+                            throw new MessageException(sn+"价格配置错误");
+                        }
+                        actSet.add(oActivities.get(0).getId());
+                    }
+                    if(actSet.size()!=1){
+                        throw new MessageException(snBegin+"到"+snEnd+":活动不一致,请分开上传");
+                    }
+                    for (Map<String, Object> map : data) {
+                        String sn = String.valueOf(map.get("termId"));
+                        Map<String,String> redisMap = new HashMap<>();
+                        redisMap.put("sn",sn);
+                        redisMap.put("termActiveId",String.valueOf(map.get("termActiveId")));
+                        redisMap.put("termActiveName",String.valueOf(map.get("termActiveName")));
+                        redisMap.put("termBatchId",String.valueOf(map.get("termBatchId")));
+                        redisMap.put("termTypeId",String.valueOf(map.get("termTypeId")));
+                        redisMap.put("termCheck",String.valueOf(map.get("termCheck")));
+                        redisMap.put("agencyId",String.valueOf(map.get("agencyId")));
+                        redisMap.put("agencyName",String.valueOf(map.get("agencyName")));
+                        redisService.hSet(snBegin+","+snEnd,sn, JsonUtil.objectToJson(redisMap));
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -642,8 +693,13 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 cav.setOldAct(activity_old.getBusProCode());
                 cav.setOptUser(row.getcUser());
 
-//                cav.setSnStart(row.getBeginSn()+(detailstart.getTerminalidCheck()==null?"":detailstart.getTerminalidCheck()));
-//                cav.setSnEnd(detailend.getSnNum()+(detailend.getTerminalidCheck()==null?"":detailend.getTerminalidCheck()));
+                String snBeginJson = redisService.hGet(row.getBeginSn() + "," + row.getEndSn(), row.getBeginSn());
+                Map<String, Object> snBeginMap = JsonUtil.jsonToMap(snBeginJson);
+                String snEndJson = redisService.hGet(row.getBeginSn() + "," + row.getEndSn(), row.getEndSn());
+                Map<String, Object> snEndMap = JsonUtil.jsonToMap(snEndJson);
+
+                cav.setSnStart(row.getBeginSn()+(StringUtils.isBlank(String.valueOf(snBeginMap.get("termCheck")))?"":String.valueOf(snBeginMap.get("termCheck"))));
+                cav.setSnEnd(row.getEndSn()+(StringUtils.isBlank(String.valueOf(snEndMap.get("termCheck")))?"":String.valueOf(snEndMap.get("termCheck"))));
 
                 cav.setPlatformType(platformType.code);
                 cav.setoRefundPriceDiffDetailId(row.getId());
