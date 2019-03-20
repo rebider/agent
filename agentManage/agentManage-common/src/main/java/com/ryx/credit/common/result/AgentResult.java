@@ -41,6 +41,11 @@ public class AgentResult implements Serializable{
         return new AgentResult(null);
     }
 
+    public static AgentResult ok(Map<String,Object> mapData) {
+        AgentResult res = new AgentResult(null);
+        return res;
+    }
+
     public static AgentResult fail() {
         return build(500,"失败");
     }
