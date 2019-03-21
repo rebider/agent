@@ -61,6 +61,9 @@ public class OReturnOrderDetail implements Serializable {
 
     private BigDecimal version;
 
+    //活动id
+    private OActivity act;
+
     public String getId() {
         return id;
     }
@@ -283,5 +286,14 @@ public class OReturnOrderDetail implements Serializable {
 
     public void setVersion(BigDecimal version) {
         this.version = version;
+    }
+
+
+    public OActivity getAct() {
+        return act;
+    }
+
+    public void setAct(OActivity act) {
+        this.act = act;
     }
 }

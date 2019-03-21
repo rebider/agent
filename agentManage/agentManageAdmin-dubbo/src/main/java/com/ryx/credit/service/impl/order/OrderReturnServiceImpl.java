@@ -1999,7 +1999,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
 
-        List<String> idList = new OLogisticServiceImpl().idList(startSn, endSn, begins, finish,ol.getProCom());
+        List<String> idList = oLogisticsService.idList(startSn, endSn, begins, finish,ol.getProCom());
         List<OLogisticsDetail> detailList = new ArrayList<>();
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {

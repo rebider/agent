@@ -447,12 +447,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisMap.put("agencyName",String.valueOf(map.get("agencyName")));
                     redisService.hSet(snStart+","+snEnd,sn, JsonUtil.objectToJson(redisMap));
                 }
+                redisService.delete(snStart+","+snEnd+"_act");
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
                         .putKeyV("count",count)
+                        .putKeyV("price",oActivity.getPrice())
+                        .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity",actSet);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -527,12 +531,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisService.hSet(snStart+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
                 }
                 //号段活动存储在redis中
+                redisService.delete(snStart+","+snEnd+"_act");
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
                         .putKeyV("count",count)
+                        .putKeyV("price",oActivity.getPrice())
+                        .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity",actSet);
             } catch (Exception e) {
                 e.printStackTrace();

@@ -81,4 +81,12 @@ public interface OldOrderReturnService {
      * @throws Exception
      */
      void approvalFinish(String processInstanceId, String activityName) throws Exception;
+
+    /**
+     * 解析上传文件
+     * @param excelList
+     * @return
+     * @throws MessageException
+     */
+    public AgentResult parseExcel(List<List<Object>> excelList)throws MessageException;
 }

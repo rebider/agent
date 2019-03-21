@@ -170,7 +170,8 @@ public class AgentResult implements Serializable{
         return mapData;
     }
 
-    public void setMapData(Map<String, Object> mapData) {
+    public AgentResult setMapData(Map<String, Object> mapData) {
         this.mapData = mapData;
+        return this;
     }
 }
