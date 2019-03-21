@@ -29,6 +29,7 @@ import com.ryx.credit.service.dict.IdService;
 import com.ryx.credit.service.order.CompensateService;
 import com.ryx.credit.service.order.OCashReceivablesService;
 import com.ryx.credit.service.order.OrderActivityService;
+import com.ryx.credit.service.order.ProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +105,10 @@ public class CompensateServiceImpl implements CompensateService {
     private OCashReceivablesService cashReceivablesService;
     @Autowired
     private RedisService redisService;
-    
+    @Autowired
+    private ProductService productService;
+
+
 
     @Override
     public ORefundPriceDiff selectByPrimaryKey(String id){
@@ -987,6 +991,32 @@ public class CompensateServiceImpl implements CompensateService {
             for (ORefundPriceDiffDetail oRefundPriceDiffDetail : oRefundPriceDiffDetails) {
                 OActivity oActivity = activityMapper.selectByPrimaryKey(oRefundPriceDiffDetail.getActivityFrontId());
                 oRefundPriceDiffDetail.setActivityFront(oActivity);
+
+                OActivityExample oActivityExample = new OActivityExample();
+                OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
+                activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
+                activityCriteria.andActCodeNotEqualTo(oActivity.getActCode());
+                activityCriteria.andVenderEqualTo(oActivity.getVender());
+                activityCriteria.andProModelEqualTo(oActivity.getProModel());
+                activityCriteria.andPlatformEqualTo(oActivity.getPlatform());
+                activityCriteria.andProTypeEqualTo(oActivity.getProType());
+                Date date = new Date();
+                activityCriteria.andBeginTimeLessThanOrEqualTo(date);
+                activityCriteria.andEndTimeGreaterThanOrEqualTo(date);
+                List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
+                oRefundPriceDiffDetail.setoActivities(oActivities);
+
+                OProduct oProduct = productService.findById(oRefundPriceDiffDetail.getProId());
+                OProduct product = new OProduct();
+                product.setProType(oProduct.getProType());
+                List<Map> proMaps = productService.queryGroupByProCode(product);
+                for (Map proMap : proMaps) {
+                    if(String.valueOf(proMap.get("proName")).equals("流量卡")){
+                        proMaps.remove(proMap);
+                        break;
+                    }
+                }
+                oRefundPriceDiffDetail.setProMaps(proMaps);
             }
         }
         oRefundPriceDiff.setRefundPriceDiffDetailList(oRefundPriceDiffDetails);

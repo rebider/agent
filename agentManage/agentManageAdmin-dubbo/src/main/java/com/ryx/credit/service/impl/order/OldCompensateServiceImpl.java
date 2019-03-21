@@ -1,7 +1,5 @@
 package com.ryx.credit.service.impl.order;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -603,6 +601,95 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 throw new ProcessException("处理失败");
             }
         });
+        return AgentResult.ok();
+    }
+
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW,isolation = Isolation.DEFAULT,rollbackFor = Exception.class)
+    @Override
+    public AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                         List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList) {
+
+        try {
+            if(null==refundPriceDiffDetailList){
+                throw new ProcessException("退补差价明细数据为空");
+            }
+            if(null==oRefundPriceDiff){
+                throw new ProcessException("退补差价金额数据为空");
+            }
+            refundPriceDiffDetailList.forEach(row->{
+                //查询最新活动
+                OActivity oActivity = activityMapper.selectByPrimaryKey(row.getActivityRealId());
+                ORefundPriceDiffDetail oRefundPriceDiffDetail = refundPriceDiffDetailMapper.selectByPrimaryKey(row.getId());
+                oRefundPriceDiffDetail.setActivityRealId(row.getActivityRealId());
+                oRefundPriceDiffDetail.setActivityName(oActivity.getActivityName());
+                oRefundPriceDiffDetail.setActivityWay(oActivity.getActivityWay());
+                oRefundPriceDiffDetail.setActivityRule(oActivity.getActivityRule());
+                oRefundPriceDiffDetail.setPrice(oActivity.getPrice());
+                oRefundPriceDiffDetail.setProId(row.getProId());
+                oRefundPriceDiffDetail.setProName(row.getProName());
+                int i = refundPriceDiffDetailMapper.updateByPrimaryKeySelective(oRefundPriceDiffDetail);
+                if(i!=1){
+                    throw new ProcessException("修改退补差价数据失败");
+                }
+            });
+            if(null==oRefundPriceDiff.getId()){
+                throw new ProcessException("退补差价数据id为空");
+            }
+            BigDecimal belowPayAmt = new BigDecimal(0);
+            BigDecimal shareDeductAmt = new BigDecimal(0);
+            for (OCashReceivablesVo oCashReceivablesVo : cashReceivablesVoList) {
+                if(oCashReceivablesVo.getPayType().equals(PayType.YHHK.code)){
+                    belowPayAmt = belowPayAmt.add(oCashReceivablesVo.getAmount());
+                }else if(oCashReceivablesVo.getPayType().equals(PayType.FRDK.code)){
+                    shareDeductAmt = shareDeductAmt.add(oCashReceivablesVo.getAmount());
+                }
+            }
+            oRefundPriceDiff.setBelowPayAmt(belowPayAmt);
+            oRefundPriceDiff.setShareDeductAmt(shareDeductAmt);
+            int k = refundPriceDiffMapper.updateByPrimaryKeySelective(oRefundPriceDiff);
+            if(k!=1){
+                throw new ProcessException("更新退补差价数据失败");
+            }
+            //附件修改
+            if(null!=refundPriceDiffFile){
+                AttachmentRelExample attachmentRelExample = new AttachmentRelExample();
+                AttachmentRelExample.Criteria criteria = attachmentRelExample.createCriteria();
+                criteria.andSrcIdEqualTo(oRefundPriceDiff.getId());
+                criteria.andBusTypeEqualTo(AttachmentRelType.ActivityEdit.name());
+                List<AttachmentRel> attachmentRels = attachmentRelMapper.selectByExample(attachmentRelExample);
+                attachmentRels.forEach(row->{
+                    row.setStatus(Status.STATUS_0.status);
+                    int i = attachmentRelMapper.updateByPrimaryKeySelective(row);
+                    if (1 != i) {
+                        log.info("删除活动变更附件关系失败");
+                        throw new ProcessException("删除附件失败");
+                    }
+                });
+
+                refundPriceDiffFile.forEach(row->{
+                    AttachmentRel record = new AttachmentRel();
+                    record.setAttId(row);
+                    record.setSrcId(oRefundPriceDiff.getId());
+                    record.setcUser(cUser);
+                    record.setcTime(Calendar.getInstance().getTime());
+                    record.setStatus(Status.STATUS_1.status);
+                    record.setBusType(AttachmentRelType.ActivityEdit.name());
+                    record.setId(idService.genId(TabId.a_attachment_rel));
+                    int i = attachmentRelMapper.insertSelective(record);
+                    if (1 != i) {
+                        log.info("活动变更附件关系失败");
+                        throw new ProcessException("系统异常");
+                    }
+                });
+            }
+            ORefundPriceDiff refundPriceDiff = refundPriceDiffMapper.selectByPrimaryKey(oRefundPriceDiff.getId());
+            cashReceivablesService.addOCashReceivables(cashReceivablesVoList,cUser,refundPriceDiff.getAgentId(),CashPayType.REFUNDPRICEDIFF,oRefundPriceDiff.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("退补差价修改失败");
+            throw new ProcessException("退补差价修改失败");
+        }
         return AgentResult.ok();
     }
 

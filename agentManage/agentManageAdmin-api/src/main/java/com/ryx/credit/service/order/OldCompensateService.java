@@ -31,4 +31,8 @@ public interface OldCompensateService {
     BigDecimal calculatePriceDiff(String oldActivityId, String activityId, BigDecimal proNum)throws Exception;
 
     AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
+
+    AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                  List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList);
+
 }
