@@ -191,9 +191,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
             List<String>  listAct =  redisService.lrange(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_act",0,-1);
-
             OActivity oActivity = oActivityMapper.selectByPrimaryKey(listAct.get(0));
-
             oReturnOrderDetail.setId(idService.genId(TabId.o_return_order_detail));
             oReturnOrderDetail.setReturnId(oReturnOrder.getId());
             oReturnOrderDetail.setAgentId(oldOrderReturnVo.getAgentId());
@@ -265,6 +263,10 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         OReturnOrderDetailExample oReturnOrderDetailExample = new OReturnOrderDetailExample();
         oReturnOrderDetailExample.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
         List<OReturnOrderDetail> details  =returnOrderDetailMapper.selectByExample(oReturnOrderDetailExample);
+        for (OReturnOrderDetail detail : details) {
+            List<String> listAct = redisService.lrange(detail.getBeginSn()+","+detail.getEndSn()+"_act",0,-1);
+            detail.setAct(listAct.size()>0?oActivityMapper.selectByPrimaryKey(listAct.get(0)):null);
+        }
         AgentResult agentResult = AgentResult.ok();
         agentResult.setMapData(
                 FastMap.fastMap("details",details).putKeyV("oReturnOrder",oReturnOrder)
