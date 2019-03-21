@@ -12,7 +12,8 @@ import java.util.function.BiConsumer;
 public class OldOrderReturnSubmitProVo implements Serializable {
 
     private String proId,proName,proType,snStart,snEnd;
-    BigDecimal returnCount;
+    BigDecimal returnCount,price,amt;
+
 
     public String getProId() {
         return proId;
@@ -60,5 +61,21 @@ public class OldOrderReturnSubmitProVo implements Serializable {
 
     public void setReturnCount(BigDecimal returnCount) {
         this.returnCount = returnCount;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getAmt() {
+        return amt;
+    }
+
+    public void setAmt(BigDecimal amt) {
+        this.amt = amt;
     }
 }

@@ -450,9 +450,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
                         .putKeyV("count",count)
+                        .putKeyV("price",oActivity.getPrice())
+                        .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity",actSet);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -530,9 +533,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
                         .putKeyV("count",count)
+                        .putKeyV("price",oActivity.getPrice())
+                        .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity",actSet);
             } catch (Exception e) {
                 e.printStackTrace();
