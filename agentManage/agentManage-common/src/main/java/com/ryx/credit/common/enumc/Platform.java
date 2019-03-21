@@ -23,7 +23,11 @@ public enum Platform {
     REF("100004","POS-瑞e付"),
     RYF("100005","POS-瑞银付"),
     RXS("100006","POS-瑞享送"),
-    RF("100007","POS-瑞付");
+    RF("100007","POS-瑞付"),
+    RYT("100008","POS-瑞银通"),
+    RLS("100009","POS-瑞乐送"),
+    RYS("100010","POS-瑞银送"),
+    RET("100011","POS-瑞易通");
 
     public String code;
 
