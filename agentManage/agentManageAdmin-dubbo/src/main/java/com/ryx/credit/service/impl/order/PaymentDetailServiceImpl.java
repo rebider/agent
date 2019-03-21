@@ -389,42 +389,12 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
 
         if (payStatus.compareTo(PaySign.FKING.code)==0){//付款中
             for (Map<String, Object> map : maps) {
-                //机具汇总传数据
-                if (map.get("tools")!=null){
 
-                    String detailId = (String) map.get("detailId");//付款明细id
+
+                    String detailId = (String) map.get("detailId");//付款汇总id
                     String srcId = (String) map.get("srcId");//付款源id
                     if (StringUtils.isBlank(detailId)) {
-                        logger.info("付款明细ID为空:{}", detailId);
-                        throw new ProcessException("付款明细ID为空");
-                    }
-                    if (StringUtils.isBlank(srcId)) {
-                        logger.info("付款源ID为空:{}", srcId);
-                        throw new ProcessException("付款源ID为空");
-                    }
-                    //分别去查询付款单数据  和    付款明细的数据
-                    OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-                    OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
-                    criteria.andOPdSumIdEqualTo(detailId);
-                    criteria.andStatusEqualTo(Status.STATUS_1.status);
-                    List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-                    if (oPaymentDetails.size()==0)
-                        throw new ProcessException("没有查找到相关数据");
-                    for (OPaymentDetail oPaymentDetail:oPaymentDetails) {
-                        oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
-                        oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
-                        oPaymentDetail.setSrcId(srcId);
-                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
-                            logger.info("付款明细更新数据失败");
-                            throw new ProcessException("付款明细更新数据失败");
-                        }
-                    }
-                }else{
-
-                    String detailId = (String) map.get("detailId");//付款明细id
-                    String srcId = (String) map.get("srcId");//付款源id
-                    if (StringUtils.isBlank(detailId)) {
-                        logger.info("付款明细ID为空:{}", detailId);
+                        logger.info("付款汇总idID为空:{}", detailId);
                         throw new ProcessException("付款明细ID为空");
                     }
                     if (StringUtils.isBlank(srcId)) {
@@ -447,7 +417,7 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                         logger.info("付款明细更新数据失败");
                         throw new ProcessException("付款明细更新数据失败");
                     }
-                }
+
 
 
 

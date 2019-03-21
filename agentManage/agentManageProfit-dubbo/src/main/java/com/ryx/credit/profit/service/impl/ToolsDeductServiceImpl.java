@@ -265,7 +265,6 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                             Map<String, Object> successMap = new HashMap<String, Object>(2);
                             successMap.put("detailId", map.get("ID"));
                             successMap.put("srcId", profitDeduction.getId());
-                            successMap.put("tools", "tools");
                             successList.add(successMap);
                         }
                     } catch (Exception e) {
@@ -276,27 +275,11 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
                 }
             }
 
-            LOG.info("通知订单系统，付款中订单信息：{} ", JSONObject.toJSON(successList));
+
             try {
-                if(successList.size() > 0){
-                    for (Map map  :successList) {
-                            OPdSum oPdSum = new OPdSum();
-                            oPdSum.setId(map.get("detailId").toString());
-                            oPdSum.setSumStatus("Deduction_lok");
-                            oPdSum.setPaySrc(map.get("srcId").toString());
+                LOG.info("通知订单系统，付款中订单信息：{} ", JSONObject.toJSON(successList));
+                ioPdSumService.uploadStatus(successList, PaySign.FKING.code);
 
-                            try{
-                                ioPdSumService.updateByPrimaryKeySelective(oPdSum);
-                            }catch (Exception e){
-                                e.getMessage();
-                                throw new ProcessException("机具付款汇总更新数据失败");
-                            }
-
-
-                    }
-                 //通知订单系统，订单付款中
-                    iPaymentDetailService.uploadStatus(successList, PaySign.FKING.code);
-                }
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new ProcessException("通知订单系统更新付款中状态异常");

@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.PamentSrcType;
 import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
@@ -8,6 +9,7 @@ import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.service.*;
+import com.ryx.credit.service.order.IOPdSumService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+    @Autowired
+    private IOPdSumService OPdSumService;
+
     private static final String RHB = "5000";
     private static final String POS = "100003";
     private static final String ZPOS = "100002";
@@ -413,10 +418,12 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 map.put("notDeductionAmt", notDeductionAmt.toString());
                 map.put("detailId", deduction.getSourceId());
                 map.put("srcId", deduction.getId());
+                map.put("srcType", PamentSrcType.FENRUN_DIKOU.code);
                 noticeList.add(map);
             }
-            LOG.info("系统已经终审，通知订单系统，机具款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
-            iPaymentDetailService.uploadStatus(noticeList, PaySign.JQ.code);
+
+            LOG.info("系统已经终审，通知订单系统，机具汇总款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
+            OPdSumService.uploadStatus(noticeList, PaySign.JQ.code);
         }
     }
 
