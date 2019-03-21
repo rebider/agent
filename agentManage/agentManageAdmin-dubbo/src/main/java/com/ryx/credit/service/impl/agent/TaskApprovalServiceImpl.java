@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.ApprovalType;
-import com.ryx.credit.common.enumc.Platform;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -104,6 +101,28 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
 
         if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+            //判断打款方式--->银行汇款  是否填写了实际到账金额
+            for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
+                if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
+                    if (null==capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")){
+                        logger.info("请填写实际到账金额");
+                        throw new ProcessException("请填写实际到账金额");
+                    }
+
+                }
+                Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
+                capitalVo.setcUtime(new Date());
+                capitalVo.setVersion(capital.getVersion());
+                capitalVo.setcInAmount(capitalVo.getcInAmount());
+                capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                capitalVo.setId(capitalVo.getId());
+                int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
+                if(i!=1){
+                    logger.info("实际到账金额填写失败");
+                    throw new ProcessException("实际到账金额填写失败");
+                }
+            }
+
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
@@ -152,21 +171,6 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if(i!=1){
                     throw new ProcessException("更新打款公司或业务所属上级异常");
-                }
-            }
-
-            //财务填写实际到账时间
-            for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
-                Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
-                capitalVo.setcUtime(new Date());
-                capitalVo.setVersion(capital.getVersion());
-                capitalVo.setcInAmount(capitalVo.getcInAmount());
-                capitalVo.setcFqInAmount(capitalVo.getcInAmount());
-                capitalVo.setId(capitalVo.getId());
-                int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
-                if(i!=1){
-                    logger.info("实际到账金额填写失败");
-                    throw new ProcessException("实际到账金额填写失败");
                 }
             }
         }
