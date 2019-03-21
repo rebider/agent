@@ -41,8 +41,9 @@ public class AgentResult implements Serializable{
         return new AgentResult(null);
     }
 
-    public static AgentResult ok(Map<String,Object> mapData) {
+    public static AgentResult okMap(Map<String,Object> mapData) {
         AgentResult res = new AgentResult(null);
+        res.setMapData(mapData);
         return res;
     }
 

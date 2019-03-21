@@ -13,6 +13,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
+import com.ryx.credit.machine.vo.AdjustmentMachineVo;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
@@ -1105,7 +1106,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String sBusProCode= "";
             for (OLogisticsDetail forsendSn : listDetails) {
                 listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
-                        ,forsendSn.getSnNum()+forsendSn.getTerminalidCheck()
+                        ,forsendSn.getSnNum()+(forsendSn.getTerminalidCheck()==null?"":forsendSn.getTerminalidCheck())
                         ,forsendSn.getTerminalidKey()
                         ,forsendSn.getBusProCode()
                         ,forsendSn.getTermtype()));

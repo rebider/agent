@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public enum Oreturntype {
 
-    NE("NE","新订单"),
+    NEW("NEW","新订单"),
     OLD("OLD","历史订单");
 
     public String code;

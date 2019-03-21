@@ -190,6 +190,18 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         BigDecimal tt = BigDecimal.ZERO;
         OReturnOrderDetail oReturnOrderDetail = new OReturnOrderDetail();
         for (OldOrderReturnSubmitProVo oldOrderReturnSubmitProVo : oldOrderReturnVo.getOldOrderReturnSubmitProVoList()) {
+            OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+            oLogisticsDetailExample.or()
+                    .andSnNumGreaterThanOrEqualTo(oldOrderReturnSubmitProVo.getSnStart())
+                    .andSnNumLessThanOrEqualTo(oldOrderReturnSubmitProVo.getSnEnd());
+            List<OLogisticsDetail>  details = logisticsDetailMapper.selectByExample(oLogisticsDetailExample);
+            if(details.size()>0){
+                StringBuffer sb = new StringBuffer();
+                for (OLogisticsDetail detail : details) {
+                    sb.append(detail.getSnNum()).append(",");
+                }
+                throw new MessageException(oldOrderReturnSubmitProVo.getSnStart()+"-"+oldOrderReturnSubmitProVo.getSnEnd()+"["+sb.toString()+"]非历史订单机具，请前往退货服务进行申请");
+            }
             List<String>  listAct =  redisService.lrange(oldOrderReturnSubmitProVo.getSnStart()+","+oldOrderReturnSubmitProVo.getSnEnd()+"_act",0,-1);
             OActivity oActivity = oActivityMapper.selectByPrimaryKey(listAct.get(0));
             oReturnOrderDetail.setId(idService.genId(TabId.o_return_order_detail));
@@ -219,6 +231,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
         }
 
         //退货单添加
+        oReturnOrder.setGoodsReturnAmo(tt);
         oReturnOrder.setReturnAmo(tt);
         logger.info("历史退货单申请 {} {} {} {}",oldOrderReturnVo.getUserId(),oldOrderReturnVo.getAgentId(),oldOrderReturnVo.getRemark(),oReturnOrder.getId());
         if(1!=returnOrderMapper.insertSelective(oReturnOrder)){
@@ -279,9 +292,9 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
     @Override
     public AgentResult taskApprove(AgentVo agentVo, String userId)throws MessageException {
 
-        //业务部审批提交排单信息，fixme 业务部如果没有排单信息提示必须进行排单
+        //业务部审批提交排单信息， 业务部如果没有排单信息提示必须进行排单
         OReturnOrder oReturnOrder = returnOrderMapper.selectByPrimaryKey(agentVo.getReturnId());
-        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business1_id",""))) {
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_business1_id","")) && "pass".equals(agentVo.getApprovalResult())) {
             if(StringUtils.isBlank(agentVo.getPlans())){
                 throw new MessageException("排单信息不能为空");
             }
@@ -298,9 +311,18 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     throw new MessageException(e.getLocalizedMessage());
                 }
             }
+            //没有补全历史退货订单信息必须补全历史订单信息
+            OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+            example.or().andReturnIdEqualTo(oReturnOrder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
+            for (OReturnOrderDetail oReturnOrderDetail : list) {
+                if(StringUtils.isBlank(oReturnOrderDetail.getOrderId())){
+                    throw new MessageException("请先保存退货历史订单信息["+oReturnOrderDetail.getBeginSn()+":"+oReturnOrderDetail.getEndSn()+"]");
+                }
+            }
         }
         //保存抵扣信息
-        if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0){
+        if(agentVo.getDeductCapitalList()!=null && agentVo.getDeductCapitalList().size()>0 && "pass".equals(agentVo.getApprovalResult())){
             for (ODeductCapital oDeductCapital : agentVo.getDeductCapitalList()) {
                 if(null!=oDeductCapital.getcAmount() && oDeductCapital.getcAmount().compareTo(BigDecimal.ZERO)>0) {
                     iOrderReturnService.saveCut(agentVo.getReturnId(), oDeductCapital.getcAmount().toString(), oDeductCapital.getcType());
@@ -308,7 +330,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             }
         }
         //财务二级审批
-        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_finc2_id",""))) {
+        if(agentVo.getSid().equals(AppConfig.getProperty("old_refund_finc2_id","")) && "pass".equals(agentVo.getApprovalResult())) {
             //财务最后审批时上传打款凭证,并且是已经执行退款方案
             if (agentVo.getApprovalResult()!=null && ApprovalType.PASS.getValue().equals(agentVo.getApprovalResult())) {
                 OAccountAdjustExample oAccountAdjustExample = new OAccountAdjustExample();
@@ -356,7 +378,73 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             throw new MessageException("审批任务处理失败！");
         }
     }
-
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
+    @Override
+    public void approvalReject(String processInstanceId, String activityName) throws MessageException{
+        try {
+            logger.info("退货审批拒绝回调:{},{}", processInstanceId, activityName);
+            //审批流关系
+            BusActRel rel = busActRelService.findById(processInstanceId);
+            //退货编号
+            String returnId = rel.getBusId();
+            //更新退货单
+            OReturnOrder returnOrder = returnOrderMapper.selectByPrimaryKey(returnId);
+            returnOrder.setRetSchedule(new BigDecimal(RetSchedule.JJ.code));
+            returnOrder.setuTime(new Date());
+            if(1!=returnOrderMapper.updateByPrimaryKeySelective(returnOrder)){
+                logger.info("更新数据库失败:{},{}", processInstanceId, activityName);
+                throw new MessageException("更新数据库失败");
+            }
+            //删除退货redis sn
+            OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+            example.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
+            List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
+            for (OReturnOrderDetail oReturnOrderDetail : list) {
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
+            }
+            //删除排单和物流
+            List<String> order_return_details_id = new ArrayList<>();
+            for (OReturnOrderDetail order_return_detail : list) {
+                order_return_details_id.add(order_return_detail.getId());
+            }
+            //删除排单计划
+            ReceiptPlanExample receiptPlanExample = new ReceiptPlanExample();
+            receiptPlanExample.or().andReturnOrderDetailIdIn(order_return_details_id);
+            List<ReceiptPlan> receiptPlans = receiptPlanMapper.selectByExample(receiptPlanExample);
+            for (ReceiptPlan receiptPlan : receiptPlans) {
+                String receiptPlanId = receiptPlan.getId();
+                //更新收货单商品表已排单数量
+                String receiptProId = receiptPlan.getProId();
+                OReceiptProExample receiptProExample = new OReceiptProExample();
+                receiptProExample.or().andIdEqualTo(receiptProId);
+                List<OReceiptPro> receiptPros = receiptProMapper.selectByExample(receiptProExample);
+                if (receiptPros != null && receiptPros.size() > 0) {
+                    OReceiptPro receiptPro = receiptPros.get(0);
+                    receiptPro.setSendNum(receiptPro.getSendNum().subtract(receiptPlan.getSendProNum()));
+                    int cts = receiptProMapper.updateByPrimaryKeySelective(receiptPro);
+                    if(cts<=0){
+                        throw new ProcessException("退货退回时更新已排单数量失败，receiptProId={"+receiptProId+"}");
+                    }
+                }
+                //删除物流及物流明细
+                OLogisticsExample logisticsExample = new OLogisticsExample();
+                logisticsExample.or().andReceiptPlanIdEqualTo(receiptPlanId);
+                List<OLogistics> oLogistics = logisticsMapper.selectByExample(logisticsExample);
+                for (OLogistics logistics : oLogistics) {
+                    String logisticsId = logistics.getId();
+                    OLogisticsDetailExample oLogisticsDetailExample = new OLogisticsDetailExample();
+                    oLogisticsDetailExample.or().andLogisticsIdEqualTo(logisticsId);
+                    logisticsDetailMapper.deleteByExample(oLogisticsDetailExample);
+                }
+                logisticsMapper.deleteByExample(logisticsExample);
+            }
+            receiptPlanMapper.deleteByExample(receiptPlanExample);
+        } catch (Exception e) {
+            logger.error("退货审批拒绝回调错误", e);
+            throw e;
+        }
+    }
 
     /**
      * 抓取订单中指定的商品的信息，对业务订单审批界面进行补全
@@ -403,7 +491,42 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             if(StringUtils.isBlank(oldOrderReturnBusEditVo.getActivity()))throw new MessageException("未获取到活动");
             if(StringUtils.isBlank(oldOrderReturnBusEditVo.getProprice()))throw new MessageException("未获取到采购单价");
             if(StringUtils.isBlank(oldOrderReturnBusEditVo.getReturndetailid()))throw new MessageException("未获取到退货明细");
+
+            OOrder order  = oOrderMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getOrderid());
+            if(order==null){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"不存在");
+            }
+            if(!Oreturntype.OLD.code.equals(order.getOxOrder()+"")){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"非历史订单");
+            }
             OProduct product = oProductMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getProductid());
+            //检查订单中是否有此商品
+            OSubOrderExample oSubOrderExample = new OSubOrderExample();
+            oSubOrderExample.or()
+                    .andOrderIdEqualTo(oldOrderReturnBusEditVo.getOrderid())
+                    .andProIdEqualTo(oldOrderReturnBusEditVo.getProductid())
+                   .andStatusEqualTo(Status.STATUS_1.status);
+            List<OSubOrder>  oSubOrderList =oSubOrderMapper.selectByExample(oSubOrderExample);
+            if(oSubOrderList.size()!=1){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"无"+product.getProName()+"商品");
+            }
+            OSubOrder oSubOrder = oSubOrderList.get(0);
+            //检查商品活动是否和此商品一致
+            OSubOrderActivityExample example = new OSubOrderActivityExample();
+            example.or().andSubOrderIdEqualTo(oSubOrder.getId()).andStatusEqualTo(Status.STATUS_1.status);
+            List<OSubOrderActivity> oSubOrderActivityList =oSubOrderActivityMapper.selectByExample(example);
+            if(oSubOrderActivityList.size()!=1){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"无"+product.getProName()+"商品无活动");
+            }
+            //业务部门填写的订单对应的商品的活动
+            OSubOrderActivity oSubOrderActivity = oSubOrderActivityList.get(0);
+
+            OActivity order_activity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
+            //从业务平台获取的活动
+            OActivity bus_activity = oActivityMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getActivity());
+            if(!order_activity.getActCode().equalsIgnoreCase(bus_activity.getActCode())){
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"中"+product.getProName()+"商品的活动与sn活动一致，订单活动["+order_activity.getActCode()+":"+order_activity.getActivityName()+"],业务平台活动["+bus_activity.getActCode()+":"+bus_activity.getActivityName()+"]");
+            }
             OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getReturndetailid());
             oReturnOrderDetail.setOrderId(oldOrderReturnBusEditVo.getOrderid());
             oReturnOrderDetail.setProId(oldOrderReturnBusEditVo.getProductid());
@@ -411,11 +534,11 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             oReturnOrderDetail.setProCode(product.getProCode());
             oReturnOrderDetail.setProType(oldOrderReturnBusEditVo.getModeltype());
             oReturnOrderDetail.setProCom(oldOrderReturnBusEditVo.getManufacturer());
-            oReturnOrderDetail.setProPrice(new BigDecimal(oldOrderReturnBusEditVo.getProprice()));
+            oReturnOrderDetail.setProPrice(bus_activity.getPrice());
             oReturnOrderDetail.setModel(oldOrderReturnBusEditVo.getPromode());
-            oReturnOrderDetail.setOrderPrice(new BigDecimal(oldOrderReturnBusEditVo.getProprice()));
-            oReturnOrderDetail.setReturnPrice(new BigDecimal(oldOrderReturnBusEditVo.getProprice()));
-            oReturnOrderDetail.setReturnAmt(oReturnOrderDetail.getReturnCount().multiply(oReturnOrderDetail.getReturnPrice()).setScale(2,BigDecimal.ROUND_HALF_UP));
+            oReturnOrderDetail.setOrderPrice(bus_activity.getPrice());
+            oReturnOrderDetail.setReturnPrice(bus_activity.getPrice());
+            oReturnOrderDetail.setReturnAmt(oReturnOrderDetail.getReturnCount().multiply(bus_activity.getPrice()).setScale(2,BigDecimal.ROUND_HALF_UP));
             oReturnOrderDetail.setReturnTime(new Date());
             if(StringUtils.isBlank(returnid))returnid = oldOrderReturnBusEditVo.getReturnid();
              if(1!=returnOrderDetailMapper.updateByPrimaryKeySelective(oReturnOrderDetail)){
@@ -762,8 +885,8 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
                 AdjustmentMachineVo vo = new AdjustmentMachineVo();
                 vo.setOptUser(user);
-                vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
-                vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
+                vo.setSnStart(detailstart.getSnNum()+(detailstart.getTerminalidCheck()==null?"":detailstart.getTerminalidCheck()));
+                vo.setSnEnd(detailend.getSnNum()+(detailend.getTerminalidCheck()==null?"":detailend.getTerminalidCheck()));
                 vo.setSnNum(oLogistics.getSendNum().toString());
 
                 //发货订单的业务编号
@@ -866,6 +989,15 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 logger.info("退货审批完成回调:{},{},更新退货单失败", processInstanceId, activityName);
                 throw new MessageException("更新退货单失败");
             }
+            //删除退货redissn
+            OReturnOrderDetailExample example = new OReturnOrderDetailExample();
+            example.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
+            List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
+            for (OReturnOrderDetail oReturnOrderDetail : list) {
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
+                redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
+            }
+
         } catch (Exception e) {
             logger.error("退货审批完成回调异常", e);
             throw e;
@@ -924,12 +1056,19 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                                                         OLogistics oLogistic,
                                                         ReceiptPlan receiptPlan,
                                                         String cUser)throws MessageException{
+        //排单信息
         ReceiptPlan planVo = receiptPlanMapper.selectByPrimaryKey(receiptPlan.getId());
-        String orderId = planVo.getOrderId();//订单ID
-        String proId = planVo.getProId();//收货单商品id
+        //退货sn号段，根据号段获取sn信息
+        OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(planVo.getReturnOrderDetailId());
+        //订单
+        String orderId = planVo.getOrderId();
+        //收货单商品id
+        String proId = planVo.getProId();
+        //收货单商品对象
         OReceiptPro oReceiptPro  = oReceiptProMapper.selectByPrimaryKey(proId);
         OSubOrderExample example = new OSubOrderExample();
         example.or().andOrderIdEqualTo(orderId).andProIdEqualTo(oReceiptPro.getProId()).andStatusEqualTo(Status.STATUS_1.status);
+        //子订单
         List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(example);
         if(oSubOrders.size()==0){
             throw new MessageException("商品价格未能锁定");
@@ -996,6 +1135,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     detail.setPosSpePrice(oSubOrderActivity.getPosSpePrice());
                     detail.setStandTime(oSubOrderActivity.getStandTime());
                 }
+                //查询缓存数据，对从业务平台获取的数据进行解析保存到库里
+                String snData = redisService.hGet(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn(),idSn);
+                logger.info("从缓存中获取从业务平台中获取的sn[{}]信息[{}]",idSn,snData);
+                if(StringUtils.isNotBlank(snData)){
+                    JSONObject snDataJson = JSONObject.parseObject(snData);
+                    detail.setTerminalidCheck(snDataJson.getString("termCheck"));//Sn校验码
+                }
                 detail.setSnNum(idSn);
                 detail.setAgentId(order.getAgentId());
                 detail.setcUser(cUser);
@@ -1019,5 +1165,15 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             }
         }
         return detailList;
+    }
+
+    @Override
+    public AgentResult checkReturnOrderOrderIdIsCompplet(String returnDetailsId){
+        if(StringUtils.isBlank(returnDetailsId))return AgentResult.fail("订单信息未补全");
+        OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(returnDetailsId);
+        if(oReturnOrderDetail==null || StringUtils.isBlank(oReturnOrderDetail.getOrderId())){
+            return AgentResult.fail("订单信息未补全");
+        }
+        return AgentResult.ok();
     }
 }

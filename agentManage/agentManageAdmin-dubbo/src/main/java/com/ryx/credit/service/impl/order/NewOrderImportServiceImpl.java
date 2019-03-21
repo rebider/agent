@@ -273,6 +273,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             }
             orderImportBaseInfo.setOrderImportGoodsInfos(OrderImportGoodsInfos);
             AgentResult agentImport = newOrderImportService.newPareseOrderImportBaseInfo(orderImportBaseInfo,User);
+
             return agentImport;
         } catch (Exception e) {
             e.printStackTrace();

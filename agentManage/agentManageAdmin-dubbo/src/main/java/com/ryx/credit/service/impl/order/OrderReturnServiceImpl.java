@@ -2170,8 +2170,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             AdjustmentMachineVo vo = new AdjustmentMachineVo();
             vo.setOptUser(userId);
-            vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
-            vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
+            vo.setSnStart(detailstart.getSnNum()+(detailstart.getTerminalidCheck()==null?"":detailstart.getTerminalidCheck()));
+            vo.setSnEnd(detailend.getSnNum()+(detailend.getTerminalidCheck()==null?"":detailend.getTerminalidCheck()));
             vo.setSnNum(logistics.getSendNum().toString());
 
             //发货订单的业务编号
@@ -2230,6 +2230,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         return AgentResult.ok();
                     }
+                }catch (MessageException e) {
+                    e.printStackTrace();
+                    logistics.setSendStatus(Status.STATUS_2.status);
+                    logistics.setSendMsg(e.getMsg());
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                        log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
+                    }
+                    return AgentResult.fail(e.getLocalizedMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                     logistics.setSendStatus(Status.STATUS_2.status);
