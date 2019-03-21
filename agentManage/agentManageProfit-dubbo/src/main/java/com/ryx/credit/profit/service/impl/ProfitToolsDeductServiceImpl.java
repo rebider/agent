@@ -310,17 +310,15 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 map.put("notDeductionAmt", notDeductionAmt.toString());
                 map.put("detailId", deduction.getSourceId());
                 map.put("srcId", deduction.getId());
+                map.put("srcType", PamentSrcType.FENRUN_DIKOU.code);
                 noticeList.add(map);
             }
-            LOG.info("系统已经终审，通知订单系统，机具款变更清算状态，通知数据：{}", JSONObject.toJSON(noticeList));
-            iPaymentDetailService.uploadStatus(noticeList, PaySign.JQ.code);
+            LOG.info("系统已经终审，通知订单系统，机具汇总款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
+            OPdSumService.uploadStatus(noticeList, PaySign.JQ.code);
         }
     }
 
-    @Override
-    public void clearDetail() {
 
-    }
 
     /*private void deduceParentAgent(ProfitDeduction profitDeduction, BigDecimal mustAmt, String computType){
         LOG.info("机具扣款流水号：{}，代理商唯一码：{}，汇总分润不足：{}",
@@ -459,7 +457,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
      * @param map
      * @return
      */
-    private Map<String, Object> secondRound(String agentPid, Map<String, Object> map, List<ProfitDeduction> list, String computType) {
+   /* private Map<String, Object> secondRound(String agentPid, Map<String, Object> map, List<ProfitDeduction> list, String computType) {
         List<Map<String, Object>> mergeAgentList= (List<Map<String, Object>>)map.get("hbList");
         for (ProfitDeduction profitDeductionList : list){
             if(profitDeductionList.getNotDeductionAmt().compareTo(BigDecimal.ZERO) == 0){
@@ -554,12 +552,12 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         map.put("hbList", mergeAgentList);
         LOG.info("机具分润扣款响应参数：{}", map);
         return map;
-    }
+    }*/
 
 
-    /**
+   /* *//**
      * 终审后，查询机具未扣款订单，通知订单系统，未扣款订单与金额
-     */
+     *//*
     @Override
     public void otherOperate(){
         String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7).replace("-","");
@@ -586,7 +584,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             LOG.info("系统已经终审，通知订单系统，机具汇总款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
             OPdSumService.uploadStatus(noticeList, PaySign.JQ.code);
         }
-    }
+    }*/
 
     @Override
     public void clearDetail(){
