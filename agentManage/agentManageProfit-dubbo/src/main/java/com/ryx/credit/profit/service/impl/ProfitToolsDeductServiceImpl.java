@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.enumc.PamentSrcType;
 import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
@@ -8,6 +9,7 @@ import com.ryx.credit.profit.pojo.ProfitDeduction;
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.service.*;
+import com.ryx.credit.service.order.IOPdSumService;
 import com.ryx.credit.service.order.IPaymentDetailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,9 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     private ProfitDetailMonthService profitDetailMonthServiceImpl;
     @Autowired
     private IPaymentDetailService iPaymentDetailService;
+    @Autowired
+    private IOPdSumService OPdSumService;
+
     private static final String RHB = "5000";
     private static final String POS = "100003";
     private static final String ZPOS = "100002";
@@ -445,5 +450,146 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             e.printStackTrace();
             throw new Exception("机具扣款更新失败。");
         }
-    }*/
+    }
+
+    /**
+     * 扣除合并代理商的分润，合并代理商的分润被扣完，则将该合并代理从list列表里删除
+     * 代理商代扣的机具款，记录在合并代理商对应的机具实扣列中
+     * @param agentPid
+     * @param map
+     * @return
+     */
+    private Map<String, Object> secondRound(String agentPid, Map<String, Object> map, List<ProfitDeduction> list, String computType) {
+        List<Map<String, Object>> mergeAgentList= (List<Map<String, Object>>)map.get("hbList");
+        for (ProfitDeduction profitDeductionList : list){
+            if(profitDeductionList.getNotDeductionAmt().compareTo(BigDecimal.ZERO) == 0){
+                continue;
+            }
+            Iterator<Map<String, Object>> iter = mergeAgentList.iterator();
+            while (iter.hasNext()) {
+                Map<String, Object> mergeMap = iter.next();
+                ProfitDetailMonth profitMonth = profitMonthService.getProfitDetailMonth((String)mergeMap.get("id"));
+                if(profitMonth == null){
+                    continue;
+                }
+                BigDecimal basicAmt = new BigDecimal(mergeMap.get("basicAmt").toString());
+                BigDecimal notDeductionAmt = profitDeductionList.getNotDeductionAmt();
+                LOG.info("机具扣款代理商唯一码：{}，应扣：{}，实扣：{}，未扣足金额：{}",
+                        agentPid, profitDeductionList.getMustDeductionAmt(), profitDeductionList.getActualDeductionAmt() ,notDeductionAmt);
+                LOG.info("合并代理商唯一码：{}，合并代理商基础分润：{}",profitMonth.getAgentId(), basicAmt);
+                BigDecimal deductAmt = null;
+                ProfitDeduction insert = new ProfitDeduction();
+                if(basicAmt.compareTo(notDeductionAmt) >= 0){
+                    basicAmt = basicAmt.subtract(notDeductionAmt);
+                    deductAmt = notDeductionAmt;
+                    mergeMap.put("basicAmt", basicAmt);
+                    insert.setMustDeductionAmt(notDeductionAmt);
+                    insert.setActualDeductionAmt(notDeductionAmt);
+                    profitDeductionList.setNotDeductionAmt(BigDecimal.ZERO);
+                    profitDeductionList.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt().add(notDeductionAmt));
+                    LOG.info("合并代理商唯一码：{}，已扣金额：{}，合并代理商剩余基础分润：{}",
+                            profitMonth.getAgentId(), notDeductionAmt, basicAmt);
+                } else {
+                    LOG.info("基础分润不足，合并代理商唯一码：{}，已扣金额：{}，合并代理商剩余基础分润：{}",
+                            profitMonth.getAgentId(), basicAmt, BigDecimal.ZERO);
+                    BigDecimal surNotDeductionAmt = notDeductionAmt.subtract(basicAmt);
+                    insert.setMustDeductionAmt(notDeductionAmt);
+                    insert.setActualDeductionAmt(basicAmt);
+                    insert.setNotDeductionAmt(surNotDeductionAmt);
+                    profitDeductionList.setNotDeductionAmt(surNotDeductionAmt);
+                    profitDeductionList.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt().add(basicAmt));
+                    deductAmt = basicAmt;
+                    mergeMap.put("basicAmt", BigDecimal.ZERO);
+                }
+
+                try {
+                    if(Objects.equals(computType, "1")){
+                        insert.setAgentPid(profitMonth.getAgentId());
+                        insert.setAgentId(profitMonth.getAgentId());
+                        insert.setAgentName(profitMonth.getAgentName());
+                        insert.setDeductionType(DeductionType.MACHINE.getType());
+                        insert.setDeductionDesc(profitDeductionList.getDeductionDesc());
+                        insert.setDeductionDate(profitDeductionList.getDeductionDate());
+                        insert.setId(profitDeductionList.getId());
+                        insert.setRemark("合并代理商代扣，扣款明细："+profitDeductionList.getSourceId());
+                        insert.setUserId(profitDeductionList.getAgentId());
+                        profitDeducttionDetailService.insertDeducttionDetail(insert);
+                    }
+
+                    ProfitDetailMonth update = new ProfitDetailMonth();
+                    update.setId((String)mergeMap.get("id"));
+                    if(Objects.equals(POS, profitDeductionList.getDeductionDesc())){
+                        BigDecimal posDgRealDeductionAmt = profitMonth.getPosDgRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getZposTdRealDeductionAmt();
+                        update.setPosDgRealDeductionAmt(posDgRealDeductionAmt.add(deductAmt));
+                    } else if(Objects.equals(ZPOS, profitDeductionList.getDeductionDesc())){
+                        BigDecimal zposTdRealDeductionAmt = profitMonth.getZposTdRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getZposTdRealDeductionAmt();
+                        update.setZposTdRealDeductionAmt(zposTdRealDeductionAmt.add(deductAmt));
+                    }else if(Objects.equals(RHB, profitDeductionList.getDeductionDesc())){
+                        BigDecimal rhbDgRealDeductionAmt = profitMonth.getRhbDgRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getZposTdRealDeductionAmt();
+                        update.setRhbDgRealDeductionAmt(rhbDgRealDeductionAmt.add(deductAmt));
+                    }
+                    profitMonthService.updateByPrimaryKeySelective(update);
+
+                    if(Objects.equals(computType, "1")){
+                        ProfitDeduction updateDeduct = new ProfitDeduction();
+                        updateDeduct.setId(profitDeductionList.getId());
+                        updateDeduct.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                        updateDeduct.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
+                        updateDeduct.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
+                        profitDeductionService.updateProfitDeduction(updateDeduct);
+                    }
+                } catch (Exception e) {e.printStackTrace();}
+
+                if(profitDeductionList.getMustDeductionAmt().compareTo(profitDeductionList.getActualDeductionAmt()) == 0){
+                    LOG.info("代理商唯一码：{}，订单号：{}，该笔机具款实扣金额已经扣完，循环下一条机具扣款。应扣：{}，实扣：{}，未扣足：{}",
+                            profitDeductionList.getAgentId(), profitDeductionList.getSourceId(),
+                            profitDeductionList.getMustDeductionAmt(), profitDeductionList.getActualDeductionAmt(), profitDeductionList.getNotDeductionAmt());
+                    break;
+                } else {
+                    LOG.info("此合并代理商分润已扣完。合并代理商分润主键：{}，继续扣下个合并代理商扣款。应扣：{}，实扣：{}，未扣足：{}",
+                            mergeMap.get("id"),profitDeductionList.getMustDeductionAmt(), profitDeductionList.getActualDeductionAmt(), profitDeductionList.getNotDeductionAmt());
+                }
+            }
+        }
+        map.put("hbList", mergeAgentList);
+        LOG.info("机具分润扣款响应参数：{}", map);
+        return map;
+    }
+
+
+    /**
+     * 终审后，查询机具未扣款订单，通知订单系统，未扣款订单与金额
+     */
+    @Override
+    public void otherOperate(){
+        String deductDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0,7).replace("-","");
+        ProfitDeduction profitDeduction = new ProfitDeduction();
+        profitDeduction.setDeductionDate(deductDate);
+        profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+        List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
+        if(list != null && !list.isEmpty()){
+            List<Map<String, Object>> noticeList = new ArrayList<Map<String, Object>>(list.size());
+            for (ProfitDeduction deduction : list){
+                Map<String, Object> map = new HashMap<String, Object>(8);
+                ProfitDeducttionDetail detail = profitDeducttionDetailService.getProfitDeducttionDetail(deduction);
+                map.put("deductTime", detail != null ? detail.getCreateDateTime() : "");
+                map.put("mustDeductionAmtSum", deduction.getSumDeductionAmt().toString());
+                map.put("actualDeductionAmtSum", deduction.getActualDeductionAmt().toString());
+                BigDecimal notDeductionAmt = deduction.getSumDeductionAmt().subtract(deduction.getActualDeductionAmt());
+                map.put("notDeductionAmt", notDeductionAmt.toString());
+                map.put("detailId", deduction.getSourceId());
+                map.put("srcId", deduction.getId());
+                map.put("srcType", PamentSrcType.FENRUN_DIKOU.code);
+                noticeList.add(map);
+            }
+
+            LOG.info("系统已经终审，通知订单系统，机具汇总款变更清算状态，通知数据：{}",JSONObject.toJSON(noticeList));
+            OPdSumService.uploadStatus(noticeList, PaySign.JQ.code);
+        }
+    }
+
+    @Override
+    public void clearDetail(){
+
+    }
 }

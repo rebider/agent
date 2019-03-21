@@ -1447,6 +1447,76 @@ public class OPaymentDetailExample {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
+
+        public Criteria andOPdSumIdIsNull() {
+            addCriterion("O_PD_SUM_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdIsNotNull() {
+            addCriterion("O_PD_SUM_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdEqualTo(String value) {
+            addCriterion("O_PD_SUM_ID =", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdNotEqualTo(String value) {
+            addCriterion("O_PD_SUM_ID <>", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdGreaterThan(String value) {
+            addCriterion("O_PD_SUM_ID >", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdGreaterThanOrEqualTo(String value) {
+            addCriterion("O_PD_SUM_ID >=", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdLessThan(String value) {
+            addCriterion("O_PD_SUM_ID <", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdLessThanOrEqualTo(String value) {
+            addCriterion("O_PD_SUM_ID <=", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdLike(String value) {
+            addCriterion("O_PD_SUM_ID like", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdNotLike(String value) {
+            addCriterion("O_PD_SUM_ID not like", value, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdIn(List<String> values) {
+            addCriterion("O_PD_SUM_ID in", values, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdNotIn(List<String> values) {
+            addCriterion("O_PD_SUM_ID not in", values, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdBetween(String value1, String value2) {
+            addCriterion("O_PD_SUM_ID between", value1, value2, "oPdSumId");
+            return (Criteria) this;
+        }
+
+        public Criteria andOPdSumIdNotBetween(String value1, String value2) {
+            addCriterion("O_PD_SUM_ID not between", value1, value2, "oPdSumId");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

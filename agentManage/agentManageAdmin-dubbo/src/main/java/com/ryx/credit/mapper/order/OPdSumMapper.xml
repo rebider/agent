@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.dao.order.OPdSumMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.pojo.admin.order.OPdSum">
+    <id column="ID" jdbcType="VARCHAR" property="id" />
+    <result column="AGENTID" jdbcType="VARCHAR" property="agentid" />
+    <result column="PLATFORM" jdbcType="VARCHAR" property="platform" />
+    <result column="SUM_MOUTH" jdbcType="VARCHAR" property="sumMouth" />
+    <result column="REAL_AMOUNT" jdbcType="DECIMAL" property="realAmount" />
+    <result column="REAL_DATETIME" jdbcType="TIMESTAMP" property="realDatetime" />
+    <result column="REAL_USER" jdbcType="VARCHAR" property="realUser" />
+    <result column="PAY_SRC" jdbcType="VARCHAR" property="paySrc" />
+    <result column="PAY_SRC_TYPE" jdbcType="VARCHAR" property="paySrcType" />
+    <result column="SUM_STATUS" jdbcType="VARCHAR" property="sumStatus" />
+    <result column="STATUS" jdbcType="DECIMAL" property="status" />
+    <result column="VERSION" jdbcType="DECIMAL" property="version" />
+    <result column="C_USER" jdbcType="VARCHAR" property="cUser" />
+    <result column="C_TIME" jdbcType="TIMESTAMP" property="cTime" />
+    <result column="U_TIME" jdbcType="TIMESTAMP" property="uTime" />
+    <result column="SUM_AMOUNT" jdbcType="DECIMAL" property="sumAmount" />
+    <result column="REV" jdbcType="VARCHAR" property="rev" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, AGENTID, PLATFORM, SUM_MOUTH, REAL_AMOUNT, REAL_DATETIME, REAL_USER, PAY_SRC, 
+    PAY_SRC_TYPE, SUM_STATUS, STATUS, VERSION, C_USER, C_TIME, U_TIME, SUM_AMOUNT, REV
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.pojo.admin.order.OPdSumExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from O_PD_SUM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from O_PD_SUM
+    where ID = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.pojo.admin.order.OPdSumExample">
+    delete from O_PD_SUM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.pojo.admin.order.OPdSum">
+    insert into O_PD_SUM (ID, AGENTID, PLATFORM, 
+      SUM_MOUTH, REAL_AMOUNT, REAL_DATETIME, 
+      REAL_USER, PAY_SRC, PAY_SRC_TYPE, 
+      SUM_STATUS, STATUS, VERSION, 
+      C_USER, C_TIME, U_TIME, 
+      SUM_AMOUNT, REV)
+    values (#{id,jdbcType=VARCHAR}, #{agentid,jdbcType=VARCHAR}, #{platform,jdbcType=VARCHAR}, 
+      #{sumMouth,jdbcType=VARCHAR}, #{realAmount,jdbcType=DECIMAL}, #{realDatetime,jdbcType=TIMESTAMP}, 
+      #{realUser,jdbcType=VARCHAR}, #{paySrc,jdbcType=VARCHAR}, #{paySrcType,jdbcType=VARCHAR}, 
+      #{sumStatus,jdbcType=VARCHAR}, #{status,jdbcType=DECIMAL}, #{version,jdbcType=DECIMAL}, 
+      #{cUser,jdbcType=VARCHAR}, #{cTime,jdbcType=TIMESTAMP}, #{uTime,jdbcType=TIMESTAMP}, 
+      #{sumAmount,jdbcType=DECIMAL}, #{rev,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.pojo.admin.order.OPdSum">
+    insert into O_PD_SUM
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="agentid != null">
+        AGENTID,
+      </if>
+      <if test="platform != null">
+        PLATFORM,
+      </if>
+      <if test="sumMouth != null">
+        SUM_MOUTH,
+      </if>
+      <if test="realAmount != null">
+        REAL_AMOUNT,
+      </if>
+      <if test="realDatetime != null">
+        REAL_DATETIME,
+      </if>
+      <if test="realUser != null">
+        REAL_USER,
+      </if>
+      <if test="paySrc != null">
+        PAY_SRC,
+      </if>
+      <if test="paySrcType != null">
+        PAY_SRC_TYPE,
+      </if>
+      <if test="sumStatus != null">
+        SUM_STATUS,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="version != null">
+        VERSION,
+      </if>
+      <if test="cUser != null">
+        C_USER,
+      </if>
+      <if test="cTime != null">
+        C_TIME,
+      </if>
+      <if test="uTime != null">
+        U_TIME,
+      </if>
+      <if test="sumAmount != null">
+        SUM_AMOUNT,
+      </if>
+      <if test="rev != null">
+        REV,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="agentid != null">
+        #{agentid,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null">
+        #{platform,jdbcType=VARCHAR},
+      </if>
+      <if test="sumMouth != null">
+        #{sumMouth,jdbcType=VARCHAR},
+      </if>
+      <if test="realAmount != null">
+        #{realAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="realDatetime != null">
+        #{realDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="realUser != null">
+        #{realUser,jdbcType=VARCHAR},
+      </if>
+      <if test="paySrc != null">
+        #{paySrc,jdbcType=VARCHAR},
+      </if>
+      <if test="paySrcType != null">
+        #{paySrcType,jdbcType=VARCHAR},
+      </if>
+      <if test="sumStatus != null">
+        #{sumStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="cUser != null">
+        #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sumAmount != null">
+        #{sumAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="rev != null">
+        #{rev,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.pojo.admin.order.OPdSumExample" resultType="java.lang.Long">
+    select count(*) from O_PD_SUM
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update O_PD_SUM
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentid != null">
+        AGENTID = #{record.agentid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.platform != null">
+        PLATFORM = #{record.platform,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sumMouth != null">
+        SUM_MOUTH = #{record.sumMouth,jdbcType=VARCHAR},
+      </if>
+      <if test="record.realAmount != null">
+        REAL_AMOUNT = #{record.realAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.realDatetime != null">
+        REAL_DATETIME = #{record.realDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.realUser != null">
+        REAL_USER = #{record.realUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paySrc != null">
+        PAY_SRC = #{record.paySrc,jdbcType=VARCHAR},
+      </if>
+      <if test="record.paySrcType != null">
+        PAY_SRC_TYPE = #{record.paySrcType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sumStatus != null">
+        SUM_STATUS = #{record.sumStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null">
+        STATUS = #{record.status,jdbcType=DECIMAL},
+      </if>
+      <if test="record.version != null">
+        VERSION = #{record.version,jdbcType=DECIMAL},
+      </if>
+      <if test="record.cUser != null">
+        C_USER = #{record.cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.cTime != null">
+        C_TIME = #{record.cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.uTime != null">
+        U_TIME = #{record.uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.sumAmount != null">
+        SUM_AMOUNT = #{record.sumAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.rev != null">
+        REV = #{record.rev,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update O_PD_SUM
+    set ID = #{record.id,jdbcType=VARCHAR},
+      AGENTID = #{record.agentid,jdbcType=VARCHAR},
+      PLATFORM = #{record.platform,jdbcType=VARCHAR},
+      SUM_MOUTH = #{record.sumMouth,jdbcType=VARCHAR},
+      REAL_AMOUNT = #{record.realAmount,jdbcType=DECIMAL},
+      REAL_DATETIME = #{record.realDatetime,jdbcType=TIMESTAMP},
+      REAL_USER = #{record.realUser,jdbcType=VARCHAR},
+      PAY_SRC = #{record.paySrc,jdbcType=VARCHAR},
+      PAY_SRC_TYPE = #{record.paySrcType,jdbcType=VARCHAR},
+      SUM_STATUS = #{record.sumStatus,jdbcType=VARCHAR},
+      STATUS = #{record.status,jdbcType=DECIMAL},
+      VERSION = #{record.version,jdbcType=DECIMAL},
+      C_USER = #{record.cUser,jdbcType=VARCHAR},
+      C_TIME = #{record.cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{record.uTime,jdbcType=TIMESTAMP},
+      SUM_AMOUNT = #{record.sumAmount,jdbcType=DECIMAL},
+      REV = #{record.rev,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.pojo.admin.order.OPdSum">
+    update O_PD_SUM
+    <set>
+      <if test="agentid != null">
+        AGENTID = #{agentid,jdbcType=VARCHAR},
+      </if>
+      <if test="platform != null">
+        PLATFORM = #{platform,jdbcType=VARCHAR},
+      </if>
+      <if test="sumMouth != null">
+        SUM_MOUTH = #{sumMouth,jdbcType=VARCHAR},
+      </if>
+      <if test="realAmount != null">
+        REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="realDatetime != null">
+        REAL_DATETIME = #{realDatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="realUser != null">
+        REAL_USER = #{realUser,jdbcType=VARCHAR},
+      </if>
+      <if test="paySrc != null">
+        PAY_SRC = #{paySrc,jdbcType=VARCHAR},
+      </if>
+      <if test="paySrcType != null">
+        PAY_SRC_TYPE = #{paySrcType,jdbcType=VARCHAR},
+      </if>
+      <if test="sumStatus != null">
+        SUM_STATUS = #{sumStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=DECIMAL},
+      </if>
+      <if test="version != null">
+        VERSION = #{version,jdbcType=DECIMAL},
+      </if>
+      <if test="cUser != null">
+        C_USER = #{cUser,jdbcType=VARCHAR},
+      </if>
+      <if test="cTime != null">
+        C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="uTime != null">
+        U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="sumAmount != null">
+        SUM_AMOUNT = #{sumAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="rev != null">
+        REV = #{rev,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OPdSum">
+    update O_PD_SUM
+    set AGENTID = #{agentid,jdbcType=VARCHAR},
+      PLATFORM = #{platform,jdbcType=VARCHAR},
+      SUM_MOUTH = #{sumMouth,jdbcType=VARCHAR},
+      REAL_AMOUNT = #{realAmount,jdbcType=DECIMAL},
+      REAL_DATETIME = #{realDatetime,jdbcType=TIMESTAMP},
+      REAL_USER = #{realUser,jdbcType=VARCHAR},
+      PAY_SRC = #{paySrc,jdbcType=VARCHAR},
+      PAY_SRC_TYPE = #{paySrcType,jdbcType=VARCHAR},
+      SUM_STATUS = #{sumStatus,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=DECIMAL},
+      VERSION = #{version,jdbcType=DECIMAL},
+      C_USER = #{cUser,jdbcType=VARCHAR},
+      C_TIME = #{cTime,jdbcType=TIMESTAMP},
+      U_TIME = #{uTime,jdbcType=TIMESTAMP},
+      SUM_AMOUNT = #{sumAmount,jdbcType=DECIMAL},
+      REV = #{rev,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

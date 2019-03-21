@@ -61,4 +61,11 @@ public interface OPaymentDetailMapper {
 
     int updateCapitalById(OPaymentDetail record);
 
+
+    List<Map<String,Object>> getOpdSum(Map<String,Object> map);
+
+    List<Map<String,Object>> getOPaymentDetailID(Map<String, Object> map);
+
+    List<Map<String,Object>> SelectByMonthRefund(Map<String, Object> map);
+
 }

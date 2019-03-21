@@ -155,7 +155,9 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             }
             HashMap<String, Object> map = new HashMap<>();
             map.put("time", time);
-            maps = oPaymentDetailMapper.selectShareMoney(map);
+
+            maps =  oPaymentDetailMapper.SelectByMonthRefund(map);
+          /*  maps = oPaymentDetailMapper.selectShareMoney(map);*/
         }else if (method.equals(GetMethod.ALLCAPITAL.code)) {
             if (StringUtils.isBlank(time)) {
                 logger.info("分润查询:{}", "时间为空");
@@ -219,6 +221,29 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
                 logger.info("扣款时间为空:{}", deductTime);
                 throw new ProcessException("扣款时间为空");
             }
+
+           /* if (map.get("tools")!=null){
+                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+                criteria.andOPdSumIdEqualTo(detailId);
+                criteria.andStatusEqualTo(Status.STATUS_1.status);
+                List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                if(oPaymentDetails.size()!=0){
+                    for (OPaymentDetail oPaymentDetail:oPaymentDetails) {
+                        oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
+                        if (payStatus.compareTo(PaySign.FKING.code)==0){//付款中
+                            oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                        }
+                        //更新分期明细
+                        if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                            logger.info("付款明细更新数据失败");
+                            throw new ProcessException("付款明细更新数据失败");
+                        }
+                    }
+                }else{
+                    throw new ProcessException("没有查找到相关数据");
+                }
+            }*/
             //分别去查询付款单数据  和    付款明细的数据
             OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
             OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
@@ -359,34 +384,46 @@ public class PaymentDetailServiceImpl implements IPaymentDetailService {
             }
         } }
 
+
+
+
         if (payStatus.compareTo(PaySign.FKING.code)==0){//付款中
             for (Map<String, Object> map : maps) {
-                String detailId = (String) map.get("detailId");//付款明细id
-                String srcId = (String) map.get("srcId");//付款源id
-                if (StringUtils.isBlank(detailId)) {
-                    logger.info("付款明细ID为空:{}", detailId);
-                    throw new ProcessException("付款明细ID为空");
-                }
-                if (StringUtils.isBlank(srcId)) {
-                    logger.info("付款源ID为空:{}", srcId);
-                    throw new ProcessException("付款源ID为空");
-                }
-                //分别去查询付款单数据  和    付款明细的数据
-                OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
-                OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
-                criteria.andIdEqualTo(detailId);
-                criteria.andStatusEqualTo(Status.STATUS_1.status);
-                List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
-                if (1 != oPaymentDetails.size())
-                    throw new ProcessException("没有查找到相关数据");
-                OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
-                oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
-                oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
-                oPaymentDetail.setSrcId(srcId);
-                if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
-                    logger.info("付款明细更新数据失败");
-                    throw new ProcessException("付款明细更新数据失败");
-                }
+
+
+                    String detailId = (String) map.get("detailId");//付款汇总id
+                    String srcId = (String) map.get("srcId");//付款源id
+                    if (StringUtils.isBlank(detailId)) {
+                        logger.info("付款汇总idID为空:{}", detailId);
+                        throw new ProcessException("付款明细ID为空");
+                    }
+                    if (StringUtils.isBlank(srcId)) {
+                        logger.info("付款源ID为空:{}", srcId);
+                        throw new ProcessException("付款源ID为空");
+                    }
+                    //分别去查询付款单数据  和    付款明细的数据
+                    OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
+                    OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
+                    criteria.andIdEqualTo(detailId);
+                    criteria.andStatusEqualTo(Status.STATUS_1.status);
+                    List<OPaymentDetail> oPaymentDetails = oPaymentDetailMapper.selectByExample(oPaymentDetailExample);
+                    if (1 != oPaymentDetails.size())
+                        throw new ProcessException("没有查找到相关数据");
+                    OPaymentDetail oPaymentDetail = oPaymentDetails.get(0);
+                    oPaymentDetail.setPayTime(Calendar.getInstance().getTime());
+                    oPaymentDetail.setPaymentStatus(PaymentStatus.FKING.code);
+                    oPaymentDetail.setSrcId(srcId);
+                    if (1 != oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)) {
+                        logger.info("付款明细更新数据失败");
+                        throw new ProcessException("付款明细更新数据失败");
+                    }
+
+
+
+
+
+
+
             }
         }
 
