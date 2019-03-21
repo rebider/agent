@@ -273,6 +273,25 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             }
             orderImportBaseInfo.setOrderImportGoodsInfos(OrderImportGoodsInfos);
             AgentResult agentImport = newOrderImportService.newPareseOrderImportBaseInfo(orderImportBaseInfo,User);
+            //订单解析失败 订单商品记录也更新为失败
+            if (!agentImport.isOK()) {
+                List<OrderImportGoodsInfo> orderImportGoodsInfos = orderImportBaseInfo.getOrderImportGoodsInfos();
+                for (OrderImportGoodsInfo orderImportGoodsInfo : orderImportGoodsInfos) {
+                    String importId = orderImportGoodsInfo.getImportId();
+                    ImportAgent orderImportGoodsInfo_importAgent = importAgentMapper.selectByPrimaryKey(importId);
+                    orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_3.status);
+                    orderImportGoodsInfo_importAgent.setDealmsg(agentImport.getMsg());
+                    orderImportGoodsInfo_importAgent.setDealTime(new Date());
+                    int updateAgentImport = importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent);
+                    if (updateAgentImport != 1) {
+                        redisService.rpushList(import_order_imOrderMsg_key + orderImportBaseInfo.getOrder_id(),
+                                "更新orderImportBaseInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                        logger.info("更新orderImportBaseInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                        throw new MessageException("更新orderImportBaseInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                    }
+                }
+                logger.info("======处理订单解析{}失败{}", orderImportBaseInfo.getOrder_id(), agentImport.getMsg());
+            }
             return agentImport;
         } catch (Exception e) {
             e.printStackTrace();
@@ -598,7 +617,8 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_3.status);
                 orderImportGoodsInfo_importAgent.setDealmsg(suborder.getMsg());
                 orderImportGoodsInfo_importAgent.setDealTime(new Date());
-                if(importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent) != 1){
+                int updateSuborder = importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent);
+                if(updateSuborder != 1){
                     redisService.rpushList(import_order_imOrderMsg_key + orderImportBaseInfo.getOrder_id(),
                             "更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
                     logger.info("更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
@@ -606,7 +626,6 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 }
             }
             logger.info("======处理订单商品解析{}失败{}", orderImportBaseInfo.getOrder_id(), suborder.getMsg());
-            throw new MessageException(suborder.getMsg());
         }
 
         return AgentResult.ok();
