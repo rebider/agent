@@ -876,7 +876,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     logistics.setSendMsg(e.getLocalizedMessage());
                     oLogisticsMapper.updateByPrimaryKeySelective(logistics);
                 }
-            //cxinfo 机具退货调整首刷接口调用
+            //机具退货调整首刷接口调用
             }else{
                 logger.info("======历史订单首刷发货 更新库存记录:{}:{}",proType,stringList);
                 //起始sn sn码必须在查询的时候进行生成
@@ -933,7 +933,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 OSubOrderActivity old_act = list_old_act.get(0);
                 vo.setOldAct(old_act.getBusProCode());
 
-                //cxinfo 机具退货调整首刷接口调用
+                //机具退货调整首刷接口调用
                 OLogistics logistics =  oLogisticsMapper.selectByPrimaryKey(oLogistics.getId());
                 //同平台下发，不同平台不下发
                 if(busInfo.getBusPlatform().equals(returnbusInfo.getBusPlatform())) {
