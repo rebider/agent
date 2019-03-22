@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ryx.credit.machine.dao.ImsPosMapper">
+  <resultMap id="BaseResultMap" type="com.ryx.credit.machine.entity.ImsPos">
+    <id column="ID" jdbcType="CHAR" property="id" />
+    <result column="POS_MODEL" jdbcType="VARCHAR" property="posModel" />
+    <result column="MANUF" jdbcType="VARCHAR" property="manuf" />
+    <result column="DEVICE_TYPE" jdbcType="VARCHAR" property="deviceType" />
+    <result column="COMM_TYPE" jdbcType="VARCHAR" property="commType" />
+    <result column="TMS_INFO" jdbcType="CHAR" property="tmsInfo" />
+    <result column="TMS_TIME" jdbcType="TIMESTAMP" property="tmsTime" />
+    <result column="TMS_MODEL" jdbcType="VARCHAR" property="tmsModel" />
+    <result column="STATUS" jdbcType="CHAR" property="status" />
+    <result column="JD_MODEL" jdbcType="VARCHAR" property="jdModel" />
+    <result column="IS_OWNER_VERSION" jdbcType="CHAR" property="isOwnerVersion" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    ID, POS_MODEL, MANUF, DEVICE_TYPE, COMM_TYPE, TMS_INFO, TMS_TIME, TMS_MODEL, STATUS, 
+    JD_MODEL, IS_OWNER_VERSION
+  </sql>
+  <select id="selectByExample" parameterType="com.ryx.credit.machine.entity.ImsPosExample" resultMap="BaseResultMap">
+    <include refid="OracleDialectPrefix" />
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from IMS_POS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+    <include refid="OracleDialectSuffix" />
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from IMS_POS
+    where ID = #{id,jdbcType=CHAR}
+  </select>
+  <delete id="deleteByExample" parameterType="com.ryx.credit.machine.entity.ImsPosExample">
+    delete from IMS_POS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ryx.credit.machine.entity.ImsPos">
+    insert into IMS_POS (ID, POS_MODEL, MANUF, 
+      DEVICE_TYPE, COMM_TYPE, TMS_INFO, 
+      TMS_TIME, TMS_MODEL, STATUS, 
+      JD_MODEL, IS_OWNER_VERSION)
+    values (#{id,jdbcType=CHAR}, #{posModel,jdbcType=VARCHAR}, #{manuf,jdbcType=VARCHAR}, 
+      #{deviceType,jdbcType=VARCHAR}, #{commType,jdbcType=VARCHAR}, #{tmsInfo,jdbcType=CHAR}, 
+      #{tmsTime,jdbcType=TIMESTAMP}, #{tmsModel,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, 
+      #{jdModel,jdbcType=VARCHAR}, #{isOwnerVersion,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ryx.credit.machine.entity.ImsPos">
+    insert into IMS_POS
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        ID,
+      </if>
+      <if test="posModel != null">
+        POS_MODEL,
+      </if>
+      <if test="manuf != null">
+        MANUF,
+      </if>
+      <if test="deviceType != null">
+        DEVICE_TYPE,
+      </if>
+      <if test="commType != null">
+        COMM_TYPE,
+      </if>
+      <if test="tmsInfo != null">
+        TMS_INFO,
+      </if>
+      <if test="tmsTime != null">
+        TMS_TIME,
+      </if>
+      <if test="tmsModel != null">
+        TMS_MODEL,
+      </if>
+      <if test="status != null">
+        STATUS,
+      </if>
+      <if test="jdModel != null">
+        JD_MODEL,
+      </if>
+      <if test="isOwnerVersion != null">
+        IS_OWNER_VERSION,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=CHAR},
+      </if>
+      <if test="posModel != null">
+        #{posModel,jdbcType=VARCHAR},
+      </if>
+      <if test="manuf != null">
+        #{manuf,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceType != null">
+        #{deviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="commType != null">
+        #{commType,jdbcType=VARCHAR},
+      </if>
+      <if test="tmsInfo != null">
+        #{tmsInfo,jdbcType=CHAR},
+      </if>
+      <if test="tmsTime != null">
+        #{tmsTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmsModel != null">
+        #{tmsModel,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="jdModel != null">
+        #{jdModel,jdbcType=VARCHAR},
+      </if>
+      <if test="isOwnerVersion != null">
+        #{isOwnerVersion,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ryx.credit.machine.entity.ImsPosExample" resultType="java.lang.Long">
+    select count(*) from IMS_POS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.machine.entity.ImsPos">
+    update IMS_POS
+    <set>
+      <if test="posModel != null">
+        POS_MODEL = #{posModel,jdbcType=VARCHAR},
+      </if>
+      <if test="manuf != null">
+        MANUF = #{manuf,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceType != null">
+        DEVICE_TYPE = #{deviceType,jdbcType=VARCHAR},
+      </if>
+      <if test="commType != null">
+        COMM_TYPE = #{commType,jdbcType=VARCHAR},
+      </if>
+      <if test="tmsInfo != null">
+        TMS_INFO = #{tmsInfo,jdbcType=CHAR},
+      </if>
+      <if test="tmsTime != null">
+        TMS_TIME = #{tmsTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="tmsModel != null">
+        TMS_MODEL = #{tmsModel,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        STATUS = #{status,jdbcType=CHAR},
+      </if>
+      <if test="jdModel != null">
+        JD_MODEL = #{jdModel,jdbcType=VARCHAR},
+      </if>
+      <if test="isOwnerVersion != null">
+        IS_OWNER_VERSION = #{isOwnerVersion,jdbcType=CHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=CHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ryx.credit.machine.entity.ImsPos">
+    update IMS_POS
+    set POS_MODEL = #{posModel,jdbcType=VARCHAR},
+      MANUF = #{manuf,jdbcType=VARCHAR},
+      DEVICE_TYPE = #{deviceType,jdbcType=VARCHAR},
+      COMM_TYPE = #{commType,jdbcType=VARCHAR},
+      TMS_INFO = #{tmsInfo,jdbcType=CHAR},
+      TMS_TIME = #{tmsTime,jdbcType=TIMESTAMP},
+      TMS_MODEL = #{tmsModel,jdbcType=VARCHAR},
+      STATUS = #{status,jdbcType=CHAR},
+      JD_MODEL = #{jdModel,jdbcType=VARCHAR},
+      IS_OWNER_VERSION = #{isOwnerVersion,jdbcType=CHAR}
+    where ID = #{id,jdbcType=CHAR}
+  </update>
+  <sql id="OracleDialectPrefix">
+    <if test="page != null">
+      select * from ( select row_.*, rownum rownum_ from ( 
+    </if>
+  </sql>
+  <sql id="OracleDialectSuffix">
+    <if test="page != null">
+      <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
+    </if>
+  </sql>
+</mapper>

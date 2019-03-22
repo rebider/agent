@@ -104,10 +104,14 @@ public class OldCompensateServiceImpl implements OldCompensateService {
                 count =  String.valueOf(excel.get(2));
                 proModel =  String.valueOf(excel.get(3));
             } catch (Exception e) {
-                throw new MessageException("导入解析文件失败");
+                throw new MessageException(snBegin+"-"+snEnd+",导入解析文件失败");
             }
-
-            AgentResult agentResult = orderActivityService.querySnInfoFromBusSystem(snBegin, snEnd, count, proModel);
+            AgentResult agentResult = null;
+            try {
+                agentResult = orderActivityService.querySnInfoFromBusSystem(snBegin, snEnd, count, proModel);
+            } catch (MessageException e) {
+                throw new MessageException(snBegin+"-"+snEnd+","+e.getMsg());
+            }
             FastMap fastMap = (FastMap)agentResult.getMapData();
 
             OProduct product = new OProduct();
