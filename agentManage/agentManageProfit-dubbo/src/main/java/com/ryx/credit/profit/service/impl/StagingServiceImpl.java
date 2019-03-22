@@ -321,6 +321,11 @@ public class StagingServiceImpl implements StagingService {
         return profitStagingDetailMapper.byTaskId(taskId);
     }
 
+    @Override
+    public ProfitStagingDetail selectByPrimaryKey(String id) {
+        return profitStagingDetailMapper.selectByPrimaryKey(id);
+    }
+
     /**
      * 审批流与业务关联对象
      * @param profitStaging 分期对象

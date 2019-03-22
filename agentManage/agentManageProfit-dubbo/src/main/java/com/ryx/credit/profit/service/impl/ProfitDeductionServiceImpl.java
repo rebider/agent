@@ -998,7 +998,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         map.put("agentId",profitDeduction.getAgentId());
         map.put("parentAgentId",profitDeduction.getParentAgentId());
         map.put("date",profitDeduction.getDeductionDate());
-        map.put("desc",profitDeduction.getDeductionDate());
+        map.put("desc",profitDeduction.getDeductionDesc());
         map.put("type",DeductionType.MACHINE.getType());
         map.put("remark","%" + "代理商代扣机具款，扣款明细：" + "%");
         List<Map<String,Object>> list = profitDeductionMapper.getRev2List(map);

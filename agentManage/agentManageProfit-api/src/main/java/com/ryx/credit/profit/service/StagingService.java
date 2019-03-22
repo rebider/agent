@@ -104,4 +104,6 @@ public interface StagingService {
      * @return
      */
     Map<String,Object> byTaskId(String taskId);
+
+    ProfitStagingDetail selectByPrimaryKey(String id);
 }
