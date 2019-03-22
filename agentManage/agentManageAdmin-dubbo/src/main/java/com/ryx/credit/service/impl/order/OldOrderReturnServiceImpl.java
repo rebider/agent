@@ -161,8 +161,14 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                     oldOrderReturnSubmitProVo.getReturnCount().compareTo(BigDecimal.ZERO)<=0){
                 return AgentResult.fail("数量必须大于0");
             }
+            //检查sn是否在退货中
+           int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
+                   .fastMap("begin",oldOrderReturnSubmitProVo.getSnStart())
+                   .putKeyV("end",oldOrderReturnSubmitProVo.getSnEnd())
+                   .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+           );
+           if(checkCount>0)  return AgentResult.fail(oldOrderReturnSubmitProVo.getSnStart()+":"+oldOrderReturnSubmitProVo.getSnEnd()+"在退货中");
         }
-
         Agent agent = agentMapper.selectByPrimaryKey(oldOrderReturnVo.getAgentId());
         //保存审批中的退货申请单
         OReturnOrder oReturnOrder = new OReturnOrder();
@@ -524,9 +530,14 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             OActivity order_activity = oActivityMapper.selectByPrimaryKey(oSubOrderActivity.getActivityId());
             //从业务平台获取的活动
             OActivity bus_activity = oActivityMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getActivity());
+
             if(!order_activity.getActCode().equalsIgnoreCase(bus_activity.getActCode())){
                 throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"中"+product.getProName()+"商品的活动与sn活动一致，订单活动["+order_activity.getActCode()+":"+order_activity.getActivityName()+"],业务平台活动["+bus_activity.getActCode()+":"+bus_activity.getActivityName()+"]");
             }
+
+            //首刷  fixme 首刷校验
+            //pos  fixme pos活动校验
+
             OReturnOrderDetail oReturnOrderDetail = returnOrderDetailMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getReturndetailid());
             oReturnOrderDetail.setOrderId(oldOrderReturnBusEditVo.getOrderid());
             oReturnOrderDetail.setProId(oldOrderReturnBusEditVo.getProductid());
@@ -557,7 +568,6 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
 
     }
 
-    @Transactional(readOnly = false,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
     @Override
     public List<String> uploadSnFileList(List<List<Object>> data, String user) throws Exception {
         List<String> list = new ArrayList<>();
@@ -589,7 +599,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
      * @return
      * @throws Exception
      */
-    @Transactional(readOnly = false,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    @Transactional(readOnly = false,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW,rollbackFor = Exception.class)
     @Override
     public AgentResult uploadSnFileListItem(List<Object> objectList, String user) throws Exception {
         List col = Arrays.asList(ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.col);
@@ -989,15 +999,30 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 logger.info("退货审批完成回调:{},{},更新退货单失败", processInstanceId, activityName);
                 throw new MessageException("更新退货单失败");
             }
-            //删除退货redissn
+            //删除退货redissn 更新历史订单退货数量
             OReturnOrderDetailExample example = new OReturnOrderDetailExample();
             example.or().andReturnIdEqualTo(returnId).andStatusEqualTo(Status.STATUS_1.status);
             List<OReturnOrderDetail> list = returnOrderDetailMapper.selectByExample(example);
             for (OReturnOrderDetail oReturnOrderDetail : list) {
                 redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn());
                 redisService.delete(oReturnOrderDetail.getBeginSn()+","+oReturnOrderDetail.getEndSn()+"_act");
+                //更新历史订单退货数量
+                OSubOrderExample oSubOrderExample = new OSubOrderExample();
+                oSubOrderExample.or()
+                        .andOrderIdEqualTo(oReturnOrderDetail.getOrderId())
+                        .andProIdEqualTo(oReturnOrderDetail.getProId())
+                        .andStatusEqualTo(Status.STATUS_1.status);
+                List<OSubOrder> oSubOrders = oSubOrderMapper.selectByExample(oSubOrderExample);
+                for (OSubOrder oSubOrder : oSubOrders) {
+                    if(oSubOrder.getReturnsNum()!=null){
+                        oSubOrder.setReturnsNum(oSubOrder.getReturnsNum().add(oReturnOrderDetail.getReturnCount()));
+                    }
+                    //审批通过更新退货数量
+                    if(1!=oSubOrderMapper.updateByPrimaryKeySelective(oSubOrder)){
+                       throw new MessageException("更新退货数量失败");
+                    }
+                }
             }
-
         } catch (Exception e) {
             logger.error("退货审批完成回调异常", e);
             throw e;
@@ -1024,10 +1049,19 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 snEnd = String.valueOf(excel.get(1));
                 count = String.valueOf(excel.get(2));
                 proModel = String.valueOf(excel.get(3));
+
             } catch (Exception e) {
                 throw new MessageException("导入解析文件失败");
             }
             try {
+                //检查是否在退货中
+                int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
+                        .fastMap("begin",snBegin)
+                        .putKeyV("end",snEnd)
+                        .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+                );
+                if(checkCount>0)  return AgentResult.fail(snEnd+":"+snEnd+"在退货中");
+
                 Dict modelType = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MODEL_TYPE.name(),proModel);
                 if(modelType==null){
                     throw new MessageException("导入类型错误");
