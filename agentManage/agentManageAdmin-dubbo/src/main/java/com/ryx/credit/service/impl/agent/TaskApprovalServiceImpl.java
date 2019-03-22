@@ -14,6 +14,7 @@ import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -55,7 +56,8 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private TaskApprovalService taskApprovalService;
      @Autowired
      private CapitalMapper capitalMapper;
-
+    @Autowired
+    private IUserService iUserService;
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
 
@@ -100,11 +102,19 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     @Override
     public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
 
-        if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+        if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
             //判断打款方式--->银行汇款  是否填写了实际到账金额
-            for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
-                if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
-                    if (null==capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")){
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new ProcessException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            //财务审批
+            if(orgId.equals("222")){
+            for (CapitalVo capitalVo : agentVo.getCapitalVoList()) {
+                if (capitalVo.getcPayType().equals(PayType.YHHK.code)) {
+                    if (null == capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")) {
                         logger.info("请填写实际到账金额");
                         throw new ProcessException("请填写实际到账金额");
                     }
@@ -117,11 +127,12 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 capitalVo.setcFqInAmount(capitalVo.getcInAmount());
                 capitalVo.setId(capitalVo.getId());
                 int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
-                if(i!=1){
+                if (i != 1) {
                     logger.info("实际到账金额填写失败");
                     throw new ProcessException("实际到账金额填写失败");
                 }
             }
+        }
 
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {

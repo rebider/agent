@@ -465,7 +465,7 @@
   <select id="queryPlannerAll" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
 
-    select  ac.vender as "proCom",ac.pro_model as "model",
+    select  ac.vender as "proCom",ac.pro_model as "model",ac.ACTIVITY_NAME,
     ro.ID, ro.ORDER_ID, ro.RECEIPT_NUM, ro.ADDRESS_ID, ro.ADDR_REALNAME, ro.ADDR_MOBILE, ro.ADDR_PROVINCE,
     ro.ADDR_CITY, ro.ADDR_DISTRICT, ro.ADDR_DETAIL, ro.REMARK, ro.ZIP_CODE, ro.PRO_NUM as PRO_NUM_SUM, ro.EXPRESS_REMARK,
     ro.EXPRESS_SUC_DATE, ro.C_TIME, ro.C_USER, ro.U_TIME, ro.RECEIPT_STATUS, ro.U_USER, ro.STATUS, ro.VERSION,
