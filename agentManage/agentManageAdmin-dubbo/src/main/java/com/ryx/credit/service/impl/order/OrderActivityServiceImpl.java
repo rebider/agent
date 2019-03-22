@@ -458,7 +458,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("count",count)
                         .putKeyV("price",oActivity.getPrice())
                         .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
-                        .putKeyV("activity",actSet);
+                        .putKeyV("activity",actSet)
+                        .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:"+e.getLocalizedMessage());
@@ -543,7 +544,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("count",count)
                         .putKeyV("price",oActivity.getPrice())
                         .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
-                        .putKeyV("activity",actSet);
+                        .putKeyV("activity",actSet)
+                        .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("sn信息查询异常:"+e.getMessage());

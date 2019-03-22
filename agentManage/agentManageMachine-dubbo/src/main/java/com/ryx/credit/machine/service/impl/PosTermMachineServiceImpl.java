@@ -8,12 +8,10 @@ import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.*;
 import com.ryx.credit.common.util.agentUtil.AESUtil;
 import com.ryx.credit.common.util.agentUtil.RSAUtil;
+import com.ryx.credit.machine.dao.ImsPosMapper;
 import com.ryx.credit.machine.dao.ImsTermWarehouseDetailMapper;
 import com.ryx.credit.machine.dao.ImsTermWarehouseLogMapper;
-import com.ryx.credit.machine.entity.ImsTermActive;
-import com.ryx.credit.machine.entity.ImsTermMachine;
-import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
-import com.ryx.credit.machine.entity.ImsTermWarehouseLog;
+import com.ryx.credit.machine.entity.*;
 import com.ryx.credit.machine.service.ImsTermActiveService;
 import com.ryx.credit.machine.service.ImsTermMachineService;
 import com.ryx.credit.machine.service.TermMachineService;
@@ -50,6 +48,8 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
     private ImsTermWarehouseDetailMapper imsTermWarehouseDetailMapper;
     @Autowired
     private ImsTermWarehouseLogMapper imsTermWarehouseLogMapper;
+    @Autowired
+    private ImsPosMapper imsPosMapper;
 
 
     @Override
@@ -59,7 +59,9 @@ public class PosTermMachineServiceImpl  implements TermMachineService {
         for (ImsTermMachine imsTermMachine : list) {
             TermMachineVo newvo = new TermMachineVo();
             newvo.setId(imsTermMachine.getMachineId());
-            newvo.setMechineName("型号:"+imsTermMachine.getModel()+"|价格:"+imsTermMachine.getPrice()
+            String model = imsTermMachine.getModel();
+            ImsPos imsPos = imsPosMapper.selectByPrimaryKey(model);
+            newvo.setMechineName("型号代码:"+model+"|厂商型号:"+imsPos.getPosModel()+"|价格:"+imsTermMachine.getPrice()
                     +"|达标金额:" +imsTermMachine.getStandAmt()+"|返还类型:"+ BackType.getContentByValue(imsTermMachine.getBackType())
                     +"|备注:" +imsTermMachine.getRemark());
             newvo.setStandAmt(String.valueOf(imsTermMachine.getStandAmt()));

@@ -20,7 +20,7 @@ public interface OldCompensateService {
     List<Map<String,Object>> getOrderMsgByExcel(List<List<Object>> excelList)throws MessageException;
 
     AgentResult compensateAmtSave(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
-                                  List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList);
+                                  List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> oCashReceivablesVoList)throws Exception;
 
     AgentResult startCompensateActiviy(String id, String cuser) throws Exception;
 
@@ -31,4 +31,8 @@ public interface OldCompensateService {
     BigDecimal calculatePriceDiff(String oldActivityId, String activityId, BigDecimal proNum)throws Exception;
 
     AgentResult compressCompensateActivity(String proIns, BigDecimal agStatus)throws Exception;
+
+    AgentResult compensateAmtEdit(ORefundPriceDiff oRefundPriceDiff, List<ORefundPriceDiffDetail> refundPriceDiffDetailList,
+                                  List<String> refundPriceDiffFile, String cUser, List<OCashReceivablesVo> cashReceivablesVoList);
+
 }
