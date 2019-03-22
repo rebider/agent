@@ -54,6 +54,8 @@ public class ORefundPriceDiff implements Serializable{
 
     private BigDecimal shareDeductAmt;
 
+    private BigDecimal orderType;
+
     private List<ORefundPriceDiffDetail> refundPriceDiffDetailList;
 
     private List<Attachment> attachmentList;
@@ -276,5 +278,13 @@ public class ORefundPriceDiff implements Serializable{
 
     public void setShareDeductAmt(BigDecimal shareDeductAmt) {
         this.shareDeductAmt = shareDeductAmt;
+    }
+
+    public BigDecimal getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(BigDecimal orderType) {
+        this.orderType = orderType;
     }
 }

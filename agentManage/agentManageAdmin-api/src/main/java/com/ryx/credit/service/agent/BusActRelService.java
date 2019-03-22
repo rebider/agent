@@ -8,6 +8,9 @@ import com.ryx.credit.pojo.admin.agent.BusActRel;
 public interface BusActRelService {
 
     BusActRel findById(String activId);
+
     BusActRel findByBusIdAndType(String busId,String type);
+
+    BusActRel findByProIns(String proIns);
 
 }
