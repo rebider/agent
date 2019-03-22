@@ -1058,7 +1058,13 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
                 int checkCount = returnOrderDetailMapper.checkSnIsReturn(FastMap
                         .fastMap("begin",snBegin)
                         .putKeyV("end",snEnd)
-                        .putKeyV("sts",Arrays.asList(RetSchedule.DFH.code,RetSchedule.FHZ.code,RetSchedule.SPZ.code,RetSchedule.TH.code,RetSchedule.TKZ.code,RetSchedule.YFH.code))
+                        .putKeyV("sts",Arrays.asList(
+                                RetSchedule.DFH.code,
+                                RetSchedule.FHZ.code,
+                                RetSchedule.SPZ.code,
+                                RetSchedule.TH.code,
+                                RetSchedule.TKZ.code,
+                                RetSchedule.YFH.code))
                 );
                 if(checkCount>0)  return AgentResult.fail(snEnd+":"+snEnd+"在退货中");
 

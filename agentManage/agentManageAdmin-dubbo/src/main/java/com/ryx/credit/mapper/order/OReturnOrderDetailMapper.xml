@@ -434,22 +434,18 @@
      a.begin_sn &lt;= #{begin,jdbcType=VARCHAR}
      and a.end_sn &gt;= #{begin,jdbcType=VARCHAR}
      and  b.ret_schedule in
-      <trim prefix="(" prefixOverrides="," suffix=")">
-        <foreach collection="sts" item="stsItem">
-               ${stsItem}
-        </foreach>
-      </trim>
+    <foreach collection="sts" item="stsItem" open="(" separator="," close=")">
+      ${stsItem}
+    </foreach>
     )
     or
     (
       a.begin_sn &lt;= #{end,jdbcType=VARCHAR}
       and a.end_sn &gt;= #{end,jdbcType=VARCHAR}
       and  b.ret_schedule in
-      <trim prefix="(" prefixOverrides="," suffix=")">
-        <foreach collection="sts" item="stsItem">
+        <foreach collection="sts" item="stsItem" open="(" separator="," close=")">
           ${stsItem}
         </foreach>
-      </trim>
     )
   </select>
 </mapper>

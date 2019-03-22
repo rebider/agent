@@ -43,7 +43,7 @@ public class OrderImportBaseInfo implements Serializable {
             this.setOrder_dk_amt(data.getString(colum.indexOf("order_dk_amt")));
             this.setOrder_hkr(data.getString(colum.indexOf("order_hkr")));
             this.setOrder_hk_date(data.getString(colum.indexOf("order_hk_date")));
-            this.setOrder_remark(data.getString(colum.indexOf("order_remark")));
+            this.setOrder_remark((colum.indexOf("order_remark")<data.size())?data.getString(colum.indexOf("order_remark")):"");
         }
         this.importId=importId;
     }

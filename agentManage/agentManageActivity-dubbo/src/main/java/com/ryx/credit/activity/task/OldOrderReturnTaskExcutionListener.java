@@ -28,15 +28,16 @@ public class OldOrderReturnTaskExcutionListener  implements TaskListener, Execut
             logger.info("start=========" + "ActivityId:" + delegateExecution.getCurrentActivityId() + "  ProcessInstanceId:" + delegateExecution.getProcessInstanceId() + "  Execution:" + delegateExecution.getId());
         } else if ("end".equals(eventName)) {
             String activityName = delegateExecution.getCurrentActivityName();
+            String activityId = delegateExecution.getCurrentActivityId();
             //数据变更服务类
             OldOrderReturnService oldOrderReturnService = (OldOrderReturnService) MySpringContextHandler.applicationContext.getBean("oldOrderReturnService");
             //审批拒绝
-            if ("reject_end".equals(activityName)) {
+            if ("reject_end".equals(activityName) || "reject_end".equals(activityId) ) {
                 logger.info("=========MergeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
                 oldOrderReturnService.approvalReject(delegateExecution.getProcessInstanceId(),activityName);
             }
             //审批同意更新数据库
-            if ("finish_end".equals(activityName)) {
+            if ("finish_end".equals(activityName) || "finish_end".equals(activityId)) {
                 logger.info("=========MergeTaskExecutionListener 流程{}eventName{}", delegateExecution.getProcessInstanceId(), eventName);
                 oldOrderReturnService.approvalFinish(delegateExecution.getProcessInstanceId(),activityName);
             }

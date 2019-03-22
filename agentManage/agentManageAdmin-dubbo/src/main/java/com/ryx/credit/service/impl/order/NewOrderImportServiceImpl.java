@@ -272,7 +272,13 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 throw new MessageException("商品信息记录为空["+orderImportBaseInfo.getOrder_id()+"]");
             }
             orderImportBaseInfo.setOrderImportGoodsInfos(OrderImportGoodsInfos);
-            AgentResult agentImport = newOrderImportService.newPareseOrderImportBaseInfo(orderImportBaseInfo,User);
+            AgentResult agentImport = AgentResult.ok();
+            try {
+                agentImport = newOrderImportService.newPareseOrderImportBaseInfo(orderImportBaseInfo,User);
+            } catch (MessageException e) {
+                e.printStackTrace();
+                agentImport = AgentResult.fail(e.getMsg());
+            }
             //订单解析失败 订单商品记录也更新为失败
             if (!agentImport.isOK()) {
                 List<OrderImportGoodsInfo> orderImportGoodsInfos = orderImportBaseInfo.getOrderImportGoodsInfos();

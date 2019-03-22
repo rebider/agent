@@ -396,10 +396,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 if(!agentResult.isOK()){
                     throw new MessageException("查询手刷失败");
                 }
+                logger.info("根据sn查询业务系统返回:"+agentResult.getData());
                 List<Map<String,Object>> data = (List<Map<String,Object>>)agentResult.getData();
                 if(data.size()!=Integer.parseInt(count)){
                     logger.info("查询手刷根据SN号段查询机具信息数量：{},count:{}",data.size(),count);
-                    throw new MessageException("请检查sn有效性");
+                    throw new MessageException("sn数量有误");
                 }
                 for (Map<String, Object> map : data) {
                     String termActiveId = String.valueOf(map.get("termActiveId"));
@@ -468,13 +469,14 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 if(!agentResult.isOK()){
                     throw new MessageException("查询pos失败");
                 }
+                logger.info("根据sn查询业务系统返回:"+agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                 JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                System.out.println(String.valueOf(data.get("termMachineList")));
+                logger.info(String.valueOf(data.get("termMachineList")));
                 List<Map<String,Object>> termMachineListMap = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(data.get("termMachineList")));
                 if(termMachineListMap.size()!=Integer.parseInt(count)){
                     logger.info("查询pos根据SN号段查询机具信息数量：{},count:{}",termMachineListMap.size(),count);
-                    throw new MessageException("请检查sn有效性");
+                    throw new MessageException("sn数量有误");
                 }
                 for (Map<String, Object> map : termMachineListMap) {
                     String posSn = String.valueOf(map.get("posSn"));
@@ -482,16 +484,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     String machineManufName = String.valueOf(map.get("machineManufName"));
                     String machineId = String.valueOf(map.get("machineId"));
                     String posType = String.valueOf(map.get("posType"));
-                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
-                    if (manufaName == null) {
-                        throw new MessageException(machineManufName+"厂商不存在");
-                    }
-                    String manufaValue = manufaName.getdItemvalue();//厂商
+//                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
+//                    if (manufaName == null) {
+//                       throw new MessageException(machineManufName+"厂商不存在");
+//                    }
+//                     String manufaValue = manufaName.getdItemvalue();//厂商
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-                    activityCriteria.andVenderEqualTo(manufaValue);
-                    activityCriteria.andProModelEqualTo(tmsModel);
+//                    activityCriteria.andVenderEqualTo(manufaValue);
+//                    activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
                     activityCriteria.andBusProCodeEqualTo(machineId);
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
@@ -522,12 +524,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisMap.put("machineManufName",machineManufName);
                     redisMap.put("machineId",String.valueOf(map.get("machineId")));
                     redisMap.put("posType",String.valueOf(map.get("posType")));
-                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
-                    if (manufaName == null) {
-                        throw new MessageException(machineManufName + "厂商不存在");
-                    }
-                    String manufaValue = manufaName.getdItemvalue();//厂商
-                    redisMap.put("manufaValue",manufaValue);
+//                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
+//                    if (manufaName == null) {
+//                        throw new MessageException(machineManufName + "厂商不存在");
+//                    }
+//                    String manufaValue = manufaName.getdItemvalue();//厂商
+//                    redisMap.put("manufaValue",manufaValue);
                     redisService.hSet(snStart+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
                 }
                 //号段活动存储在redis中
@@ -544,7 +546,7 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("activity",actSet);
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new MessageException(e.getMessage());
+                throw new MessageException("sn信息查询异常:"+e.getMessage());
             }
         }
         AgentResult agentResult = AgentResult.ok();
