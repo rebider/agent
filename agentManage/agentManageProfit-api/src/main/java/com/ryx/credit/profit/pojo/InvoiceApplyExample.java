@@ -2045,6 +2045,126 @@ public class InvoiceApplyExample {
             addCriterion("PROFIT_MONTH not between", value1, value2, "profitMonth");
             return (Criteria) this;
         }
+
+        public Criteria andAmountBeforeTaxIsNull() {
+            addCriterion("AMOUNT_BEFORE_TAX is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxIsNotNull() {
+            addCriterion("AMOUNT_BEFORE_TAX is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_BEFORE_TAX =", value, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxNotEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_BEFORE_TAX <>", value, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxGreaterThan(BigDecimal value) {
+            addCriterion("AMOUNT_BEFORE_TAX >", value, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_BEFORE_TAX >=", value, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxLessThan(BigDecimal value) {
+            addCriterion("AMOUNT_BEFORE_TAX <", value, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_BEFORE_TAX <=", value, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxIn(List<BigDecimal> values) {
+            addCriterion("AMOUNT_BEFORE_TAX in", values, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxNotIn(List<BigDecimal> values) {
+            addCriterion("AMOUNT_BEFORE_TAX not in", values, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("AMOUNT_BEFORE_TAX between", value1, value2, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountBeforeTaxNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("AMOUNT_BEFORE_TAX not between", value1, value2, "amountBeforeTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxIsNull() {
+            addCriterion("AMOUNT_TAX is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxIsNotNull() {
+            addCriterion("AMOUNT_TAX is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_TAX =", value, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxNotEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_TAX <>", value, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxGreaterThan(BigDecimal value) {
+            addCriterion("AMOUNT_TAX >", value, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_TAX >=", value, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxLessThan(BigDecimal value) {
+            addCriterion("AMOUNT_TAX <", value, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("AMOUNT_TAX <=", value, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxIn(List<BigDecimal> values) {
+            addCriterion("AMOUNT_TAX in", values, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxNotIn(List<BigDecimal> values) {
+            addCriterion("AMOUNT_TAX not in", values, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("AMOUNT_TAX between", value1, value2, "amountTax");
+            return (Criteria) this;
+        }
+
+        public Criteria andAmountTaxNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("AMOUNT_TAX not between", value1, value2, "amountTax");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {
