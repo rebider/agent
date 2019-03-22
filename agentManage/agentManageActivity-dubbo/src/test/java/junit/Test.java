@@ -5,6 +5,7 @@ import com.ryx.credit.activity.entity.ActIdUser;
 import com.ryx.credit.service.ActIdUserService;
 import com.ryx.credit.service.ActivityService;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
@@ -32,7 +33,7 @@ import java.util.Map;
  * @since 1.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "classpath*:/test/spring-context.xml" })
+@ContextConfiguration(locations = { "classpath*:spring-context.xml" ,"classpath*:spring-mybatis.xml"})
 public class Test {
     @Autowired
     StandaloneProcessEngineConfiguration processEngineConfiguration;
@@ -182,6 +183,15 @@ public class Test {
 //
 //    }
 
+
+    @org.junit.Test
+    public void deleteDepWar(){
+//        ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
+//        RepositoryService repositoryService = processEngine.getRepositoryService();
+//        RuntimeService runtimeService = processEngine.getRuntimeService();
+//        repositoryService.deleteDeployment("2465008",true);
+
+    }
 
 
 }

@@ -364,4 +364,20 @@ public class OActivity implements Serializable{
     public void setStandTime(BigDecimal standTime) {
         this.standTime = standTime;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OActivity activity = (OActivity) o;
+
+        return id.equals(activity.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }

@@ -75,4 +75,6 @@ public interface TermMachineService {
      JSONObject request(Map data, String url)throws Exception;
 
 
+     AgentResult querySnMsg(PlatformType platformType,String snBegin,String snEnd)throws Exception;
+
 }

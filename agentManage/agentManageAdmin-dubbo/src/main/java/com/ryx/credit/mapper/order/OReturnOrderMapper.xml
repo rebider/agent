@@ -430,7 +430,8 @@
     ro.rel_return_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo) as rel_return_amo,
     ro.cut_amo * (odetail.return_count * odetail.return_price / ro.goods_return_amo) as cut_amo,
     refund.clo_bank_account,
-    refund.clo_realname
+    refund.clo_realname,
+    oorder.ox_order
     from o_return_order ro
     right join o_return_order_detail odetail on odetail.return_id = ro.id
     left join o_sub_order os on os.pro_id = odetail.pro_id and os.order_id = odetail.order_id and os.status=1

@@ -36,7 +36,7 @@ public interface OldOrderReturnService {
      * @return
      */
     public AgentResult taskApprove(AgentVo agentVo,String userId)throws MessageException;
-
+    public void approvalReject(String processInstanceId, String activityName) throws MessageException;
 
     /**
      * 抓取订单中指定的商品的信息，对业务订单审批界面进行补全
@@ -81,4 +81,14 @@ public interface OldOrderReturnService {
      * @throws Exception
      */
      void approvalFinish(String processInstanceId, String activityName) throws Exception;
+
+    /**
+     * 解析上传文件
+     * @param excelList
+     * @return
+     * @throws MessageException
+     */
+    public AgentResult parseExcel(List<List<Object>> excelList)throws MessageException;
+
+    public AgentResult checkReturnOrderOrderIdIsCompplet(String returnDetailsId);
 }
