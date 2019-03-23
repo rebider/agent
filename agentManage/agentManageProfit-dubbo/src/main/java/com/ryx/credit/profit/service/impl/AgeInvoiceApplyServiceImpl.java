@@ -144,12 +144,13 @@ public class AgeInvoiceApplyServiceImpl implements IAgeInvoiceApplyService {
         invoiceApply.setUnitPrice(new BigDecimal(list.get(5).toString()));
         String str2 = list.get(6).toString().trim();
         invoiceApply.setNumberSl(Long.valueOf(str2.substring(0,str2.indexOf("."))));
-        BigDecimal sum = invoiceApply.getUnitPrice().multiply(new BigDecimal(invoiceApply.getNumberSl()));
-        invoiceApply.setSumAmt(sum.setScale(2));
-        invoiceApply.setExpressDate(list.get(7).toString());
+        invoiceApply.setAmountBeforeTax(new BigDecimal(list.get(7).toString()));
         invoiceApply.setTax(new BigDecimal(list.get(8).toString()));
-        invoiceApply.setExpressCompany(list.get(9).toString());
-        String str3 = list.get(10).toString();
+        invoiceApply.setAmountTax(new BigDecimal(list.get(9).toString()));
+        invoiceApply.setSumAmt(new BigDecimal(list.get(10).toString()));
+        invoiceApply.setExpressDate(list.get(11).toString());
+        invoiceApply.setExpressCompany(list.get(12).toString());
+        String str3 = list.get(13).toString();
         if(str3.indexOf(".") != -1){
             str3 = str3.substring(0,str3.indexOf("."));
         }

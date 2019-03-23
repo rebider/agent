@@ -30,6 +30,8 @@
     <result column="AGENT_ID" jdbcType="VARCHAR" property="agentId" />
     <result column="AGENT_NAME" jdbcType="VARCHAR" property="agentName" />
     <result column="PROFIT_MONTH" jdbcType="VARCHAR" property="profitMonth" />
+    <result column="AMOUNT_BEFORE_TAX" jdbcType="DECIMAL" property="amountBeforeTax" />
+    <result column="AMOUNT_TAX" jdbcType="DECIMAL" property="amountTax" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -90,11 +92,11 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    ID, INVOICE_COMPANY, INVOICE_DATE, INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM, UNIT_PRICE, 
-    NUMBER_SL, SUM_AMT, TAX, EXPRESS_COMPANY, EXPRESS_NUMBER, EXPRESS_DATE, ATTACHMENT, 
-    SH_DATE, SH_NAME, CURRENT_INVOICE, SH_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, 
-    RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, FILENAME, AGENT_ID, AGENT_NAME, 
-    PROFIT_MONTH
+    ID, INVOICE_COMPANY, INVOICE_DATE, INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM, UNIT_PRICE,
+    NUMBER_SL, SUM_AMT, TAX, EXPRESS_COMPANY, EXPRESS_NUMBER, EXPRESS_DATE, ATTACHMENT,
+    SH_DATE, SH_NAME, CURRENT_INVOICE, SH_RESULT, RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER,
+    RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, FILENAME, AGENT_ID, AGENT_NAME,
+    PROFIT_MONTH, AMOUNT_BEFORE_TAX, AMOUNT_TAX
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.InvoiceApplyExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -113,7 +115,7 @@
     <include refid="OracleDialectSuffix" />
   </select>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from P_INVOICE_APPLY
     where ID = #{id,jdbcType=VARCHAR}
@@ -125,26 +127,28 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
-    insert into P_INVOICE_APPLY (ID, INVOICE_COMPANY, INVOICE_DATE, 
-      INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM, 
-      UNIT_PRICE, NUMBER_SL, SUM_AMT, 
-      TAX, EXPRESS_COMPANY, EXPRESS_NUMBER, 
-      EXPRESS_DATE, ATTACHMENT, SH_DATE, 
-      SH_NAME, CURRENT_INVOICE, SH_RESULT, 
-      RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER, 
-      RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME, 
-      FILENAME, AGENT_ID, AGENT_NAME, 
-      PROFIT_MONTH)
-    values (#{id,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{invoiceDate,jdbcType=VARCHAR}, 
-      #{invoiceNumber,jdbcType=VARCHAR}, #{invoiceCode,jdbcType=VARCHAR}, #{invoiceItem,jdbcType=VARCHAR}, 
-      #{unitPrice,jdbcType=DECIMAL}, #{numberSl,jdbcType=DECIMAL}, #{sumAmt,jdbcType=DECIMAL}, 
-      #{tax,jdbcType=DECIMAL}, #{expressCompany,jdbcType=VARCHAR}, #{expressNumber,jdbcType=VARCHAR}, 
-      #{expressDate,jdbcType=VARCHAR}, #{attachment,jdbcType=VARCHAR}, #{shDate,jdbcType=VARCHAR}, 
-      #{shName,jdbcType=VARCHAR}, #{currentInvoice,jdbcType=DECIMAL}, #{shResult,jdbcType=CHAR}, 
-      #{returnReason,jdbcType=VARCHAR}, #{returnDate,jdbcType=VARCHAR}, #{returnExpressNumber,jdbcType=VARCHAR}, 
-      #{returnExpressCompany,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR}, 
-      #{filename,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR}, 
-      #{profitMonth,jdbcType=VARCHAR})
+    insert into P_INVOICE_APPLY (ID, INVOICE_COMPANY, INVOICE_DATE,
+      INVOICE_NUMBER, INVOICE_CODE, INVOICE_ITEM,
+      UNIT_PRICE, NUMBER_SL, SUM_AMT,
+      TAX, EXPRESS_COMPANY, EXPRESS_NUMBER,
+      EXPRESS_DATE, ATTACHMENT, SH_DATE,
+      SH_NAME, CURRENT_INVOICE, SH_RESULT,
+      RETURN_REASON, RETURN_DATE, RETURN_EXPRESS_NUMBER,
+      RETURN_EXPRESS_COMPANY, CREATE_DATE, CREATE_NAME,
+      FILENAME, AGENT_ID, AGENT_NAME,
+      PROFIT_MONTH, AMOUNT_BEFORE_TAX, AMOUNT_TAX
+      )
+    values (#{id,jdbcType=VARCHAR}, #{invoiceCompany,jdbcType=VARCHAR}, #{invoiceDate,jdbcType=VARCHAR},
+      #{invoiceNumber,jdbcType=VARCHAR}, #{invoiceCode,jdbcType=VARCHAR}, #{invoiceItem,jdbcType=VARCHAR},
+      #{unitPrice,jdbcType=DECIMAL}, #{numberSl,jdbcType=DECIMAL}, #{sumAmt,jdbcType=DECIMAL},
+      #{tax,jdbcType=DECIMAL}, #{expressCompany,jdbcType=VARCHAR}, #{expressNumber,jdbcType=VARCHAR},
+      #{expressDate,jdbcType=VARCHAR}, #{attachment,jdbcType=VARCHAR}, #{shDate,jdbcType=VARCHAR},
+      #{shName,jdbcType=VARCHAR}, #{currentInvoice,jdbcType=DECIMAL}, #{shResult,jdbcType=CHAR},
+      #{returnReason,jdbcType=VARCHAR}, #{returnDate,jdbcType=VARCHAR}, #{returnExpressNumber,jdbcType=VARCHAR},
+      #{returnExpressCompany,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{createName,jdbcType=VARCHAR},
+      #{filename,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, #{agentName,jdbcType=VARCHAR},
+      #{profitMonth,jdbcType=VARCHAR}, #{amountBeforeTax,jdbcType=DECIMAL}, #{amountTax,jdbcType=DECIMAL}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.InvoiceApply">
     insert into P_INVOICE_APPLY
@@ -233,6 +237,12 @@
       <if test="profitMonth != null">
         PROFIT_MONTH,
       </if>
+      <if test="amountBeforeTax != null">
+        AMOUNT_BEFORE_TAX,
+      </if>
+      <if test="amountTax != null">
+        AMOUNT_TAX,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -318,6 +328,12 @@
       </if>
       <if test="profitMonth != null">
         #{profitMonth,jdbcType=VARCHAR},
+      </if>
+      <if test="amountBeforeTax != null">
+        #{amountBeforeTax,jdbcType=DECIMAL},
+      </if>
+      <if test="amountTax != null">
+        #{amountTax,jdbcType=DECIMAL},
       </if>
     </trim>
   </insert>
@@ -414,6 +430,12 @@
       <if test="record.profitMonth != null">
         PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
       </if>
+      <if test="record.amountBeforeTax != null">
+        AMOUNT_BEFORE_TAX = #{record.amountBeforeTax,jdbcType=DECIMAL},
+      </if>
+      <if test="record.amountTax != null">
+        AMOUNT_TAX = #{record.amountTax,jdbcType=DECIMAL},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -422,33 +444,35 @@
   <update id="updateByExample" parameterType="map">
     update P_INVOICE_APPLY
     set ID = #{record.id,jdbcType=VARCHAR},
-      INVOICE_COMPANY = #{record.invoiceCompany,jdbcType=VARCHAR},
-      INVOICE_DATE = #{record.invoiceDate,jdbcType=VARCHAR},
-      INVOICE_NUMBER = #{record.invoiceNumber,jdbcType=VARCHAR},
-      INVOICE_CODE = #{record.invoiceCode,jdbcType=VARCHAR},
-      INVOICE_ITEM = #{record.invoiceItem,jdbcType=VARCHAR},
-      UNIT_PRICE = #{record.unitPrice,jdbcType=DECIMAL},
-      NUMBER_SL = #{record.numberSl,jdbcType=DECIMAL},
-      SUM_AMT = #{record.sumAmt,jdbcType=DECIMAL},
-      TAX = #{record.tax,jdbcType=DECIMAL},
-      EXPRESS_COMPANY = #{record.expressCompany,jdbcType=VARCHAR},
-      EXPRESS_NUMBER = #{record.expressNumber,jdbcType=VARCHAR},
-      EXPRESS_DATE = #{record.expressDate,jdbcType=VARCHAR},
-      ATTACHMENT = #{record.attachment,jdbcType=VARCHAR},
-      SH_DATE = #{record.shDate,jdbcType=VARCHAR},
-      SH_NAME = #{record.shName,jdbcType=VARCHAR},
-      CURRENT_INVOICE = #{record.currentInvoice,jdbcType=DECIMAL},
-      SH_RESULT = #{record.shResult,jdbcType=CHAR},
-      RETURN_REASON = #{record.returnReason,jdbcType=VARCHAR},
-      RETURN_DATE = #{record.returnDate,jdbcType=VARCHAR},
-      RETURN_EXPRESS_NUMBER = #{record.returnExpressNumber,jdbcType=VARCHAR},
-      RETURN_EXPRESS_COMPANY = #{record.returnExpressCompany,jdbcType=VARCHAR},
-      CREATE_DATE = #{record.createDate,jdbcType=VARCHAR},
-      CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
-      FILENAME = #{record.filename,jdbcType=VARCHAR},
-      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
-      AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
-      PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR}
+    INVOICE_COMPANY = #{record.invoiceCompany,jdbcType=VARCHAR},
+    INVOICE_DATE = #{record.invoiceDate,jdbcType=VARCHAR},
+    INVOICE_NUMBER = #{record.invoiceNumber,jdbcType=VARCHAR},
+    INVOICE_CODE = #{record.invoiceCode,jdbcType=VARCHAR},
+    INVOICE_ITEM = #{record.invoiceItem,jdbcType=VARCHAR},
+    UNIT_PRICE = #{record.unitPrice,jdbcType=DECIMAL},
+    NUMBER_SL = #{record.numberSl,jdbcType=DECIMAL},
+    SUM_AMT = #{record.sumAmt,jdbcType=DECIMAL},
+    TAX = #{record.tax,jdbcType=DECIMAL},
+    EXPRESS_COMPANY = #{record.expressCompany,jdbcType=VARCHAR},
+    EXPRESS_NUMBER = #{record.expressNumber,jdbcType=VARCHAR},
+    EXPRESS_DATE = #{record.expressDate,jdbcType=VARCHAR},
+    ATTACHMENT = #{record.attachment,jdbcType=VARCHAR},
+    SH_DATE = #{record.shDate,jdbcType=VARCHAR},
+    SH_NAME = #{record.shName,jdbcType=VARCHAR},
+    CURRENT_INVOICE = #{record.currentInvoice,jdbcType=DECIMAL},
+    SH_RESULT = #{record.shResult,jdbcType=CHAR},
+    RETURN_REASON = #{record.returnReason,jdbcType=VARCHAR},
+    RETURN_DATE = #{record.returnDate,jdbcType=VARCHAR},
+    RETURN_EXPRESS_NUMBER = #{record.returnExpressNumber,jdbcType=VARCHAR},
+    RETURN_EXPRESS_COMPANY = #{record.returnExpressCompany,jdbcType=VARCHAR},
+    CREATE_DATE = #{record.createDate,jdbcType=VARCHAR},
+    CREATE_NAME = #{record.createName,jdbcType=VARCHAR},
+    FILENAME = #{record.filename,jdbcType=VARCHAR},
+    AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+    AGENT_NAME = #{record.agentName,jdbcType=VARCHAR},
+    PROFIT_MONTH = #{record.profitMonth,jdbcType=VARCHAR},
+    AMOUNT_BEFORE_TAX = #{record.amountBeforeTax,jdbcType=DECIMAL},
+    AMOUNT_TAX = #{record.amountTax,jdbcType=DECIMAL}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -537,6 +561,12 @@
       <if test="profitMonth != null">
         PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
       </if>
+      <if test="amountBeforeTax != null">
+        AMOUNT_BEFORE_TAX = #{amountBeforeTax,jdbcType=DECIMAL},
+      </if>
+      <if test="amountTax != null">
+        AMOUNT_TAX = #{amountTax,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -568,12 +598,14 @@
       FILENAME = #{filename,jdbcType=VARCHAR},
       AGENT_ID = #{agentId,jdbcType=VARCHAR},
       AGENT_NAME = #{agentName,jdbcType=VARCHAR},
-      PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR}
+      PROFIT_MONTH = #{profitMonth,jdbcType=VARCHAR},
+      AMOUNT_BEFORE_TAX = #{amountBeforeTax,jdbcType=DECIMAL},
+      AMOUNT_TAX = #{amountTax,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">

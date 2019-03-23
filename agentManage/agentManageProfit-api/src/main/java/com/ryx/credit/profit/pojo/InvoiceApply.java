@@ -60,6 +60,10 @@ public class InvoiceApply implements Serializable {
 
     private String profitMonth;
 
+    private BigDecimal amountBeforeTax;
+
+    private BigDecimal amountTax;
+
     public String getId() {
         return id;
     }
@@ -283,4 +287,21 @@ public class InvoiceApply implements Serializable {
     public void setProfitMonth(String profitMonth) {
         this.profitMonth = profitMonth == null ? null : profitMonth.trim();
     }
+
+    public BigDecimal getAmountBeforeTax() {
+        return amountBeforeTax;
+    }
+
+    public void setAmountBeforeTax(BigDecimal amountBeforeTax) {
+        this.amountBeforeTax = amountBeforeTax;
+    }
+
+    public BigDecimal getAmountTax() {
+        return amountTax;
+    }
+
+    public void setAmountTax(BigDecimal amountTax) {
+        this.amountTax = amountTax;
+    }
+
 }
