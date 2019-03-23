@@ -718,7 +718,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
         ProfitDetailMonth detailMonth = new ProfitDetailMonth();
         detailMonth.setStatus("4,6");
-        detailMonth.setProfitDate(profitDate);
         List<ProfitDetailMonth> profitDetailMonthList = getProfitDetailMonthList(null, null, detailMonth);
         if (profitDetailMonthList != null && profitDetailMonthList.size() > 0) {
             String paytDate = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
@@ -785,7 +784,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentPid", profitDetailMonthTemp.getAgentId()); //业务平台编号
         map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));   //扣款月份
-        map.put("agentProfitAmt", agentProfitAmt);     //代理商分润
+        //屏蔽原因：此地为代理商所有平台汇总的分润金额，新需求要求机具扣款以平台的维度去扣款：即那个平台下扣那个平台的款
+        /*map.put("agentProfitAmt", agentProfitAmt); */    //代理商分润
         map.put("computType", computType);
         map.put("rotation", "1");
 
