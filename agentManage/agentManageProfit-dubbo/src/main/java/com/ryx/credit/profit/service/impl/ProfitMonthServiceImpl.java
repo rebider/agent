@@ -792,11 +792,12 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private BigDecimal doToolDeduction(ProfitDetailMonth profitDetailMonthTemp, BigDecimal agentProfitAmt, String computType) {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentPid", profitDetailMonthTemp.getAgentId()); //业务平台编号
+        map.put("parentAgentId", profitDetailMonthTemp.getParentAgentId());
         map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));   //扣款月份
-        //屏蔽原因：此地为代理商所有平台汇总的分润金额，新需求要求机具扣款以平台的维度去扣款：即那个平台下扣那个平台的款
-        /*map.put("agentProfitAmt", agentProfitAmt); */    //代理商分润
+        map.put("agentProfitAmt", agentProfitAmt);
         map.put("computType", computType);
         map.put("rotation", "1");
+
 
         try {
             profitToolsDeductService.execut(map);
