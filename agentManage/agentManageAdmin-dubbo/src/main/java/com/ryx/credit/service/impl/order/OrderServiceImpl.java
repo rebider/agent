@@ -383,6 +383,12 @@ public class OrderServiceImpl implements OrderService {
                 }
                 return payment;
             case "FKFQ"://打款分期
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(dateFromStr) < 0) {
+                    throw new MessageException("分期日期有误");
+                }
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new MessageException("分期期数有误");
+                }
                 List<OCashReceivablesVo> cash_FKFQ = agentVo.getoCashReceivables();
                 if (cash_FKFQ==null || cash_FKFQ.size()> 0) {
                     agentVo.setoCashReceivables(new ArrayList<>());
