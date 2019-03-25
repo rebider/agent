@@ -395,6 +395,12 @@ public class OrderServiceImpl implements OrderService {
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "FRFQ"://分润分期
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(dateFromStr) < 0) {
+                    throw new MessageException("分期日期有误");
+                }
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new MessageException("分期期数有误");
+                }
                 List<OCashReceivablesVo> cash_FRFQ = agentVo.getoCashReceivables();
                 if (cash_FRFQ==null || cash_FRFQ.size()> 0) {
                     agentVo.setoCashReceivables(new ArrayList<>());
