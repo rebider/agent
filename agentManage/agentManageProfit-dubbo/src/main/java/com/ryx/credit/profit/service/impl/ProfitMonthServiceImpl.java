@@ -95,6 +95,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private IProfitDirectService profitDirectService;
     @Autowired
     AgentRelateDetailMapper agentRelateDetailMapper;
+    @Autowired
+    private ProfitComputerService computerService;
+    @Autowired
+    private ProfitDirectMapper profitDirectMapper;
 
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
@@ -406,9 +410,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public void computeProfitAmt() {
-        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
-        profitDetailMonthMapper.clearComputData(profitDate);
-        profitToolsDeductService.clearDetail();
         comput("1");
     }
 
@@ -447,10 +448,17 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Map<String, Object> params = new HashMap<>();
         params.put("profitMonth", profitDate);
 
+
+
+
         int count = this.getProfitDetailMonthCount(null, profitDetailMonth);
         if (count > 0) {
 
             long sstart = System.currentTimeMillis();
+
+            // 计算前清理数据
+            profitDetailMonthMapper.clearComputData(profitDate);
+            profitDirectMapper.clearComputData(profitDate);
 
             //更新代理商税点
             LOG.info("更新代理商税点开始，{}月", profitDate);
@@ -468,7 +476,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
                 }
             });*/
 
-            //600直发非一代退单扣款
+            //直发平台补款，从上往下
+            computerService.computer_Supply_ZhiFa(profitDate,computType);
+            //直发平台扣款，从下往上
+            computerService.computer_Buckle_ZhiFa(profitDate,computType);
 
 
             // 机具扣款未扣足，扣合并代理商
@@ -706,8 +717,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
     @Override
     public void testComputeProfitAmt() {
-        String profitDate = LocalDate.now().plusMonths(-1).format(DateTimeFormatter.BASIC_ISO_DATE).substring(0, 6);
-        profitDetailMonthMapper.clearComputData(profitDate);
         comput("2");
     }
 

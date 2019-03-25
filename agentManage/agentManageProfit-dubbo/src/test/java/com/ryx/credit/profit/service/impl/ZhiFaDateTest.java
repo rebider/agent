@@ -83,9 +83,9 @@ public class ZhiFaDateTest {
     public void computer(){
         try {
             //计算直发补款
-            computerService.computer_Supply_ZhiFa();
+            computerService.computer_Supply_ZhiFa(profitMonth, computType);
             //计算不足扣款找上级代扣，并记录
-            computerService.computer_Buckle_ZhiFa();
+            computerService.computer_Buckle_ZhiFa(profitMonth, computType);
             //计算直发实际分润
             computerService.computer_ZhiFa();
         } catch (Exception e) {
