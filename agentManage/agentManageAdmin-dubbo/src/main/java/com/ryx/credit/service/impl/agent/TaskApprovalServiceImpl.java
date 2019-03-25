@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.ApprovalType;
-import com.ryx.credit.common.enumc.Platform;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -11,10 +8,13 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.dao.agent.AgentBusInfoMapper;
 import com.ryx.credit.dao.agent.AgentColinfoMapper;
 import com.ryx.credit.dao.agent.BusActRelMapper;
+import com.ryx.credit.dao.agent.CapitalMapper;
 import com.ryx.credit.pojo.admin.agent.*;
 import com.ryx.credit.pojo.admin.vo.AgentBusInfoVo;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
+import com.ryx.credit.pojo.admin.vo.CapitalVo;
 import com.ryx.credit.service.ActivityService;
+import com.ryx.credit.service.IUserService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentEnterService;
 import com.ryx.credit.service.agent.TaskApprovalService;
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import sun.management.resources.agent;
 
 import java.util.*;
 
@@ -53,7 +54,10 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
      private BusActRelMapper busActRelMapper;
      @Autowired
      private TaskApprovalService taskApprovalService;
-
+     @Autowired
+     private CapitalMapper capitalMapper;
+    @Autowired
+    private IUserService iUserService;
      @Override
      public List<Map<String,Object>> queryBusInfoAndRemit(AgentBusInfo agentBusInfo){
 
@@ -98,7 +102,38 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
     @Override
     public AgentResult updateApproval(AgentVo agentVo,String userId) throws Exception{
 
-        if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())){
+        if(agentVo.getApprovalResult().equals(ApprovalType.PASS.getValue())) {
+            //判断打款方式--->银行汇款  是否填写了实际到账金额
+            List<Map<String, Object>> orgCodeRes = iUserService.orgCode(Long.valueOf(userId));
+            if(orgCodeRes==null && orgCodeRes.size()!=1){
+                throw new ProcessException("部门参数为空");
+            }
+            Map<String, Object> stringObjectMap = orgCodeRes.get(0);
+            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            //财务审批
+            if(orgId.equals("222")){
+            for (CapitalVo capitalVo : agentVo.getCapitalVoList()) {
+                if (capitalVo.getcPayType().equals(PayType.YHHK.code)) {
+                    if (null == capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")) {
+                        logger.info("请填写实际到账金额");
+                        throw new ProcessException("请填写实际到账金额");
+                    }
+
+                }
+                Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
+                capitalVo.setcUtime(new Date());
+                capitalVo.setVersion(capital.getVersion());
+                capitalVo.setcInAmount(capitalVo.getcInAmount());
+                capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                capitalVo.setId(capitalVo.getId());
+                int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
+                if (i != 1) {
+                    logger.info("实际到账金额填写失败");
+                    throw new ProcessException("实际到账金额填写失败");
+                }
+            }
+        }
+
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
                 AgentResult result = agentColinfoService.saveAgentColinfoRel(agentColinfoRel, userId);
