@@ -5,9 +5,7 @@ import com.ryx.credit.common.enumc.PamentSrcType;
 import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
-import com.ryx.credit.profit.pojo.ProfitDeduction;
-import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
-import com.ryx.credit.profit.pojo.ProfitDetailMonth;
+import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.order.IOPdSumService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -51,10 +49,12 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         LOG.info("机具分润扣款请求参数：{}", map);
         String agentPid = map.get("agentPid").toString();
         String computType = map.get("computType").toString();
+        String parentAgentId = map.get("parentAgentId").toString();
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId(agentPid);
         profitDeduction.setDeductionDate(map.get("deductDate").toString());
         profitDeduction.setDeductionType(DeductionType.MACHINE.getType());
+        profitDeduction.setParentAgentId(parentAgentId);
         List<ProfitDeduction> list = profitDeductionService.getProfitDeduction(profitDeduction);
         if (list != null && !list.isEmpty()) {
             if (Objects.equals("1", map.get("rotation"))) {
@@ -76,7 +76,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         return map;
     }
 
-    private Map<String, Object> fristRound(Map<String, Object> map, String agentPid, String computType, List<ProfitDeduction> list) {
+    private Map<String, Object> fristRound(Map<String, Object> map, String agentPid, String computType, List<ProfitDeduction> list) throws Exception {
+       /* String agentId= map.get("agentPid").toString();
+        String deductDate = map.get("deductDate").toString();
+        BigDecimal profitSumAmt = BigDecimal.ZERO;*/
         BigDecimal profitSumAmt = new BigDecimal(map.get("agentProfitAmt").toString());
         list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("PosDgMustDeductionAmt", bigDecimal));
         list.stream().filter(profitDeduction1 -> Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("RhbDgMustDeductionAmt", bigDecimal));
@@ -94,6 +97,20 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             LOG.info("机具扣款流水号：{}，代理商唯一码：{}，应扣金额：{}，分润汇总剩余：{}", deduction.getSourceId(), agentPid, mustAmt, profitSumAmt);
 
             if (Objects.equals("1", map.get("rotation"))) {
+               /* String busCode =deduction.getDeductionDesc();
+                TransProfitDetailExample transProfitDetail = new TransProfitDetailExample();
+                TransProfitDetailExample.Criteria criteria = transProfitDetail.createCriteria();
+                criteria.andAgentIdEqualTo(agentId);
+                criteria.andProfitDateEqualTo(deductDate);
+                criteria.andBusCodeEqualTo(busCode);
+                List<TransProfitDetail> transProfitDetails = profitDetailMonthServiceImpl.getTransProfitDetailByBusCode(transProfitDetail);
+                if (transProfitDetails.size()!=1){
+                    LOG.info("获取对应平台的月份润错误");
+                    return null;
+                }
+                TransProfitDetail transProfitDetail1 = transProfitDetails.get(0);
+                //平台对应的分润
+                profitSumAmt = transProfitDetail1.getProfitAmt();*/
                 if (profitSumAmt.compareTo(BigDecimal.ZERO) > 0) {
                     this.basicsProfitDeductAmt(deduction, mustAmt, profitSumAmt, map);
                     profitSumAmt = (BigDecimal) map.get("profitSumAmt");

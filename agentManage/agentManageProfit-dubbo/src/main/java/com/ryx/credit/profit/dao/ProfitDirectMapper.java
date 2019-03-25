@@ -63,4 +63,6 @@ public interface ProfitDirectMapper {
     BigDecimal selectSumTaxAmt2(ProfitDirect dirct);
 
     Map<String,Object> profitCount(Map<String, Object> param);
+
+    void clearComputData(@Param("profitDate") String profitDate);
 }

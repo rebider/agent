@@ -463,15 +463,19 @@
     SELECT
     <include refid="Base_Column_List" />
     FROM P_PROFIT_DIRECT
-    where AGENT_ID in
-    (select agent_id from p_profit_supply where agent_id is not null and SUPPLY_DATE=to_char(add_months(sysdate,-2),'YYYYMM') and supply_amt>0 and SUPPLY_TYPE='退单补款')
+    where
+    trans_month = to_char(add_months(sysdate,-1),'YYYYMM')
+    and AGENT_ID in
+    (select agent_id from p_profit_supply where agent_id is not null and SUPPLY_DATE=to_char(add_months(sysdate,-1),'YYYYMM') and supply_amt > 0 and BUS_BIG_TYPE='02')
   </select>
 
+  <!--查询存在退单扣款的直发代理商-->
   <select id="selectByBuckle"  resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
     FROM P_PROFIT_DIRECT
-    where TRANS_MONTH=to_char(add_months(sysdate,-1),'YYYYMM') AND BUCKLE_AMT > 0
+    where TRANS_MONTH=to_char(add_months(sysdate,-1),'YYYYMM')
+    AND agent_id in(select agent_id from P_DEDUCTION where  DEDUCTION_TYPE = '01' and source_id='02' AND DEDUCTION_DATE = to_char(add_months(sysdate,-1),'YYYYMM'))
   </select>
 
   <select id="getProfitDirectList" parameterType="java.util.Map" resultType="java.util.Map">
@@ -601,5 +605,13 @@
     delete from P_PROFIT_DIRECT
     where TRANS_MONTH = '${transMonth}'
   </delete>
+
+
+  <!--清理计算数据重跑 -->
+  <update id="clearComputData" parameterType="java.lang.String">
+    update P_PROFIT_DIRECT
+    set SUPPLY_AMT=0,BUCKLE_AMT=0,PARENT_BUCKLE=0,PARENT_SUPPLY=0
+    where TRANS_MONTH = #{profitDate,jdbcType=VARCHAR}
+  </update>
 
 </mapper>

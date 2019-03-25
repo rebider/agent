@@ -121,6 +121,10 @@ public class ProfitDetailMonthServiceImpl implements ProfitDetailMonthService {
         }
         return null;
     }
+    @Override
+    public List<TransProfitDetail> getTransProfitDetailByBusCode(TransProfitDetailExample transProfitDetailExample ) {
+        return transProfitDetailMapper.selectByExample(transProfitDetailExample);
+    }
 
     @Override
     public List<TransProfitDetail> getChildTransProfitDetailList(String agentId, List<String> profitDate, String agentType) {

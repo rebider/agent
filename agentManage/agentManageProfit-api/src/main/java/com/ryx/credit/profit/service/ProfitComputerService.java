@@ -1,14 +1,8 @@
 package com.ryx.credit.profit.service;
 
-import com.ryx.credit.common.exception.ProcessException;
-import com.ryx.credit.common.util.Page;
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
-import com.ryx.credit.profit.pojo.ProfitMonth;
-import com.ryx.credit.profit.pojo.ProfitUnfreeze;
-import org.omg.CosNaming.BindingHelper;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * @author wangY
@@ -82,13 +76,17 @@ public interface ProfitComputerService {
 
     /**
      * 计算直发分润（追溯本源，逐级往下补款）
+     * @param profitMonth
+     * @param computType
      */
-    void computer_Supply_ZhiFa();
+    void computer_Supply_ZhiFa(String profitMonth, String computType);
 
     /**
      * 计算直发分润（逐级往上扣款）
+     * @param profitMonth
+     * @param computType
      */
-    void computer_Buckle_ZhiFa();
+    void computer_Buckle_ZhiFa(String profitMonth, String computType);
 
     /**
      * 直发分润计算（上月所有）
