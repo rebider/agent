@@ -360,7 +360,7 @@
   </sql>
   <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <select id="getSumRunAmt" parameterType="java.lang.String" resultType="java.math.BigDecimal">
-    select SUM(RUN_AMT-SUPPLY_AMT) from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR}
+    select SUM(RUN_AMT-nvl(SUPPLY_AMT,0)) from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} and run_type = '1'
   </select>
   <select id="selectListByAgentIdAndRunDate" parameterType="java.util.Map" resultType="map">
     select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.RUN_AMT
@@ -380,7 +380,9 @@ on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.SUPPLY_DATE,0,6)=ppd.TRA
   <select id="selectListByBearAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultMap="BaseResultMap">
     select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND substr(SUPPLY_DATE,0,6)=#{runDate}
   </select>
+
+  <!--从被代扣代理商维度查询代扣记录-->
   <select id="selectListByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select * from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} AND RUN_STATUS='0' ORDER BY RUN_LEVEL DESC
+    select * from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} AND RUN_STATUS='0' and run_type = '1' and RUN_AMT > nvl(SUPPLY_AMT,0) ORDER BY RUN_LEVEL DESC
   </select>
 </mapper>

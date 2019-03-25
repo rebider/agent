@@ -134,6 +134,7 @@ public class RefundJob {
         List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotSupplyProfitSettleErrLsList(query);
         insertSettleErrList(array, orgMap, supplyIdMap, settleErrLs, "2");
 
+        //orgMap<业务系统编码：应补金额>
         if (orgMap.size() > 0) {
             Set<String> keys = orgMap.keySet();
             for (String key : keys) {
@@ -194,7 +195,9 @@ public class RefundJob {
             List<ProfitSettleErrLs> settleErrLs = profitSettleErrLsService.getNotDeductionProfitSettleErrLsList(query);
             LOG.info("对数据汇总并生成退单明细。");
             insertSettleErrList(array, orgMap, deductionIdMap, settleErrLs, "1");
+
             LOG.info("对数据汇总并生成扣款信息。");
+            //orgMap<业务系统机构编码：应扣金额>
             if (orgMap.size() > 0) {
                 Set<String> keys = orgMap.keySet();
                 for (String key : keys) {
@@ -310,7 +313,7 @@ public class RefundJob {
                                     sourceIdMap.put(sourceId, result);
                                 }
                             }
-                            hasNode = true;
+                            hasNode = true;//本次又有那笔退款
                             delArray.add(obj);
                             break;
                         }
@@ -366,7 +369,6 @@ public class RefundJob {
         settleErrLs.setBalanceAmt(jsonObject.getBigDecimal("balanceAmt"));// 剩余未销账金额
         settleErrLs.setHostLs(jsonObject.getString("hostLs"));
         settleErrLs.setMerchName(jsonObject.getString("merchName"));
-        settleErrLs.setId(idService.genId(TabId.P_SETTLE_ERR_LS));
         settleErrLs.setBusinessType(jsonObject.getString("businessType"));
         settleErrLs.setCardNo(jsonObject.getString("cardNo"));
         settleErrLs.setErrDate(jsonObject.getString("errDate"));
@@ -379,7 +381,7 @@ public class RefundJob {
         settleErrLs.setRealDeductAmt(jsonObject.getBigDecimal("realDeductAmt"));
         settleErrLs.setOffsetLossAmt(jsonObject.getBigDecimal("offsetLossAmt"));
         settleErrLs.setYswsAmt(jsonObject.getBigDecimal("ingshou"));
-        String orgId = jsonObject.getString("instId");
+        String orgId = jsonObject.getString("instId");//每个业务系统机构编号
 
         synchronized (object) {
             if ("POS".equals(jsonObject.getString("businessType"))){

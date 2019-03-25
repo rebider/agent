@@ -142,8 +142,8 @@ public class ProfitZhiFaDataJob {
             profitDirect.setBankOpen(json.getString("BANKOPEN"));//开户行
             profitDirect.setBankCode(json.getString("BANKCODE"));//银行号
             profitDirect.setSupplyAmt(BigDecimal.ZERO);//补款
+            profitDirect.setParentSupply(BigDecimal.ZERO);//下级补款
             profitDirect.setParentBuckle(BigDecimal.ZERO);//代下级扣款
-            //ProfitDirect.setBuckleAmt(buckle == null ? BigDecimal.ZERO : buckle);//退单扣款
             profitDirect.setBuckleAmt(BigDecimal.ZERO);//退单扣款
             profitDirect.setDailyAmt(json.getBigDecimal("DAILYMONEY"));//日结分润总金额
             profitDirect.setBossCode("6000");
@@ -153,20 +153,20 @@ public class ProfitZhiFaDataJob {
         synchroProfitDirect(transDate);
     }
 
-    public void computer() {
+    /*public void computer() {
         try {
             Thread.sleep(1000);
             //计算直发补款
-            computerService.computer_Supply_ZhiFa();
+            computerService.computer_Supply_ZhiFa(profitMonth);
             //计算不足扣款找上级代扣，并记录
-            computerService.computer_Buckle_ZhiFa();
+            computerService.computer_Buckle_ZhiFa(profitMonth);
             //计算直发实际分润
             computerService.computer_ZhiFa();
         } catch (Exception e) {
             logger.error("直发分润计算出错！");
             e.printStackTrace();
         }
-    }
+    }*/
 
 
     public static void main(String agrs[]) {

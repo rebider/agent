@@ -7,6 +7,7 @@ package com.ryx.credit.profit.service;/**
 import com.ryx.credit.profit.pojo.ProfitDetailMonth;
 import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
+import com.ryx.credit.profit.pojo.TransProfitDetailExample;
 
 import java.util.List;
 
@@ -95,4 +96,6 @@ public interface ProfitDetailMonthService {
      * @return
      */
     List<TransProfitDetail> getChildTransProfitDetailList(List<String> agentId, List<String> profitDate, String agentType);
+
+    List<TransProfitDetail> getTransProfitDetailByBusCode(TransProfitDetailExample transProfitDetailExample );
 }
