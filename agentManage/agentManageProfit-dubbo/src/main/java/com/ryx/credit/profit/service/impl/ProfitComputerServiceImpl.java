@@ -284,8 +284,11 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                         supply = BigDecimal.ZERO;
                     }
 
-                    buckleRun.setSupplyAmt(b.add(nowbk));
-                    buckleRunMapper.updateByPrimaryKeySelective(buckleRun);
+
+                    if ("2".equals(computType)){
+                        buckleRun.setSupplyAmt(b.add(nowbk));
+                        buckleRunMapper.updateByPrimaryKeySelective(buckleRun);
+                    }
 
 
                     //代扣直发代理商信息
@@ -342,7 +345,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 directMapper.updateByPrimaryKeySelective(profitDirect);
 
                 lackAmt = lackAmt.multiply(new BigDecimal("-1"));
-                computerSurplus(profitDirect, 1, profitDirect.getAgentId(), lackAmt);
+                computerSurplus(profitDirect, 1, profitDirect.getAgentId(), lackAmt,computType);
             }else {//自身就够扣
                 profitDirect.setBuckleAmt(isDecimalNull(profitDirect.getBuckleAmt()).add(deductionAmt));
                 directMapper.updateByPrimaryKeySelective(profitDirect);
@@ -357,9 +360,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * @param index        追溯层级,起始1
      * @param oldAgrnt     追溯底层代理商编号
      * @param buck         剩余扣款
+     * @param computType
      * @return
      */
-    public void computerSurplus(ProfitDirect profitDirect, int index, String oldAgrnt, BigDecimal buck) {
+    public void computerSurplus(ProfitDirect profitDirect, int index, String oldAgrnt, BigDecimal buck, String computType) {
         ProfitDirect parentWhere = new ProfitDirect();
         parentWhere.setTransMonth(profitDirect.getTransMonth());
         parentWhere.setAgentId(profitDirect.getParentAgentId());
@@ -372,54 +376,65 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             detailMonth.setZhifaBuckle(buckle.add(buck));
             detailMonthMapper.updateByPrimaryKeySelective(detailMonth);
 
-            //记录代扣承担关系
-            BuckleRun buckleRun = new BuckleRun();
-            buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
-            buckleRun.setAgentId(oldAgrnt);
-            buckleRun.setBearAgentPid(parentDirect.getFristAgentPid());
-            buckleRun.setBearAgentId(parentDirect.getAgentId());
-            buckleRun.setRunAmt(buck);
-            buckleRun.setSupplyAmt(BigDecimal.ZERO);
-            buckleRun.setRunDate(DateUtil.getDays());
-            buckleRun.setRunLevel(index + "");
-            buckleRun.setRunStatus("0");
-            buckleRunMapper.insertSelective(buckleRun);
+            if ("2".equals(computType)){
+                //记录代扣承担关系
+                BuckleRun buckleRun = new BuckleRun();
+                buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
+                buckleRun.setAgentId(oldAgrnt);
+                buckleRun.setBearAgentPid(parentDirect.getFristAgentPid());
+                buckleRun.setBearAgentId(parentDirect.getAgentId());
+                buckleRun.setRunAmt(buck);
+                buckleRun.setSupplyAmt(BigDecimal.ZERO);
+                buckleRun.setRunDate(DateUtil.getDays());
+                buckleRun.setRunLevel(index + "");
+                buckleRun.setRunStatus("0");
+                buckleRunMapper.insertSelective(buckleRun);
+            }
+
         } else {
             BigDecimal bearAmt = parentDirect.getProfitAmt().add(parentDirect.getSupplyAmt()).subtract(parentDirect.getBuckleAmt()).subtract(parentDirect.getParentBuckle());//上级的分润
             if (bearAmt.compareTo(BigDecimal.ZERO) < 0) {//上级自己还差钱
-                computerSurplus(parentDirect, index++, oldAgrnt, buck);
+                computerSurplus(parentDirect, index++, oldAgrnt, buck, computType);
                 return;
             }
             if (bearAmt.compareTo(buck) < 0) {//上级分润不够扣
                 parentDirect.setParentBuckle(isDecimalNull(parentDirect.getParentBuckle()).add(bearAmt));//替下级扣款(自己全部分润搭进去了)
                 directMapper.updateByPrimaryKeySelective(parentDirect);
-                //记录代扣承担关系
-                BuckleRun buckleRun = new BuckleRun();
-                buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
-                buckleRun.setAgentId(oldAgrnt);
-                buckleRun.setBearAgentId(parentDirect.getAgentId());
-                buckleRun.setRunAmt(bearAmt);//上级承担的扣款也就只能是自己不够扣的分润了
-                buckleRun.setSupplyAmt(BigDecimal.ZERO);
-                buckleRun.setRunDate(DateUtil.getDays());
-                buckleRun.setRunLevel(index + "");
-                buckleRun.setRunStatus("0");
-                buckleRunMapper.insertSelective(buckleRun);
+
+                if ("2".equals(computType)){
+                    //记录代扣承担关系
+                    BuckleRun buckleRun = new BuckleRun();
+                    buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
+                    buckleRun.setAgentId(oldAgrnt);
+                    buckleRun.setBearAgentId(parentDirect.getAgentId());
+                    buckleRun.setRunAmt(bearAmt);//上级承担的扣款也就只能是自己不够扣的分润了
+                    buckleRun.setSupplyAmt(BigDecimal.ZERO);
+                    buckleRun.setRunDate(DateUtil.getDays());
+                    buckleRun.setRunLevel(index + "");
+                    buckleRun.setRunStatus("0");
+                    buckleRunMapper.insertSelective(buckleRun);
+                }
+
                 buck = buck.subtract(bearAmt);//剩余扣款
-                computerSurplus(parentDirect, index++, oldAgrnt, buck);
+                computerSurplus(parentDirect, index++, oldAgrnt, buck, computType);
             } else {
                 parentDirect.setParentBuckle(isDecimalNull(parentDirect.getParentBuckle()).add(buck));//替下级扣款
                 directMapper.updateByPrimaryKeySelective(parentDirect);
-                //记录代扣承担关系
-                BuckleRun buckleRun = new BuckleRun();
-                buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
-                buckleRun.setAgentId(oldAgrnt);
-                buckleRun.setBearAgentId(parentDirect.getAgentId());
-                buckleRun.setRunAmt(buck);//上级承担的扣款
-                buckleRun.setSupplyAmt(BigDecimal.ZERO);
-                buckleRun.setRunDate(DateUtil.getDays());
-                buckleRun.setRunLevel(index + "");
-                buckleRun.setRunStatus("0");
-                buckleRunMapper.insertSelective(buckleRun);
+
+                if ("2".equals(computType)){
+                    //记录代扣承担关系
+                    BuckleRun buckleRun = new BuckleRun();
+                    buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
+                    buckleRun.setAgentId(oldAgrnt);
+                    buckleRun.setBearAgentId(parentDirect.getAgentId());
+                    buckleRun.setRunAmt(buck);//上级承担的扣款
+                    buckleRun.setSupplyAmt(BigDecimal.ZERO);
+                    buckleRun.setRunDate(DateUtil.getDays());
+                    buckleRun.setRunLevel(index + "");
+                    buckleRun.setRunStatus("0");
+                    buckleRunMapper.insertSelective(buckleRun);
+                }
+
             }
         }
     }
