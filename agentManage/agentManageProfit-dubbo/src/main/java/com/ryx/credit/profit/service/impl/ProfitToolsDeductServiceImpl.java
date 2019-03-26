@@ -61,10 +61,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             if (Objects.equals("1", map.get("rotation"))) {
                 LOG.info("第一轮机具扣款，扣代理商本身，代理商编号：{}", agentPid);
                 return this.fristRound(map, agentPid, computType, list);
-            } else if (Objects.equals("2", map.get("rotation"))) {
+            } /*else if (Objects.equals("2", map.get("rotation"))) {
                 LOG.info("第二轮机具扣款，扣合并代理商：代理商编号：{}", agentPid);
                 return this.secondRound(agentPid, map, list, computType);
-            } else if (Objects.equals("3", map.get("rotation"))) {
+            }*/ else if (Objects.equals("3", map.get("rotation"))) {
                 LOG.info("第三轮机具扣款，扣关联代理商：代理商编号：{}", agentPid);
                 return this.secondRound(agentPid, map, list, computType);
             } /*else {
