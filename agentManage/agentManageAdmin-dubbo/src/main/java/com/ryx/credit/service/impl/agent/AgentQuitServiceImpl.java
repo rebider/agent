@@ -401,6 +401,7 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal sumAmt = new BigDecimal(0);
         for (Capital capital : capitals) {
+            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()))
             sumAmt = sumAmt.add(capital.getcFqInAmount());
         }
         return sumAmt;
