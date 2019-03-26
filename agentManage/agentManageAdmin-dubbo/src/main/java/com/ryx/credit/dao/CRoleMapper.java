@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -23,4 +24,5 @@ public interface CRoleMapper extends BaseMapper<CRole> {
 
 	CRole selectByName(String name);
 
+	Set<String> selectShiroUrl(@Param("userId") Long userId);
 }

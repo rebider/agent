@@ -6,12 +6,14 @@ import com.ryx.credit.activity.entity.ActRuTaskExample;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.service.ActRuTaskService;
+import com.ryx.credit.service.CRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * ActRuTaskServiceImpl
@@ -27,6 +29,8 @@ import java.util.Map;
 public class ActRuTaskServiceImpl implements ActRuTaskService {
     @Autowired
     private ActRuTaskMapper  actRuTaskMapper;
+    @Autowired
+    private CRoleService roleService;
 
     @Override
     public int insert(ActRuTask record) {
@@ -104,6 +108,7 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
     @Override
     public PageInfo queryMyTaskPage(Page page, Map<String,Object> param){
 
+        Set<String> userIds = roleService.selectShiroUrl((Long) param.get("userId"));
 
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
         PageInfo pageInfo = new PageInfo();
