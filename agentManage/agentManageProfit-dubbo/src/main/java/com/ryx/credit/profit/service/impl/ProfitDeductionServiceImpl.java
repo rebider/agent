@@ -154,17 +154,36 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
+    public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) throws ProcessException{
         if(deductionist == null || deductionist.size() == 0){
-            throw new RuntimeException("导入数据为空");
+            throw new ProcessException("导入数据为空");
         }
-
-        if (deductionist != null && deductionist.size() > 0) {
-            deductionist.stream().filter(list -> list != null && list.size() > 0 && StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
-                    StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) && StringUtils.isNotBlank(list.get(6).toString())  ).forEach(list -> {
-                insertDeduction(list, userId);
-            });
+        for (List<Object> list : deductionist) {
+            if (list.size() != 7){
+                throw new ProcessException("请检查文件内数据是否准确！");
+            }
+            if(StringUtils.isBlank(list.get(0).toString()) ){
+                throw new ProcessException("代理商唯一码不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(1).toString()) ){
+                throw new ProcessException("代理商姓名不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(4).toString()) ){
+                throw new ProcessException("月份不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(5).toString()) ){
+                throw new ProcessException("扣款类型不能为空！");
+            }if(StringUtils.isBlank(list.get(6).toString()) ){
+                throw new ProcessException("扣款金额不能为空！");
+            }
         }
+            try{
+                deductionist.stream().forEach(list ->{
+                    insertDeduction(list, userId);
+                });
+            }catch (Exception e){
+                throw new ProcessException("数据格式异常");
+            }
     }
 
 
