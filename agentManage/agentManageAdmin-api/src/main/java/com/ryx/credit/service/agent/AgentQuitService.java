@@ -5,6 +5,7 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
 import com.ryx.credit.pojo.admin.agent.AgentQuit;
+import com.ryx.credit.pojo.admin.agent.Capital;
 import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.pojo.admin.vo.OCashReceivablesVo;
 
@@ -65,4 +66,7 @@ public interface AgentQuitService {
 
 
     AgentResult manualAgentQuitNotify(String busId,String platformCode);
+
+
+    List<Capital> queryCapital(String id);
 }

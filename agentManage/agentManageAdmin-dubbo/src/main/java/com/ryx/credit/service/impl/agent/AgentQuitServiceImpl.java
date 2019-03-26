@@ -1283,4 +1283,21 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         return AgentResult.ok();
     }
 
+
+    @Override
+    public List<Capital> queryCapital(String id) {
+        List<Capital> capitals = capitalMapper.paymentQuery(id);
+        List<Capital> resultList = new ArrayList<>();
+        if (null != capitals && capitals.size() > 0) {
+            for (Capital capital : capitals) {
+                capital.setAttachmentList(attachmentMapper.accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
+                if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name())){
+                    resultList.add(capital);
+                }
+            }
+        }
+        return resultList;
+    }
+
+
 }
