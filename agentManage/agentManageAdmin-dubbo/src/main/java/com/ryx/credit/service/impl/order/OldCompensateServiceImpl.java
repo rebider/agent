@@ -347,6 +347,8 @@ public class OldCompensateServiceImpl implements OldCompensateService {
         record.setBusType(BusActRelBusType.COMPENSATE.name());
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(oRefundPriceDiff.getAgentId());
+        record.setDataShiro(BusActRelBusType.COMPENSATE.key);
+
         Agent agent = agentMapper.selectByPrimaryKey(oRefundPriceDiff.getAgentId());
         if(null!=agent)
             record.setAgentName(agent.getAgName());

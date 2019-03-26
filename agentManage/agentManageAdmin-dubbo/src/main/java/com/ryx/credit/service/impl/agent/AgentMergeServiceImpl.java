@@ -707,6 +707,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(mainAgent.getId());
         record.setAgentName(mainAgent.getAgName());
+        record.setDataShiro(BusActRelBusType.MERGE.key);
+
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商合并提交审批，启动审批异常，添加审批关系失败{}:{}", id, proceId);
             throw new MessageException("审批流启动失败：添加审批关系失败！");

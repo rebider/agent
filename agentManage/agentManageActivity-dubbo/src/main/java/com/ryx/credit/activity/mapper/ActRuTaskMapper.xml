@@ -367,6 +367,12 @@
     <if test="params.group == 'city' " >
       and (a.ag_doc_pro = #{params.orgId} or a.ag_doc_district = #{params.orgId})
     </if>
+    <if test="params.userIds != null " >
+      and
+      <foreach collection="params.userIds" separator="," item="userId" index="index" open=" DATA_SHIRO in (" close=")">
+         #{userId}
+      </foreach>
+    </if>
   </sql>
 
   <select id="queryMyTaskCount" parameterType="map" resultType="int">

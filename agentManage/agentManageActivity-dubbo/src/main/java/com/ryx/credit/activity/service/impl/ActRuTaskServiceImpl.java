@@ -109,7 +109,7 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
     public PageInfo queryMyTaskPage(Page page, Map<String,Object> param){
 
         Set<String> userIds = roleService.selectShiroUrl((Long) param.get("userId"));
-
+        param.put("userIds",userIds);
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(taskList);

@@ -21,6 +21,16 @@ public class BusActRel extends BusActRelKey implements Serializable{
 
     private String netInBusType;
 
+    private String dataShiro;
+
+    public String getDataShiro() {
+        return dataShiro;
+    }
+
+    public void setDataShiro(String dataShiro) {
+        this.dataShiro = dataShiro;
+    }
+
     public String getBusType() {
         return busType;
     }

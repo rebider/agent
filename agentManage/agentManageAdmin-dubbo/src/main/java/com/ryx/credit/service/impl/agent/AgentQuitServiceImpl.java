@@ -548,6 +548,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentQuit.getAgentId());
         record.setAgentName(agentQuit.getAgentName());
+        record.setDataShiro(BusActRelBusType.QUIT.key);
+
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
