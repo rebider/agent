@@ -1225,6 +1225,9 @@ public class AgentMergeServiceImpl implements AgentMergeService {
             AgentBusInfo busInfo = agentBusInfoList.get(0);
             PayComp payComp = apaycompService.selectById(busInfo.getCloPayCompany());
             AgentColinfo agentColinfo = agentColinfoService.selectByAgentIdAndBusId(agentMerge.getMainAgentId(), busInfo.getId());
+            if(agentColinfo==null){
+                throw new MessageException("缺少收款账户信息");
+            }
             agentColinfo.setAccountId(payComp.getId());
             agentColinfo.setAccountName(payComp.getComName());
             AgentPlatFormSyn record = new AgentPlatFormSyn();
