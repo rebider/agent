@@ -49,7 +49,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         LOG.info("机具分润扣款请求参数：{}", map);
         String agentPid = map.get("agentPid").toString();
         String computType = map.get("computType").toString();
-        String parentAgentId = map.get("parentAgentId").toString();
+        String parentAgentId =null;
+        if(map.get("parentAgentId")!=null){
+            parentAgentId = map.get("parentAgentId").toString();
+        }
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId(agentPid);
         profitDeduction.setDeductionDate(map.get("deductDate").toString());
