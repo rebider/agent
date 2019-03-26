@@ -2,6 +2,8 @@ package com.ryx.credit.profit.dao;
 
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 import com.ryx.credit.profit.pojo.ProfitDeducttionDetailExample;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface ProfitDeducttionDetailMapper {
@@ -20,4 +22,6 @@ public interface ProfitDeducttionDetailMapper {
     int updateByPrimaryKeySelective(ProfitDeducttionDetail record);
 
     int updateByPrimaryKey(ProfitDeducttionDetail record);
+
+    void clearComputData(@Param("profitDate") String profitDate, @Param("type")String type);
 }

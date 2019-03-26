@@ -46,6 +46,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     @Autowired
     private ProfitDetailMonthMapper profitDetailMonthMapper;
     @Autowired
+    private ProfitDeducttionDetailService profitDeducttionDetailService;
+    @Autowired
     private ProfitUnfreezeMapper profitUnfreezeMapper;
     @Autowired
     private IdService idService;
@@ -459,6 +461,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 计算前清理数据
             profitDetailMonthMapper.clearComputData(profitDate);
             profitDirectMapper.clearComputData(profitDate);
+            //清理扣款明细数据
+            profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
+
+
 
             //更新代理商税点
             LOG.info("更新代理商税点开始，{}月", profitDate);
