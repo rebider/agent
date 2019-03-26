@@ -300,7 +300,7 @@
   <delete id="clearComputData" parameterType="java.lang.String">
     delete from P_DEDUCTION_DETAIL where 1=1
     <if test="profitDate != null">
-      AND PROFIT_DATE=#{profitDate,jdbcType=VARCHAR}
+      AND DEDUCTION_DATE=#{profitDate,jdbcType=VARCHAR}
     </if>
     <if test="type != null">
       AND DEDUCTION_TYPE=#{type,jdbcType=VARCHAR}
