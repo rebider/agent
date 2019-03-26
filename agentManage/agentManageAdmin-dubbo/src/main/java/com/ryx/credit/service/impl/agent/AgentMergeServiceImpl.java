@@ -132,6 +132,8 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     private OPaymentDetailMapper oPaymentDetailMapper;
     @Autowired
     private OPaymentMapper paymentMapper;
+    @Autowired
+    private CapitalChangeApplyMapper capitalChangeApplyMapper;
 
     /**
      * 合并列表
@@ -530,7 +532,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
     }
 
     /**
-     *补款、退货、补差价、下订单流程中、有未排单的、未发货的,不可以合并
+     *补款、退货、补差价、下订单流程中、有未排单的、未发货的,保证金申请,不可以合并或退出
      * @param subAgentId
      */
     public void verifypprovaling(String subAgentId)throws Exception{
@@ -544,7 +546,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         criteria.andReviewStatusEqualTo(AgStatus.Approving.getValue());
         List<OOrder> oOrders = orderMapper.selectByExample(oOrderExample);
         if(oOrders.size()!=0){
-            throw new MessageException("有审批中的订单,不能发起合并");
+            throw new MessageException("有审批中的订单,不能发起申请");
         }
 
         //补款
@@ -555,7 +557,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         supplementCriteria.andReviewStatusEqualTo(AgStatus.Approving.getValue());
         List<OSupplement> oSupplements = supplementMapper.selectByExample(supplementExample);
         if(oSupplements.size()!=0){
-            throw new MessageException("有审批中的补款,不能发起合并");
+            throw new MessageException("有审批中的补款,不能发起申请");
         }
 
         //补差价
@@ -566,7 +568,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         refundPriceDiffCriteria.andReviewStatusEqualTo(AgStatus.Approving.getValue());
         List<ORefundPriceDiff> oRefundPriceDiffs = refundPriceDiffMapper.selectByExample(refundPriceDiffExample);
         if(oRefundPriceDiffs.size()!=0){
-            throw new MessageException("有审批中的补差价,不能发起合并");
+            throw new MessageException("有审批中的补差价,不能发起申请");
         }
 
         //退货
@@ -577,7 +579,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         returnOrderCriteria.andRetScheduleEqualTo(new BigDecimal(RetSchedule.SPZ.code));
         List<OReturnOrder> oReturnOrders = returnOrderMapper.selectByExample(returnOrderExample);
         if(oReturnOrders.size()!=0){
-            throw new MessageException("有审批中的退货,不能发起合并");
+            throw new MessageException("有审批中的退货,不能发起申请");
         }
 
         //未排单
@@ -589,7 +591,7 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         reqMap.put("agentId", subAgentId);
         int i = receiptOrderMapper.queryPlannerCount(reqMap);
         if(i!=0){
-            throw new MessageException("有未排单,不能发起合并");
+            throw new MessageException("有未排单,不能发起申请");
         }
 
         //未发货
@@ -598,7 +600,21 @@ public class AgentMergeServiceImpl implements AgentMergeService {
         param.put("planOrderStatus", PlannerStatus.YesPlanner.getValue());
         Long count = receiptPlanMapper.getReceipPlanCount(param);
         if(count!=0){
-            throw new MessageException("有未发货,不能发起合并");
+            throw new MessageException("有未发货,不能发起申请");
+        }
+
+        //扣除保证金
+        CapitalChangeApplyExample capitalChangeApplyExample = new CapitalChangeApplyExample();
+        CapitalChangeApplyExample.Criteria capitalCriteria = capitalChangeApplyExample.createCriteria();
+        capitalCriteria.andStatusEqualTo(Status.STATUS_1.status);
+        capitalCriteria.andAgentIdEqualTo(subAgentId);
+        List<BigDecimal> cloReviewStatusList = new ArrayList<>();
+        cloReviewStatusList.add(AgStatus.Approving.getValue());
+        cloReviewStatusList.add(AgStatus.Create.getValue());
+        capitalCriteria.andCloReviewStatusIn(cloReviewStatusList);
+        long l = capitalChangeApplyMapper.countByExample(capitalChangeApplyExample);
+        if(l!=0){
+            throw new MessageException("有审批中或暂存的保证金申请,不能发起申请");
         }
 
     }
