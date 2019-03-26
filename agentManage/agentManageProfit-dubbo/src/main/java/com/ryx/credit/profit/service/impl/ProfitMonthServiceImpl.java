@@ -482,13 +482,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             computerService.computer_Buckle_ZhiFa(profitDate,computType);
 
 
-            // 机具扣款未扣足，扣合并代理商
+            /* 机具扣款未扣足，扣合并代理商
             toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
                 List<Map<String, Object>> hbList = getAgentIdProfitAmt(profitDetailMonthTemp.getAgentId(), profitAmtMap);
                 if (hbList != null && hbList.size() > 0) {
                     doHbToolDeduction(profitDetailMonthTemp, computType, hbList, "2");
                 }
-            });
+            });*/
 
             // 机具扣款未扣足，扣关联代理商
             toolNotDeductionList.parallelStream().forEach(profitDetailMonthTemp -> {
