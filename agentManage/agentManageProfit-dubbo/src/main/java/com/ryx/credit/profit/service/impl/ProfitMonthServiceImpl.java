@@ -801,10 +801,10 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
 
         try {
             profitToolsDeductService.execut(map);
-            profitDetailMonthTemp.setRhbDgMustDeductionAmt((BigDecimal) map.get("RhbDgMustDeductionAmt"));
+          /*  profitDetailMonthTemp.setRhbDgMustDeductionAmt((BigDecimal) map.get("RhbDgMustDeductionAmt"));
             profitDetailMonthTemp.setRhbDgRealDeductionAmt((BigDecimal) map.get("RhbDgRealDeductionAmt"));
             profitDetailMonthTemp.setZposDgMustDeductionAmt((BigDecimal) map.get("ZposDgMustDeductionAmt"));
-            profitDetailMonthTemp.setZposTdRealDeductionAmt((BigDecimal) map.get("ZposTdRealDeductionAmt"));
+            profitDetailMonthTemp.setZposTdRealDeductionAmt((BigDecimal) map.get("ZposTdRealDeductionAmt"));*/
             profitDetailMonthTemp.setPosDgMustDeductionAmt((BigDecimal) map.get("PosDgMustDeductionAmt"));
             profitDetailMonthTemp.setPosDgRealDeductionAmt((BigDecimal) map.get("PosDgRealDeductionAmt"));
             if (!Objects.equals(profitDetailMonthTemp.getRhbDgMustDeductionAmt(), profitDetailMonthTemp.getRhbDgRealDeductionAmt())
