@@ -1996,6 +1996,66 @@ public class ProfitDirectExample {
             addCriterion("PARENT_SUPPLY not between", value1, value2, "parentSupply");
             return (Criteria) this;
         }
+
+        public Criteria andMustBuckleAmtIsNull() {
+            addCriterion("MUST_BUCKLE_AMT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtIsNotNull() {
+            addCriterion("MUST_BUCKLE_AMT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtEqualTo(BigDecimal value) {
+            addCriterion("MUST_BUCKLE_AMT =", value, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtNotEqualTo(BigDecimal value) {
+            addCriterion("MUST_BUCKLE_AMT <>", value, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtGreaterThan(BigDecimal value) {
+            addCriterion("MUST_BUCKLE_AMT >", value, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtGreaterThanOrEqualTo(BigDecimal value) {
+            addCriterion("MUST_BUCKLE_AMT >=", value, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtLessThan(BigDecimal value) {
+            addCriterion("MUST_BUCKLE_AMT <", value, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtLessThanOrEqualTo(BigDecimal value) {
+            addCriterion("MUST_BUCKLE_AMT <=", value, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtIn(List<BigDecimal> values) {
+            addCriterion("MUST_BUCKLE_AMT in", values, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtNotIn(List<BigDecimal> values) {
+            addCriterion("MUST_BUCKLE_AMT not in", values, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MUST_BUCKLE_AMT between", value1, value2, "mustBuckleAmt");
+            return (Criteria) this;
+        }
+
+        public Criteria andMustBuckleAmtNotBetween(BigDecimal value1, BigDecimal value2) {
+            addCriterion("MUST_BUCKLE_AMT not between", value1, value2, "mustBuckleAmt");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

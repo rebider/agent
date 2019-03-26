@@ -174,4 +174,21 @@ public interface ProfitDeductionService {
     List<Map<String,Object>> getRev2DetailById(String id);
 
 
+    /***
+     * @Description: 获取扣款列表
+     * @Param: param 扣款查询参数
+     * @return: 扣款列表
+     * @Author: zhaodw
+     * @Date: 2018/8/21
+     */
+    List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param);
+
+    /***
+     * @Description: 更新退单明细
+     * @Author: zhaodw
+     * @Date: 2018/11/20
+     */
+    void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt);
+
+
 }

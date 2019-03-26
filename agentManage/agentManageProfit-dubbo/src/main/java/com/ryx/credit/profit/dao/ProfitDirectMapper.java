@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ProfitDirectMapper {
+
     long countByExample(ProfitDirectExample example);
 
     int deleteByExample(ProfitDirectExample example);
@@ -19,19 +20,26 @@ public interface ProfitDirectMapper {
 
     List<ProfitDirect> selectByExample(ProfitDirectExample example);
 
+    ProfitDirect selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") ProfitDirect record, @Param("example") ProfitDirectExample example);
+
+    int updateByExample(@Param("record") ProfitDirect record, @Param("example") ProfitDirectExample example);
+
+    int updateByPrimaryKeySelective(ProfitDirect record);
+
+    int updateByPrimaryKey(ProfitDirect record);
+
+
     List<ProfitDirect> selectByMonth(ProfitDirect record);
 
     List<ProfitDirect> selectBySupply();
 
     List<ProfitDirect> selectByBuckle();
 
-    ProfitDirect selectByPrimaryKey(String id);
 
     ProfitDirect selectByAgentAndMon(ProfitDirect record);
 
-    int updateByPrimaryKeySelective(ProfitDirect record);
-
-    int updateByPrimaryKey(ProfitDirect record);
 
     List<Map<String,Object>> getProfitDirectList(Map<String, Object> param);
 

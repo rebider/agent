@@ -13,8 +13,11 @@ import com.ryx.credit.pojo.admin.agent.AgentColinfo;
 import com.ryx.credit.pojo.admin.order.OPayment;
 import com.ryx.credit.profit.dao.*;
 import com.ryx.credit.profit.dao.ProfitDayMapper;
+import com.ryx.credit.profit.enums.DeductionType;
+import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.pojo.*;
 import com.ryx.credit.profit.service.ProfitComputerService;
+import com.ryx.credit.profit.service.ProfitDeductionService;
 import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.AgentColinfoService;
 import com.ryx.credit.service.agent.AgentQueryService;
@@ -28,7 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -79,6 +84,10 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
     OrderService orderService;
     @Autowired
     ProfitDeductionMapper profitDeductionMapper;
+    @Autowired
+    private ProfitDeductionService profitDeductionServiceImpl;
+    @Resource
+    ProfitDeductionService profitDeductionService;
 
     private int index = 1;
     private BigDecimal tranAmount = BigDecimal.ZERO;
@@ -285,7 +294,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                     }
 
 
-                    if ("2".equals(computType)){
+                    if ("1".equals(computType)){
                         buckleRun.setSupplyAmt(b.add(nowbk));
                         buckleRunMapper.updateByPrimaryKeySelective(buckleRun);
                     }
@@ -326,32 +335,85 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         }
     }
 
+    /**
+     * @Author: Zhang Lei
+     * @Description: 直发平台扣款
+     * @Date: 15:37 2019/3/26
+     */
     @Override
     public void computer_Buckle_ZhiFa(String profitMonth, String computType) {
+        String deductionDate = LocalDate.now().plusMonths(-1).toString().substring(0, 7).replace("-", "");
+        logger.info("直发平台扣款开始，本月分润不够扣的记录，逐级找上级扣款。并记录代扣关系");
         List<ProfitDirect> profitDirects = directMapper.selectByBuckle();//存在退单扣款的记录
         for (ProfitDirect profitDirect : profitDirects) {
-            logger.info("本月分润不够扣的记录，逐级找上级扣款。并记录代扣关系");
-            //查询总退款扣款金额
-            Map<String, String> map = new HashMap<>();
-            map.put("date", profitMonth);
-            map.put("type", "01");
-            map.put("agentId", profitDirect.getAgentId());
-            BigDecimal deductionAmt = profitDeductionMapper.getNotDeductionAmt(map);
-            //本级可扣金额
-            BigDecimal bjkk = profitDirect.getProfitAmt().add(profitDirect.getSupplyAmt()).subtract(profitDirect.getParentBuckle()).subtract(profitDirect.getBuckleAmt());
-            BigDecimal lackAmt = bjkk.subtract(deductionAmt);
-            if (lackAmt.compareTo(BigDecimal.ZERO) < 0) {//说明还需找上级代扣的退单金额
-                profitDirect.setBuckleAmt(isDecimalNull(profitDirect.getBuckleAmt()).add(bjkk));
-                directMapper.updateByPrimaryKeySelective(profitDirect);
 
-                lackAmt = lackAmt.multiply(new BigDecimal("-1"));
-                computerSurplus(profitDirect, 1, profitDirect.getAgentId(), lackAmt,computType);
-            }else {//自身就够扣
-                profitDirect.setBuckleAmt(isDecimalNull(profitDirect.getBuckleAmt()).add(deductionAmt));
-                directMapper.updateByPrimaryKeySelective(profitDirect);
+            ProfitDeduction profitDeduction = new ProfitDeduction();
+            profitDeduction.setAgentId(profitDirect.getAgentId());
+            profitDeduction.setParentAgentId(profitDirect.getParentAgentId());
+            profitDeduction.setDeductionDate(deductionDate);
+            profitDeduction.setDeductionType(DeductionType.SETTLE_ERR.getType());
+            profitDeduction.setSourceId("01");
+
+            // 退单应扣款
+            BigDecimal deductionAmt = profitDeductionServiceImpl.getSettleErrDeductionAmt(profitDeduction);
+            deductionAmt = deductionAmt == null ? BigDecimal.ZERO : deductionAmt;
+            profitDirect.setMustBuckleAmt(deductionAmt);
+
+            // 实扣
+            BigDecimal totalRealDeductionAmt = BigDecimal.ZERO;
+
+            // 获取退单扣款
+            Map<String, Object> param = new HashMap<>();
+            param.put("deductionDate", deductionDate);
+            param.put("type", DeductionType.SETTLE_ERR.getType());
+            param.put("deductionStatus", "N6");
+            List<ProfitDeduction> deductionList = profitDeductionService.getProfitDeductionListByType(param);
+            if (deductionList != null && deductionList.size() > 0) {
+                for (ProfitDeduction deduction:deductionList){
+
+                    BigDecimal nowDeduction = BigDecimal.ZERO;
+                    //本级可扣金额
+                    BigDecimal bjkk = profitDirect.getProfitAmt().add(profitDirect.getSupplyAmt()).subtract(profitDirect.getParentBuckle()).subtract(profitDirect.getBuckleAmt());
+                    BigDecimal lackAmt = bjkk.subtract(deduction.getMustDeductionAmt());
+                    if (lackAmt.compareTo(BigDecimal.ZERO) < 0) {//说明还需找上级代扣的退单金额
+                        nowDeduction = nowDeduction.add(bjkk);
+                        deduction.setActualDeductionAmt(nowDeduction);
+
+                        BigDecimal bulck = deduction.getMustDeductionAmt().subtract(nowDeduction);//本单剩余
+                        computerSurplus(profitDirect, 1, profitDirect.getAgentId(), bulck,computType,nowDeduction,deduction);
+
+                    }else {//自身就够扣
+                        nowDeduction = nowDeduction.add(deduction.getMustDeductionAmt());
+                    }
+
+                    totalRealDeductionAmt = totalRealDeductionAmt.add(nowDeduction);
+
+
+                    if ("1".equals(computType)) {
+                        // 更新退单明细
+                        if (deduction.getDeductionType().equals("01") && nowDeduction.doubleValue() > 0) {
+                            BigDecimal finalRealDeductionAmt = nowDeduction;
+                            profitDeductionService.updateTdDetail(deduction, finalRealDeductionAmt);
+                        }
+
+                        deduction.setActualDeductionAmt(nowDeduction);
+                        deduction.setNotDeductionAmt(deduction.getMustDeductionAmt().subtract(nowDeduction));
+                        deduction.setDeductionStatus("1");//已扣款
+                        profitDeductionMapper.updateByPrimaryKeySelective(deduction);
+                    }
+
+                }
             }
+
+
+            profitDirect.setBuckleAmt(isDecimalNull(profitDirect.getBuckleAmt()).add(totalRealDeductionAmt));
+            directMapper.updateByPrimaryKeySelective(profitDirect);
+
+
+
         }
     }
+
 
     /**
      * //递归找上级补扣，直到能扣完为止
@@ -363,7 +425,7 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
      * @param computType
      * @return
      */
-    public void computerSurplus(ProfitDirect profitDirect, int index, String oldAgrnt, BigDecimal buck, String computType) {
+    public void computerSurplus(ProfitDirect profitDirect, int index, String oldAgrnt, BigDecimal buck, String computType,BigDecimal nowDeduction,ProfitDeduction deduction) {
         ProfitDirect parentWhere = new ProfitDirect();
         parentWhere.setTransMonth(profitDirect.getTransMonth());
         parentWhere.setAgentId(profitDirect.getParentAgentId());
@@ -376,7 +438,9 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
             detailMonth.setZhifaBuckle(buckle.add(buck));
             detailMonthMapper.updateByPrimaryKeySelective(detailMonth);
 
-            if ("2".equals(computType)){
+            nowDeduction = nowDeduction.add(buck);
+
+            if ("1".equals(computType)){
                 //记录代扣承担关系
                 BuckleRun buckleRun = new BuckleRun();
                 buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
@@ -394,14 +458,17 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
         } else {
             BigDecimal bearAmt = parentDirect.getProfitAmt().add(parentDirect.getSupplyAmt()).subtract(parentDirect.getBuckleAmt()).subtract(parentDirect.getParentBuckle());//上级的分润
             if (bearAmt.compareTo(BigDecimal.ZERO) < 0) {//上级自己还差钱
-                computerSurplus(parentDirect, index++, oldAgrnt, buck, computType);
+                computerSurplus(parentDirect, index++, oldAgrnt, buck, computType,nowDeduction,deduction);
                 return;
             }
+
+
             if (bearAmt.compareTo(buck) < 0) {//上级分润不够扣
+                nowDeduction = nowDeduction.add(bearAmt);
                 parentDirect.setParentBuckle(isDecimalNull(parentDirect.getParentBuckle()).add(bearAmt));//替下级扣款(自己全部分润搭进去了)
                 directMapper.updateByPrimaryKeySelective(parentDirect);
 
-                if ("2".equals(computType)){
+                if ("1".equals(computType)){
                     //记录代扣承担关系
                     BuckleRun buckleRun = new BuckleRun();
                     buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
@@ -416,12 +483,12 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
                 }
 
                 buck = buck.subtract(bearAmt);//剩余扣款
-                computerSurplus(parentDirect, index++, oldAgrnt, buck, computType);
+                computerSurplus(parentDirect, index++, oldAgrnt, buck, computType, nowDeduction, deduction);
             } else {
                 parentDirect.setParentBuckle(isDecimalNull(parentDirect.getParentBuckle()).add(buck));//替下级扣款
                 directMapper.updateByPrimaryKeySelective(parentDirect);
-
-                if ("2".equals(computType)){
+                nowDeduction = nowDeduction.add(buck);
+                if ("1".equals(computType)){
                     //记录代扣承担关系
                     BuckleRun buckleRun = new BuckleRun();
                     buckleRun.setId(idService.genId(TabId.P_BUCKLE_RUN));
@@ -480,13 +547,13 @@ public class ProfitComputerServiceImpl implements ProfitComputerService {
 //        return total;
 //    }
 
-    @Scheduled(cron = "0 40 10 14 * ?")
+    /*@Scheduled(cron = "0 40 10 14 * ?")
     @Test
     public void test() {
         String transDate = "201810";
         BigDecimal amt = synchroSSTotalTransAmt(transDate);
         System.out.println(amt);
-    }
+    }*/
 
     /**
      * 同步手刷月分润交易汇总
