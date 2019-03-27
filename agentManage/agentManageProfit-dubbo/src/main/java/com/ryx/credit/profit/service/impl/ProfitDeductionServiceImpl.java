@@ -1012,12 +1012,10 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     @Override
     public List<Map<String,Object>> getRev2DetailById(String id){
-        ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByPrimaryKey(id);
         Map<String,String> map = new HashMap<String,String>();
-        map.put("agentId",profitDeduction.getAgentId());
-        map.put("parentAgentId",profitDeduction.getParentAgentId());
-        map.put("date",profitDeduction.getDeductionDate());
-        map.put("desc",profitDeduction.getDeductionDesc());
+        map.put("agentId",profitDetailMonth.getAgentId());
+        map.put("date",profitDetailMonth.getProfitDate());
         map.put("type",DeductionType.MACHINE.getType());
         map.put("remark","%" + "代理商代扣机具款，扣款明细：" + "%");
         List<Map<String,Object>> list = profitDeductionMapper.getRev2List(map);
