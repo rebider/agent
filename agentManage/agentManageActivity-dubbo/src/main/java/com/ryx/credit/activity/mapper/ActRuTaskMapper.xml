@@ -346,7 +346,8 @@
   <select id="queryMyTaskPage" parameterType="map" resultType="map">
     <include refid="OracleDialectPrefix" />
     select
-    rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, br.C_TIME, br.C_USER, br.ACTIV_STATUS, br.STATUS,ri.group_id_
+    rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
+    br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type
     from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
     <where>
       rt.EXECUTION_ID_ = br.activ_id
@@ -372,6 +373,21 @@
       <foreach collection="params.userIds" separator="," item="userId" index="index" open=" DATA_SHIRO in (" close=")">
          #{userId}
       </foreach>
+    </if>
+    <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
+      and br.BUS_TYPE = #{params.busActRelBusType}
+    </if>
+    <if test="params.agentId != null and params.agentId!='' " >
+      and br.agent_id = #{params.agentId}
+    </if>
+    <if test="params.agentName != null and params.agentName!='' " >
+      and br.agent_name = #{params.agentName}
+    </if>
+    <if test="params.subBegin != null and params.subBegin!='' " >
+      and br.C_TIME <![CDATA[ >= ]]> to_date(#{params.subBegin}, 'yyyy-mm-dd hh24:mi:ss')
+    </if>
+    <if test="params.subEnd != null and params.subEnd!='' " >
+      and br.C_TIME <![CDATA[ <= ]]> to_date(#{params.subEnd}, 'yyyy-mm-dd hh24:mi:ss')
     </if>
   </sql>
 
