@@ -523,15 +523,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 更新实发分润
             profitDetailMonthMapper.updateRealProfitAmt(params);
 
-            /*// 计算税点及实发分润
-            try {
-                long sstart = System.currentTimeMillis();
-                profitComputerService.new_computerTax(computType);
-                long send = System.currentTimeMillis();
-                System.out.println("实发处理时间"+(send-sstart));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
             long send = System.currentTimeMillis();
             LOG.info("执行完毕，处理共耗时：{}",(send-sstart));
             temp.clear();

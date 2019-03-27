@@ -155,16 +155,26 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 if (Objects.equals(AGENT_TYPE_2, transProfitDetail.getAgentType())
                         || Objects.equals(AGENT_TYPE_3, transProfitDetail.getAgentType())
                         || Objects.equals(AGENT_TYPE_6, transProfitDetail.getAgentType())) {
-                    /*PosReward posReward = new PosReward();
+                    PosReward posReward = new PosReward();
                     posReward.setAgentId(transProfitDetail.getAgentId());
-                    posReward.setApplyStatus("1");*/
-                    Map<String, Object> posRewardPrams = new HashMap<>();
+                    posReward.setApplyStatus("1");
+
+                    //pos奖励申请
+                    List<PosReward> posRewardList = iPosRewardService.selectRewardByMonth(posReward);
+                    if (posRewardList == null || posRewardList.isEmpty()) {
+                        this.computRewardStandard(posrewardDetail, currentDate, posRewardTemplates);
+                    } else {
+                        this.computSpecialStandard(posrewardDetail, currentDate, posRewardList);
+                    }
+
+
+                    /*Map<String, Object> posRewardPrams = new HashMap<>();
                     posRewardPrams.put("agentId", transProfitDetail.getAgentId());
                     posRewardPrams.put("applyStatus", "1");
-                    posRewardPrams.put("profitMonth", LocalDate.now().plusMonths(-1).toString().substring(0, 7));
+                    posRewardPrams.put("profitMonth", LocalDate.now().plusMonths(-1).toString().substring(0, 7));*/
 
                     //单个pos奖励申请
-                    List<PosReward> posRewardList = iPosRewardService.selectPosRewardByParams(posRewardPrams);
+                    /*List<PosReward> posRewardList = iPosRewardService.selectPosRewardByParams(posRewardPrams);
                     if (posRewardList != null && !posRewardList.isEmpty()) {
                         this.computSpecialStandard(posrewardDetail, currentDate, posRewardList);
                     } else {
@@ -175,7 +185,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                         } else {
                             this.computRewardStandard(posrewardDetail, currentDate, posRewardTemplates);
                         }
-                    }
+                    }*/
 
 
                     //计算分润奖励
@@ -311,7 +321,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
             LOG.info("计算申请特殊奖励的代理商，考核奖励扣款，结束");
 
 
-            LOG.info("POS抱团奖励补款，开始");
+            /*LOG.info("POS抱团奖励补款，开始");
             Map<String, Object> map = new HashMap<>();
             map.put("profitMonth", LocalDate.now().plusMonths(-1).toString().substring(0, 7));
             map.put("applyStatus", "1");
@@ -371,7 +381,7 @@ public class PosProfitComputeServiceImpl implements DeductService {
                 }
 
             }
-            LOG.info("POS抱团奖励补款，结束");
+            LOG.info("POS抱团奖励补款，结束");*/
 
 
             LOG.info("更新基础分润中，POS奖励、考核扣款金额，开始");
