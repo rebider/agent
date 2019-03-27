@@ -187,7 +187,7 @@ public interface ProfitMonthService {
      */
     void initPosRowardDetail()throws Exception;
 
-    PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth);
+    PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo);
 
     Map<String,Object> profitCount(Map<String, Object> param);
 

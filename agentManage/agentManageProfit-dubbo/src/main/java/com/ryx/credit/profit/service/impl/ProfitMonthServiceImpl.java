@@ -1029,7 +1029,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth) {
+    public PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = 0L;
         List<Map<String, Object>> list;
         if ("1".equals(param.get("chekbox"))) {
