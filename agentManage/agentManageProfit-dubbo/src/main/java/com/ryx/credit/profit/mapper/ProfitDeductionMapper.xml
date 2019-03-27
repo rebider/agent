@@ -590,16 +590,8 @@
         pd.AGENT_ID,pd.AGENT_NAME,pd.PARENT_AGENT_NAME,pd.PARENT_AGENT_ID
         from P_DEDUCTION_DETAIL pdd left join P_DEDUCTION pd on pdd.DEDUCTION_ID = pd.ID
         where pdd.AGENT_ID = #{agentId}  and pdd.DEDUCTION_DATE = #{date}
-        and pdd.DEDUCTION_TYPE = #{type} and pdd.DEDUCTION_DESC = #{desc}
+        and pdd.DEDUCTION_TYPE = #{type}
         and pdd.REMARK like #{remark}
-        <choose>
-            <when test="parentAgentId != null and parentAgentId != '' ">
-                and pdd.PARENT_AGENT_ID  = #{parentAgentId}
-            </when>
-            <otherwise>
-                and pdd.PARENT_AGENT_ID is null
-            </otherwise>
-        </choose>
     </select>
 
 </mapper>
