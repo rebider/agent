@@ -1,7 +1,6 @@
 package com.ryx.credit.service.impl.order;
 
 import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
@@ -26,13 +25,11 @@ import com.ryx.credit.service.agent.AgentBusinfoService;
 import com.ryx.credit.service.agent.ApaycompService;
 import com.ryx.credit.service.dict.DictOptionsService;
 import com.ryx.credit.service.dict.IdService;
-import com.ryx.credit.service.impl.agent.AimportServiceImpl;
 import com.ryx.credit.service.order.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -42,13 +39,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.text.Bidi;
 import java.util.*;
 
 /**
  * 作者：cx
  * 时间：2019/1/29
- * 描述：订单导入解析
+ * 描述：订单导入解析（含有SN订单解析）
  */
 @Service("orderImportService")
 public class OrderImportServiceImpl implements OrderImportService {
@@ -118,9 +114,9 @@ public class OrderImportServiceImpl implements OrderImportService {
     @Resource(name = "taskExecutor")
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
-
     List<Dict> CAPITAL_TYPE = new ArrayList<>();
     List<PayComp> payComps = new ArrayList<>();
+
     @PostConstruct
     public void init(){
         CAPITAL_TYPE = dictOptionsService.dictList(DictGroup.AGENT.name(), DictGroup.CAPITAL_TYPE.name());
@@ -135,6 +131,7 @@ public class OrderImportServiceImpl implements OrderImportService {
         importAgent.setVersion(Status.STATUS_0.status);
         return importAgentMapper.insertSelective(importAgent);
     }
+
     @Override
     public List<String> addOrderInfoList(List<List<Object>> data, String dataType, String user, String batch) throws Exception {
         List<String> ids = new ArrayList<>();
@@ -154,8 +151,11 @@ public class OrderImportServiceImpl implements OrderImportService {
         return ids;
     }
 
-
-
+    /**
+     * 解析SN订单数据（含有SN）
+     * @param user
+     * @return
+     */
     @Override
     public ResultVO pareseOrderEnter(String user) {
         threadPoolTaskExecutor.execute(new Runnable() {
@@ -196,13 +196,12 @@ public class OrderImportServiceImpl implements OrderImportService {
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
                     }
                 }
-
             }
         });
 
-
         return new ResultVO(ResultVO.SUCCESS,"任务处理中");
     }
+
 
     @Override
     public ResultVO pareseReturnOrderEnter(String user) {
@@ -219,12 +218,14 @@ public class OrderImportServiceImpl implements OrderImportService {
                         logger.info("======处理订单解析{}",importAgent.getDataid());
                         importAgent.setDealstatus(Status.STATUS_1.status);
                         importAgent.setDealmsg("处理中");
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         if(orderImportService.deleteFailImportAgentReturn(importAgent,user).isOK()){
                             AgentResult agentResult = orderImportService.pareseReturn(importAgent,user);
                             importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                             importAgent.setDealstatus(Status.STATUS_2.status);
                             importAgent.setDealmsg(agentResult.getMsg());
+                            importAgent.setDealTime(new Date());
                             importAgentMapper.updateByPrimaryKeySelective(importAgent);
                             logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),agentResult.getMsg());
                         }
@@ -233,6 +234,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
                         importAgent.setDealmsg(e.getMsg());
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getMsg());
                     }catch (Exception e) {
@@ -240,16 +242,24 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
                         importAgent.setDealmsg(e.getLocalizedMessage());
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
                     }
                 }
-
             }
         });
         return new ResultVO(ResultVO.SUCCESS,"任务处理中");
     }
 
+
+    /**
+     * 解析订单对象
+     * @param importAgent
+     * @param User
+     * @return
+     * @throws MessageException
+     */
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRES_NEW)
     @Override
     public AgentResult pareseOrder(ImportAgent importAgent,String User) throws MessageException {
@@ -304,7 +314,33 @@ public class OrderImportServiceImpl implements OrderImportService {
                 throw new MessageException("商品信息记录为空["+orderImportBaseInfo.getOrder_id()+"]");
             }
             orderImportBaseInfo.setOrderImportGoodsInfos(OrderImportGoodsInfos);
-            AgentResult agentImport = orderImportService.pareseOrderImportBaseInfo(orderImportBaseInfo,User);
+
+            AgentResult agentImport = AgentResult.ok();
+            try {
+                agentImport = orderImportService.pareseOrderImportBaseInfo(orderImportBaseInfo,User);
+            } catch (MessageException e) {
+                e.printStackTrace();
+                agentImport = AgentResult.fail(e.getMsg());
+            }
+            //订单解析失败 订单商品记录也更新为失败
+            if (!agentImport.isOK()) {
+                List<OrderImportGoodsInfo> orderImportGoodsInfoList = orderImportBaseInfo.getOrderImportGoodsInfos();
+                for (OrderImportGoodsInfo orderImportGoodsInfo : orderImportGoodsInfoList) {
+                    String importId = orderImportGoodsInfo.getImportId();
+                    ImportAgent orderImportGoodsInfo_importAgent = importAgentMapper.selectByPrimaryKey(importId);
+                    orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_3.status);
+                    orderImportGoodsInfo_importAgent.setDealmsg(agentImport.getMsg());
+                    orderImportGoodsInfo_importAgent.setDealTime(new Date());
+                    int updateAgentImport = importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent);
+                    if (updateAgentImport != 1) {
+                        redisService.rpushList(import_order_imOrderMsg_key + orderImportBaseInfo.getOrder_id(),
+                                "更新orderImportBaseInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                        logger.info("更新orderImportBaseInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                        throw new MessageException("更新orderImportBaseInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                    }
+                }
+                logger.info("======处理订单解析{}失败{}", orderImportBaseInfo.getOrder_id(), agentImport.getMsg());
+            }
             return agentImport;
         } catch (Exception e) {
             e.printStackTrace();
@@ -314,8 +350,8 @@ public class OrderImportServiceImpl implements OrderImportService {
         }finally {
             redisService.delete(import_order_logic_redis_key+importAgent.getDataid());
         }
-
     }
+
 
     /**
      * 解析生成订单及付款单信息
@@ -327,7 +363,6 @@ public class OrderImportServiceImpl implements OrderImportService {
     @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
     public AgentResult pareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User) throws MessageException {
-
         //查询代理商信息 查询代理商业务平台信息
         AgentBusInfoExample example = new AgentBusInfoExample();
         example.or().andBusNumEqualTo(orderImportBaseInfo.getOrder_orgid()).andStatusEqualTo(Status.STATUS_1.status);
@@ -347,7 +382,6 @@ public class OrderImportServiceImpl implements OrderImportService {
              cuserAgent = cuserAgentList.get(0);
         }
         Calendar c = Calendar.getInstance();
-
 
         //==========================================生成订单信息
         OOrder orderFormVo = new OOrder();
@@ -376,6 +410,8 @@ public class OrderImportServiceImpl implements OrderImportService {
         orderFormVo.setOrderPlatform(agentBusInfo.getBusPlatform());
         //busid
         orderFormVo.setBusId(agentBusInfo.getId());
+        //新老订单
+        orderFormVo.setOxOrder(Oreturntype.OLD.code);
         orderFormVo.setReviewStatus(AgStatus.Approved.status);
         orderFormVo.setOrderStatus(OrderStatus.ENABLE.status);
         if(orderImportBaseInfo.getOrder_amt().equals(orderImportBaseInfo.getOrder_have_amt())) {
@@ -393,7 +429,6 @@ public class OrderImportServiceImpl implements OrderImportService {
             logger.info("插入订单失败{}",orderImportBaseInfo.getOrder_orgid());
             throw new MessageException("插入订单失败");
         }
-
 
         //==========================================生成付款单
         OPayment oPayment = new OPayment();
@@ -434,7 +469,6 @@ public class OrderImportServiceImpl implements OrderImportService {
         }
         //抵扣金额
         oPayment.setDeductionAmount(orderImportBaseInfo.getOrder_dk_amt()!=null?new BigDecimal(orderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
-
         //首付金额
         if(StringUtils.isNotBlank(orderImportBaseInfo.getOrder_shoufu_amt())) {
             oPayment.setDownPayment(
@@ -476,7 +510,6 @@ public class OrderImportServiceImpl implements OrderImportService {
             logger.info("插入付款单失败{}",orderImportBaseInfo.getOrder_orgid());
             throw new MessageException("插入付款单失败");
         }
-
 
         //==========================================生成付款明细
         String batchcode = c.getTime().getTime()+"";
@@ -623,17 +656,34 @@ public class OrderImportServiceImpl implements OrderImportService {
                 }
             }
         }
+
         //解析商品物流信息
-        AgentResult suborder =  orderImportService.pareseOrderImportSubOrderInfo(orderImportBaseInfo,orderFormVo,oPayment,User);
-        if(!suborder.isOK()){
-            throw new MessageException(suborder.getMsg());
+        AgentResult suborder = orderImportService.pareseOrderImportSubOrderInfo(orderImportBaseInfo,orderFormVo,oPayment,User);
+        if (!suborder.isOK()) {
+            List<OrderImportGoodsInfo> orderImportGoodsInfos = orderImportBaseInfo.getOrderImportGoodsInfos();
+            for (OrderImportGoodsInfo orderImportGoodsInfo : orderImportGoodsInfos) {
+                String importId = orderImportGoodsInfo.getImportId();
+                ImportAgent orderImportGoodsInfo_importAgent = importAgentMapper.selectByPrimaryKey(importId);
+                orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_3.status);
+                orderImportGoodsInfo_importAgent.setDealmsg(suborder.getMsg());
+                orderImportGoodsInfo_importAgent.setDealTime(new Date());
+                int updateSuborder = importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent);
+                if(updateSuborder != 1){
+                    redisService.rpushList(import_order_imOrderMsg_key + orderImportBaseInfo.getOrder_id(),
+                            "更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                    logger.info("更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                    throw new MessageException("更新orderImportGoodsInfo记录失败" + orderImportBaseInfo.getOrder_id() + ":importId" + importId);
+                }
+            }
+            logger.info("======处理订单商品解析{}失败{}", orderImportBaseInfo.getOrder_id(), suborder.getMsg());
         }
+
         return AgentResult.ok();
     }
 
 
     /**
-     *
+     *解析生成订单子订单，子订单活动信息
      * @param orderImportBaseInfo
      * @param order
      * @param oPayment
@@ -820,7 +870,6 @@ public class OrderImportServiceImpl implements OrderImportService {
                     throw new MessageException("收货单商品添加失败");
                 }
 
-
                 //收货单商品排单
                 receiptPlan.setId(idService.genId(TabId.o_receipt_plan));
                 receiptPlan.setPlanNum(receiptPlan.getId());
@@ -871,7 +920,6 @@ public class OrderImportServiceImpl implements OrderImportService {
                             logger.info("日期格式支持yyyyMMdd 或者yyyy-MM-dd 或者 yyyy/MM/dd"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
                             throw new MessageException("日期格式支持yyyyMMdd 或者yyyy-MM-dd 或者 yyyy/MM/dd");
                         }
-
                     }
                 }
                 logistics.setLogCom(logicInfo.getLogicComp());
@@ -886,14 +934,13 @@ public class OrderImportServiceImpl implements OrderImportService {
                 logistics.setSendStatus(Status.STATUS_1.status);
                 logistics.setSendMsg("(老订单)");
                 if(1!=oLogisticsMapper.insertSelective(logistics)){
-                    redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"排单信息添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-                    logger.info("排单信息添加失败"+orderImportBaseInfo.getOrder_id()+":"+orderImportGoodsInfo.getGoodsCode());
-
+                    redisService.rpushList(import_order_imOrderMsg_key + orderImportBaseInfo.getOrder_id(),
+                            "排单信息添加失败" + orderImportBaseInfo.getOrder_id() + ":" + orderImportGoodsInfo.getGoodsCode());
+                    logger.info("排单信息添加失败" + orderImportBaseInfo.getOrder_id() + ":" + orderImportGoodsInfo.getGoodsCode());
                     throw new MessageException("排单信息添加失败");
                 }
                 //生成sn明细
                 List<String> idListArr = oLogisticsService.idList(logicInfo.getSnStart(), logicInfo.getSnEnd(), Integer.valueOf(logicInfo.getSnEndNum()),Integer.valueOf( logicInfo.getSnEndNum()),logistics.getProCom());
-
                 if (null != idListArr && idListArr.size() > 0) {
                     for (String idSn : idListArr) {
                         OLogisticsDetail detail = new OLogisticsDetail();
@@ -940,7 +987,6 @@ public class OrderImportServiceImpl implements OrderImportService {
                     }
                 }
 
-
                 String importid =  logicInfo.getImportId();
                 ImportAgent logicInfo_importAgent = importAgentMapper.selectByPrimaryKey(importid);
                 logicInfo_importAgent.setDealstatus(Status.STATUS_2.status);
@@ -951,16 +997,18 @@ public class OrderImportServiceImpl implements OrderImportService {
                     throw new MessageException("更新logicInfo_importAgent记录失败"+orderImportBaseInfo.getOrder_id()+":importid"+importid);
                 }
             }
-            String importid =  orderImportGoodsInfo.getImportId();
+            String importid = orderImportGoodsInfo.getImportId();
             ImportAgent orderImportGoodsInfo_importAgent = importAgentMapper.selectByPrimaryKey(importid);
             orderImportGoodsInfo_importAgent.setDealstatus(Status.STATUS_2.status);
             orderImportGoodsInfo_importAgent.setDealmsg("成功");
+            orderImportGoodsInfo_importAgent.setDealTime(new Date());
             if(importAgentMapper.updateByPrimaryKeySelective(orderImportGoodsInfo_importAgent)!=1){
                 redisService.rpushList(import_order_imOrderMsg_key+orderImportBaseInfo.getOrder_id(),"更新orderImportGoodsInfo记录失败"+orderImportBaseInfo.getOrder_id()+":importid"+importid);
                 logger.info("更新orderImportGoodsInfo记录失败"+orderImportBaseInfo.getOrder_id()+":importid"+importid);
                 throw new MessageException("更新orderImportGoodsInfo记录失败"+orderImportBaseInfo.getOrder_id()+":importid"+importid);
             }
         }
+
         return AgentResult.ok();
     }
 
@@ -1515,4 +1563,5 @@ public class OrderImportServiceImpl implements OrderImportService {
 
         return AgentResult.ok();
     }
+
 }
