@@ -372,6 +372,44 @@
       and br.agent_id = a.id
       <include refid="queryMyTaskWhere" />
     </where>
+  <sql id="queryMyTaskField" >
+      rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
+      br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type
+  </sql>
+  <sql id="queryMyTaskSql">
+      (select
+      <include refid="queryMyTaskField"/>
+      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
+      <where>
+        rt.EXECUTION_ID_ = br.activ_id
+        and ri.task_id_ = rt.id_
+        and br.agent_id = a.id
+        <include refid="queryMyTaskWhere"/>
+        and NET_IN_BUS_TYPE is null
+      </where>
+      UNION
+      select
+      <include refid="queryMyTaskField"/>
+      from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
+      <where>
+        rt.EXECUTION_ID_ = br.activ_id
+        and ri.task_id_ = rt.id_
+        and br.agent_id = a.id
+        <include refid="queryMyTaskWhere"/>
+        <if test="params.netInUrls != null and params.netInUrls.size>0">
+          and
+          <foreach collection="params.netInUrls" separator="," item="netInUrl" index="index" open=" NET_IN_BUS_TYPE in ("
+                   close=")">
+            #{netInUrl}
+          </foreach>
+        </if>
+      </where>
+      )
+      ORDER by C_TIME desc
+  </sql>
+  <select id="queryMyTaskPage" parameterType="map" resultType="map">
+    <include refid="OracleDialectPrefix" />
+    <include refid="queryMyTaskSql"/>
     <include refid="OracleDialectSuffix" />
   </select>
 
@@ -384,12 +422,6 @@
     </if>
     <if test="params.group == 'city' " >
       and (a.ag_doc_pro = #{params.orgId} or a.ag_doc_district = #{params.orgId})
-    </if>
-    <if test="params.userIds != null " >
-      and
-      <foreach collection="params.userIds" separator="," item="userId" index="index" open=" DATA_SHIRO in (" close=")">
-         #{userId}
-      </foreach>
     </if>
     <if test="params.busActRelBusType != null and params.busActRelBusType!='' " >
       and br.BUS_TYPE = #{params.busActRelBusType}
@@ -406,19 +438,18 @@
     <if test="params.subEnd != null and params.subEnd!='' " >
       and br.C_TIME <![CDATA[ <= ]]> to_date(#{params.subEnd}, 'yyyy-mm-dd hh24:mi:ss')
     </if>
-    ORDER BY br.c_time desc
+    <if test="params.dbUrls != null and params.dbUrls.size>0" >
+      and
+      <foreach collection="params.dbUrls" separator="," item="dbUrl" index="index" open=" DATA_SHIRO in (" close=")">
+        #{dbUrl}
+      </foreach>
+    </if>
   </sql>
 
   <select id="queryMyTaskCount" parameterType="map" resultType="int">
-    select
-      count(*)
-    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
-    <where>
-      rt.EXECUTION_ID_ = br.activ_id
-      and ri.task_id_  = rt.id_
-      and br.agent_id = a.id
-      <include refid="queryMyTaskWhere" />
-    </where>
+    select count(*) from(
+      <include refid="queryMyTaskSql"/>
+    )
   </select>
 
 </mapper>
