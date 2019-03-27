@@ -3,6 +3,7 @@ package com.ryx.credit.activity.service.impl;
 import com.ryx.credit.activity.dao.ActRuTaskMapper;
 import com.ryx.credit.activity.entity.ActRuTask;
 import com.ryx.credit.activity.entity.ActRuTaskExample;
+import com.ryx.credit.common.util.AppConfig;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.service.ActRuTaskService;
@@ -10,10 +11,7 @@ import com.ryx.credit.service.CRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * ActRuTaskServiceImpl
@@ -27,6 +25,7 @@ import java.util.Set;
  */
 @Service("actRuTaskService")
 public class ActRuTaskServiceImpl implements ActRuTaskService {
+
     @Autowired
     private ActRuTaskMapper  actRuTaskMapper;
     @Autowired
@@ -108,8 +107,10 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
     @Override
     public PageInfo queryMyTaskPage(Page page, Map<String,Object> param){
 
-        Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),"451143","/BusActRelBusType");
-        Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),"672403","");
+        String dbUrlsPid = AppConfig.getProperty("dbUrls_pid");
+        String netInUrlsPid = AppConfig.getProperty("netInUrls_pid");
+        Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),dbUrlsPid,"/BusActRelBusType");
+        Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),netInUrlsPid,"");
 
         param.put("dbUrls",dbUrls);
         param.put("netInUrls",netInUrls);
