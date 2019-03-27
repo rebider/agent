@@ -1045,22 +1045,13 @@
     ppd.BASICS_PROFIT_AMT as sssxqyffrhz,
     nvl(ppd.deduction_tax_month_amt,0)+nvl(ppd.deduction_tax_month_ago_amt,0) as taxPayDeduct,
     ppd.supply_tax_amt,
-    ppd.account_name,
-    case ppd.status
-    when '0' then  '正常'
-    when '1' then  '冻结'
-    when '2' then  '解冻中'
-    when '3' then  '解冻失败,未分润'
-    when '4' then  '未分润'
-    when '5' then  '已分润'
-    when '6' then  '打款失败'
-    end
-    as status
+    ppd.account_name, ppd.status
     from P_PROFIT_DETAIL_M ppd
     <include refid="queryWhere"/>
     order by ppd.profit_date desc ) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
     <include refid="paging_end" />
   </select>
+
     <!--导出数据 查询：不包含下级-->
   <select id="exportByFNoChild" parameterType="java.util.Map" resultType="java.util.Map">
     select bb.* ,aa.ag_name as parentAgentName from(select
@@ -1132,17 +1123,7 @@
   ppd.BASICS_PROFIT_AMT as sssxqyffrhz,
   nvl((ppd.deduction_tax_month_amt+ppd.deduction_tax_month_ago_amt),0) as taxPayDeduct,
   ppd.supply_tax_amt,
-  ppd.account_name,
-  case ppd.status
-  when '0' then  '正常'
-  when '1' then  '冻结'
-  when '2' then  '解冻中'
-  when '3' then  '解冻失败,未分润'
-  when '4' then  '未分润'
-  when '5' then  '已分润'
-  when '6' then  '打款失败'
-  end
-  as status
+  ppd.account_name,ppd.status
   from P_PROFIT_DETAIL_M ppd
   order by ppd.profit_date desc) bb left join A_AGENT aa on bb.PARENT_AGENT_ID=aa.ID
   where  1=1
