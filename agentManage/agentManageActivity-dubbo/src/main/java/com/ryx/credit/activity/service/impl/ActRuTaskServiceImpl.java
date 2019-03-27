@@ -108,8 +108,11 @@ public class ActRuTaskServiceImpl implements ActRuTaskService {
     @Override
     public PageInfo queryMyTaskPage(Page page, Map<String,Object> param){
 
-        Set<String> userIds = roleService.selectShiroUrl((Long) param.get("userId"));
-        param.put("userIds",userIds);
+        Set<String> dbUrls = roleService.selectShiroUrl((Long) param.get("userId"),"451143","/BusActRelBusType");
+        Set<String> netInUrls = roleService.selectShiroUrl((Long) param.get("userId"),"672403","");
+
+        param.put("dbUrls",dbUrls);
+        param.put("netInUrls",netInUrls);
         List<Map<String, Object>> taskList = actRuTaskMapper.queryMyTaskPage(param,page);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(taskList);
