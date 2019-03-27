@@ -5,7 +5,10 @@ import com.ryx.credit.common.enumc.PamentSrcType;
 import com.ryx.credit.common.enumc.PaySign;
 import com.ryx.credit.profit.enums.DeductionStatus;
 import com.ryx.credit.profit.enums.DeductionType;
-import com.ryx.credit.profit.pojo.*;
+import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
+import com.ryx.credit.profit.pojo.ProfitDetailMonth;
+import com.ryx.credit.profit.pojo.ProfitDetailMonthExample;
 import com.ryx.credit.profit.service.*;
 import com.ryx.credit.service.order.IOPdSumService;
 import com.ryx.credit.service.order.IPaymentDetailService;
@@ -49,7 +52,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         LOG.info("机具分润扣款请求参数：{}", map);
         String agentPid = map.get("agentPid").toString();
         String computType = map.get("computType").toString();
-        String parentAgentId = map.get("parentAgentId").toString();
+        String parentAgentId =null;
+        if(map.get("parentAgentId")!=null){
+            parentAgentId = map.get("parentAgentId").toString();
+        }
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId(agentPid);
         profitDeduction.setDeductionDate(map.get("deductDate").toString());
@@ -60,10 +66,10 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
             if (Objects.equals("1", map.get("rotation"))) {
                 LOG.info("第一轮机具扣款，扣代理商本身，代理商编号：{}", agentPid);
                 return this.fristRound(map, agentPid, computType, list);
-            } else if (Objects.equals("2", map.get("rotation"))) {
+            } /*else if (Objects.equals("2", map.get("rotation"))) {
                 LOG.info("第二轮机具扣款，扣合并代理商：代理商编号：{}", agentPid);
                 return this.secondRound(agentPid, map, list, computType);
-            } else if (Objects.equals("3", map.get("rotation"))) {
+            }*/ else if (Objects.equals("3", map.get("rotation"))) {
                 LOG.info("第三轮机具扣款，扣关联代理商：代理商编号：{}", agentPid);
                 return this.secondRound(agentPid, map, list, computType);
             } /*else {
@@ -81,10 +87,36 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
         String deductDate = map.get("deductDate").toString();
         BigDecimal profitSumAmt = BigDecimal.ZERO;*/
         BigDecimal profitSumAmt = new BigDecimal(map.get("agentProfitAmt").toString());
-        list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("PosDgMustDeductionAmt", bigDecimal));
+
+
+     /* list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("PosDgMustDeductionAmt", bigDecimal));
         list.stream().filter(profitDeduction1 -> Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("RhbDgMustDeductionAmt", bigDecimal));
-        list.stream().filter(profitDeduction1 -> Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("ZposDgMustDeductionAmt", bigDecimal));
-        for (ProfitDeduction deduction : list) {
+        list.stream().filter(profitDeduction1 -> Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getMustDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("ZposDgMustDeductionAmt", bigDecimal));*/
+        BigDecimal sumMustDeductionAmt =BigDecimal.ZERO;
+     for (ProfitDeduction profitDeduction:list) {
+         sumMustDeductionAmt = profitDeduction.getMustDeductionAmt().add(sumMustDeductionAmt);
+        }
+        map.put("PosDgMustDeductionAmt",sumMustDeductionAmt);
+        /*ProfitDetailMonthExample profitDetailMonthExample = new ProfitDetailMonthExample();
+        ProfitDetailMonthExample.Criteria criteria = profitDetailMonthExample.createCriteria();
+        if(agentPid!=null){
+            criteria.andAgentIdEqualTo(agentPid);
+        }
+        if (map.get("deductDate")!=null) {
+            criteria.andProfitDateEqualTo(map.get("deductDate").toString());
+        }
+        if(map.get("parentAgentId")!=null){
+            criteria.andParentAgentIdEqualTo(map.get("parentAgentId").toString());
+        }
+        List<ProfitDetailMonth> profitDetailMonthList =  profitDetailMonthServiceImpl.selectByExample(profitDetailMonthExample);
+        if(profitDetailMonthList.size()!=1){
+            LOG.info("获取月分润数据错误");
+            return null;
+        }
+        ProfitDetailMonth profitDetailMonth = profitDetailMonthList.get(0);
+        profitDetailMonth.setPosDgMustDeductionAmt(sumMustDeductionAmt);*/
+
+     for (ProfitDeduction deduction : list) {
             if (deduction.getMustDeductionAmt().compareTo(deduction.getActualDeductionAmt()) == 0) {
                 continue;
             }
@@ -124,10 +156,17 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                         deduction.getMustDeductionAmt(), deduction.getActualDeductionAmt(), deduction.getNotDeductionAmt());
             }*/
         }
-        list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("PosDgRealDeductionAmt", bigDecimal));
+       /* list.stream().filter(profitDeduction1 -> Objects.equals(POS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("PosDgRealDeductionAmt", bigDecimal));
         list.stream().filter(profitDeduction1 -> Objects.equals(RHB, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("RhbDgRealDeductionAmt", bigDecimal));
-        list.stream().filter(profitDeduction1 -> Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("ZposTdRealDeductionAmt", bigDecimal));
+        list.stream().filter(profitDeduction1 -> Objects.equals(ZPOS, profitDeduction1.getDeductionDesc())).map(ProfitDeduction::getActualDeductionAmt).reduce(BigDecimal::add).ifPresent(bigDecimal -> map.put("ZposTdRealDeductionAmt", bigDecimal));*/
+        BigDecimal sumRealDeductionAmt =BigDecimal.ZERO;
+        for (ProfitDeduction profitDeduction:list) {
+            sumRealDeductionAmt = profitDeduction.getActualDeductionAmt().add(sumRealDeductionAmt);
+        }
+        map.put("PosDgRealDeductionAmt",sumRealDeductionAmt);
+        /*profitDetailMonth.setPosDgRealDeductionAmt(sumRealDeductionAmt);
 
+        profitMonthService.updateByPrimaryKeySelective(profitDetailMonth);*/
         map.put("agentProfitAmt", profitSumAmt);
         LOG.info("机具分润扣款响应参数：{}", map);
         return map;
@@ -145,9 +184,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
     private void basicsProfitDeductAmt(ProfitDeduction deduction, BigDecimal mustAmt, BigDecimal basicsProfitAmt, Map<String, Object> map) {
         if (basicsProfitAmt.compareTo(mustAmt) >= 0) {
             deduction.setActualDeductionAmt(deduction.getActualDeductionAmt().add(mustAmt));
-            if (deduction.getNotDeductionAmt().compareTo(BigDecimal.ZERO) > 0) {
-                deduction.setNotDeductionAmt(deduction.getNotDeductionAmt().subtract(mustAmt));
-            }
+            deduction.setNotDeductionAmt(BigDecimal.ZERO);
             basicsProfitAmt = basicsProfitAmt.subtract(mustAmt);
             map.put("profitSumAmt", basicsProfitAmt);
             try {
@@ -264,16 +301,16 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
 
                     ProfitDetailMonth update = new ProfitDetailMonth();
                     update.setId((String) mergeMap.get("id"));
-                    if (Objects.equals(POS, profitDeductionList.getDeductionDesc())) {
+                    /*if (Objects.equals(POS, profitDeductionList.getDeductionDesc())) {*/
                         BigDecimal posDgRealDeductionAmt = profitMonth.getPosDgRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getPosDgRealDeductionAmt();
                         update.setPosDgRealDeductionAmt(posDgRealDeductionAmt.add(deductAmt));
-                    } else if (Objects.equals(ZPOS, profitDeductionList.getDeductionDesc())) {
+                    /*} else if (Objects.equals(ZPOS, profitDeductionList.getDeductionDesc())) {
                         BigDecimal zposTdRealDeductionAmt = profitMonth.getZposTdRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getZposTdRealDeductionAmt();
                         update.setZposTdRealDeductionAmt(zposTdRealDeductionAmt.add(deductAmt));
                     } else if (Objects.equals(RHB, profitDeductionList.getDeductionDesc())) {
                         BigDecimal rhbDgRealDeductionAmt = profitMonth.getRhbDgRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getRhbDgRealDeductionAmt();
                         update.setRhbDgRealDeductionAmt(rhbDgRealDeductionAmt.add(deductAmt));
-                    }
+                    }*/
                     profitMonthService.updateByPrimaryKeySelective(update);
 
                     if (Objects.equals(computType, "1")) {

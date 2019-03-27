@@ -1,6 +1,7 @@
 package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.exceptions.DeductionException;
@@ -55,7 +56,7 @@ public interface ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/7/31 
     */
-    public void batchInsertOtherDeduction(List<List<Object>> datas , String userId);
+    public void batchInsertOtherDeduction(List<List<Object>> datas , String userId) throws ProcessException;
 
     /**
      * 根据扣款类型、扣款日期、查询总数

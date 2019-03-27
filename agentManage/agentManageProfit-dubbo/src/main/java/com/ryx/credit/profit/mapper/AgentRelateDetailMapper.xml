@@ -284,13 +284,17 @@
   <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
   <select id="selectMyRelateAgents" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
-    <include refid="Base_Column_List" />
+      <include refid="Base_Column_List" />
     from A_AGENT_RELATE_DETAIL
-    where RELATE_ID in (
-        select id from A_AGENT_RELATE where START_MONTH in(
+    where RELATE_ID = (
+        select id
+        from A_AGENT_RELATE
+        where STATUS = '1'
+          and AGENT_ID = '${agentId}'
+          and START_MONTH =(
             select max(START_MONTH) from A_AGENT_RELATE
             where STATUS = '1'
-                and START_MONTH &gt;='${profitMonth}'
+                and START_MONTH &lt;='${profitMonth}'
                 and AGENT_ID = '${agentId}'
                 <choose >
                   <when test="parentAgentId != null and parentAgentId !=''" >
@@ -300,7 +304,15 @@
                     and PARENT_AGENT_ID is null
                   </otherwise>
                 </choose>
-        )
+          )
+        <choose >
+          <when test="parentAgentId != null and parentAgentId !=''" >
+            and PARENT_AGENT_ID = '${parentAgentId}'
+          </when>
+          <otherwise>
+            and PARENT_AGENT_ID is null
+          </otherwise>
+        </choose>
     ) order by ORDER_NUM asc
   </select>
 </mapper>

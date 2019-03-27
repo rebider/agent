@@ -532,7 +532,7 @@ public class OldOrderReturnServiceImpl implements OldOrderReturnService {
             OActivity bus_activity = oActivityMapper.selectByPrimaryKey(oldOrderReturnBusEditVo.getActivity());
 
             if(!order_activity.getActCode().equalsIgnoreCase(bus_activity.getActCode())){
-                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"中"+product.getProName()+"商品的活动与sn活动一致，订单活动["+order_activity.getActCode()+":"+order_activity.getActivityName()+"],业务平台活动["+bus_activity.getActCode()+":"+bus_activity.getActivityName()+"]");
+                throw new MessageException("订单"+oldOrderReturnBusEditVo.getOrderid()+"中"+product.getProName()+"商品的活动与sn活动不一致，订单活动["+order_activity.getActCode()+":"+order_activity.getActivityName()+"],业务平台活动["+bus_activity.getActCode()+":"+bus_activity.getActivityName()+"]");
             }
 
             //首刷  fixme 首刷校验
