@@ -215,6 +215,7 @@ public class RefundJob {
      */
     private JSONObject getRefundList(JSONObject param) {
         String result = HttpClientUtil.doPostJson(URL, param.toJSONString());
+        LOG.info("同步退单数据："+result);
         if (StringUtils.isNotBlank(result)) {
             return  JSONObject.parseObject(result);
         }

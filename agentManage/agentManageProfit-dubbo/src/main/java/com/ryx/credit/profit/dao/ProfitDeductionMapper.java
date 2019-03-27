@@ -52,4 +52,5 @@ public interface ProfitDeductionMapper {
     /**查看代理商担保扣款*/
     List<Map<String,Object>> getRev2List(Map<String,String> param);
 
+    void clearComputData(@Param("profitDate") String profitDate, @Param("decutionType") String decutionType);
 }

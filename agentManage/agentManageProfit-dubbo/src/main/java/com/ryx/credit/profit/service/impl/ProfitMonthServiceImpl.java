@@ -101,6 +101,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     private ProfitComputerService computerService;
     @Autowired
     private ProfitDirectMapper profitDirectMapper;
+    @Autowired
+    ProfitDeductionMapper profitDeductionMapper;
 
 
     public final static Map<String, Map<String, Object>> temp = new HashMap<>();
@@ -463,6 +465,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             profitDirectMapper.clearComputData(profitDate);
             //清理扣款明细数据
             profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
+            //清理机具扣款实扣、未扣足数据
+            profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
 
 
 

@@ -210,16 +210,18 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
 
     private void updateDeductionInfo(ProfitDeduction profitDeductionList, String computType) throws Exception {
         try {
-            if (Objects.equals(computType, "1")) {
+
                 if (profitDeductionList != null) {
                     ProfitDeduction update = new ProfitDeduction();
                     update.setId(profitDeductionList.getId());
-                    update.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                    if (Objects.equals(computType, "1")) {
+                        update.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                    }
                     update.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
                     update.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
                     profitDeductionService.updateProfitDeduction(update);
                     profitDeducttionDetailService.insertDeducttionDetail(profitDeductionList);
-                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -308,14 +310,16 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                     }*/
                     profitMonthService.updateByPrimaryKeySelective(update);
 
-                    if (Objects.equals(computType, "1")) {
+
                         ProfitDeduction updateDeduct = new ProfitDeduction();
                         updateDeduct.setId(profitDeductionList.getId());
-                        updateDeduct.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                        if (Objects.equals(computType, "1")) {
+                            updateDeduct.setStagingStatus(DeductionStatus.YES_WITHHOLD.getStatus());
+                        }
                         updateDeduct.setActualDeductionAmt(profitDeductionList.getActualDeductionAmt());
                         updateDeduct.setNotDeductionAmt(profitDeductionList.getNotDeductionAmt());
                         profitDeductionService.updateProfitDeduction(updateDeduct);
-                    }
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
