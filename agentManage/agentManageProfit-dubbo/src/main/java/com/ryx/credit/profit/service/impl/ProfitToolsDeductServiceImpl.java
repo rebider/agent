@@ -313,6 +313,8 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                         BigDecimal rhbDgRealDeductionAmt = profitMonth.getRhbDgRealDeductionAmt() == null ? BigDecimal.ZERO : profitMonth.getRhbDgRealDeductionAmt();
                         update.setRhbDgRealDeductionAmt(rhbDgRealDeductionAmt.add(deductAmt));
                     }*/
+                    //更新剩余分润
+                    update.setBasicsProfitAmt((BigDecimal) mergeMap.get("basicAmt"));
                     profitMonthService.updateByPrimaryKeySelective(update);
 
 
