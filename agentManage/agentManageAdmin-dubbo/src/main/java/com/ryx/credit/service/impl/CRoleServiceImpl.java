@@ -22,7 +22,7 @@ public class CRoleServiceImpl implements CRoleService {
     private CRoleMapper roleMapper;
 
     @Override
-    public Set<String> selectShiroUrl(Long userId){
-        return roleMapper.selectShiroUrl(userId);
+    public Set<String> selectShiroUrl(Long userId,String pid,String url){
+        return roleMapper.selectShiroUrl(userId,pid,url);
     }
 }

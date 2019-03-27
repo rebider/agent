@@ -69,8 +69,10 @@
         and r.id = rr.role_id
         and rr.resource_id = re.id
         and url is not null
-        and pid= 451143
-        and url like '/BusActRelBusType%'
+        and pid= #{pid}
+        <if test="url != null" >
+            and url like CONCAT(CONCAT('',#{url}),'%')
+        </if>
         and u.id = #{userId}
     </select>
 
