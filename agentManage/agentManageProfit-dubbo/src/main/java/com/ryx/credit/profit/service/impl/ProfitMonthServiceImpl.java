@@ -547,6 +547,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         Map<String, Object> map = new HashMap<>(10);
         map.put("agentPid", profitDetailMonthTemp.getAgentId()); //业务平台编号
         map.put("agentProfitAmt", profitDetailMonthTemp.getBasicsProfitAmt());
+        map.put("parentAgentId",profitDetailMonthTemp.getParentAgentId());
         map.put("deductDate", LocalDate.now().plusMonths(-1).toString().substring(0, 7).replaceAll("-", ""));   //扣款月份
         map.put("hbList", hbList);     //代理商组群
         map.put("computType", computType);
