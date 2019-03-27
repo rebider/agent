@@ -26,4 +26,6 @@ public interface AgentRelateDetailMapper {
     int updateByPrimaryKeySelective(AgentRelateDetail record);
 
     int updateByPrimaryKey(AgentRelateDetail record);
+
+    List<AgentRelateDetail> selectMyRelateAgents(@Param("agentId") String agentId, @Param("parentAgentId") String parentAgentId, @Param("profitMonth") String profitMonth);
 }

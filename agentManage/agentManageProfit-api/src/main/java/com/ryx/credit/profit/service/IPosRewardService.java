@@ -88,7 +88,7 @@ public interface IPosRewardService {
      * @param record
      * @return
      */
-    int insertHuddleDetail (PosHuddleRewardDetail record);
+    int insertHuddleDetail(PosHuddleRewardDetail record);
 
     /**
      * 查询抱团此周期内是否重复
@@ -109,7 +109,18 @@ public interface IPosRewardService {
 
     List<PosHuddleRewardDetail> selectByHuddleCode(String huddleCode);
 
+    Boolean isRepetition(PosReward posReward);
 
 
     public PageInfo posHuddleRewardList(PosHuddleRewardDetail posHuddleRewardDetail, Page page);
+
+    List<PPosHuddleReward> getHuddlePosRewardByDataId(String id);
+
+    List<PosReward> selectPosRewardByParams(Map<String,Object> posRewardPrams);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByParams(Map<String,Object> posRewardPrams);
+
+    List<PPosHuddleReward> selectPosHuddleRewardByEndMonth(Map<String,Object> map);
+
+    int editHuddleRewardRegect(PPosHuddleReward pPosHuddleReward);
 }

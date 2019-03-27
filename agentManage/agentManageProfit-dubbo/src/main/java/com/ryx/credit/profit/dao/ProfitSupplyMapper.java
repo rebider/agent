@@ -37,4 +37,12 @@ public interface ProfitSupplyMapper {
     List<Map<String,Object>> getProfitSupplyList(Map <String, Object> param);
 
     Map<String,Object> profitCount(Map <String, Object> param);
+
+    /**获取其他补款*/
+    List<ProfitSupply> getProfitSuppList(ProfitSupply record);
+
+    /**根据agentId,月份，parentAgentId,获取其他补款总计*/
+    BigDecimal getTotalByPidMonthAndAndAG(Map<String,String> param);
+
+
 }

@@ -98,4 +98,12 @@ public interface StagingService {
 
     BigDecimal getNextStagAmt(ProfitStagingDetail profitStagingDetail);
 
+    /**
+     * 根据任务id查询任务名
+     * @param taskId
+     * @return
+     */
+    Map<String,Object> byTaskId(String taskId);
+
+    ProfitStagingDetail selectByPrimaryKey(String id);
 }

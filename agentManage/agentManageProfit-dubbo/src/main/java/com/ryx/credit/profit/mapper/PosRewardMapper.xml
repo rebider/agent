@@ -13,7 +13,7 @@
     <result column="APPLY_STATUS" jdbcType="CHAR" property="applyStatus" />
     <result column="TOTAL_END_MONTH" jdbcType="VARCHAR" property="totalEndMonth" />
     <result column="MACHINERY_NUM" jdbcType="NUMERIC" property="machineryNum" />
-    <result column="CREATE_TM" jdbcType="CHAR" property="createTm" />
+    <result column="CREATE_TM" jdbcType="VARCHAR" property="createTm" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -104,7 +104,7 @@
     values (#{id,jdbcType=VARCHAR}, #{agentPid,jdbcType=VARCHAR}, #{agentId,jdbcType=VARCHAR}, 
       #{agentName,jdbcType=VARCHAR}, #{totalConsMonth,jdbcType=VARCHAR}, #{growAmt,jdbcType=DECIMAL}, 
       #{creditConsMonth,jdbcType=VARCHAR}, #{rewardScale,jdbcType=DECIMAL}, #{applyStatus,jdbcType=CHAR},
-      #{totalEndMonth,jdbcType=VARCHAR}, #{machineryNum,jdbcType=NUMERIC}, #{createTm,jdbcType=CHAR}
+      #{totalEndMonth,jdbcType=VARCHAR}, #{machineryNum,jdbcType=NUMERIC}, #{createTm,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.PosReward">
@@ -182,7 +182,7 @@
         #{machineryNum,jdbcType=NUMERIC},
       </if>
       <if test="createTm != null">
-        #{createTm,jdbcType=CHAR}
+        #{createTm,jdbcType=VARCHAR}
       </if>
 
     </trim>
@@ -227,7 +227,7 @@
         MACHINERY_NUM = #{machineryNum,jdbcType=NUMERIC},
       </if>
       <if test="createTm != null">
-        CREATE_TM= #{createTm,jdbcType=CHAR},
+        CREATE_TM= #{createTm,jdbcType=VARCHAR},
       </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
@@ -244,7 +244,7 @@
       APPLY_STATUS = #{applyStatus,jdbcType=CHAR},
     TOTAL_END_MONTH = #{totalEndMonth,jdbcType=VARCHAR},
     MACHINERY_NUM = #{machineryNum,jdbcType=NUMERIC},
-    CREATE_TM = #{createTm,jdbcType=CHAR},
+    CREATE_TM = #{createTm,jdbcType=VARCHAR},
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
@@ -262,11 +262,15 @@
   <select id="huddlePos" parameterType="java.util.Map"  resultType="java.util.Map" >
    select pphr.ID,pphr.APPLY_STATUS,pphr.CREDIT_CONS_MONTH,pphr.TOTAL_CONS_MONTH, pphr.TOTAL_END_MONTH,phrd.POS_AGENT_ID,phrd.POS_AGENT_NAME   from P_POS_HUDDLE_REWARD pphr join POS_HUDDLE_REWARD_DETAIL phrd on pphr.HUDDLE_CODE = phrd.HUDDLE_CODE
     where 1=1
-   <if test="TOTAL_CONS_MONTH != null and TOTAL_CONS_MONTH !='' ">and  pphr.TOTAL_END_MONTH like   concat(concat('%', #{TOTAL_CONS_MONTH}), '%')</if>
-    <if test="CREDIT_CONS_MONTH != null and CREDIT_CONS_MONTH !='' ">and pphr.TOTAL_END_MONTH like  concat(concat('%', #{CREDIT_CONS_MONTH}), '%') </if>
-    <if test="APPLY_STATUS != null and APPLY_STATUS !='' ">and pphr.APPLY_STATUS = #{APPLY_STATUS} </if>
+   <!--<if test="TOTAL_CONS_MONTH != null and TOTAL_CONS_MONTH !='' ">and  pphr.TOTAL_END_MONTH like   concat(concat('%', #{TOTAL_CONS_MONTH}), '%')</if>
+    <if test="CREDIT_CONS_MONTH != null and CREDIT_CONS_MONTH !='' ">and pphr.TOTAL_END_MONTH like  concat(concat('%', #{CREDIT_CONS_MONTH}), '%') </if>-->
     <if test="POS_AGENT_ID != null and POS_AGENT_ID !='' ">and phrd.POS_AGENT_ID = #{POS_AGENT_ID} </if>
     <if test="POS_AGENT_NAME != null and POS_AGENT_NAME !='' ">and phrd.POS_AGENT_NAME = #{POS_AGENT_NAME} </if>
+<!--<choose>
+    <when test="TOTAL_CONS_MONTH != null and TOTAL_CONS_MONTH !='' ">and  pphr.TOTAL_CONS_MONTH  &gt; #{CREDIT_CONS_MONTH}</when>
+      <when test="CREDIT_CONS_MONTH != null and CREDIT_CONS_MONTH !='' ">and pphr.CREDIT_CONS_MONTH &lt; #{TOTAL_CONS_MONTH}</when>
+</choose>-->
+
   </select>
 
 
@@ -286,5 +290,25 @@
     from ACT_RU_TASK
     where ID_ = #{id,jdbcType=OTHER}
   </select>
+
+
+  <select id="selectByTaskId" resultType="java.util.Map" parameterType="java.lang.String" >
+    select GROUP_ID_,ID_,PROC_DEF_ID_,PROC_INST_ID_,REV_,TASK_ID_,TYPE_,USER_ID_ from  act_ru_identitylink where TASK_ID_ = #{taskId}
+  </select>
+
+  <select id="selectPosRewardByParams" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select
+    <include refid="Base_Column_List" />
+    from  P_POS_REWARD
+    where AGENT_ID = '${agentId}'
+    <if test="applyStatus != null and applyStatus !='' ">
+      and APPLY_STATUS = '${applyStatus}'
+    </if>
+    <if test="profitMonth != null and profitMonth !='' ">
+      and TOTAL_CONS_MONTH &lt;= '${profitMonth}' and CREDIT_CONS_MONTH &gt;= '${profitMonth}'
+    </if>
+  </select>
+
+
 
 </mapper>

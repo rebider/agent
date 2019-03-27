@@ -2,10 +2,7 @@ package com.ryx.credit.profit.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ryx.credit.activity.entity.ActRuTask;
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.BusActRelBusType;
-import com.ryx.credit.common.enumc.RewardStatus;
-import com.ryx.credit.common.enumc.TabId;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.DateUtils;
@@ -103,13 +100,13 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
         PosHuddleRewardDetailExample posHuddleRewardDetailExample = new PosHuddleRewardDetailExample();
         PosHuddleRewardDetailExample.Criteria criteria = posHuddleRewardDetailExample.createCriteria();
-        if(StringUtils.isNotBlank(posHuddleRewardDetail.getPosAgentId())){
+        if (StringUtils.isNotBlank(posHuddleRewardDetail.getPosAgentId())) {
             criteria.andPosAgentIdEqualTo(posHuddleRewardDetail.getPosAgentId());
         }
-        if(StringUtils.isNotBlank(posHuddleRewardDetail.getPosAgentName())){
+        if (StringUtils.isNotBlank(posHuddleRewardDetail.getPosAgentName())) {
             criteria.andPosAgentNameEqualTo(posHuddleRewardDetail.getPosAgentName());
         }
-        List<PosHuddleRewardDetail> listDetail= posHuddleRewardDetailMapper.selectByExample(posHuddleRewardDetailExample);
+        List<PosHuddleRewardDetail> listDetail = posHuddleRewardDetailMapper.selectByExample(posHuddleRewardDetailExample);
         List<String> listQuvery = new ArrayList<>();
         for (PosHuddleRewardDetail detail : listDetail) {
             listQuvery.add(detail.getHuddleCode());
@@ -119,9 +116,31 @@ public class PosRewardServiceImpl implements IPosRewardService {
         List<PPosHuddleReward> profitD = pPosHuddleRewardMapper.selectByList(listQuvery);
         PageInfo pageInfo = new PageInfo();
         pageInfo.setRows(profitD);
-        pageInfo.setTotal((int)pPosHuddleRewardMapper.selectByCount(listQuvery));
+        pageInfo.setTotal((int) pPosHuddleRewardMapper.selectByCount(listQuvery));
         return pageInfo;
     }
+
+    @Override
+    public List<PosReward> selectPosRewardByParams(Map<String, Object> posRewardPrams) {
+        return rewardMapper.selectPosRewardByParams(posRewardPrams);
+    }
+
+    @Override
+    public List<PPosHuddleReward> selectPosHuddleRewardByParams(Map<String, Object> posRewardPrams) {
+        return pPosHuddleRewardMapper.selectPosHuddleRewardByParams(posRewardPrams);
+    }
+
+    @Override
+    public List<PPosHuddleReward> selectPosHuddleRewardByEndMonth(Map<String, Object> map) {
+        PPosHuddleRewardExample example = new PPosHuddleRewardExample();
+        PPosHuddleRewardExample.Criteria criteria = example.createCriteria();
+        criteria.andCreditConsMonthEqualTo((String)map.get("profitMonth"));
+        criteria.andApplyStatusEqualTo("1");
+        List<PPosHuddleReward> rewards = pPosHuddleRewardMapper.selectByExample(example);
+        return rewards;
+    }
+
+
     /**
      * @author: Lihl
      * @desc POS奖励申请调整，进行审批流
@@ -132,7 +151,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public void applyPosReward(PosReward posReward, String userId, String workId) throws ProcessException {
         posReward.setId((idService.genId(TabId.p_pos_reward)));
-        logger.info("序列ID......"+idService.genId(TabId.p_pos_reward));
+        logger.info("序列ID......" + idService.genId(TabId.p_pos_reward));
         rewardMapper.insertSelective(posReward);
 
         //启动审批流
@@ -158,7 +177,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         } catch (Exception e) {
             e.getStackTrace();
             logger.error("POS奖励审批流启动失败{}");
-            throw new ProcessException("POS奖励审批流启动失败!:{}",e.getMessage());
+            throw new ProcessException("POS奖励审批流启动失败!:{}", e.getMessage());
         }
         posReward.setApplyStatus(RewardStatus.REVIEWING.getStatus());//REVIEWING 0:审核中
         rewardMapper.updateByPrimaryKeySelective(posReward);
@@ -167,6 +186,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
     /**
      * POS抱团奖励进行审批流
+     *
      * @param pPosHuddleReward
      * @param userId
      * @param workId
@@ -175,7 +195,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
     @Override
     public void applyHuddlePosReward(PPosHuddleReward pPosHuddleReward, String userId, String workId) throws ProcessException {
         pPosHuddleReward.setId((idService.genId(TabId.p_pos_reward)));
-        logger.info("序列ID......"+idService.genId(TabId.p_pos_reward));
+        logger.info("序列ID......" + idService.genId(TabId.p_pos_reward));
         pPosHuddleRewardMapper.insertSelective(pPosHuddleReward);
 
         //启动审批流
@@ -200,7 +220,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         } catch (Exception e) {
             e.getStackTrace();
             logger.error("POS奖励审批流启动失败{}");
-            throw new ProcessException("POS奖励审批流启动失败!:{}",e.getMessage());
+            throw new ProcessException("POS奖励审批流启动失败!:{}", e.getMessage());
         }
         pPosHuddleReward.setApplyStatus(RewardStatus.REVIEWING.getStatus());//REVIEWING 0:审核中
         pPosHuddleRewardMapper.updateByPrimaryKeySelective(pPosHuddleReward);
@@ -208,12 +228,37 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
     @Override
     public PPosHuddleReward selectByPrimaryKey(String id) {
-        return  pPosHuddleRewardMapper.selectByPrimaryKey(id);
+        return pPosHuddleRewardMapper.selectByPrimaryKey(id);
     }
 
     @Override
     public List<PosHuddleRewardDetail> selectByHuddleCode(String huddleCode) {
         return posHuddleRewardDetailMapper.selectByHuddleCode(huddleCode);
+    }
+
+    @Override
+    public Boolean isRepetition(PosReward posReward) {
+        PosRewardExample example = new PosRewardExample();
+        PosRewardExample.Criteria criteria = example.createCriteria();
+        if(StringUtils.isNotBlank(posReward.getAgentPid())){
+            criteria.andAgentPidEqualTo(posReward.getAgentPid());
+        }
+        if(StringUtils.isNotBlank(posReward.getAgentId())){
+            criteria.andAgentIdEqualTo(posReward.getAgentId());
+        }
+        if(StringUtils.isNotBlank(posReward.getApplyStatus())){
+            criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
+        }
+        List<PosReward> list=rewardMapper.selectByExample(example);
+        List<String> month=getMonthBetween(posReward.getTotalConsMonth(),posReward.getCreditConsMonth());
+        for (PosReward p :list) {
+            for (String mon:month) {
+                if(mon.compareTo(p.getTotalConsMonth())>=0&&mon.compareTo(p.getCreditConsMonth())<=0){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 
@@ -222,24 +267,47 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
 
         String taskId = agentVo.getTaskId();
-        Map<String, Object> mapactRuTask = rewardMapper.selectById(taskId);
-        String activid = (String) mapactRuTask.get("EXECUTION_ID_");
-        Map<String, Object> mapActRel = rewardMapper.selectByActiv(activid);
-        PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
-        PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
-        criteria.andAgentNameEqualTo((String) mapActRel.get("AGENT_NAME"));
-        criteria.andIdEqualTo((String) mapActRel.get("BUS_ID"));
-        List<PPosHuddleReward> listPos = pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+        if (taskId != null) {
+            Map<String, Object> identitylink = rewardMapper.selectByTaskId(taskId);
+            String groupId = (String) identitylink.get("GROUP_ID_");
+            Map<String, Object> mapactRuTask = rewardMapper.selectById(taskId);
+            String activid = (String) mapactRuTask.get("EXECUTION_ID_");
+            Map<String, Object> mapActRel = rewardMapper.selectByActiv(activid);
+            PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
+            PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
+            criteria.andAgentNameEqualTo((String) mapActRel.get("AGENT_NAME"));
+            criteria.andIdEqualTo((String) mapActRel.get("BUS_ID"));
+            List<PPosHuddleReward> listPos = pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+
+            if(agentVo.getPretest()!=null || "".equals(agentVo.getOrderAprDept())) {
+
+                if (listPos != null) {
+                    for (PPosHuddleReward pos : listPos) {
+                        if (agentVo.getPretest()!=null ){
+                            pos.setRev1(agentVo.getPretest());
+                        }
+                        if("".equals(agentVo.getOrderAprDept()) &&(pos.getRev1()!=null)){
+                            if ("pass".equals(agentVo.getApprovalResult()) && (!"city".equals(groupId))) {
+                                if(!"business".equals(groupId)){
+                                    pos.setApplyStatus(Status.STATUS_1.status.toString());
+                                }
+                            }
+                        }
+                        pPosHuddleRewardMapper.updateByPrimaryKeySelective(pos);
+                    }
+                }
+            }
+        }
 
 
         logger.info("审批对象：{}", JSONObject.toJSON(agentVo));
         AgentResult result = new AgentResult(500, "系统异常", "");
         Map<String, Object> reqMap = new HashMap<>();
-        if(StringUtils.isNotBlank(agentVo.getOrderAprDept())){
+        if (StringUtils.isNotBlank(agentVo.getOrderAprDept())) {
             reqMap.put("dept", agentVo.getOrderAprDept());
         }
-        if(Objects.equals("pass",agentVo.getApprovalResult())
-                && StringUtils.isBlank(agentVo.getOrderAprDept())){
+        if (Objects.equals("pass", agentVo.getApprovalResult())
+                && StringUtils.isBlank(agentVo.getOrderAprDept())) {
             reqMap.put("dept", "finish");
         }
         reqMap.put("rs", agentVo.getApprovalResult());
@@ -254,27 +322,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
         String msg = String.valueOf(resultMap.get("msg"));
 
 
-        if(agentVo.getPretest()!=null || "".equals(agentVo.getOrderAprDept())) {
-
-            if (listPos != null) {
-                for (PPosHuddleReward pos : listPos) {
-                    if("".equals(agentVo.getOrderAprDept()) &&(pos.getRev1()!=null)){
-                        if ("pass".equals(agentVo.getApprovalResult())) {
-                            pos.setApplyStatus("1");
-                        }else {
-                            pos.setApplyStatus("2");
-                        }
-                    }else if(pos.getRev1()==null && "pass".equals(agentVo.getApprovalResult())){
-                        pos.setRev1(agentVo.getPretest());
-                    }else {
-                        pos.setApplyStatus("2");
-                    }
-                    pPosHuddleRewardMapper.updateByPrimaryKeySelective(pos);
-                }
-            }
-        }
-
-
         if (resultMap == null) {
             return result;
         }
@@ -287,27 +334,27 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED)
     @Override
-    public void completeTaskEnterActivity(String insid, String status){
+    public void completeTaskEnterActivity(String insid, String status) {
         BusActRel busActRel = new BusActRel();
         busActRel.setActivId(insid);
         try {
-            BusActRel rel =  taskApprovalService.queryBusActRel(busActRel);
+            BusActRel rel = taskApprovalService.queryBusActRel(busActRel);
             if (rel != null) {
                 PosReward posReward = rewardMapper.selectByPrimaryKey(rel.getBusId());
                 posReward.setApplyStatus(RewardStatus.PASS.getStatus());   // PASS 1:生效
-                String agentId=posReward.getAgentId();
-                PosReward tempPosReward=new PosReward();
+                String agentId = posReward.getAgentId();
+                PosReward tempPosReward = new PosReward();
                 tempPosReward.setAgentId(agentId);
                 tempPosReward.setApplyStatus(RewardStatus.PASS.getStatus());
-                List<PosReward> oldList=rewardMapper.selectByExample(rewardEqualsTo(tempPosReward));//查出之前此代理商通过的所有特殊奖励申请单
+                List<PosReward> oldList = rewardMapper.selectByExample(rewardEqualsTo(tempPosReward));//查出之前此代理商通过的所有特殊奖励申请单
                 rewardMapper.updateByPrimaryKeySelective(posReward);//将此审批通过的申请更新到数据库
-                List<PosReward> updateList=new ArrayList<PosReward>();
-                List<String> monthList=getMonthBetween(posReward.getTotalConsMonth(),posReward.getCreditConsMonth());
-                oldList.stream().forEach(oldPosReward->{
-                    List<String> tempMonth=getMonthBetween(oldPosReward.getTotalConsMonth(),oldPosReward.getCreditConsMonth());
-                    for (String str1:tempMonth){
-                        for (String str2:monthList){
-                            if(str1.equals(str2)){
+                List<PosReward> updateList = new ArrayList<PosReward>();
+                List<String> monthList = getMonthBetween(posReward.getTotalConsMonth(), posReward.getCreditConsMonth());
+                oldList.stream().forEach(oldPosReward -> {
+                    List<String> tempMonth = getMonthBetween(oldPosReward.getTotalConsMonth(), oldPosReward.getCreditConsMonth());
+                    for (String str1 : tempMonth) {
+                        for (String str2 : monthList) {
+                            if (str1.equals(str2)) {
                                 oldPosReward.setApplyStatus(RewardStatus.UN_PASS.getStatus());
                                 updateList.add(oldPosReward);
                                 return;
@@ -315,7 +362,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
                         }
                     }
                 });
-                for (PosReward updatePosReward:updateList){
+                for (PosReward updatePosReward : updateList) {
                     rewardMapper.updateByPrimaryKeySelective(updatePosReward);
                 }
                 logger.info("2更新审批流与业务对象");
@@ -332,14 +379,14 @@ public class PosRewardServiceImpl implements IPosRewardService {
     public PosReward getPosRewardById(String id) {
         if (StringUtils.isNotBlank(id)) {
             return rewardMapper.selectByPrimaryKey(id);
-        }else{
+        } else {
             return null;
         }
     }
 
     @Override
     public List<PosReward> getPosRewardByDataId(String id) {
-        if(StringUtils.isNotBlank(id)){
+        if (StringUtils.isNotBlank(id)) {
             PosRewardExample posRewardExample = new PosRewardExample();
             PosRewardExample.Criteria criteria = posRewardExample.createCriteria();
             criteria.andIdEqualTo(id);
@@ -347,6 +394,23 @@ public class PosRewardServiceImpl implements IPosRewardService {
         }
         return null;
     }
+
+    @Override
+    public List<PPosHuddleReward> getHuddlePosRewardByDataId(String id) {
+        if(StringUtils.isNotBlank(id)){
+            PPosHuddleRewardExample pPosHuddleRewardExample = new PPosHuddleRewardExample();
+            PPosHuddleRewardExample.Criteria criteria = pPosHuddleRewardExample.createCriteria();
+            criteria.andIdEqualTo(id);
+            return pPosHuddleRewardMapper.selectByExample(pPosHuddleRewardExample);
+        }
+        return null;
+    }
+
+    @Override
+    public int editHuddleRewardRegect(PPosHuddleReward pPosHuddleReward) {
+        return pPosHuddleRewardMapper.updateByPrimaryKeySelective(pPosHuddleReward);
+    }
+
 
     @Override
     public void editRewardRegect(PosReward posReward) throws Exception {
@@ -360,6 +424,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
 
     /**
      * 查询此交易月份是否已申请
+     *
      * @param posReward
      * @return
      */
@@ -367,19 +432,19 @@ public class PosRewardServiceImpl implements IPosRewardService {
     public List<PosReward> selectRewardByMonth(PosReward posReward) {
         PosRewardExample example = new PosRewardExample();
         PosRewardExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(posReward.getTotalConsMonth())){
-            criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
+        if (StringUtils.isNotBlank(posReward.getTotalConsMonth())) {
+            criteria.andTotalConsMonthLike("%" + posReward.getTotalConsMonth() + "%");
         }
-        if(StringUtils.isNotBlank(posReward.getCreditConsMonth())){
-            criteria.andCreditConsMonthLike("%"+posReward.getCreditConsMonth()+"%");
+        if (StringUtils.isNotBlank(posReward.getCreditConsMonth())) {
+            criteria.andCreditConsMonthLike("%" + posReward.getCreditConsMonth() + "%");
         }
-        if(StringUtils.isNotBlank(posReward.getAgentPid())){
+        if (StringUtils.isNotBlank(posReward.getAgentPid())) {
             criteria.andAgentPidEqualTo(posReward.getAgentPid());
         }
-        if(StringUtils.isNotBlank(posReward.getAgentId())){
+        if (StringUtils.isNotBlank(posReward.getAgentId())) {
             criteria.andAgentIdEqualTo(posReward.getAgentId());
         }
-        if(StringUtils.isNotBlank(posReward.getApplyStatus())){
+        if (StringUtils.isNotBlank(posReward.getApplyStatus())) {
             criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
         }
         return rewardMapper.selectByExample(example);
@@ -392,8 +457,8 @@ public class PosRewardServiceImpl implements IPosRewardService {
         /*if(StringUtils.isNotBlank(posReward.getTotalConsMonth())){
             criteria.andTotalConsMonthLike("%"+posReward.getTotalConsMonth()+"%");
         }*/
-        if(StringUtils.isNotBlank(posReward.getCreditConsMonth())){
-            criteria.andCreditConsMonthLike("%"+posReward.getCreditConsMonth()+"%");
+        if (StringUtils.isNotBlank(posReward.getCreditConsMonth())) {
+            criteria.andCreditConsMonthEqualTo(posReward.getCreditConsMonth());
         }
        /* if(StringUtils.isNotBlank(posReward.getAgentPid())){
             criteria.andAgentPidEqualTo(posReward.getAgentPid());
@@ -404,7 +469,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         if(StringUtils.isNotBlank(posReward.getAgentId())){
             criteria.andAgentIdEqualTo(posReward.getAgentId());
         }*/
-        if(StringUtils.isNotBlank(posReward.getApplyStatus())){
+        if (StringUtils.isNotBlank(posReward.getApplyStatus())) {
             criteria.andApplyStatusEqualTo(posReward.getApplyStatus());
         }
         return rewardMapper.selectByExample(example);
@@ -419,7 +484,6 @@ public class PosRewardServiceImpl implements IPosRewardService {
     public List<Map<String, Object>> huddlePos(Map<String, Object> param) {
         return rewardMapper.huddlePos(param);
     }
-
 
 
     private static List<String> getMonthBetween(String minDate, String maxDate) {

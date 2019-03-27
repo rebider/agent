@@ -41,4 +41,5 @@ public interface InvoiceDetailMapper {
     /**根据agentId或者agentName获得本月欠票**/
     Map<String,Object> getOwnInvoice(Map<String,String> map);
 
+
 }

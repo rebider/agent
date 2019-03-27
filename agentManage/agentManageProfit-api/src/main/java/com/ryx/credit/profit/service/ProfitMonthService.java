@@ -187,7 +187,7 @@ public interface ProfitMonthService {
      */
     void initPosRowardDetail()throws Exception;
 
-    PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth);
+    PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo);
 
     Map<String,Object> profitCount(Map<String, Object> param);
 
@@ -207,12 +207,12 @@ public interface ProfitMonthService {
     /**
      * 代理商日分润冻结
      */
-    Map<String,String> doFrozenByAgent(String agentId);
+    Map<String,String> doFrozenByAgent(List<String> list);
 
     /**
      * 代理商日分润解冻
      */
-    Map<String,String> doUnFrozenAgentProfit(String agentId);
+    Map<String,String>  doUnFrozenAgentProfit(List<String> list);
 
 
 

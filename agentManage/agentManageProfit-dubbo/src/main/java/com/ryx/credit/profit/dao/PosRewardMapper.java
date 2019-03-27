@@ -34,4 +34,8 @@ public interface PosRewardMapper {
     Map<String, Object> selectById(String id);
 
     Map<String, Object> selectByActiv(String activId);
+
+    Map<String, Object> selectByTaskId(String taskId);
+
+    List<PosReward> selectPosRewardByParams(Map<String,Object> posRewardPrams);
 }

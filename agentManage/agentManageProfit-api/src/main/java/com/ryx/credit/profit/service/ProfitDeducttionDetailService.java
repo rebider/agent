@@ -30,4 +30,11 @@ public interface ProfitDeducttionDetailService {
      * @return
      */
     public List<ProfitDeducttionDetail> getDeducttionDetailList(ProfitDeduction profitDeduction);
+
+    /**
+     * 清楚明细
+     * @param profitDate
+     * @param type
+     */
+    void clearComputData( String profitDate,String type);
 }

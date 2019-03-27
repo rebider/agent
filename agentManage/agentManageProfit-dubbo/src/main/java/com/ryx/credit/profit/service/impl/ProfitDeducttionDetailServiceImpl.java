@@ -77,4 +77,9 @@ public class ProfitDeducttionDetailServiceImpl implements ProfitDeducttionDetail
         example.setOrderByClause("MUST_DEDUCTION_AMT ");
         return  profitDeducttionDetailMapper.selectByExample(example) ;
     }
+
+    @Override
+    public void clearComputData(String profitDate, String type) {
+        profitDeducttionDetailMapper.clearComputData( profitDate, type);
+    }
 }

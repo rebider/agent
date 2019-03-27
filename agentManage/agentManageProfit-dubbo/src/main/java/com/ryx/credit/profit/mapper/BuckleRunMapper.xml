@@ -11,6 +11,11 @@
     <result column="SUPPLY_AMT" jdbcType="DECIMAL" property="supplyAmt" />
     <result column="RUN_DATE" jdbcType="VARCHAR" property="runDate" />
     <result column="RUN_STATUS" jdbcType="VARCHAR" property="runStatus" />
+    <result column="CREATE_TIME" jdbcType="VARCHAR" property="createTime" />
+    <result column="SUPPLY_DATE" jdbcType="VARCHAR" property="supplyDate" />
+    <result column="SUPPLY_TIMES" jdbcType="DECIMAL" property="supplyTimes" />
+    <result column="SOUCE_ID" jdbcType="VARCHAR" property="souceId" />
+    <result column="RUN_TYPE" jdbcType="DECIMAL" property="runType" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -41,9 +46,38 @@
       </foreach>
     </where>
   </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
   <sql id="Base_Column_List">
     ID, BEAR_AGENT_ID, BEAR_AGENT_PID, AGENT_ID, RUN_LEVEL, RUN_AMT, SUPPLY_AMT, RUN_DATE, 
-    RUN_STATUS
+    RUN_STATUS, CREATE_TIME, SUPPLY_DATE, SUPPLY_TIMES, SOUCE_ID, RUN_TYPE
   </sql>
   <select id="selectByExample" parameterType="com.ryx.credit.profit.pojo.BuckleRunExample" resultMap="BaseResultMap">
     <include refid="OracleDialectPrefix" />
@@ -76,12 +110,14 @@
   <insert id="insert" parameterType="com.ryx.credit.profit.pojo.BuckleRun">
     insert into P_BUCKLE_RUN (ID, BEAR_AGENT_ID, BEAR_AGENT_PID, 
       AGENT_ID, RUN_LEVEL, RUN_AMT, 
-      SUPPLY_AMT, RUN_DATE, RUN_STATUS
-      )
+      SUPPLY_AMT, RUN_DATE, RUN_STATUS,
+      CREATE_TIME, SUPPLY_DATE, SUPPLY_TIMES,
+      SOUCE_ID, RUN_TYPE)
     values (#{id,jdbcType=VARCHAR}, #{bearAgentId,jdbcType=VARCHAR}, #{bearAgentPid,jdbcType=VARCHAR}, 
       #{agentId,jdbcType=VARCHAR}, #{runLevel,jdbcType=VARCHAR}, #{runAmt,jdbcType=DECIMAL}, 
-      #{supplyAmt,jdbcType=DECIMAL}, #{runDate,jdbcType=VARCHAR}, #{runStatus,jdbcType=VARCHAR}
-      )
+      #{supplyAmt,jdbcType=DECIMAL}, #{runDate,jdbcType=VARCHAR}, #{runStatus,jdbcType=VARCHAR},
+      #{createTime,jdbcType=VARCHAR}, #{supplyDate,jdbcType=VARCHAR}, #{supplyTimes,jdbcType=DECIMAL},
+      #{souceId,jdbcType=VARCHAR}, #{runType,jdbcType=DECIMAL})
   </insert>
   <insert id="insertSelective" parameterType="com.ryx.credit.profit.pojo.BuckleRun">
     insert into P_BUCKLE_RUN
@@ -113,6 +149,21 @@
       <if test="runStatus != null">
         RUN_STATUS,
       </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="supplyDate != null">
+        SUPPLY_DATE,
+      </if>
+      <if test="supplyTimes != null">
+        SUPPLY_TIMES,
+      </if>
+      <if test="souceId != null">
+        SOUCE_ID,
+      </if>
+      <if test="runType != null">
+        RUN_TYPE,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -142,6 +193,21 @@
       <if test="runStatus != null">
         #{runStatus,jdbcType=VARCHAR},
       </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyDate != null">
+        #{supplyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTimes != null">
+        #{supplyTimes,jdbcType=DECIMAL},
+      </if>
+      <if test="souceId != null">
+        #{souceId,jdbcType=VARCHAR},
+      </if>
+      <if test="runType != null">
+        #{runType,jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.ryx.credit.profit.pojo.BuckleRunExample" resultType="java.lang.Long">
@@ -150,16 +216,76 @@
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-
-  <select id="getSumRunAmt" parameterType="java.lang.String" resultType="java.math.BigDecimal">
-    select SUM(RUN_AMT-SUPPLY_AMT) from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR}
-  </select>
-
-
-  <select id="selectListByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select * from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} AND RUN_STATUS='0' ORDER BY RUN_LEVEL DESC
-  </select>
-
+  <update id="updateByExampleSelective" parameterType="map">
+    update P_BUCKLE_RUN
+    <set>
+      <if test="record.id != null">
+        ID = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bearAgentId != null">
+        BEAR_AGENT_ID = #{record.bearAgentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bearAgentPid != null">
+        BEAR_AGENT_PID = #{record.bearAgentPid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agentId != null">
+        AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.runLevel != null">
+        RUN_LEVEL = #{record.runLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="record.runAmt != null">
+        RUN_AMT = #{record.runAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.supplyAmt != null">
+        SUPPLY_AMT = #{record.supplyAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="record.runDate != null">
+        RUN_DATE = #{record.runDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.runStatus != null">
+        RUN_STATUS = #{record.runStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null">
+        CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyDate != null">
+        SUPPLY_DATE = #{record.supplyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="record.supplyTimes != null">
+        SUPPLY_TIMES = #{record.supplyTimes,jdbcType=DECIMAL},
+      </if>
+      <if test="record.souceId != null">
+        SOUCE_ID = #{record.souceId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.runType != null">
+        RUN_TYPE = #{record.runType,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update P_BUCKLE_RUN
+    set ID = #{record.id,jdbcType=VARCHAR},
+      BEAR_AGENT_ID = #{record.bearAgentId,jdbcType=VARCHAR},
+      BEAR_AGENT_PID = #{record.bearAgentPid,jdbcType=VARCHAR},
+      AGENT_ID = #{record.agentId,jdbcType=VARCHAR},
+      RUN_LEVEL = #{record.runLevel,jdbcType=VARCHAR},
+      RUN_AMT = #{record.runAmt,jdbcType=DECIMAL},
+      SUPPLY_AMT = #{record.supplyAmt,jdbcType=DECIMAL},
+      RUN_DATE = #{record.runDate,jdbcType=VARCHAR},
+      RUN_STATUS = #{record.runStatus,jdbcType=VARCHAR},
+      CREATE_TIME = #{record.createTime,jdbcType=VARCHAR},
+      SUPPLY_DATE = #{record.supplyDate,jdbcType=VARCHAR},
+      SUPPLY_TIMES = #{record.supplyTimes,jdbcType=DECIMAL},
+      SOUCE_ID = #{record.souceId,jdbcType=VARCHAR},
+      RUN_TYPE = #{record.runType,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.ryx.credit.profit.pojo.BuckleRun">
     update P_BUCKLE_RUN
     <set>
@@ -187,6 +313,21 @@
       <if test="runStatus != null">
         RUN_STATUS = #{runStatus,jdbcType=VARCHAR},
       </if>
+      <if test="createTime != null">
+        CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyDate != null">
+        SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR},
+      </if>
+      <if test="supplyTimes != null">
+        SUPPLY_TIMES = #{supplyTimes,jdbcType=DECIMAL},
+      </if>
+      <if test="souceId != null">
+        SOUCE_ID = #{souceId,jdbcType=VARCHAR},
+      </if>
+      <if test="runType != null">
+        RUN_TYPE = #{runType,jdbcType=DECIMAL},
+      </if>
     </set>
     where ID = #{id,jdbcType=VARCHAR}
   </update>
@@ -199,12 +340,17 @@
       RUN_AMT = #{runAmt,jdbcType=DECIMAL},
       SUPPLY_AMT = #{supplyAmt,jdbcType=DECIMAL},
       RUN_DATE = #{runDate,jdbcType=VARCHAR},
-      RUN_STATUS = #{runStatus,jdbcType=VARCHAR}
+      RUN_STATUS = #{runStatus,jdbcType=VARCHAR},
+      CREATE_TIME = #{createTime,jdbcType=VARCHAR},
+      SUPPLY_DATE = #{supplyDate,jdbcType=VARCHAR},
+      SUPPLY_TIMES = #{supplyTimes,jdbcType=DECIMAL},
+      SOUCE_ID = #{souceId,jdbcType=VARCHAR},
+      RUN_TYPE = #{runType,jdbcType=DECIMAL}
     where ID = #{id,jdbcType=VARCHAR}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
-      select * from ( select row_.*, rownum rownum_ from ( 
+      select * from ( select row_.*, rownum rownum_ from (
     </if>
   </sql>
   <sql id="OracleDialectSuffix">
@@ -212,5 +358,31 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+  <!-- ======================以上为自动生成代码，请务必把自己添加代码写到下面，防止被覆盖================================-->
+  <select id="getSumRunAmt" parameterType="java.lang.String" resultType="java.math.BigDecimal">
+    select SUM(RUN_AMT-nvl(SUPPLY_AMT,0)) from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} and run_type = '1'
+  </select>
+  <select id="selectListByAgentIdAndRunDate" parameterType="java.util.Map" resultType="map">
+    select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.RUN_AMT
+    from (select * from P_BUCKLE_RUN where AGENT_ID = #{agentId} AND RUN_TYPE=1 AND RUN_STATUS='0' AND SUBSTR(RUN_DATE,0,6) = #{runDate}) pbr
+left join (select distinct PARENT_AGENT_NAME,PARENT_AGENT_ID,TRANS_MONTH from P_PROFIT_DIRECT) ppd
+on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.RUN_DATE,0,6)=ppd.TRANS_MONTH ORDER BY RUN_LEVEL desc
+  </select>
+  <select id="selectListByAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultType="map">
+    select pbr.AGENT_ID,pbr.BEAR_AGENT_ID,ppd.PARENT_AGENT_NAME as AGENT_NAME,pbr.SUPPLY_AMT
+    from (select * from P_BUCKLE_RUN where AGENT_ID = #{agentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND SUBSTR(SUPPLY_DATE,0,6) = #{runDate}) pbr
+left join (select distinct PARENT_AGENT_NAME,PARENT_AGENT_ID,TRANS_MONTH from P_PROFIT_DIRECT) ppd
+on pbr.BEAR_AGENT_ID=ppd.PARENT_AGENT_ID and substr(pbr.SUPPLY_DATE,0,6)=ppd.TRANS_MONTH ORDER BY RUN_LEVEL desc
+  </select>
+  <select id="selectListByBearAgentIdAndRunDate" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=1 AND RUN_STATUS='0' AND SUBSTR(RUN_DATE,0,6) = #{runDate}
+  </select>
+  <select id="selectListByBearAgentIdAndRunDateWithSupply" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select * from P_BUCKLE_RUN where BEAR_AGENT_ID = #{bearAgentId} AND RUN_TYPE=2 AND RUN_STATUS='0' AND substr(SUPPLY_DATE,0,6)=#{runDate}
+  </select>
 
+  <!--从被代扣代理商维度查询代扣记录-->
+  <select id="selectListByAgentId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select * from P_BUCKLE_RUN where AGENT_ID = #{agentId,jdbcType=VARCHAR} AND RUN_STATUS='0' and run_type = '1' and RUN_AMT > nvl(SUPPLY_AMT,0) ORDER BY RUN_LEVEL DESC
+  </select>
 </mapper>

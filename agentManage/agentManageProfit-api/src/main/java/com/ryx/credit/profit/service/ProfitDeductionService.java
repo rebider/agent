@@ -1,10 +1,12 @@
 package com.ryx.credit.profit.service;
 
 import com.ryx.credit.common.exception.MessageException;
+import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.exceptions.DeductionException;
 import com.ryx.credit.profit.pojo.ProfitDeduction;
+import com.ryx.credit.profit.pojo.ProfitDeducttionDetail;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -54,7 +56,7 @@ public interface ProfitDeductionService {
     * @Author: zhaodw
     * @Date: 2018/7/31 
     */
-    public void batchInsertOtherDeduction(List<List<Object>> datas , String userId);
+    public void batchInsertOtherDeduction(List<List<Object>> datas , String userId) throws ProcessException;
 
     /**
      * 根据扣款类型、扣款日期、查询总数
@@ -160,5 +162,33 @@ public interface ProfitDeductionService {
      * @return
      */
     Map<String,BigDecimal> getNotDeduction(Map<String,String> map);
+
+    /**
+     * 获取机具扣款关联代理商扣款
+     */
+    List<Map<String,Object>> getRev1DetailById(String id);
+
+    /**
+     * 获取机具扣款---代理商担保扣款
+     */
+    List<Map<String,Object>> getRev2DetailById(String id);
+
+
+    /***
+     * @Description: 获取扣款列表
+     * @Param: param 扣款查询参数
+     * @return: 扣款列表
+     * @Author: zhaodw
+     * @Date: 2018/8/21
+     */
+    List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param);
+
+    /***
+     * @Description: 更新退单明细
+     * @Author: zhaodw
+     * @Date: 2018/11/20
+     */
+    void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt);
+
 
 }

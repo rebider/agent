@@ -60,6 +60,8 @@ public enum DictGroup {
     SETTLEMENT_PRICESTR("结算价类型"),
     PAY_TYPE("打款方式"),
     MERGE("代理商合并"),
+    OTHER_DEDUCT("其他扣款/补款审批参数"),
+    INVOICEAPPLY("发票审核审批参数"),
     MERGE_MARKET("代理商合并审批市场部参数"),
     MERGE_YUHUA("代理商合并审批于华参数"),
     NETIN_MARKET("代理商入网审批市场部参数"),
@@ -68,7 +70,11 @@ public enum DictGroup {
     QUIT_MARKET_DEADLINE("代理商退出审批选择期限"),
     QUIT_MIGR_PLATFORM("代理商退出手刷迁移平台"),
     CAPITAL_MIARKET("保证金变更市场部审批参数"),
-    ORDER_RETURN("订单退货业务选择下一级审批人参数");
+    ORDER_RETURN("订单退货业务选择下一级审批人参数"),
+
+
+    POS("POS审批"),
+    POS_APR_BUSNISS("POS审批参数");
 
     public String  msg;
 

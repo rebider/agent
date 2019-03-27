@@ -30,4 +30,7 @@ public interface ActRuTaskMapper {
     List<Map<String,Object>> queryMyTaskPage(@Param("params") Map<String,Object> params,@Param("page") Page page);
 
     int queryMyTaskCount(@Param("params") Map<String,Object> params);
+
+    List<Map<String,Object>> queryHuddleMyTask(@Param("params") Map<String,Object> params);
+
 }

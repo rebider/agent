@@ -58,6 +58,10 @@ public class ProfitDirect implements Serializable {
 
     private BigDecimal dailyAmt;
 
+    private BigDecimal parentSupply;
+
+    private BigDecimal mustBuckleAmt;
+
     public String getId() {
         return id;
     }
@@ -272,5 +276,21 @@ public class ProfitDirect implements Serializable {
 
     public void setDailyAmt(BigDecimal dailyAmt) {
         this.dailyAmt = dailyAmt;
+    }
+
+    public BigDecimal getParentSupply() {
+        return parentSupply;
+    }
+
+    public void setParentSupply(BigDecimal parentSupply) {
+        this.parentSupply = parentSupply;
+    }
+
+    public BigDecimal getMustBuckleAmt() {
+        return mustBuckleAmt;
+    }
+
+    public void setMustBuckleAmt(BigDecimal mustBuckleAmt) {
+        this.mustBuckleAmt = mustBuckleAmt;
     }
 }

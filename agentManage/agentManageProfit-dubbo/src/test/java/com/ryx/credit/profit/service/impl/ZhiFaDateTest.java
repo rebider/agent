@@ -44,10 +44,10 @@ public class ZhiFaDateTest {
     ProfitDeductionService profitDeductionService;
     private int index=1;
 
-    @Test
+    /*@Test
     public void testX(){
         computer();
-    }
+    }*/
 
     /**
      * 同步直发分润数据
@@ -80,19 +80,19 @@ public class ZhiFaDateTest {
         }
     }
 
-    public void computer(){
+    /*public void computer(){
         try {
             //计算直发补款
-            computerService.computer_Supply_ZhiFa();
+            computerService.computer_Supply_ZhiFa(profitMonth, computType);
             //计算不足扣款找上级代扣，并记录
-            computerService.computer_Buckle_ZhiFa();
+            computerService.computer_Buckle_ZhiFa(profitMonth, computType);
             //计算直发实际分润
             computerService.computer_ZhiFa();
         } catch (Exception e) {
             System.out.println("直发分润计算出错！");
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void insertProfitDirect(List<JSONObject> profitDirects,String transDate){
         for(JSONObject json:profitDirects){

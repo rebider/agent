@@ -1,6 +1,8 @@
 package com.ryx.credit.profit.service;
 
+import com.ryx.credit.common.result.AgentResult;
 import com.ryx.credit.common.util.PageInfo;
+import com.ryx.credit.pojo.admin.vo.AgentVo;
 import com.ryx.credit.profit.pojo.AgentRelate;
 import com.ryx.credit.profit.pojo.AgentRelateDetail;
 import com.ryx.credit.profit.pojo.AgentRelateExample;
@@ -25,7 +27,18 @@ public interface IAgentRelateService {
 
     AgentRelate selectById(String id);
 
-    Map<String,String> queryParentAgentByAgentId(String agentId);
+    Map<String,String> queryParentAgentByAgentId(Map<String,String> param);
 
     boolean applyAgentRelate(AgentRelate agentRelate, List<AgentRelateDetail> list, String userId, String workId);
+
+    List<AgentRelateDetail> queryDetailByBusId(String busId);
+
+    AgentResult approvalAgentRelateTask(AgentVo agentVo, String userId) throws Exception;
+
+    /**
+     * 审批流回调方法
+     * @param insid
+     * @param status
+     */
+    public void completeTaskEnterActivity(String insid, String status);
 }

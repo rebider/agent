@@ -1,8 +1,9 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class AgentRelate {
+public class AgentRelate implements Serializable {
     private String id;
 
     private String agentId;

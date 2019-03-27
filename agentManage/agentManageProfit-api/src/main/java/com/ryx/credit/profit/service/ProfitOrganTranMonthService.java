@@ -8,6 +8,8 @@ import com.ryx.credit.common.util.Page;
 import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.profit.pojo.ProfitOrganTranMonth;
 
+import java.util.Map;
+
 /**
  * 每月交易核对
  *
@@ -56,4 +58,26 @@ public interface ProfitOrganTranMonthService {
     * @Date: 2018/8/10 
     */ 
     void importData(String type);
+
+    /**
+     * 调用清结算接口 查询消费交易总额
+     * @param param
+     * @return
+     */
+    String doSettleTranAmount(Map<String,String> param);
+
+    /**
+     * 获取数据库中所有交易类型表头信息
+     * @return
+     */
+    Map<String,Object> getAllTranPlatform();
+
+    /**
+     * 调用日结分润接口 获取月结分润
+     * @param param
+     * @return
+     */
+    String doProfitNewMonth(Map<String,String> param);
+
+    Map<String,Object> getTranAmtByMonth(String tranMonth);
 }

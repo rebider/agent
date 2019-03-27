@@ -66,6 +66,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     @Autowired
     private ProfitStagingMapper profitStagingMapper;
 
+    @Autowired
+    private ProfitDeducttionDetailMapper profitDeducttionDetailMapper;
+
     private static final ExecutorService service = Executors.newFixedThreadPool(10);
 
     @Override
@@ -87,6 +90,9 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getParentAgentId())) {
             criteria.andAgentIdEqualTo(profitDeduction.getParentAgentId());
         }
+        if(StringUtils.isNotBlank(profitDeduction.getDeductionDesc())){
+            criteria.andDeductionDescEqualTo(profitDeduction.getDeductionDesc());
+        }
         if (department != null) {
             example.setInnerJoinDepartment(department.get("ORGANIZATIONCODE").toString(), department.get("ORGID").toString());
         }
@@ -97,10 +103,11 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                 list.add("04");
                 list.add("05");
                 criteria.andDeductionTypeIn(list);
-            }else if("'03','06'".equals(profitDeduction.getDeductionType())){
+            }else if("'03','06','07'".equals(profitDeduction.getDeductionType())){
                 List<String> list = new ArrayList<String>();
                 list.add("03");
                 list.add("06");
+                list.add("07");
                 criteria.andDeductionTypeIn(list);
             }else{//查询其他扣款
                 criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
@@ -147,26 +154,36 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
     }
 
     @Override
-    public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) {
+    public void batchInsertOtherDeduction(List<List<Object>> deductionist, String userId) throws ProcessException{
         if(deductionist == null || deductionist.size() == 0){
-            throw new RuntimeException("导入数据为空");
+            throw new ProcessException("导入数据为空");
         }
-        for (List<Object> list: deductionist) {
-            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
-                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                throw new RuntimeException("数据不能为空");
+        for (List<Object> list : deductionist) {
+            if (list.size() != 7){
+                throw new ProcessException("请检查文件内数据是否准确！");
             }
+            if(StringUtils.isBlank(list.get(0).toString()) ){
+                throw new ProcessException("代理商唯一码不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(1).toString()) ){
+                throw new ProcessException("代理商姓名不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(4).toString()) ){
+                throw new ProcessException("月份不能为空！");
+            }
+            if(StringUtils.isBlank(list.get(5).toString()) ){
+                throw new ProcessException("扣款类型不能为空！");
+            }if(StringUtils.isBlank(list.get(6).toString()) ){
+                throw new ProcessException("扣款金额不能为空！");
+            }
+        }
             try{
-                insertDeduction(list, userId);
+                deductionist.stream().forEach(list ->{
+                    insertDeduction(list, userId);
+                });
             }catch (Exception e){
-                throw  new RuntimeException("数据格式异常！");
+                throw new ProcessException("数据格式异常");
             }
-        }
-        /*if (deductionist != null && deductionist.size() > 0) {
-            deductionist.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(2) != null && list.get(3) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
-                insertDeduction(list, userId);
-            });
-        }*/
     }
 
 
@@ -186,7 +203,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         BigDecimal ToolNotDeductionAmt = getDeductionAmt(map,"02"); //机具扣款
         resultMap.put("ToolNotDeductionAmt",ToolNotDeductionAmt);
 
-        BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03");//其他扣款  03
+        BigDecimal otherNotDeductionAmt = getDeductionAmt(map,"03").add(getDeductionAmt(map,"07"));//其他扣款  03
         resultMap.put("otherNotDeductionAmt",otherNotDeductionAmt);
 
         BigDecimal chargeBackNotDeductionAmt = getDeductionAmt(map,"01"); //退单扣款
@@ -299,7 +316,12 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if (StringUtils.isNotBlank(profitDeduction.getAgentId())) {
             criteria.andAgentIdEqualTo(profitDeduction.getAgentId());
         }
-        if (StringUtils.isNotBlank(profitDeduction.getDeductionType())) {
+        if("03,07".equals(profitDeduction.getDeductionType())){
+            List<String> list = new ArrayList<String>();
+            list.add("03");
+            list.add("07");
+            criteria.andDeductionTypeIn(list);
+        }else if (StringUtils.isNotBlank(profitDeduction.getDeductionType())){
             criteria.andDeductionTypeEqualTo(profitDeduction.getDeductionType());
         }
         if (StringUtils.isNotBlank(profitDeduction.getDeductionDate())) {
@@ -476,7 +498,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @Author: zhaodw
      * @Date: 2018/8/21
      */
-    private List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param) {
+    public List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId((String) param.get("agentId"));
         profitDeduction.setDeductionType((String) param.get("type"));
@@ -499,8 +521,8 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      */
     private BigDecimal otherDeduction(Map<String, Object> param) {
         // 获取代理商所有其它扣款信息
-        param.put("type", DeductionType.OTHER.getType());
-        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);
+        param.put("type","03,07");
+        List<ProfitDeduction> deductionList = getProfitDeductionListByType(param);  // todo
         return getDeductionAmt(deductionList, param);
     }
 
@@ -623,7 +645,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @Author: zhaodw
      * @Date: 2018/11/20
      */
-    private void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt) {
+    public void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt) {
         ProfitSettleErrLs settleErr = new ProfitSettleErrLs();
         settleErr.setSourceId(profitDeductionTemp.getId());
         PageInfo pageInfo = profitSettleErrLsServiceImpl.getProfitSettleErrList(settleErr, null);
@@ -642,7 +664,6 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
                     break;
                 }
             }
-            ;
         }
     }
 
@@ -904,23 +925,19 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         if(datas == null || datas.size() == 0){
             throw new RuntimeException("导入数据为空");
         }
-        for (List<Object> list: datas) {
-            if(list.size()!= 7 || StringUtils.isBlank(list.get(0).toString()) || StringUtils.isBlank(list.get(1).toString()) || StringUtils.isBlank(list.get(2).toString()) ||StringUtils.isBlank(list.get(3).toString())||
-                    StringUtils.isBlank(list.get(4).toString()) || StringUtils.isBlank(list.get(5).toString()) || StringUtils.isBlank(list.get(6).toString())){
-                throw new RuntimeException("数据不能为空");
-            }
-            try{
-                insertDeduction(list, userId);
-            }catch (Exception e){
-                throw  new RuntimeException("数据格式异常！");
+        if (datas != null && datas.size() > 0) {
+            for (List<Object> list:datas) {
+                if(list != null && list.size() > 0 &&
+                        StringUtils.isNotBlank(list.get(0).toString()) && StringUtils.isNotBlank(list.get(1).toString()) &&
+                        StringUtils.isNotBlank(list.get(4).toString()) && StringUtils.isNotBlank(list.get(5).toString()) &&
+                        StringUtils.isNotBlank(list.get(6).toString())){
+                    insertCheckDeduction(list, userId);
+                }else{
+                    throw new RuntimeException(list.get(0).toString()+":存在不合理数据格式");
+                }
+
             }
         }
-
-       /* if (datas != null && datas.size() > 0) {
-            datas.stream().filter(list -> list != null && list.size() > 0 && list.get(0) != null && list.get(1) != null && list.get(4) != null && list.get(5) != null).forEach(list -> {
-                insertCheckDeduction(list, userId);
-            });
-        }*/
     }
 
 
@@ -972,6 +989,37 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
         return BigDecimal.ZERO;
     }
 
+    /**
+     * 获取机具--关联代理商扣款
+     * @param id
+     * @return
+     */
+   @Override
+    public List<Map<String,Object>> getRev1DetailById(String id){
+       ProfitDeduction profitDeduction = profitDeductionMapper.selectByPrimaryKey(id);
+       Map<String,String> map = new HashMap<String,String>();
+       map.put("id",profitDeduction.getId());
+       map.put("date",profitDeduction.getDeductionDate());
+       map.put("desc",profitDeduction.getDeductionDesc());
+       map.put("type",DeductionType.MACHINE.getType());
+       map.put("remark","%"+"代理商代扣机具款，扣款明细："+"%");
+       List<Map<String,Object>> list = profitDeductionMapper.getRev1List(map);
+        return list;
+    }
 
+    /**
+     * 获取代理商担保扣款:
+     */
+    @Override
+    public List<Map<String,Object>> getRev2DetailById(String id){
+        ProfitDetailMonth profitDetailMonth = profitDetailMonthMapper.selectByPrimaryKey(id);
+        Map<String,String> map = new HashMap<String,String>();
+        map.put("agentId",profitDetailMonth.getAgentId());
+        map.put("date",profitDetailMonth.getProfitDate());
+        map.put("type",DeductionType.MACHINE.getType());
+        map.put("remark","%" + "代理商代扣机具款，扣款明细：" + "%");
+        List<Map<String,Object>> list = profitDeductionMapper.getRev2List(map);
+        return list;
+    }
 
 }

@@ -1,9 +1,10 @@
 package com.ryx.credit.profit.pojo;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class AgentRelateDetail {
+public class AgentRelateDetail implements Serializable {
     private String id;
 
     private String relateId;

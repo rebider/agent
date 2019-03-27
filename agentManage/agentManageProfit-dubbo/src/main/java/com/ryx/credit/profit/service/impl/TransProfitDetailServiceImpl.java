@@ -4,9 +4,11 @@ package com.ryx.credit.profit.service.impl;/**
  * @Description:
  */
 
+import com.alibaba.fastjson.JSONObject;
+import com.ryx.credit.common.util.Page;
+import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.profit.dao.TransProfitDetailMapper;
-import com.ryx.credit.profit.pojo.ProfitMonth;
 import com.ryx.credit.profit.pojo.TransProfitDetail;
 import com.ryx.credit.profit.pojo.TransProfitDetailExample;
 import com.ryx.credit.profit.service.TransProfitDetailService;
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * 分润交易接口实现
@@ -53,9 +55,40 @@ public class TransProfitDetailServiceImpl implements TransProfitDetailService {
         List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(example);
         return transProfitDetails==null?Collections.EMPTY_LIST:transProfitDetails;
     }
+    @Override
+    public List<TransProfitDetail> getTransProfitDetailByBusNum(TransProfitDetail transProfitDetail) {
+        TransProfitDetailExample example = new TransProfitDetailExample();
+        TransProfitDetailExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(transProfitDetail.getBusNum())) {
+            criteria.andBusNumEqualTo(transProfitDetail.getBusNum());
+        }
+        if (StringUtils.isNotBlank(transProfitDetail.getProfitDate())) {
+            criteria.andProfitDateEqualTo(transProfitDetail.getProfitDate());
+        }
+        List<TransProfitDetail> transProfitDetails = transProfitDetailMapper.selectByExample(example);
+        return transProfitDetails==null?Collections.EMPTY_LIST:transProfitDetails;
+    }
 
     @Override
     public List<TransProfitDetail> getPosTransProfitDetailSumList(String prfitDate) {
         return transProfitDetailMapper.getPosTransProfitDetailSumList(prfitDate);
+    }
+
+    @Override
+    public PageInfo posBaseProfitList(Map<String, Object> params, PageInfo page) {
+        PageInfo pageInfo = new PageInfo();
+        Integer count = 0;
+        List<Map<String, Object>> listAll;
+        if ("1".equals(params.get("concludeChild"))) {//包含下级
+            count = transProfitDetailMapper.baseProfitLowerCount(params);
+            listAll = transProfitDetailMapper.baseProfitLowerList(params);
+        }else{
+             listAll =   transProfitDetailMapper.baseProfitList(params);
+            count = transProfitDetailMapper.baseProfitCount(params);
+        }
+        System.out.println("查询============================================" + JSONObject.toJSON(listAll));
+        pageInfo.setRows(listAll);
+        pageInfo.setTotal(count);
+        return pageInfo;
     }
 }
