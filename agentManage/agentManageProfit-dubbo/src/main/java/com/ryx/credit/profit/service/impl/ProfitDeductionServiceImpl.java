@@ -498,7 +498,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @Author: zhaodw
      * @Date: 2018/8/21
      */
-    private List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param) {
+    public List<ProfitDeduction> getProfitDeductionListByType(Map<String, Object> param) {
         ProfitDeduction profitDeduction = new ProfitDeduction();
         profitDeduction.setAgentId((String) param.get("agentId"));
         profitDeduction.setDeductionType((String) param.get("type"));
@@ -645,7 +645,7 @@ public class ProfitDeductionServiceImpl implements ProfitDeductionService {
      * @Author: zhaodw
      * @Date: 2018/11/20
      */
-    private void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt) {
+    public void updateTdDetail(ProfitDeduction profitDeductionTemp, BigDecimal realDeductionAmt) {
         ProfitSettleErrLs settleErr = new ProfitSettleErrLs();
         settleErr.setSourceId(profitDeductionTemp.getId());
         PageInfo pageInfo = profitSettleErrLsServiceImpl.getProfitSettleErrList(settleErr, null);

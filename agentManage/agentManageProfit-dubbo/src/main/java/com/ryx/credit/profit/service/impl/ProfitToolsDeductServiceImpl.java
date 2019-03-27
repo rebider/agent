@@ -286,7 +286,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                 }
 
                 try {
-                    if (Objects.equals(computType, "1")) {
+                    //if (Objects.equals(computType, "1")) {
                         insert.setAgentPid(profitMonth.getAgentId());
                         insert.setAgentId(profitMonth.getAgentId());
                         insert.setAgentName(profitMonth.getAgentName());
@@ -297,7 +297,7 @@ public class ProfitToolsDeductServiceImpl implements DeductService {
                         insert.setRemark(typename + "代理商代扣机具款，扣款明细：" + profitDeductionList.getSourceId());
                         insert.setUserId(profitDeductionList.getAgentId());
                         profitDeducttionDetailService.insertDeducttionDetail(insert);
-                    }
+                    //}
 
                     ProfitDetailMonth update = new ProfitDetailMonth();
                     update.setId((String) mergeMap.get("id"));
