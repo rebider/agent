@@ -126,4 +126,5 @@
     <dubbo:service interface="com.ryx.credit.service.order.NewOrderImportService" ref="newOrderImportService" timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.profit.IPosProfitDataService" ref="posProfitDataService"  timeout="1200000" registry="${zk.group}" />
     <dubbo:service interface="com.ryx.credit.service.order.OldCompensateService" ref="oldCompensateService"  timeout="1200000" registry="${zk.group}" />
+    <dubbo:service interface="com.ryx.credit.service.CRoleService" ref="cRoleService"  timeout="1200000" registry="${zk.group}" />
 </beans>

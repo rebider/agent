@@ -61,4 +61,18 @@
             parameterType="java.lang.String">
 		select * from c_role where name = #{name}
 	</select>
+
+    <select id="selectShiroUrl" resultType="java.lang.String">
+        select re.url from c_user u,c_user_role ur,c_role r ,c_role_resource rr,c_resource re
+        where u.id = ur.user_id
+        and ur.role_id = r.id
+        and r.id = rr.role_id
+        and rr.resource_id = re.id
+        and url is not null
+        and pid= 451143
+        and url like '/BusActRelBusType%'
+        and u.id = #{userId}
+    </select>
+
+
 </mapper>

@@ -401,7 +401,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         List<Capital> capitals = capitalMapper.selectByExample(capitalExample);
         BigDecimal sumAmt = new BigDecimal(0);
         for (Capital capital : capitals) {
-            sumAmt = sumAmt.add(capital.getcAmount());
+            if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name()))
+            sumAmt = sumAmt.add(capital.getcFqInAmount());
         }
         return sumAmt;
     }
@@ -547,6 +548,8 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentQuit.getAgentId());
         record.setAgentName(agentQuit.getAgentName());
+        record.setDataShiro(BusActRelBusType.QUIT.key);
+
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("代理商退出提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败：添加审批关系失败！");
@@ -1281,5 +1284,22 @@ public class AgentQuitServiceImpl extends AgentMergeServiceImpl implements Agent
         }
         return AgentResult.ok();
     }
+
+
+    @Override
+    public List<Capital> queryCapital(String id) {
+        List<Capital> capitals = capitalMapper.paymentQuery(id);
+        List<Capital> resultList = new ArrayList<>();
+        if (null != capitals && capitals.size() > 0) {
+            for (Capital capital : capitals) {
+                capital.setAttachmentList(attachmentMapper.accessoryQuery(capital.getId(), AttachmentRelType.Capital.name()));
+                if(!capital.getcType().equals(AgCapitalType.FUWUFEI.name())){
+                    resultList.add(capital);
+                }
+            }
+        }
+        return resultList;
+    }
+
 
 }

@@ -405,6 +405,8 @@ public class TerminalTransferServiceImpl implements TerminalTransferService {
         record.setBusType(BusActRelBusType.agentTerminal.name());
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
+        record.setDataShiro(BusActRelBusType.agentTerminal.key);
+
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
         if(null!=agent)
             record.setAgentName(agent.getAgName());

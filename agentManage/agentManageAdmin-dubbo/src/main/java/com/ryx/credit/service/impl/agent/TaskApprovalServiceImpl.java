@@ -245,6 +245,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         record.setAgentId(busActRel.getAgentId());
         record.setAgentName(busActRel.getAgentName());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setDataShiro(busActRel.getDataShiro());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("启动审批异常，添加审批关系失败{}:{}:{}", busActRel.getActivId(), busActRel.getBusId(),busActRel.getBusType());
         }
