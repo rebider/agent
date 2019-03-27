@@ -294,4 +294,15 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         List<BusActRel>  list = busActRelMapper.selectByExample(example);
         return list.size()==1?list.get(0):null;
     }
+
+
+    @Override
+    public void updateShrioBusActRel() {
+        BusActRelExample busActRelExample = new BusActRelExample();
+        List<BusActRel> busActRels = busActRelMapper.selectByExample(busActRelExample);
+        for (BusActRel busActRel : busActRels) {
+            busActRel.setDataShiro(BusActRelBusType.getNameByKey(busActRel.getBusType()));
+            busActRelMapper.updateByPrimaryKeySelective(busActRel);
+        }
+    }
 }

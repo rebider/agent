@@ -406,6 +406,7 @@
     <if test="params.subEnd != null and params.subEnd!='' " >
       and br.C_TIME <![CDATA[ <= ]]> to_date(#{params.subEnd}, 'yyyy-mm-dd hh24:mi:ss')
     </if>
+    ORDER BY br.c_time desc
   </sql>
 
   <select id="queryMyTaskCount" parameterType="map" resultType="int">
