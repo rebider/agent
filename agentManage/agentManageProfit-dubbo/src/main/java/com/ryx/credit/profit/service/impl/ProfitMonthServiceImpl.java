@@ -461,11 +461,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             long sstart = System.currentTimeMillis();
 
             // 计算前清理数据
+            LOG.info("清理月分润汇总表数据，{}月", profitDate);
             profitDetailMonthMapper.clearComputData(profitDate);
+            LOG.info("清理直发分润表数据，{}月", profitDate);
             profitDirectMapper.clearComputData(profitDate);
-            //清理扣款明细数据
+            LOG.info("清理机具扣款明细数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
-            //清理机具扣款实扣、未扣足数据
+            LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
 
 
