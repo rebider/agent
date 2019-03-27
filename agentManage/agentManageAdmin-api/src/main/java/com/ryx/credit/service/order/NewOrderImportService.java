@@ -6,11 +6,12 @@ import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.agent.ImportAgent;
 import com.ryx.credit.pojo.admin.order.OOrder;
 import com.ryx.credit.pojo.admin.order.OPayment;
-import com.ryx.credit.pojo.admin.vo.OrderImportBaseInfo;
+import com.ryx.credit.pojo.admin.vo.NewOrderImportBaseInfo;
 import java.util.List;
 
 /**
  * Created by lhl on 2019/3/5.
+ * 无SN订单解析
  */
 public interface NewOrderImportService {
 
@@ -52,22 +53,22 @@ public interface NewOrderImportService {
 
     /**
      * 解析生成订单及付款单信息
-     * @param orderImportBaseInfo
+     * @param newOrderImportBaseInfo
      * @param User
      * @return
      * @throws Exception
      */
-    public AgentResult newPareseOrderImportBaseInfo(OrderImportBaseInfo orderImportBaseInfo, String User)throws MessageException;
+    public AgentResult newPareseOrderImportBaseInfo(NewOrderImportBaseInfo newOrderImportBaseInfo, String User)throws MessageException;
 
 
     /**
      * 解析生成订单子订单，子订单活动信息
-     * @param orderImportBaseInfo
+     * @param newOrderImportBaseInfo
      * @param User
      * @return
      * @throws Exception
      */
-    public AgentResult newPareseOrderImportSubOrderInfo(OrderImportBaseInfo orderImportBaseInfo, OOrder order, OPayment oPayment, String User)throws MessageException;
+    public AgentResult newPareseOrderImportSubOrderInfo(NewOrderImportBaseInfo newOrderImportBaseInfo, OOrder order, OPayment oPayment, String User)throws MessageException;
 
 
     /**
