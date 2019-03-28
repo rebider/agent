@@ -171,12 +171,14 @@ public class OrderImportServiceImpl implements OrderImportService {
                         logger.info("======处理订单解析{}",importAgent.getDataid());
                         importAgent.setDealstatus(Status.STATUS_1.status);
                         importAgent.setDealmsg("处理中");
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         if(orderImportService.deleteFailImportAgentOrder(importAgent,user).isOK()) {
                             AgentResult agentResult = orderImportService.pareseOrder(importAgent, user);
                             importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                             importAgent.setDealstatus(Status.STATUS_2.status);
                             importAgent.setDealmsg(agentResult.getMsg());
+                            importAgent.setDealTime(new Date());
                             importAgentMapper.updateByPrimaryKeySelective(importAgent);
                             logger.info("======处理订单解析{}完成{}", importAgent.getDataid(), agentResult.getMsg());
                         }
@@ -185,6 +187,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
                         importAgent.setDealmsg(e.getMsg());
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getMsg());
                     }catch (Exception e) {
@@ -192,6 +195,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
                         importAgent.setDealmsg(e.getLocalizedMessage().substring(0,60));
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
                     }
@@ -1106,6 +1110,7 @@ public class OrderImportServiceImpl implements OrderImportService {
             orderImportReturnLogincInfo.loadInfoFromJsonArray(JSONArray.parseArray(importAgentsLogic.getDatacontent()),importAgentsLogic.getId());
             orderImportReturnLogincInfos.add(orderImportReturnLogincInfo);
             importAgentsLogic.setDealstatus(Status.STATUS_1.status);
+            importAgentsLogic.setDealTime(new Date());
             if(importAgentMapper.updateByPrimaryKeySelective(importAgentsLogic)!=1){
               logger.info("物流信息更新处理中失败，importAgentsLogic.getId()["+importAgentsLogic.getId()+"]");
               throw new MessageException("物流信息更新处理中失败，importAgentsLogic.getId()["+importAgentsLogic.getId()+"]");
@@ -1435,11 +1440,11 @@ public class OrderImportServiceImpl implements OrderImportService {
             }
         }
         //更新为处理成功
-
         for (OrderImportReturnLogincInfo orderImportReturnLogincInfo: orderImportReturnLogincInfos) {
             ImportAgent importAgent1 = importAgentMapper.selectByPrimaryKey(orderImportReturnLogincInfo.getImportId());
             importAgent1.setDealstatus(Status.STATUS_2.status);
             importAgent1.setDealmsg("处理成功");
+            importAgent1.setDealTime(new Date());
             if (importAgentMapper.updateByPrimaryKeySelective(importAgent1) != 1) {
                 logger.info("物流信息更新处理中失败，importAgentsLogic.getId()[" + importAgent1.getId() + "]");
                 throw new MessageException("物流信息更新处理中失败，importAgentsLogic.getId()[" + importAgent1.getId() + "]");
