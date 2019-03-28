@@ -1104,6 +1104,7 @@ public class OrderImportServiceImpl implements OrderImportService {
             orderImportReturnLogincInfo.loadInfoFromJsonArray(JSONArray.parseArray(importAgentsLogic.getDatacontent()),importAgentsLogic.getId());
             orderImportReturnLogincInfos.add(orderImportReturnLogincInfo);
             importAgentsLogic.setDealstatus(Status.STATUS_1.status);
+            importAgentsLogic.setDealTime(new Date());
             if(importAgentMapper.updateByPrimaryKeySelective(importAgentsLogic)!=1){
               logger.info("物流信息更新处理中失败，importAgentsLogic.getId()["+importAgentsLogic.getId()+"]");
               throw new MessageException("物流信息更新处理中失败，importAgentsLogic.getId()["+importAgentsLogic.getId()+"]");
@@ -1433,11 +1434,11 @@ public class OrderImportServiceImpl implements OrderImportService {
             }
         }
         //更新为处理成功
-
         for (OrderImportReturnLogincInfo orderImportReturnLogincInfo: orderImportReturnLogincInfos) {
             ImportAgent importAgent1 = importAgentMapper.selectByPrimaryKey(orderImportReturnLogincInfo.getImportId());
             importAgent1.setDealstatus(Status.STATUS_2.status);
             importAgent1.setDealmsg("处理成功");
+            importAgent1.setDealTime(new Date());
             if (importAgentMapper.updateByPrimaryKeySelective(importAgent1) != 1) {
                 logger.info("物流信息更新处理中失败，importAgentsLogic.getId()[" + importAgent1.getId() + "]");
                 throw new MessageException("物流信息更新处理中失败，importAgentsLogic.getId()[" + importAgent1.getId() + "]");
