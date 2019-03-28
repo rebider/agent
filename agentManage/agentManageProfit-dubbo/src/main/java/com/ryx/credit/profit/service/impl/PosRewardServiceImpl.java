@@ -171,6 +171,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         record.setBusType(BusActRelBusType.POSREWARD.name());
         record.setAgentId(posReward.getAgentId());
         record.setAgentName(posReward.getAgentName());
+        record.setDataShiro(BusActRelBusType.POSREWARD.key);
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("POS奖励审批流启动成功");
@@ -214,6 +215,7 @@ public class PosRewardServiceImpl implements IPosRewardService {
         record.setcUser(userId);
         record.setBusType(BusActRelBusType.POSHUDDLEREWARD.name());
         record.setAgentName(pPosHuddleReward.getAgentName());
+        record.setDataShiro(BusActRelBusType.POSHUDDLEREWARD.key);
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("POS奖励审批流启动成功");

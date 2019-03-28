@@ -94,6 +94,7 @@ public class PTaxAdjustServiceImpl implements IPTaxAdjustService {
         record.setBusType(BusActRelBusType.POSTAX.name());
         record.setAgentId(tax.getAgentId());
         record.setAgentName(tax.getAgentName());
+        record.setDataShiro(BusActRelBusType.POSTAX.key);
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("税点调整申请审批流启动成功");
