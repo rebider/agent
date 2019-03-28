@@ -143,6 +143,7 @@ public class AgentRelateServiceImpl implements IAgentRelateService {
         record.setBusType(BusActRelBusType.agentRelate.name());
         record.setAgentId(agentRelate.getAgentId());
         record.setAgentName(agentRelate.getAgentName());
+        record.setDataShiro(BusActRelBusType.agentRelate.key);
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("POS奖励审批流启动成功");
