@@ -519,7 +519,7 @@ public class OrderImportServiceImpl implements OrderImportService {
         //抵扣金额
         BigDecimal dikou = oPayment.getDeductionAmount()==null ?BigDecimal.ZERO:oPayment.getDeductionAmount();
         //首付实付金额
-        BigDecimal acture = shoufu==null ?BigDecimal.ZERO:(shoufu.subtract(dikou));
+        BigDecimal acture = (shoufu==null||shoufu.compareTo(BigDecimal.ZERO)==0) ?BigDecimal.ZERO:(shoufu.subtract(dikou));
 
 
         oPayment.setActualReceipt(acture);
@@ -587,7 +587,7 @@ public class OrderImportServiceImpl implements OrderImportService {
             }
         }
         //已付款余处
-        BigDecimal yifu_mingxi = yifu.subtract(shoufu);
+        BigDecimal yifu_mingxi = (shoufu==null||shoufu.compareTo(BigDecimal.ZERO)<=0)?yifu.subtract(dikou):(yifu.subtract(shoufu));
         if(yifu_mingxi.compareTo(BigDecimal.ZERO)>0){
             //生成逾出明细
             OPaymentDetail record = new OPaymentDetail();
