@@ -29,6 +29,7 @@ import com.ryx.credit.service.order.OLogisticsService;
 import com.ryx.credit.service.order.PlannerService;
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.ognl.enhance.OrderedReturn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1053,9 +1054,15 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             //业务审批时添加排单
             if (approveResult.equals(ApprovalType.PASS.getValue()) && sid.equals(refund_business1_id)) {
-                AgentResult agentResult = savePlans(agentVo, userId);
-                if (!agentResult.isOK()) {
-                    return AgentResult.fail(agentResult.getMsg());
+                try {
+                    AgentResult agentResult = savePlans(agentVo, userId);
+                    if (!agentResult.isOK()) {
+                        return AgentResult.fail(agentResult.getMsg());
+                    }
+                } catch (MessageException me){
+                   throw new ProcessException(me.getMsg());
+                }catch (Exception e){
+                    throw new ProcessException(e.getLocalizedMessage());
                 }
             }
 
@@ -1259,7 +1266,9 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 保存排单
      * @Date: 21:31 2018/8/2
      */
-    public AgentResult savePlans(AgentVo agentVo, String userid) {
+    @Override
+    @Transactional(isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED,rollbackFor = Exception.class)
+    public AgentResult savePlans(AgentVo agentVo, String userid)throws Exception {
         try {
 
             JSONArray jsonArray = JSONObject.parseArray(agentVo.getPlans());
@@ -1355,7 +1364,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
         } catch (Exception e) {
             log.error("保存退货排单失败", e);
-            return AgentResult.fail("保存退货排单失败");
+          throw new MessageException("保存退货排单失败:"+e.getLocalizedMessage());
         }
 
         return AgentResult.ok();
@@ -1367,6 +1376,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @Description: 保存打款截图
      * @Date: 21:31 2018/8/2
      */
+    @Override
     public AgentResult saveAttachments(AgentVo agentVo, String userid) {
         try {
             String[] attachments = agentVo.getAttachments();
@@ -1896,7 +1906,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
      * @param db
      * @return
      */
-    private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
+    @Override
+    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
         String [] col= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_column.code.split(",");
         String [] title= ReceiptPlanReturnExportColum.ReceiptPlanExportColum_title.code.split(",");
@@ -1990,7 +2001,7 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         }
 
 
-        List<String> idList = new OLogisticServiceImpl().idList(startSn, endSn, begins, finish,ol.getProCom());
+        List<String> idList = oLogisticsService.idList(startSn, endSn, begins, finish,ol.getProCom());
         List<OLogisticsDetail> detailList = new ArrayList<>();
         if (null != idList && idList.size() > 0) {
             for (String idSn : idList) {
@@ -2161,8 +2172,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
 
             AdjustmentMachineVo vo = new AdjustmentMachineVo();
             vo.setOptUser(userId);
-            vo.setSnStart(detailstart.getSnNum()+detailstart.getTerminalidCheck());
-            vo.setSnEnd(detailend.getSnNum()+detailend.getTerminalidCheck());
+            vo.setSnStart(detailstart.getSnNum()+(detailstart.getTerminalidCheck()==null?"":detailstart.getTerminalidCheck()));
+            vo.setSnEnd(detailend.getSnNum()+(detailend.getTerminalidCheck()==null?"":detailend.getTerminalidCheck()));
             vo.setSnNum(logistics.getSendNum().toString());
 
             //发货订单的业务编号
@@ -2221,6 +2232,14 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
                         }
                         return AgentResult.ok();
                     }
+                }catch (MessageException e) {
+                    e.printStackTrace();
+                    logistics.setSendStatus(Status.STATUS_2.status);
+                    logistics.setSendMsg(e.getMsg());
+                    if(1!=oLogisticsMapper.updateByPrimaryKeySelective(logistics)){
+                        log.info("机具退货调整首刷接口调用Exception更新数据库失败:{}",JSONObject.toJSONString(logistics));
+                    }
+                    return AgentResult.fail(e.getLocalizedMessage());
                 } catch (Exception e) {
                     e.printStackTrace();
                     logistics.setSendStatus(Status.STATUS_2.status);
@@ -2259,5 +2278,10 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
             oInvoice.setAttachments(attachments);
         }
         return oInvoices;
+    }
+
+    @Override
+    public OReturnOrder selectById(String id) {
+        return returnOrderMapper.selectByPrimaryKey(id);
     }
 }

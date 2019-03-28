@@ -396,10 +396,11 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 if(!agentResult.isOK()){
                     throw new MessageException("查询手刷失败");
                 }
+                logger.info("根据sn查询业务系统返回:"+agentResult.getData());
                 List<Map<String,Object>> data = (List<Map<String,Object>>)agentResult.getData();
                 if(data.size()!=Integer.parseInt(count)){
                     logger.info("查询手刷根据SN号段查询机具信息数量：{},count:{}",data.size(),count);
-                    throw new MessageException("请检查sn有效性");
+                    throw new MessageException("sn数量有误");
                 }
                 for (Map<String, Object> map : data) {
                     String termActiveId = String.valueOf(map.get("termActiveId"));
@@ -447,12 +448,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisMap.put("agencyName",String.valueOf(map.get("agencyName")));
                     redisService.hSet(snStart+","+snEnd,sn, JsonUtil.objectToJson(redisMap));
                 }
+                redisService.delete(snStart+","+snEnd+"_act");
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
                         .putKeyV("count",count)
+                        .putKeyV("price",oActivity.getPrice())
+                        .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity",actSet)
                         .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
@@ -465,13 +470,14 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                 if(!agentResult.isOK()){
                     throw new MessageException("查询pos失败");
                 }
+                logger.info("根据sn查询业务系统返回:"+agentResult.getMsg());
                 JSONObject jsonObject = JSONObject.parseObject(agentResult.getMsg());
                 JSONObject data = JSONObject.parseObject(String.valueOf(jsonObject.get("data")));
-                System.out.println(String.valueOf(data.get("termMachineList")));
+                logger.info(String.valueOf(data.get("termMachineList")));
                 List<Map<String,Object>> termMachineListMap = (List<Map<String,Object>>) JSONArray.parse(String.valueOf(data.get("termMachineList")));
                 if(termMachineListMap.size()!=Integer.parseInt(count)){
                     logger.info("查询pos根据SN号段查询机具信息数量：{},count:{}",termMachineListMap.size(),count);
-                    throw new MessageException("请检查sn有效性");
+                    throw new MessageException("sn数量有误");
                 }
                 for (Map<String, Object> map : termMachineListMap) {
                     String posSn = String.valueOf(map.get("posSn"));
@@ -528,17 +534,21 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisService.hSet(snStart+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
                 }
                 //号段活动存储在redis中
+                redisService.delete(snStart+","+snEnd+"_act");
                 for (OActivity activity : actSet) {
                     redisService.lpushList(snStart+","+snEnd+"_act",activity.getId());
                 }
+                OActivity oActivity = actSet.iterator().next();
                 res.putKeyV("snStart",snStart)
                         .putKeyV("snEnd",snEnd)
                         .putKeyV("count",count)
+                        .putKeyV("price",oActivity.getPrice())
+                        .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
                         .putKeyV("activity",actSet)
                         .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new MessageException(e.getMessage());
+                throw new MessageException("sn信息查询异常:"+e.getMessage());
             }
         }
         AgentResult agentResult = AgentResult.ok();

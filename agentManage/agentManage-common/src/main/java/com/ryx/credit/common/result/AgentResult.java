@@ -41,8 +41,9 @@ public class AgentResult implements Serializable{
         return new AgentResult(null);
     }
 
-    public static AgentResult ok(Map<String,Object> mapData) {
+    public static AgentResult okMap(Map<String,Object> mapData) {
         AgentResult res = new AgentResult(null);
+        res.setMapData(mapData);
         return res;
     }
 
@@ -170,7 +171,8 @@ public class AgentResult implements Serializable{
         return mapData;
     }
 
-    public void setMapData(Map<String, Object> mapData) {
+    public AgentResult setMapData(Map<String, Object> mapData) {
         this.mapData = mapData;
+        return this;
     }
 }

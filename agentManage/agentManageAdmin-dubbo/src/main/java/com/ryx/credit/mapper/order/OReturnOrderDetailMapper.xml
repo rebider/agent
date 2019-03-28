@@ -379,10 +379,10 @@
         STATUS = #{status,jdbcType=DECIMAL},
       </if>
       <if test="version != null">
-        VERSION = #{version,jdbcType=DECIMAL},
+        VERSION = VERSION + 1,
       </if>
     </set>
-    where ID = #{id,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=VARCHAR} and  VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ryx.credit.pojo.admin.order.OReturnOrderDetail">
     update O_RETURN_ORDER_DETAIL
@@ -412,8 +412,8 @@
       C_USER = #{cUser,jdbcType=VARCHAR},
       U_USER = #{uUser,jdbcType=VARCHAR},
       STATUS = #{status,jdbcType=DECIMAL},
-      VERSION = #{version,jdbcType=DECIMAL}
-    where ID = #{id,jdbcType=VARCHAR}
+      VERSION = VERSION + 1
+    where ID = #{id,jdbcType=VARCHAR} and VERSION = #{version,jdbcType=DECIMAL}
   </update>
   <sql id="OracleDialectPrefix">
     <if test="page != null">
@@ -425,4 +425,27 @@
       <![CDATA[ ) row_ ) where rownum_ > #{page.begin} and rownum_ <= #{page.end} ]]>
     </if>
   </sql>
+
+  <select id="checkSnIsReturn" parameterType="map" resultType="int">
+    select count(a.id) from O_RETURN_ORDER_DETAIL a
+    left join o_return_order b on a.return_id = b.id
+    where
+    (
+     a.begin_sn &lt;= #{begin,jdbcType=VARCHAR}
+     and a.end_sn &gt;= #{begin,jdbcType=VARCHAR}
+     and  b.ret_schedule in
+    <foreach collection="sts" item="stsItem" open="(" separator="," close=")">
+      ${stsItem}
+    </foreach>
+    )
+    or
+    (
+      a.begin_sn &lt;= #{end,jdbcType=VARCHAR}
+      and a.end_sn &gt;= #{end,jdbcType=VARCHAR}
+      and  b.ret_schedule in
+        <foreach collection="sts" item="stsItem" open="(" separator="," close=")">
+          ${stsItem}
+        </foreach>
+    )
+  </select>
 </mapper>

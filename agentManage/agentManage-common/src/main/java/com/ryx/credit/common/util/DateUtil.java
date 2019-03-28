@@ -23,11 +23,15 @@ public class DateUtil {
     public final static String DATE_FORMAT_4 = "yyyyMMddHHmmssss";
     public final static String DATE_FORMAT_yyyyMM = "yyyyMM";
 
+
     public final static SimpleDateFormat sdfDays = new SimpleDateFormat(
             "yyyyMMdd");
 
     public final static SimpleDateFormat sdf_Days = new SimpleDateFormat(
             "yyyy-MM-dd");
+
+    public final static SimpleDateFormat sdf_g_Days = new SimpleDateFormat(
+            "yyyy/MM/dd");
 
     /**
 	 * 将Date类型转换为字符串

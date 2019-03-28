@@ -3,18 +3,15 @@ package com.ryx.credit.pojo.admin.vo;
 import com.alibaba.fastjson.JSONArray;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * 作者：cx
- * 时间：2019/1/29
- * 描述：
+ * Created by lhl on 2019/3/27.
  */
-public class OrderImportBaseInfo implements Serializable {
+public class NewOrderImportBaseInfo implements Serializable {
 
-    public static  List<String> colum  = Arrays.asList(
+    public static List<String> colum  = Arrays.asList(
             "order_id",
             "order_orgid",
             "order_platform",
@@ -23,7 +20,7 @@ public class OrderImportBaseInfo implements Serializable {
             "order_paymethod","order_shoufu_amt","order_fenqi_count","order_fenqi_date","order_colcomp","order_pay_user","order_is_fp",
             "order_dk_type","order_dk_amt","order_hkr","order_hk_date","order_remark");
 
-    public void loadInfoFromJsonArray(JSONArray data,String importId){
+    public void loadInfoFromJsonArray(JSONArray data, String importId){
         if(data!=null){
             this.setOrder_id(data.getString(colum.indexOf("order_id")));
             this.setOrder_orgid(data.getString(colum.indexOf("order_orgid")));
@@ -48,7 +45,6 @@ public class OrderImportBaseInfo implements Serializable {
         this.importId=importId;
     }
 
-
     private String importId;
     public  String order_id ;
     public  String order_orgid ;
@@ -69,7 +65,7 @@ public class OrderImportBaseInfo implements Serializable {
     public  String order_hkr ;
     public  String order_hk_date ;
     public  String order_remark ;
-    public  List<OrderImportGoodsInfo> orderImportGoodsInfos;
+    public  List<NewOrderImportGoodsInfo> newOrderImportGoodsInfos;
 
     public String ox_order;
 
@@ -241,11 +237,11 @@ public class OrderImportBaseInfo implements Serializable {
         this.order_remark = order_remark;
     }
 
-    public List<OrderImportGoodsInfo> getOrderImportGoodsInfos() {
-        return orderImportGoodsInfos;
+    public List<NewOrderImportGoodsInfo> getNewOrderImportGoodsInfos() {
+        return newOrderImportGoodsInfos;
     }
 
-    public void setOrderImportGoodsInfos(List<OrderImportGoodsInfo> orderImportGoodsInfos) {
-        this.orderImportGoodsInfos = orderImportGoodsInfos;
+    public void setNewOrderImportGoodsInfos(List<NewOrderImportGoodsInfo> newOrderImportGoodsInfos) {
+        this.newOrderImportGoodsInfos = newOrderImportGoodsInfos;
     }
 }

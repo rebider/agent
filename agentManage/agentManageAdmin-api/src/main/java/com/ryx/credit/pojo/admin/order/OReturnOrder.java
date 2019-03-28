@@ -74,6 +74,8 @@ public class OReturnOrder implements Serializable {
 
     private String auditor;
 
+    private String oreturntype;
+
     public String getId() {
         return id;
     }
@@ -264,5 +266,13 @@ public class OReturnOrder implements Serializable {
 
     public void setAuditor(String auditor) {
         this.auditor = auditor == null ? null : auditor.trim();
+    }
+
+    public String getOreturntype() {
+        return oreturntype;
+    }
+
+    public void setOreturntype(String oreturntype) {
+        this.oreturntype = oreturntype == null ? null : oreturntype.trim();
     }
 }

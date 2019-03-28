@@ -13,6 +13,7 @@ import com.ryx.credit.commons.utils.StringUtils;
 import com.ryx.credit.machine.entity.ImsTermWarehouseDetail;
 import com.ryx.credit.machine.service.ImsTermWarehouseDetailService;
 import com.ryx.credit.machine.service.TermMachineService;
+import com.ryx.credit.machine.vo.AdjustmentMachineVo;
 import com.ryx.credit.machine.vo.LowerHairMachineVo;
 import com.ryx.credit.machine.vo.MposSnVo;
 import com.ryx.credit.pojo.admin.agent.AgentBusInfo;
@@ -595,7 +596,8 @@ public class OLogisticServiceImpl implements OLogisticsService {
      * @param db
      * @return
      */
-    private AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
+    @Override
+    public AgentResult checkRecordPlan(List<Object> excel,Map<String,Object> db){
         Object PLAN_NUM = db.get("PLAN_NUM");
         String [] col= ReceiptPlanExportColum.ReceiptPlanExportColum_column.code.split(",");
         String [] title= ReceiptPlanExportColum.ReceiptPlanExportColum_title.code.split(",");
@@ -1104,7 +1106,7 @@ public class OLogisticServiceImpl implements OLogisticsService {
             String sBusProCode= "";
             for (OLogisticsDetail forsendSn : listDetails) {
                 listSn.add(new MposSnVo(forsendSn.getTermBatchcode()
-                        ,forsendSn.getSnNum()+forsendSn.getTerminalidCheck()
+                        ,forsendSn.getSnNum()+(forsendSn.getTerminalidCheck()==null?"":forsendSn.getTerminalidCheck())
                         ,forsendSn.getTerminalidKey()
                         ,forsendSn.getBusProCode()
                         ,forsendSn.getTermtype()));
