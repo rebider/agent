@@ -461,11 +461,13 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             long sstart = System.currentTimeMillis();
 
             // 计算前清理数据
+            LOG.info("清理月分润汇总表数据，{}月", profitDate);
             profitDetailMonthMapper.clearComputData(profitDate);
+            LOG.info("清理直发分润表数据，{}月", profitDate);
             profitDirectMapper.clearComputData(profitDate);
-            //清理扣款明细数据
+            LOG.info("清理机具扣款明细数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeducttionDetailService.clearComputData(profitDate,DeductionType.MACHINE.getType());
-            //清理机具扣款实扣、未扣足数据
+            LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
 
 
@@ -521,15 +523,6 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             // 更新实发分润
             profitDetailMonthMapper.updateRealProfitAmt(params);
 
-            /*// 计算税点及实发分润
-            try {
-                long sstart = System.currentTimeMillis();
-                profitComputerService.new_computerTax(computType);
-                long send = System.currentTimeMillis();
-                System.out.println("实发处理时间"+(send-sstart));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
             long send = System.currentTimeMillis();
             LOG.info("执行完毕，处理共耗时：{}",(send-sstart));
             temp.clear();
@@ -1036,7 +1029,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
     }
 
     @Override
-    public PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo, ProfitDetailMonth profitDetailMonth) {
+    public PageInfo queryProfitDetailMonthList(Map<String, Object> param, PageInfo pageInfo) {
         Long count = 0L;
         List<Map<String, Object>> list;
         if ("1".equals(param.get("chekbox"))) {
