@@ -459,7 +459,24 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
                 oPayment.setCollectCompany(payComp.getId());
             }
         }
-        oPayment.setActualReceipt(oPayment.getDownPayment());
+
+        String batchcode = c.getTime().getTime()+"";
+        //总额
+        BigDecimal payAmount = oPayment.getPayAmount();
+        //已付
+        BigDecimal yifu = oPayment.getRealAmount();
+        //待付生成分期 或者生成欠款
+        BigDecimal daifu = oPayment.getOutstandingAmount();
+        //首付金额 首付生成首付明细
+        BigDecimal shoufu = oPayment.getDownPayment();
+        //抵扣类型
+        String dikou_type = oPayment.getDeductionType();
+        //抵扣金额
+        BigDecimal dikou = oPayment.getDeductionAmount()==null ?BigDecimal.ZERO:oPayment.getDeductionAmount();
+        //首付实付金额
+        BigDecimal acture = shoufu==null ?BigDecimal.ZERO:(shoufu.subtract(dikou));
+
+        oPayment.setActualReceipt(acture);
         oPayment.setActualReceiptDate(c.getTime());
         oPayment.setRemark("(老订单)");
         oPayment.setcTime(c.getTime());
@@ -473,17 +490,10 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         }
 
         //==========================================生成付款明细
-        String batchcode = c.getTime().getTime()+"";
-        //总额
-        BigDecimal payAmount = oPayment.getPayAmount();
-        //已付
-        BigDecimal yifu = oPayment.getRealAmount();
-        //待付生成分期 或者生成欠款
-        BigDecimal daifu = oPayment.getOutstandingAmount();
+
 
         //首付金额 首付生成首付明细
-        BigDecimal shoufu = oPayment.getDownPayment();
-        if(shoufu.compareTo(BigDecimal.ZERO)>0){
+        if(acture.compareTo(BigDecimal.ZERO)>0){
             OPaymentDetail record = new OPaymentDetail();
             record.setId(idService.genId(TabId.o_payment_detail));
             record.setBatchCode(batchcode);
@@ -491,8 +501,8 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
             record.setPaymentType(PamentIdType.ORDER_FKD.code);
             record.setOrderId(oPayment.getOrderId());
             record.setPayType(PaymentType.SF.code);
-            record.setPayAmount(shoufu);
-            record.setRealPayAmount(shoufu);
+            record.setPayAmount(acture);
+            record.setRealPayAmount(acture);
             record.setPlanPayTime(c.getTime());
             record.setPlanNum(BigDecimal.ZERO);
             record.setAgentId(orderFormVo.getAgentId());
@@ -511,8 +521,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         }
 
         //抵扣 抵扣生成抵扣明细
-        String dikou_type = oPayment.getDeductionType();
-        BigDecimal dikou = oPayment.getDeductionAmount();
+
         if(dikou.compareTo(BigDecimal.ZERO)>0){
             OPaymentDetail record = new OPaymentDetail();
             record.setId(idService.genId(TabId.o_payment_detail));
@@ -541,7 +550,7 @@ public class NewOrderImportServiceImpl implements NewOrderImportService{
         }
 
         //已付款余处
-        BigDecimal yifu_mingxi = yifu.subtract(shoufu).subtract(dikou);
+        BigDecimal yifu_mingxi = yifu.subtract(shoufu);
         if(yifu_mingxi.compareTo(BigDecimal.ZERO)>0){
             //生成逾出明细
             OPaymentDetail record = new OPaymentDetail();
