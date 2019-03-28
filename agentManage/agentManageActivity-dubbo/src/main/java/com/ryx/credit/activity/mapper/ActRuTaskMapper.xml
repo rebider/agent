@@ -358,20 +358,6 @@
 
   </select>
 
-  <select id="queryMyTaskPage" parameterType="map" resultType="map">
-    <include refid="OracleDialectPrefix" />
-    select
-    rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
-    br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type
-    from ACT_RU_TASK rt, A_bus_act_rel br,act_ru_identitylink ri,a_agent a
-    <where>
-      rt.EXECUTION_ID_ = br.activ_id
-      and ri.task_id_  = rt.id_
-      and br.agent_id = a.id
-      <include refid="queryMyTaskWhere" />
-    </where>
-  </select>
-
   <sql id="queryMyTaskField" >
       rt.ID_,rt.NAME_,br.ACTIV_ID, br.BUS_ID, br.BUS_TYPE, to_char(br.C_TIME, 'yyyy-mm-dd hh24:mi:ss') C_TIME,
       br.C_USER,br.ACTIV_STATUS, br.STATUS,ri.group_id_, br.agent_id,br.agent_name,br.net_in_bus_type
