@@ -171,12 +171,14 @@ public class OrderImportServiceImpl implements OrderImportService {
                         logger.info("======处理订单解析{}",importAgent.getDataid());
                         importAgent.setDealstatus(Status.STATUS_1.status);
                         importAgent.setDealmsg("处理中");
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         if(orderImportService.deleteFailImportAgentOrder(importAgent,user).isOK()) {
                             AgentResult agentResult = orderImportService.pareseOrder(importAgent, user);
                             importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                             importAgent.setDealstatus(Status.STATUS_2.status);
                             importAgent.setDealmsg(agentResult.getMsg());
+                            importAgent.setDealTime(new Date());
                             importAgentMapper.updateByPrimaryKeySelective(importAgent);
                             logger.info("======处理订单解析{}完成{}", importAgent.getDataid(), agentResult.getMsg());
                         }
@@ -185,6 +187,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
                         importAgent.setDealmsg(e.getMsg());
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getMsg());
                     }catch (Exception e) {
@@ -192,6 +195,7 @@ public class OrderImportServiceImpl implements OrderImportService {
                         importAgent = importAgentMapper.selectByPrimaryKey(importAgent.getId());
                         importAgent.setDealstatus(Status.STATUS_3.status);
                         importAgent.setDealmsg(e.getLocalizedMessage().substring(0,60));
+                        importAgent.setDealTime(new Date());
                         importAgentMapper.updateByPrimaryKeySelective(importAgent);
                         logger.info("======处理订单解析{}完成{}",importAgent.getDataid(),e.getLocalizedMessage());
                     }
