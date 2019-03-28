@@ -95,8 +95,6 @@ public enum TabId {
     A_CAPITAL_CHANGE_APPLY("ACCA%s%014d"),
     A_CAPITAL_FLOW("ACF%s%014d"),
     O_INVOICE("OI%s%014d"),
-    P_CITYAPPLICATION_DETAIL("PCD%s%015d"),
-    P_INVOICE_APPLY("PIA%s%015d"),
     P_DATA_ADJUST("PDA%s%015d");
 
 
