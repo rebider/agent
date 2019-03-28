@@ -1,5 +1,6 @@
 package com.ryx.credit.service.order;
 
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.pojo.admin.order.OPdSum;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 
 public interface IOPdSumService {
 
-   void insertOPdSum();
+   void insertOPdSum()throws MessageException;
 
 
    int updateByPrimaryKeySelective(OPdSum record);

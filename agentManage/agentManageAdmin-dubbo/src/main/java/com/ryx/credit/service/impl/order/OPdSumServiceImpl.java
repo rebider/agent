@@ -1,6 +1,7 @@
 package com.ryx.credit.service.impl.order;
 
 import com.ryx.credit.common.enumc.*;
+import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.util.ResultVO;
 import com.ryx.credit.commons.utils.BeanUtils;
@@ -45,8 +46,9 @@ public class OPdSumServiceImpl implements IOPdSumService {
     @Autowired
     OOrderMapper oOrderMapper;
 
+    @Transactional(rollbackFor = Exception.class,isolation = Isolation.DEFAULT,propagation = Propagation.REQUIRED)
     @Override
-    public void insertOPdSum() {
+    public void insertOPdSum()throws MessageException {
         String month = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE).substring(0, 7);
         Map<String, Object> mapMonth = new HashMap<>();
         mapMonth.put("month", month);
@@ -65,11 +67,12 @@ public class OPdSumServiceImpl implements IOPdSumService {
             List<Map<String, Object>> listId = oPaymentDetailMapper.getOPaymentDetailID(mapOPd);
             for (Map<String, Object> mapid : listId) {
                 String id = (String) mapid.get("ID");
-                OPaymentDetail oPaymentDetail = new OPaymentDetail();
-                oPaymentDetail.setId(id);
+                OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
                 oPaymentDetail.setoPdSumId(oPdSum.getId());
-                /*oPaymentDetail.setPaymentStatus(Status.STATUS_5.status);*/
-                oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail);
+                if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)){
+                    logger.info("分期欠款汇总更新数据失败"+agentId+":"+month+":"+oPaymentDetail.getId()+":"+oPdSum.getId());
+                    throw new MessageException("更新数据库失败"+agentId+":"+month+":"+oPaymentDetail.getId()+":"+oPdSum.getId());
+                }
             }
 
             oPdSum.setAgentid(agentId);
@@ -82,7 +85,9 @@ public class OPdSumServiceImpl implements IOPdSumService {
             /*  oPdSum.setcUser();*/
             oPdSum.setcTime(new Date());
             oPdSum.setuTime(new Date());
-            oPdSumMapper.insert(oPdSum);
+            if(1!=oPdSumMapper.insert(oPdSum)){
+                logger.info("分期欠款汇总插入数据失败"+agentId+":"+month+":"+oPdSum.getId());
+            }
 
         }
 
