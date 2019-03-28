@@ -6,6 +6,7 @@ import com.ryx.credit.common.util.PageInfo;
 import com.ryx.credit.pojo.admin.order.OProduct;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by RYX on 2018/7/13.
@@ -30,4 +31,6 @@ public interface ProductService {
     String findNameById(String id);
 
     List<OProduct> findListByProCode(String proCode);
+
+    List<Map> queryGroupByProCode(OProduct product);
 }

@@ -250,6 +250,8 @@ public class AgentQuitRefundServiceImpl implements AgentQuitRefundService {
             record.setActivStatus(AgStatus.Approving.name());
             record.setAgentId(agentQuitRefund.getAgentId());
             record.setAgentName(agentQuitRefund.getAgentName());
+            record.setDataShiro(BusActRelBusType.agentQuitRefund.key);
+
             if (1 != busActRelMapper.insertSelective(record)) {
                 logger.info("代理商退出-申请退款提交审批，启动审批异常，添加审批关系失败{}:{}", agentQuitRefund.getId(), proceId);
                 throw new MessageException("审批流启动失败：添加审批关系失败！");

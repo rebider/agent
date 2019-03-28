@@ -64,4 +64,14 @@ public enum BusActRelBusType {
         return resultMap;
     }
 
+    public static String getNameByKey(String name){
+        BusActRelBusType[] valus = BusActRelBusType.values();
+        for (BusActRelBusType busActRelBusType : valus) {
+            if(busActRelBusType.name().equals(name)){
+                return busActRelBusType.key;
+            }
+        }
+        return null;
+    }
+
 }

@@ -320,5 +320,20 @@
       ) a
   </select>
 
+  <select id="queryGroupByProCode" parameterType="map" resultType="map">
+    select max(O_product.Id) as "id" ,
+    Pro_Code as "proCode",Pro_Name  as "proName",Pro_Type  as "proType",Pro_Price  as "proPrice"
+    from O_product
+    <where>
+      O_product.Pro_Status=1 and status = 1
+      <if test="proType!=null and proType!=''"> and O_product.Pro_Type=#{proType}</if>
+      <if test="proTypes!=null"> and O_product.Pro_Type IN
+        <foreach collection="proTypes" item="proTypeitem" open="(" separator="," close=")">
+          '${proTypeitem}'
+        </foreach>
+      </if>
+    </where>
+    group by Pro_Code,Pro_Name,Pro_Type,Pro_Price
+  </select>
 
 </mapper>

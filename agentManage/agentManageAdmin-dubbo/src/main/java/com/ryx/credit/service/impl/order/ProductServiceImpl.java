@@ -277,4 +277,25 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
+
+    @Override
+    public List<Map> queryGroupByProCode(OProduct product) {
+        FastMap example = FastMap.fastFailMap();
+        if (StringUtils.isNotBlank(product.getProType())) {
+            String proTypeString = product.getProType();
+            if(proTypeString.contains(",")) {
+                String[] split = proTypeString.split(",");
+                List<String> proCodeList = new ArrayList<>();
+                for (int i = 0; i < split.length; i++) {
+                    proCodeList.add(split[i]);
+                }
+                example.putKeyV("proTypes", proCodeList);
+            }else {
+                example.putKeyV("proType", product.getProType());
+            }
+        }
+        List<Map> oProducts = productMapper.queryGroupByProCode(example);
+        return oProducts;
+    }
+
 }

@@ -383,6 +383,12 @@ public class OrderServiceImpl implements OrderService {
                 }
                 return payment;
             case "FKFQ"://打款分期
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(dateFromStr) < 0) {
+                    throw new MessageException("分期日期有误");
+                }
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new MessageException("分期期数有误");
+                }
                 List<OCashReceivablesVo> cash_FKFQ = agentVo.getoCashReceivables();
                 if (cash_FKFQ==null || cash_FKFQ.size()> 0) {
                     agentVo.setoCashReceivables(new ArrayList<>());
@@ -395,6 +401,12 @@ public class OrderServiceImpl implements OrderService {
                 payment.setActualReceipt(BigDecimal.ZERO);
                 return payment;
             case "FRFQ"://分润分期
+                if (payment.getDownPaymentDate() == null || payment.getDownPaymentDate().compareTo(dateFromStr) < 0) {
+                    throw new MessageException("分期日期有误");
+                }
+                if (payment.getDownPaymentCount() == null || payment.getDownPaymentCount().compareTo(BigDecimal.ZERO) <= 0) {
+                    throw new MessageException("分期期数有误");
+                }
                 List<OCashReceivablesVo> cash_FRFQ = agentVo.getoCashReceivables();
                 if (cash_FRFQ==null || cash_FRFQ.size()> 0) {
                     agentVo.setoCashReceivables(new ArrayList<>());
@@ -1299,6 +1311,8 @@ public class OrderServiceImpl implements OrderService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(order.getAgentId());
         record.setAgentName(agent.getAgName());
+        record.setDataShiro(BusActRelBusType.ORDER.key);
+
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("订单提交审批，启动审批异常，添加审批关系失败{}:{}", id, proce);
             throw new MessageException("审批流启动失败:添加审批关系失败");

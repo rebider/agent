@@ -930,6 +930,8 @@ public class OrderReturnServiceImpl implements IOrderReturnService {
         record.setBusType(BusActRelBusType.refund.name());
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agentId);
+        record.setDataShiro(BusActRelBusType.refund.key);
+
         Agent agent = agentMapper.selectByPrimaryKey(agentId);
         if(agent!=null)
         record.setAgentName(agent.getAgName());

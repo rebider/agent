@@ -312,6 +312,7 @@ public class OSupplementServiceImpl implements OSupplementService {
         record.setStatus(Status.STATUS_1.status);
         record.setBusType(BusActRelBusType.PkType.name());//流程关系类型是数据申请类型
         record.setActivStatus(AgStatus.Approving.name());
+        record.setDataShiro(BusActRelBusType.PkType.key);
         if (null!=oSupplement.getAgentId()){
             record.setAgentId(oSupplement.getAgentId());
             Agent agent = agentMapper.selectByPrimaryKey(oSupplement.getAgentId());

@@ -42,6 +42,8 @@
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentQuitService" id="agentQuitService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentQuitRefundService" id="agentQuitRefundService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.agent.CapitalChangeApplyService" id="capitalChangeApplyService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.OldCompensateService" id="oldCompensateService"  timeout="1200000" registry="${zk.group}" check="false"/>
+    <dubbo:reference interface="com.ryx.credit.service.CRoleService" id="cRoleService"  timeout="1200000" registry="${zk.group}" check="false"/>
 
     <dubbo:reference interface="com.ryx.credit.profit.service.IAgentRelateService" id="agentRelateService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.profit.service.IProfitCityApplicationService" id="profitCityApplicationService"  timeout="1200000" registry="${zk.group}" check="false"/>
