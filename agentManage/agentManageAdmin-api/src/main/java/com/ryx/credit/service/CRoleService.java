@@ -7,6 +7,6 @@ import java.util.Set;
  */
 public interface CRoleService {
 
-    Set<String> selectShiroUrl(Long userId);
+    Set<String> selectShiroUrl(Long userId,String pid,String url);
 
 }
