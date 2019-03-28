@@ -51,4 +51,6 @@ public interface TaskApprovalService {
     BusActRel queryBusActRel(String busId, String busType,String activStatus);
 
     List<Map<String, Object>> queryById(AgentBusInfo agentBusInfo);
+
+    void updateShrioBusActRel();
 }

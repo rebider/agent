@@ -817,6 +817,76 @@ public class BusActRelExample {
             addCriterion("NET_IN_BUS_TYPE not between", value1, value2, "netInBusType");
             return (Criteria) this;
         }
+
+        public Criteria andDataShiroIsNull() {
+            addCriterion("DATA_SHIRO is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroIsNotNull() {
+            addCriterion("DATA_SHIRO is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroEqualTo(String value) {
+            addCriterion("DATA_SHIRO =", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroNotEqualTo(String value) {
+            addCriterion("DATA_SHIRO <>", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroGreaterThan(String value) {
+            addCriterion("DATA_SHIRO >", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroGreaterThanOrEqualTo(String value) {
+            addCriterion("DATA_SHIRO >=", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroLessThan(String value) {
+            addCriterion("DATA_SHIRO <", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroLessThanOrEqualTo(String value) {
+            addCriterion("DATA_SHIRO <=", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroLike(String value) {
+            addCriterion("DATA_SHIRO like", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroNotLike(String value) {
+            addCriterion("DATA_SHIRO not like", value, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroIn(List<String> values) {
+            addCriterion("DATA_SHIRO in", values, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroNotIn(List<String> values) {
+            addCriterion("DATA_SHIRO not in", values, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroBetween(String value1, String value2) {
+            addCriterion("DATA_SHIRO between", value1, value2, "dataShiro");
+            return (Criteria) this;
+        }
+
+        public Criteria andDataShiroNotBetween(String value1, String value2) {
+            addCriterion("DATA_SHIRO not between", value1, value2, "dataShiro");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

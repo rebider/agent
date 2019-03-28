@@ -66,7 +66,7 @@ public class CompensationTaskExecutionListener implements TaskListener, Executio
                     AgentResult res = dataChange.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
                     logger.info("=========CompensationTaskExecutionListener 流程{}eventName{}res{}", delegateExecution.getProcessInstanceId(), eventName, res.getMsg());
                 }else{
-                    AgentResult res = oldCompensateService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Refuse.status);
+                    AgentResult res = oldCompensateService.compressCompensateActivity(delegateExecution.getProcessInstanceId(), AgStatus.Approved.status);
                 }
             }
         } else if ("take".equals(eventName)) {

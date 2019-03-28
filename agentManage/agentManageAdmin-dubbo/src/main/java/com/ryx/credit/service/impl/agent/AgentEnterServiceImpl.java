@@ -340,6 +340,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
             record.setActivStatus(AgStatus.Approving.name());
             record.setAgentId(agent.getId());
             record.setAgentName(agent.getAgName());
+            record.setDataShiro(BusActRelBusType.Agent.key);
+
             AgentBusInfo agentBusInfo = aginfo.get(0);
             PlatForm platForm = platFormMapper.selectByPlatFormNum(agentBusInfo.getBusPlatform());
             record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
@@ -441,6 +443,8 @@ public class AgentEnterServiceImpl implements AgentEnterService {
         record.setActivStatus(AgStatus.Approving.name());
         record.setAgentId(agent.getId());
         record.setAgentName(agent.getAgName());
+        record.setDataShiro(BusActRelBusType.Business.key);
+
         PlatForm platForm = platFormMapper.selectByPlatFormNum(abus.getBusPlatform());
         record.setNetInBusType("ACTIVITY_"+platForm.getPlatformType());
         if (1 != busActRelMapper.insertSelective(record)) {

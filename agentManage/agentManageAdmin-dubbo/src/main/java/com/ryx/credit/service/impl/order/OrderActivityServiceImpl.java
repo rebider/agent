@@ -458,7 +458,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("count",count)
                         .putKeyV("price",oActivity.getPrice())
                         .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
-                        .putKeyV("activity",actSet);
+                        .putKeyV("activity",actSet)
+                        .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("查询机具sn异常:"+e.getLocalizedMessage());
@@ -484,16 +485,16 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     String machineManufName = String.valueOf(map.get("machineManufName"));
                     String machineId = String.valueOf(map.get("machineId"));
                     String posType = String.valueOf(map.get("posType"));
-//                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
-//                    if (manufaName == null) {
-//                       throw new MessageException(machineManufName+"厂商不存在");
-//                    }
-//                     String manufaValue = manufaName.getdItemvalue();//厂商
+                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
+                    if (manufaName == null) {
+                        throw new MessageException(machineManufName+"厂商不存在");
+                    }
+                    String manufaValue = manufaName.getdItemvalue();//厂商
                     OActivityExample oActivityExample = new OActivityExample();
                     OActivityExample.Criteria activityCriteria = oActivityExample.createCriteria();
                     activityCriteria.andStatusEqualTo(Status.STATUS_1.status);
-//                    activityCriteria.andVenderEqualTo(manufaValue);
-//                    activityCriteria.andProModelEqualTo(tmsModel);
+                    activityCriteria.andVenderEqualTo(manufaValue);
+                    activityCriteria.andProModelEqualTo(tmsModel);
                     activityCriteria.andPosTypeEqualTo(posType);
                     activityCriteria.andBusProCodeEqualTo(machineId);
                     List<OActivity> oActivities = activityMapper.selectByExample(oActivityExample);
@@ -524,12 +525,12 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                     redisMap.put("machineManufName",machineManufName);
                     redisMap.put("machineId",String.valueOf(map.get("machineId")));
                     redisMap.put("posType",String.valueOf(map.get("posType")));
-//                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
-//                    if (manufaName == null) {
-//                        throw new MessageException(machineManufName + "厂商不存在");
-//                    }
-//                    String manufaValue = manufaName.getdItemvalue();//厂商
-//                    redisMap.put("manufaValue",manufaValue);
+                    Dict manufaName = dictOptionsService.findDictByName(DictGroup.ORDER.name(), DictGroup.MANUFACTURER.name(), machineManufName);
+                    if (manufaName == null) {
+                        throw new MessageException(machineManufName + "厂商不存在");
+                    }
+                    String manufaValue = manufaName.getdItemvalue();//厂商
+                    redisMap.put("manufaValue",manufaValue);
                     redisService.hSet(snStart+","+snEnd,posSn, JsonUtil.objectToJson(redisMap));
                 }
                 //号段活动存储在redis中
@@ -543,7 +544,8 @@ public class OrderActivityServiceImpl implements OrderActivityService {
                         .putKeyV("count",count)
                         .putKeyV("price",oActivity.getPrice())
                         .putKeyV("amt",oActivity.getPrice().multiply(new BigDecimal(count)))
-                        .putKeyV("activity",actSet);
+                        .putKeyV("activity",actSet)
+                        .putKeyV("modelType",modelType.getdItemvalue());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new MessageException("sn信息查询异常:"+e.getMessage());

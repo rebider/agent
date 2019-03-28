@@ -1,9 +1,6 @@
 package com.ryx.credit.service.impl.agent;
 
-import com.ryx.credit.common.enumc.AgStatus;
-import com.ryx.credit.common.enumc.ApprovalType;
-import com.ryx.credit.common.enumc.Platform;
-import com.ryx.credit.common.enumc.Status;
+import com.ryx.credit.common.enumc.*;
 import com.ryx.credit.common.exception.MessageException;
 import com.ryx.credit.common.exception.ProcessException;
 import com.ryx.credit.common.result.AgentResult;
@@ -210,6 +207,7 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         record.setAgentId(busActRel.getAgentId());
         record.setAgentName(busActRel.getAgentName());
         record.setActivStatus(AgStatus.Approving.name());
+        record.setDataShiro(busActRel.getDataShiro());
         if (1 != busActRelMapper.insertSelective(record)) {
             logger.info("启动审批异常，添加审批关系失败{}:{}:{}", busActRel.getActivId(), busActRel.getBusId(),busActRel.getBusType());
         }
@@ -257,5 +255,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
         }
         List<BusActRel>  list = busActRelMapper.selectByExample(example);
         return list.size()==1?list.get(0):null;
+    }
+
+
+    @Override
+    public void updateShrioBusActRel() {
+        BusActRelExample busActRelExample = new BusActRelExample();
+        List<BusActRel> busActRels = busActRelMapper.selectByExample(busActRelExample);
+        for (BusActRel busActRel : busActRels) {
+            busActRel.setDataShiro(BusActRelBusType.getNameByKey(busActRel.getBusType()));
+            busActRelMapper.updateByPrimaryKeySelective(busActRel);
+        }
     }
 }
