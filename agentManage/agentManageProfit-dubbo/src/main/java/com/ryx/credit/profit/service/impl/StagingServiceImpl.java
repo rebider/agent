@@ -343,10 +343,13 @@ public class StagingServiceImpl implements StagingService {
         record.setAgentName(deduction.getAgentName());
         if(("otherDeductAgent".equals(workId)&&"1".equals(bustype)) || ("otherDeductCity".equals(workId)&&"1".equals(bustype))) {
             record.setBusType(BusActRelBusType.OTHER_DEDUCTION.name());
+            record.setDataShiro(BusActRelBusType.OTHER_DEDUCTION.key);
         }else if(("otherDeductAgent".equals(workId)&&"2".equals(bustype)) || ("otherDeductCity".equals(workId)&&"2".equals(bustype))){
             record.setBusType(BusActRelBusType.ASSESS_DEDUCTION.name());
+            record.setDataShiro(BusActRelBusType.ASSESS_DEDUCTION.key);
         }else{
             record.setBusType(BusActRelBusType.STAGING.name());
+            record.setDataShiro(BusActRelBusType.STAGING.key);
         }
         record.setActivStatus(AgStatus.Approving.name());
         try {

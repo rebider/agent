@@ -87,6 +87,7 @@ public class PAgentQuitServiceImpl implements PAgentQuitService {
         record.setcTime(Calendar.getInstance().getTime());
         record.setcUser(cuser);
         record.setBusType(BusActRelBusType.QUIT.name());
+        record.setDataShiro(BusActRelBusType.QUIT.key);
         try {
             taskApprovalService.addABusActRel(record);
             logger.info("代理商退出申请审批流启动成功！");

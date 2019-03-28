@@ -128,6 +128,7 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         record.setAgentId(pCityApplicationDetail.getAgentId());
         record.setAgentName(pCityApplicationDetail.getAgentName());
         record.setBusType(BusActRelBusType.CityApplyDeduction.name());
+        record.setDataShiro(BusActRelBusType.CityApplyDeduction.key);
         try{
             taskApprovalService.addABusActRel(record);
             logger.info("其他扣款申请审批流启动成功");
@@ -311,6 +312,7 @@ public class ProfitCityApplicationServiceImpl implements IProfitCityApplicationS
         record.setAgentId(pCityApplicationDetail.getAgentId());
         record.setAgentName(pCityApplicationDetail.getAgentName());
         record.setBusType(BusActRelBusType.CityApplySupply.name());
+        record.setDataShiro(BusActRelBusType.CityApplySupply.key);
         try{
             taskApprovalService.addABusActRel(record);
             logger.info("其他补款申请审批流启动成功");

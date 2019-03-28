@@ -319,6 +319,7 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
         record.setBusType(BusActRelBusType.THAW.name());
         record.setAgentId(profitUnfreeze.getAgentId());
         record.setAgentName(profitUnfreeze.getAgentName());
+        record.setDataShiro(BusActRelBusType.THAW.key);
         try {
             taskApprovalService.addABusActRel(record);
             LOG.info("月分润解冻申请审批流启动成功");
