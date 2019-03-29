@@ -103,6 +103,7 @@ public class ToolsDeductServiceImpl implements ToolsDeductService {
         record.setBusType(BusActRelBusType.TOOLS.name());
         record.setAgentId(profitDeduction.getAgentId());
         record.setAgentName(profitDeduction.getAgentName());
+        record.setDataShiro(BusActRelBusType.TOOLS.key);
         try {
             taskApprovalService.addABusActRel(record);
             LOG.info("机具扣款调整申请审批流启动成功");
