@@ -381,6 +381,26 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
             String orgId = String.valueOf(stringObjectMap.get("ORGID"));
             //财务审批
             if(orgId.equals("222")){
+//                财务填写实际到账金额
+                for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
+                    if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
+                        if (null==capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")){
+                            logger.info("请填写实际到账金额");
+                            throw new ProcessException("请填写实际到账金额");
+                        }
+                    }
+                    Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
+                    capitalVo.setcUtime(new Date());
+                    capitalVo.setVersion(capital.getVersion());
+                    capitalVo.setcInAmount(capitalVo.getcInAmount());
+                    capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                    capitalVo.setId(capitalVo.getId());
+                    int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
+                    if(i!=1){
+                        logger.info("实际到账金额填写失败");
+                        throw new ProcessException("实际到账金额填写失败");
+                    }
+                }
                 DateChangeRequest dateChangeRequest = dateChangeRequestMapper.selectByPrimaryKey(agentVo.getAgentBusId());
                 if(null==dateChangeRequest){
                     throw new ProcessException("数据错误");
