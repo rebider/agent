@@ -122,8 +122,8 @@ public class OPdSumServiceImpl implements IOPdSumService {
                 String notDeductionAmt = (String) map.get("notDeductionAmt");//未扣足
                 String deductTime = (String) map.get("deductTime");//扣款时间
                 if (StringUtils.isBlank(detailId)) {
-                    logger.info("付款明细ID为空:{}", detailId);
-                    throw new ProcessException("付款明细ID为空");
+                    logger.info("付款汇总ID为空:{}", detailId);
+                    throw new ProcessException("付款汇总ID为空");
                 }
                 if (StringUtils.isBlank(srcId)) {
                     logger.info("付款源ID为空:{}", srcId);

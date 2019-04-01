@@ -1466,8 +1466,8 @@
         set (PAY_COMPANY) =(select cc.CLO_PAY_COMPANY from  (select distinct  aa.AGENT_ID,aa.CLO_PAY_COMPANY,
         bb.AGENT_ID  as parentAgentId from A_AGENT_BUSINFO
       aa join A_AGENT_BUSINFO bb  on aa.BUS_PARENT =bb.ID) cc
-      where cc.AGENT_ID = dd.AGENT_ID and cc.parentAgentId = dd.PARENT_AGENT_ID)where
-       dd.PROFIT_DATE =#{profitDate}
+      where cc.AGENT_ID = dd.AGENT_ID and cc.parentAgentId = dd.PARENT_AGENT_ID)
+      where dd.PROFIT_DATE =#{profitDate}
    and  exists(select 1 from A_AGENT_BUSINFO ee where ee.AGENT_ID=dd.AGENT_ID)
   </update>
 
