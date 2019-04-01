@@ -64,6 +64,9 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
     private DictOptionsService dictOptionsService;
     @Autowired
     private ApaycompService apaycompService;
+    @Autowired
+    private IUserService  iUserService;
+
 
 
     @Override
@@ -467,4 +470,30 @@ public class ApprovalFlowRecordServiceImpl implements ApprovalFlowRecordService 
         return textList;
     }
 
+
+
+    @Override
+    public List<Map<String,Object>> queryFlowByExecutionId(String executionId){
+
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        ApprovalFlowRecordExample approvalFlowRecordExample = new ApprovalFlowRecordExample();
+        ApprovalFlowRecordExample.Criteria criteria = approvalFlowRecordExample.createCriteria();
+        criteria.andStatusEqualTo(Status.STATUS_1.status);
+        criteria.andExecutionIdEqualTo(executionId);
+        List<ApprovalFlowRecord> approvalFlowRecords = approvalFlowRecordMapper.selectByExample(approvalFlowRecordExample);
+        for (ApprovalFlowRecord approvalFlowRecord : approvalFlowRecords) {
+            Map<String,Object> resultMap = new HashMap<>();
+            CUser cUser = iUserService.selectById(approvalFlowRecord.getApprovalPerson());
+            if(null!=cUser){
+                resultMap.put("approvalPerson",cUser.getName());
+            }else{
+                resultMap.put("approvalPerson","");
+            }
+            resultMap.put("createTime",DateUtil.format(approvalFlowRecord.getApprovalTime(),DateUtil.DATE_FORMAT_1));
+            resultMap.put("rs",approvalFlowRecord.getApprovalResult());
+            resultMap.put("approvalOpinion",approvalFlowRecord.getApprovalOpinion());
+            resultList.add(resultMap);
+        }
+        return resultList;
+    }
 }

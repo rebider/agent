@@ -35,4 +35,6 @@ public interface ApprovalFlowRecordService {
 
     List<Map<String, Object>> exportAgentEdit(ApprovalFlowRecord approvalFlowRecord) throws Exception;
 
+
+    List<Map<String,Object>> queryFlowByExecutionId(String executionId);
 }
