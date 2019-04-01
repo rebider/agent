@@ -69,6 +69,7 @@ public class OPdSumServiceImpl implements IOPdSumService {
                 String id = (String) mapid.get("ID");
                 OPaymentDetail oPaymentDetail = oPaymentDetailMapper.selectByPrimaryKey(id);
                 oPaymentDetail.setoPdSumId(oPdSum.getId());
+                oPaymentDetail.setPaymentStatus(PaySign.FKING.code);
                 if(1!=oPaymentDetailMapper.updateByPrimaryKeySelective(oPaymentDetail)){
                     logger.info("分期欠款汇总更新数据失败"+agentId+":"+month+":"+oPaymentDetail.getId()+":"+oPdSum.getId());
                     throw new MessageException("更新数据库失败"+agentId+":"+month+":"+oPaymentDetail.getId()+":"+oPdSum.getId());
@@ -349,10 +350,23 @@ public class OPdSumServiceImpl implements IOPdSumService {
         if (payStatus.compareTo(PaySign.FKING.code) == 0) {
             if(maps.size() > 0){
                 for (Map map  :maps) {
+
+                    //机具汇总传数据
+                    String detailId = (String) map.get("detailId");//付款汇总id
+                    String srcId = (String) map.get("srcId");//付款源id
+                    if (StringUtils.isBlank(detailId)) {
+                        logger.info("付款汇总ID为空:{}", detailId);
+                        throw new ProcessException("付款汇总ID为空");
+                    }
+                    if (StringUtils.isBlank(srcId)) {
+                        logger.info("付款源ID为空:{}", srcId);
+                        throw new ProcessException("付款源ID为空");
+                    }
+
                     OPdSum oPdSum = new OPdSum();
-                    oPdSum.setId(map.get("detailId").toString());
+                    oPdSum.setId(detailId);
                     oPdSum.setSumStatus(DeductionSumStatus.Deduction_lok.code);
-                    oPdSum.setPaySrc(map.get("srcId").toString());
+                    oPdSum.setPaySrc(srcId);
 
                     try{
                         oPdSumMapper.updateByPrimaryKeySelective(oPdSum);
@@ -361,18 +375,8 @@ public class OPdSumServiceImpl implements IOPdSumService {
                         throw new ProcessException("机具付款汇总更新数据失败");
                     }
 
-                    //机具汇总传数据
-                        String detailId = (String) map.get("detailId");//付款汇总id
-                        String srcId = (String) map.get("srcId");//付款源id
-                        if (StringUtils.isBlank(detailId)) {
-                            logger.info("付款明细ID为空:{}", detailId);
-                            throw new ProcessException("付款明细ID为空");
-                        }
-                        if (StringUtils.isBlank(srcId)) {
-                            logger.info("付款源ID为空:{}", srcId);
-                            throw new ProcessException("付款源ID为空");
-                        }
-                        //付款明细的数据
+
+                       /* //付款明细的数据
                         OPaymentDetailExample oPaymentDetailExample = new OPaymentDetailExample();
                         OPaymentDetailExample.Criteria criteria = oPaymentDetailExample.createCriteria();
                         criteria.andOPdSumIdEqualTo(detailId);
@@ -388,7 +392,7 @@ public class OPdSumServiceImpl implements IOPdSumService {
                                 logger.info("付款明细更新数据失败");
                                 throw new ProcessException("付款明细更新数据失败");
                             }
-                        }
+                        }*/
 
                 }
 
