@@ -378,9 +378,9 @@ public class DataChangeActivityServiceImpl implements DataChangeActivityService 
                 throw new ProcessException("部门参数为空");
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
             //财务审批
-            if(orgId.equals("222")){
+            if(orgCode.equals("finance")){
 //                财务填写实际到账金额
                 for (CapitalVo  capitalVo:agentVo.getCapitalVoList()){
                     if (capitalVo.getcPayType().equals(PayType.YHHK.code)){
