@@ -109,30 +109,30 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                 throw new ProcessException("部门参数为空");
             }
             Map<String, Object> stringObjectMap = orgCodeRes.get(0);
-            String orgId = String.valueOf(stringObjectMap.get("ORGID"));
+            String orgCode = String.valueOf(stringObjectMap.get("ORGANIZATIONCODE"));
             //财务审批
-            if(orgId.equals("222")){
-            for (CapitalVo capitalVo : agentVo.getCapitalVoList()) {
-                if (capitalVo.getcPayType().equals(PayType.YHHK.code)) {
-                    if (null == capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")) {
-                        logger.info("请填写实际到账金额");
-                        throw new ProcessException("请填写实际到账金额");
-                    }
+            if(orgCode.equals("finance")){
+                for (CapitalVo capitalVo : agentVo.getCapitalVoList()) {
+                    if (capitalVo.getcPayType().equals(PayType.YHHK.code)) {
+                        if (null == capitalVo.getcInAmount() || capitalVo.getcInAmount().equals("")) {
+                            logger.info("请填写实际到账金额");
+                            throw new ProcessException("请填写实际到账金额");
+                        }
 
-                }
-                Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
-                capitalVo.setcUtime(new Date());
-                capitalVo.setVersion(capital.getVersion());
-                capitalVo.setcInAmount(capitalVo.getcInAmount());
-                capitalVo.setcFqInAmount(capitalVo.getcInAmount());
-                capitalVo.setId(capitalVo.getId());
-                int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
-                if (i != 1) {
-                    logger.info("实际到账金额填写失败");
-                    throw new ProcessException("实际到账金额填写失败");
+                    }
+                    Capital capital = capitalMapper.selectByPrimaryKey(capitalVo.getId());
+                    capitalVo.setcUtime(new Date());
+                    capitalVo.setVersion(capital.getVersion());
+                    capitalVo.setcInAmount(capitalVo.getcInAmount());
+                    capitalVo.setcFqInAmount(capitalVo.getcInAmount());
+                    capitalVo.setId(capitalVo.getId());
+                    int i = capitalMapper.updateByPrimaryKeySelective(capitalVo);
+                    if (i != 1) {
+                        logger.info("实际到账金额填写失败");
+                        throw new ProcessException("实际到账金额填写失败");
+                    }
                 }
             }
-        }
 
             //处理财务修改
             for (AgentColinfoRel agentColinfoRel : agentVo.getAgentColinfoRelList()) {
@@ -165,23 +165,16 @@ public class TaskApprovalServiceImpl implements TaskApprovalService {
                     throw new ProcessException("更新打款公司或业务所属上级异常");
                 }
             }
-            //处理业务修改
-            for (AgentBusInfoVo agentBusInfoVo : agentVo.getBusInfoVoList()) {
-                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
-                //上级不为空判断是否与上级打款公司一致 fixme 一个代理商下的业务平台的打款公司必须是一样
-//                if(StringUtils.isNotBlank(agentBusInfo.getBusParent())){
-//                    AgentBusInfo parentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfo.getBusParent());
-//                    if(!agentBusInfoVo.getCloPayCompany().equals(parentBusInfo.getCloPayCompany())){
-//                        throw new ProcessException(Platform.getContentByValue(agentBusInfo.getBusPlatform())+"上级打款公司不一致");
-//                    }
-//                }
 
+            if(orgCode.equals("business"))
+            for (AgentBusInfoVo agentBusInfoVo : agentVo.getEditDebitList()) {
+                AgentBusInfo agentBusInfo = agentBusInfoMapper.selectByPrimaryKey(agentBusInfoVo.getId());
                 agentBusInfoVo.setId(agentBusInfoVo.getId());
                 agentBusInfoVo.setVersion(agentBusInfo.getVersion());
                 agentBusInfoVo.setcUtime(new Date());
                 int i = agentBusInfoMapper.updateByPrimaryKeySelective(agentBusInfoVo);
                 if(i!=1){
-                    throw new ProcessException("更新打款公司或业务所属上级异常");
+                    throw new ProcessException("更新借记费率等信息失败");
                 }
             }
         }
