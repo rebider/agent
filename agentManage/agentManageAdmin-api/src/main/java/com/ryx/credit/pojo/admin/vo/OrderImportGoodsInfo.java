@@ -21,17 +21,17 @@ public class OrderImportGoodsInfo implements Serializable {
 
     public void loadInfoFromJsonArray(JSONArray data,String importId){
         if(data!=null){
-            this.setOrder_id(data.getString(colum.indexOf("order_id")));
-            this.setOrder_orgid(data.getString(colum.indexOf("order_orgid")));
-            this.setOrder_platform(data.getString(colum.indexOf("order_platform")));
-            this.setOrder_agname(data.getString(colum.indexOf("order_agname")));
-            this.setGoodsCode(data.getString(colum.indexOf("goodsCode")));
-            this.setGoodsName(data.getString(colum.indexOf("goodsName")));
-            this.setGoodsNum(data.getString(colum.indexOf("goodsNum")));
-            this.setGoodsRemark(data.getString(colum.indexOf("goodsRemark")));
-            this.setActId(data.getString(colum.indexOf("actId")));
-            this.setActCode(data.getString(colum.indexOf("actCode")));
-            this.setActName(data.getString(colum.indexOf("actName")));
+            this.setOrder_id((colum.indexOf("order_id")<data.size())?data.getString(colum.indexOf("order_id")):"");
+            this.setOrder_orgid((colum.indexOf("order_orgid")<data.size())?data.getString(colum.indexOf("order_orgid")):"");
+            this.setOrder_platform((colum.indexOf("order_platform")<data.size())?data.getString(colum.indexOf("order_platform")):"");
+            this.setOrder_agname((colum.indexOf("order_agname")<data.size())?data.getString(colum.indexOf("order_agname")):"");
+            this.setGoodsCode((colum.indexOf("goodsCode")<data.size())?data.getString(colum.indexOf("goodsCode")):"");
+            this.setGoodsName((colum.indexOf("goodsName")<data.size())?data.getString(colum.indexOf("goodsName")):"");
+            this.setGoodsNum((colum.indexOf("goodsNum")<data.size())?data.getString(colum.indexOf("goodsNum")):"");
+            this.setGoodsRemark((colum.indexOf("goodsRemark")<data.size())?data.getString(colum.indexOf("goodsRemark")):"");
+            this.setActId((colum.indexOf("actId")<data.size())?data.getString(colum.indexOf("actId")):"");
+            this.setActCode((colum.indexOf("actCode")<data.size())?data.getString(colum.indexOf("actCode")):"");
+            this.setActName((colum.indexOf("actName")<data.size())?data.getString(colum.indexOf("actName")):"");
         }
         this.importId=importId;
     }
