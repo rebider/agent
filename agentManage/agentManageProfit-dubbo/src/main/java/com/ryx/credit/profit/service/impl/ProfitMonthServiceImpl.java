@@ -471,8 +471,8 @@ public class ProfitMonthServiceImpl implements ProfitMonthService {
             LOG.info("清理机具扣款实扣、未扣足数据，{}月，{}", profitDate,DeductionType.MACHINE.getType());
             profitDeductionMapper.clearComputData(profitDate,DeductionType.MACHINE.getType());
 
-
-
+            //更新代理商打款公司
+            profitDetailMonthMapper.updateAgentPayCompany(profitDate);
 
             //更新代理商税点
             LOG.info("更新代理商税点开始，{}月", profitDate);

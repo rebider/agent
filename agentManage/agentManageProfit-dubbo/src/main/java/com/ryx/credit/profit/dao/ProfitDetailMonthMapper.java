@@ -133,4 +133,6 @@ public interface ProfitDetailMonthMapper {
 
     ProfitDetailMonth selectByIdAndMonth(ProfitDetailMonth record);
 
+    void updateAgentPayCompany(@Param("profitDate")String profitDate);
+
 }
