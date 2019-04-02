@@ -472,7 +472,9 @@ public class OrderImportServiceImpl implements OrderImportService {
             }
         }
         //抵扣金额
-        oPayment.setDeductionAmount(orderImportBaseInfo.getOrder_dk_amt()!=null?new BigDecimal(orderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
+        oPayment.setDeductionAmount(
+                StringUtils.isNotBlank(
+                        orderImportBaseInfo.getOrder_dk_amt())?new BigDecimal(orderImportBaseInfo.getOrder_dk_amt()):BigDecimal.ZERO);
         //首付金额
         if(StringUtils.isNotBlank(orderImportBaseInfo.getOrder_shoufu_amt())) {
             oPayment.setDownPayment(
