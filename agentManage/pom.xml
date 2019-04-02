@@ -21,6 +21,7 @@
         <module>agentManageProfit-dubbo</module>
         <module>agentManageMachine-api</module>
         <module>agentManageMachine-dubbo</module>
+        <module>agentManagejob</module>
     </modules>
     <properties>
         <spring.version>4.3.7.RELEASE</spring.version>

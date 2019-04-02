@@ -592,6 +592,10 @@ public class AimportServiceImpl implements AimportService {
                                 .andAgentIdEqualTo(busItem.getAgentId())
                                 .andBusPlatformEqualTo(busItem.getBusPlatform())
                                 .andStatusEqualTo(Status.STATUS_1.status);
+                        agentBusInfoExample.or()
+                                .andAgentIdEqualTo(busItem.getAgentId())
+                                .andBusPlatformEqualTo(busItem.getBusNum())
+                                .andStatusEqualTo(Status.STATUS_1.status);
                         List<AgentBusInfo> agentBusInfoExamplelist = agentBusInfoMapper.selectByExample(agentBusInfoExample);
 
                         if(agentBusInfoExamplelist.size()>0) {
