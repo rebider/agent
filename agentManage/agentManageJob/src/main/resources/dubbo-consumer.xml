@@ -17,4 +17,6 @@
      <dubbo:protocol name="dubbo" port="20880"/> -->
     <dubbo:consumer check="false" timeout="1200000" />
     <dubbo:reference interface="com.ryx.credit.service.agent.AgentService" id="agentService"  timeout="1200000" registry="myGroup"/>
-    </beans>
+    <dubbo:reference interface="com.ryx.credit.service.order.OrderService" id="orderService"  timeout="1200000" registry="myGroup"/>
+    <dubbo:reference interface="com.ryx.credit.service.order.IOPdSumService" id="OPdSumService"  timeout="1200000" registry="myGroup"/>
+</beans>
