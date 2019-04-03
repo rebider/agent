@@ -1462,13 +1462,27 @@
   </update>
 
   <update id="updateAgentPayCompany" parameterType="java.lang.String">
-  update P_PROFIT_DETAIL_M dd
+
+
+update P_PROFIT_DETAIL_M dd
+        set (PAY_COMPANY) =(select distinct cc.CLO_PAY_COMPANY from  (select distinct  aa.AGENT_ID,aa.CLO_PAY_COMPANY,
+           bb.AGENT_ID  as parentAgentId from A_AGENT_BUSINFO
+      aa left join A_AGENT_BUSINFO bb  on aa.BUS_PARENT =bb.ID) cc
+       where cc.AGENT_ID = dd.AGENT_ID and dd.PROFIT_DATE =#{profitDate} and cc.CLO_PAY_COMPANY is not null and (cc.parentAgentId = dd.PARENT_AGENT_ID or cc.parentAgentId is null))
+       where
+
+       exists(select 1 from A_AGENT_BUSINFO ee where ee.AGENT_ID=dd.AGENT_ID)
+
+
+
+
+/*  update P_PROFIT_DETAIL_M dd
         set (PAY_COMPANY) =(select cc.CLO_PAY_COMPANY from  (select distinct  aa.AGENT_ID,aa.CLO_PAY_COMPANY,
         bb.AGENT_ID  as parentAgentId from A_AGENT_BUSINFO
       aa join A_AGENT_BUSINFO bb  on aa.BUS_PARENT =bb.ID) cc
       where cc.AGENT_ID = dd.AGENT_ID and cc.parentAgentId = dd.PARENT_AGENT_ID)
       where dd.PROFIT_DATE =#{profitDate}
-   and  exists(select 1 from A_AGENT_BUSINFO ee where ee.AGENT_ID=dd.AGENT_ID)
+   and  exists(select 1 from A_AGENT_BUSINFO ee where ee.AGENT_ID=dd.AGENT_ID)*/
   </update>
 
   <update id="updateMonthProfitFozzen" parameterType="java.lang.String">
