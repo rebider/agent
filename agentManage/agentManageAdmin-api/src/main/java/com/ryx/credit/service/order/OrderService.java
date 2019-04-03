@@ -226,5 +226,10 @@ public interface OrderService {
     AgentResult insertSelectiveCashSummaryMouth(CashSummaryMouth cashSummaryMouth);
 
 
+    /**
+     *
+     */
+    public void CashSummaryMouth();
+
     void testRepeatableRead();
 }
