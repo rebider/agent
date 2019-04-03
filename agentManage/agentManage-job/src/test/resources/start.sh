@@ -1,2 +1,2 @@
-java -Xms800m -Xmx800m -XX:PermSize=256m -XX:MaxPermSize=512m -XX:MaxNewSize=512m -jar agentManagejob.jar >/dev/null 2>&1 &
-tail -f /home/ryx/agentManager-job-dubbo/agentManager-job-debug.log
+java -Xms512m -Xmx1024m -XX:PermSize=128m -XX:MaxPermSize=512m -jar agentManageJob.jar >/dev/null 2>&1 &
+tail -f /home/tomcat/agentManager-job/agentManager-job-info.log
