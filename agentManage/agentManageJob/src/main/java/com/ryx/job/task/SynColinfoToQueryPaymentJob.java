@@ -2,7 +2,7 @@ package com.ryx.job.task;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
-import com.ryx.credit.service.order.OrderService;
+import com.ryx.credit.service.agent.ColinfoTaskService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,29 +11,23 @@ import org.springframework.stereotype.Service;
 /**
  * 作者：cx
  * 时间：2019/4/3
- * 描述： 代理商月度打款金额开票不开票信息统计
+ * 描述：定时查询交易 0 0/30 * * * ?
  */
-@Service("cashSummaryMouthDataJob")
-public class CashSummaryMouthDataJob  implements SimpleJob {
+@Service("synColinfoToQueryPaymentJob")
+public class SynColinfoToQueryPaymentJob   implements SimpleJob {
 
-    private static Logger logger = LoggerFactory.getLogger(CashSummaryMouthDataJob.class);
+    private static Logger logger = LoggerFactory.getLogger(SynColinfoToPaymentJob.class);
     @Autowired
-    private OrderService orderService;
-
-    /**
-     * 每月1号的0点十分
-     * @param shardingContext
-     */
+    private ColinfoTaskService colinfoTaskService;
     @Override
     public void execute(ShardingContext shardingContext) {
         try {
             logger.info("======job:{}，开始",shardingContext.getJobName());
-            orderService.CashSummaryMouth();
+            colinfoTaskService.synColinfoToQueryPayment();
             logger.info("======job:{}，结束",shardingContext.getJobName());
-        } catch (Exception e) {
+        } catch (Exception e){
             e.printStackTrace();
-            logger.error("Job:"+shardingContext.getJobName()+",出错",e);
-
+            logger.error("======Job:"+shardingContext.getJobName()+",出错",e);
         }
 
     }

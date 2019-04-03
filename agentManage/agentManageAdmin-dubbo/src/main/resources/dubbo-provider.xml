@@ -63,6 +63,8 @@
     <dubbo:service interface="com.ryx.credit.service.agent.AgentQuitRefundService" ref="agentQuitRefundService" timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.CapitalChangeApplyService" ref="capitalChangeApplyService" timeout="1200000" registry="${zk.group}"/>
     <dubbo:service interface="com.ryx.credit.service.agent.CapitalFlowService" ref="capitalFlowService" timeout="1200000" registry="${zk.group}"/>
+    <dubbo:service interface="com.ryx.credit.service.agent.ColinfoTaskService" ref="colinfoTaskService" timeout="1200000" registry="${zk.group}"/>
+
 
     <dubbo:reference interface="com.ryx.credit.service.ActivityService" id="activityService"  timeout="1200000" registry="${zk.group}" check="false"/>
     <dubbo:reference interface="com.ryx.credit.service.ActUtilService" id="actUtilService"  timeout="1200000" registry="${zk.group}" check="false" />

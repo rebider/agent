@@ -17,18 +17,19 @@ import org.springframework.stereotype.Service;
 @Service("agentLoginAccountCreateJob")
 public class AgentLoginAccountCreateJob implements SimpleJob {
 
-    private Logger logger = LoggerFactory.getLogger(AgentLoginAccountCreateJob.class);
+    private static Logger logger = LoggerFactory.getLogger(AgentLoginAccountCreateJob.class);
     @Autowired
     private AgentService agentService;
 
     @Override
     public void execute(ShardingContext shardingContext) {
         try {
+            logger.info("======job:{}，开始",shardingContext.getJobName());
             AgentResult agentResult = agentService.createAgentAccount();
-            logger.info("任务：{},执行结果:{}",shardingContext.getJobName(),agentResult.getMsg());
+            logger.info("======job:{}，结束:{}",shardingContext.getJobName(),agentResult.getMsg());
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("AgentLoginAccountCreateTask异常：",e);
+            logger.error("Job:"+shardingContext.getJobName()+",出错",e);
         }
     }
 }

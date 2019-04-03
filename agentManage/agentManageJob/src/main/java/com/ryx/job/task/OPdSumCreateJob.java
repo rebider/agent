@@ -14,12 +14,12 @@ import java.util.Calendar;
 /**
  * 作者：cx
  * 时间：2019/4/3
- * 描述：
+ * 描述：分润抵扣机具欠款分期汇总
  */
 @Service("oPdSumCreateJob")
 public class OPdSumCreateJob   implements SimpleJob {
 
-    private Logger logger = LoggerFactory.getLogger(OPdSumCreateJob.class);
+    private static Logger logger = LoggerFactory.getLogger(OPdSumCreateJob.class);
     @Autowired
     IOPdSumService oPdSumService;
 
@@ -29,6 +29,7 @@ public class OPdSumCreateJob   implements SimpleJob {
      */
     @Override
     public void execute(ShardingContext shardingContext) {
+        logger.info("======job:{}，开始",shardingContext.getJobName());
         logger.info("======分润抵扣机具欠款分期汇总开始任务执行======");
         Calendar c = Calendar.getInstance();
         c.set(Calendar.MONTH, +1);
@@ -39,7 +40,10 @@ public class OPdSumCreateJob   implements SimpleJob {
             logger.info("======分润抵扣机具欠款分期汇总完成");
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("======分润抵扣机具欠款分期汇总异常",e);
+            logger.error("Job:"+shardingContext.getJobName()+",出错",e);
+        }finally {
+            logger.info("======job:{}，结束",shardingContext.getJobName());
         }
+
     }
 }
